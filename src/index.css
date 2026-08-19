@@ -1,0 +1,195 @@
+@import "tailwindcss";
+@variant dark (&:is(.dark &));
+
+body {
+  background: #e5e9ee;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === Carta (Plantilla Mantenimiento) === */
+:root {
+  --azul: #1e3a5f;
+  --azul-claro: #4a7ba6;
+  --gris-borde: #94a3b8;
+  --gris-texto: #334155;
+  --gris-suave: #64748b;
+  --fondo-tabla: #eef3f8;
+}
+
+* { box-sizing: border-box; }
+
+.hoja {
+  max-width: 850px;
+  margin: 0 auto 24px auto;
+  background: #fff;
+  padding: 34px 40px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--gris-texto);
+  font-family: "Calibri", "Segoe UI", Arial, sans-serif;
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--azul);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.logo-box { display: flex; align-items: center; gap: 12px; }
+.logo-box img { height: 62px; width: auto; }
+
+.folio-box {
+  text-align: center;
+  border: 1px solid var(--gris-borde);
+  border-radius: 4px;
+  padding: 4px 12px;
+  min-width: 120px;
+}
+.folio-box .etiqueta {
+  font-size: 9px;
+  color: var(--gris-suave);
+  letter-spacing: 0.5px;
+}
+.folio-box > div:last-child {
+  font-weight: 700;
+  color: var(--azul);
+  font-size: 13px;
+}
+
+.titulo-box { text-align: center; flex: 1; }
+.titulo-box h1 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--azul);
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+.titulo-box h2 {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--gris-suave);
+}
+
+.meta {
+  display: flex;
+  gap: 24px;
+  background: var(--fondo-tabla);
+  border-radius: 4px;
+  padding: 8px 14px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  flex-wrap: wrap;
+}
+.meta div { display: flex; gap: 6px; }
+.meta label { font-weight: 700; color: var(--azul); }
+
+.parrafo { text-align: justify; margin: 0 0 12px 0; }
+.parrafo strong { color: var(--azul); }
+
+ul.compromisos {
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+}
+ul.compromisos li { margin-bottom: 4px; }
+
+.subtitulo {
+  font-weight: 700;
+  color: var(--azul);
+  margin: 0 0 6px 0;
+  font-size: 13.5px;
+}
+
+table.recurso {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 11.5px;
+}
+table.recurso th {
+  background: var(--azul);
+  color: #fff;
+  padding: 6px;
+  text-align: left;
+  font-weight: 600;
+}
+table.recurso td {
+  border: 1px solid var(--gris-borde);
+  padding: 6px;
+  vertical-align: top;
+}
+table.recurso tr:nth-child(even) td { background: var(--fondo-tabla); }
+
+.seguimiento {
+  border: 1px solid var(--gris-borde);
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin: 10px 0 14px 0;
+}
+.seguimiento h3 {
+  margin: 0 0 8px 0;
+  font-size: 12.5px;
+  color: var(--azul);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.seguimiento .meta {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 8px;
+}
+.seguimiento .linea-completa { font-size: 12.5px; }
+.seguimiento .linea-completa label { font-weight: 700; color: var(--azul); }
+
+.campo {
+  border-bottom: 1px dotted var(--gris-borde);
+  display: inline-block;
+  min-width: 160px;
+  padding: 0 2px;
+}
+
+.nota {
+  background: var(--fondo-tabla);
+  border-left: 4px solid var(--azul-claro);
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-bottom: 22px;
+}
+.nota strong { color: var(--azul); }
+
+.firmas {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 34px;
+  gap: 40px;
+}
+.firma { text-align: center; flex: 1; }
+.firma .linea {
+  border-top: 1px solid var(--gris-texto);
+  padding-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* === Print === */
+@media print {
+  body { background: #fff; padding: 0; }
+  .no-print, .no-print * { display: none !important; }
+  .print-area { padding: 0 !important; margin: 0 !important; background: #fff !important; }
+  .hoja {
+    box-shadow: none !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    padding: 24px !important;
+  }
+}
+
+@page {
+  size: letter;
+  margin: 12mm;
+}
