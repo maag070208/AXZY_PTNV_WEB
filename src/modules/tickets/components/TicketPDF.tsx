@@ -6,40 +6,29 @@ import {
   View,
 } from "@react-pdf/renderer";
 import type { Ticket } from "@core/api/tickets.api";
-import { CommonHeader, CommonFooter, commonStyles } from "@modules/shared/components/pdf/CommonPDF";
 
 interface Props {
   ticket: Ticket;
-  pageNumber?: number;
-  totalPages?: number;
 }
 
-const NAVY = "#1e3a5f";
-const WHITE = "#ffffff";
-const SLATE = "#64748b";
-const SLATE_LIGHT = "#94a3b8";
+const BRAND = "#0f172a";
+const ACCENT = "#2563eb";
+const MUTED = "#64748b";
+const LIGHT = "#f1f5f9";
 const BORDER = "#e2e8f0";
-const LIGHT = "#f8fafc";
-const DARK_TEXT = "#1e293b";
-const MID_TEXT = "#475569";
+const WHITE = "#ffffff";
 
 const STATUS_COLORS: Record<string, string> = {
-  ABIERTO: "#d97706",
-  EN_SEGUIMIENTO: "#2563eb",
-  CERRADO: "#16a34a",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  ABIERTO: "Abierto",
-  EN_SEGUIMIENTO: "En seguimiento",
-  CERRADO: "Cerrado",
+  ABIERTO: "#f59e0b",
+  EN_SEGUIMIENTO: "#3b82f6",
+  CERRADO: "#22c55e",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  BAJA: "#64748b",
-  MEDIA: "#d97706",
-  ALTA: "#dc2626",
-  URGENTE: "#991b1b",
+  BAJA: "#94a3b8",
+  MEDIA: "#f59e0b",
+  ALTA: "#ef4444",
+  URGENTE: "#dc2626",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -49,258 +38,115 @@ const CATEGORY_LABELS: Record<string, string> = {
   OTRO: "Otro",
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  ABIERTO: "Abierto",
+  EN_SEGUIMIENTO: "En seguimiento",
+  CERRADO: "Cerrado",
+};
+
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: WHITE,
+    paddingTop: 36,
+    paddingBottom: 30,
+    paddingLeft: 40,
+    paddingRight: 40,
+    fontSize: 9,
     fontFamily: "Helvetica",
-  },
-  pageContent: {
-    padding: 0,
-  },
-
-  /* ── Status Banner ── */
-  statusBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    backgroundColor: LIGHT,
-    borderBottomWidth: 1,
-    borderBottomColor: BORDER,
-  },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginRight: 16,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 6,
-  },
-  statusText: {
-    fontSize: 9,
-    fontFamily: "Helvetica-Bold",
-    color: WHITE,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  priorityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 3,
-  },
-  priorityText: {
-    fontSize: 8,
-    fontFamily: "Helvetica-Bold",
-    color: WHITE,
-    textTransform: "uppercase",
-  },
-  categoryBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 3,
-    backgroundColor: NAVY,
-  },
-  categoryText: {
-    fontSize: 8,
-    fontFamily: "Helvetica-Bold",
-    color: WHITE,
-    textTransform: "uppercase",
-  },
-  statusMeta: {
-    flexDirection: "row",
-    gap: 20,
-    marginLeft: "auto",
-  },
-  statusMetaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  statusMetaLabel: {
-    fontSize: 8,
-    color: SLATE,
-  },
-  statusMetaValue: {
-    fontSize: 9,
-    fontFamily: "Helvetica-Bold",
-    color: DARK_TEXT,
+    color: "#1e293b",
+    backgroundColor: "#fff",
   },
 
-  /* ── Body ── */
-  body: {
-    paddingHorizontal: 40,
-    paddingTop: 28,
-    paddingBottom: 60,
-  },
-
-  /* ── KPI Cards ── */
-  kpiRow: {
+  header: {
     flexDirection: "row",
-    gap: 12,
-    marginBottom: 24,
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 20,
+    paddingBottom: 14,
+    borderBottomWidth: 2,
+    borderBottomColor: ACCENT,
+    borderBottomStyle: "solid",
   },
-  kpiCard: {
-    flex: 1,
-    backgroundColor: LIGHT,
-    borderRadius: 8,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: BORDER,
-    borderLeftWidth: 3,
-    borderLeftColor: "#c9a84c",
+  headerRight: {
+    alignItems: "flex-end",
   },
-  kpiLabel: {
-    fontSize: 7,
-    color: SLATE,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
+  headerTitle: {
+    fontSize: 16,
+    fontFamily: "Helvetica-Bold",
+    color: BRAND,
     marginBottom: 4,
   },
-  kpiValue: {
-    fontSize: 14,
-    fontFamily: "Helvetica-Bold",
-    color: DARK_TEXT,
+  headerSubtitle: {
+    fontSize: 9,
+    color: MUTED,
   },
-  kpiSub: {
+  headerDate: {
     fontSize: 8,
-    color: SLATE,
-    marginTop: 2,
+    color: MUTED,
+    textAlign: "right",
+    marginTop: 4,
+  },
+  badge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 3,
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: "#fff",
+    overflow: "hidden",
   },
 
-  /* ── Efficacy ── */
-  efficacySection: {
-    marginBottom: 24,
+  metaRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 16,
   },
-  efficacyCard: {
+  metaCard: {
+    flex: 1,
     backgroundColor: LIGHT,
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: 6,
+    padding: 8,
     borderWidth: 1,
     borderColor: BORDER,
   },
-  efficacyHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  efficacyTitle: {
-    fontSize: 9,
+  metaLabel: {
+    fontSize: 7,
     fontFamily: "Helvetica-Bold",
-    color: DARK_TEXT,
+    color: MUTED,
     textTransform: "uppercase",
     letterSpacing: 0.5,
+    marginBottom: 3,
   },
-  efficacyScore: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 4,
-  },
-  efficacyNumber: {
-    fontSize: 22,
-    fontFamily: "Helvetica-Bold",
-  },
-  efficacyLabel: {
+  metaValue: {
     fontSize: 10,
-  },
-  efficacyBarBg: {
-    height: 8,
-    backgroundColor: BORDER,
-    borderRadius: 4,
-    overflow: "hidden",
-    marginBottom: 8,
-  },
-  efficacyBarFill: {
-    height: 8,
-    borderRadius: 4,
-  },
-  efficacyFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  efficacyDetail: {
-    fontSize: 8,
-    color: SLATE,
+    fontFamily: "Helvetica-Bold",
+    color: BRAND,
   },
 
-  /* ── Section ── */
   section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: BORDER,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 10,
-    fontFamily: "Helvetica-Bold",
-    color: NAVY,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-  },
-  sectionLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#c9a84c",
-    marginLeft: 12,
-  },
-
-  /* ── Description ── */
-  descriptionBox: {
-    backgroundColor: LIGHT,
-    borderRadius: 6,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: NAVY,
-  },
-  descriptionText: {
-    fontSize: 10,
-    color: MID_TEXT,
-    lineHeight: 1.7,
-  },
-
-  /* ── Info Grid ── */
-  infoGrid: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  infoCard: {
-    flex: 1,
-    backgroundColor: LIGHT,
-    borderRadius: 6,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: BORDER,
-  },
-  infoLabel: {
-    fontSize: 7,
-    color: SLATE,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: 4,
-  },
-  infoValue: {
-    fontSize: 11,
-    fontFamily: "Helvetica-Bold",
-    color: DARK_TEXT,
-    marginBottom: 2,
-  },
-  infoSub: {
     fontSize: 8,
-    color: SLATE,
+    fontFamily: "Helvetica-Bold",
+    color: MUTED,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 8,
+    paddingBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  description: {
+    fontSize: 10,
+    color: "#334155",
+    lineHeight: 1.6,
+    backgroundColor: LIGHT,
+    padding: 12,
+    borderRadius: 6,
+    borderLeftWidth: 3,
+    borderLeftColor: ACCENT,
   },
 
-  /* ── Comments Table ── */
   table: {
     borderWidth: 1,
     borderColor: BORDER,
@@ -309,21 +155,21 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: NAVY,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    backgroundColor: BRAND,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
   },
   tableHeaderCell: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
-    color: WHITE,
+    color: "#fff",
     textTransform: "uppercase",
     letterSpacing: 0.3,
   },
   tableRow: {
     flexDirection: "row",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
@@ -332,67 +178,92 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     fontSize: 9,
-    color: MID_TEXT,
-  },
-  tableCellBold: {
-    fontSize: 9,
-    fontFamily: "Helvetica-Bold",
-    color: DARK_TEXT,
+    color: "#334155",
   },
 
-  /* ── Timeline ── */
-  timeline: {
-    gap: 0,
-  },
-  timelineItem: {
+  historyItem: {
     flexDirection: "row",
-    marginBottom: 0,
+    gap: 8,
+    marginBottom: 10,
   },
-  timelineLeft: {
-    alignItems: "center",
-    width: 30,
-  },
-  timelineDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+  historyDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: ACCENT,
     marginTop: 2,
   },
-  timelineLine: {
-    width: 2,
+  historyContent: {
     flex: 1,
-    backgroundColor: BORDER,
-    marginTop: 4,
-    marginBottom: -8,
   },
-  timelineContent: {
-    flex: 1,
-    flexDirection: "row",
-    paddingBottom: 16,
-    paddingLeft: 8,
-    borderLeftWidth: 0,
-  },
-  timelineCard: {
-    flex: 1,
-    backgroundColor: LIGHT,
-    borderRadius: 6,
-    padding: 10,
-    borderLeftWidth: 3,
-  },
-  timelineCardTitle: {
+  historyTitle: {
     fontSize: 9,
     fontFamily: "Helvetica-Bold",
-    color: DARK_TEXT,
-    marginBottom: 2,
+    color: BRAND,
   },
-  timelineCardMeta: {
+  historyDetail: {
     fontSize: 8,
-    color: SLATE,
-    marginBottom: 2,
+    color: MUTED,
+    marginTop: 1,
+    lineHeight: 1.4,
   },
-  timelineCardTime: {
+  historyTime: {
     fontSize: 7,
-    color: SLATE_LIGHT,
+    color: MUTED,
+    marginTop: 2,
+  },
+
+  efficacyContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+    padding: 10,
+    backgroundColor: LIGHT,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  efficacyBar: {
+    flex: 1,
+    height: 8,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 4,
+    overflow: "hidden",
+    marginRight: 10,
+  },
+  efficacyFill: {
+    height: 8,
+    borderRadius: 4,
+  },
+  efficacyText: {
+    fontSize: 10,
+    fontFamily: "Helvetica-Bold",
+  },
+  efficacyLabel: {
+    fontSize: 8,
+    marginLeft: 6,
+  },
+
+  footer: {
+    position: "absolute",
+    bottom: 20,
+    left: 40,
+    right: 40,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTopWidth: 0.5,
+    borderTopColor: BORDER,
+    borderTopStyle: "solid",
+    paddingTop: 8,
+  },
+  footerText: {
+    fontSize: 7,
+    color: MUTED,
+  },
+  footerPowered: {
+    fontSize: 7,
+    color: ACCENT,
+    fontFamily: "Helvetica-Bold",
   },
 });
 
@@ -416,13 +287,7 @@ const formatShortDate = (dateStr: string) => {
   });
 };
 
-interface TicketPDFProps {
-  ticket: Ticket;
-  pageNumber?: number;
-  totalPages?: number;
-}
-
-export const TicketPDFPage = ({ ticket, pageNumber = 1, totalPages = 1 }: TicketPDFProps) => {
+export const TicketPDF = ({ ticket }: Props) => {
   const getEfficacy = () => {
     if (!ticket.closedAt) return null;
     const created = new Date(ticket.creadoEn).getTime();
@@ -437,189 +302,136 @@ export const TicketPDFPage = ({ ticket, pageNumber = 1, totalPages = 1 }: Ticket
     const t = thresholds[ticket.priority] ?? { excellent: 24, good: 72, fair: 120 };
     let score = hours <= t.excellent ? 100 : hours <= t.good ? 80 : hours <= t.fair ? 60 : 40;
     const label = score === 100 ? "Excelente" : score === 80 ? "Bueno" : score === 60 ? "Regular" : "Bajo";
-    const color = score === 100 ? "#16a34a" : score === 80 ? "#2563eb" : score === 60 ? "#d97706" : "#dc2626";
+    const color = score === 100 ? "#22c55e" : score === 80 ? "#3b82f6" : score === 60 ? "#f59e0b" : "#ef4444";
     return { score, label, hours: Math.round(hours * 10) / 10, color };
   };
 
   const efficacy = getEfficacy();
 
   return (
-    <Page size="A4" style={styles.page}>
-      <View style={styles.pageContent}>
-        <CommonHeader
-          title={ticket.titulo}
-          subtitle="Reporte de Ticket"
-          meta={`Ticket #${ticket.id.slice(0, 8).toUpperCase()}`}
-          pageNumber={pageNumber}
-          totalPages={totalPages}
-        />
-
-        {/* Status Banner */}
-        <View style={styles.statusBanner}>
-          <View style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[ticket.status] ?? SLATE }}>
-            <View style={{ ...styles.statusDot, backgroundColor: WHITE }} />
-            <Text style={styles.statusText}>{STATUS_LABELS[ticket.status] ?? ticket.status}</Text>
+    <Document title={`Ticket - ${ticket.titulo}`} author="Hotel Puerto Nuevo">
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>{ticket.titulo}</Text>
+            <Text style={styles.headerSubtitle}>
+              Ticket #{ticket.id.slice(0, 8).toUpperCase()}
+            </Text>
           </View>
-          <View style={{ ...styles.priorityBadge, backgroundColor: PRIORITY_COLORS[ticket.priority] ?? SLATE }}>
-            <Text style={styles.priorityText}>{ticket.priority}</Text>
-          </View>
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{CATEGORY_LABELS[ticket.category] ?? ticket.category}</Text>
-          </View>
-          <View style={styles.statusMeta}>
-            <View style={styles.statusMetaItem}>
-              <Text style={styles.statusMetaLabel}>Creado:</Text>
-              <Text style={styles.statusMetaValue}>{formatShortDate(ticket.creadoEn)}</Text>
-            </View>
-            {ticket.closedAt && (
-              <View style={styles.statusMetaItem}>
-                <Text style={styles.statusMetaLabel}>Cerrado:</Text>
-                <Text style={styles.statusMetaValue}>{formatShortDate(ticket.closedAt)}</Text>
-              </View>
-            )}
+          <View style={styles.headerRight}>
+            <Text style={{ ...styles.badge, backgroundColor: STATUS_COLORS[ticket.status] ?? "#64748b" }}>
+              {STATUS_LABELS[ticket.status] ?? ticket.status}
+            </Text>
+            <Text style={styles.headerDate}>Creado: {formatShortDate(ticket.creadoEn)}</Text>
           </View>
         </View>
 
-        {/* Body */}
-        <View style={styles.body}>
-          {/* KPI Row */}
-          <View style={styles.kpiRow}>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Creado por</Text>
-              <Text style={styles.kpiValue}>{ticket.creadoPor?.name ?? "—"}</Text>
-              <Text style={styles.kpiSub}>{ticket.creadoPor?.puesto ?? "Empleado"}</Text>
-            </View>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Asignado a</Text>
-              <Text style={styles.kpiValue}>{ticket.asignadoA?.name ?? "Sin asignar"}</Text>
-              <Text style={styles.kpiSub}>{ticket.asignadoA?.puesto ?? "—"}</Text>
-            </View>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Comentarios</Text>
-              <Text style={styles.kpiValue}>{ticket.comments.length}</Text>
-              <Text style={styles.kpiSub}>Interacciones</Text>
-            </View>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Eventos</Text>
-              <Text style={styles.kpiValue}>{ticket.history.length}</Text>
-              <Text style={styles.kpiSub}>Cambios registrados</Text>
-            </View>
+        <View style={styles.metaRow}>
+          <View style={styles.metaCard}>
+            <Text style={styles.metaLabel}>Prioridad</Text>
+            <Text style={{ ...styles.metaValue, color: PRIORITY_COLORS[ticket.priority] ?? BRAND }}>
+              {ticket.priority}
+            </Text>
           </View>
+          <View style={styles.metaCard}>
+            <Text style={styles.metaLabel}>Categoría</Text>
+            <Text style={styles.metaValue}>
+              {CATEGORY_LABELS[ticket.category] ?? ticket.category}
+            </Text>
+          </View>
+          <View style={styles.metaCard}>
+            <Text style={styles.metaLabel}>Departamento</Text>
+            <Text style={styles.metaValue}>
+              {ticket.department?.name ?? "—"}
+            </Text>
+          </View>
+        </View>
 
-          {/* Efficacy */}
-          {efficacy && (
-            <View style={styles.efficacySection}>
-              <View style={styles.efficacyCard}>
-                <View style={styles.efficacyHeader}>
-                  <Text style={styles.efficacyTitle}>Índice de Eficacia</Text>
-                  <View style={styles.efficacyScore}>
-                    <Text style={{ ...styles.efficacyNumber, color: efficacy.color }}>
-                      {efficacy.score}%
-                    </Text>
-                    <Text style={{ ...styles.efficacyLabel, color: efficacy.color }}>
-                      {efficacy.label}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.efficacyBarBg}>
-                  <View style={{ ...styles.efficacyBarFill, width: `${efficacy.score}%`, backgroundColor: efficacy.color }} />
-                </View>
-                <View style={styles.efficacyFooter}>
-                  <Text style={styles.efficacyDetail}>
-                    Tiempo de resolución: {efficacy.hours} horas
-                  </Text>
-                  <Text style={styles.efficacyDetail}>
-                    Prioridad: {ticket.priority}
-                  </Text>
-                </View>
-              </View>
+        <View style={styles.metaRow}>
+          <View style={styles.metaCard}>
+            <Text style={styles.metaLabel}>Creado por</Text>
+            <Text style={styles.metaValue}>{ticket.creadoPor?.name ?? "—"}</Text>
+          </View>
+          <View style={styles.metaCard}>
+            <Text style={styles.metaLabel}>Asignado a</Text>
+            <Text style={styles.metaValue}>
+              {ticket.asignadoA?.name ?? "Sin asignar"}
+            </Text>
+          </View>
+          {ticket.closedAt && (
+            <View style={styles.metaCard}>
+              <Text style={styles.metaLabel}>Cerrado</Text>
+              <Text style={{ ...styles.metaValue, color: "#22c55e" }}>
+                {formatShortDate(ticket.closedAt)}
+              </Text>
             </View>
           )}
+        </View>
 
-          {/* Description */}
+        {efficacy && (
+          <View style={styles.efficacyContainer}>
+            <View style={styles.efficacyBar}>
+              <View style={{ ...styles.efficacyFill, width: `${efficacy.score}%`, backgroundColor: efficacy.color }} />
+            </View>
+            <Text style={{ ...styles.efficacyText, color: efficacy.color }}>{efficacy.score}%</Text>
+            <Text style={{ ...styles.efficacyLabel, color: MUTED }}>{efficacy.label} · {efficacy.hours}h</Text>
+          </View>
+        )}
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Descripción</Text>
+          <Text style={styles.description}>{ticket.descripcion}</Text>
+        </View>
+
+        {ticket.comments.length > 0 && (
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Descripción del Ticket</Text>
-              <View style={styles.sectionLine} />
-            </View>
-            <View style={styles.descriptionBox}>
-              <Text style={styles.descriptionText}>{ticket.descripcion}</Text>
+            <Text style={styles.sectionTitle}>Comentarios ({ticket.comments.length})</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Fecha</Text>
+                <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Autor</Text>
+                <Text style={{ ...styles.tableHeaderCell, flex: 4 }}>Comentario</Text>
+              </View>
+              {ticket.comments.map((c, i) => (
+                <View key={c.id} style={i % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}>
+                  <Text style={{ ...styles.tableCell, flex: 2 }}>{formatDate(c.creadoEn)}</Text>
+                  <Text style={{ ...styles.tableCell, flex: 2 }}>{c.autor?.name ?? "—"}</Text>
+                  <Text style={{ ...styles.tableCell, flex: 4 }}>{c.texto}</Text>
+                </View>
+              ))}
             </View>
           </View>
+        )}
 
-          {/* Comments */}
-          {ticket.comments.length > 0 && (
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Comentarios y Seguimiento</Text>
-                <View style={styles.sectionLine} />
-              </View>
-              <View style={styles.table}>
-                <View style={styles.tableHeader}>
-                  <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Fecha</Text>
-                  <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Autor</Text>
-                  <Text style={{ ...styles.tableHeaderCell, flex: 4 }}>Comentario</Text>
-                </View>
-                {ticket.comments.map((c, i) => (
-                  <View key={c.id} style={i % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}>
-                    <Text style={{ ...styles.tableCell, flex: 2 }}>{formatDate(c.creadoEn)}</Text>
-                    <Text style={{ ...styles.tableCellBold, flex: 2 }}>{c.autor?.name ?? "—"}</Text>
-                    <Text style={{ ...styles.tableCell, flex: 4 }}>{c.texto}</Text>
+        {ticket.history.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Historial ({ticket.history.length})</Text>
+            {ticket.history.map((h) => {
+              const isClosed = h.type === "STATUS" && h.detail?.includes("CERRADO");
+              const dotColor = isClosed ? "#ef4444" : h.type === "CREATED" ? "#22c55e" : h.type === "ASSIGNED" ? "#8b5cf6" : h.type === "DEPARTMENT" ? "#a855f7" : ACCENT;
+              return (
+                <View key={h.id} style={styles.historyItem}>
+                  <View style={{ ...styles.historyDot, backgroundColor: dotColor }} />
+                  <View style={styles.historyContent}>
+                    <Text style={{ ...styles.historyTitle, color: isClosed ? "#ef4444" : BRAND }}>
+                      {h.detail ?? h.type}
+                    </Text>
+                    {h.autor && (
+                      <Text style={styles.historyDetail}>Por {h.autor.name}</Text>
+                    )}
+                    <Text style={styles.historyTime}>{formatDate(h.createdAt)}</Text>
                   </View>
-                ))}
-              </View>
-            </View>
-          )}
+                </View>
+              );
+            })}
+          </View>
+        )}
 
-          {/* Timeline / History */}
-          {ticket.history.length > 0 && (
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Historial de Actividad</Text>
-                <View style={styles.sectionLine} />
-              </View>
-              <View style={styles.timeline}>
-                {ticket.history.map((h, idx) => {
-                  const isClosed = h.type === "STATUS" && h.detail?.includes("CERRADO");
-                  const dotColor = isClosed ? "#dc2626" : h.type === "CREATED" ? "#16a34a" : h.type === "ASSIGNED" ? "#7c3aed" : h.type === "DEPARTMENT" ? "#9333ea" : h.type === "PRIORITY" ? "#d97706" : NAVY;
-                  const borderColor = isClosed ? "#dc2626" : h.type === "CREATED" ? "#16a34a" : h.type === "ASSIGNED" ? "#7c3aed" : h.type === "DEPARTMENT" ? "#9333ea" : h.type === "PRIORITY" ? "#d97706" : NAVY;
-                  return (
-                    <View key={h.id} style={styles.timelineItem}>
-                      <View style={styles.timelineLeft}>
-                        <View style={{ ...styles.timelineDot, backgroundColor: dotColor }} />
-                        {idx < ticket.history.length - 1 && <View style={styles.timelineLine} />}
-                      </View>
-                      <View style={styles.timelineContent}>
-                        <View style={{ ...styles.timelineCard, borderLeftColor: borderColor }}>
-                          <Text style={styles.timelineCardTitle}>
-                            {h.detail ?? h.type}
-                          </Text>
-                          {h.autor && (
-                            <Text style={styles.timelineCardMeta}>
-                              Por {h.autor.name}
-                            </Text>
-                          )}
-                          <Text style={styles.timelineCardTime}>
-                            {formatDate(h.createdAt)}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            </View>
-          )}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Hotel Puerto Nuevo · Sistema de Tickets</Text>
+          <Text style={styles.footerPowered}>powered by axzy.dev</Text>
         </View>
-
-        <CommonFooter />
-      </View>
-    </Page>
+      </Page>
+    </Document>
   );
 };
-
-export const TicketPDF = ({ ticket }: Props) => (
-  <Document title={`Ticket - ${ticket.titulo}`} author="Hotel Puerto Nuevo">
-    <TicketPDFPage ticket={ticket} pageNumber={1} totalPages={1} />
-  </Document>
-);
