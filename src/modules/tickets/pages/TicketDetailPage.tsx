@@ -16,6 +16,7 @@ import {
   FaCheckCircle,
   FaClock,
   FaComment,
+  FaFilePdf,
   FaPaperPlane,
   FaTicketAlt,
   FaUserCog,
@@ -34,6 +35,7 @@ import { usersApi, type User } from "@core/api/auth.api";
 import { departmentsApi, type Department } from "@core/api/departments.api";
 import { formatFechaHora } from "@core/store/cartas/types";
 import { useAblyTicket } from "@core/hooks/useAbly";
+import { downloadTicketPDF } from "../utils/pdf";
 
 const STATUS_BADGE: Record<string, { color: string; label: string }> = {
   ABIERTO: { color: "warning", label: "Abierto" },
@@ -86,6 +88,7 @@ export default function TicketDetailPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
   const [sendingComment, setSendingComment] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
 
   useEffect(() => {
     if (id) dispatch(fetchTicketById(id));
@@ -181,6 +184,21 @@ export default function TicketDetailPage() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!ticket) return;
+    setDownloadingPDF(true);
+    try {
+      await downloadTicketPDF(ticket);
+      setToastType("success");
+      setToast("PDF descargado");
+    } catch (e) {
+      setToastType("error");
+      setToast("Error al generar PDF");
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
   const empleadoOptions = empleados.map((u) => ({
     value: u.id,
     label: u.name + (u.puesto ? ` · ${u.puesto}` : ""),
@@ -254,6 +272,20 @@ export default function TicketDetailPage() {
       ]}
       actions={
         <ITFlex gap={2}>
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="primary"
+            onClick={handleDownloadPDF}
+            disabled={downloadingPDF}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaFilePdf size={12} />
+              <ITText className="font-bold text-[11px]">
+                {downloadingPDF ? "Generando..." : "PDF"}
+              </ITText>
+            </ITFlex>
+          </ITButton>
           {!isClosed && (
             <ITButton variant="outlined" size="small" color="success" onClick={() => handleStatusChange("CERRADO")}>
               <ITFlex align="center" gap={1}>
