@@ -13,12 +13,15 @@ import {
 import { useEffect, useState } from "react";
 import {
   FaBuilding,
+  FaCheck,
   FaCheckCircle,
   FaClock,
   FaComment,
   FaFilePdf,
   FaPaperPlane,
+  FaSync,
   FaTicketAlt,
+  FaTimesCircle,
   FaUserCog,
   FaUserPlus,
 } from "react-icons/fa";
@@ -222,18 +225,23 @@ export default function TicketDetailPage() {
 
   const isClosed = ticket.status === "CERRADO";
 
-  const historyTypeIcons: Record<string, { icon: React.ReactNode; bg: string }> = {
-    CREATED: { icon: <FaTicketAlt size={9} />, bg: "bg-emerald-500" },
-    STATUS: { icon: <FaClock size={9} />, bg: "bg-blue-500" },
-    PRIORITY: { icon: <FaClock size={9} />, bg: "bg-amber-500" },
-    ASSIGNED: { icon: <FaUserPlus size={9} />, bg: "bg-blue-500" },
-    DEPARTMENT: { icon: <FaBuilding size={9} />, bg: "bg-purple-500" },
+  const getHistoryMeta = (h: typeof ticket.history[0]) => {
+    if (h.type === "CREATED") return { icon: <FaTicketAlt size={10} />, bg: "bg-emerald-500", color: "text-emerald-600" };
+    if (h.type === "STATUS") {
+      if (h.detail?.includes("CERRADO")) return { icon: <FaTimesCircle size={10} />, bg: "bg-red-500", color: "text-red-600" };
+      if (h.detail?.includes("EN_SEGUIMIENTO")) return { icon: <FaSync size={10} />, bg: "bg-blue-500", color: "text-blue-600" };
+      return { icon: <FaCheckCircle size={10} />, bg: "bg-sky-500", color: "text-sky-600" };
+    }
+    if (h.type === "PRIORITY") return { icon: <FaClock size={10} />, bg: "bg-amber-500", color: "text-amber-600" };
+    if (h.type === "ASSIGNED") return { icon: <FaUserPlus size={10} />, bg: "bg-violet-500", color: "text-violet-600" };
+    if (h.type === "DEPARTMENT") return { icon: <FaBuilding size={10} />, bg: "bg-purple-500", color: "text-purple-600" };
+    return { icon: <FaClock size={10} />, bg: "bg-slate-400", color: "text-slate-500" };
   };
 
   const timelineEvents: TimelineEvent[] = [];
 
   ticket.history.forEach((h) => {
-    const meta = historyTypeIcons[h.type] ?? { icon: <FaClock size={9} />, bg: "bg-slate-400" };
+    const meta = getHistoryMeta(h);
     timelineEvents.push({
       id: h.id,
       type: h.type.toLowerCase() as any,
@@ -249,7 +257,7 @@ export default function TicketDetailPage() {
     timelineEvents.push({
       id: c.id,
       type: "comment",
-      icon: <FaComment size={9} />,
+      icon: <FaComment size={10} />,
       iconBg: "bg-slate-400",
       title: c.autor?.name ?? "Usuario",
       detail: c.texto,
@@ -259,6 +267,32 @@ export default function TicketDetailPage() {
   });
 
   timelineEvents.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  const calculateEfficacy = () => {
+    if (!ticket.closedAt) return null;
+    const created = new Date(ticket.creadoEn).getTime();
+    const closed = new Date(ticket.closedAt).getTime();
+    const hours = (closed - created) / (1000 * 60 * 60);
+
+    const thresholds: Record<string, { excellent: number; good: number; fair: number }> = {
+      URGENTE: { excellent: 4, good: 8, fair: 24 },
+      ALTA: { excellent: 8, good: 24, fair: 48 },
+      MEDIA: { excellent: 24, good: 72, fair: 120 },
+      BAJA: { excellent: 72, good: 120, fair: 168 },
+    };
+
+    const t = thresholds[ticket.priority] ?? { excellent: 24, good: 72, fair: 120 };
+    let score: number;
+    if (hours <= t.excellent) score = 100;
+    else if (hours <= t.good) score = 80;
+    else if (hours <= t.fair) score = 60;
+    else score = 40;
+
+    const label = score === 100 ? "Excelente" : score === 80 ? "Bueno" : score === 60 ? "Regular" : "Bajo";
+    return { score, label, hours: Math.round(hours * 10) / 10 };
+  };
+
+  const efficacy = calculateEfficacy();
 
   return (
     <ITPage
@@ -287,9 +321,9 @@ export default function TicketDetailPage() {
             </ITFlex>
           </ITButton>
           {!isClosed && (
-            <ITButton variant="outlined" size="small" color="success" onClick={() => handleStatusChange("CERRADO")}>
+            <ITButton variant="filled" size="small" color="danger" onClick={() => handleStatusChange("CERRADO")}>
               <ITFlex align="center" gap={1}>
-                <FaCheckCircle size={12} />
+                <FaTimesCircle size={12} />
                 <ITText className="font-bold text-[11px]">Finalizar</ITText>
               </ITFlex>
             </ITButton>
@@ -359,6 +393,41 @@ export default function TicketDetailPage() {
                   </ITStack>
                 </ITGrid>
               </ITGrid>
+
+              {efficacy && (
+                <ITFlex className="mt-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <ITStack direction="column" spacing={1} className="flex-1">
+                    <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      Eficacia de resolución
+                    </ITText>
+                    <ITFlex align="center" gap={2}>
+                      <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            efficacy.score === 100 ? "bg-emerald-500" : efficacy.score === 80 ? "bg-blue-500" : efficacy.score === 60 ? "bg-amber-500" : "bg-red-500"
+                          }`}
+                          style={{ width: `${efficacy.score}%` }}
+                        />
+                      </div>
+                      <ITFlex align="center" gap={1}>
+                        <ITText className={`text-[13px] font-black ${
+                          efficacy.score === 100 ? "text-emerald-600" : efficacy.score === 80 ? "text-blue-600" : efficacy.score === 60 ? "text-amber-600" : "text-red-600"
+                        }`}>
+                          {efficacy.score}%
+                        </ITText>
+                        <ITText className={`text-[9px] font-bold ${
+                          efficacy.score === 100 ? "text-emerald-500" : efficacy.score === 80 ? "text-blue-500" : efficacy.score === 60 ? "text-amber-500" : "text-red-500"
+                        }`}>
+                          {efficacy.label}
+                        </ITText>
+                      </ITFlex>
+                    </ITFlex>
+                    <ITText className="text-[9px] text-slate-400">
+                      Resuelto en {efficacy.hours}h
+                    </ITText>
+                  </ITStack>
+                </ITFlex>
+              )}
             </ITStack>
           </ITFlex>
 
@@ -490,41 +559,45 @@ export default function TicketDetailPage() {
                   const isLast = idx === 0;
 
                   return (
-                    <div key={event.id} className="flex gap-3">
-                      {/* Línea vertical + dot */}
-                      <div className="flex flex-col items-center w-6 shrink-0">
-                        <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center ${event.iconBg} text-white z-10 ring-2 ring-white shrink-0`}
-                        >
-                          {event.icon}
-                        </div>
-                        {!isLast && (
-                          <div className="w-px flex-1 bg-slate-200 min-h-[8px]" />
-                        )}
+                    <div key={event.id} className="flex gap-3 relative">
+                      {/* Línea vertical */}
+                      {!isLast && (
+                        <div className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-gradient-to-b from-slate-200 to-slate-100" />
+                      )}
+
+                      {/* Dot */}
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center ${event.iconBg} text-white z-10 ring-2 ring-white shrink-0 shadow-sm`}
+                      >
+                        {event.icon}
                       </div>
 
                       {/* Contenido */}
-                      <div className={`pb-4 min-w-0 flex-1 ${isLast ? "pb-0" : ""}`}>
-                        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
-                          <span className="text-[11px] font-bold text-slate-700 leading-tight">
-                            {event.title}
-                          </span>
-                          <span className="text-[9px] text-slate-400 tabular-nums whitespace-nowrap">
-                            {formatFechaHora(event.timestamp)}
-                          </span>
+                      <div className={`pb-5 min-w-0 flex-1 ${isLast ? "pb-0" : ""}`}>
+                        <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
+                          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 mb-1">
+                            <span className={`text-[11px] font-bold leading-tight ${
+                              event.title.includes("CERRADO") ? "text-red-600" : "text-slate-700"
+                            }`}>
+                              {event.title}
+                            </span>
+                            <span className="text-[9px] text-slate-400 tabular-nums whitespace-nowrap bg-white px-1.5 py-0.5 rounded">
+                              {formatFechaHora(event.timestamp)}
+                            </span>
+                          </div>
+                          {event.detail && (
+                            <p className={`text-[11px] leading-snug break-words ${
+                              isComment ? "text-slate-600 italic" : "text-slate-500"
+                            }`}>
+                              {isComment ? `"${event.detail}"` : event.detail}
+                            </p>
+                          )}
+                          {event.author && (
+                            <span className="text-[9px] text-slate-400 mt-1 block">
+                              {event.author}
+                            </span>
+                          )}
                         </div>
-                        {event.detail && (
-                          <p className={`text-[11px] leading-snug mt-1 break-words ${
-                            isComment ? "text-slate-600 italic" : "text-slate-500"
-                          }`}>
-                            {isComment ? `"${event.detail}"` : event.detail}
-                          </p>
-                        )}
-                        {event.author && (
-                          <span className="text-[9px] text-slate-400 mt-1 block truncate">
-                            {event.author}
-                          </span>
-                        )}
                       </div>
                     </div>
                   );

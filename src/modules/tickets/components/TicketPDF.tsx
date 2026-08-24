@@ -212,6 +212,36 @@ const styles = StyleSheet.create({
     color: MUTED,
     marginTop: 2,
   },
+  efficacyContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+    padding: 10,
+    backgroundColor: LIGHT,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  efficacyBar: {
+    flex: 1,
+    height: 8,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 4,
+    overflow: "hidden",
+    marginRight: 10,
+  },
+  efficacyFill: {
+    height: 8,
+    borderRadius: 4,
+  },
+  efficacyText: {
+    fontSize: 10,
+    fontFamily: "Helvetica-Bold",
+  },
+  efficacyLabel: {
+    fontSize: 8,
+    marginLeft: 6,
+  },
   footer: {
     position: "absolute",
     bottom: 20,
@@ -305,6 +335,31 @@ export const TicketPDF = ({ ticket }: Props) => (
         )}
       </View>
 
+      {ticket.closedAt && (() => {
+        const created = new Date(ticket.creadoEn).getTime();
+        const closed = new Date(ticket.closedAt).getTime();
+        const hours = (closed - created) / (1000 * 60 * 60);
+        const thresholds: Record<string, { excellent: number; good: number; fair: number }> = {
+          URGENTE: { excellent: 4, good: 8, fair: 24 },
+          ALTA: { excellent: 8, good: 24, fair: 48 },
+          MEDIA: { excellent: 24, good: 72, fair: 120 },
+          BAJA: { excellent: 72, good: 120, fair: 168 },
+        };
+        const t = thresholds[ticket.priority] ?? { excellent: 24, good: 72, fair: 120 };
+        let score = hours <= t.excellent ? 100 : hours <= t.good ? 80 : hours <= t.fair ? 60 : 40;
+        const label = score === 100 ? "Excelente" : score === 80 ? "Bueno" : score === 60 ? "Regular" : "Bajo";
+        const color = score === 100 ? "#22c55e" : score === 80 ? "#3b82f6" : score === 60 ? "#f59e0b" : "#ef4444";
+        return (
+          <View style={styles.efficacyContainer}>
+            <View style={styles.efficacyBar}>
+              <View style={{ ...styles.efficacyFill, width: `${score}%`, backgroundColor: color }} />
+            </View>
+            <Text style={{ ...styles.efficacyText, color }}>{score}%</Text>
+            <Text style={{ ...styles.efficacyLabel, color: MUTED }}>{label} · {Math.round(hours * 10) / 10}h</Text>
+          </View>
+        );
+      })()}
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Descripción</Text>
         <Text style={styles.description}>{ticket.descripcion}</Text>
@@ -339,24 +394,28 @@ export const TicketPDF = ({ ticket }: Props) => (
       {ticket.history.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Historial ({ticket.history.length})</Text>
-          {ticket.history.map((h) => (
-            <View key={h.id} style={styles.historyItem}>
-              <View style={styles.historyDot} />
-              <View style={styles.historyContent}>
-                <Text style={styles.historyTitle}>
-                  {h.detail ?? h.type}
-                </Text>
-                {h.autor && (
-                  <Text style={styles.historyDetail}>
-                    Por {h.autor.name}
+          {ticket.history.map((h) => {
+            const isClosed = h.type === "STATUS" && h.detail?.includes("CERRADO");
+            const dotColor = isClosed ? "#ef4444" : h.type === "CREATED" ? "#22c55e" : h.type === "ASSIGNED" ? "#8b5cf6" : h.type === "DEPARTMENT" ? "#a855f7" : ACCENT;
+            return (
+              <View key={h.id} style={styles.historyItem}>
+                <View style={{ ...styles.historyDot, backgroundColor: dotColor }} />
+                <View style={styles.historyContent}>
+                  <Text style={{ ...styles.historyTitle, color: isClosed ? "#ef4444" : BRAND }}>
+                    {h.detail ?? h.type}
                   </Text>
-                )}
-                <Text style={styles.historyTime}>
-                  {formatDate(h.createdAt)}
-                </Text>
+                  {h.autor && (
+                    <Text style={styles.historyDetail}>
+                      Por {h.autor.name}
+                    </Text>
+                  )}
+                  <Text style={styles.historyTime}>
+                    {formatDate(h.createdAt)}
+                  </Text>
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
 
