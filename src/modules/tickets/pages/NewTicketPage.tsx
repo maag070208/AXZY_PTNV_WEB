@@ -126,7 +126,6 @@ export default function NewTicketPage() {
                 value={form.titulo}
                 onChange={(e) => handleField("titulo", e.target.value)}
                 placeholder="Ej. Fuga de agua en oficina 302"
-                required
               />
 
               <ITFlex direction="column" gap={1}>
@@ -137,7 +136,6 @@ export default function NewTicketPage() {
                   onChange={(v) => handleField("descripcion", v)}
                   placeholder="Describe el problema o solicitud con el mayor detalle posible…"
                   rows={6}
-                  required
                 />
                 <ITText className="text-[9px] text-slate-400 text-right">
                   {form.descripcion.length} / 2000
@@ -153,7 +151,7 @@ export default function NewTicketPage() {
                 ¿Qué tan urgente es?
               </ITText>
 
-              <ITFlex gap={2} wrap>
+              <ITFlex gap={2} wrap="wrap">
                 {PRIORITIES.map((p) => (
                   <button
                     key={p.value}

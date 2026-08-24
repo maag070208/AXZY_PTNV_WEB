@@ -59,6 +59,7 @@ export const usersApi = {
   update: (
     id: string,
     data: {
+      username?: string;
       name?: string;
       role?: UserRole;
       active?: boolean;

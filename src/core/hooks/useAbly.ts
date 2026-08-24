@@ -29,11 +29,11 @@ export const useAblyTicket = (
     const client = getAblyClient();
     const channel = client.channels.get(`tickets:${ticketId}`);
 
-    const handleComment = (message: Ably.Types.Message) => {
+    const handleComment = (message: Ably.Message) => {
       onCommentRef.current?.(message.data);
     };
 
-    const handleUpdate = (message: Ably.Types.Message) => {
+    const handleUpdate = (message: Ably.Message) => {
       onUpdateRef.current?.(message.data);
     };
 
@@ -56,7 +56,7 @@ export const useAblyNotifications = (userId: string | undefined, onNotification?
     const client = getAblyClient();
     const channel = client.channels.get(`user:${userId}`);
 
-    const handleNotification = (message: Ably.Types.Message) => {
+    const handleNotification = (message: Ably.Message) => {
       store.dispatch(prependNotification(message.data));
       onNotificationRef.current?.(message.data?.title ?? "Nueva notificacion");
     };

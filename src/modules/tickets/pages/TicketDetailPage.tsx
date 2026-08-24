@@ -90,7 +90,7 @@ export default function TicketDetailPage() {
   useEffect(() => {
     if (id) dispatch(fetchTicketById(id));
     departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
-    return () => dispatch(clearCurrent());
+    return () => { dispatch(clearCurrent()); };
   }, [id, dispatch]);
 
   // Ably: live comments

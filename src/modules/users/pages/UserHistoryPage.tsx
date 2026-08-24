@@ -108,7 +108,7 @@ export default function UserHistoryPage() {
       ]}
     >
       <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 mb-6">
-        <ITFlex gap={6} wrap>
+        <ITFlex gap={6} wrap="wrap">
           <ITStack direction="column" spacing={1}>
             <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
               Username

@@ -119,7 +119,7 @@ export default function DevicesListPage() {
         sortable: false,
         render: (row: Device) => (
           <ITBadget
-            color={row.estado === "DISPONIBLE" ? "success" : row.estado === "ASIGNADO" ? "warning" : "default"}
+            color={row.estado === "DISPONIBLE" ? "success" : row.estado === "ASIGNADO" ? "warning" : "gray"}
             size="small"
           >
             {row.estado}

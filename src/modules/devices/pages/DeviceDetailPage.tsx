@@ -3,6 +3,7 @@ import {
   ITButton,
   ITFlex,
   ITGrid,
+  ITLoader,
   ITPage,
   ITStack,
   ITTextarea,
@@ -99,7 +100,11 @@ export default function DeviceDetailPage() {
           { label: "Detalle" },
         ]}
         loading
-      />
+      >
+        <ITFlex justify="center" align="center" className="py-20">
+          <ITLoader variant="spinner" size="lg" color="primary" />
+        </ITFlex>
+      </ITPage>
     );
   }
 
@@ -184,7 +189,7 @@ export default function DeviceDetailPage() {
           {/* Info del dispositivo */}
           <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
             <ITStack direction="column" spacing={5} className="w-full">
-              <ITFlex gap={2} wrap>
+              <ITFlex gap={2} wrap="wrap">
                 <ITBadget color={ESTADO_BADGE[device.estado]?.color as any ?? "default"} size="small">
                   {ESTADO_BADGE[device.estado]?.label ?? device.estado}
                 </ITBadget>

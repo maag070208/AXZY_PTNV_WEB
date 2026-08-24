@@ -62,7 +62,7 @@ export default function NotificationsPage() {
       description="Centro de notificaciones y alertas"
       icon={<FaBell size={20} />}
       maxWidth="3xl"
-      action={
+      actions={
         unreadCount > 0 ? (
           <ITButton
             variant="outlined"

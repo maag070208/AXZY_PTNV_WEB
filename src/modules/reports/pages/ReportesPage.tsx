@@ -91,7 +91,7 @@ export default function ReportesPage() {
   };
 
   const estadoBadge = (estado: string) => (
-    <ITBadget color={estado === "DEVUELTO" ? "default" : "success"} size="small">
+    <ITBadget color={estado === "DEVUELTO" ? "gray" : "success"} size="small">
       {estado}
     </ITBadget>
   );
