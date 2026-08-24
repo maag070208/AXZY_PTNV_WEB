@@ -47,7 +47,6 @@ export default function DeviceCard({ device, onClick }: Props) {
             </ITText>
             <ITText className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
               {device.marca} {device.modelo}
-              {device.cantidad > 1 ? ` · ${device.cantidad} pzas` : ""}
             </ITText>
             <ITFlex align="center" gap={1} className="mt-1">
               <span className={`w-1.5 h-1.5 rounded-full ${colorEstado}`} />

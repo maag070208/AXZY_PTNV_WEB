@@ -17,6 +17,7 @@
     "@axzydev/axzy_ui_system": "1.2.9",
     "@react-pdf/renderer": "^4.6.1",
     "@reduxjs/toolkit": "^2.5.1",
+    "ably": "^2.27.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
     "dayjs": "^1.11.19",

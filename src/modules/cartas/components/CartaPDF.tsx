@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   logoBox: { flexDirection: "row", alignItems: "center" },
-  logo: { width: 318, height: 80 },
+  logo: { width: 80, height: 80 },
   metaBox: {
     borderWidth: 0.8,
     borderColor: "#000",
@@ -197,7 +197,7 @@ export default function CartaPDF({ carta }: Props) {
   // descripción con cantidad si > 1
   const descripcionConCantidad =
     (item?.descripcion || "CONTROL DE TV(5 PIEZAS)") +
-    ((carta.cantidad ?? 1) > 1 ? ` (${carta.cantidad} piezas)` : "");
+    (carta.items.length > 1 ? ` (${carta.items.length} piezas)` : "");
 
   return (
     <Document

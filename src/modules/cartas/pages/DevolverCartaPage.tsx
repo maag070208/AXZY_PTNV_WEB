@@ -83,7 +83,10 @@ export default function DevolverCartaPage() {
 
   if (loading) {
     return (
-      <ITPage title="Devolución" loading>
+      <ITPage title="Devolución" loading breadcrumbs={[
+        { label: "Cartas", onClick: () => navigate("/cartas") },
+        { label: "Devolución" },
+      ]}>
         <ITFlex justify="center" align="center">
           <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
@@ -93,7 +96,10 @@ export default function DevolverCartaPage() {
 
   if (!carta) {
     return (
-      <ITPage title="Devolución" backAction={() => navigate("/")}>
+      <ITPage title="Devolución" backAction={() => navigate(-1)} breadcrumbs={[
+        { label: "Cartas", onClick: () => navigate("/cartas") },
+        { label: "Devolución" },
+      ]}>
         <ITAlert variant="error">Carta no encontrada</ITAlert>
       </ITPage>
     );
@@ -103,9 +109,12 @@ export default function DevolverCartaPage() {
     <ITPage
       title={isReturned ? "Cancelar devolución" : "Marcar devolución"}
       description={`Folio ${carta.consecutivo} · ${formatFecha(carta.fecha)}`}
-      backAction={() => navigate("/")}
-      maxWidth="3xl"
+      backAction={() => navigate(-1)}
       icon={<FaFileSignature size={20} />}
+      breadcrumbs={[
+        { label: "Cartas", onClick: () => navigate("/cartas") },
+        { label: "Devolución" },
+      ]}
     >
       <ITStack direction="column" spacing={6}>
         {isReturned && (

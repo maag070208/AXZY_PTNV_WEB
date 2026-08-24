@@ -28,7 +28,6 @@ export default function DeviceFormPage() {
   const [form, setForm] = useState({
     typeId: "",
     descripcion: "",
-    cantidad: 1,
     marca: "",
     modelo: "",
     numeroSerie: "",
@@ -52,7 +51,6 @@ export default function DeviceFormPage() {
           setForm({
             typeId: d.typeId,
             descripcion: d.descripcion,
-            cantidad: d.cantidad,
             marca: d.marca,
             modelo: d.modelo,
             numeroSerie: d.numeroSerie ?? "",
@@ -71,7 +69,6 @@ export default function DeviceFormPage() {
       const payload = {
         typeId: form.typeId,
         descripcion: form.descripcion,
-        cantidad: form.cantidad,
         marca: form.marca,
         modelo: form.modelo,
         numeroSerie: form.numeroSerie || undefined,
@@ -93,7 +90,10 @@ export default function DeviceFormPage() {
 
   if (loading) {
     return (
-      <ITPage title="Dispositivos" loading backAction={() => navigate("/")}>
+      <ITPage title="Dispositivos" loading backAction={() => navigate(-1)} breadcrumbs={[
+        { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
+        { label: "Formulario" },
+      ]}>
         <ITFlex justify="center" align="center">
           <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
@@ -128,9 +128,12 @@ export default function DeviceFormPage() {
     <ITPage
       title={isEdit ? "Editar dispositivo" : "Nuevo dispositivo"}
       description={isEdit ? "Si cambias el tipo se generará un nuevo control de activos" : undefined}
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
+      breadcrumbs={[
+        { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
+        { label: isEdit ? "Editar" : "Nuevo" },
+      ]}
       actions={actions}
-      maxWidth="4xl"
     >
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -151,21 +154,6 @@ export default function DeviceFormPage() {
               value={form.typeId}
               onChange={(e) => setForm((f) => ({ ...f, typeId: e.target.value }))}
               required
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={6}>
-            <ITInput
-              name="cantidad"
-              type="number"
-              label="Cantidad"
-              min={1}
-              value={form.cantidad}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  cantidad: Math.max(1, parseInt(e.target.value || "1", 10)),
-                }))
-              }
             />
           </ITGrid>
           <ITGrid item xs={12}>

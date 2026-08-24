@@ -58,7 +58,10 @@ export default function DeviceTypeFormPage() {
 
   if (loading) {
     return (
-      <ITPage title="Tipos de dispositivo" loading backAction={() => navigate("/")}>
+      <ITPage title="Tipos de dispositivo" loading backAction={() => navigate(-1)} breadcrumbs={[
+        { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
+        { label: "Tipos" },
+      ]}>
         <ITFlex justify="center" align="center">
           <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
@@ -88,9 +91,12 @@ export default function DeviceTypeFormPage() {
   return (
     <ITPage
       title={isEdit ? "Editar tipo" : "Nuevo tipo de dispositivo"}
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
+      breadcrumbs={[
+        { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
+        { label: isEdit ? "Editar tipo" : "Nuevo tipo" },
+      ]}
       actions={actions}
-      maxWidth="3xl"
     >
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>

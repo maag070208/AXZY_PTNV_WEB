@@ -134,7 +134,7 @@ export default function DepartmentsPage() {
           <ITButton
             variant="outlined"
             size="small"
-            color="info"
+            color="secondary"
             onClick={() => navigate(`/departamentos/${d.id}`)}
             title="Ver detalle"
           >
@@ -160,8 +160,12 @@ export default function DepartmentsPage() {
     <ITPage
       title="Departamentos"
       description="Estructura organizacional de Puerto Nuevo"
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
       icon={<FaBuilding size={20} />}
+      breadcrumbs={[
+        { label: "Inicio", onClick: () => navigate("/") },
+        { label: "Departamentos" },
+      ]}
       actions={
         isAdmin ? (
           <ITButton

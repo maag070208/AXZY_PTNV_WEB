@@ -1,82 +1,34 @@
 import {
-  ITAlert,
+  ITBadget,
   ITButton,
-  ITCard,
+  ITConfirmDialog,
   ITDataTable,
+  ITDialog,
   ITFlex,
-  ITGrid,
   ITInput,
   ITPage,
-  ITSelect,
-  ITStack,
   ITText,
+  ITToast,
 } from "@axzydev/axzy_ui_system";
 import type {
   Column,
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaUserShield, FaPlus } from "react-icons/fa";
-import { useCallback, useEffect, useState } from "react";
+import { FaEdit, FaEye, FaKey, FaPlus, FaTrash, FaUserShield } from "react-icons/fa";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usersApi, type User } from "@core/api/auth.api";
-import {
-  departmentsApi,
-  type Department,
-} from "@core/api/departments.api";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
-  const [departments, setDepartments] = useState<Department[]>([]);
   const [total, setTotal] = useState(0);
-  const [showForm, setShowForm] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [form, setForm] = useState({
-    username: "",
-    password: "",
-    name: "",
-    role: "USER" as "ADMIN" | "USER" | "EMPLEADO",
-    numeroEmpleado: "",
-    puesto: "",
-    departmentId: "",
-    subareaId: "",
-  });
 
-  useEffect(() => {
-    departmentsApi.list(true).then(setDepartments).catch(() => setDepartments([]));
-  }, []);
-
-  const selectedDept = departments.find((d) => d.id === form.departmentId);
-
-  const handleCreate = async () => {
-    try {
-      await usersApi.create({
-        username: form.username,
-        password: form.password,
-        name: form.name,
-        role: form.role,
-        numeroEmpleado: form.numeroEmpleado || undefined,
-        puesto: form.puesto || undefined,
-        departmentId: form.departmentId || undefined,
-        subareaId: form.subareaId || undefined,
-      });
-      setForm({
-        username: "",
-        password: "",
-        name: "",
-        role: "USER",
-        numeroEmpleado: "",
-        puesto: "",
-        departmentId: "",
-        subareaId: "",
-      });
-      setShowForm(false);
-      setReloadKey((k) => k + 1);
-    } catch (e: any) {
-      setError(e.message);
-    }
-  };
+  const [userToToggle, setUserToToggle] = useState<User | null>(null);
+  const [userToPassword, setUserToPassword] = useState<User | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
   const fetchTableData = useCallback(
     async (params: ITDataTableFetchParams) => {
@@ -95,18 +47,40 @@ export default function UsersListPage() {
     []
   );
 
+  const handleToggleActive = async () => {
+    if (!userToToggle) return;
+    try {
+      await usersApi.update(userToToggle.id, { active: !userToToggle.active });
+      setUserToToggle(null);
+      setReloadKey((k) => k + 1);
+      setToast({
+        message: userToToggle.active ? "Usuario desactivado" : "Usuario reactivado",
+        type: "success",
+      });
+    } catch (e: any) {
+      setToast({ message: e.message || "Error al actualizar usuario", type: "error" });
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!userToPassword || !newPassword.trim()) return;
+    try {
+      await usersApi.changePassword(userToPassword.id, newPassword);
+      setUserToPassword(null);
+      setNewPassword("");
+      setToast({ message: "Contraseña actualizada", type: "success" });
+    } catch (e: any) {
+      setToast({ message: e.message || "Error al cambiar contraseña", type: "error" });
+    }
+  };
+
   const roleBadge = (role: string) => (
-    <ITText
-      className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-        role === "ADMIN"
-          ? "bg-rose-50 text-rose-700"
-          : role === "USER"
-          ? "bg-amber-50 text-amber-700"
-          : "bg-emerald-50 text-emerald-700"
-      }`}
+    <ITBadget
+      color={role === "ADMIN" ? "danger" : role === "GERENTE" ? "info" : role === "JEFE_DE_AREA" ? "warning" : "success"}
+      size="small"
     >
-      {role}
-    </ITText>
+      {role === "JEFE_DE_AREA" ? "JEFE AREA" : role}
+    </ITBadget>
   );
 
   const columns: Column<User>[] = [
@@ -137,7 +111,8 @@ export default function UsersListPage() {
       catalogOptions: {
         data: [
           { id: "ADMIN", name: "ADMIN" },
-          { id: "USER", name: "USER" },
+          { id: "GERENTE", name: "GERENTE" },
+          { id: "JEFE_DE_AREA", name: "JEFE DE AREA" },
           { id: "EMPLEADO", name: "EMPLEADO" },
         ],
         loading: false,
@@ -161,7 +136,7 @@ export default function UsersListPage() {
       type: "catalog",
       filter: "catalog",
       catalogOptions: {
-        data: departments.filter((d) => d.active).map((d) => ({ id: d.id, name: d.name })),
+        data: [],
         loading: false,
         error: false,
       },
@@ -177,11 +152,7 @@ export default function UsersListPage() {
       type: "catalog",
       filter: "catalog",
       catalogOptions: {
-        data: departments
-          .filter((d) => d.active)
-          .flatMap((d) =>
-            d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` }))
-          ),
+        data: [],
         loading: false,
         error: false,
       },
@@ -191,18 +162,65 @@ export default function UsersListPage() {
         </ITText>
       ),
     },
+    {
+      key: "actions",
+      label: "",
+      type: "string",
+      sortable: false,
+      render: (u) => (
+        <ITFlex align="center" gap={2}>
+          <ITButton
+            onClick={() => navigate(`/usuarios/${u.id}/historial`)}
+            size="small"
+            color="secondary"
+          >
+            <FaEye size={14} />
+          </ITButton>
+          <ITButton
+            onClick={() => navigate(`/usuarios/${u.id}/editar`)}
+            size="small"
+            color="gray"
+          >
+            <FaEdit size={14} />
+          </ITButton>
+          <ITButton
+            onClick={() => {
+              setUserToPassword(u);
+              setNewPassword("");
+            }}
+            size="small"
+            color="success"
+
+          >
+            <FaKey size={14} />
+          </ITButton>
+          <ITButton
+            onClick={() => setUserToToggle(u)}
+            size="small"
+            variant={u.active ? "outlined" : "filled"}
+            color={u.active ? "error" : "danger"}
+          >
+            <FaTrash size={14} />
+          </ITButton>
+        </ITFlex>
+      ),
+    },
   ];
 
   return (
     <ITPage
       title="Usuarios"
       description={`${total} usuario(s)`}
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
+      breadcrumbs={[
+        { label: "Inicio", onClick: () => navigate("/") },
+        { label: "Usuarios" },
+      ]}
       actions={
         <ITButton
           variant="filled"
           color="primary"
-          onClick={() => setShowForm((s) => !s)}
+          onClick={() => navigate("/usuarios/nuevo")}
         >
           <ITFlex align="center" gap={1}>
             <FaPlus size={12} />
@@ -212,124 +230,6 @@ export default function UsersListPage() {
       }
       icon={<FaUserShield size={20} />}
     >
-      {error && (
-        <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
-          {error}
-        </ITAlert>
-      )}
-
-      {showForm && (
-        <ITCard className="p-6 mb-6">
-          <ITStack direction="column" spacing={4}>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-              Nuevo usuario
-            </ITText>
-            <ITGrid container columns={12} spacing={3}>
-              <ITGrid item xs={12} md={4}>
-                <ITInput
-                  name="u_username"
-                  label="Username *"
-                  value={form.username}
-                  onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
-                  required
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={4}>
-                <ITInput
-                  name="u_password"
-                  type="password"
-                  label="Contraseña *"
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  required
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={4}>
-                <ITInput
-                  name="u_name"
-                  label="Nombre *"
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  required
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={4}>
-                <ITSelect
-                  name="u_role"
-                  label="Rol *"
-                  options={[
-                    { value: "ADMIN", label: "ADMIN" },
-                    { value: "USER", label: "USER" },
-                    { value: "EMPLEADO", label: "EMPLEADO" },
-                  ]}
-                  value={form.role}
-                  onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as any }))}
-                  required
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={4}>
-                <ITInput
-                  name="u_num"
-                  label="No. Empleado"
-                  value={form.numeroEmpleado}
-                  onChange={(e) => setForm((f) => ({ ...f, numeroEmpleado: e.target.value }))}
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={4}>
-                <ITInput
-                  name="u_puesto"
-                  label="Puesto"
-                  value={form.puesto}
-                  onChange={(e) => setForm((f) => ({ ...f, puesto: e.target.value }))}
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITSelect
-                  name="u_dept"
-                  label="Departamento"
-                  options={departments
-                    .filter((d) => d.active)
-                    .map((d) => ({ value: d.id, label: d.name }))}
-                  value={form.departmentId}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      departmentId: e.target.value,
-                      subareaId: "",
-                    }))
-                  }
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITSelect
-                  name="u_sub"
-                  label="Subárea"
-                  options={(selectedDept?.subareas ?? []).map((s) => ({
-                    value: s.id,
-                    label: s.name,
-                  }))}
-                  value={form.subareaId}
-                  onChange={(e) => setForm((f) => ({ ...f, subareaId: e.target.value }))}
-                />
-              </ITGrid>
-            </ITGrid>
-            <ITFlex justify="end" gap={2}>
-              <ITButton variant="outlined" onClick={() => setShowForm(false)}>
-                Cancelar
-              </ITButton>
-              <ITButton
-                variant="filled"
-                color="primary"
-                onClick={handleCreate}
-                disabled={!form.username || !form.password || !form.name}
-              >
-                Guardar
-              </ITButton>
-            </ITFlex>
-          </ITStack>
-        </ITCard>
-      )}
-
       <ITDataTable
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
@@ -341,6 +241,62 @@ export default function UsersListPage() {
         defaultItemsPerPage={10}
         size="sm"
       />
+
+      <ITConfirmDialog
+        isOpen={!!userToToggle}
+        onClose={() => setUserToToggle(null)}
+        onConfirm={handleToggleActive}
+        title={userToToggle?.active ? "Desactivar usuario" : "Eliminar usuario"}
+        message={
+          userToToggle?.active
+            ? `¿Desactivar a ${userToToggle?.username}? No podrá iniciar sesión.`
+            : `¿Eliminar a ${userToToggle?.username}? Esta acción no se puede deshacer.`
+        }
+        confirmLabel={userToToggle?.active ? "Desactivar" : "Eliminar"}
+        cancelLabel="Cancelar"
+        variant="danger"
+      />
+
+      <ITDialog
+        isOpen={!!userToPassword}
+        onClose={() => setUserToPassword(null)}
+        title={`Cambiar contraseña — ${userToPassword?.username}`}
+      >
+        <ITFlex direction="column" gap={3}>
+          <ITInput
+            name="newPassword"
+            type="password"
+            label="Nueva contraseña"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Ingresa la nueva contraseña"
+            autoFocus
+          />
+          <ITFlex justify="end" gap={2}>
+            <ITButton variant="outlined" onClick={() => setUserToPassword(null)}>
+              Cancelar
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={handleChangePassword}
+              disabled={!newPassword.trim()}
+            >
+              <ITText className="font-bold text-[11px]">Guardar</ITText>
+            </ITButton>
+          </ITFlex>
+        </ITFlex>
+      </ITDialog>
+
+      {toast && (
+        <ITToast
+          message={toast.message}
+          type={toast.type}
+          position="bottom-center"
+          duration={2500}
+          onClose={() => setToast(null)}
+        />
+      )}
     </ITPage>
   );
 }

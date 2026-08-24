@@ -22,7 +22,6 @@ export interface CartaInput {
   numeroEmpleado: string;
   empresa?: string;
   departamento?: string;
-  cantidad?: number;
   areaBoss?: string;
   deliveryBy?: string;
   responsableId?: string;
@@ -43,7 +42,7 @@ export interface GenerateCartaEntry extends CartaResponsiva {
 export interface GenerateCartasResult {
   tipo: { code: string; name: string; prefix: string };
   contador: number;
-  cartas: GenerateCartaEntry[];
+  carta: GenerateCartaEntry;
 }
 
 export const cartasApi = {
@@ -63,8 +62,8 @@ export const cartasApi = {
     api.post<CartaResponsiva>(`/cartas/${id}/return`, data),
   undoReturn: (id: string) =>
     api.delete<CartaResponsiva>(`/cartas/${id}/return`),
-  generate: (typeId: string, cantidad: number) =>
-    api.post<GenerateCartasResult>(`/cartas/generate`, { typeId, cantidad }),
+  generate: (typeId: string) =>
+    api.post<GenerateCartasResult>(`/cartas/generate`, { typeId }),
   getConsecutivo: () => api.get<ConsecutivoState>(`/cartas/consecutivo`),
   peekConsecutivo: () => api.get<{ siguiente: string }>(`/cartas/consecutivo/peek`),
   resetConsecutivo: () =>

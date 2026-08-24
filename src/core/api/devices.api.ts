@@ -20,15 +20,24 @@ export interface Device {
   type?: DeviceType;
   controlActivos: string;
   descripcion: string;
-  cantidad: number;
   marca: string;
   modelo: string;
   numeroSerie?: string | null;
   nombreEquipo?: string | null;
   area: string;
   estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
+  history?: DeviceHistoryEntry[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DeviceHistoryEntry {
+  id: string;
+  deviceId: string;
+  type: string;
+  detail?: string | null;
+  autor?: { id: string; name: string; username: string } | null;
+  createdAt: string;
 }
 
 export const deviceTypesApi = {
@@ -37,6 +46,7 @@ export const deviceTypesApi = {
   list: (includeInactive = false) =>
     api.get<DeviceType[]>(`/device-types${includeInactive ? "?includeInactive=true" : ""}`),
   peek: (id: string) => api.get<{ siguiente: string }>(`/device-types/${id}/peek`),
+  peekCarta: (id: string) => api.get<{ siguiente: string }>(`/device-types/${id}/peek-carta`),
   get: (id: string) => api.get<DeviceType>(`/device-types/${id}`),
   create: (data: { code: string; name: string; prefix: string }) =>
     api.post<DeviceType>(`/device-types`, data),
@@ -60,7 +70,6 @@ export const devicesApi = {
   create: (data: {
     typeId: string;
     descripcion: string;
-    cantidad?: number;
     marca: string;
     modelo: string;
     numeroSerie?: string;
@@ -71,7 +80,6 @@ export const devicesApi = {
   update: (id: string, data: Partial<{
     typeId: string;
     descripcion: string;
-    cantidad: number;
     marca: string;
     modelo: string;
     numeroSerie: string;
@@ -80,4 +88,7 @@ export const devicesApi = {
     estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
   }>) => api.put<Device>(`/devices/${id}`, data),
   remove: (id: string) => api.delete<Device>(`/devices/${id}`),
+  getHistory: (id: string) => api.get<DeviceHistoryEntry[]>(`/devices/${id}/history`),
+  addHistory: (id: string, data: { type: string; detail?: string }) =>
+    api.post<DeviceHistoryEntry>(`/devices/${id}/history`, data),
 };

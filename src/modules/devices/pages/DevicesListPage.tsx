@@ -1,4 +1,5 @@
 import {
+  ITBadget,
   ITButton,
   ITDataTable,
   ITFlex,
@@ -76,7 +77,7 @@ export default function DevicesListPage() {
         filter: true,
         render: (row: Device) => (
           <Link
-            to={`/dispositivos/${row.id}/editar`}
+            to={`/dispositivos/${row.id}`}
             className="text-[12px] font-black text-emerald-700 hover:underline"
           >
             {row.controlActivos}
@@ -93,11 +94,6 @@ export default function DevicesListPage() {
           <ITFlex direction="column" gap={0.5}>
             <ITText className="text-[12px] font-black text-slate-800">
               {row.descripcion}
-              {row.cantidad > 1 && (
-                <ITText as="span" className="ml-2 text-[10px] font-bold text-slate-500">
-                  ({row.cantidad} piezas)
-                </ITText>
-              )}
             </ITText>
             <ITText className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               {row.marca} {row.modelo}
@@ -122,17 +118,12 @@ export default function DevicesListPage() {
         label: "ESTADO",
         sortable: false,
         render: (row: Device) => (
-          <ITText
-            className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-              row.estado === "DISPONIBLE"
-                ? "bg-emerald-50 text-emerald-700"
-                : row.estado === "ASIGNADO"
-                ? "bg-amber-50 text-amber-700"
-                : "bg-slate-100 text-slate-500"
-            }`}
+          <ITBadget
+            color={row.estado === "DISPONIBLE" ? "success" : row.estado === "ASIGNADO" ? "warning" : "default"}
+            size="small"
           >
             {row.estado}
-          </ITText>
+          </ITBadget>
         ),
       },
       {
@@ -141,15 +132,17 @@ export default function DevicesListPage() {
         label: "",
         align: "right",
         render: (row: Device) => (
-          <ITButton
-            variant="outlined"
-            size="small"
-            color="info"
-            onClick={() => navigate(`/dispositivos/${row.id}/editar`)}
-            title="Editar"
-          >
-            <FaEye size={14} />
-          </ITButton>
+          <ITFlex gap={1}>
+            <ITButton
+              variant="outlined"
+              size="small"
+              color="secondary"
+              onClick={() => navigate(`/dispositivos/${row.id}`)}
+              title="Ver detalle"
+            >
+              <FaEye size={14} />
+            </ITButton>
+          </ITFlex>
         ),
       },
     ],
@@ -160,7 +153,7 @@ export default function DevicesListPage() {
     (row: Record<string, unknown>) => (
       <DeviceCard
         device={row as unknown as Device}
-        onClick={(id) => navigate(`/dispositivos/${id}/editar`)}
+        onClick={(id) => navigate(`/dispositivos/${id}`)}
       />
     ),
     [navigate]
@@ -170,7 +163,11 @@ export default function DevicesListPage() {
     <ITPage
       title="Dispositivos"
       description={`${total} dispositivo(s) · ${types.length} tipo(s)`}
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
+      breadcrumbs={[
+        { label: "Inicio", onClick: () => navigate("/") },
+        { label: "Dispositivos" },
+      ]}
       actions={
         <ITFlex gap={2}>
           <ITButton

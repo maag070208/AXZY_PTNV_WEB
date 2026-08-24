@@ -73,8 +73,12 @@ export default function DepartmentDetailPage() {
     return (
       <ITPage
         title="Detalle de departamento"
-        backAction={() => navigate("/departamentos")}
+        backAction={() => navigate(-1)}
         icon={<FaBuilding size={20} />}
+        breadcrumbs={[
+          { label: "Departamentos", onClick: () => navigate("/departamentos") },
+          { label: "Detalle" },
+        ]}
       >
         {error ? (
           <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -93,8 +97,12 @@ export default function DepartmentDetailPage() {
     <ITPage
       title="Detalle del departamento"
       description={dept.name}
-      backAction={() => navigate("/departamentos")}
+      backAction={() => navigate(-1)}
       icon={<FaBuilding size={20} />}
+      breadcrumbs={[
+        { label: "Departamentos", onClick: () => navigate("/departamentos") },
+        { label: dept.name },
+      ]}
     >
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>

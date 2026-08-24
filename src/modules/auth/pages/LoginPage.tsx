@@ -1,4 +1,4 @@
-import { ITAlert, ITButton, ITCard, ITFlex, ITInput, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITCard, ITFlex, ITInput, ITStack, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { useState } from "react";
 import { FaSignInAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,17 +9,23 @@ import { loginThunk } from "@core/store/auth/auth.slice";
 export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { token, loading, error } = useSelector((s: RootState) => s.auth);
+  const { token } = useSelector((s: RootState) => s.auth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
   if (token) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const action = await dispatch(loginThunk({ username, password }));
     if (loginThunk.fulfilled.match(action)) {
       navigate("/");
+    } else {
+      setIsSubmitting(false);
+      setToast({ message: "Credenciales inválidas", type: "error" });
     }
   };
 
@@ -70,36 +76,34 @@ export default function LoginPage() {
                 />
               </ITFlex>
 
-              {error && (
-                <ITAlert variant="error" dismissible onDismiss={() => undefined}>
-                  {error}
-                </ITAlert>
-              )}
-
               <ITButton
                 type="submit"
                 variant="filled"
                 color="primary"
-                disabled={loading || !username || !password}
+                disabled={isSubmitting || !username || !password}
                 className="w-full flex items-center justify-center gap-2"
               >
                 <ITFlex align="center" gap={1}>
                   <FaSignInAlt size={14} />
                   <ITText className="font-bold text-[11px]">
-                    {loading ? "Entrando…" : "Entrar"}
+                    {isSubmitting ? "Entrando…" : "Entrar"}
                   </ITText>
                 </ITFlex>
               </ITButton>
             </form>
 
-            <ITFlex direction="column" align="center" gap={1} className="mt-6 pt-5 border-t border-slate-100">
-              <ITText className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Demo
-              </ITText>
-              <ITText className="text-[11px] font-mono text-slate-500">admin / admin123</ITText>
-              <ITText className="text-[11px] font-mono text-slate-500">usuario / user123</ITText>
-            </ITFlex>
+
           </ITCard>
+
+          {toast && (
+            <ITToast
+              message={toast.message}
+              type={toast.type}
+              position="bottom-center"
+              duration={2500}
+              onClose={() => setToast(null)}
+            />
+          )}
         </ITFlex>
     </ITFlex>
   );

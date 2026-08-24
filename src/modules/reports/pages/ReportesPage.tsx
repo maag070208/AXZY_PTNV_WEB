@@ -1,4 +1,5 @@
 import {
+  ITBadget,
   ITButton,
   ITDataTable,
   ITDatePicker,
@@ -18,6 +19,7 @@ import { FaChartBar, FaDownload } from "react-icons/fa";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { reportsApi, type ReportFilters, type ReportRow } from "@core/api/reports.api";
+import { downloadReportPDF } from "../utils/pdf";
 import {
   departmentsApi,
   type Department,
@@ -32,7 +34,9 @@ const localDateString = (d: Date): string => {
 
 export default function ReportesPage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useState<ReportFilters>({});
+  const [filters, setFilters] = useState<ReportFilters & { dateRange?: [Date | null, Date | null] }>({
+    dateRange: [new Date(), null],
+  });
   const [total, setTotal] = useState(0);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [reloadKey, setReloadKey] = useState(0);
@@ -72,34 +76,24 @@ export default function ReportesPage() {
     []
   );
 
-  const csvUrl = useMemo(() => reportsApi.csvUrl(filters), [filters]);
+  const [exporting, setExporting] = useState(false);
 
-  const handleDownloadCsv = () => {
-    const token = JSON.parse(localStorage.getItem("cartas_auth_v1") || "{}")?.token;
-    if (!token) return;
-    window
-      .fetch(csvUrl, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.blob())
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "reporte_entregas.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
+  const handleDownloadPdf = async () => {
+    setExporting(true);
+    try {
+      const { data } = await reportsApi.get(filters);
+      await downloadReportPDF(data, filters);
+    } catch (e) {
+      console.error("Error al exportar PDF", e);
+    } finally {
+      setExporting(false);
+    }
   };
 
   const estadoBadge = (estado: string) => (
-    <ITText
-      className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
-        estado === "DEVUELTO"
-          ? "bg-slate-100 text-slate-600"
-          : "bg-emerald-50 text-emerald-700"
-      }`}
-    >
+    <ITBadget color={estado === "DEVUELTO" ? "default" : "success"} size="small">
       {estado}
-    </ITText>
+    </ITBadget>
   );
 
   const columns: Column<ReportRow>[] = [
@@ -173,35 +167,31 @@ export default function ReportesPage() {
     <ITPage
       title="Reportes"
       description={`${total} entregas encontradas`}
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
       icon={<FaChartBar size={20} />}
+      breadcrumbs={[
+        { label: "Inicio", onClick: () => navigate("/") },
+        { label: "Reportes" },
+      ]}
     >
       <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 mb-6" direction="column" gap={4}>
         <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12} md={3}>
+          <ITGrid item xs={12} md={4}>
             <ITDatePicker
-              name="start"
-              label="Desde"
-              value={filters.start ? new Date(filters.start) : undefined}
-              onChange={(e) =>
+              name="dateRange"
+              label="Rango de fechas"
+              range={true}
+              value={filters.dateRange ?? [null, null]}
+              onChange={(e) => {
+                const range = e.target.value as [Date | null, Date | null];
                 setFilters((f) => ({
                   ...f,
-                  start: e.target.value instanceof Date ? localDateString(e.target.value) : undefined,
-                }))
-              }
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={3}>
-            <ITDatePicker
-              name="end"
-              label="Hasta"
-              value={filters.end ? new Date(filters.end) : undefined}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  end: e.target.value instanceof Date ? localDateString(e.target.value) : undefined,
-                }))
-              }
+                  dateRange: range,
+                  start: range[0] ? localDateString(range[0]) : undefined,
+                  end: range[1] ? localDateString(range[1]) : undefined,
+                }));
+              }}
+              placeholder="Fecha inicio - Fecha fin"
             />
           </ITGrid>
           <ITGrid item xs={12} md={3}>
@@ -239,11 +229,12 @@ export default function ReportesPage() {
           <ITButton
             variant="filled"
             color="primary"
-            onClick={handleDownloadCsv}
+            onClick={handleDownloadPdf}
+            disabled={exporting}
           >
             <ITFlex align="center" gap={1}>
               <FaDownload size={12} />
-              <ITText className="font-bold text-[11px]">Exportar CSV</ITText>
+              <ITText className="font-bold text-[11px]">{exporting ? "Exportando..." : "Exportar PDF"}</ITText>
             </ITFlex>
           </ITButton>
         </ITFlex>

@@ -5,7 +5,6 @@ import {
   ITCard,
   ITFlex,
   ITGrid,
-  ITInput,
   ITLoader,
   ITPage,
   ITSelect,
@@ -25,7 +24,6 @@ export default function GenerarCartasPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [typeId, setTypeId] = useState("");
-  const [cantidad, setCantidad] = useState(1);
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<GenerateCartasResult | null>(null);
 
@@ -48,12 +46,12 @@ export default function GenerarCartasPage() {
   }, []);
 
   const handleGenerate = async () => {
-    if (!typeId || cantidad < 1) return;
+    if (!typeId) return;
     setGenerating(true);
     setError(null);
     setResult(null);
     try {
-      const data = await cartasApi.generate(typeId, cantidad);
+      const data = await cartasApi.generate(typeId);
       setResult(data);
     } catch (e: any) {
       setError(e.message);
@@ -62,15 +60,16 @@ export default function GenerarCartasPage() {
     }
   };
 
-  const selectedType = types.find((t) => t.id === typeId);
-
   return (
     <ITPage
-      title="Generar cartas por tipo"
-      description="Crea plantillas de cartas con folio consecutivo según el tipo"
-      backAction={() => navigate("/cartas")}
+      title="Generar carta por tipo"
+      description="Crea una plantilla de carta con folio consecutivo según el tipo"
+      backAction={() => navigate(-1)}
       icon={<FaFileSignature size={20} />}
-      maxWidth="3xl"
+      breadcrumbs={[
+        { label: "Cartas", onClick: () => navigate("/cartas") },
+        { label: "Generar" },
+      ]}
     >
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -99,22 +98,6 @@ export default function GenerarCartasPage() {
               />
             </ITGrid>
 
-            <ITGrid item xs={12} md={5}>
-              <ITInput
-                name="cantidad"
-                type="number"
-                label="Cantidad *"
-                min={1}
-                max={100}
-                value={cantidad}
-                onChange={(e) =>
-                  setCantidad(
-                    Math.min(100, Math.max(1, parseInt(e.target.value || "1", 10)))
-                  )
-                }
-              />
-            </ITGrid>
-
             <ITGrid item xs={12}>
               <ITFlex justify="end" gap={2}>
                 <ITButton variant="outlined" onClick={() => navigate("/cartas")}>
@@ -124,12 +107,12 @@ export default function GenerarCartasPage() {
                   variant="filled"
                   color="primary"
                   onClick={handleGenerate}
-                  disabled={generating || !typeId || cantidad < 1}
+                  disabled={generating || !typeId}
                 >
                   <ITFlex align="center" gap={1}>
                     <FaLayerGroup size={12} />
                     <ITText className="font-bold text-[11px]">
-                      {generating ? "Generando…" : "Generar"}
+                      {generating ? "Generando…" : "Generar carta"}
                     </ITText>
                   </ITFlex>
                 </ITButton>
@@ -142,19 +125,17 @@ export default function GenerarCartasPage() {
       {result && (
         <ITCard className="p-6 mt-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
           <ITFlex direction="column" gap={3}>
-            <ITAlert variant="success" title="Cartas generadas">
-              Se generaron {result.cartas.length} plantilla(s) de tipo {result.tipo.name}.
+            <ITAlert variant="success" title="Carta generada">
+              Se generó la plantilla de tipo {result.tipo.name}.
             </ITAlert>
             <ITFlex direction="column" gap={1}>
               <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                Folios generados ({result.cartas.length})
+                Folio generado
               </ITText>
               <ITFlex wrap="wrap" gap={2}>
-                {result.cartas.map((c) => (
-                  <ITBadget key={c.id} color="primary" size="small">
-                    {c.consecutivo}
-                  </ITBadget>
-                ))}
+                <ITBadget color="primary" size="small">
+                  {result.carta.consecutivo}
+                </ITBadget>
               </ITFlex>
             </ITFlex>
             <ITFlex justify="end" gap={2}>

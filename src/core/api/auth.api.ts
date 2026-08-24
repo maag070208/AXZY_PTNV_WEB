@@ -4,7 +4,7 @@ import {
   type ITDataTableFetchParamsPost,
 } from "./table";
 
-export type UserRole = "ADMIN" | "USER" | "EMPLEADO";
+export type UserRole = "ADMIN" | "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO";
 
 export interface AuthUser {
   id: string;
@@ -23,6 +23,8 @@ export interface User extends AuthUser {
   puesto?: string;
   area?: string;
   numeroEmpleado?: string;
+  departmentId?: string | null;
+  subareaId?: string | null;
 }
 
 export const authApi = {
@@ -38,7 +40,11 @@ export const usersApi = {
     const qs = role ? `?role=${role}` : "";
     return api.get<User[]>(`/users${qs}`);
   },
-  empleados: () => api.get<User[]>(`/users/empleados`),
+  get: (id: string) => api.get<User>(`/users/${id}`),
+  empleados: (departmentId?: string) => {
+    const qs = departmentId ? `?departmentId=${encodeURIComponent(departmentId)}` : "";
+    return api.get<User[]>(`/users/empleados${qs}`);
+  },
   create: (data: {
     username: string;
     password: string;
@@ -59,9 +65,20 @@ export const usersApi = {
       puesto?: string;
       area?: string;
       numeroEmpleado?: string;
+      departmentId?: string | null;
+      subareaId?: string | null;
     }
   ) => api.put<User>(`/users/${id}`, data),
   changePassword: (id: string, password: string) =>
     api.put<void>(`/users/${id}/password`, { password }),
   delete: (id: string) => api.delete<{ id: string; active: boolean }>(`/users/${id}`),
+  history: (id: string) =>
+    api.get<Array<{
+      id: string;
+      type: string;
+      title: string;
+      detail: string;
+      timestamp: string;
+      refId?: string;
+    }>>(`/users/${id}/history`),
 };

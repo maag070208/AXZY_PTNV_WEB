@@ -14,7 +14,7 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { useCallback, useMemo, useState } from "react";
-import { FaEye, FaFileSignature, FaLayerGroup, FaTrash } from "react-icons/fa";
+import { FaEye, FaFileSignature, FaTrash } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import type { AppDispatch } from "@core/store/store";
@@ -135,7 +135,7 @@ export default function CartasListPage() {
             <ITButton
               variant="outlined"
               size="small"
-              color="info"
+              color="secondary"
               onClick={() => handleLoad(row.id)}
               title="Ver / Editar"
             >
@@ -173,21 +173,15 @@ export default function CartasListPage() {
   return (
     <ITPage
       title="Cartas Responsivas"
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
       description="Genera y administra cartas responsivas del Departamento de Mantenimiento"
       icon={<FaFileSignature size={20} />}
+      breadcrumbs={[
+        { label: "Inicio", onClick: () => navigate("/") },
+        { label: "Cartas" },
+      ]}
       actions={
         <ITFlex gap={2}>
-          <ITButton
-            variant="outlined"
-            color="info"
-            onClick={() => navigate("/cartas/generar")}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaLayerGroup size={12} />
-              <ITText className="font-bold text-[11px]">Generar por tipo</ITText>
-            </ITFlex>
-          </ITButton>
           <ITButton
             variant="filled"
             color="primary"

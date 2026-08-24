@@ -16,7 +16,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaPlus, FaUserTie } from "react-icons/fa";
+import { FaEdit, FaPlus, FaUserTie } from "react-icons/fa";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -173,19 +173,41 @@ export default function EmployeesListPage() {
         </ITText>
       ),
     },
+    ...(isAdmin
+      ? [
+          {
+            key: "actions",
+            label: "",
+            type: "string" as const,
+            sortable: false,
+            render: (u: User) => (
+              <FaEdit
+                size={14}
+                className="text-slate-400 hover:text-blue-600 cursor-pointer"
+                onClick={() => navigate(`/empleados/${u.id}/editar`)}
+                title="Editar empleado"
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
     <ITPage
       title="Empleados"
       description={`${total} empleado(s) activo(s)`}
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
+      breadcrumbs={[
+        { label: "Inicio", onClick: () => navigate("/") },
+        { label: "Empleados" },
+      ]}
       actions={
         isAdmin ? (
           <ITButton
             variant="filled"
             color="primary"
-            onClick={() => setShowForm((s) => !s)}
+            onClick={() => navigate("/usuarios/nuevo")}
           >
             <ITFlex align="center" gap={1}>
               <FaPlus size={12} />

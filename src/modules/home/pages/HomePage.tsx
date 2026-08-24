@@ -7,6 +7,7 @@ import {
   FaFileSignature,
   FaHouseUser,
   FaLaptop,
+  FaTicketAlt,
   FaUserShield,
   FaUserTie,
 } from "react-icons/fa";
@@ -16,6 +17,7 @@ import { cartasApi } from "@core/api/cartas.api";
 import { devicesApi } from "@core/api/devices.api";
 import { departmentsApi } from "@core/api/departments.api";
 import { usersApi } from "@core/api/auth.api";
+import { ticketsApi } from "@core/api/tickets.api";
 
 interface HomeModule {
   id: string;
@@ -33,15 +35,19 @@ export default function HomePage() {
   const user = useSelector((s: RootState) => s.auth.user);
   const [counts, setCounts] = useState<Counts>({});
 
-  const isAdmin = user?.role === "ADMIN";
-  const isUser = isAdmin || user?.role === "USER";
+  const isAdmin = user?.role === "ADMIN" || user?.role === "GERENTE";
+  const isJefeArea = user?.role === "JEFE_DE_AREA";
+  const canManage = isAdmin || isJefeArea;
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       const jobs: Array<[string, Promise<{ total: number }>]> = [];
-      if (isUser) {
+      if (canManage || user?.role === "EMPLEADO") {
         jobs.push(["cartas", cartasApi.table({ page: 1, limit: 1, filters: {} })]);
+        jobs.push(["tickets", ticketsApi.table({ page: 1, limit: 1, filters: {} })]);
+      }
+      if (canManage) {
         jobs.push(["empleados", usersApi.table({ page: 1, limit: 1, filters: { role: "EMPLEADO" } })]);
       }
       if (isAdmin) {
@@ -62,10 +68,32 @@ export default function HomePage() {
     return () => {
       cancelled = true;
     };
-  }, [isUser, isAdmin]);
+  }, [canManage, isAdmin, user?.role]);
 
   const modules: HomeModule[] = [
-    ...(isUser
+    // EMPLEADO: solo cartas y tickets
+    ...(!canManage && user?.role === "EMPLEADO"
+      ? [
+          {
+            id: "cartas",
+            title: "Mis Cartas",
+            description: "Cartas responsivas asignadas a ti",
+            icon: <FaFileSignature size={22} />,
+            to: "/cartas",
+            count: counts.cartas,
+          },
+          {
+            id: "tickets",
+            title: "Mis Tickets",
+            description: "Tickets que has creado o te fueron asignados",
+            icon: <FaTicketAlt size={22} />,
+            to: "/tickets",
+            count: counts.tickets,
+          },
+        ]
+      : []),
+    // ADMIN/GERENTE/JEFE_DE_AREA: cartas, tickets, reportes, empleados
+    ...(canManage
       ? [
           {
             id: "cartas",
@@ -73,7 +101,15 @@ export default function HomePage() {
             description: "Genera y administra cartas responsivas del departamento de Mantenimiento",
             icon: <FaFileSignature size={22} />,
             to: "/cartas",
-            count: counts.cartas
+            count: counts.cartas,
+          },
+          {
+            id: "tickets",
+            title: "Tickets",
+            description: "Gestiona tickets de soporte y mantenimiento",
+            icon: <FaTicketAlt size={22} />,
+            to: "/tickets",
+            count: counts.tickets,
           },
           {
             id: "reportes",
@@ -81,7 +117,7 @@ export default function HomePage() {
             description: "Consulta entregas y devoluciones de equipo por periodo",
             icon: <FaChartBar size={22} />,
             to: "/reportes",
-            count: undefined
+            count: undefined,
           },
           {
             id: "empleados",
@@ -89,10 +125,11 @@ export default function HomePage() {
             description: "Catálogo de empleados que reciben equipo",
             icon: <FaUserTie size={22} />,
             to: "/empleados",
-            count: counts.empleados
+            count: counts.empleados,
           },
         ]
       : []),
+    // Solo ADMIN: dispositivos, departamentos, usuarios
     ...(isAdmin
       ? [
           {
@@ -101,7 +138,7 @@ export default function HomePage() {
             description: "Control de activos y estados de cada equipo",
             icon: <FaLaptop size={22} />,
             to: "/dispositivos",
-            count: counts.dispositivos
+            count: counts.dispositivos,
           },
           {
             id: "departamentos",
@@ -109,7 +146,7 @@ export default function HomePage() {
             description: "Estructura organizacional y subáreas",
             icon: <FaBuilding size={22} />,
             to: "/departamentos",
-            count: counts.departamentos
+            count: counts.departamentos,
           },
           {
             id: "usuarios",
@@ -117,7 +154,7 @@ export default function HomePage() {
             description: "Administración de accesos al sistema",
             icon: <FaUserShield size={22} />,
             to: "/usuarios",
-            count: counts.usuarios
+            count: counts.usuarios,
           },
         ]
       : []),

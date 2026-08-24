@@ -104,7 +104,7 @@ export default function DeviceTypesListPage() {
         <ITButton
           variant="outlined"
           size="small"
-          color="info"
+          color="secondary"
           onClick={() => navigate(`/dispositivos/tipos/${t.id}/editar`)}
           title="Editar"
         >
@@ -118,7 +118,11 @@ export default function DeviceTypesListPage() {
     <ITPage
       title="Tipos de dispositivo"
       description="Cada tipo tiene su propio consecutivo (prefijo)"
-      backAction={() => navigate("/")}
+      backAction={() => navigate(-1)}
+      breadcrumbs={[
+        { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
+        { label: "Tipos" },
+      ]}
       actions={
         <ITButton
           variant="filled"
