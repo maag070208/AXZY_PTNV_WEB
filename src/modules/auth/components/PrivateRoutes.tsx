@@ -1,4 +1,4 @@
-import { ITCard, ITLayout, ITToast } from "@axzydev/axzy_ui_system";
+import { ITCard, ITLayout, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { useEffect, useState, useCallback } from "react";
 import {
   FaBuilding,
@@ -179,6 +179,11 @@ export default function PrivateRoutes() {
           <Outlet />
         </ITCard>
       </ITLayout>
+      <div className="w-full py-3 flex justify-center items-center bg-slate-50 border-t border-slate-200">
+        <ITText className="text-[10px] text-slate-400">
+          powered by <span className="font-bold text-slate-500">axzy.dev</span>
+        </ITText>
+      </div>
       {toast && (
         <ITToast
           message={toast}

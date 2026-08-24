@@ -6,15 +6,15 @@ import {
   View,
 } from "@react-pdf/renderer";
 import type { Ticket } from "@core/api/tickets.api";
+import { CommonHeader, CommonFooter, commonStyles } from "@modules/shared/components/pdf/CommonPDF";
 
 interface Props {
   ticket: Ticket;
+  pageNumber?: number;
+  totalPages?: number;
 }
 
 const NAVY = "#1e3a5f";
-const NAVY_DARK = "#0f2744";
-const GOLD = "#c9a84c";
-const GOLD_LIGHT = "#f5e6c8";
 const WHITE = "#ffffff";
 const SLATE = "#64748b";
 const SLATE_LIGHT = "#94a3b8";
@@ -56,74 +56,6 @@ const styles = StyleSheet.create({
   },
   pageContent: {
     padding: 0,
-  },
-
-  /* ── Header ── */
-  headerBlock: {
-    backgroundColor: NAVY,
-    paddingTop: 32,
-    paddingBottom: 28,
-    paddingHorizontal: 40,
-  },
-  headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 20,
-  },
-  logoArea: {
-    flexDirection: "column",
-  },
-  logoText: {
-    fontSize: 22,
-    fontFamily: "Helvetica-Bold",
-    color: WHITE,
-    letterSpacing: 0.5,
-  },
-  logoSubtext: {
-    fontSize: 8,
-    color: GOLD,
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
-    marginTop: 2,
-  },
-  ticketId: {
-    fontSize: 9,
-    color: GOLD,
-    textAlign: "right",
-    fontFamily: "Helvetica-Bold",
-    letterSpacing: 1,
-  },
-  headerDivider: {
-    height: 2,
-    backgroundColor: GOLD,
-    marginBottom: 20,
-  },
-  ticketTitle: {
-    fontSize: 18,
-    fontFamily: "Helvetica-Bold",
-    color: WHITE,
-    marginBottom: 8,
-    lineHeight: 1.3,
-  },
-  headerMeta: {
-    flexDirection: "row",
-    gap: 20,
-  },
-  headerMetaItem: {
-    flexDirection: "column",
-  },
-  headerMetaLabel: {
-    fontSize: 7,
-    color: SLATE_LIGHT,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: 2,
-  },
-  headerMetaValue: {
-    fontSize: 10,
-    color: WHITE,
-    fontFamily: "Helvetica-Bold",
   },
 
   /* ── Status Banner ── */
@@ -204,7 +136,7 @@ const styles = StyleSheet.create({
   body: {
     paddingHorizontal: 40,
     paddingTop: 28,
-    paddingBottom: 40,
+    paddingBottom: 60,
   },
 
   /* ── KPI Cards ── */
@@ -221,7 +153,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BORDER,
     borderLeftWidth: 3,
-    borderLeftColor: GOLD,
+    borderLeftColor: "#c9a84c",
   },
   kpiLabel: {
     fontSize: 7,
@@ -319,7 +251,7 @@ const styles = StyleSheet.create({
   sectionLine: {
     flex: 1,
     height: 1,
-    backgroundColor: GOLD,
+    backgroundColor: "#c9a84c",
     marginLeft: 12,
   },
 
@@ -462,47 +394,6 @@ const styles = StyleSheet.create({
     fontSize: 7,
     color: SLATE_LIGHT,
   },
-
-  /* ── Footer ── */
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: NAVY_DARK,
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  footerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  footerLogo: {
-    width: 12,
-    height: 12,
-    backgroundColor: GOLD,
-    borderRadius: 2,
-  },
-  footerText: {
-    fontSize: 8,
-    color: SLATE_LIGHT,
-  },
-  footerRight: {
-    alignItems: "flex-end",
-  },
-  footerDate: {
-    fontSize: 8,
-    color: SLATE_LIGHT,
-  },
-  footerConf: {
-    fontSize: 7,
-    color: GOLD,
-    marginTop: 1,
-  },
 });
 
 const formatDate = (dateStr: string) => {
@@ -525,7 +416,13 @@ const formatShortDate = (dateStr: string) => {
   });
 };
 
-export const TicketPDF = ({ ticket }: Props) => {
+interface TicketPDFProps {
+  ticket: Ticket;
+  pageNumber?: number;
+  totalPages?: number;
+}
+
+export const TicketPDFPage = ({ ticket, pageNumber = 1, totalPages = 1 }: TicketPDFProps) => {
   const getEfficacy = () => {
     if (!ticket.closedAt) return null;
     const created = new Date(ticket.creadoEn).getTime();
@@ -547,213 +444,182 @@ export const TicketPDF = ({ ticket }: Props) => {
   const efficacy = getEfficacy();
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.pageContent}>
-          {/* Header */}
-          <View style={styles.headerBlock}>
-            <View style={styles.headerTop}>
-              <View style={styles.logoArea}>
-                <Text style={styles.logoText}>Puerto Nuevo</Text>
-                <Text style={styles.logoSubtext}>Hotel & Villas</Text>
-              </View>
-              <Text style={styles.ticketId}>
-                TICKET #{ticket.id.slice(0, 8).toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.headerDivider} />
-            <Text style={styles.ticketTitle}>{ticket.titulo}</Text>
-            <View style={styles.headerMeta}>
-              <View style={styles.headerMetaItem}>
-                <Text style={styles.headerMetaLabel}>Creado</Text>
-                <Text style={styles.headerMetaValue}>{formatShortDate(ticket.creadoEn)}</Text>
-              </View>
-              <View style={styles.headerMetaItem}>
-                <Text style={styles.headerMetaLabel}>Departamento</Text>
-                <Text style={styles.headerMetaValue}>
-                  {ticket.department?.name ?? "Sin asignar"}
-                </Text>
-              </View>
-              <View style={styles.headerMetaItem}>
-                <Text style={styles.headerMetaLabel}>Reporta</Text>
-                <Text style={styles.headerMetaValue}>{ticket.creadoPor?.name ?? "—"}</Text>
-              </View>
-            </View>
-          </View>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.pageContent}>
+        <CommonHeader
+          title={ticket.titulo}
+          subtitle="Reporte de Ticket"
+          meta={`Ticket #${ticket.id.slice(0, 8).toUpperCase()}`}
+          pageNumber={pageNumber}
+          totalPages={totalPages}
+        />
 
-          {/* Status Banner */}
-          <View style={styles.statusBanner}>
-            <View style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[ticket.status] ?? SLATE }}>
-              <View style={{ ...styles.statusDot, backgroundColor: WHITE }} />
-              <Text style={styles.statusText}>{STATUS_LABELS[ticket.status] ?? ticket.status}</Text>
+        {/* Status Banner */}
+        <View style={styles.statusBanner}>
+          <View style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[ticket.status] ?? SLATE }}>
+            <View style={{ ...styles.statusDot, backgroundColor: WHITE }} />
+            <Text style={styles.statusText}>{STATUS_LABELS[ticket.status] ?? ticket.status}</Text>
+          </View>
+          <View style={{ ...styles.priorityBadge, backgroundColor: PRIORITY_COLORS[ticket.priority] ?? SLATE }}>
+            <Text style={styles.priorityText}>{ticket.priority}</Text>
+          </View>
+          <View style={styles.categoryBadge}>
+            <Text style={styles.categoryText}>{CATEGORY_LABELS[ticket.category] ?? ticket.category}</Text>
+          </View>
+          <View style={styles.statusMeta}>
+            <View style={styles.statusMetaItem}>
+              <Text style={styles.statusMetaLabel}>Creado:</Text>
+              <Text style={styles.statusMetaValue}>{formatShortDate(ticket.creadoEn)}</Text>
             </View>
-            <View style={{ ...styles.priorityBadge, backgroundColor: PRIORITY_COLORS[ticket.priority] ?? SLATE }}>
-              <Text style={styles.priorityText}>{ticket.priority}</Text>
-            </View>
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{CATEGORY_LABELS[ticket.category] ?? ticket.category}</Text>
-            </View>
-            <View style={styles.statusMeta}>
+            {ticket.closedAt && (
               <View style={styles.statusMetaItem}>
-                <Text style={styles.statusMetaLabel}>Creado:</Text>
-                <Text style={styles.statusMetaValue}>{formatShortDate(ticket.creadoEn)}</Text>
-              </View>
-              {ticket.closedAt && (
-                <View style={styles.statusMetaItem}>
-                  <Text style={styles.statusMetaLabel}>Cerrado:</Text>
-                  <Text style={styles.statusMetaValue}>{formatShortDate(ticket.closedAt)}</Text>
-                </View>
-              )}
-            </View>
-          </View>
-
-          {/* Body */}
-          <View style={styles.body}>
-            {/* KPI Row */}
-            <View style={styles.kpiRow}>
-              <View style={styles.kpiCard}>
-                <Text style={styles.kpiLabel}>Creado por</Text>
-                <Text style={styles.kpiValue}>{ticket.creadoPor?.name ?? "—"}</Text>
-                <Text style={styles.kpiSub}>{ticket.creadoPor?.puesto ?? "Empleado"}</Text>
-              </View>
-              <View style={styles.kpiCard}>
-                <Text style={styles.kpiLabel}>Asignado a</Text>
-                <Text style={styles.kpiValue}>{ticket.asignadoA?.name ?? "Sin asignar"}</Text>
-                <Text style={styles.kpiSub}>{ticket.asignadoA?.puesto ?? "—"}</Text>
-              </View>
-              <View style={styles.kpiCard}>
-                <Text style={styles.kpiLabel}>Comentarios</Text>
-                <Text style={styles.kpiValue}>{ticket.comments.length}</Text>
-                <Text style={styles.kpiSub}>Interacciones</Text>
-              </View>
-              <View style={styles.kpiCard}>
-                <Text style={styles.kpiLabel}>Eventos</Text>
-                <Text style={styles.kpiValue}>{ticket.history.length}</Text>
-                <Text style={styles.kpiSub}>Cambios registrados</Text>
-              </View>
-            </View>
-
-            {/* Efficacy */}
-            {efficacy && (
-              <View style={styles.efficacySection}>
-                <View style={styles.efficacyCard}>
-                  <View style={styles.efficacyHeader}>
-                    <Text style={styles.efficacyTitle}>Índice de Eficacia</Text>
-                    <View style={styles.efficacyScore}>
-                      <Text style={{ ...styles.efficacyNumber, color: efficacy.color }}>
-                        {efficacy.score}%
-                      </Text>
-                      <Text style={{ ...styles.efficacyLabel, color: efficacy.color }}>
-                        {efficacy.label}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.efficacyBarBg}>
-                    <View style={{ ...styles.efficacyBarFill, width: `${efficacy.score}%`, backgroundColor: efficacy.color }} />
-                  </View>
-                  <View style={styles.efficacyFooter}>
-                    <Text style={styles.efficacyDetail}>
-                      Tiempo de resolución: {efficacy.hours} horas
-                    </Text>
-                    <Text style={styles.efficacyDetail}>
-                      Prioridad: {ticket.priority}
-                    </Text>
-                  </View>
-                </View>
+                <Text style={styles.statusMetaLabel}>Cerrado:</Text>
+                <Text style={styles.statusMetaValue}>{formatShortDate(ticket.closedAt)}</Text>
               </View>
             )}
-
-            {/* Description */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Descripción del Ticket</Text>
-                <View style={styles.sectionLine} />
-              </View>
-              <View style={styles.descriptionBox}>
-                <Text style={styles.descriptionText}>{ticket.descripcion}</Text>
-              </View>
-            </View>
-
-            {/* Comments */}
-            {ticket.comments.length > 0 && (
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Comentarios y Seguimiento</Text>
-                  <View style={styles.sectionLine} />
-                </View>
-                <View style={styles.table}>
-                  <View style={styles.tableHeader}>
-                    <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Fecha</Text>
-                    <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Autor</Text>
-                    <Text style={{ ...styles.tableHeaderCell, flex: 4 }}>Comentario</Text>
-                  </View>
-                  {ticket.comments.map((c, i) => (
-                    <View key={c.id} style={i % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}>
-                      <Text style={{ ...styles.tableCell, flex: 2 }}>{formatDate(c.creadoEn)}</Text>
-                      <Text style={{ ...styles.tableCellBold, flex: 2 }}>{c.autor?.name ?? "—"}</Text>
-                      <Text style={{ ...styles.tableCell, flex: 4 }}>{c.texto}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Timeline / History */}
-            {ticket.history.length > 0 && (
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Historial de Actividad</Text>
-                  <View style={styles.sectionLine} />
-                </View>
-                <View style={styles.timeline}>
-                  {ticket.history.map((h, idx) => {
-                    const isClosed = h.type === "STATUS" && h.detail?.includes("CERRADO");
-                    const dotColor = isClosed ? "#dc2626" : h.type === "CREATED" ? "#16a34a" : h.type === "ASSIGNED" ? "#7c3aed" : h.type === "DEPARTMENT" ? "#9333ea" : h.type === "PRIORITY" ? "#d97706" : NAVY;
-                    const borderColor = isClosed ? "#dc2626" : h.type === "CREATED" ? "#16a34a" : h.type === "ASSIGNED" ? "#7c3aed" : h.type === "DEPARTMENT" ? "#9333ea" : h.type === "PRIORITY" ? "#d97706" : NAVY;
-                    return (
-                      <View key={h.id} style={styles.timelineItem}>
-                        <View style={styles.timelineLeft}>
-                          <View style={{ ...styles.timelineDot, backgroundColor: dotColor }} />
-                          {idx < ticket.history.length - 1 && <View style={styles.timelineLine} />}
-                        </View>
-                        <View style={styles.timelineContent}>
-                          <View style={{ ...styles.timelineCard, borderLeftColor: borderColor }}>
-                            <Text style={styles.timelineCardTitle}>
-                              {h.detail ?? h.type}
-                            </Text>
-                            {h.autor && (
-                              <Text style={styles.timelineCardMeta}>
-                                Por {h.autor.name}
-                              </Text>
-                            )}
-                            <Text style={styles.timelineCardTime}>
-                              {formatDate(h.createdAt)}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  })}
-                </View>
-              </View>
-            )}
-          </View>
-
-          {/* Footer */}
-          <View style={styles.footer} fixed>
-            <View style={styles.footerLeft}>
-              <View style={styles.footerLogo} />
-              <Text style={styles.footerText}>Hotel Puerto Nuevo · Sistema de Tickets</Text>
-            </View>
-            <View style={styles.footerRight}>
-              <Text style={styles.footerDate}>
-                Generado el {formatDate(new Date().toISOString())}
-              </Text>
-              <Text style={styles.footerConf}>Documento confidencial</Text>
-            </View>
           </View>
         </View>
-      </Page>
-    </Document>
+
+        {/* Body */}
+        <View style={styles.body}>
+          {/* KPI Row */}
+          <View style={styles.kpiRow}>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiLabel}>Creado por</Text>
+              <Text style={styles.kpiValue}>{ticket.creadoPor?.name ?? "—"}</Text>
+              <Text style={styles.kpiSub}>{ticket.creadoPor?.puesto ?? "Empleado"}</Text>
+            </View>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiLabel}>Asignado a</Text>
+              <Text style={styles.kpiValue}>{ticket.asignadoA?.name ?? "Sin asignar"}</Text>
+              <Text style={styles.kpiSub}>{ticket.asignadoA?.puesto ?? "—"}</Text>
+            </View>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiLabel}>Comentarios</Text>
+              <Text style={styles.kpiValue}>{ticket.comments.length}</Text>
+              <Text style={styles.kpiSub}>Interacciones</Text>
+            </View>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiLabel}>Eventos</Text>
+              <Text style={styles.kpiValue}>{ticket.history.length}</Text>
+              <Text style={styles.kpiSub}>Cambios registrados</Text>
+            </View>
+          </View>
+
+          {/* Efficacy */}
+          {efficacy && (
+            <View style={styles.efficacySection}>
+              <View style={styles.efficacyCard}>
+                <View style={styles.efficacyHeader}>
+                  <Text style={styles.efficacyTitle}>Índice de Eficacia</Text>
+                  <View style={styles.efficacyScore}>
+                    <Text style={{ ...styles.efficacyNumber, color: efficacy.color }}>
+                      {efficacy.score}%
+                    </Text>
+                    <Text style={{ ...styles.efficacyLabel, color: efficacy.color }}>
+                      {efficacy.label}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.efficacyBarBg}>
+                  <View style={{ ...styles.efficacyBarFill, width: `${efficacy.score}%`, backgroundColor: efficacy.color }} />
+                </View>
+                <View style={styles.efficacyFooter}>
+                  <Text style={styles.efficacyDetail}>
+                    Tiempo de resolución: {efficacy.hours} horas
+                  </Text>
+                  <Text style={styles.efficacyDetail}>
+                    Prioridad: {ticket.priority}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Description */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Descripción del Ticket</Text>
+              <View style={styles.sectionLine} />
+            </View>
+            <View style={styles.descriptionBox}>
+              <Text style={styles.descriptionText}>{ticket.descripcion}</Text>
+            </View>
+          </View>
+
+          {/* Comments */}
+          {ticket.comments.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Comentarios y Seguimiento</Text>
+                <View style={styles.sectionLine} />
+              </View>
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Fecha</Text>
+                  <Text style={{ ...styles.tableHeaderCell, flex: 2 }}>Autor</Text>
+                  <Text style={{ ...styles.tableHeaderCell, flex: 4 }}>Comentario</Text>
+                </View>
+                {ticket.comments.map((c, i) => (
+                  <View key={c.id} style={i % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}>
+                    <Text style={{ ...styles.tableCell, flex: 2 }}>{formatDate(c.creadoEn)}</Text>
+                    <Text style={{ ...styles.tableCellBold, flex: 2 }}>{c.autor?.name ?? "—"}</Text>
+                    <Text style={{ ...styles.tableCell, flex: 4 }}>{c.texto}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Timeline / History */}
+          {ticket.history.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Historial de Actividad</Text>
+                <View style={styles.sectionLine} />
+              </View>
+              <View style={styles.timeline}>
+                {ticket.history.map((h, idx) => {
+                  const isClosed = h.type === "STATUS" && h.detail?.includes("CERRADO");
+                  const dotColor = isClosed ? "#dc2626" : h.type === "CREATED" ? "#16a34a" : h.type === "ASSIGNED" ? "#7c3aed" : h.type === "DEPARTMENT" ? "#9333ea" : h.type === "PRIORITY" ? "#d97706" : NAVY;
+                  const borderColor = isClosed ? "#dc2626" : h.type === "CREATED" ? "#16a34a" : h.type === "ASSIGNED" ? "#7c3aed" : h.type === "DEPARTMENT" ? "#9333ea" : h.type === "PRIORITY" ? "#d97706" : NAVY;
+                  return (
+                    <View key={h.id} style={styles.timelineItem}>
+                      <View style={styles.timelineLeft}>
+                        <View style={{ ...styles.timelineDot, backgroundColor: dotColor }} />
+                        {idx < ticket.history.length - 1 && <View style={styles.timelineLine} />}
+                      </View>
+                      <View style={styles.timelineContent}>
+                        <View style={{ ...styles.timelineCard, borderLeftColor: borderColor }}>
+                          <Text style={styles.timelineCardTitle}>
+                            {h.detail ?? h.type}
+                          </Text>
+                          {h.autor && (
+                            <Text style={styles.timelineCardMeta}>
+                              Por {h.autor.name}
+                            </Text>
+                          )}
+                          <Text style={styles.timelineCardTime}>
+                            {formatDate(h.createdAt)}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+        </View>
+
+        <CommonFooter />
+      </View>
+    </Page>
   );
 };
+
+export const TicketPDF = ({ ticket }: Props) => (
+  <Document title={`Ticket - ${ticket.titulo}`} author="Hotel Puerto Nuevo">
+    <TicketPDFPage ticket={ticket} pageNumber={1} totalPages={1} />
+  </Document>
+);
