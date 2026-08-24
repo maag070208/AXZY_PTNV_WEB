@@ -173,6 +173,24 @@ const styles = StyleSheet.create({
   badgeDevuelto: {
     fontSize: 7,
     fontFamily: "Helvetica-Bold",
+    color: "#b45309",
+    backgroundColor: "#fef3c7",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 3,
+  },
+  badgePerdido: {
+    fontSize: 7,
+    fontFamily: "Helvetica-Bold",
+    color: "#dc2626",
+    backgroundColor: "#fee2e2",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 3,
+  },
+  badgeDefault: {
+    fontSize: 7,
+    fontFamily: "Helvetica-Bold",
     color: MUTED,
     backgroundColor: LIGHT,
     paddingHorizontal: 6,
@@ -327,7 +345,12 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
               <View style={{ width: COL.resp }}><Text style={styles.cell}>{r.responsible}</Text></View>
               <View style={{ width: COL.depto }}><Text style={styles.cellMuted}>{r.department}</Text></View>
               <View style={{ width: COL.estado }}>
-                <Text style={r.estado === "DEVUELTO" ? styles.badgeDevuelto : styles.badgeDevuelto}>
+                <Text style={
+                  r.estado === "ASIGNADO" ? styles.badgeAsignado :
+                  r.estado === "DEVUELTO" ? styles.badgeDevuelto :
+                  r.estado === "PERDIDO" ? styles.badgePerdido :
+                  styles.badgeDefault
+                }>
                   {r.estado}
                 </Text>
               </View>
