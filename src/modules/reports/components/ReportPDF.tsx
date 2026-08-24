@@ -7,7 +7,6 @@ import {
   View,
 } from "@react-pdf/renderer";
 import type { ReportRow } from "@core/api/reports.api";
-import { CommonFooter } from "@modules/shared/components/pdf/CommonPDF";
 
 interface Props {
   rows: ReportRow[];

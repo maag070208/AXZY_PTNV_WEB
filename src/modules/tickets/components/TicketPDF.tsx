@@ -1,5 +1,6 @@
 import {
   Document,
+  Image,
   Page,
   StyleSheet,
   Text,
@@ -24,6 +25,12 @@ const STATUS_COLORS: Record<string, string> = {
   CERRADO: "#22c55e",
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  ABIERTO: "Abierto",
+  EN_SEGUIMIENTO: "En seguimiento",
+  CERRADO: "Cerrado",
+};
+
 const PRIORITY_COLORS: Record<string, string> = {
   BAJA: "#94a3b8",
   MEDIA: "#f59e0b",
@@ -36,12 +43,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   EQUIPO: "Equipo",
   SISTEMA: "Sistema",
   OTRO: "Otro",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  ABIERTO: "Abierto",
-  EN_SEGUIMIENTO: "En seguimiento",
-  CERRADO: "Cerrado",
 };
 
 const styles = StyleSheet.create({
@@ -66,11 +67,17 @@ const styles = StyleSheet.create({
     borderBottomColor: ACCENT,
     borderBottomStyle: "solid",
   },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  logo: { width: 52, height: 52 },
   headerRight: {
     alignItems: "flex-end",
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Helvetica-Bold",
     color: BRAND,
     marginBottom: 4,
@@ -217,6 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 12,
+    marginBottom: 16,
     padding: 10,
     backgroundColor: LIGHT,
     borderRadius: 6,
@@ -287,6 +295,14 @@ const formatShortDate = (dateStr: string) => {
   });
 };
 
+const formatReportDate = (): string => {
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2, "0");
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const yy = now.getFullYear();
+  return `${dd}/${mm}/${yy}`;
+};
+
 export const TicketPDF = ({ ticket }: Props) => {
   const getEfficacy = () => {
     if (!ticket.closedAt) return null;
@@ -307,22 +323,25 @@ export const TicketPDF = ({ ticket }: Props) => {
   };
 
   const efficacy = getEfficacy();
+  const today = formatReportDate();
 
   return (
     <Document title={`Ticket - ${ticket.titulo}`} author="Hotel Puerto Nuevo">
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>{ticket.titulo}</Text>
-            <Text style={styles.headerSubtitle}>
-              Ticket #{ticket.id.slice(0, 8).toUpperCase()}
-            </Text>
+          <View style={styles.headerLeft}>
+            <Image src="/logo-puerto-nuevo.png" style={styles.logo} />
+            <View>
+              <Text style={styles.headerTitle}>Reporte de Ticket</Text>
+              <Text style={styles.headerSubtitle}>Puerto Nuevo Hotel y Villas</Text>
+            </View>
           </View>
           <View style={styles.headerRight}>
             <Text style={{ ...styles.badge, backgroundColor: STATUS_COLORS[ticket.status] ?? "#64748b" }}>
               {STATUS_LABELS[ticket.status] ?? ticket.status}
             </Text>
-            <Text style={styles.headerDate}>Creado: {formatShortDate(ticket.creadoEn)}</Text>
+            <Text style={styles.headerDate}>Ticket #{ticket.id.slice(0, 8).toUpperCase()}</Text>
+            <Text style={styles.headerDate}>Fecha: {today}</Text>
           </View>
         </View>
 
