@@ -7,6 +7,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import { formatFecha, type CartaResponsiva } from "@core/store/cartas/types";
+import { isITDeviceCode } from "@core/utils/itDevice";
 
 interface Props {
   carta: CartaResponsiva;
@@ -120,6 +121,18 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     minHeight: 9,
   },
+  especBloque: {
+    marginTop: 6,
+    borderTopWidth: 0.5,
+    borderTopColor: "#888",
+    borderTopStyle: "dashed",
+    paddingTop: 4,
+  },
+  especTitulo: {
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 2,
+    fontSize: 8.5,
+  },
   bloqueSeguimiento: {
     borderWidth: 0.8,
     borderColor: "#000",
@@ -198,6 +211,9 @@ export default function CartaPDF({ carta }: Props) {
   const descripcionConCantidad =
     (item?.descripcion || "CONTROL DE TV(5 PIEZAS)") +
     (carta.items.length > 1 ? ` (${carta.items.length} piezas)` : "");
+
+  const showITSpecs = isITDeviceCode(item?.device?.type?.code);
+  const dev = item?.device;
 
   return (
     <Document
@@ -311,6 +327,39 @@ export default function CartaPDF({ carta }: Props) {
               </Text>
             </View>
           </View>
+
+          {/* Especificaciones técnicas (TIC) — solo si el device es PC / TABLET / LAPTOP */}
+          {showITSpecs && (
+            <View style={styles.especBloque}>
+              <Text style={styles.especTitulo}>
+                Especificaciones técnicas:
+              </Text>
+              <View style={styles.recursoLista}>
+                <View style={styles.recursoRow}>
+                  <Text style={styles.recLabel}>Dirección IP:</Text>
+                  <Text style={styles.recVal}>{dev?.ip || "N/A"}</Text>
+                </View>
+                <View style={styles.recursoRow}>
+                  <Text style={styles.recLabel}>MAC Address:</Text>
+                  <Text style={styles.recVal}>{dev?.macAddress || "N/A"}</Text>
+                </View>
+                <View style={styles.recursoRow}>
+                  <Text style={styles.recLabel}>Sistema Operativo:</Text>
+                  <Text style={styles.recVal}>{dev?.sistemaOp || "N/A"}</Text>
+                </View>
+                <View style={styles.recursoRow}>
+                  <Text style={styles.recLabel}>RAM:</Text>
+                  <Text style={styles.recVal}>{dev?.ram || "N/A"}</Text>
+                </View>
+                <View style={styles.recursoRow}>
+                  <Text style={styles.recLabel}>Almacenamiento:</Text>
+                  <Text style={styles.recVal}>
+                    {dev?.almacenamiento || "N/A"}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           <Text style={{ ...styles.parrafo, marginTop: 6 }}>
             Así mismo, declaro estar enterado del{" "}

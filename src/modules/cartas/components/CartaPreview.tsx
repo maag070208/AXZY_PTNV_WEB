@@ -1,4 +1,5 @@
 import { formatFecha, type CartaResponsiva } from "@core/store/cartas/types";
+import { isITDeviceCode } from "@core/utils/itDevice";
 interface Props {
   carta: CartaResponsiva;
   pageIndex?: number;
@@ -107,6 +108,41 @@ export default function CartaPreview({
               <span style={styles.recVal}>{item?.area || ""}</span>
             </div>
           </div>
+
+          {/* Especificaciones técnicas (TIC) */}
+          {isITDeviceCode(item?.device?.type?.code) && (
+            <div style={styles.especBloque}>
+              <strong style={styles.especTitulo}>Especificaciones técnicas:</strong>
+              <div style={styles.recursoLista}>
+                <div style={styles.recursoRow}>
+                  <span style={styles.recLabel}>Dirección IP:</span>
+                  <span style={styles.recVal}>{item?.device?.ip || "N/A"}</span>
+                </div>
+                <div style={styles.recursoRow}>
+                  <span style={styles.recLabel}>MAC Address:</span>
+                  <span style={styles.recVal}>
+                    {item?.device?.macAddress || "N/A"}
+                  </span>
+                </div>
+                <div style={styles.recursoRow}>
+                  <span style={styles.recLabel}>Sistema Operativo:</span>
+                  <span style={styles.recVal}>
+                    {item?.device?.sistemaOp || "N/A"}
+                  </span>
+                </div>
+                <div style={styles.recursoRow}>
+                  <span style={styles.recLabel}>RAM:</span>
+                  <span style={styles.recVal}>{item?.device?.ram || "N/A"}</span>
+                </div>
+                <div style={styles.recursoRow}>
+                  <span style={styles.recLabel}>Almacenamiento:</span>
+                  <span style={styles.recVal}>
+                    {item?.device?.almacenamiento || "N/A"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <p style={{ ...styles.parrafo, marginTop: 12 }}>
@@ -280,6 +316,16 @@ const styles: Record<string, React.CSSProperties> = {
     paddingLeft: "6px",
     textTransform: "uppercase",
     fontSize: "11px",
+  },
+  especBloque: {
+    marginTop: "10px",
+    paddingTop: "8px",
+    borderTop: "1px dashed #888",
+  },
+  especTitulo: {
+    fontSize: "11px",
+    display: "block",
+    marginBottom: "4px",
   },
   espacioDiagonal: {
     height: "95px",

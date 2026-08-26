@@ -15,6 +15,7 @@ import type { AppDispatch, RootState } from "@core/store/store";
 import { resetDraft, saveCarta } from "@core/store/cartas/cartas.slice";
 import { downloadCartaPDF } from "../utils/pdf";
 import { validateCartaDraft } from "../utils/validation";
+import { type CartaResponsiva } from "@core/store/cartas/types";
 import CartaForm from "../components/CartaForm";
 import CartaPreview from "../components/CartaPreview";
 
@@ -46,8 +47,42 @@ export default function CartaEditorPage() {
     try {
       const action = await dispatch(saveCarta());
       if (saveCarta.fulfilled.match(action)) {
+        const saved: any = action.payload;
         setToastType("success");
-        setToast("Carta guardada en el historial");
+        setToast("Carta guardada · generando PDF…");
+
+        // Normalizar el shape: el backend devuelve `consecutive` mientras que
+        // el front y el PDF esperan `consecutivo`.
+        const consecutivoFinal: string = saved.consecutive ?? saved.consecutivo;
+        const cartaParaPdf: CartaResponsiva = {
+          ...draft,
+          id: saved.id,
+          consecutivo: consecutivoFinal,
+          responsable: saved.responsable ?? draft.responsable,
+          encargado: saved.encargado ?? draft.encargado,
+          items:
+            saved.items?.map((it: any, idx: number) => ({
+              ...(draft.items[idx] ?? {}),
+              ...it,
+              device: it.device ?? draft.items[idx]?.device,
+            })) ?? draft.items,
+        };
+
+        // Genera el PDF con los datos frescos del backend (incluye device,
+        // responsable y encargado hidratados) y redirige a la lista.
+        try {
+          await downloadCartaPDF(null, {
+            consecutivo: consecutivoFinal,
+            fecha: cartaParaPdf.fecha,
+            carta: cartaParaPdf,
+          });
+        } catch (err) {
+          console.error("Error generando PDF:", err);
+          setToastType("error");
+          setToast("Guardada, pero falló la generación del PDF");
+        }
+        dispatch(resetDraft());
+        navigate("/cartas");
       } else {
         setToastType("error");
         setToast("Error al guardar");
@@ -59,6 +94,13 @@ export default function CartaEditorPage() {
   };
 
   const handleDownload = async () => {
+    const errors = validateCartaDraft(draft);
+    const firstError = Object.values(errors).find(Boolean);
+    if (firstError) {
+      setToastType("error");
+      setToast("Completa todos los campos requeridos antes de descargar");
+      return;
+    }
     setDownloading(true);
     setToastType("success");
     setToast("Generando PDF…");
@@ -117,7 +159,7 @@ export default function CartaEditorPage() {
         size="small"
         color="primary"
         onClick={handleDownload}
-        disabled={downloading}
+        disabled={downloading || !!Object.values(validateCartaDraft(draft)).find(Boolean)}
       >
         <ITFlex align="center" gap={1}>
           <FaDownload size={12} />

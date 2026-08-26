@@ -1,4 +1,5 @@
-import { ITFlex, ITGrid, ITInput, ITSearchSelect, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITFlex, ITGrid, ITInput, ITSearchSelect, ITSelect, ITStack, ITText, ITDivider } from "@axzydev/axzy_ui_system";
+import { FaNetworkWired } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@core/store/store";
@@ -6,9 +7,10 @@ import {
   setDraftField,
   setItemField,
 } from "@core/store/cartas/cartas.slice";
-import { usersApi, type User } from "@core/api/auth.api";
+import { usersApi, type User, type UserRole } from "@core/api/auth.api";
 import { devicesApi, deviceTypesApi, type Device, type DeviceType } from "@core/api/devices.api";
 import type { CartaFormErrors } from "../utils/validation";
+import { isITDeviceCode } from "@core/utils/itDevice";
 
 interface Props {
   errors?: CartaFormErrors;
@@ -19,19 +21,41 @@ export default function CartaForm({ errors }: Props) {
   const draft = useSelector((s: RootState) => s.cartas.draft);
   const item = draft.items[0];
   const [empleados, setEmpleados] = useState<User[]>([]);
+  const [jefes, setJefes] = useState<User[]>([]);
   const [tipos, setTipos] = useState<DeviceType[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [loadingConsecutivo, setLoadingConsecutivo] = useState(false);
+  const [selectedEmpleadoId, setSelectedEmpleadoId] = useState<string>("");
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
 
   useEffect(() => {
     usersApi.empleados().then(setEmpleados).catch(() => setEmpleados([]));
+    usersApi
+      .empleadosPorRoles(["ADMIN", "GERENTE", "JEFE_DE_AREA"] as UserRole[])
+      .then(setJefes)
+      .catch(() => setJefes([]));
     deviceTypesApi.list().then(setTipos).catch(() => setTipos([]));
+  }, []);
+
+  useEffect(() => {
     devicesApi
-      .list({ estado: "DISPONIBLE" })
+      .list({ estado: "DISPONIBLE", typeId: draft.deviceTypeId || undefined })
       .then((res) => setDevices(res.data))
       .catch(() => setDevices([]));
-  }, []);
+    setSelectedDeviceId("");
+    if (item) {
+      // Al cambiar el tipo, se descarta el device anterior y los campos derivados
+      // del item para que el PDF preview no muestre datos stale.
+      dispatch(setItemField({ id: item.id, field: "deviceId", value: "" }));
+      dispatch(setItemField({ id: item.id, field: "device", value: null as any }));
+      dispatch(setItemField({ id: item.id, field: "controlActivos", value: "" }));
+      dispatch(setItemField({ id: item.id, field: "descripcion", value: "" }));
+      dispatch(setItemField({ id: item.id, field: "marca", value: "" }));
+      dispatch(setItemField({ id: item.id, field: "modelo", value: "" }));
+      dispatch(setItemField({ id: item.id, field: "numeroSerie", value: "" }));
+      dispatch(setItemField({ id: item.id, field: "nombreEquipo", value: "" }));
+    }
+  }, [draft.deviceTypeId]);
 
   const handleField = (field: keyof typeof draft, value: string | number) => {
     dispatch(setDraftField({ field, value }));
@@ -56,6 +80,82 @@ export default function CartaForm({ errors }: Props) {
     }
   };
 
+  const handleEmpleadoSelect = (value: string | number) => {
+    const u = empleados.find((e) => e.id === String(value));
+    if (!u) {
+      setSelectedEmpleadoId("");
+      return;
+    }
+    setSelectedEmpleadoId(String(value));
+
+    // Autollenado de la carta a partir del empleado seleccionado
+    dispatch(setDraftField({ field: "numeroEmpleado", value: u.numeroEmpleado ?? "" }));
+    dispatch(setDraftField({ field: "responsableId", value: u.id })); // quien recibe
+    // Snapshot del responsable para que el PDF preview muestre el nombre de
+    // quien firma sin esperar a guardar en backend.
+    dispatch(
+      setDraftField({
+        field: "responsable",
+        value: {
+          id: u.id,
+          name: u.name,
+          puesto: u.puesto ?? null,
+          area: u.department?.name ?? null,
+          numeroEmpleado: u.numeroEmpleado ?? null,
+        },
+      })
+    );
+    dispatch(
+      setDraftField({
+        field: "empresa",
+        value: u.empresa ?? "Puerto Nuevo Hotel y Villas",
+      })
+    );
+    dispatch(
+      setDraftField({
+        field: "departamento",
+        value: u.department?.name ?? "",
+      })
+    );
+
+    if (item) {
+      dispatch(
+        setItemField({
+          id: item.id,
+          field: "area",
+          value: u.department?.name ?? "",
+        })
+      );
+    }
+  };
+
+  const handleEncargadoSelect = (value: string | number) => {
+    const u = jefes.find((e) => e.id === String(value));
+    dispatch(setDraftField({ field: "encargadoId", value: String(value) }));
+    if (!u) {
+      dispatch(
+        setDraftField({
+          field: "encargado",
+          value: null,
+        })
+      );
+      return;
+    }
+    // Snapshot del encargado para que el PDF preview muestre el nombre.
+    dispatch(
+      setDraftField({
+        field: "encargado",
+        value: {
+          id: u.id,
+          name: u.name,
+          puesto: u.puesto ?? null,
+          area: u.department?.name ?? null,
+          numeroEmpleado: u.numeroEmpleado ?? null,
+        },
+      })
+    );
+  };
+
   const handleDeviceSelect = (value: string | number) => {
     const dev = devices.find((d) => d.id === String(value));
     if (!dev) {
@@ -64,21 +164,68 @@ export default function CartaForm({ errors }: Props) {
     }
     setSelectedDeviceId(String(value));
     if (!item) return;
+
+    // Campos planos del item: necesarios para que el PDF preview muestre
+    // la información del dispositivo en tiempo real (sin esperar al guardado).
     dispatch(setItemField({ id: item.id, field: "descripcion", value: dev.descripcion }));
     dispatch(setItemField({ id: item.id, field: "marca", value: dev.marca }));
     dispatch(setItemField({ id: item.id, field: "modelo", value: dev.modelo }));
-    dispatch(setItemField({ id: item.id, field: "numeroSerie", value: dev.numeroSerie ?? "" }));
-    dispatch(setItemField({ id: item.id, field: "nombreEquipo", value: dev.nombreEquipo ?? "" }));
     dispatch(setItemField({ id: item.id, field: "controlActivos", value: dev.controlActivos }));
-    dispatch(setItemField({ id: item.id, field: "area", value: dev.area }));
+    dispatch(setItemField({ id: item.id, field: "numeroSerie", value: dev.numeroSerie ?? "N/A" }));
+    dispatch(setItemField({ id: item.id, field: "nombreEquipo", value: dev.nombreEquipo ?? "N/A" }));
+    // No pisamos area si ya fue autollenada por el empleado; usamos device.area como fallback.
+    if (!item.area) {
+      dispatch(setItemField({ id: item.id, field: "area", value: dev.area ?? "" }));
+    }
+    dispatch(setItemField({ id: item.id, field: "deviceId", value: dev.id }));
+
+    // Snapshot con specs TIC para que el bloque "Especificaciones técnicas"
+    // del PDF/preview se muestre cuando es un device IT.
+    dispatch(
+      setItemField({
+        id: item.id,
+        field: "device",
+        value: {
+          id: dev.id,
+          controlActivos: dev.controlActivos,
+          descripcion: dev.descripcion,
+          marca: dev.marca,
+          modelo: dev.modelo,
+          ip: dev.ip ?? null,
+          macAddress: dev.macAddress ?? null,
+          sistemaOp: dev.sistemaOp ?? null,
+          ram: dev.ram ?? null,
+          almacenamiento: dev.almacenamiento ?? null,
+          type: dev.type
+            ? { code: dev.type.code, name: dev.type.name, prefix: dev.type.prefix }
+            : undefined,
+        } as any,
+      })
+    );
   };
 
   if (!item) return null;
 
-  const empleadoOptions = empleados.map((u) => ({
-    value: u.id,
-    label: u.name + (u.puesto ? ` · ${u.puesto}` : ""),
-  }));
+  const empleadoOptions = empleados.map((u) => {
+    const parts = [
+      u.name,
+      u.numeroEmpleado ? `#${u.numeroEmpleado}` : null,
+      u.puesto ?? null,
+      u.department?.name ?? null,
+    ].filter(Boolean);
+    return { value: u.id, label: parts.join(" · ") };
+  });
+
+  const jefeOptions = jefes.map((u) => {
+    const parts = [
+      u.name,
+      u.role,
+      u.numeroEmpleado ? `#${u.numeroEmpleado}` : null,
+      u.puesto ?? null,
+      u.department?.name ?? null,
+    ].filter(Boolean);
+    return { value: u.id, label: parts.join(" · ") };
+  });
 
   const tipoOptions = tipos.map((t) => ({
     value: t.id,
@@ -91,6 +238,10 @@ export default function CartaForm({ errors }: Props) {
     sublabel: `${d.marca} ${d.modelo}`,
   }));
 
+  const devicePlaceholder = draft.deviceTypeId
+    ? "Buscar por activo, marca o modelo..."
+    : "Selecciona primero el tipo de dispositivo";
+
   return (
     <ITStack direction="column" spacing={5}>
       {/* ── Encabezado ── */}
@@ -99,7 +250,7 @@ export default function CartaForm({ errors }: Props) {
           Encabezado
         </ITText>
         <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12}>
+          <ITGrid item xs={12} md={6}>
             <ITSelect
               name="deviceTypeId"
               label="Tipo de dispositivo"
@@ -109,7 +260,7 @@ export default function CartaForm({ errors }: Props) {
             />
           </ITGrid>
           {draft.deviceTypeId && (
-            <ITGrid item xs={12}>
+            <ITGrid item xs={12} md={6}>
               <ITInput
                 name="consecutivo"
                 label="Folio (consecutivo)"
@@ -120,31 +271,51 @@ export default function CartaForm({ errors }: Props) {
               />
             </ITGrid>
           )}
-          <ITGrid item xs={12} md={6}>
+
+          <ITGrid item xs={12}>
+            <ITSearchSelect
+              name="empleadoId"
+              label="Empleado (quien recibe)"
+              placeholder="Buscar por nombre, número, puesto o departamento..."
+              options={empleadoOptions}
+              value={selectedEmpleadoId}
+              onChange={handleEmpleadoSelect}
+              required
+              error={errors?.responsableId}
+            />
+          </ITGrid>
+
+          {/* Campos autollenados del empleado */}
+          <ITGrid item xs={12} md={4}>
             <ITInput
               name="numeroEmpleado"
               label="No. de empleado"
               value={draft.numeroEmpleado}
               onChange={(e) => handleField("numeroEmpleado", e.target.value)}
-              placeholder="N/A"
+              placeholder="Selecciona un empleado"
+              disabled={!selectedEmpleadoId}
               required
               error={errors?.numeroEmpleado}
             />
           </ITGrid>
-          <ITGrid item xs={12} md={6}>
+          <ITGrid item xs={12} md={4}>
             <ITInput
               name="empresa"
               label="Empresa"
               value={draft.empresa}
               onChange={(e) => handleField("empresa", e.target.value)}
+              disabled={!selectedEmpleadoId}
+              placeholder="Viene del empleado"
             />
           </ITGrid>
-          <ITGrid item xs={12}>
+          <ITGrid item xs={12} md={4}>
             <ITInput
               name="departamento"
               label="Departamento"
               value={draft.departamento}
               onChange={(e) => handleField("departamento", e.target.value)}
+              disabled={!selectedEmpleadoId}
+              placeholder="Viene del empleado"
             />
           </ITGrid>
         </ITGrid>
@@ -166,85 +337,87 @@ export default function CartaForm({ errors }: Props) {
             <ITSearchSelect
               name="deviceSearch"
               label="Buscar dispositivo existente"
-              placeholder="Buscar por activo, marca o modelo..."
+              placeholder={devicePlaceholder}
               value={selectedDeviceId}
               onChange={handleDeviceSelect}
               options={deviceOptions}
+              disabled={!draft.deviceTypeId}
+              error={errors?.deviceId}
             />
 
-            <ITGrid container columns={12} spacing={3}>
-              <ITGrid item xs={12}>
-                <ITInput
-                  name={`desc_${item.id}`}
-                  label="Descripción general"
-                  value={item.descripcion}
-                  onChange={(e) => handleItem("descripcion", e.target.value)}
-                  placeholder="Ej. CONTROL DE TV"
-                  required
-                  error={errors?.descripcion}
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITInput
-                  name={`marca_${item.id}`}
-                  label="Marca"
-                  value={item.marca}
-                  onChange={(e) => handleItem("marca", e.target.value)}
-                  placeholder="STEREN"
-                  required
-                  error={errors?.marca}
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITInput
-                  name={`modelo_${item.id}`}
-                  label="Modelo"
-                  value={item.modelo}
-                  onChange={(e) => handleItem("modelo", e.target.value)}
-                  placeholder="RM-115"
-                  required
-                  error={errors?.modelo}
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITInput
-                  name={`act_${item.id}`}
-                  label="Control de activos"
-                  value={item.controlActivos}
-                  onChange={(e) => handleItem("controlActivos", e.target.value)}
-                  placeholder="TBE-0001"
-                  required
-                  error={errors?.controlActivos}
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITInput
-                  name={`serie_${item.id}`}
-                  label="No. Serie"
-                  value={item.numeroSerie}
-                  onChange={(e) => handleItem("numeroSerie", e.target.value)}
-                  placeholder="N/A"
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITInput
-                  name={`eq_${item.id}`}
-                  label="Nombre del equipo"
-                  value={item.nombreEquipo}
-                  onChange={(e) => handleItem("nombreEquipo", e.target.value)}
-                  placeholder="N/A"
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
-                <ITInput
-                  name={`area_${item.id}`}
-                  label="Área"
-                  value={item.area}
-                  onChange={(e) => handleItem("area", e.target.value)}
-                  placeholder="MANTENIMIENTO"
-                />
-              </ITGrid>
-            </ITGrid>
+            {/* Especificaciones técnicas (TIC) — solo lectura, vienen del Device */}
+            {item.device && isITDeviceCode(item.device.type?.code) && (
+              <>
+                <ITDivider className="my-2" />
+                <ITFlex justify="between" align="center">
+                  <ITFlex align="center" gap={2}>
+                    <FaNetworkWired className="text-slate-400" />
+                    <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                      Especificaciones técnicas (del dispositivo)
+                    </ITText>
+                  </ITFlex>
+                  <ITBadget color="primary" size="small">
+                    {item.device.type?.code}
+                  </ITBadget>
+                </ITFlex>
+                <ITGrid container columns={12} spacing={3}>
+                  <ITGrid item xs={12} md={6}>
+                    <ITInput
+                      name={`ip_${item.id}`}
+                      label="IP"
+                      value={item.device.ip ?? ""}
+                      disabled
+                      placeholder="Sin IP registrada"
+                      onChange={() => {}}
+                    />
+                  </ITGrid>
+                  <ITGrid item xs={12} md={6}>
+                    <ITInput
+                      name={`mac_${item.id}`}
+                      label="MAC Address"
+                      value={item.device.macAddress ?? ""}
+                      disabled
+                      placeholder="Sin MAC registrada"
+                      onChange={() => {}}
+                    />
+                  </ITGrid>
+                  <ITGrid item xs={12} md={6}>
+                    <ITInput
+                      name={`so_${item.id}`}
+                      label="Sistema Operativo"
+                      value={item.device.sistemaOp ?? ""}
+                      disabled
+                      placeholder="Sin SO registrado"
+                      onChange={() => {}}
+                    />
+                  </ITGrid>
+                  <ITGrid item xs={12} md={6}>
+                    <ITInput
+                      name={`ram_${item.id}`}
+                      label="RAM"
+                      value={item.device.ram ?? ""}
+                      disabled
+                      placeholder="Sin RAM registrada"
+                      onChange={() => {}}
+                    />
+                  </ITGrid>
+                  <ITGrid item xs={12}>
+                    <ITInput
+                      name={`alm_${item.id}`}
+                      label="Almacenamiento"
+                      value={item.device.almacenamiento ?? ""}
+                      disabled
+                      placeholder="Sin almacenamiento registrado"
+                      onChange={() => {}}
+                    />
+                  </ITGrid>
+                </ITGrid>
+                <ITText className="text-[9px] text-slate-400 italic">
+                  Estas especificaciones se imprimen en el PDF. Para editarlas,
+                  actualiza el dispositivo desde Dispositivos.
+                </ITText>
+              </>
+            )}
           </ITStack>
         </div>
       </ITStack>
@@ -256,24 +429,16 @@ export default function CartaForm({ errors }: Props) {
         </ITText>
         <ITGrid container columns={12} spacing={3}>
           <ITGrid item xs={12} md={6}>
-            <ITSelect
-              name="responsableId"
-              label="Responsable (quien recibe)"
-              options={empleadoOptions}
-              value={draft.responsableId ?? ""}
-              onChange={(e) => handleField("responsableId", e.target.value)}
+            <ITSearchSelect
+              name="encargadoId"
+              label="Jefe de área (encargado)"
+              placeholder="Buscar administrador, gerente o jefe..."
+              options={jefeOptions}
+              value={draft.encargadoId ?? ""}
+              onChange={handleEncargadoSelect}
             />
           </ITGrid>
           <ITGrid item xs={12} md={6}>
-            <ITSelect
-              name="encargadoId"
-              label="Jefe de área (encargado)"
-              options={empleadoOptions}
-              value={draft.encargadoId ?? ""}
-              onChange={(e) => handleField("encargadoId", e.target.value)}
-            />
-          </ITGrid>
-          <ITGrid item xs={12}>
             <ITInput
               name="deliveryBy"
               label="Entrega (quien entrega)"
