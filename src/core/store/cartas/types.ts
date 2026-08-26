@@ -1,3 +1,17 @@
+export interface ITDeviceSummary {
+  id: string;
+  controlActivos: string;
+  descripcion: string;
+  marca: string;
+  modelo: string;
+  ip?: string | null;
+  macAddress?: string | null;
+  sistemaOp?: string | null;
+  ram?: string | null;
+  almacenamiento?: string | null;
+  type?: { code: string; name: string; prefix: string };
+}
+
 export interface TICItem {
   id: string;
   descripcion: string;
@@ -8,6 +22,7 @@ export interface TICItem {
   controlActivos: string;
   area: string;
   deviceId?: string;
+  device?: ITDeviceSummary | null;
 }
 
 export interface Firmante {

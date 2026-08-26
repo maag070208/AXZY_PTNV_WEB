@@ -7,12 +7,12 @@ import type { CartaResponsiva, TICItem } from "@core/store/cartas/types";
 
 export interface CartaItemInput {
   deviceId?: string;
-  descripcion: string;
-  marca: string;
-  modelo: string;
+  descripcion?: string;
+  marca?: string;
+  modelo?: string;
   numeroSerie?: string;
   nombreEquipo?: string;
-  controlActivos: string;
+  controlActivos?: string;
   area?: string;
 }
 
@@ -45,14 +45,68 @@ export interface GenerateCartasResult {
   carta: GenerateCartaEntry;
 }
 
+// Ajusta la respuesta del backend al shape que espera el frontend:
+// - Renombra `consecutive` → `consecutivo` (la BD Prisma está en inglés)
+// - Aplana `responsable.department.name` → `responsable.area`
+//   y `encargado.department.name` → `encargado.area`
+// - Garantiza los campos `area` y `numeroEmpleado` en ambos firmantes.
+export const normalizeCarta = (raw: any): CartaResponsiva => {
+  if (!raw) return raw;
+  const c: any = { ...raw };
+  if (raw.consecutive != null && raw.consecutivo == null) {
+    c.consecutivo = raw.consecutive;
+  }
+  if (raw.responsable) {
+    const { department, area, numeroEmpleado, ...rest } = raw.responsable;
+    c.responsable = {
+      ...rest,
+      area: area ?? department?.name ?? null,
+      numeroEmpleado: numeroEmpleado ?? null,
+    };
+  }
+  if (raw.encargado) {
+    const { department, area, numeroEmpleado, ...rest } = raw.encargado;
+    c.encargado = {
+      ...rest,
+      area: area ?? department?.name ?? null,
+      numeroEmpleado: numeroEmpleado ?? null,
+    };
+  }
+  return c as CartaResponsiva;
+};
+
+const normalizeList = <T extends { data?: any[] } | any[]>(res: T): T => {
+  if (Array.isArray(res)) {
+    return (res as any[]).map(normalizeCarta) as unknown as T;
+  }
+  if (res && Array.isArray((res as any).data)) {
+    return {
+      ...(res as any),
+      data: (res as any).data.map(normalizeCarta),
+    } as T;
+  }
+  return res;
+};
+
 export const cartasApi = {
-  table: (params: ITDataTableFetchParamsPost) =>
-    tableRequest<CartaResponsiva>(`/cartas/query`, params),
-  list: (search?: string) => {
-    const qs = search ? `?q=${encodeURIComponent(search)}` : "";
-    return api.get<{ data: CartaResponsiva[]; total: number }>(`/cartas${qs}`);
+  table: async (params: ITDataTableFetchParamsPost) => {
+    const res = await tableRequest<CartaResponsiva>(`/cartas/query`, params);
+    return {
+      ...res,
+      data: res.data.map(normalizeCarta),
+    };
   },
-  get: (id: string) => api.get<CartaResponsiva>(`/cartas/${id}`),
+  list: async (search?: string) => {
+    const qs = search ? `?q=${encodeURIComponent(search)}` : "";
+    const res = await api.get<{ data: CartaResponsiva[]; total: number }>(
+      `/cartas${qs}`
+    );
+    return normalizeList(res);
+  },
+  get: async (id: string) => {
+    const res = await api.get<CartaResponsiva>(`/cartas/${id}`);
+    return normalizeCarta(res);
+  },
   create: (input: CartaInput) =>
     api.post<CartaResponsiva>(`/cartas`, input),
   update: (id: string, input: Partial<CartaInput>) =>

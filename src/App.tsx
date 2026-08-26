@@ -4,7 +4,12 @@ import PrivateRoutes from "@modules/auth/components/PrivateRoutes";
 import HomePage from "@modules/home/pages/HomePage";
 import CartasListPage from "@modules/cartas/pages/CartasListPage";
 import CartaEditorPage from "@modules/cartas/pages/CartaEditorPage";
+import CartaDetailPage from "@modules/cartas/pages/CartaDetailPage";
 import DevolverCartaPage from "@modules/cartas/pages/DevolverCartaPage";
+import InventoryIndexPage from "@modules/inventory/pages/InventoryIndexPage";
+import InventoryMovementsPage from "@modules/inventory/pages/InventoryMovementsPage";
+import NewInventoryMovementPage from "@modules/inventory/pages/NewInventoryMovementPage";
+import LocationsPage from "@modules/inventory/pages/LocationsPage";
 import GenerarCartasPage from "@modules/cartas/pages/GenerarCartasPage";
 import DevicesListPage from "@modules/devices/pages/DevicesListPage";
 import DeviceFormPage from "@modules/devices/pages/DeviceFormPage";
@@ -35,6 +40,7 @@ export default function App() {
         <Route path="/cartas" element={<CartasListPage />} />
         <Route path="/cartas/nueva" element={<CartaEditorPage />} />
         <Route path="/cartas/generar" element={<GenerarCartasPage />} />
+        <Route path="/cartas/:id" element={<CartaDetailPage />} />
         <Route path="/cartas/:id/devolver" element={<DevolverCartaPage />} />
 
         <Route path="/tickets" element={<TicketsListPage />} />
@@ -48,6 +54,11 @@ export default function App() {
         <Route path="/dispositivos/tipos" element={<DeviceTypesListPage />} />
         <Route path="/dispositivos/tipos/nuevo" element={<DeviceTypeFormPage />} />
         <Route path="/dispositivos/tipos/:id/editar" element={<DeviceTypeFormPage />} />
+
+        <Route path="/inventario" element={<InventoryIndexPage />} />
+        <Route path="/inventario/movimientos" element={<InventoryMovementsPage />} />
+        <Route path="/inventario/movimientos/nuevo" element={<NewInventoryMovementPage />} />
+        <Route path="/inventario/ubicaciones" element={<LocationsPage />} />
 
         <Route path="/departamentos" element={<DepartmentsPage />} />
         <Route path="/departamentos/:id" element={<DepartmentDetailPage />} />

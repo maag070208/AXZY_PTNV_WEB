@@ -23,8 +23,11 @@ export interface User extends AuthUser {
   puesto?: string;
   area?: string;
   numeroEmpleado?: string;
+  empresa?: string | null;
   departmentId?: string | null;
+  department?: { id: string; name: string } | null;
   subareaId?: string | null;
+  subarea?: { id: string; name: string } | null;
 }
 
 export const authApi = {
@@ -44,6 +47,13 @@ export const usersApi = {
   empleados: (departmentId?: string) => {
     const qs = departmentId ? `?departmentId=${encodeURIComponent(departmentId)}` : "";
     return api.get<User[]>(`/users/empleados${qs}`);
+  },
+  empleadosPorRoles: (roles: UserRole[], departmentId?: string) => {
+    const params = new URLSearchParams();
+    if (roles.length) params.set("roles", roles.join(","));
+    if (departmentId) params.set("departmentId", departmentId);
+    const qs = params.toString();
+    return api.get<User[]>(`/users/empleados${qs ? `?${qs}` : ""}`);
   },
   create: (data: {
     username: string;

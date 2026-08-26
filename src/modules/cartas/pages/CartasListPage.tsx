@@ -21,7 +21,6 @@ import type { AppDispatch } from "@core/store/store";
 import { cartasApi } from "@core/api/cartas.api";
 import {
   deleteCartaThunk,
-  loadCartaIntoDraft,
   resetDraft,
 } from "@core/store/cartas/cartas.slice";
 import { formatFecha, type CartaResponsiva } from "@core/store/cartas/types";
@@ -41,8 +40,7 @@ export default function CartasListPage() {
   };
 
   const handleLoad = (id: string) => {
-    dispatch(loadCartaIntoDraft(id));
-    navigate("/cartas/nueva");
+    navigate(`/cartas/${id}`);
   };
 
   const handleDelete = (id: string) => {
@@ -137,7 +135,7 @@ export default function CartasListPage() {
               size="small"
               color="secondary"
               onClick={() => handleLoad(row.id)}
-              title="Ver / Editar"
+              title="Ver (solo lectura)"
             >
               <FaEye size={14} />
             </ITButton>

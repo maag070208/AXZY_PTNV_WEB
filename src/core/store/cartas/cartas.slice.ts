@@ -128,10 +128,13 @@ const slice = createSlice({
   reducers: {
     setDraftField(
       state,
-      action: PayloadAction<{ field: keyof CartaResponsiva; value: string | number }>
+      action: PayloadAction<{
+        field: keyof CartaResponsiva;
+        value: string | number | null | object;
+      }>
     ) {
       const { field, value } = action.payload;
-      (state.draft as unknown as Record<string, string | number>)[field] = value;
+      (state.draft as unknown as Record<string, unknown>)[field] = value;
       persist(state);
     },
     setItemField(
@@ -139,13 +142,13 @@ const slice = createSlice({
       action: PayloadAction<{
         id: string;
         field: keyof TICItem;
-        value: string;
+        value: string | null | object;
       }>
     ) {
       const { id, field, value } = action.payload;
       const item = state.draft.items.find((i) => i.id === id);
       if (item) {
-        item[field] = value;
+        (item as any)[field] = value;
         persist(state);
       }
     },
