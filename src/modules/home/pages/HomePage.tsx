@@ -7,6 +7,7 @@ import {
   FaFileSignature,
   FaHouseUser,
   FaLaptop,
+  FaBoxes,
   FaTicketAlt,
   FaUserShield,
   FaUserTie,
@@ -139,6 +140,13 @@ export default function HomePage() {
             icon: <FaLaptop size={22} />,
             to: "/dispositivos",
             count: counts.dispositivos,
+          },
+          {
+            id: "inventario",
+            title: "Inventario",
+            description: "Movimientos, kardex y ubicaciones de equipos",
+            icon: <FaBoxes size={22} />,
+            to: "/inventario",
           },
           {
             id: "departamentos",
