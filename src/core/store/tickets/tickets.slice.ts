@@ -43,7 +43,17 @@ export const createTicketThunk = createAsyncThunk<Ticket, TicketInput>(
 
 export const updateTicketThunk = createAsyncThunk<
   Ticket,
-  { id: string; data: Partial<{ status: string; priority: string; asignadoAId: string | null; departmentId: string | null }> }
+  {
+    id: string;
+    data: Partial<{
+      titulo: string;
+      descripcion: string;
+      status: string;
+      priority: string;
+      asignadoAId: string | null;
+      departmentId: string | null;
+    }>;
+  }
 >(
   "tickets/update",
   async ({ id, data }) => {

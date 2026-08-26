@@ -14,6 +14,18 @@ export interface DeviceType {
   _count?: { devices: number };
 }
 
+export interface Location {
+  id: string;
+  lugar?: string | null;
+  subLugar?: string | null;
+  numero?: string | null;
+  descripcion?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  _count?: { devices: number };
+  devices?: Device[];
+}
+
 export interface Device {
   id: string;
   typeId: string;
@@ -26,6 +38,14 @@ export interface Device {
   nombreEquipo?: string | null;
   area: string;
   estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
+  locationId?: string | null;
+  location?: Location | null;
+  // Especificaciones técnicas (TIC) — solo aplican a PC / TABLET / LAPTOP
+  ip?: string | null;
+  macAddress?: string | null;
+  sistemaOp?: string | null;
+  ram?: string | null;
+  almacenamiento?: string | null;
   history?: DeviceHistoryEntry[];
   createdAt: string;
   updatedAt: string;
