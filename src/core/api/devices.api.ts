@@ -46,6 +46,10 @@ export interface Device {
   sistemaOp?: string | null;
   ram?: string | null;
   almacenamiento?: string | null;
+  // Lote (alta por cantidad): dispositivos dados de alta juntos comparten loteId
+  loteId?: string | null;
+  loteSize?: number;
+  loteCount?: { disponible: number; asignado: number; baja: number };
   history?: DeviceHistoryEntry[];
   createdAt: string;
   updatedAt: string;
@@ -58,6 +62,32 @@ export interface DeviceHistoryEntry {
   detail?: string | null;
   autor?: { id: string; name: string; username: string } | null;
   createdAt: string;
+}
+
+export interface DeviceSummary {
+  total: number;
+  disponible: number;
+  asignado: number;
+  baja: number;
+  tipos: number;
+}
+
+export interface LoteSharedUpdate {
+  descripcion?: string;
+  marca?: string;
+  modelo?: string;
+  sistemaOp?: string;
+  ram?: string;
+  almacenamiento?: string;
+}
+
+export interface LoteUnitUpdate {
+  id: string;
+  numeroSerie?: string;
+  nombreEquipo?: string;
+  ip?: string;
+  macAddress?: string;
+  area?: string;
 }
 
 export const deviceTypesApi = {
@@ -78,6 +108,10 @@ export const deviceTypesApi = {
 export const devicesApi = {
   table: (params: ITDataTableFetchParamsPost) =>
     tableRequest<Device>(`/devices/query`, params),
+  summary: () => api.get<DeviceSummary>(`/devices/summary`),
+  getLote: (loteId: string) => api.get<{ data: Device[]; total: number }>(`/devices/lotes/${loteId}`),
+  updateLote: (loteId: string, data: LoteSharedUpdate & { units: LoteUnitUpdate[] }) =>
+    api.put<{ data: Device[]; total: number }>(`/devices/lotes/${loteId}`, data),
   list: (filters: { typeId?: string; estado?: string; q?: string } = {}) => {
     const params = new URLSearchParams();
     if (filters.typeId) params.set("typeId", filters.typeId);
@@ -96,7 +130,29 @@ export const devicesApi = {
     nombreEquipo?: string;
     area?: string;
     estado?: "DISPONIBLE" | "ASIGNADO" | "BAJA";
+    ip?: string;
+    macAddress?: string;
+    sistemaOp?: string;
+    ram?: string;
+    almacenamiento?: string;
   }) => api.post<Device>(`/devices`, data),
+  createBatch: (data: {
+    typeId: string;
+    descripcion: string;
+    marca: string;
+    modelo: string;
+    area?: string;
+    estado?: "DISPONIBLE" | "ASIGNADO" | "BAJA";
+    sistemaOp?: string;
+    ram?: string;
+    almacenamiento?: string;
+    units: Array<{
+      numeroSerie?: string;
+      nombreEquipo?: string;
+      ip?: string;
+      macAddress?: string;
+    }>;
+  }) => api.post<{ data: Device[]; total: number }>(`/devices/batch`, data),
   update: (id: string, data: Partial<{
     typeId: string;
     descripcion: string;
@@ -106,8 +162,13 @@ export const devicesApi = {
     nombreEquipo: string;
     area: string;
     estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
+    ip: string;
+    macAddress: string;
+    sistemaOp: string;
+    ram: string;
+    almacenamiento: string;
   }>) => api.put<Device>(`/devices/${id}`, data),
-  remove: (id: string) => api.delete<Device>(`/devices/${id}`),
+  remove: (id: string) => api.delete<{ soft: boolean; data: Device }>(`/devices/${id}`),
   getHistory: (id: string) => api.get<DeviceHistoryEntry[]>(`/devices/${id}/history`),
   addHistory: (id: string, data: { type: string; detail?: string }) =>
     api.post<DeviceHistoryEntry>(`/devices/${id}/history`, data),

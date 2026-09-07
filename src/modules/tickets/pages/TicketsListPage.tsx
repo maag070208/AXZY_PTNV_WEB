@@ -1,7 +1,9 @@
 import {
+  ITAlert,
   ITBadget,
   ITButton,
   ITCard,
+  ITConfirmDialog,
   ITDataTable,
   ITFlex,
   ITPage,
@@ -14,7 +16,7 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { useCallback, useState } from "react";
-import { FaCheckCircle, FaEye, FaPlus, FaTicketAlt } from "react-icons/fa";
+import { FaCheckCircle, FaEye, FaPlus, FaTicketAlt, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ticketsApi, type Ticket } from "@core/api/tickets.api";
 
@@ -47,6 +49,19 @@ const STATUS_LABELS: Record<string, string> = {
 export default function TicketsListPage() {
   const navigate = useNavigate();
   const [reloadKey, setReloadKey] = useState(0);
+  const [ticketToDelete, setTicketToDelete] = useState<Ticket | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const confirmDeleteTicket = async () => {
+    if (!ticketToDelete) return;
+    try {
+      await ticketsApi.remove(ticketToDelete.id);
+      setReloadKey((k) => k + 1);
+    } catch (e: any) {
+      setDeleteError(e.message);
+    }
+    setTicketToDelete(null);
+  };
 
   const fetchTableData = useCallback(
     async (params: ITDataTableFetchParams) => {
@@ -72,7 +87,12 @@ export default function TicketsListPage() {
       filter: true,
       render: (t) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
+          <ITFlex align="center" gap={1}>
+            <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
+            {t.deletedAt && (
+              <ITBadget color="gray" size="small">Eliminado</ITBadget>
+            )}
+          </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
             {CATEGORY_LABELS[t.category] ?? t.category}
           </ITText>
@@ -150,6 +170,15 @@ export default function TicketsListPage() {
           >
             <FaEye size={12} />
           </ITButton>
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="danger"
+            onClick={() => setTicketToDelete(t)}
+            title={t.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
+          >
+            {t.deletedAt ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
+          </ITButton>
         </ITFlex>
       ),
     },
@@ -188,6 +217,27 @@ export default function TicketsListPage() {
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
         size="sm"
+      />
+
+      {deleteError && (
+        <ITAlert variant="error" dismissible onDismiss={() => setDeleteError(null)}>
+          {deleteError}
+        </ITAlert>
+      )}
+
+      <ITConfirmDialog
+        isOpen={!!ticketToDelete}
+        onClose={() => setTicketToDelete(null)}
+        onConfirm={confirmDeleteTicket}
+        title={ticketToDelete?.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
+        message={
+          ticketToDelete?.deletedAt
+            ? `¿Eliminar definitivamente "${ticketToDelete?.titulo}"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.`
+            : `¿Mover a papelera "${ticketToDelete?.titulo}"? Quedará oculto en estado eliminado y podrás borrarlo definitivamente después.`
+        }
+        confirmLabel={ticketToDelete?.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
+        cancelLabel="Cancelar"
+        variant="danger"
       />
     </ITPage>
   );

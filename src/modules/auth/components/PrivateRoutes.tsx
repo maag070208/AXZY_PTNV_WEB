@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import {
   FaBuilding,
   FaChartBar,
+  FaClipboardList,
   FaFileSignature,
   FaHouseUser,
   FaTicketAlt,
@@ -101,6 +102,17 @@ export default function PrivateRoutes() {
         },
       ]
       : []),
+    ...(isAdmin
+      ? [
+        {
+          id: "salidas",
+          label: "Salidas",
+          icon: <FaClipboardList size={14} />,
+          action: () => navigate("/salidas"),
+          isActive: active("/salidas"),
+        },
+      ]
+      : []),
     ...(canManage
       ? [
         {
@@ -156,7 +168,7 @@ export default function PrivateRoutes() {
         className="h-9 w-auto object-contain"
       />
     ),
-    logoText: "Cartas Responsivas",
+    logoText: "Puerto Nuevo",
     userMenu: user
       ? {
         userName: user.name ?? "—",

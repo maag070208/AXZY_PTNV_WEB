@@ -236,9 +236,13 @@ export default function DepartmentsPage() {
         isOpen={!!deptToDelete}
         onClose={() => setDeptToDelete(null)}
         onConfirm={confirmDeleteDept}
-        title="Eliminar departamento"
-        message={`¿Eliminar ${deptToDelete?.name}? Si tiene usuarios asociados no se podrá eliminar.`}
-        confirmLabel="Eliminar"
+        title={deptToDelete?.active ? "Eliminar departamento" : "Eliminar definitivamente"}
+        message={
+          deptToDelete?.active
+            ? `¿Eliminar ${deptToDelete?.name}? Se desactivará; si tiene usuarios asociados no se podrá eliminar.`
+            : `¿Eliminar definitivamente ${deptToDelete?.name}? Se borrarán sus áreas y se desligará de usuarios y tickets. Esta acción no se puede deshacer.`
+        }
+        confirmLabel={deptToDelete?.active ? "Eliminar" : "Eliminar definitivamente"}
         cancelLabel="Cancelar"
         variant="danger"
       />

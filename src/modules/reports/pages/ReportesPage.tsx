@@ -8,6 +8,7 @@ import {
   ITInput,
   ITPage,
   ITSelect,
+  ITTabs,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type {
@@ -15,11 +16,13 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaChartBar, FaDownload } from "react-icons/fa";
+import { FaBoxOpen, FaChartBar, FaDownload, FaHandHolding } from "react-icons/fa";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { reportsApi, type ReportFilters, type ReportRow } from "@core/api/reports.api";
 import { downloadReportPDF } from "../utils/pdf";
+import PrestamosTab from "../components/PrestamosTab";
+import DevicesTab from "../components/DevicesTab";
 import {
   departmentsApi,
   type Department,
@@ -163,17 +166,8 @@ export default function ReportesPage() {
     },
   ];
 
-  return (
-    <ITPage
-      title="Reportes"
-      description={`${total} entregas encontradas`}
-      backAction={() => navigate(-1)}
-      icon={<FaChartBar size={20} />}
-      breadcrumbs={[
-        { label: "Inicio", onClick: () => navigate("/") },
-        { label: "Reportes" },
-      ]}
-    >
+  const entregasContent = (
+    <>
       <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 mb-6" direction="column" gap={4}>
         <ITGrid container columns={12} spacing={3}>
           <ITGrid item xs={12} md={4}>
@@ -251,6 +245,43 @@ export default function ReportesPage() {
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
         size="sm"
+      />
+    </>
+  );
+
+  return (
+    <ITPage
+      title="Reportes"
+      description={`${total} entregas encontradas`}
+      backAction={() => navigate(-1)}
+      icon={<FaChartBar size={20} />}
+      breadcrumbs={[
+        { label: "Inicio", onClick: () => navigate("/") },
+        { label: "Reportes" },
+      ]}
+    >
+      <ITTabs
+        variant="line"
+        items={[
+          {
+            id: "entregas",
+            label: "Entregas",
+            icon: <FaChartBar size={13} />,
+            content: entregasContent,
+          },
+          {
+            id: "prestamos",
+            label: "Préstamos",
+            icon: <FaHandHolding size={13} />,
+            content: <PrestamosTab />,
+          },
+          {
+            id: "dispositivos",
+            label: "Dispositivos",
+            icon: <FaBoxOpen size={13} />,
+            content: <DevicesTab />,
+          },
+        ]}
       />
     </ITPage>
   );

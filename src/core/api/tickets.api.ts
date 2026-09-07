@@ -37,6 +37,7 @@ export interface Ticket {
   department?: { id: string; name: string } | null;
   closedAt?: string | null;
   closedBy?: string | null;
+  deletedAt?: string | null;
   comments: TicketComment[];
   history: TicketHistoryEntry[];
   creadoEn: string;
@@ -67,7 +68,7 @@ export const ticketsApi = {
     asignadoAId: string | null;
     departmentId: string | null;
   }>) => api.put<Ticket>(`/tickets/${id}`, data),
-  remove: (id: string) => api.delete<void>(`/tickets/${id}`),
+  remove: (id: string) => api.delete<{ soft: boolean; data: Ticket }>(`/tickets/${id}`),
   addComment: (id: string, texto: string) =>
     api.post<TicketComment>(`/tickets/${id}/comments`, { texto }),
 };

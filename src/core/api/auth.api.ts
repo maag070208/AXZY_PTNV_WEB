@@ -44,14 +44,18 @@ export const usersApi = {
     return api.get<User[]>(`/users${qs}`);
   },
   get: (id: string) => api.get<User>(`/users/${id}`),
-  empleados: (departmentId?: string) => {
-    const qs = departmentId ? `?departmentId=${encodeURIComponent(departmentId)}` : "";
-    return api.get<User[]>(`/users/empleados${qs}`);
+  empleados: (departmentId?: string, q?: string) => {
+    const params = new URLSearchParams();
+    if (departmentId) params.set("departmentId", departmentId);
+    if (q) params.set("q", q);
+    const qs = params.toString();
+    return api.get<User[]>(`/users/empleados${qs ? `?${qs}` : ""}`);
   },
-  empleadosPorRoles: (roles: UserRole[], departmentId?: string) => {
+  empleadosPorRoles: (roles: UserRole[], departmentId?: string, q?: string) => {
     const params = new URLSearchParams();
     if (roles.length) params.set("roles", roles.join(","));
     if (departmentId) params.set("departmentId", departmentId);
+    if (q) params.set("q", q);
     const qs = params.toString();
     return api.get<User[]>(`/users/empleados${qs ? `?${qs}` : ""}`);
   },

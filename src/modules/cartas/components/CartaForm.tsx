@@ -27,13 +27,40 @@ export default function CartaForm({ errors }: Props) {
   const [loadingConsecutivo, setLoadingConsecutivo] = useState(false);
   const [selectedEmpleadoId, setSelectedEmpleadoId] = useState<string>("");
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
+  const [busyEmpleados, setBusyEmpleados] = useState(false);
+  const [busyJefes, setBusyJefes] = useState(false);
+
+  const buscarEmpleados = async (q?: string) => {
+    setBusyEmpleados(true);
+    try {
+      const res = await usersApi.empleados(undefined, q || undefined);
+      setEmpleados(res);
+    } catch {
+      setEmpleados([]);
+    } finally {
+      setBusyEmpleados(false);
+    }
+  };
+
+  const buscarJefes = async (q?: string) => {
+    setBusyJefes(true);
+    try {
+      const res = await usersApi.empleadosPorRoles(
+        ["ADMIN", "GERENTE", "JEFE_DE_AREA"] as UserRole[],
+        undefined,
+        q || undefined
+      );
+      setJefes(res);
+    } catch {
+      setJefes([]);
+    } finally {
+      setBusyJefes(false);
+    }
+  };
 
   useEffect(() => {
-    usersApi.empleados().then(setEmpleados).catch(() => setEmpleados([]));
-    usersApi
-      .empleadosPorRoles(["ADMIN", "GERENTE", "JEFE_DE_AREA"] as UserRole[])
-      .then(setJefes)
-      .catch(() => setJefes([]));
+    buscarEmpleados();
+    buscarJefes();
     deviceTypesApi.list().then(setTipos).catch(() => setTipos([]));
   }, []);
 
@@ -280,6 +307,8 @@ export default function CartaForm({ errors }: Props) {
               options={empleadoOptions}
               value={selectedEmpleadoId}
               onChange={handleEmpleadoSelect}
+              onSearch={buscarEmpleados}
+              isLoading={busyEmpleados}
               required
               error={errors?.responsableId}
             />
@@ -436,6 +465,8 @@ export default function CartaForm({ errors }: Props) {
               options={jefeOptions}
               value={draft.encargadoId ?? ""}
               onChange={handleEncargadoSelect}
+              onSearch={buscarJefes}
+              isLoading={busyJefes}
             />
           </ITGrid>
           <ITGrid item xs={12} md={6}>

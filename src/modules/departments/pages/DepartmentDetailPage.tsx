@@ -11,7 +11,7 @@ import {
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaBuilding, FaPlus, FaTimes, FaUsers } from "react-icons/fa";
+import { FaBuilding, FaPlus, FaTimes, FaTrash, FaTrashRestore, FaUsers } from "react-icons/fa";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -32,6 +32,22 @@ export default function DepartmentDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [newSubarea, setNewSubarea] = useState("");
   const [subareaToDelete, setSubareaToDelete] = useState<Subarea | null>(null);
+  const [deptToDelete, setDeptToDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const confirmDeleteDept = async () => {
+    if (!dept) return;
+    setDeleting(true);
+    try {
+      await departmentsApi.remove(dept.id);
+      navigate("/departamentos");
+    } catch (e: any) {
+      setError(e.message);
+      setDeptToDelete(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -103,6 +119,19 @@ export default function DepartmentDetailPage() {
         { label: "Departamentos", onClick: () => navigate("/departamentos") },
         { label: dept.name },
       ]}
+      actions={
+        isAdmin ? (
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="danger"
+            onClick={() => setDeptToDelete(true)}
+            title={dept.active ? "Eliminar departamento" : "Eliminar definitivamente"}
+          >
+            {dept.active ? <FaTrash size={12} /> : <FaTrashRestore size={12} />}
+          </ITButton>
+        ) : undefined
+      }
     >
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -217,9 +246,28 @@ export default function DepartmentDetailPage() {
         isOpen={!!subareaToDelete}
         onClose={() => setSubareaToDelete(null)}
         onConfirm={confirmRemoveSubarea}
-        title="Eliminar subárea"
-        message={`¿Eliminar la subárea "${subareaToDelete?.name}"?`}
-        confirmLabel="Eliminar"
+        title={subareaToDelete?.active ? "Eliminar subárea" : "Eliminar definitivamente"}
+        message={
+          subareaToDelete?.active
+            ? `¿Eliminar la subárea "${subareaToDelete?.name}"? Se desactivará.`
+            : `¿Eliminar definitivamente la subárea "${subareaToDelete?.name}"? Esta acción no se puede deshacer.`
+        }
+        confirmLabel={subareaToDelete?.active ? "Eliminar" : "Eliminar definitivamente"}
+        cancelLabel="Cancelar"
+        variant="danger"
+      />
+
+      <ITConfirmDialog
+        isOpen={deptToDelete}
+        onClose={() => setDeptToDelete(false)}
+        onConfirm={confirmDeleteDept}
+        title={dept.active ? "Eliminar departamento" : "Eliminar definitivamente"}
+        message={
+          dept.active
+            ? `¿Eliminar ${dept.name}? Se desactivará; si tiene usuarios asociados no se podrá eliminar.`
+            : `¿Eliminar definitivamente ${dept.name}? Se borrarán sus áreas y se desligará de usuarios y tickets. Esta acción no se puede deshacer.`
+        }
+        confirmLabel={dept.active ? "Eliminar" : "Eliminar definitivamente"}
         cancelLabel="Cancelar"
         variant="danger"
       />

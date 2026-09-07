@@ -1,9 +1,12 @@
 import {
   ITBadget,
   ITButton,
+  ITConfirmDialog,
   ITFlex,
   ITGrid,
+  ITInput,
   ITPage,
+  ITSearchSelect,
   ITSelect,
   ITStack,
   ITTextarea,
@@ -22,6 +25,8 @@ import {
   FaSync,
   FaTicketAlt,
   FaTimesCircle,
+  FaTrash,
+  FaTrashRestore,
   FaUserCog,
   FaUserPlus,
 } from "react-icons/fa";
@@ -34,8 +39,8 @@ import {
   addCommentThunk,
   clearCurrent,
 } from "@core/store/tickets/tickets.slice";
+import { ticketsApi } from "@core/api/tickets.api";
 import { usersApi, type User } from "@core/api/auth.api";
-import { departmentsApi, type Department } from "@core/api/departments.api";
 import { formatFechaHora } from "@core/store/cartas/types";
 import { useAblyTicket } from "@core/hooks/useAbly";
 import { downloadTicketPDF } from "../utils/pdf";
@@ -86,16 +91,29 @@ export default function TicketDetailPage() {
   const isAdmin = currentUser?.role === "ADMIN";
 
   const [empleados, setEmpleados] = useState<User[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const [busyEmpleados, setBusyEmpleados] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
   const [sendingComment, setSendingComment] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const handleDeleteTicket = async () => {
+    if (!ticket) return;
+    try {
+      await ticketsApi.remove(ticket.id);
+      setDeleteOpen(false);
+      navigate("/tickets");
+    } catch (e: any) {
+      setToastType("error");
+      setToast(e.message);
+      setDeleteOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (id) dispatch(fetchTicketById(id));
-    departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
     return () => { dispatch(clearCurrent()); };
   }, [id, dispatch]);
 
@@ -107,12 +125,20 @@ export default function TicketDetailPage() {
   });
 
   useEffect(() => {
-    if (ticket?.departmentId) {
-      usersApi.empleados(ticket.departmentId).then(setEmpleados).catch(() => setEmpleados([]));
-    } else {
-      usersApi.empleados().then(setEmpleados).catch(() => setEmpleados([]));
+    usersApi.empleados().then(setEmpleados).catch(() => setEmpleados([]));
+  }, []);
+
+  const buscarEmpleados = async (q?: string) => {
+    setBusyEmpleados(true);
+    try {
+      const res = await usersApi.empleados(undefined, q || undefined);
+      setEmpleados(res);
+    } catch {
+      setEmpleados([]);
+    } finally {
+      setBusyEmpleados(false);
     }
-  }, [ticket?.departmentId]);
+  };
 
   useEffect(() => {
     if (!toast) return;
@@ -136,36 +162,28 @@ export default function TicketDetailPage() {
     }
   };
 
-  const handleAssign = async (userId: string) => {
+  const handleAssign = async (value: string | number) => {
     if (!ticket) return;
+    const userId = String(value);
+    const empleado = empleados.find((e) => e.id === userId) ?? null;
     const action = await dispatch(
-      updateTicketThunk({ id: ticket.id, data: { asignadoAId: userId || null } })
+      updateTicketThunk({
+        id: ticket.id,
+        data: {
+          asignadoAId: userId || null,
+          // Al asignar empleado se autollena el departamento del ticket.
+          departmentId: empleado?.departmentId ?? null,
+        },
+      })
     );
     if (updateTicketThunk.fulfilled.match(action)) {
       refresh();
       setToastType("success");
-      setToast("Responsable actualizado");
-    }
-  };
-
-  const handleDepartment = async (deptId: string) => {
-    if (!ticket) return;
-    const updates: Record<string, any> = { departmentId: deptId || null };
-    if (deptId && ticket.asignadoAId) {
-      const belongsToDept = empleados.some(
-        (e) => e.id === ticket.asignadoAId && e.departmentId === deptId
+      setToast(
+        empleado
+          ? `Asignado a ${empleado.name}${empleado.department?.name ? ` · ${empleado.department.name}` : ""}`
+          : "Responsable actualizado"
       );
-      if (!belongsToDept) {
-        updates.asignadoAId = null;
-      }
-    }
-    const action = await dispatch(
-      updateTicketThunk({ id: ticket.id, data: updates })
-    );
-    if (updateTicketThunk.fulfilled.match(action)) {
-      refresh();
-      setToastType("success");
-      setToast("Departamento actualizado");
     }
   };
 
@@ -204,7 +222,9 @@ export default function TicketDetailPage() {
 
   const empleadoOptions = empleados.map((u) => ({
     value: u.id,
-    label: u.name + (u.puesto ? ` · ${u.puesto}` : ""),
+    label: [u.name, u.numeroEmpleado ? `#${u.numeroEmpleado}` : null]
+      .filter(Boolean)
+      .join(" "),
   }));
 
   if (!ticket) {
@@ -328,6 +348,15 @@ export default function TicketDetailPage() {
               </ITFlex>
             </ITButton>
           )}
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="danger"
+            onClick={() => setDeleteOpen(true)}
+            title={ticket.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
+          >
+            {ticket.deletedAt ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
+          </ITButton>
         </ITFlex>
       }
     >
@@ -347,6 +376,9 @@ export default function TicketDetailPage() {
                 <ITBadget color="primary" size="small">
                   {CATEGORY_LABELS[ticket.category] ?? ticket.category}
                 </ITBadget>
+                {ticket.deletedAt && (
+                  <ITBadget color="gray" size="small">Eliminado</ITBadget>
+                )}
               </ITFlex>
 
               <ITStack direction="column" spacing={2}>
@@ -458,28 +490,26 @@ export default function TicketDetailPage() {
                     />
                   </ITGrid>
                   <ITGrid item xs={12} sm={6} md={4}>
-                    <ITSelect
-                      name="departmentId"
-                      label="Departamento"
-                      placeholder="Seleccionar..."
-                      options={departments.map((d) => ({
-                        value: d.id,
-                        label: d.name,
-                      }))}
-                      value={ticket.departmentId ?? ""}
-                      onChange={(e) => handleDepartment(e.target.value)}
+                    <ITSearchSelect
+                      name="asignadoAId"
+                      label="Asignar a"
+                      placeholder="Buscar empleado por nombre, no., puesto o departamento..."
+                      options={empleadoOptions}
+                      value={ticket.asignadoAId ?? ""}
+                      onChange={handleAssign}
+                      onSearch={buscarEmpleados}
+                      isLoading={busyEmpleados}
                       disabled={isClosed}
                     />
                   </ITGrid>
-                  <ITGrid item xs={12} sm={12} md={4}>
-                    <ITSelect
-                      name="asignadoAId"
-                      label="Asignar a"
-                      placeholder="Seleccionar..."
-                      options={empleadoOptions}
-                      value={ticket.asignadoAId ?? ""}
-                      onChange={(e) => handleAssign(e.target.value)}
-                      disabled={isClosed}
+                  <ITGrid item xs={12} sm={6} md={4}>
+                    <ITInput
+                      name="departmentInfo"
+                      label="Departamento"
+                      value={ticket.department?.name ?? "—"}
+                      disabled
+                      placeholder="Se autollena con el empleado"
+                      onChange={() => {}}
                     />
                   </ITGrid>
                 </ITGrid>
@@ -617,6 +647,21 @@ export default function TicketDetailPage() {
           onClose={() => setToast(null)}
         />
       )}
+
+      <ITConfirmDialog
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleDeleteTicket}
+        title={ticket.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
+        message={
+          ticket.deletedAt
+            ? `¿Eliminar definitivamente "${ticket.titulo}"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.`
+            : `¿Mover a papelera "${ticket.titulo}"? Quedará en estado eliminado y podrás borrarlo definitivamente después.`
+        }
+        confirmLabel={ticket.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
+        cancelLabel="Cancelar"
+        variant="danger"
+      />
     </ITPage>
   );
 }

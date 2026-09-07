@@ -21,6 +21,8 @@ import DepartmentDetailPage from "@modules/departments/pages/DepartmentDetailPag
 import EmployeesListPage from "@modules/employees/pages/EmployeesListPage";
 import EmployeeFormPage from "@modules/employees/pages/EmployeeFormPage";
 import ReportesPage from "@modules/reports/pages/ReportesPage";
+import SalidasPage from "@modules/salidas/pages/SalidasPage";
+import SalidaFormPage from "@modules/salidas/pages/SalidaFormPage";
 import UsersListPage from "@modules/users/pages/UsersListPage";
 import UserFormPage from "@modules/users/pages/UserFormPage";
 import UserHistoryPage from "@modules/users/pages/UserHistoryPage";
@@ -65,6 +67,9 @@ export default function App() {
         <Route path="/empleados" element={<EmployeesListPage />} />
         <Route path="/empleados/:id/editar" element={<EmployeeFormPage />} />
         <Route path="/reportes" element={<ReportesPage />} />
+        <Route path="/salidas" element={<SalidasPage />} />
+        <Route path="/salidas/nueva" element={<SalidaFormPage />} />
+        <Route path="/salidas/:id/editar" element={<SalidaFormPage />} />
         <Route path="/usuarios" element={<UsersListPage />} />
         <Route path="/usuarios/nuevo" element={<UserFormPage />} />
         <Route path="/usuarios/:id/editar" element={<UserFormPage />} />

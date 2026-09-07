@@ -53,6 +53,11 @@ export default function DeviceCard({ device, onClick }: Props) {
               <ITText className="text-[9px] font-black uppercase tracking-widest text-slate-500">
                 {device.estado}
               </ITText>
+              {!!device.loteSize && device.loteSize > 1 && (
+                <ITText className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
+                  · Lote ×{device.loteSize}
+                </ITText>
+              )}
             </ITFlex>
           </ITFlex>
           <FaArrowRight size={14} className="text-slate-300 flex-shrink-0" />

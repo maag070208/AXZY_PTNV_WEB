@@ -52,7 +52,7 @@ export default function LoginPage() {
                 Iniciar sesión
               </ITText>
               <ITText className="text-sm text-slate-500 block text-center mt-1">
-                Cartas Responsivas · Mantenimiento
+                Ingresa tus credenciales para acceder al sistema
               </ITText>
             </ITStack>
 

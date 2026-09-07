@@ -29,9 +29,9 @@ export const departmentsApi = {
     api.post<Department>(`/departments`, data),
   update: (id: string, data: { name?: string; active?: boolean }) =>
     api.put<Department>(`/departments/${id}`, data),
-  remove: (id: string) => api.delete<Department>(`/departments/${id}`),
+  remove: (id: string) => api.delete<{ soft: boolean; data: Department }>(`/departments/${id}`),
   addSubarea: (departmentId: string, name: string) =>
     api.post<Subarea>(`/departments/${departmentId}/subareas`, { name }),
   removeSubarea: (subareaId: string) =>
-    api.delete<Subarea>(`/departments/subareas/${subareaId}`),
+    api.delete<{ soft: boolean; data: Subarea }>(`/departments/subareas/${subareaId}`),
 };
