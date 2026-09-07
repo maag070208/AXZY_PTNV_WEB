@@ -14,7 +14,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaBuilding, FaEye, FaPlus, FaTrash } from "react-icons/fa";
+import { FaBuilding, FaEdit, FaEye, FaPlus, FaTrash } from "react-icons/fa";
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +35,8 @@ export default function DepartmentsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [deptToDelete, setDeptToDelete] = useState<Department | null>(null);
+  const [deptToEdit, setDeptToEdit] = useState<Department | null>(null);
+  const [editName, setEditName] = useState("");
 
   const handleCreateDept = async () => {
     if (!newDept.trim()) return;
@@ -45,6 +47,24 @@ export default function DepartmentsPage() {
       setReloadKey((k) => k + 1);
     } catch (e: any) {
       setError(e.message);
+    }
+  };
+
+  const openEditDept = (d: Department) => {
+    setDeptToEdit(d);
+    setEditName(d.name);
+  };
+
+  const handleUpdateDept = async () => {
+    if (!deptToEdit || !editName.trim()) return;
+    try {
+      await departmentsApi.update(deptToEdit.id, { name: editName.trim() });
+      setDeptToEdit(null);
+      setEditName("");
+      setReloadKey((k) => k + 1);
+    } catch (e: any) {
+      setError(e.message);
+      setDeptToEdit(null);
     }
   };
 
@@ -144,6 +164,17 @@ export default function DepartmentsPage() {
             <ITButton
               variant="outlined"
               size="small"
+              color="secondary"
+              onClick={() => openEditDept(d)}
+              title="Editar nombre"
+            >
+              <FaEdit size={12} />
+            </ITButton>
+          )}
+          {isAdmin && (
+            <ITButton
+              variant="outlined"
+              size="small"
               color="danger"
               onClick={() => setDeptToDelete(d)}
               title="Eliminar departamento"
@@ -227,6 +258,36 @@ export default function DepartmentsPage() {
                 <FaPlus size={12} />
                 <ITText className="font-bold text-[11px]">Crear</ITText>
               </ITFlex>
+            </ITButton>
+          </ITFlex>
+        </ITFlex>
+      </ITDialog>
+
+      <ITDialog
+        isOpen={!!deptToEdit}
+        onClose={() => setDeptToEdit(null)}
+        title="Editar departamento"
+      >
+        <ITFlex direction="column" gap={3}>
+          <ITInput
+            name="editDept"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="Nombre del departamento"
+            onKeyDown={(e) => e.key === "Enter" && handleUpdateDept()}
+            autoFocus
+          />
+          <ITFlex justify="end" gap={2}>
+            <ITButton variant="outlined" onClick={() => setDeptToEdit(null)}>
+              Cancelar
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={handleUpdateDept}
+              disabled={!editName.trim()}
+            >
+              <ITText className="font-bold text-[11px]">Guardar</ITText>
             </ITButton>
           </ITFlex>
         </ITFlex>

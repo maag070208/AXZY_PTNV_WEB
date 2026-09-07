@@ -50,15 +50,15 @@ export default function UsersListPage() {
   const handleToggleActive = async () => {
     if (!userToToggle) return;
     try {
-      await usersApi.update(userToToggle.id, { active: !userToToggle.active });
+      const res = await usersApi.delete(userToToggle.id);
       setUserToToggle(null);
       setReloadKey((k) => k + 1);
       setToast({
-        message: userToToggle.active ? "Usuario desactivado" : "Usuario reactivado",
+        message: res.soft ? "Usuario desactivado" : "Usuario eliminado definitivamente",
         type: "success",
       });
     } catch (e: any) {
-      setToast({ message: e.message || "Error al actualizar usuario", type: "error" });
+      setToast({ message: e.message || "Error al eliminar usuario", type: "error" });
     }
   };
 
