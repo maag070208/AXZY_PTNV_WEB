@@ -13,17 +13,17 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaDownload, FaExclamationTriangle, FaSync } from "react-icons/fa";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { reportsApi, type PrestamoRow } from "@core/api/reports.api";
-import { downloadPrestamosPDF } from "../utils/pdf";
+import { reportsApi, type AsignadoRow } from "@core/api/reports.api";
+import { downloadAsignadosPDF } from "../utils/pdf";
 
-const origenBadgeColor = (origen: PrestamoRow["origen"]) =>
+const origenBadgeColor = (origen: AsignadoRow["origen"]) =>
   origen === "CARTA" ? "success" : origen === "MOVIMIENTO" ? "warning" : "gray";
 
-const origenLabel = (origen: PrestamoRow["origen"]) =>
+const origenLabel = (origen: AsignadoRow["origen"]) =>
   origen === "CARTA" ? "Carta" : origen === "MOVIMIENTO" ? "Movimiento" : "Desconocido";
 
-export default function PrestamosTab() {
-  const [rows, setRows] = useState<PrestamoRow[]>([]);
+export default function AsignadosTab() {
+  const [rows, setRows] = useState<AsignadoRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
@@ -33,7 +33,7 @@ export default function PrestamosTab() {
     setLoading(true);
     setError(null);
     reportsApi
-      .prestamos()
+      .asignados()
       .then((res) => setRows(res.data))
       .catch((e: any) => setError(e.message ?? "No se pudo cargar el reporte"))
       .finally(() => setLoading(false));
@@ -46,28 +46,28 @@ export default function PrestamosTab() {
   const promedioDias = useMemo(() => {
     if (rows.length === 0) return 0;
     return Math.round(
-      rows.reduce((acc, r) => acc + (r.diasPrestado ?? 0), 0) / rows.length
+      rows.reduce((acc, r) => acc + (r.diasAsignado ?? 0), 0) / rows.length
     );
   }, [rows]);
 
   const masDe30 = useMemo(
-    () => rows.filter((r) => (r.diasPrestado ?? 0) > 30).length,
+    () => rows.filter((r) => (r.diasAsignado ?? 0) > 30).length,
     [rows]
   );
 
   const handleDownloadPdf = async () => {
     setExporting(true);
     try {
-      await downloadPrestamosPDF(rows);
+      await downloadAsignadosPDF(rows);
     } catch (e) {
-      console.error("Error al exportar PDF de préstamos", e);
+      console.error("Error al exportar PDF de asignados", e);
     } finally {
       setExporting(false);
     }
   };
 
   // ITDataTable exige un fetchData asíncrono (page/limit); como el universo
-  // de préstamos activos es acotado, paginamos en el cliente sobre `rows`.
+  // de asignados activos es acotado, paginamos en el cliente sobre `rows`.
   const fetchTableData = useCallback(
     async (params: ITDataTableFetchParams) => {
       const start = (params.page - 1) * params.limit;
@@ -80,7 +80,7 @@ export default function PrestamosTab() {
     [rows]
   );
 
-  const columns: Column<PrestamoRow>[] = [
+  const columns: Column<AsignadoRow>[] = [
     {
       key: "controlActivos",
       label: "Activo",
@@ -149,17 +149,17 @@ export default function PrestamosTab() {
       ),
     },
     {
-      key: "diasPrestado",
-      label: "Días prestado",
+      key: "diasAsignado",
+      label: "Días asignado",
       type: "number",
       sortable: false,
       render: (r) => (
         <ITText
           className={`text-[11px] font-black ${
-            (r.diasPrestado ?? 0) > 30 ? "text-red-600" : "text-slate-700"
+            (r.diasAsignado ?? 0) > 30 ? "text-red-600" : "text-slate-700"
           }`}
         >
-          {r.diasPrestado ?? "—"}
+          {r.diasAsignado ?? "—"}
         </ITText>
       ),
     },
@@ -172,7 +172,7 @@ export default function PrestamosTab() {
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-slate-800 leading-none">{rows.length}</ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Préstamos activos
+              Asignados
             </ITText>
           </ITFlex>
         </ITCard>
@@ -188,7 +188,7 @@ export default function PrestamosTab() {
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-red-600 leading-none">{masDe30}</ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              +30 días prestado
+              +30 días asignado
             </ITText>
           </ITFlex>
         </ITCard>

@@ -10,7 +10,7 @@ interface Props {
 }
 
 // Membrete institucional compartido por los reportes del sistema (Entregas,
-// Préstamos, Dispositivos). Se renderiza igual en cada página para que el
+// Asignados, Dispositivos). Se renderiza igual en cada página para que el
 // documento se lea como una sola pieza profesional, no como una tabla suelta.
 export default function PdfLetterhead({ title, pageIndex, pageCount, generatedAt }: Props) {
   return (

@@ -58,11 +58,11 @@ export default function DevicesTab() {
   };
 
   const stats = useMemo(() => {
-    const prestados = rows.filter((r) => r.estado === "ASIGNADO").length;
+    const asignados = rows.filter((r) => r.estado === "ASIGNADO").length;
     const disponibles = rows.filter((r) => r.estado === "DISPONIBLE").length;
     const bajas = rows.filter((r) => r.estado === "BAJA").length;
-    const masDe30 = rows.filter((r) => (r.diasPrestado ?? 0) > 30).length;
-    return { prestados, disponibles, bajas, masDe30 };
+    const masDe30 = rows.filter((r) => (r.diasAsignado ?? 0) > 30).length;
+    return { asignados, disponibles, bajas, masDe30 };
   }, [rows]);
 
   // ITDataTable exige fetchData asíncrono (page/limit); el universo de
@@ -153,21 +153,21 @@ export default function DevicesTab() {
       ),
     },
     {
-      key: "diasPrestado",
-      label: "Días prestado",
+      key: "diasAsignado",
+      label: "Días asignado",
       type: "number",
       sortable: false,
       render: (r) => (
         <ITText
           className={`text-[11px] font-black ${
-            r.estado === "ASIGNADO" && (r.diasPrestado ?? 0) > 30
+            r.estado === "ASIGNADO" && (r.diasAsignado ?? 0) > 30
               ? "text-red-600"
               : r.estado === "ASIGNADO"
               ? "text-slate-700"
               : "text-slate-300"
           }`}
         >
-          {r.estado === "ASIGNADO" ? r.diasPrestado ?? "—" : "—"}
+          {r.estado === "ASIGNADO" ? r.diasAsignado ?? "—" : "—"}
         </ITText>
       ),
     },
@@ -214,9 +214,9 @@ export default function DevicesTab() {
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-amber-700 leading-none">{stats.prestados}</ITText>
+            <ITText className="text-[18px] font-black text-amber-700 leading-none">{stats.asignados}</ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Prestados
+              Asignados
             </ITText>
           </ITFlex>
         </ITCard>
@@ -224,7 +224,7 @@ export default function DevicesTab() {
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-red-600 leading-none">{stats.masDe30}</ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              +30 días prestado
+              +30 días asignado
             </ITText>
           </ITFlex>
         </ITCard>

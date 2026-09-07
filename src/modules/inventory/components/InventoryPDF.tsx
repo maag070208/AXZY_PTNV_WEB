@@ -24,7 +24,7 @@ const TIPO_LABELS: Record<MovementType, string> = {
   SALIDA: "Salida",
   TRASLADO: "Traslado",
   BAJA: "Baja",
-  PRESTAMO: "Préstamo",
+  PRESTAMO: "Asignado",
   DEVOLUCION: "Devolución",
 };
 

@@ -25,7 +25,7 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
   MOVEMENT_SALIDA: { label: "Salida", color: "warning" },
   MOVEMENT_TRASLADO: { label: "Traslado", color: "info" },
   MOVEMENT_BAJA: { label: "Baja", color: "danger" },
-  MOVEMENT_PRESTAMO: { label: "Prestamo", color: "purple" },
+  MOVEMENT_PRESTAMO: { label: "Asignado", color: "purple" },
   MOVEMENT_DEVOLUCION: { label: "Devolucion", color: "teal" },
   CARTA_CREATED: { label: "Carta Creada", color: "primary" },
   DEVICE_UPDATED: { label: "Dispositivo Actualizado", color: "info" },

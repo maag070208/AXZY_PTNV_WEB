@@ -42,14 +42,14 @@ const COL = {
 export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: Props) {
   const today = fmtDate(new Date().toISOString());
   const disponibles = rows.filter((r) => r.estado === "DISPONIBLE").length;
-  const prestados = rows.filter((r) => r.estado === "ASIGNADO").length;
+  const asignados = rows.filter((r) => r.estado === "ASIGNADO").length;
   const bajas = rows.filter((r) => r.estado === "BAJA").length;
-  const masDe30 = rows.filter((r) => (r.diasPrestado ?? 0) > 30).length;
+  const masDe30 = rows.filter((r) => (r.diasAsignado ?? 0) > 30).length;
 
   const summary: Array<{ label: string; value: number; color: string }> = [
     { label: "Dispositivos", value: rows.length, color: PDF_COLORS.band },
     { label: "Disponibles", value: disponibles, color: PDF_COLORS.success },
-    { label: "Prestados", value: prestados, color: PDF_COLORS.warning },
+    { label: "Asignados", value: asignados, color: PDF_COLORS.warning },
     { label: "+30 días", value: masDe30, color: PDF_COLORS.danger },
     { label: "Baja", value: bajas, color: PDF_COLORS.gray },
   ];
@@ -104,8 +104,8 @@ export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: P
                 <View style={{ width: COL.resp }}><Text style={pdfTheme.cell}>{r.estado === "ASIGNADO" ? r.responsable ?? "—" : "—"}</Text></View>
                 <View style={{ width: COL.depto }}><Text style={pdfTheme.cellMuted}>{r.estado === "ASIGNADO" ? r.departamento ?? "—" : "—"}</Text></View>
                 <View style={{ width: COL.dias }}>
-                  <Text style={r.estado === "ASIGNADO" && (r.diasPrestado ?? 0) > 30 ? styles.diasAlerta : pdfTheme.cell}>
-                    {r.estado === "ASIGNADO" ? r.diasPrestado ?? "—" : "—"}
+                  <Text style={r.estado === "ASIGNADO" && (r.diasAsignado ?? 0) > 30 ? styles.diasAlerta : pdfTheme.cell}>
+                    {r.estado === "ASIGNADO" ? r.diasAsignado ?? "—" : "—"}
                   </Text>
                 </View>
                 <View style={{ width: COL.folio }}><Text style={pdfTheme.cellMuted}>{r.estado === "ASIGNADO" ? r.folio ?? "—" : "—"}</Text></View>

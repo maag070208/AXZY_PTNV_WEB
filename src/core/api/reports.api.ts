@@ -44,7 +44,7 @@ const buildQS = (filters: ReportFilters): string => {
   return s ? `?${s}` : "";
 };
 
-export interface PrestamoRow {
+export interface AsignadoRow {
   deviceId: string;
   controlActivos: string;
   descripcion: string;
@@ -55,7 +55,7 @@ export interface PrestamoRow {
   numeroEmpleado: string | null;
   departamento: string | null;
   fecha: string | null;
-  diasPrestado: number | null;
+  diasAsignado: number | null;
   origen: "CARTA" | "MOVIMIENTO" | "DESCONOCIDO";
   folio: string | null;
 }
@@ -80,7 +80,7 @@ export interface DeviceReportRow {
   numeroEmpleado: string | null;
   departamento: string | null;
   fecha: string | null;
-  diasPrestado: number | null;
+  diasAsignado: number | null;
   origen: "CARTA" | "MOVIMIENTO" | "DESCONOCIDO" | null;
   folio: string | null;
 }
@@ -90,8 +90,8 @@ export const reportsApi = {
     tableRequest<ReportRow>(`/reports/query`, params),
   get: (filters: ReportFilters) =>
     api.get<{ data: ReportRow[]; total: number }>(`/reports${buildQS(filters)}`),
-  prestamos: () =>
-    api.get<{ data: PrestamoRow[]; total: number }>(`/reports/prestamos`),
+  asignados: () =>
+    api.get<{ data: AsignadoRow[]; total: number }>(`/reports/asignados`),
   devices: () =>
     api.get<{ data: DeviceReportRow[]; total: number }>(`/reports/devices`),
   csvUrl: (filters: ReportFilters) => {

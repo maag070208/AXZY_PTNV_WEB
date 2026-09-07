@@ -26,8 +26,8 @@ const TIPO_OPTIONS = [
   { value: "SALIDA", label: "Salida (retirar de ubicación)" },
   { value: "TRASLADO", label: "Traslado (mover a otra ubicación)" },
   { value: "BAJA", label: "Baja (dar de baja el dispositivo)" },
-  { value: "PRESTAMO", label: "Préstamo (equipo prestado a alguien)" },
-  { value: "DEVOLUCION", label: "Devolución (equipo regresado de préstamo)" },
+  { value: "PRESTAMO", label: "Asignado (equipo entregado a alguien)" },
+  { value: "DEVOLUCION", label: "Devolución (equipo regresado de asignación)" },
 ];
 
 const CONDICION_OPTIONS = [
@@ -268,11 +268,11 @@ export default function NewInventoryMovementPage() {
           {requiresPrestamoFields && (
             <ITStack direction="column" spacing={4} className="p-4 bg-blue-50 rounded-xl border border-blue-100">
               <ITText className="text-[11px] font-black uppercase tracking-widest text-blue-600">
-                Datos del préstamo
+                Datos de la asignación
               </ITText>
               <ITInput
                 name="prestadoA"
-                label="Prestado a"
+                label="Asignado a"
                 value={form.prestadoA}
                 onChange={(e) => setForm((f) => ({ ...f, prestadoA: e.target.value }))}
                 placeholder="Nombre de quien recibe el equipo..."

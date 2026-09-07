@@ -333,7 +333,7 @@ export default function DeviceFormPage() {
           {disabledAll ? <FaLock size={12} /> : <FaSave size={12} />}
           <ITText className="font-bold text-[11px]">
             {disabledAll
-              ? "Prestado — bloqueado"
+              ? "Asignado — bloqueado"
               : saving
               ? "Guardando…"
               : isBatch
@@ -369,7 +369,7 @@ export default function DeviceFormPage() {
           <ITFlex align="center" gap={2}>
             <FaLock size={14} />
             <ITText className="text-[12px] font-bold">
-              Este dispositivo (activo {blockedAssetCode}) está prestado (asignado) y no se
+              Este dispositivo (activo {blockedAssetCode}) está asignado y no se
               puede editar. Registra su devolución para poder modificarlo.
             </ITText>
           </ITFlex>
@@ -848,7 +848,7 @@ export default function DeviceFormPage() {
                           <ITFlex align="center" gap={1}>
                             <FaLock size={10} className="text-amber-600" />
                             <ITText className="text-[9px] font-black uppercase tracking-widest text-amber-600">
-                              Prestado — protegido
+                              Asignado — protegido
                             </ITText>
                           </ITFlex>
                         )}

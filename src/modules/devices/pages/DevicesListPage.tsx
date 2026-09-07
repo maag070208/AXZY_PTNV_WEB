@@ -227,7 +227,7 @@ export default function DevicesListPage() {
                 disabled={isLoaned}
                 title={
                   isLoaned
-                    ? `Prestado (activo ${row.controlActivos}) — no se puede editar hasta que se devuelva`
+                    ? `Asignado (activo ${row.controlActivos}) — no se puede editar hasta que se devuelva`
                     : "Editar"
                 }
               >
@@ -241,7 +241,7 @@ export default function DevicesListPage() {
                 disabled={row.estado === "ASIGNADO"}
                 title={
                   row.estado === "ASIGNADO"
-                    ? `Prestado (activo ${row.controlActivos}) — registra su devolución antes de dar de baja`
+                    ? `Asignado (activo ${row.controlActivos}) — registra su devolución antes de dar de baja`
                     : row.estado === "BAJA"
                     ? "Eliminar definitivamente"
                     : "Dar de baja"
@@ -344,7 +344,7 @@ export default function DevicesListPage() {
               </ITFlex>
               <ITFlex direction="column" gap={0}>
                 <ITText className="text-[18px] font-black text-amber-700 leading-none">{summary?.asignado ?? "–"}</ITText>
-                <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Prestado</ITText>
+                <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Asignado</ITText>
               </ITFlex>
             </ITFlex>
           </ITCard>

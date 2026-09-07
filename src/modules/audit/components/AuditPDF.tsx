@@ -95,7 +95,7 @@ const ACTION_LABELS: Record<string, string> = {
   MOVEMENT_SALIDA: "Salida",
   MOVEMENT_TRASLADO: "Traslado",
   MOVEMENT_BAJA: "Baja",
-  MOVEMENT_PRESTAMO: "Prestamo",
+  MOVEMENT_PRESTAMO: "Asignado",
   MOVEMENT_DEVOLUCION: "Devolucion",
   CARTA_CREATED: "Carta Creada",
   DEVICE_UPDATED: "Dispositivo Actualizado",

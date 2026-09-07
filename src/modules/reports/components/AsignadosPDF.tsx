@@ -1,11 +1,11 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import type { PrestamoRow } from "@core/api/reports.api";
+import type { AsignadoRow } from "@core/api/reports.api";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@core/pdf/theme";
 import PdfLetterhead from "@core/pdf/PdfLetterhead";
 import PdfFooter from "@core/pdf/PdfFooter";
 
 interface Props {
-  rows: PrestamoRow[];
+  rows: AsignadoRow[];
   title?: string;
 }
 
@@ -22,10 +22,10 @@ const fmtDate = (d: string | null): string => {
   return `${dd}/${mm}/${yy}`;
 };
 
-const origenBadgeStyle = (origen: PrestamoRow["origen"]) =>
+const origenBadgeStyle = (origen: AsignadoRow["origen"]) =>
   origen === "CARTA" ? badgeStyleFor("success") : origen === "MOVIMIENTO" ? badgeStyleFor("warning") : badgeStyleFor("gray");
 
-const origenLabel = (origen: PrestamoRow["origen"]) =>
+const origenLabel = (origen: AsignadoRow["origen"]) =>
   origen === "CARTA" ? "Carta" : origen === "MOVIMIENTO" ? "Movimiento" : "Desconocido";
 
 const COL = {
@@ -39,24 +39,24 @@ const COL = {
   origen: 42,
 };
 
-export default function PrestamoPDF({ rows, title = "Reporte de Préstamos Activos" }: Props) {
+export default function AsignadosPDF({ rows, title = "Reporte de Dispositivos Asignados" }: Props) {
   const today = fmtDate(new Date().toISOString());
-  const totalPrestamos = rows.length;
+  const totalAsignados = rows.length;
   const conCarta = rows.filter((r) => r.origen === "CARTA").length;
   const promedioDias = rows.length
-    ? Math.round(rows.reduce((acc, r) => acc + (r.diasPrestado ?? 0), 0) / rows.length)
+    ? Math.round(rows.reduce((acc, r) => acc + (r.diasAsignado ?? 0), 0) / rows.length)
     : 0;
   const deptos = new Set(rows.map((r) => r.departamento).filter(Boolean)).size;
 
   const summary: Array<{ label: string; value: number; color: string }> = [
-    { label: "Préstamos activos", value: totalPrestamos, color: PDF_COLORS.band },
+    { label: "Asignados", value: totalAsignados, color: PDF_COLORS.band },
     { label: "Con carta responsiva", value: conCarta, color: PDF_COLORS.success },
     { label: "Días promedio", value: promedioDias, color: PDF_COLORS.danger },
     { label: "Departamentos", value: deptos, color: PDF_COLORS.bandAccent },
   ];
 
   const ROWS_PER_PAGE = 26;
-  const pages: PrestamoRow[][] = [];
+  const pages: AsignadoRow[][] = [];
   for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
     pages.push(rows.slice(i, i + ROWS_PER_PAGE));
   }
@@ -103,8 +103,8 @@ export default function PrestamoPDF({ rows, title = "Reporte de Préstamos Activ
                 <View style={{ width: COL.folio }}><Text style={pdfTheme.cellMuted}>{r.folio ?? "—"}</Text></View>
                 <View style={{ width: COL.fecha }}><Text style={pdfTheme.cellMuted}>{fmtDate(r.fecha)}</Text></View>
                 <View style={{ width: COL.dias }}>
-                  <Text style={(r.diasPrestado ?? 0) > 30 ? styles.diasAlerta : pdfTheme.cell}>
-                    {r.diasPrestado ?? "—"}
+                  <Text style={(r.diasAsignado ?? 0) > 30 ? styles.diasAlerta : pdfTheme.cell}>
+                    {r.diasAsignado ?? "—"}
                   </Text>
                 </View>
                 <View style={{ width: COL.origen }}>

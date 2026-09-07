@@ -22,7 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { reportsApi, type ReportFilters, type ReportRow } from "@core/api/reports.api";
 import { downloadReportPDF } from "../utils/pdf";
-import PrestamosTab from "../components/PrestamosTab";
+import AsignadosTab from "../components/AsignadosTab";
 import DevicesTab from "../components/DevicesTab";
 import {
   departmentsApi,
@@ -327,10 +327,10 @@ export default function ReportesPage() {
             content: entregasContent,
           },
           {
-            id: "prestamos",
-            label: "Préstamos",
+            id: "asignados",
+            label: "Asignados",
             icon: <FaHandHolding size={13} />,
-            content: <PrestamosTab />,
+            content: <AsignadosTab />,
           },
           {
             id: "dispositivos",

@@ -213,14 +213,14 @@ export default function DeviceDetailPage() {
             disabled={device.estado === "ASIGNADO"}
             title={
               device.estado === "ASIGNADO"
-                ? `Prestado (activo ${device.controlActivos}) — no se puede editar hasta que se devuelva`
+                ? `Asignado (activo ${device.controlActivos}) — no se puede editar hasta que se devuelva`
                 : undefined
             }
           >
             <ITFlex align="center" gap={1}>
               {device.estado === "ASIGNADO" ? <FaLock size={12} /> : <FaEdit size={12} />}
               <ITText className="font-bold text-[11px]">
-                {device.estado === "ASIGNADO" ? "Prestado" : "Editar"}
+                {device.estado === "ASIGNADO" ? "Asignado" : "Editar"}
               </ITText>
             </ITFlex>
           </ITButton>
@@ -232,7 +232,7 @@ export default function DeviceDetailPage() {
             disabled={device.estado === "ASIGNADO"}
             title={
               device.estado === "ASIGNADO"
-                ? `Prestado (activo ${device.controlActivos}) — registra su devolución antes de dar de baja`
+                ? `Asignado (activo ${device.controlActivos}) — registra su devolución antes de dar de baja`
                 : device.estado === "BAJA"
                 ? "Eliminar definitivamente"
                 : "Dar de baja"
