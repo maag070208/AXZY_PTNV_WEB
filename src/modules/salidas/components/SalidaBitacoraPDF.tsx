@@ -41,7 +41,7 @@ const COL = {
 const styles = StyleSheet.create({
   page: {
     paddingTop: 14,
-    paddingBottom: 12,
+    paddingBottom: 26,
     paddingLeft: 32,
     paddingRight: 14,
     fontSize: 8,
@@ -104,6 +104,14 @@ const styles = StyleSheet.create({
     borderBottomStyle: "solid",
     minHeight: 16,
   },
+  tRowAlt: {
+    flexDirection: "row",
+    backgroundColor: "#fafafa",
+    borderBottomWidth: 0.6,
+    borderBottomColor: "#666",
+    borderBottomStyle: "solid",
+    minHeight: 16,
+  },
   th: {
     fontSize: 7.5,
     fontFamily: "Helvetica-Bold",
@@ -126,6 +134,19 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 3,
   },
+  footer: {
+    position: "absolute",
+    bottom: 10,
+    left: 32,
+    right: 14,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTopWidth: 0.6,
+    borderTopColor: "#999",
+    borderTopStyle: "solid",
+    paddingTop: 4,
+  },
+  footerText: { fontSize: 6.5, color: "#555" },
 });
 
 export default function SalidaBitacoraPDF({ rows, area, numeroEmpleado }: Props) {
@@ -191,8 +212,9 @@ export default function SalidaBitacoraPDF({ rows, area, numeroEmpleado }: Props)
 
             {Array.from({ length: ROWS_PER_PAGE }).map((_, i) => {
               const r = pageRows[i];
+              const rowStyle = r && i % 2 === 1 ? styles.tRowAlt : styles.tRow;
               return (
-                <View key={i} style={styles.tRow}>
+                <View key={i} style={rowStyle}>
                   <Text style={[styles.td, { width: COL.num }]}>{i + 1}</Text>
                   <Text style={[styles.td, { width: COL.desc }]}>{r?.descripcion ?? ""}</Text>
                   <Text style={[styles.td, { width: COL.modelo }]}>{r?.modelo ?? ""}</Text>
@@ -209,6 +231,13 @@ export default function SalidaBitacoraPDF({ rows, area, numeroEmpleado }: Props)
                 </View>
               );
             })}
+          </View>
+
+          <View style={styles.footer} fixed>
+            <Text style={styles.footerText}>
+              F-SIS-0005 Bitácora de Salida de Material — Departamento de Sistemas
+            </Text>
+            <Text style={styles.footerText}>Generado el {today}</Text>
           </View>
         </Page>
       ))}

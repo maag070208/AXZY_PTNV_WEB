@@ -18,58 +18,63 @@ const ACCENT = "#2563eb";
 const MUTED = "#64748b";
 const LIGHT = "#f1f5f9";
 const BORDER = "#e2e8f0";
+const WHITE = "#ffffff";
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 36,
+    paddingTop: 32,
     paddingBottom: 30,
     paddingLeft: 40,
     paddingRight: 40,
     fontSize: 9,
     fontFamily: "Helvetica",
     color: "#1e293b",
-    backgroundColor: "#fff",
+    backgroundColor: WHITE,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 20,
-    paddingBottom: 14,
+    marginBottom: 16,
+    paddingBottom: 12,
     borderBottomWidth: 2,
     borderBottomColor: ACCENT,
     borderBottomStyle: "solid",
   },
-  logo: { width: 52, height: 52 },
+  logo: { width: 48, height: 48 },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Helvetica-Bold",
     color: BRAND,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   headerSubtitle: { fontSize: 9, color: MUTED },
-  headerDate: { fontSize: 9, color: MUTED, textAlign: "right" },
-  summaryRow: { flexDirection: "row", gap: 10, marginBottom: 20 },
+  headerDate: { fontSize: 8.5, color: MUTED, textAlign: "right", marginBottom: 2 },
+
+  summaryRow: { flexDirection: "row", gap: 8, marginBottom: 18 },
   summaryCard: {
     flex: 1,
     backgroundColor: LIGHT,
     borderRadius: 6,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     alignItems: "center",
   },
   summaryValue: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Helvetica-Bold",
     color: BRAND,
     marginBottom: 2,
   },
   summaryLabel: {
-    fontSize: 7,
+    fontSize: 6.5,
     fontFamily: "Helvetica-Bold",
     color: MUTED,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
+    textAlign: "center",
   },
+
   tableHeader: {
     flexDirection: "row",
     backgroundColor: BRAND,
@@ -79,9 +84,9 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   tableHeaderText: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
-    color: "#fff",
+    color: WHITE,
     textTransform: "uppercase",
     letterSpacing: 0.3,
   },
@@ -100,14 +105,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: BORDER,
   },
-  cell: { fontSize: 8, color: "#334155" },
-  cellBold: { fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND },
-  cellMuted: { fontSize: 7.5, color: MUTED },
+  cell: { fontSize: 7.8, color: "#334155" },
+  cellBold: { fontSize: 7.8, fontFamily: "Helvetica-Bold", color: BRAND },
+  cellMuted: { fontSize: 7.3, color: MUTED },
+  cellDescTitle: { fontSize: 7.8, fontFamily: "Helvetica-Bold", color: "#334155" },
+  cellDescSub: { fontSize: 6.8, color: MUTED, marginTop: 1 },
+  badge: {
+    fontSize: 6.8,
+    fontFamily: "Helvetica-Bold",
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 3,
+    textAlign: "center",
+  },
   diasAlerta: {
-    fontSize: 8,
+    fontSize: 7.8,
     fontFamily: "Helvetica-Bold",
     color: "#dc2626",
   },
+
   footer: {
     position: "absolute",
     bottom: 20,
@@ -133,12 +149,12 @@ const fmtDate = (d: string | null): string => {
   return `${dd}/${mm}/${yy}`;
 };
 
-const estadoBadgeStyle = (estado: string) =>
+const badgeStyle = (estado: string) =>
   estado === "DISPONIBLE"
-    ? { color: "#15803d", backgroundColor: "#dcfce7" }
+    ? { ...styles.badge, color: "#15803d", backgroundColor: "#dcfce7" }
     : estado === "ASIGNADO"
-    ? { color: "#b45309", backgroundColor: "#fef3c7" }
-    : { color: MUTED, backgroundColor: LIGHT };
+    ? { ...styles.badge, color: "#b45309", backgroundColor: "#fef3c7" }
+    : { ...styles.badge, color: MUTED, backgroundColor: "#e2e8f0" };
 
 export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: Props) {
   const today = fmtDate(new Date().toISOString());
@@ -147,7 +163,7 @@ export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: P
   const bajas = rows.filter((r) => r.estado === "BAJA").length;
   const masDe30 = rows.filter((r) => (r.diasPrestado ?? 0) > 30).length;
 
-  const ROWS_PER_PAGE = 26;
+  const ROWS_PER_PAGE = 28;
   const pages: DeviceReportRow[][] = [];
   for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
     pages.push(rows.slice(i, i + ROWS_PER_PAGE));
@@ -155,29 +171,21 @@ export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: P
   if (pages.length === 0) pages.push([]);
 
   const COL = {
-    activo: 60,
-    desc: 130,
-    cant: 25,
-    estado: 45,
-    resp: 85,
-    depto: 70,
-    dias: 35,
-    folio: 55,
-  };
-
-  const badgeBase = {
-    fontSize: 7,
-    fontFamily: "Helvetica-Bold",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 3,
+    activo: 68,
+    desc: 144,
+    cant: 28,
+    estado: 50,
+    resp: 94,
+    depto: 72,
+    dias: 34,
+    folio: 36,
   };
 
   return (
     <Document title={title} author="Puerto Nuevo Hotel y Villas">
       {pages.map((pageRows, pageIdx) => (
         <Page key={pageIdx} size="LETTER" style={styles.page}>
-          {pageIdx === 0 && (
+          {pageIdx === 0 ? (
             <View style={styles.header}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                 <Image src="/logo-puerto-nuevo.png" style={styles.logo} />
@@ -188,8 +196,15 @@ export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: P
               </View>
               <View style={{ alignItems: "flex-end" }}>
                 <Text style={styles.headerDate}>Fecha de generación: {today}</Text>
-                <Text style={styles.headerDate}>Página {pageIdx + 1} de {pages.length}</Text>
+                <Text style={styles.headerDate}>
+                  Página {pageIdx + 1} de {pages.length}
+                </Text>
               </View>
+            </View>
+          ) : (
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 14, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: BORDER, borderBottomStyle: "solid" }}>
+              <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", color: BRAND }}>{title}</Text>
+              <Text style={{ fontSize: 8, color: MUTED }}>Página {pageIdx + 1} de {pages.length}</Text>
             </View>
           )}
 
@@ -218,13 +233,6 @@ export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: P
             </View>
           )}
 
-          {pageIdx > 0 && (
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 14, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: BORDER, borderBottomStyle: "solid" }}>
-              <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", color: BRAND }}>{title}</Text>
-              <Text style={{ fontSize: 8, color: MUTED }}>Página {pageIdx + 1} de {pages.length}</Text>
-            </View>
-          )}
-
           <View style={styles.tableHeader}>
             <View style={{ width: COL.activo }}><Text style={styles.tableHeaderText}>Activo</Text></View>
             <View style={{ width: COL.desc }}><Text style={styles.tableHeaderText}>Descripción</Text></View>
@@ -240,12 +248,12 @@ export default function DevicePDF({ rows, title = "Reporte de Dispositivos" }: P
             <View key={r.deviceId + i} style={i % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
               <View style={{ width: COL.activo }}><Text style={styles.cellBold}>{r.controlActivos}</Text></View>
               <View style={{ width: COL.desc }}>
-                <Text style={styles.cell}>{r.descripcion}</Text>
-                <Text style={styles.cellMuted}>{r.tipo} · {r.marca} {r.modelo}</Text>
+                <Text style={styles.cellDescTitle}>{r.descripcion}</Text>
+                <Text style={styles.cellDescSub}>{r.tipo} · {r.marca} {r.modelo}</Text>
               </View>
               <View style={{ width: COL.cant }}><Text style={styles.cell}>{r.cantidad}</Text></View>
               <View style={{ width: COL.estado }}>
-                <Text style={{ ...badgeBase, ...estadoBadgeStyle(r.estado) }}>{r.estado}</Text>
+                <Text style={badgeStyle(r.estado)}>{r.estado === "ASIGNADO" ? "Asignado" : r.estado === "DISPONIBLE" ? "Disponible" : "Baja"}</Text>
               </View>
               <View style={{ width: COL.resp }}><Text style={styles.cell}>{r.estado === "ASIGNADO" ? r.responsable ?? "—" : "—"}</Text></View>
               <View style={{ width: COL.depto }}><Text style={styles.cellMuted}>{r.estado === "ASIGNADO" ? r.departamento ?? "—" : "—"}</Text></View>

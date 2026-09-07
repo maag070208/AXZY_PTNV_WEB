@@ -1,6 +1,7 @@
 import {
   ITBadget,
   ITButton,
+  ITCard,
   ITDataTable,
   ITDatePicker,
   ITFlex,
@@ -43,10 +44,25 @@ export default function ReportesPage() {
   const [total, setTotal] = useState(0);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [reloadKey, setReloadKey] = useState(0);
+  const [stats, setStats] = useState<ReportRow[]>([]);
 
   useEffect(() => {
     departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
   }, []);
+
+  // Resumen del tab Entregas (mismas stats que en el PDF): consulta ligera
+  // con los filtros actuales.
+  useEffect(() => {
+    let cancelled = false;
+    reportsApi
+      .get(filters)
+      .then((res) => !cancelled && setStats(res.data))
+      .catch(() => !cancelled && setStats([]));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.start, filters.end, filters.department, filters.employee]);
 
   const externalFilters: Record<string, string | number | boolean> =
     useMemo(() => {
@@ -168,6 +184,47 @@ export default function ReportesPage() {
 
   const entregasContent = (
     <>
+      <ITFlex gap={3} wrap="wrap" className="mb-4">
+        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
+          <ITFlex direction="column" gap={0}>
+            <ITText className="text-[18px] font-black text-slate-800 leading-none">{stats.length}</ITText>
+            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+              Entregas
+            </ITText>
+          </ITFlex>
+        </ITCard>
+        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
+          <ITFlex direction="column" gap={0}>
+            <ITText className="text-[18px] font-black text-emerald-700 leading-none">
+              {stats.filter((r) => r.estado === "ASIGNADO").length}
+            </ITText>
+            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+              Asignadas
+            </ITText>
+          </ITFlex>
+        </ITCard>
+        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
+          <ITFlex direction="column" gap={0}>
+            <ITText className="text-[18px] font-black text-slate-600 leading-none">
+              {stats.filter((r) => r.estado === "DEVUELTO").length}
+            </ITText>
+            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+              Devueltas
+            </ITText>
+          </ITFlex>
+        </ITCard>
+        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
+          <ITFlex direction="column" gap={0}>
+            <ITText className="text-[18px] font-black text-blue-600 leading-none">
+              {new Set(stats.map((r) => r.department)).size}
+            </ITText>
+            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+              Departamentos
+            </ITText>
+          </ITFlex>
+        </ITCard>
+      </ITFlex>
+
       <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 mb-6" direction="column" gap={4}>
         <ITGrid container columns={12} spacing={3}>
           <ITGrid item xs={12} md={4}>

@@ -21,7 +21,7 @@ const BORDER = "#e2e8f0";
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 36,
+    paddingTop: 32,
     paddingBottom: 30,
     paddingLeft: 40,
     paddingRight: 40,
@@ -34,41 +34,43 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 20,
-    paddingBottom: 14,
+    marginBottom: 16,
+    paddingBottom: 12,
     borderBottomWidth: 2,
     borderBottomColor: ACCENT,
     borderBottomStyle: "solid",
   },
-  logo: { width: 52, height: 52 },
+  logo: { width: 48, height: 48 },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Helvetica-Bold",
     color: BRAND,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   headerSubtitle: { fontSize: 9, color: MUTED },
-  headerDate: { fontSize: 9, color: MUTED, textAlign: "right" },
-  summaryRow: { flexDirection: "row", gap: 10, marginBottom: 20 },
+  headerDate: { fontSize: 8.5, color: MUTED, textAlign: "right", marginBottom: 2 },
+  summaryRow: { flexDirection: "row", gap: 8, marginBottom: 18 },
   summaryCard: {
     flex: 1,
     backgroundColor: LIGHT,
     borderRadius: 6,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     alignItems: "center",
   },
   summaryValue: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Helvetica-Bold",
     color: BRAND,
     marginBottom: 2,
   },
   summaryLabel: {
-    fontSize: 7,
+    fontSize: 6.5,
     fontFamily: "Helvetica-Bold",
     color: MUTED,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
+    textAlign: "center",
   },
   tableHeader: {
     flexDirection: "row",
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   tableHeaderText: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: "#fff",
     textTransform: "uppercase",
@@ -103,8 +105,10 @@ const styles = StyleSheet.create({
   cell: { fontSize: 8, color: "#334155" },
   cellBold: { fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND },
   cellMuted: { fontSize: 7.5, color: MUTED },
+  cellDescTitle: { fontSize: 8, fontFamily: "Helvetica-Bold", color: "#334155" },
+  cellDescSub: { fontSize: 6.8, color: MUTED, marginTop: 1 },
   badgeCarta: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: "#15803d",
     backgroundColor: "#dcfce7",
@@ -113,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   badgeMovimiento: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: "#b45309",
     backgroundColor: "#fef3c7",
@@ -122,7 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   badgeDesconocido: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: MUTED,
     backgroundColor: LIGHT,
@@ -189,14 +193,14 @@ export default function PrestamoPDF({ rows, title = "Reporte de Préstamos Activ
   if (pages.length === 0) pages.push([]);
 
   const COL = {
-    activo: 55,
-    desc: 120,
-    resp: 90,
-    depto: 75,
-    folio: 60,
-    fecha: 55,
-    dias: 40,
-    origen: 55,
+    activo: 68,
+    desc: 112,
+    resp: 92,
+    depto: 70,
+    folio: 50,
+    fecha: 48,
+    dias: 36,
+    origen: 42,
   };
 
   return (
@@ -261,7 +265,10 @@ export default function PrestamoPDF({ rows, title = "Reporte de Préstamos Activ
           {pageRows.map((r, i) => (
             <View key={r.deviceId + i} style={i % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
               <View style={{ width: COL.activo }}><Text style={styles.cellBold}>{r.controlActivos}</Text></View>
-              <View style={{ width: COL.desc }}><Text style={styles.cell}>{r.descripcion}</Text></View>
+              <View style={{ width: COL.desc }}>
+                <Text style={styles.cellDescTitle}>{r.descripcion}</Text>
+                <Text style={styles.cellDescSub}>{r.tipo} · {r.marca} {r.modelo}</Text>
+              </View>
               <View style={{ width: COL.resp }}><Text style={styles.cell}>{r.responsable}</Text></View>
               <View style={{ width: COL.depto }}><Text style={styles.cellMuted}>{r.departamento ?? "—"}</Text></View>
               <View style={{ width: COL.folio }}><Text style={styles.cellMuted}>{r.folio ?? "—"}</Text></View>

@@ -24,11 +24,10 @@ const ACCENT = "#2563eb";
 const MUTED = "#64748b";
 const LIGHT = "#f1f5f9";
 const BORDER = "#e2e8f0";
-const WHITE = "#ffffff";
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 36,
+    paddingTop: 32,
     paddingBottom: 30,
     paddingLeft: 40,
     paddingRight: 40,
@@ -42,56 +41,59 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 20,
-    paddingBottom: 14,
+    marginBottom: 16,
+    paddingBottom: 12,
     borderBottomWidth: 2,
     borderBottomColor: ACCENT,
     borderBottomStyle: "solid",
   },
-  logo: { width: 52, height: 52 },
+  logo: { width: 48, height: 48 },
   headerRight: {
     alignItems: "flex-end",
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Helvetica-Bold",
     color: BRAND,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   headerSubtitle: {
     fontSize: 9,
     color: MUTED,
   },
   headerDate: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: MUTED,
     textAlign: "right",
+    marginBottom: 2,
   },
 
   summaryRow: {
     flexDirection: "row",
-    gap: 10,
-    marginBottom: 20,
+    gap: 8,
+    marginBottom: 18,
   },
   summaryCard: {
     flex: 1,
     backgroundColor: LIGHT,
     borderRadius: 6,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     alignItems: "center",
   },
   summaryValue: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Helvetica-Bold",
     color: BRAND,
     marginBottom: 2,
   },
   summaryLabel: {
-    fontSize: 7,
+    fontSize: 6.5,
     fontFamily: "Helvetica-Bold",
     color: MUTED,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
+    textAlign: "center",
   },
 
   filterBox: {
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   tableHeaderText: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: "#fff",
     textTransform: "uppercase",
@@ -159,9 +161,11 @@ const styles = StyleSheet.create({
     fontSize: 7.5,
     color: MUTED,
   },
+  cellDescTitle: { fontSize: 8, fontFamily: "Helvetica-Bold", color: "#334155" },
+  cellDescSub: { fontSize: 6.8, color: MUTED, marginTop: 1 },
 
   badgeAsignado: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: "#15803d",
     backgroundColor: "#dcfce7",
@@ -170,7 +174,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   badgeDevuelto: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: "#b45309",
     backgroundColor: "#fef3c7",
@@ -179,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   badgePerdido: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: "#dc2626",
     backgroundColor: "#fee2e2",
@@ -188,7 +192,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   badgeDefault: {
-    fontSize: 7,
+    fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: MUTED,
     backgroundColor: LIGHT,
@@ -261,13 +265,13 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
   }
 
   const COL = {
-    fecha: 55,
-    folio: 65,
-    activo: 60,
-    desc: 140,
-    resp: 90,
-    depto: 80,
-    estado: 55,
+    fecha: 52,
+    folio: 60,
+    activo: 58,
+    desc: 118,
+    resp: 86,
+    depto: 72,
+    estado: 54,
   };
 
   return (
@@ -340,7 +344,12 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
               <View style={{ width: COL.fecha }}><Text style={styles.cellMuted}>{fmtDate(r.fecha)}</Text></View>
               <View style={{ width: COL.folio }}><Text style={styles.cellBold}>{r.document_code}</Text></View>
               <View style={{ width: COL.activo }}><Text style={styles.cellBold}>{r.asset_code}</Text></View>
-              <View style={{ width: COL.desc }}><Text style={styles.cell}>{r.description}</Text></View>
+              <View style={{ width: COL.desc }}>
+                <Text style={styles.cellDescTitle}>{r.description}</Text>
+                {r.brand || r.model ? (
+                  <Text style={styles.cellDescSub}>{[r.brand, r.model].filter(Boolean).join(" · ")}</Text>
+                ) : null}
+              </View>
               <View style={{ width: COL.resp }}><Text style={styles.cell}>{r.responsible}</Text></View>
               <View style={{ width: COL.depto }}><Text style={styles.cellMuted}>{r.department}</Text></View>
               <View style={{ width: COL.estado }}>
