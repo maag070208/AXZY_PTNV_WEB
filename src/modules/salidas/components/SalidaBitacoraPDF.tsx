@@ -7,6 +7,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import type { MaterialOutput } from "@core/api/salidas.api";
+import { LOGO_PUERTO_NUEVO_BASE64 } from "@core/assets/logoPuertoNuevo";
 
 interface Props {
   rows: MaterialOutput[];
@@ -169,7 +170,7 @@ export default function SalidaBitacoraPDF({ rows, area, numeroEmpleado }: Props)
         <Page key={pageIdx} size="LETTER" style={styles.page}>
           <View style={styles.topHeader}>
             <View style={styles.logoBox}>
-              <Image src="/logo-puerto-nuevo.png" style={styles.logo} />
+              <Image src={LOGO_PUERTO_NUEVO_BASE64} style={styles.logo} />
               <View style={styles.titleBox}>
                 <Text style={styles.titleFolio}>F-SIS-0005</Text>
                 <Text style={styles.titleSub}>Bitácora de Salida de Material</Text>

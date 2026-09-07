@@ -1,12 +1,8 @@
-import {
-  Document,
-  Image,
-  Page,
-  StyleSheet,
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { ReportRow } from "@core/api/reports.api";
+import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@core/pdf/theme";
+import PdfLetterhead from "@core/pdf/PdfLetterhead";
+import PdfFooter from "@core/pdf/PdfFooter";
 
 interface Props {
   rows: ReportRow[];
@@ -19,208 +15,16 @@ interface Props {
   };
 }
 
-const BRAND = "#0f172a";
-const ACCENT = "#2563eb";
-const MUTED = "#64748b";
-const LIGHT = "#f1f5f9";
-const BORDER = "#e2e8f0";
-
 const styles = StyleSheet.create({
-  page: {
-    paddingTop: 32,
-    paddingBottom: 30,
-    paddingLeft: 40,
-    paddingRight: 40,
-    fontSize: 9,
-    fontFamily: "Helvetica",
-    color: "#1e293b",
-    backgroundColor: "#fff",
-  },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 16,
-    paddingBottom: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: ACCENT,
-    borderBottomStyle: "solid",
-  },
-  logo: { width: 48, height: 48 },
-  headerRight: {
-    alignItems: "flex-end",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontFamily: "Helvetica-Bold",
-    color: BRAND,
-    marginBottom: 3,
-  },
-  headerSubtitle: {
-    fontSize: 9,
-    color: MUTED,
-  },
-  headerDate: {
-    fontSize: 8.5,
-    color: MUTED,
-    textAlign: "right",
-    marginBottom: 2,
-  },
-
-  summaryRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 18,
-  },
-  summaryCard: {
-    flex: 1,
-    backgroundColor: LIGHT,
-    borderRadius: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-    alignItems: "center",
-  },
-  summaryValue: {
-    fontSize: 17,
-    fontFamily: "Helvetica-Bold",
-    color: BRAND,
-    marginBottom: 2,
-  },
-  summaryLabel: {
-    fontSize: 6.5,
-    fontFamily: "Helvetica-Bold",
-    color: MUTED,
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-    textAlign: "center",
-  },
-
-  filterBox: {
-    backgroundColor: "#f8fafc",
-    borderWidth: 0.5,
-    borderColor: BORDER,
-    borderStyle: "solid",
-    borderRadius: 4,
-    padding: 8,
-    marginBottom: 16,
-  },
-  filterTitle: {
-    fontSize: 7,
-    fontFamily: "Helvetica-Bold",
-    color: MUTED,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 4,
-  },
-  filterText: {
-    fontSize: 8,
-    color: "#475569",
-  },
-
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: BRAND,
-    borderRadius: 4,
-    paddingVertical: 7,
-    paddingHorizontal: 6,
-    marginBottom: 2,
-  },
-  tableHeaderText: {
-    fontSize: 6.8,
-    fontFamily: "Helvetica-Bold",
-    color: "#fff",
-    textTransform: "uppercase",
-    letterSpacing: 0.3,
-  },
-  tableRow: {
-    flexDirection: "row",
-    paddingVertical: 7,
-    paddingHorizontal: 6,
-    borderBottomWidth: 0.5,
-    borderBottomColor: BORDER,
-  },
-  tableRowAlt: {
-    flexDirection: "row",
-    backgroundColor: "#fafbfc",
-    paddingVertical: 7,
-    paddingHorizontal: 6,
-    borderBottomWidth: 0.5,
-    borderBottomColor: BORDER,
-  },
-  cell: {
-    fontSize: 8,
-    color: "#334155",
-  },
-  cellBold: {
-    fontSize: 8,
-    fontFamily: "Helvetica-Bold",
-    color: BRAND,
-  },
-  cellMuted: {
-    fontSize: 7.5,
-    color: MUTED,
-  },
-  cellDescTitle: { fontSize: 8, fontFamily: "Helvetica-Bold", color: "#334155" },
-  cellDescSub: { fontSize: 6.8, color: MUTED, marginTop: 1 },
-
-  badgeAsignado: {
-    fontSize: 6.8,
-    fontFamily: "Helvetica-Bold",
-    color: "#15803d",
-    backgroundColor: "#dcfce7",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 3,
-  },
-  badgeDevuelto: {
-    fontSize: 6.8,
-    fontFamily: "Helvetica-Bold",
-    color: "#b45309",
-    backgroundColor: "#fef3c7",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 3,
-  },
   badgePerdido: {
     fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
-    color: "#dc2626",
-    backgroundColor: "#fee2e2",
-    paddingHorizontal: 6,
+    color: PDF_COLORS.danger,
+    backgroundColor: PDF_COLORS.dangerBg,
+    paddingHorizontal: 5,
     paddingVertical: 2,
     borderRadius: 3,
-  },
-  badgeDefault: {
-    fontSize: 6.8,
-    fontFamily: "Helvetica-Bold",
-    color: MUTED,
-    backgroundColor: LIGHT,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 3,
-  },
-
-  footer: {
-    position: "absolute",
-    bottom: 20,
-    left: 40,
-    right: 40,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderTopWidth: 0.5,
-    borderTopColor: BORDER,
-    borderTopStyle: "solid",
-    paddingTop: 8,
-  },
-  footerText: {
-    fontSize: 7,
-    color: MUTED,
-  },
-  footerPowered: {
-    fontSize: 7,
-    color: ACCENT,
-    fontFamily: "Helvetica-Bold",
+    textAlign: "center",
   },
 });
 
@@ -239,6 +43,25 @@ const fmtFilterDate = (iso?: string): string => {
   return `${d}/${m}/${y}`;
 };
 
+const estadoBadge = (estado: string) =>
+  estado === "ASIGNADO"
+    ? badgeStyleFor("success")
+    : estado === "DEVUELTO"
+    ? badgeStyleFor("warning")
+    : estado === "PERDIDO"
+    ? styles.badgePerdido
+    : badgeStyleFor("gray");
+
+const COL = {
+  fecha: 52,
+  folio: 60,
+  activo: 58,
+  desc: 118,
+  resp: 86,
+  depto: 72,
+  estado: 54,
+};
+
 export default function ReportPDF({ rows, title = "Reporte de Entregas de Activos", filters }: Props) {
   const today = fmtDate(new Date());
 
@@ -247,8 +70,14 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
   const devueltos = rows.filter((r) => r.estado === "DEVUELTO").length;
   const deptos = new Set(rows.map((r) => r.department)).size;
 
-  const hasFilters = filters && (filters.start || filters.end || filters.department || filters.employee);
+  const summary: Array<{ label: string; value: number; color: string }> = [
+    { label: "Total registros", value: totalEntregas, color: PDF_COLORS.band },
+    { label: "Asignados", value: asignados, color: PDF_COLORS.success },
+    { label: "Devueltos", value: devueltos, color: PDF_COLORS.warning },
+    { label: "Departamentos", value: deptos, color: PDF_COLORS.bandAccent },
+  ];
 
+  const hasFilters = filters && (filters.start || filters.end || filters.department || filters.employee);
   const filterParts: string[] = [];
   if (filters?.start || filters?.end) {
     const from = filters?.start ? fmtFilterDate(filters.start) : "…";
@@ -258,117 +87,69 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
   if (filters?.department) filterParts.push(`Departamento: ${filters.department}`);
   if (filters?.employee) filterParts.push(`Empleado: ${filters.employee}`);
 
-  const ROWS_PER_PAGE = 30;
+  const ROWS_PER_PAGE = 28;
   const pages: ReportRow[][] = [];
   for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
     pages.push(rows.slice(i, i + ROWS_PER_PAGE));
   }
-
-  const COL = {
-    fecha: 52,
-    folio: 60,
-    activo: 58,
-    desc: 118,
-    resp: 86,
-    depto: 72,
-    estado: 54,
-  };
+  if (pages.length === 0) pages.push([]);
 
   return (
     <Document title={title} author="Puerto Nuevo Hotel y Villas">
       {pages.map((pageRows, pageIdx) => (
-        <Page key={pageIdx} size="LETTER" style={styles.page}>
-          {pageIdx === 0 && (
-            <View style={styles.header}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                <Image src="/logo-puerto-nuevo.png" style={styles.logo} />
-                <View>
-                  <Text style={styles.headerTitle}>{title}</Text>
-                  <Text style={styles.headerSubtitle}>Puerto Nuevo Hotel y Villas</Text>
+        <Page key={pageIdx} size="LETTER" style={pdfTheme.page}>
+          <PdfLetterhead title={title} pageIndex={pageIdx} pageCount={pages.length} generatedAt={today} />
+
+          <View style={pdfTheme.content}>
+            {pageIdx === 0 && (
+              <View style={pdfTheme.summaryRow}>
+                {summary.map((s) => (
+                  <View key={s.label} style={[pdfTheme.summaryCard, { borderTopColor: s.color }]}>
+                    <Text style={[pdfTheme.summaryValue, { color: s.color }]}>{s.value}</Text>
+                    <Text style={pdfTheme.summaryLabel}>{s.label}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {pageIdx === 0 && hasFilters && (
+              <View style={pdfTheme.filterBox}>
+                <Text style={pdfTheme.filterTitle}>Filtros aplicados</Text>
+                <Text style={pdfTheme.filterText}>{filterParts.join("  ·  ")}</Text>
+              </View>
+            )}
+
+            <View style={pdfTheme.tableHeader}>
+              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>Fecha</Text></View>
+              <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>Folio</Text></View>
+              <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>Activo</Text></View>
+              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>Descripción</Text></View>
+              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>Responsable</Text></View>
+              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>Departamento</Text></View>
+              <View style={{ width: COL.estado }}><Text style={pdfTheme.tableHeaderText}>Estado</Text></View>
+            </View>
+
+            {pageRows.map((r, i) => (
+              <View key={r.id + i} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
+                <View style={{ width: COL.fecha }}><Text style={pdfTheme.cellMuted}>{fmtDate(r.fecha)}</Text></View>
+                <View style={{ width: COL.folio }}><Text style={pdfTheme.cellBold}>{r.document_code}</Text></View>
+                <View style={{ width: COL.activo }}><Text style={pdfTheme.cellBold}>{r.asset_code}</Text></View>
+                <View style={{ width: COL.desc }}>
+                  <Text style={pdfTheme.cellDescTitle}>{r.description}</Text>
+                  {r.brand || r.model ? (
+                    <Text style={pdfTheme.cellDescSub}>{[r.brand, r.model].filter(Boolean).join(" · ")}</Text>
+                  ) : null}
+                </View>
+                <View style={{ width: COL.resp }}><Text style={pdfTheme.cell}>{r.responsible}</Text></View>
+                <View style={{ width: COL.depto }}><Text style={pdfTheme.cellMuted}>{r.department}</Text></View>
+                <View style={{ width: COL.estado }}>
+                  <Text style={estadoBadge(r.estado)}>{r.estado}</Text>
                 </View>
               </View>
-              <View style={styles.headerRight}>
-                <Text style={styles.headerDate}>Fecha de generación: {today}</Text>
-                <Text style={styles.headerDate}>Página {pageIdx + 1} de {pages.length}</Text>
-              </View>
-            </View>
-          )}
-
-          {pageIdx === 0 && (
-            <View style={styles.summaryRow}>
-              <View style={styles.summaryCard}>
-                <Text style={styles.summaryValue}>{totalEntregas}</Text>
-                <Text style={styles.summaryLabel}>Total registros</Text>
-              </View>
-              <View style={styles.summaryCard}>
-                <Text style={[styles.summaryValue, { color: "#15803d" }]}>{asignados}</Text>
-                <Text style={styles.summaryLabel}>Asignados</Text>
-              </View>
-              <View style={styles.summaryCard}>
-                <Text style={[styles.summaryValue, { color: MUTED }]}>{devueltos}</Text>
-                <Text style={styles.summaryLabel}>Devueltos</Text>
-              </View>
-              <View style={styles.summaryCard}>
-                <Text style={[styles.summaryValue, { color: ACCENT }]}>{deptos}</Text>
-                <Text style={styles.summaryLabel}>Departamentos</Text>
-              </View>
-            </View>
-          )}
-
-          {pageIdx === 0 && hasFilters && (
-            <View style={styles.filterBox}>
-              <Text style={styles.filterTitle}>Filtros aplicados</Text>
-              <Text style={styles.filterText}>{filterParts.join("  ·  ")}</Text>
-            </View>
-          )}
-
-          {pageIdx > 0 && (
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 14, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: BORDER, borderBottomStyle: "solid" }}>
-              <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", color: BRAND }}>{title}</Text>
-              <Text style={{ fontSize: 8, color: MUTED }}>Página {pageIdx + 1} de {pages.length}</Text>
-            </View>
-          )}
-
-          <View style={styles.tableHeader}>
-            <View style={{ width: COL.fecha }}><Text style={styles.tableHeaderText}>Fecha</Text></View>
-            <View style={{ width: COL.folio }}><Text style={styles.tableHeaderText}>Folio</Text></View>
-            <View style={{ width: COL.activo }}><Text style={styles.tableHeaderText}>Activo</Text></View>
-            <View style={{ width: COL.desc }}><Text style={styles.tableHeaderText}>Descripción</Text></View>
-            <View style={{ width: COL.resp }}><Text style={styles.tableHeaderText}>Responsable</Text></View>
-            <View style={{ width: COL.depto }}><Text style={styles.tableHeaderText}>Departamento</Text></View>
-            <View style={{ width: COL.estado }}><Text style={styles.tableHeaderText}>Estado</Text></View>
+            ))}
           </View>
 
-          {pageRows.map((r, i) => (
-            <View key={r.id + i} style={i % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
-              <View style={{ width: COL.fecha }}><Text style={styles.cellMuted}>{fmtDate(r.fecha)}</Text></View>
-              <View style={{ width: COL.folio }}><Text style={styles.cellBold}>{r.document_code}</Text></View>
-              <View style={{ width: COL.activo }}><Text style={styles.cellBold}>{r.asset_code}</Text></View>
-              <View style={{ width: COL.desc }}>
-                <Text style={styles.cellDescTitle}>{r.description}</Text>
-                {r.brand || r.model ? (
-                  <Text style={styles.cellDescSub}>{[r.brand, r.model].filter(Boolean).join(" · ")}</Text>
-                ) : null}
-              </View>
-              <View style={{ width: COL.resp }}><Text style={styles.cell}>{r.responsible}</Text></View>
-              <View style={{ width: COL.depto }}><Text style={styles.cellMuted}>{r.department}</Text></View>
-              <View style={{ width: COL.estado }}>
-                <Text style={
-                  r.estado === "ASIGNADO" ? styles.badgeAsignado :
-                  r.estado === "DEVUELTO" ? styles.badgeDevuelto :
-                  r.estado === "PERDIDO" ? styles.badgePerdido :
-                  styles.badgeDefault
-                }>
-                  {r.estado}
-                </Text>
-              </View>
-            </View>
-          ))}
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Sistema de Control de Activos — Puerto Nuevo Hotel y Villas</Text>
-            <Text style={styles.footerPowered}>powered by axzy.dev</Text>
-          </View>
+          <PdfFooter pageIndex={pageIdx} pageCount={pages.length} />
         </Page>
       ))}
     </Document>
