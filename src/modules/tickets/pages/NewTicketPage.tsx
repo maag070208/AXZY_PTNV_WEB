@@ -17,9 +17,9 @@ import {
   FaSave,
   FaTicketAlt,
 } from "react-icons/fa";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import type { AppDispatch } from "@core/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
+import type { AppDispatch, RootState } from "@core/store/store";
 import { createTicketThunk } from "@core/store/tickets/tickets.slice";
 
 const PRIORITIES = [
@@ -32,6 +32,7 @@ const PRIORITIES = [
 export default function NewTicketPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const currentUser = useSelector((s: RootState) => s.auth.user);
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
   const [saving, setSaving] = useState(false);
@@ -84,6 +85,10 @@ export default function NewTicketPage() {
   };
 
   const isValid = form.titulo.trim().length > 0 && form.descripcion.trim().length > 0;
+
+  if (currentUser?.role === "EMPLEADO") {
+    return <Navigate to="/tickets" replace />;
+  }
 
   return (
     <ITPage

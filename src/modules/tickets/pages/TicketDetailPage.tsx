@@ -2,6 +2,7 @@ import {
   ITBadget,
   ITButton,
   ITConfirmDialog,
+  ITDatePicker,
   ITFlex,
   ITGrid,
   ITInput,
@@ -22,11 +23,14 @@ import {
   FaComment,
   FaFilePdf,
   FaPaperPlane,
+  FaPlus,
+  FaProjectDiagram,
   FaSync,
   FaTicketAlt,
   FaTimesCircle,
   FaTrash,
   FaTrashRestore,
+  FaTrello,
   FaUserCog,
   FaUserPlus,
 } from "react-icons/fa";
@@ -89,6 +93,10 @@ export default function TicketDetailPage() {
   const ticket = useSelector((s: RootState) => s.tickets.current);
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const isAdmin = currentUser?.role === "ADMIN";
+  const isInvolved =
+    !!ticket &&
+    (ticket.creadoPorId === currentUser?.id ||
+      ticket.assignments.some((a) => a.userId === currentUser?.id));
 
   const [empleados, setEmpleados] = useState<User[]>([]);
   const [busyEmpleados, setBusyEmpleados] = useState(false);
@@ -98,6 +106,16 @@ export default function TicketDetailPage() {
   const [sendingComment, setSendingComment] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDesc, setTaskDesc] = useState("");
+  const [taskStart, setTaskStart] = useState("");
+  const [taskDue, setTaskDue] = useState("");
+  const [savingAssignment, setSavingAssignment] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [commentOpen, setCommentOpen] = useState<Record<string, boolean>>({});
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
+  const [sendingCommentId, setSendingCommentId] = useState<string | null>(null);
 
   const handleDeleteTicket = async () => {
     if (!ticket) return;
@@ -163,27 +181,90 @@ export default function TicketDetailPage() {
   };
 
   const handleAssign = async (value: string | number) => {
-    if (!ticket) return;
-    const userId = String(value);
-    const empleado = empleados.find((e) => e.id === userId) ?? null;
-    const action = await dispatch(
-      updateTicketThunk({
-        id: ticket.id,
-        data: {
-          asignadoAId: userId || null,
-          // Al asignar empleado se autollena el departamento del ticket.
-          departmentId: empleado?.departmentId ?? null,
-        },
-      })
-    );
-    if (updateTicketThunk.fulfilled.match(action)) {
-      refresh();
+    setSelectedUserId(String(value));
+  };
+
+  const handleAddAssignment = async () => {
+    if (!ticket || !selectedUserId || !taskTitle.trim()) return;
+    setSavingAssignment(true);
+    try {
+      await ticketsApi.addAssignment(ticket.id, {
+        userId: selectedUserId,
+        title: taskTitle.trim(),
+        description: taskDesc.trim(),
+        startDate: taskStart || null,
+        dueDate: taskDue || null,
+      });
+      setSelectedUserId("");
+      setTaskTitle("");
+      setTaskDesc("");
+      setTaskStart("");
+      setTaskDue("");
       setToastType("success");
-      setToast(
-        empleado
-          ? `Asignado a ${empleado.name}${empleado.department?.name ? ` · ${empleado.department.name}` : ""}`
-          : "Responsable actualizado"
-      );
+      setToast("Tarea asignada");
+      refresh();
+    } catch (e: any) {
+      setToastType("error");
+      setToast(e.message);
+    } finally {
+      setSavingAssignment(false);
+    }
+  };
+
+  const handleUpdateAssignment = async (
+    assignmentId: string,
+    patch: {
+      title?: string;
+      description?: string;
+      status?: string;
+      startDate?: string | null;
+      dueDate?: string | null;
+    }
+  ) => {
+    if (!ticket) return;
+    setUpdatingId(assignmentId);
+    try {
+      await ticketsApi.updateAssignment(ticket.id, assignmentId, patch);
+      setToastType("success");
+      setToast("Tarea actualizada");
+      refresh();
+    } catch (e: any) {
+      setToastType("error");
+      setToast(e.message);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleRemoveAssignment = async (assignmentId: string) => {
+    if (!ticket) return;
+    try {
+      await ticketsApi.removeAssignment(ticket.id, assignmentId);
+      setToastType("success");
+      setToast("Tarea retirada");
+      refresh();
+    } catch (e: any) {
+      setToastType("error");
+      setToast(e.message);
+    }
+  };
+
+  const handleAddAssignmentComment = async (assignmentId: string) => {
+    if (!ticket) return;
+    const texto = commentDrafts[assignmentId]?.trim();
+    if (!texto) return;
+    setSendingCommentId(assignmentId);
+    try {
+      await ticketsApi.addAssignmentComment(ticket.id, assignmentId, texto);
+      setCommentDrafts((d) => ({ ...d, [assignmentId]: "" }));
+      setToastType("success");
+      setToast("Comentario agregado");
+      refresh();
+    } catch (e: any) {
+      setToastType("error");
+      setToast(e.message);
+    } finally {
+      setSendingCommentId(null);
     }
   };
 
@@ -226,6 +307,378 @@ export default function TicketDetailPage() {
       .filter(Boolean)
       .join(" "),
   }));
+
+  const renderGrafo = (canManage: boolean) => {
+    if (!ticket) return null;
+    const statusMeta: Record<string, { dot: string; bar: string; label: string }> = {
+      PENDIENTE: { dot: "bg-slate-400", bar: "border-slate-300", label: "Pendiente" },
+      EN_PROGRESO: { dot: "bg-blue-500", bar: "border-blue-400", label: "En progreso" },
+      EN_REVISION: { dot: "bg-purple-500", bar: "border-purple-400", label: "En revisión" },
+      COMPLETADA: { dot: "bg-emerald-500", bar: "border-emerald-400", label: "Completada" },
+    };
+
+    return (
+      <ITStack direction="column" spacing={3} className="w-full">
+        <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
+          <ITFlex align="center" gap={2}>
+            <FaProjectDiagram size={14} className="text-emerald-600" />
+            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+              Grafo de tareas
+            </ITText>
+          </ITFlex>
+          <ITBadget color="primary" size="small">
+            {ticket.assignments.length} asignación(es)
+          </ITBadget>
+        </ITFlex>
+
+        {/* Nodo raíz (ticket) */}
+        <div className="flex gap-3">
+          <div className="flex flex-col items-center">
+            <div className="w-3.5 h-3.5 rounded-full bg-slate-800 ring-4 ring-slate-200" />
+            <div className="w-px flex-1 bg-slate-300 min-h-4" />
+          </div>
+          <div className="flex-1 min-w-0 rounded-xl bg-slate-900 text-white px-4 py-3 shadow-sm mb-1">
+            <ITFlex justify="between" align="center" gap={2} wrap="wrap">
+              <ITFlex align="center" gap={2} className="min-w-0">
+                <FaTicketAlt size={13} className="text-slate-400 shrink-0" />
+                <ITText className="text-[13px] font-black text-white leading-tight truncate">
+                  {ticket.titulo}
+                </ITText>
+              </ITFlex>
+              <ITBadget color={STATUS_BADGE[ticket.status]?.color as any ?? "default"} size="small">
+                {STATUS_BADGE[ticket.status]?.label ?? ticket.status}
+              </ITBadget>
+            </ITFlex>
+          </div>
+        </div>
+
+        {/* Asignaciones */}
+        {ticket.assignments.length === 0 ? (
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <div className="w-px flex-1 bg-slate-300 min-h-5" />
+              <div className="w-3 h-3 rounded-full bg-slate-300 ring-4 ring-white" />
+              <div className="w-px flex-1 bg-slate-300" />
+            </div>
+            <div className="flex-1 text-[11px] text-slate-400 italic py-2">
+              Aún no hay empleados asignados a este ticket.
+            </div>
+          </div>
+        ) : (
+          ticket.assignments.map((a) => {
+            const meta = statusMeta[a.status] ?? statusMeta.PENDIENTE;
+            // Admin/gerente/jefe editan datos de la tarea; el empleado solo
+            // mueve estado y comenta en las suyas.
+            const canEditTask = canManage && !isClosed;
+            const canEditStatus = !isClosed && (canManage || a.userId === currentUser?.id);
+            return (
+              <div key={a.id} className="flex gap-3">
+                <div className="flex flex-col items-center self-stretch">
+                  <div className="w-px flex-1 bg-slate-300" />
+                  <div className={`w-3 h-3 rounded-full ${meta.dot} ring-4 ring-white shadow-sm`} />
+                  <div className="w-px flex-1 bg-slate-300" />
+                </div>
+                <div className={`flex-1 pb-3 min-w-0 rounded-xl border-l-4 ${meta.bar} bg-white border border-slate-200 shadow-sm p-3`}>
+                  <ITFlex justify="between" align="center" gap={2} className="mb-2">
+                    <ITFlex align="center" gap={2} className="min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                        <ITText className="text-[11px] font-black text-slate-600">
+                          {a.user.name
+                            .split(" ")
+                            .map((p) => p[0])
+                            .filter(Boolean)
+                            .slice(0, 2)
+                            .join("")
+                            .toUpperCase()}
+                        </ITText>
+                      </div>
+                      <ITStack direction="column" spacing={0} className="min-w-0">
+                        <ITText className="text-[12px] font-black text-slate-800 leading-tight truncate">
+                          {a.user.name}
+                        </ITText>
+                        {a.user.numeroEmpleado && (
+                          <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                            No. {a.user.numeroEmpleado}
+                          </ITText>
+                        )}
+                      </ITStack>
+                    </ITFlex>
+                    <ITFlex align="center" gap={2} className="shrink-0">
+                      {canManage && !isClosed && (
+                        <ITButton
+                          variant="outlined"
+                          size="small"
+                          color="danger"
+                          onClick={() => handleRemoveAssignment(a.id)}
+                          title="Retirar tarea"
+                          disabled={updatingId === a.id}
+                        >
+                          <FaTrash size={10} />
+                        </ITButton>
+                      )}
+                      {!canEditStatus && (
+                        <ITBadget
+                          color={
+                            a.status === "COMPLETADA"
+                              ? "success"
+                              : a.status === "EN_PROGRESO"
+                              ? "info"
+                              : a.status === "EN_REVISION"
+                              ? "purple"
+                              : "gray"
+                          }
+                          size="small"
+                        >
+                          {meta.label}
+                        </ITBadget>
+                      )}
+                    </ITFlex>
+                  </ITFlex>
+
+                  <ITStack direction="column" spacing={2}>
+                    <ITInput
+                      name={`title-${a.id}`}
+                      label="Título"
+                      value={a.title}
+                      disabled={!canEditTask}
+                      onChange={(e) => handleUpdateAssignment(a.id, { title: e.target.value })}
+                    />
+
+                    <ITTextarea
+                      name={`desc-${a.id}`}
+                      label="Descripción"
+                      value={a.description}
+                      disabled={!canEditTask}
+                      rows={2}
+                      onChange={(v) => handleUpdateAssignment(a.id, { description: v })}
+                    />
+
+                    <ITGrid container columns={12} spacing={2}>
+                      <ITGrid item xs={12} sm={6}>
+                        <ITDatePicker
+                          name={`start-${a.id}`}
+                          label="Fecha de inicio"
+                          value={a.startDate ? new Date(a.startDate) : undefined}
+                          disabled={!canEditTask}
+                          onChange={(e: any) =>
+                            handleUpdateAssignment(a.id, {
+                              startDate: e.target.value ? e.target.value.toISOString() : null,
+                            })
+                          }
+                        />
+                      </ITGrid>
+                      <ITGrid item xs={12} sm={6}>
+                        <ITDatePicker
+                          name={`due-${a.id}`}
+                          label="Fecha de fin esperada"
+                          value={a.dueDate ? new Date(a.dueDate) : undefined}
+                          disabled={!canEditTask}
+                          onChange={(e: any) =>
+                            handleUpdateAssignment(a.id, {
+                              dueDate: e.target.value ? e.target.value.toISOString() : null,
+                            })
+                          }
+                        />
+                      </ITGrid>
+                    </ITGrid>
+
+                    {canEditStatus && (
+                      <ITSelect
+                        name={`status-${a.id}`}
+                        label="Estado de la tarea"
+                        options={
+                          canManage
+                            ? [
+                                { value: "PENDIENTE", label: "Pendiente" },
+                                { value: "EN_PROGRESO", label: "En progreso" },
+                                { value: "EN_REVISION", label: "En revisión" },
+                                { value: "COMPLETADA", label: "Completada" },
+                              ]
+                            : [
+                                { value: "PENDIENTE", label: "Pendiente" },
+                                { value: "EN_PROGRESO", label: "En progreso" },
+                                { value: "EN_REVISION", label: "En revisión" },
+                              ]
+                        }
+                        value={a.status}
+                        disabled={!canEditStatus || (a.status === "COMPLETADA" && !canManage)}
+                        onChange={(e) => handleUpdateAssignment(a.id, { status: e.target.value })}
+                      />
+                    )}
+
+                    {/* Comentarios de la tarea */}
+                    <div className="border-t border-slate-100 pt-2">
+                      <ITButton
+                        variant="outlined"
+                        size="small"
+                        color="secondary"
+                        onClick={() =>
+                          setCommentOpen((s) => ({ ...s, [a.id]: !s[a.id] }))
+                        }
+                      >
+                        <ITFlex align="center" gap={1}>
+                          <FaComment size={10} />
+                          <ITText className="font-bold text-[10px]">
+                            Comentarios ({a.comments?.length ?? 0})
+                          </ITText>
+                        </ITFlex>
+                      </ITButton>
+
+                      {commentOpen[a.id] && (
+                        <div className="mt-2 space-y-2">
+                          {(a.comments ?? []).length === 0 ? (
+                            <ITText className="text-[10px] text-slate-400 italic">
+                              Sin comentarios
+                            </ITText>
+                          ) : (
+                            (a.comments ?? []).map((c) => (
+                              <div
+                                key={c.id}
+                                className="rounded-lg bg-slate-50 border border-slate-100 p-2"
+                              >
+                                <ITFlex justify="between" align="center" className="mb-0.5">
+                                  <ITText className="text-[9px] font-black text-slate-600">
+                                    {c.autor?.name ?? "Sistema"}
+                                  </ITText>
+                                  <ITText className="text-[8px] text-slate-400">
+                                    {formatFechaHora(c.createdAt)}
+                                  </ITText>
+                                </ITFlex>
+                                <ITText className="text-[10px] text-slate-600 whitespace-pre-wrap">
+                                  {c.texto}
+                                </ITText>
+                              </div>
+                            ))
+                          )}
+
+                          {canEditStatus && (
+                            <div className="flex gap-2 items-end">
+                              <ITInput
+                                name={`comment-${a.id}`}
+                                placeholder="Agregar comentario..."
+                                value={commentDrafts[a.id] ?? ""}
+                                onChange={(e) =>
+                                  setCommentDrafts((d) => ({
+                                    ...d,
+                                    [a.id]: e.target.value,
+                                  }))
+                                }
+                                onKeyDown={(e) =>
+                                  e.key === "Enter" && handleAddAssignmentComment(a.id)
+                                }
+                              />
+                              <ITButton
+                                variant="filled"
+                                color="primary"
+                                size="small"
+                                onClick={() => handleAddAssignmentComment(a.id)}
+                                disabled={
+                                  sendingCommentId === a.id ||
+                                  !(commentDrafts[a.id] ?? "").trim()
+                                }
+                              >
+                                <FaPaperPlane size={11} />
+                              </ITButton>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </ITStack>
+                </div>
+              </div>
+            );
+          })
+        )}
+
+        {/* Agregar nodo (empleado + tarea) — solo admin */}
+        {canManage && !isClosed && (
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <div className="w-px flex-1 bg-slate-300" />
+              <div className="w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-white" />
+              <div className="w-px flex-1 bg-slate-300" />
+            </div>
+            <div className="flex-1 min-w-0 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/40 p-3">
+              <ITGrid container columns={12} spacing={3}>
+                <ITGrid item xs={12} md={5}>
+                  <ITSearchSelect
+                    name="newUserId"
+                    label="Empleado"
+                    placeholder="Buscar por nombre o no. empleado..."
+                    options={empleadoOptions}
+                    value={selectedUserId}
+                    onChange={handleAssign}
+                    onSearch={buscarEmpleados}
+                    isLoading={busyEmpleados}
+                  />
+                </ITGrid>
+                <ITGrid item xs={12} md={7}>
+                  <ITInput
+                    name="taskTitle"
+                    label="Título de la tarea *"
+                    placeholder="Ej. Revisar instalación eléctrica"
+                    value={taskTitle}
+                    onChange={(e) => setTaskTitle(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddAssignment()}
+                  />
+                </ITGrid>
+                <ITGrid item xs={12}>
+                  <ITTextarea
+                    name="taskDesc"
+                    label="Descripción"
+                    placeholder="Detalles de la tarea..."
+                    rows={2}
+                    value={taskDesc}
+                    onChange={(v) => setTaskDesc(v)}
+                  />
+                </ITGrid>
+                <ITGrid item xs={12} sm={6}>
+                  <ITDatePicker
+                    name="taskStart"
+                    label="Fecha de inicio"
+                    value={taskStart ? new Date(taskStart) : undefined}
+                    onChange={(e: any) =>
+                      setTaskStart(
+                        e.target.value ? e.target.value.toISOString() : ""
+                      )
+                    }
+                  />
+                </ITGrid>
+                <ITGrid item xs={12} sm={6}>
+                  <ITDatePicker
+                    name="taskDue"
+                    label="Fecha de fin esperada"
+                    value={taskDue ? new Date(taskDue) : undefined}
+                    onChange={(e: any) =>
+                      setTaskDue(
+                        e.target.value ? e.target.value.toISOString() : ""
+                      )
+                    }
+                  />
+                </ITGrid>
+                <ITGrid item xs={12}>
+                  <ITFlex justify="end">
+                    <ITButton
+                      variant="filled"
+                      color="primary"
+                      onClick={handleAddAssignment}
+                      disabled={savingAssignment || !selectedUserId || !taskTitle.trim()}
+                    >
+                      <ITFlex align="center" gap={1}>
+                        <FaPlus size={12} />
+                        <ITText className="font-bold text-[11px]">Asignar</ITText>
+                      </ITFlex>
+                    </ITButton>
+                  </ITFlex>
+                </ITGrid>
+              </ITGrid>
+            </div>
+          </div>
+        )}
+      </ITStack>
+    );
+  };
 
   if (!ticket) {
     return (
@@ -325,7 +778,19 @@ export default function TicketDetailPage() {
         { label: ticket.titulo },
       ]}
       actions={
-        <ITFlex gap={2}>
+        <ITFlex gap={2} wrap="wrap">
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="secondary"
+            onClick={() => navigate("/tickets/kanban")}
+            title="Seguimiento kanban de todas las tareas"
+          >
+            <ITFlex align="center" gap={1}>
+              <FaTrello size={12} />
+              <ITText className="font-bold text-[11px]">Seguimiento kanban</ITText>
+            </ITFlex>
+          </ITButton>
           <ITButton
             variant="outlined"
             size="small"
@@ -340,7 +805,7 @@ export default function TicketDetailPage() {
               </ITText>
             </ITFlex>
           </ITButton>
-          {!isClosed && (
+          {!isClosed && isAdmin && (
             <ITButton variant="filled" size="small" color="danger" onClick={() => handleStatusChange("CERRADO")}>
               <ITFlex align="center" gap={1}>
                 <FaTimesCircle size={12} />
@@ -475,7 +940,7 @@ export default function TicketDetailPage() {
                 </ITFlex>
 
                 <ITGrid container columns={12} spacing={3}>
-                  <ITGrid item xs={12} sm={6} md={4}>
+                  <ITGrid item xs={12} sm={6}>
                     <ITSelect
                       name="status"
                       label="Estado"
@@ -489,20 +954,7 @@ export default function TicketDetailPage() {
                       disabled={isClosed}
                     />
                   </ITGrid>
-                  <ITGrid item xs={12} sm={6} md={4}>
-                    <ITSearchSelect
-                      name="asignadoAId"
-                      label="Asignar a"
-                      placeholder="Buscar empleado por nombre, no., puesto o departamento..."
-                      options={empleadoOptions}
-                      value={ticket.asignadoAId ?? ""}
-                      onChange={handleAssign}
-                      onSearch={buscarEmpleados}
-                      isLoading={busyEmpleados}
-                      disabled={isClosed}
-                    />
-                  </ITGrid>
-                  <ITGrid item xs={12} sm={6} md={4}>
+                  <ITGrid item xs={12} sm={6}>
                     <ITInput
                       name="departmentInfo"
                       label="Departamento"
@@ -513,7 +965,17 @@ export default function TicketDetailPage() {
                     />
                   </ITGrid>
                 </ITGrid>
+
+                {renderGrafo(true)}
               </ITStack>
+            </ITFlex>
+          )}
+
+          {/* Grafo para involucrados (no admin): ven sus tareas y pueden
+              marcar su propio estado. */}
+          {!isAdmin && isInvolved && (
+            <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
+              {renderGrafo(false)}
             </ITFlex>
           )}
 

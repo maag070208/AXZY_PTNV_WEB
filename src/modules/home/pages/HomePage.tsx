@@ -8,6 +8,7 @@ import {
   FaHouseUser,
   FaLaptop,
   FaBoxes,
+  FaTasks,
   FaTicketAlt,
   FaUserShield,
   FaUserTie,
@@ -75,6 +76,13 @@ export default function HomePage() {
     // EMPLEADO: solo cartas y tickets
     ...(!canManage && user?.role === "EMPLEADO"
       ? [
+          {
+            id: "misTareas",
+            title: "Mis Tareas",
+            description: "Tareas asignadas a ti y su seguimiento kanban",
+            icon: <FaTasks size={22} />,
+            to: "/tickets/mis-tareas",
+          },
           {
             id: "cartas",
             title: "Mis Cartas",

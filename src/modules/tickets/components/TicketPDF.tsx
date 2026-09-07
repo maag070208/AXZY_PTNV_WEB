@@ -1,5 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import type { Ticket } from "@core/api/tickets.api";
+import type { Ticket, TicketAssignment } from "@core/api/tickets.api";
 import { PDF_COLORS, pdfTheme } from "@core/pdf/theme";
 import PdfLetterhead from "@core/pdf/PdfLetterhead";
 import PdfFooter from "@core/pdf/PdfFooter";
@@ -20,11 +20,11 @@ const STATUS_LABELS: Record<string, string> = {
   CERRADO: "Cerrado",
 };
 
-const PRIORITY_COLORS: Record<string, string> = {
-  BAJA: PDF_COLORS.muted,
-  MEDIA: PDF_COLORS.warning,
-  ALTA: "#ef4444",
-  URGENTE: PDF_COLORS.danger,
+const PRIORITY_LABELS: Record<string, string> = {
+  BAJA: "Baja",
+  MEDIA: "Media",
+  ALTA: "Alta",
+  URGENTE: "Urgente",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -34,24 +34,42 @@ const CATEGORY_LABELS: Record<string, string> = {
   OTRO: "Otro",
 };
 
+const KANBAN_COLS: Array<{
+  status: TicketAssignment["status"];
+  label: string;
+  color: string;
+  bg: string;
+}> = [
+  { status: "PENDIENTE", label: "Pendiente", color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
+  { status: "EN_PROGRESO", label: "En progreso", color: PDF_COLORS.band, bg: "#bfdbfe" },
+  { status: "EN_REVISION", label: "En revisión", color: "#7c3aed", bg: "#ede9fe" },
+  { status: "COMPLETADA", label: "Completada", color: PDF_COLORS.success, bg: PDF_COLORS.successBg },
+];
+
 const styles = StyleSheet.create({
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 6,
+  },
+  ticketTitle: { fontSize: 15, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink, flex: 1 },
   statusBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 3,
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
     color: PDF_COLORS.white,
-    overflow: "hidden",
   },
-  metaRow: { flexDirection: "row", gap: 8, marginBottom: 10 },
+  idLine: { fontSize: 8, color: PDF_COLORS.muted, marginBottom: 10 },
+
+  metaRow: { flexDirection: "row", gap: 8, marginBottom: 8 },
   metaCard: {
     flex: 1,
     backgroundColor: PDF_COLORS.light,
     borderRadius: 4,
     padding: 8,
-    borderTopWidth: 2,
-    borderTopColor: PDF_COLORS.band,
   },
   metaLabel: {
     fontSize: 6.5,
@@ -70,7 +88,7 @@ const styles = StyleSheet.create({
     color: PDF_COLORS.muted,
     textTransform: "uppercase",
     letterSpacing: 0.5,
-    marginBottom: 6,
+    marginBottom: 7,
     paddingBottom: 4,
     borderBottomWidth: 1,
     borderBottomColor: PDF_COLORS.border,
@@ -86,30 +104,57 @@ const styles = StyleSheet.create({
     borderLeftColor: PDF_COLORS.band,
   },
 
-  efficacyContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-    padding: 9,
+  // ── Kanban ──
+  kanbanRow: { flexDirection: "row", gap: 8 },
+  kanbanCol: {
+    flex: 1,
     backgroundColor: PDF_COLORS.light,
     borderRadius: 4,
+    padding: 6,
+  },
+  kanbanColHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  kanbanColTitle: {
+    fontSize: 7.5,
+    fontFamily: "Helvetica-Bold",
+    color: PDF_COLORS.ink,
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
+  },
+  kanbanCount: {
+    fontSize: 7,
+    fontFamily: "Helvetica-Bold",
+    color: PDF_COLORS.band,
+  },
+  kanbanDot: { width: 6, height: 6, borderRadius: 3, marginRight: 4 },
+  taskCard: {
+    backgroundColor: PDF_COLORS.white,
+    borderRadius: 3,
     borderWidth: 0.5,
     borderColor: PDF_COLORS.border,
+    padding: 6,
+    marginBottom: 5,
   },
-  efficacyBar: {
-    flex: 1,
-    height: 7,
-    backgroundColor: PDF_COLORS.border,
-    borderRadius: 4,
-    overflow: "hidden",
-    marginRight: 10,
+  taskEmployee: { fontSize: 8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink },
+  taskNo: { fontSize: 6.5, color: PDF_COLORS.muted, marginBottom: 3 },
+  taskTitleText: { fontSize: 8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink, marginBottom: 1 },
+  taskText: { fontSize: 7.8, color: "#334155", lineHeight: 1.4 },
+  taskDates: { fontSize: 6.8, color: PDF_COLORS.muted, marginTop: 2 },
+  emptyCol: {
+    fontSize: 7.5,
+    color: PDF_COLORS.muted,
+    fontStyle: "italic",
+    textAlign: "center",
+    paddingVertical: 8,
   },
-  efficacyFill: { height: 7, borderRadius: 4 },
-  efficacyText: { fontSize: 9.5, fontFamily: "Helvetica-Bold" },
-  efficacyLabel: { fontSize: 7.5, marginLeft: 6 },
 
-  historyItem: { flexDirection: "row", gap: 8, marginBottom: 9 },
-  historyDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: PDF_COLORS.band, marginTop: 2 },
+  // ── Historial ──
+  historyItem: { flexDirection: "row", gap: 8, marginBottom: 8 },
+  historyDot: { width: 7, height: 7, borderRadius: 3.5, marginTop: 2 },
   historyContent: { flex: 1 },
   historyTitle: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink },
   historyDetail: { fontSize: 7.5, color: PDF_COLORS.muted, marginTop: 1, lineHeight: 1.4 },
@@ -140,27 +185,51 @@ const formatReportDate = (): string => {
   return `${dd}/${mm}/${yy}`;
 };
 
-export const TicketPDF = ({ ticket }: Props) => {
-  const getEfficacy = () => {
-    if (!ticket.closedAt) return null;
-    const created = new Date(ticket.creadoEn).getTime();
-    const closed = new Date(ticket.closedAt).getTime();
-    const hours = (closed - created) / (1000 * 60 * 60);
-    const thresholds: Record<string, { excellent: number; good: number; fair: number }> = {
-      URGENTE: { excellent: 4, good: 8, fair: 24 },
-      ALTA: { excellent: 8, good: 24, fair: 48 },
-      MEDIA: { excellent: 24, good: 72, fair: 120 },
-      BAJA: { excellent: 72, good: 120, fair: 168 },
-    };
-    const t = thresholds[ticket.priority] ?? { excellent: 24, good: 72, fair: 120 };
-    const score = hours <= t.excellent ? 100 : hours <= t.good ? 80 : hours <= t.fair ? 60 : 40;
-    const label = score === 100 ? "Excelente" : score === 80 ? "Bueno" : score === 60 ? "Regular" : "Bajo";
-    const color = score === 100 ? PDF_COLORS.success : score === 80 ? PDF_COLORS.band : score === 60 ? PDF_COLORS.warning : PDF_COLORS.danger;
-    return { score, label, hours: Math.round(hours * 10) / 10, color };
-  };
+const dotColorFor = (type: string, detail?: string | null) => {
+  if (type === "STATUS" && detail?.includes("CERRADO")) return PDF_COLORS.success;
+  if (type === "CREATED") return PDF_COLORS.success;
+  if (type === "ASSIGNED") return "#8b5cf6";
+  if (type === "DEPARTMENT") return "#a855f7";
+  if (type === "DELETED") return PDF_COLORS.danger;
+  return PDF_COLORS.band;
+};
 
-  const efficacy = getEfficacy();
+export const TicketPDF = ({ ticket }: Props) => {
   const today = formatReportDate();
+
+  // Historial + comentarios en una sola línea de tiempo cronológica.
+  const timeline: Array<{
+    id: string;
+    ts: string;
+    title: string;
+    detail?: string;
+    author?: string;
+    dot: string;
+  }> = [];
+  ticket.history.forEach((h) => {
+    timeline.push({
+      id: h.id,
+      ts: h.createdAt,
+      title: h.detail ?? h.type,
+      detail: h.autor?.name ? `Por ${h.autor.name}` : undefined,
+      dot: dotColorFor(h.type, h.detail),
+    });
+  });
+  ticket.comments.forEach((c) => {
+    timeline.push({
+      id: c.id,
+      ts: c.creadoEn,
+      title: `Comentario de ${c.autor?.name ?? "Usuario"}`,
+      detail: c.texto,
+      dot: PDF_COLORS.gray,
+    });
+  });
+  timeline.sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+
+  const cols = KANBAN_COLS.map((col) => ({
+    ...col,
+    items: ticket.assignments.filter((a) => a.status === col.status),
+  }));
 
   return (
     <Document title={`Ticket - ${ticket.titulo}`} author="Puerto Nuevo Hotel y Villas">
@@ -168,21 +237,21 @@ export const TicketPDF = ({ ticket }: Props) => {
         <PdfLetterhead title="Reporte de Ticket" pageIndex={0} pageCount={1} generatedAt={today} />
 
         <View style={pdfTheme.content}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-            <Text style={{ fontSize: 8.5, color: PDF_COLORS.muted }}>
-              Ticket <Text style={{ fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink }}>#{ticket.id.slice(0, 8).toUpperCase()}</Text>
-            </Text>
+          {/* ── Encabezado ── */}
+          <View style={styles.titleRow}>
+            <Text style={styles.ticketTitle}>{ticket.titulo}</Text>
             <Text style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[ticket.status] ?? PDF_COLORS.gray }}>
               {STATUS_LABELS[ticket.status] ?? ticket.status}
             </Text>
           </View>
+          <Text style={styles.idLine}>
+            Ticket #{ticket.id.slice(0, 8).toUpperCase()} · Creado {formatShortDate(ticket.creadoEn)}
+          </Text>
 
           <View style={styles.metaRow}>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>Prioridad</Text>
-              <Text style={{ ...styles.metaValue, color: PRIORITY_COLORS[ticket.priority] ?? PDF_COLORS.ink }}>
-                {ticket.priority}
-              </Text>
+              <Text style={styles.metaValue}>{PRIORITY_LABELS[ticket.priority] ?? ticket.priority}</Text>
             </View>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>Categoría</Text>
@@ -203,78 +272,99 @@ export const TicketPDF = ({ ticket }: Props) => {
               <Text style={styles.metaLabel}>Asignado a</Text>
               <Text style={styles.metaValue}>{ticket.asignadoA?.name ?? "Sin asignar"}</Text>
             </View>
-            {ticket.closedAt && (
+            {ticket.closedAt ? (
               <View style={styles.metaCard}>
                 <Text style={styles.metaLabel}>Cerrado</Text>
                 <Text style={{ ...styles.metaValue, color: PDF_COLORS.success }}>
                   {formatShortDate(ticket.closedAt)}
                 </Text>
               </View>
+            ) : (
+              <View style={styles.metaCard}>
+                <Text style={styles.metaLabel}>Tareas</Text>
+                <Text style={styles.metaValue}>
+                  {ticket.assignments.filter((a) => a.status === "COMPLETADA").length}/{ticket.assignments.length}
+                </Text>
+              </View>
             )}
           </View>
-
-          {efficacy && (
-            <View style={styles.efficacyContainer}>
-              <View style={styles.efficacyBar}>
-                <View style={{ ...styles.efficacyFill, width: `${efficacy.score}%`, backgroundColor: efficacy.color }} />
-              </View>
-              <Text style={{ ...styles.efficacyText, color: efficacy.color }}>{efficacy.score}%</Text>
-              <Text style={{ ...styles.efficacyLabel, color: PDF_COLORS.muted }}>
-                {efficacy.label} · {efficacy.hours}h
-              </Text>
-            </View>
-          )}
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Descripción</Text>
             <Text style={styles.description}>{ticket.descripcion}</Text>
           </View>
 
-          {ticket.comments.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Comentarios ({ticket.comments.length})</Text>
-              <View style={pdfTheme.tableHeader}>
-                <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>Fecha</Text>
-                <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>Autor</Text>
-                <Text style={{ ...pdfTheme.tableHeaderText, flex: 4 }}>Comentario</Text>
+          {/* ── Tablero kanban ── */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Tablero de tareas ({ticket.assignments.length})
+            </Text>
+            {ticket.assignments.length === 0 ? (
+              <Text style={styles.emptyCol}>Sin tareas asignadas a este ticket.</Text>
+            ) : (
+              <View style={styles.kanbanRow}>
+                {cols.map((col) => (
+                  <View key={col.status} style={styles.kanbanCol}>
+                    <View style={styles.kanbanColHeader}>
+                      <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <View style={{ ...styles.kanbanDot, backgroundColor: col.color }} />
+                        <Text style={styles.kanbanColTitle}>{col.label}</Text>
+                      </View>
+                      <Text style={styles.kanbanCount}>{col.items.length}</Text>
+                    </View>
+                    {col.items.length === 0 ? (
+                      <Text style={styles.emptyCol}>Sin tareas</Text>
+                    ) : (
+                      col.items.map((a) => (
+                        <View key={a.id} style={styles.taskCard}>
+                          <Text style={styles.taskEmployee}>{a.user.name}</Text>
+                          <Text style={styles.taskNo}>
+                            {a.user.numeroEmpleado ? `No. ${a.user.numeroEmpleado}` : ""}
+                          </Text>
+                          <Text style={{ ...styles.taskTitleText }}>{a.title}</Text>
+                          {a.description ? (
+                            <Text style={styles.taskText}>{a.description}</Text>
+                          ) : null}
+                          {a.dueDate && a.status !== "COMPLETADA" && new Date(a.dueDate) < new Date() && (
+                            <Text style={{ ...styles.taskText, color: PDF_COLORS.danger, fontFamily: "Helvetica-Bold" }}>
+                              Vencida
+                            </Text>
+                          )}
+                          {(a.startDate || a.dueDate) && (
+                            <Text style={styles.taskDates}>
+                              {a.startDate ? `Inicio ${formatShortDate(a.startDate)}` : ""}
+                              {a.startDate && a.dueDate ? " · " : ""}
+                              {a.dueDate ? `Fin ${formatShortDate(a.dueDate)}` : ""}
+                            </Text>
+                          )}
+                          {a.comments && a.comments.length > 0 && (
+                            <Text style={styles.taskDates}>
+                              {a.comments.length} comentario(s)
+                            </Text>
+                          )}
+                        </View>
+                      ))
+                    )}
+                  </View>
+                ))}
               </View>
-              {ticket.comments.map((c, i) => (
-                <View key={c.id} style={i % 2 === 1 ? pdfTheme.tableRowAlt : pdfTheme.tableRow}>
-                  <Text style={{ ...pdfTheme.cellMuted, flex: 2 }}>{formatDate(c.creadoEn)}</Text>
-                  <Text style={{ ...pdfTheme.cell, flex: 2 }}>{c.autor?.name ?? "—"}</Text>
-                  <Text style={{ ...pdfTheme.cell, flex: 4 }}>{c.texto}</Text>
+            )}
+          </View>
+
+          {/* ── Historial ── */}
+          {timeline.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Historial ({timeline.length})</Text>
+              {timeline.map((item) => (
+                <View key={item.id} style={styles.historyItem}>
+                  <View style={{ ...styles.historyDot, backgroundColor: item.dot }} />
+                  <View style={styles.historyContent}>
+                    <Text style={styles.historyTitle}>{item.title}</Text>
+                    {item.detail && <Text style={styles.historyDetail}>{item.detail}</Text>}
+                    <Text style={styles.historyTime}>{formatDate(item.ts)}</Text>
+                  </View>
                 </View>
               ))}
-            </View>
-          )}
-
-          {ticket.history.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Historial ({ticket.history.length})</Text>
-              {ticket.history.map((h) => {
-                const isClosed = h.type === "STATUS" && h.detail?.includes("CERRADO");
-                const dotColor = isClosed
-                  ? PDF_COLORS.danger
-                  : h.type === "CREATED"
-                  ? PDF_COLORS.success
-                  : h.type === "ASSIGNED"
-                  ? "#8b5cf6"
-                  : h.type === "DEPARTMENT"
-                  ? "#a855f7"
-                  : PDF_COLORS.band;
-                return (
-                  <View key={h.id} style={styles.historyItem}>
-                    <View style={{ ...styles.historyDot, backgroundColor: dotColor }} />
-                    <View style={styles.historyContent}>
-                      <Text style={{ ...styles.historyTitle, color: isClosed ? PDF_COLORS.danger : PDF_COLORS.ink }}>
-                        {h.detail ?? h.type}
-                      </Text>
-                      {h.autor && <Text style={styles.historyDetail}>Por {h.autor.name}</Text>}
-                      <Text style={styles.historyTime}>{formatDate(h.createdAt)}</Text>
-                    </View>
-                  </View>
-                );
-              })}
             </View>
           )}
         </View>

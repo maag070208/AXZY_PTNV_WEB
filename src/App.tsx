@@ -29,6 +29,8 @@ import UserHistoryPage from "@modules/users/pages/UserHistoryPage";
 import TicketsListPage from "@modules/tickets/pages/TicketsListPage";
 import NewTicketPage from "@modules/tickets/pages/NewTicketPage";
 import TicketDetailPage from "@modules/tickets/pages/TicketDetailPage";
+import KanbanPage from "@modules/tickets/pages/KanbanPage";
+import MisTareasPage from "@modules/tickets/pages/MisTareasPage";
 import NotificationsPage from "@modules/notifications/pages/NotificationsPage";
 
 export default function App() {
@@ -46,6 +48,8 @@ export default function App() {
         <Route path="/cartas/:id/devolver" element={<DevolverCartaPage />} />
 
         <Route path="/tickets" element={<TicketsListPage />} />
+        <Route path="/tickets/kanban" element={<KanbanPage />} />
+        <Route path="/tickets/mis-tareas" element={<MisTareasPage />} />
         <Route path="/tickets/nuevo" element={<NewTicketPage />} />
         <Route path="/tickets/:id" element={<TicketDetailPage />} />
 

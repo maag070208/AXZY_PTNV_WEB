@@ -6,6 +6,7 @@ import {
   FaClipboardList,
   FaFileSignature,
   FaHouseUser,
+  FaTasks,
   FaTicketAlt,
   FaUserShield,
   FaUserTie,
@@ -82,6 +83,13 @@ export default function PrivateRoutes() {
       : []),
     ...(!canManage && isEmpleado
       ? [
+        {
+          id: "misTareas",
+          label: "Mis Tareas",
+          icon: <FaTasks size={14} />,
+          action: () => navigate("/tickets/mis-tareas"),
+          isActive: active("/tickets/mis-tareas"),
+        },
         {
           id: "misCartas",
           label: "Mis Cartas",

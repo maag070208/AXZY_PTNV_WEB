@@ -16,8 +16,10 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { useCallback, useState } from "react";
-import { FaCheckCircle, FaEye, FaPlus, FaTicketAlt, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaCheckCircle, FaEye, FaPlus, FaTicketAlt, FaTrash, FaTrashRestore, FaTrello } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import type { RootState } from "@core/store/store";
 import { ticketsApi, type Ticket } from "@core/api/tickets.api";
 
 const STATUS_BADGE: Record<string, { color: string; label: string }> = {
@@ -48,6 +50,8 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function TicketsListPage() {
   const navigate = useNavigate();
+  const currentUser = useSelector((s: RootState) => s.auth.user);
+  const isEmpleado = currentUser?.role === "EMPLEADO";
   const [reloadKey, setReloadKey] = useState(0);
   const [ticketToDelete, setTicketToDelete] = useState<Ticket | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -195,16 +199,30 @@ export default function TicketsListPage() {
         { label: "Tickets" },
       ]}
       actions={
-        <ITButton
-          variant="filled"
-          color="primary"
-          onClick={() => navigate("/tickets/nuevo")}
-        >
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">Nuevo ticket</ITText>
-          </ITFlex>
-        </ITButton>
+        <ITFlex gap={2}>
+          <ITButton
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate("/tickets/kanban")}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaTrello size={12} />
+              <ITText className="font-bold text-[11px]">Tablero</ITText>
+            </ITFlex>
+          </ITButton>
+          {!isEmpleado && (
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={() => navigate("/tickets/nuevo")}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaPlus size={12} />
+                <ITText className="font-bold text-[11px]">Nuevo ticket</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
+        </ITFlex>
       }
     >
       <ITDataTable
