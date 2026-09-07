@@ -7,6 +7,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import { formatFecha, type CartaResponsiva } from "@core/store/cartas/types";
+import { LOGO_PUERTO_NUEVO_BASE64 } from "@core/assets/logoPuertoNuevo";
 import { isITDeviceCode } from "@core/utils/itDevice";
 
 interface Props {
@@ -224,7 +225,7 @@ export default function CartaPDF({ carta }: Props) {
         {/* 1. Encabezado superior */}
         <View style={styles.topHeader}>
           <View style={styles.logoBox}>
-            <Image src="/logo-puerto-nuevo.png" style={styles.logo} />
+            <Image src={LOGO_PUERTO_NUEVO_BASE64} style={styles.logo} />
           </View>
           <View style={styles.metaBox}>
             <View style={styles.metaRow}>
