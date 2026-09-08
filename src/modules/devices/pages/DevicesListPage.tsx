@@ -16,9 +16,11 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaCheckCircle, FaEdit, FaEye, FaLayerGroup, FaLock, FaPlus, FaTag, FaTimesCircle, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaBoxOpen, FaCheckCircle, FaEdit, FaEye, FaExclamationTriangle, FaLayerGroup, FaLock, FaPlus, FaTag, FaTimesCircle, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@core/store/store";
 import {
   deviceTypesApi,
   devicesApi,
@@ -32,6 +34,8 @@ import DeviceCard from "../components/DeviceCard";
 export default function DevicesListPage() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = authUser?.role === "ADMIN";
   const [types, setTypes] = useState<DeviceType[]>([]);
   const [filterType, setFilterType] = useState("");
   const [filterEstado, setFilterEstado] = useState("");
@@ -45,7 +49,7 @@ export default function DevicesListPage() {
   const confirmDeleteDevice = async () => {
     if (!deviceToDelete) return;
     try {
-      await devicesApi.remove(deviceToDelete.id);
+      await devicesApi.remove(deviceToDelete.id, deviceToDelete.estado === "ASIGNADO");
       setReloadKey((k) => k + 1);
     } catch (e: any) {
       setDeleteError(e.message);
@@ -238,16 +242,24 @@ export default function DevicesListPage() {
                 size="small"
                 color="danger"
                 onClick={() => setDeviceToDelete(row)}
-                disabled={row.estado === "ASIGNADO"}
+                disabled={row.estado === "ASIGNADO" && !isAdmin}
                 title={
                   row.estado === "ASIGNADO"
-                    ? `Asignado (activo ${row.controlActivos}) — registra su devolución antes de dar de baja`
+                    ? isAdmin
+                      ? `Asignado (activo ${row.controlActivos}) — forzar eliminación (solo admin)`
+                      : `Asignado (activo ${row.controlActivos}) — registra su devolución antes de dar de baja`
                     : row.estado === "BAJA"
                     ? "Eliminar definitivamente"
                     : "Dar de baja"
                 }
               >
-                {row.estado === "BAJA" ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
+                {row.estado === "ASIGNADO" && isAdmin ? (
+                  <FaExclamationTriangle size={12} />
+                ) : row.estado === "BAJA" ? (
+                  <FaTrashRestore size={12} />
+                ) : (
+                  <FaTrash size={12} />
+                )}
               </ITButton>
             </ITFlex>
           );
@@ -425,13 +437,27 @@ export default function DevicesListPage() {
         isOpen={!!deviceToDelete}
         onClose={() => setDeviceToDelete(null)}
         onConfirm={confirmDeleteDevice}
-        title={deviceToDelete?.estado === "BAJA" ? "Eliminar definitivamente" : "Dar de baja"}
+        title={
+          deviceToDelete?.estado === "ASIGNADO"
+            ? "Forzar eliminación (dispositivo asignado)"
+            : deviceToDelete?.estado === "BAJA"
+            ? "Eliminar definitivamente"
+            : "Dar de baja"
+        }
         message={
-          deviceToDelete?.estado === "BAJA"
+          deviceToDelete?.estado === "ASIGNADO"
+            ? `${deviceToDelete?.controlActivos} está actualmente ASIGNADO/prestado. Como administrador puedes forzar su eliminación definitiva: se desvinculará de cartas responsivas y salidas de material relacionadas, y se borrará junto con su historial. Esta acción no se puede deshacer.`
+            : deviceToDelete?.estado === "BAJA"
             ? `¿Eliminar definitivamente ${deviceToDelete?.controlActivos}? Se borrarán su historial y movimientos. Esta acción no se puede deshacer.`
             : `¿Dar de baja ${deviceToDelete?.controlActivos}? Quedará con estado "Baja" y podrás eliminarlo definitivamente después.`
         }
-        confirmLabel={deviceToDelete?.estado === "BAJA" ? "Eliminar definitivamente" : "Dar de baja"}
+        confirmLabel={
+          deviceToDelete?.estado === "ASIGNADO"
+            ? "Forzar eliminación"
+            : deviceToDelete?.estado === "BAJA"
+            ? "Eliminar definitivamente"
+            : "Dar de baja"
+        }
         cancelLabel="Cancelar"
         variant="danger"
       />

@@ -86,7 +86,10 @@ export const usersApi = {
   ) => api.put<User>(`/users/${id}`, data),
   changePassword: (id: string, password: string) =>
     api.put<void>(`/users/${id}/password`, { password }),
-  delete: (id: string) => api.delete<{ soft: boolean; data: User }>(`/users/${id}`),
+  delete: (id: string, force?: boolean) =>
+    api.delete<{ soft: boolean; forced?: boolean; data: User }>(
+      `/users/${id}${force ? "?force=true" : ""}`
+    ),
   history: (id: string) =>
     api.get<Array<{
       id: string;

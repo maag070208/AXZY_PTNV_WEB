@@ -168,7 +168,10 @@ export const devicesApi = {
     ram: string;
     almacenamiento: string;
   }>) => api.put<Device>(`/devices/${id}`, data),
-  remove: (id: string) => api.delete<{ soft: boolean; data: Device }>(`/devices/${id}`),
+  remove: (id: string, force?: boolean) =>
+    api.delete<{ soft: boolean; forced?: boolean; data: Device }>(
+      `/devices/${id}${force ? "?force=true" : ""}`
+    ),
   getHistory: (id: string) => api.get<DeviceHistoryEntry[]>(`/devices/${id}/history`),
   addHistory: (id: string, data: { type: string; detail?: string }) =>
     api.post<DeviceHistoryEntry>(`/devices/${id}/history`, data),

@@ -31,6 +31,8 @@ import {
   FaUserCog,
 } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@core/store/store";
 import { devicesApi, type Device, type DeviceHistoryEntry } from "@core/api/devices.api";
 import { formatFechaHora } from "@core/store/cartas/types";
 
@@ -52,6 +54,8 @@ const HISTORY_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
 export default function DeviceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = authUser?.role === "ADMIN";
   const [device, setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
@@ -92,7 +96,7 @@ export default function DeviceDetailPage() {
   const handleDeleteDevice = async () => {
     if (!device) return;
     try {
-      await devicesApi.remove(device.id);
+      await devicesApi.remove(device.id, device.estado === "ASIGNADO");
       setDeleteOpen(false);
       navigate("/dispositivos");
     } catch (e: any) {
@@ -229,16 +233,24 @@ export default function DeviceDetailPage() {
             size="small"
             color="danger"
             onClick={() => setDeleteOpen(true)}
-            disabled={device.estado === "ASIGNADO"}
+            disabled={device.estado === "ASIGNADO" && !isAdmin}
             title={
               device.estado === "ASIGNADO"
-                ? `Asignado (activo ${device.controlActivos}) — registra su devolución antes de dar de baja`
+                ? isAdmin
+                  ? `Asignado (activo ${device.controlActivos}) — forzar eliminación (solo admin)`
+                  : `Asignado (activo ${device.controlActivos}) — registra su devolución antes de dar de baja`
                 : device.estado === "BAJA"
                 ? "Eliminar definitivamente"
                 : "Dar de baja"
             }
           >
-            {device.estado === "BAJA" ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
+            {device.estado === "ASIGNADO" && isAdmin ? (
+              <FaExclamationTriangle size={12} />
+            ) : device.estado === "BAJA" ? (
+              <FaTrashRestore size={12} />
+            ) : (
+              <FaTrash size={12} />
+            )}
           </ITButton>
         </ITFlex>
       }
@@ -511,13 +523,27 @@ export default function DeviceDetailPage() {
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDeleteDevice}
-        title={device.estado === "BAJA" ? "Eliminar definitivamente" : "Dar de baja"}
+        title={
+          device.estado === "ASIGNADO"
+            ? "Forzar eliminación (dispositivo asignado)"
+            : device.estado === "BAJA"
+            ? "Eliminar definitivamente"
+            : "Dar de baja"
+        }
         message={
-          device.estado === "BAJA"
+          device.estado === "ASIGNADO"
+            ? `${device.controlActivos} está actualmente ASIGNADO/prestado. Como administrador puedes forzar su eliminación definitiva: se desvinculará de cartas responsivas y salidas de material relacionadas, y se borrará junto con su historial. Esta acción no se puede deshacer.`
+            : device.estado === "BAJA"
             ? `¿Eliminar definitivamente ${device.controlActivos}? Se borrarán su historial y movimientos. Esta acción no se puede deshacer.`
             : `¿Dar de baja ${device.controlActivos}? Quedará con estado "Baja" y podrás eliminarlo definitivamente después.`
         }
-        confirmLabel={device.estado === "BAJA" ? "Eliminar definitivamente" : "Dar de baja"}
+        confirmLabel={
+          device.estado === "ASIGNADO"
+            ? "Forzar eliminación"
+            : device.estado === "BAJA"
+            ? "Eliminar definitivamente"
+            : "Dar de baja"
+        }
         cancelLabel="Cancelar"
         variant="danger"
       />

@@ -18,14 +18,19 @@ import type {
 import { FaEdit, FaEye, FaKey, FaPlus, FaTrash, FaUserShield } from "react-icons/fa";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@core/store/store";
 import { usersApi, type User } from "@core/api/auth.api";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = authUser?.role === "ADMIN";
   const [total, setTotal] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
 
   const [userToToggle, setUserToToggle] = useState<User | null>(null);
+  const [userToForceDelete, setUserToForceDelete] = useState<User | null>(null);
   const [userToPassword, setUserToPassword] = useState<User | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
@@ -49,8 +54,9 @@ export default function UsersListPage() {
 
   const handleToggleActive = async () => {
     if (!userToToggle) return;
+    const target = userToToggle;
     try {
-      const res = await usersApi.delete(userToToggle.id);
+      const res = await usersApi.delete(target.id);
       setUserToToggle(null);
       setReloadKey((k) => k + 1);
       setToast({
@@ -58,7 +64,28 @@ export default function UsersListPage() {
         type: "success",
       });
     } catch (e: any) {
-      setToast({ message: e.message || "Error al eliminar usuario", type: "error" });
+      setUserToToggle(null);
+      // El usuario ya estaba inactivo y el borrado físico se bloqueó por
+      // tener historial ligado (tickets, cartas, etc.). Solo un admin puede
+      // forzar la eliminación definitiva pese a ese historial.
+      if (isAdmin && !target.active) {
+        setUserToForceDelete(target);
+      } else {
+        setToast({ message: e.message || "Error al eliminar usuario", type: "error" });
+      }
+    }
+  };
+
+  const handleForceDelete = async () => {
+    if (!userToForceDelete) return;
+    try {
+      await usersApi.delete(userToForceDelete.id, true);
+      setUserToForceDelete(null);
+      setReloadKey((k) => k + 1);
+      setToast({ message: "Usuario eliminado definitivamente (forzado)", type: "success" });
+    } catch (e: any) {
+      setToast({ message: e.message || "Error al forzar eliminación", type: "error" });
+      setUserToForceDelete(null);
     }
   };
 
@@ -253,6 +280,17 @@ export default function UsersListPage() {
             : `¿Eliminar a ${userToToggle?.username}? Esta acción no se puede deshacer.`
         }
         confirmLabel={userToToggle?.active ? "Desactivar" : "Eliminar"}
+        cancelLabel="Cancelar"
+        variant="danger"
+      />
+
+      <ITConfirmDialog
+        isOpen={!!userToForceDelete}
+        onClose={() => setUserToForceDelete(null)}
+        onConfirm={handleForceDelete}
+        title="Forzar eliminación definitiva"
+        message={`${userToForceDelete?.username} tiene historial ligado (tickets, cartas, comentarios, movimientos, etc.) que normalmente bloquea el borrado. Como administrador puedes forzar su eliminación: los registros con autor obligatorio se reasignarán a tu usuario y el resto quedará sin autor. Esta acción no se puede deshacer.`}
+        confirmLabel="Forzar eliminación"
         cancelLabel="Cancelar"
         variant="danger"
       />
