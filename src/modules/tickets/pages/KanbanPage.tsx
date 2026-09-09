@@ -715,22 +715,24 @@ export default function KanbanPage() {
                 </div>
               </ITStack>
 
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-4 h-fit">
-                <div>
-                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Estado</div>
-                  <Tag {...metaFor(STATUS_META, modalTicket.status)} />
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-3 h-fit md:space-y-0 md:flex md:flex-col md:gap-3">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Estado</span>
+                    <Tag {...metaFor(STATUS_META, modalTicket.status)} />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Prioridad</span>
+                    <Tag {...metaFor(PRIORITY_META, modalTicket.priority)} />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Depto</span>
+                    <Tag label={modalTicket.department?.name ?? "General"} tone={hashTone(modalTicket.department?.name ?? "General")} />
+                  </div>
                 </div>
-                <div>
-                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Prioridad</div>
-                  <Tag {...metaFor(PRIORITY_META, modalTicket.priority)} />
-                </div>
-                <div>
-                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Departamento</div>
-                  <Tag label={modalTicket.department?.name ?? "General"} tone={hashTone(modalTicket.department?.name ?? "General")} />
-                </div>
-                <div className="pt-3 border-t border-slate-200">
-                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Creado por</div>
-                  <div className="text-[11px] font-bold text-slate-700">{modalTicket.creadoPor?.name}</div>
+                <div className="flex items-center gap-1.5 pt-2.5 border-t border-slate-200 text-[11px]">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Creado por</span>
+                  <span className="font-bold text-slate-700">{modalTicket.creadoPor?.name}</span>
                 </div>
                 <ITButton
                   variant="filled"
