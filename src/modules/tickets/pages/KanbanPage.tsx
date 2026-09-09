@@ -594,7 +594,7 @@ export default function KanbanPage() {
             <ITLoader variant="spinner" size="md" color="primary" />
           </ITFlex>
         ) : (
-          <div className="h-[660px] max-h-[calc(100vh_-_10rem)] overflow-y-auto pr-1">
+          <div>
             <div className="pb-3 border-b border-slate-100 pr-8 mb-4">
               <ITFlex align="center" gap={2} className="mb-1.5">
                 <FaBookmark size={12} className="text-emerald-500" />
@@ -607,7 +607,12 @@ export default function KanbanPage() {
               <ITText className="text-xl font-black text-slate-800 leading-tight">{modalTicket.titulo}</ITText>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6">
+            {/* Alto máximo forzado por estilo inline: los valores arbitrarios de
+                Tailwind con calc()/min() no estaban compilando en este proyecto,
+                así que aquí no dependemos de eso para evitar que el modal se
+                salga de la pantalla. */}
+            <div className="overflow-y-auto pr-1" style={{ maxHeight: "min(64vh, 600px)" }}>
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6">
               <ITStack direction="column" spacing={4} className="min-w-0">
                 <div className="rounded-xl border border-slate-200 bg-white p-3.5">
                   <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
@@ -724,6 +729,7 @@ export default function KanbanPage() {
                   </ITFlex>
                 </ITButton>
               </div>
+            </div>
             </div>
           </div>
         )}
