@@ -150,13 +150,16 @@ export default function KanbanPage() {
   const [modalLoading, setModalLoading] = useState(false);
   const [employees, setEmployees] = useState<User[]>([]);
   const [busyEmployees, setBusyEmployees] = useState(false);
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [taskTitle, setTaskTitle] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
-  const [taskStart, setTaskStart] = useState("");
-  const [taskDue, setTaskDue] = useState("");
-  const [savingTask, setSavingTask] = useState(false);
+  const [showCreatePanel, setShowCreatePanel] = useState(false);
+  const [ticketOptions, setTicketOptions] = useState<Ticket[]>([]);
+  const [busyTickets, setBusyTickets] = useState(false);
+  const [createTicketId, setCreateTicketId] = useState("");
+  const [createUserId, setCreateUserId] = useState("");
+  const [createTitle, setCreateTitle] = useState("");
+  const [createDescription, setCreateDescription] = useState("");
+  const [createStart, setCreateStart] = useState("");
+  const [createDue, setCreateDue] = useState("");
+  const [creatingTask, setCreatingTask] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<Status | null>(null);
   const [search, setSearch] = useState("");
@@ -185,6 +188,10 @@ export default function KanbanPage() {
 
   useEffect(() => {
     usersApi.empleados().then(setEmployees).catch(() => setEmployees([]));
+  }, []);
+
+  useEffect(() => {
+    ticketsApi.list().then((res) => setTicketOptions(res.data)).catch(() => setTicketOptions([]));
   }, []);
 
   const uniqueAssignees = useMemo(() => {
@@ -237,7 +244,6 @@ export default function KanbanPage() {
   const openTicket = async (ticketId: string) => {
     setModalLoading(true);
     setModalTicket(null);
-    setShowTaskForm(false);
     try {
       const t = await ticketsApi.get(ticketId);
       setModalTicket(t);
@@ -246,15 +252,6 @@ export default function KanbanPage() {
     } finally {
       setModalLoading(false);
     }
-  };
-
-  const resetTaskForm = () => {
-    setSelectedUserId("");
-    setTaskTitle("");
-    setTaskDescription("");
-    setTaskStart("");
-    setTaskDue("");
-    setShowTaskForm(false);
   };
 
   const handleSearchEmployees = async (query?: string) => {
@@ -268,26 +265,50 @@ export default function KanbanPage() {
     }
   };
 
-  const handleAddTask = async () => {
-    if (!modalTicket || !selectedUserId || !taskTitle.trim()) return;
-    setSavingTask(true);
+  const handleSearchTickets = async (query?: string) => {
+    setBusyTickets(true);
     try {
-      await ticketsApi.addAssignment(modalTicket.id, {
-        userId: selectedUserId,
-        title: taskTitle.trim(),
-        description: taskDescription.trim(),
-        startDate: taskStart || null,
-        dueDate: taskDue || null,
+      const res = await ticketsApi.list(query || undefined);
+      setTicketOptions(res.data);
+    } catch {
+      setTicketOptions([]);
+    } finally {
+      setBusyTickets(false);
+    }
+  };
+
+  const resetCreateForm = () => {
+    setCreateTicketId("");
+    setCreateUserId("");
+    setCreateTitle("");
+    setCreateDescription("");
+    setCreateStart("");
+    setCreateDue("");
+  };
+
+  const handleCreateTask = async () => {
+    if (!createTicketId || !createUserId || !createTitle.trim()) return;
+    setCreatingTask(true);
+    try {
+      await ticketsApi.addAssignment(createTicketId, {
+        userId: createUserId,
+        title: createTitle.trim(),
+        description: createDescription.trim(),
+        startDate: createStart || null,
+        dueDate: createDue || null,
       });
-      const updatedTicket = await ticketsApi.get(modalTicket.id);
-      setModalTicket(updatedTicket);
-      resetTaskForm();
+      resetCreateForm();
+      setShowCreatePanel(false);
+      if (modalTicket && modalTicket.id === createTicketId) {
+        const updatedTicket = await ticketsApi.get(modalTicket.id);
+        setModalTicket(updatedTicket);
+      }
       setReloadKey((key) => key + 1);
       setToast("Tarea asignada");
     } catch (e: any) {
       setError(e.message ?? "No se pudo asignar la tarea");
     } finally {
-      setSavingTask(false);
+      setCreatingTask(false);
     }
   };
 
@@ -296,6 +317,11 @@ export default function KanbanPage() {
     label: [employee.name, employee.numeroEmpleado ? `#${employee.numeroEmpleado}` : null]
       .filter(Boolean)
       .join(" "),
+  }));
+
+  const ticketSelectOptions = ticketOptions.map((t) => ({
+    value: t.id,
+    label: `${t.titulo} · #${t.id.slice(0, 8).toUpperCase()}`,
   }));
 
   const canManageModalTicket = Boolean(
@@ -360,12 +386,20 @@ export default function KanbanPage() {
             </ITButton>
           ) : undefined
         ) : !isEmpleado ? (
-          <ITButton variant="filled" color="primary" onClick={() => navigate("/tickets/nuevo")}>
-            <ITFlex align="center" gap={1}>
-              <FaPlus size={12} />
-              <ITText className="font-bold text-[11px]">Nuevo ticket</ITText>
-            </ITFlex>
-          </ITButton>
+          <ITFlex align="center" gap={2}>
+            <ITButton variant="outlined" color="primary" onClick={() => setShowCreatePanel(true)}>
+              <ITFlex align="center" gap={1}>
+                <FaUserPlus size={12} />
+                <ITText className="font-bold text-[11px]">Nueva tarea</ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton variant="filled" color="primary" onClick={() => navigate("/tickets/nuevo")}>
+              <ITFlex align="center" gap={1}>
+                <FaPlus size={12} />
+                <ITText className="font-bold text-[11px]">Nuevo ticket</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
         ) : undefined
       }
     >
@@ -537,14 +571,11 @@ export default function KanbanPage() {
         ))}
       </div>
 
-      {/* Modal: detalle del ticket */}
+      {/* Modal: detalle del ticket (solo lectura, sin alta de tareas) */}
       <ITDialog
         isOpen={modalLoading || !!modalTicket}
-        className="w-[min(1200px,calc(100vw-2rem))] max-w-none h-[min(700px,calc(100vh-2rem))]"
-        onClose={() => {
-          setModalTicket(null);
-          resetTaskForm();
-        }}
+        className="w-[min(1180px,calc(100vw_-_2rem))] max-w-none h-[min(700px,calc(100vh_-_2rem))]"
+        onClose={() => setModalTicket(null)}
       >
         {modalLoading || !modalTicket ? (
           <ITFlex justify="center" align="center" className="py-10">
@@ -552,8 +583,7 @@ export default function KanbanPage() {
           </ITFlex>
         ) : (
           <div className="w-full h-[600px] max-h-[calc(100vh-9rem)] overflow-y-auto pr-1">
-          <ITStack direction="column" spacing={4} className="w-full min-w-0">
-            <div className="pb-3 border-b border-slate-100 pr-8">
+            <div className="pb-3 border-b border-slate-100 pr-8 mb-4">
               <ITFlex align="center" gap={2} className="mb-1.5">
                 <FaBookmark size={12} className="text-emerald-500" />
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -565,141 +595,190 @@ export default function KanbanPage() {
               <ITText className="text-xl font-black text-slate-800 leading-tight">{modalTicket.titulo}</ITText>
             </div>
 
-            <ITFlex gap={2} wrap="wrap">
-              <Tag {...metaFor(STATUS_META, modalTicket.status)} />
-              <Tag {...metaFor(PRIORITY_META, modalTicket.priority)} />
-              <Tag label={modalTicket.department?.name ?? "General"} tone={hashTone(modalTicket.department?.name ?? "General")} />
-            </ITFlex>
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6">
+              <ITStack direction="column" spacing={4} className="min-w-0">
+                <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
+                  <div className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">
+                    {modalTicket.descripcion || "Sin descripción"}
+                  </div>
+                </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
-              <div className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">
-                {modalTicket.descripcion || "Sin descripción"}
-              </div>
-            </div>
-            <TicketAttachments
-              ticketId={modalTicket.id}
-              canUpload={canManageModalTicket || Boolean(modalTicket.creadoPorId === currentUser?.id)}
-            />
+                <TicketAttachments
+                  ticketId={modalTicket.id}
+                  canUpload={canManageModalTicket || Boolean(modalTicket.creadoPorId === currentUser?.id)}
+                />
 
-            <ITFlex justify="between" align="center" gap={2}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Tareas asignadas ({modalTicket.assignments.length})
-              </ITText>
-              {canCreate && (isAdmin || modalTicket.creadoPorId === currentUser?.id) && (
-                <ITButton size="small" variant="outlined" color="primary" onClick={() => setShowTaskForm((value) => !value)}>
-                  <ITFlex align="center" gap={1}><FaUserPlus size={11} /><ITText className="font-bold text-[10px]">Nueva tarea</ITText></ITFlex>
+                <div>
+                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                    Tareas asignadas ({modalTicket.assignments.length})
+                  </ITText>
+                  <div className="max-h-[38vh] overflow-y-auto pr-1 space-y-2">
+                    {modalTicket.assignments.map((t) => (
+                      <div
+                        key={t.id}
+                        className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+                      >
+                        <ITFlex justify="between" align="center" gap={2} className="mb-1">
+                          <ITText className="text-[11px] font-black text-slate-700">
+                            {t.user.name}
+                            {t.user.numeroEmpleado ? ` · #${t.user.numeroEmpleado}` : ""}
+                          </ITText>
+                          <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
+                        </ITFlex>
+                        <div className="text-[11px] font-black text-slate-800">{t.title}</div>
+                        {t.description ? (
+                          <div className="text-[11px] text-slate-600 mt-0.5">{t.description}</div>
+                        ) : null}
+                        {(t.startDate || t.dueDate) && (
+                          <div className="text-[9px] text-slate-400 mt-1">
+                            {t.startDate
+                              ? `Inicio: ${new Date(t.startDate).toLocaleDateString("es-MX")}`
+                              : ""}
+                            {t.startDate && t.dueDate ? " · " : ""}
+                            {t.dueDate
+                              ? `Fin esperada: ${new Date(t.dueDate).toLocaleDateString("es-MX")}`
+                              : ""}
+                          </div>
+                        )}
+                        {t.comments && t.comments.length > 0 && (
+                          <div className="mt-1.5 text-[9px] text-slate-400">
+                            {t.comments.length} comentario(s)
+                          </div>
+                        )}
+                        <TicketAttachments
+                          ticketId={modalTicket.id}
+                          assignmentId={t.id}
+                          compact
+                          canUpload={
+                            canManageModalTicket || t.userId === currentUser?.id
+                          }
+                        />
+                      </div>
+                    ))}
+                    {modalTicket.assignments.length === 0 && (
+                      <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
+                        <ITText className="text-[11px] text-slate-400">Este ticket aún no tiene tareas asignadas.</ITText>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </ITStack>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-4 h-fit">
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Estado</div>
+                  <Tag {...metaFor(STATUS_META, modalTicket.status)} />
+                </div>
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Prioridad</div>
+                  <Tag {...metaFor(PRIORITY_META, modalTicket.priority)} />
+                </div>
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Departamento</div>
+                  <Tag label={modalTicket.department?.name ?? "General"} tone={hashTone(modalTicket.department?.name ?? "General")} />
+                </div>
+                <div className="pt-3 border-t border-slate-200">
+                  <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Creado por</div>
+                  <div className="text-[11px] font-bold text-slate-700">{modalTicket.creadoPor?.name}</div>
+                </div>
+                <ITButton
+                  variant="filled"
+                  color="primary"
+                  className="w-full justify-center"
+                  onClick={() => navigate(`/tickets/${modalTicket.id}`)}
+                >
+                  <ITFlex align="center" gap={1} justify="center">
+                    <FaExternalLinkAlt size={11} />
+                    <ITText className="font-bold text-[11px]">Abrir detalle completo</ITText>
+                  </ITFlex>
                 </ITButton>
-              )}
-            </ITFlex>
-
-            {showTaskForm && (
-              <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-3">
-                <ITText className="text-[10px] font-black uppercase tracking-widest text-blue-700 mb-3">Asignar nueva tarea</ITText>
-                <ITGrid container columns={12} spacing={2}>
-                  <ITGrid item xs={12}>
-                    <ITSearchSelect
-                      name="kanbanEmployee"
-                      label="Empleado"
-                      placeholder="Buscar empleado..."
-                      options={employeeOptions}
-                      value={selectedUserId}
-                      onChange={(value) => setSelectedUserId(String(value))}
-                      onSearch={handleSearchEmployees}
-                      isLoading={busyEmployees}
-                    />
-                  </ITGrid>
-                  <ITGrid item xs={12}>
-                    <ITInput name="kanbanTaskTitle" label="Título de la tarea *" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Ej. Revisar instalación" />
-                  </ITGrid>
-                  <ITGrid item xs={12}>
-                    <ITTextarea name="kanbanTaskDescription" label="Descripción" value={taskDescription} onChange={setTaskDescription} rows={2} placeholder="Detalles de la tarea..." />
-                  </ITGrid>
-                  <ITGrid item xs={12} sm={6}>
-                    <ITDatePicker name="kanbanStart" label="Inicio" value={taskStart ? new Date(taskStart) : undefined} onChange={(event: any) => setTaskStart(event.target.value ? event.target.value.toISOString() : "")} />
-                  </ITGrid>
-                  <ITGrid item xs={12} sm={6}>
-                    <ITDatePicker name="kanbanDue" label="Fecha límite" value={taskDue ? new Date(taskDue) : undefined} onChange={(event: any) => setTaskDue(event.target.value ? event.target.value.toISOString() : "")} />
-                  </ITGrid>
-                  <ITGrid item xs={12}>
-                    <ITFlex justify="end" gap={2}>
-                      <ITButton variant="outlined" size="small" onClick={resetTaskForm}>Cancelar</ITButton>
-                      <ITButton variant="filled" color="primary" size="small" onClick={handleAddTask} disabled={savingTask || !selectedUserId || !taskTitle.trim()}>
-                        <ITFlex align="center" gap={1}><FaUserPlus size={11} /><ITText className="font-bold text-[10px]">{savingTask ? "Asignando..." : "Asignar tarea"}</ITText></ITFlex>
-                      </ITButton>
-                    </ITFlex>
-                  </ITGrid>
-                </ITGrid>
-              </div>
-            )}
-
-            <div className="max-h-[42vh] overflow-y-auto pr-1 space-y-2">
-              <div className="space-y-2">
-                {modalTicket.assignments.map((t) => (
-                  <div
-                    key={t.id}
-                    className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
-                  >
-                    <ITFlex justify="between" align="center" gap={2} className="mb-1">
-                      <ITText className="text-[11px] font-black text-slate-700">
-                        {t.user.name}
-                        {t.user.numeroEmpleado ? ` · #${t.user.numeroEmpleado}` : ""}
-                      </ITText>
-                      <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
-                    </ITFlex>
-                    <div className="text-[11px] font-black text-slate-800">{t.title}</div>
-                    {t.description ? (
-                      <div className="text-[11px] text-slate-600 mt-0.5">{t.description}</div>
-                    ) : null}
-                    {(t.startDate || t.dueDate) && (
-                      <div className="text-[9px] text-slate-400 mt-1">
-                        {t.startDate
-                          ? `Inicio: ${new Date(t.startDate).toLocaleDateString("es-MX")}`
-                          : ""}
-                        {t.startDate && t.dueDate ? " · " : ""}
-                        {t.dueDate
-                          ? `Fin esperada: ${new Date(t.dueDate).toLocaleDateString("es-MX")}`
-                          : ""}
-                      </div>
-                    )}
-                    {t.comments && t.comments.length > 0 && (
-                      <div className="mt-1.5 text-[9px] text-slate-400">
-                        {t.comments.length} comentario(s)
-                      </div>
-                    )}
-                    <TicketAttachments
-                      ticketId={modalTicket.id}
-                      assignmentId={t.id}
-                      compact
-                      canUpload={
-                        canManageModalTicket || t.userId === currentUser?.id
-                      }
-                    />
-                  </div>
-                ))}
-                {modalTicket.assignments.length === 0 && (
-                  <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
-                    <ITText className="text-[11px] text-slate-400">Este ticket aún no tiene tareas asignadas.</ITText>
-                  </div>
-                )}
               </div>
             </div>
+          </div>
+        )}
+      </ITDialog>
 
+      {/* Modal: alta rápida de tarea desde el tablero principal */}
+      <ITDialog
+        isOpen={showCreatePanel}
+        className="w-[min(560px,calc(100vw_-_2rem))] max-w-none"
+        onClose={() => {
+          setShowCreatePanel(false);
+          resetCreateForm();
+        }}
+      >
+        <div className="pb-3 mb-3 border-b border-slate-100 pr-6">
+          <ITFlex align="center" gap={2}>
+            <FaUserPlus size={14} className="text-emerald-500" />
+            <ITText className="text-lg font-black text-slate-800">Nueva tarea</ITText>
+          </ITFlex>
+          <ITText className="text-[11px] text-slate-400 mt-1">Asigna una tarea a un ticket existente</ITText>
+        </div>
+        <ITGrid container columns={12} spacing={2}>
+          <ITGrid item xs={12}>
+            <ITSearchSelect
+              name="createTicket"
+              label="Ticket *"
+              placeholder="Buscar ticket..."
+              options={ticketSelectOptions}
+              value={createTicketId}
+              onChange={(value) => setCreateTicketId(String(value))}
+              onSearch={handleSearchTickets}
+              isLoading={busyTickets}
+            />
+          </ITGrid>
+          <ITGrid item xs={12}>
+            <ITSearchSelect
+              name="createEmployee"
+              label="Empleado *"
+              placeholder="Buscar empleado..."
+              options={employeeOptions}
+              value={createUserId}
+              onChange={(value) => setCreateUserId(String(value))}
+              onSearch={handleSearchEmployees}
+              isLoading={busyEmployees}
+            />
+          </ITGrid>
+          <ITGrid item xs={12}>
+            <ITInput name="createTaskTitle" label="Título de la tarea *" value={createTitle} onChange={(event) => setCreateTitle(event.target.value)} placeholder="Ej. Revisar instalación" />
+          </ITGrid>
+          <ITGrid item xs={12}>
+            <ITTextarea name="createTaskDescription" label="Descripción" value={createDescription} onChange={setCreateDescription} rows={2} placeholder="Detalles de la tarea..." />
+          </ITGrid>
+          <ITGrid item xs={12} sm={6}>
+            <ITDatePicker name="createStart" label="Inicio" value={createStart ? new Date(createStart) : undefined} onChange={(event: any) => setCreateStart(event.target.value ? event.target.value.toISOString() : "")} />
+          </ITGrid>
+          <ITGrid item xs={12} sm={6}>
+            <ITDatePicker name="createDue" label="Fecha límite" value={createDue ? new Date(createDue) : undefined} onChange={(event: any) => setCreateDue(event.target.value ? event.target.value.toISOString() : "")} />
+          </ITGrid>
+          <ITGrid item xs={12}>
             <ITFlex justify="end" gap={2}>
+              <ITButton
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  setShowCreatePanel(false);
+                  resetCreateForm();
+                }}
+              >
+                Cancelar
+              </ITButton>
               <ITButton
                 variant="filled"
                 color="primary"
-                onClick={() => navigate(`/tickets/${modalTicket.id}`)}
+                size="small"
+                onClick={handleCreateTask}
+                disabled={creatingTask || !createTicketId || !createUserId || !createTitle.trim()}
               >
                 <ITFlex align="center" gap={1}>
-                  <FaExternalLinkAlt size={11} />
-                  <ITText className="font-bold text-[11px]">Abrir detalle completo</ITText>
+                  <FaUserPlus size={11} />
+                  <ITText className="font-bold text-[10px]">{creatingTask ? "Asignando..." : "Asignar tarea"}</ITText>
                 </ITFlex>
               </ITButton>
             </ITFlex>
-          </ITStack>
-          </div>
-        )}
+          </ITGrid>
+        </ITGrid>
       </ITDialog>
 
       {toast && (
