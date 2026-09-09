@@ -48,6 +48,17 @@ export interface TicketAssignment {
   updatedAt: string;
 }
 
+export interface TicketAttachment {
+  id: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  kind: string;
+  createdAt: string;
+  uploadedById: string;
+  url: string;
+}
+
 export interface Ticket {
   id: string;
   titulo: string;
@@ -109,8 +120,30 @@ export const ticketsApi = {
     const qs = search ? `?q=${encodeURIComponent(search)}` : "";
     return api.get<{ data: Ticket[]; total: number }>(`/tickets${qs}`);
   },
-  kanban: () => api.get<{ data: KanbanAssignment[]; total: number }>(`/tickets/kanban`),
+  kanban: (ticketId?: string) => {
+    const qs = ticketId ? `?ticketId=${ticketId}` : "";
+    return api.get<{ data: KanbanAssignment[]; total: number }>(`/tickets/kanban${qs}`);
+  },
   get: (id: string) => api.get<Ticket>(`/tickets/${id}`),
+  attachments: (id: string) => api.get<TicketAttachment[]>(`/tickets/${id}/attachments`),
+  uploadAttachment: (id: string, file: File, kind = "FOTO") => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("kind", kind);
+    return api.post<TicketAttachment>(`/tickets/${id}/attachments`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  assignmentAttachments: (id: string, assignmentId: string) =>
+    api.get<TicketAttachment[]>(`/tickets/${id}/assignments/${assignmentId}/attachments`),
+  uploadAssignmentAttachment: (id: string, assignmentId: string, file: File, kind = "EVIDENCIA") => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("kind", kind);
+    return api.post<TicketAttachment>(`/tickets/${id}/assignments/${assignmentId}/attachments`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
   create: (input: TicketInput) => api.post<Ticket>(`/tickets`, input),
   update: (id: string, data: Partial<{
     status: string;

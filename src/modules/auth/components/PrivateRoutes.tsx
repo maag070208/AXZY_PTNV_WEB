@@ -70,14 +70,14 @@ export default function PrivateRoutes() {
       action: () => navigate("/tickets"),
       isActive: active("/tickets"),
     },
-    ...(canManage
+    ...(user?.role === "ADMIN"
       ? [
         {
-          id: "cartas",
-          label: "Cartas",
-          icon: <FaFileSignature size={14} />,
-          action: () => navigate("/cartas"),
-          isActive: active("/cartas"),
+          id: "adminTareas",
+          label: "Administrar tareas",
+          icon: <FaTasks size={14} />,
+          action: () => navigate("/tickets/tareas"),
+          isActive: active("/tickets/tareas"),
         },
       ]
       : []),
@@ -93,6 +93,28 @@ export default function PrivateRoutes() {
         {
           id: "misCartas",
           label: "Mis Cartas",
+          icon: <FaFileSignature size={14} />,
+          action: () => navigate("/cartas"),
+          isActive: active("/cartas"),
+        },
+      ]
+      : []),
+    ...(isJefeArea
+      ? [
+        {
+          id: "misCartas",
+          label: "Mis Cartas",
+          icon: <FaFileSignature size={14} />,
+          action: () => navigate("/cartas"),
+          isActive: active("/cartas"),
+        },
+      ]
+      : []),
+    ...(isAdmin
+      ? [
+        {
+          id: "cartas",
+          label: "Cartas",
           icon: <FaFileSignature size={14} />,
           action: () => navigate("/cartas"),
           isActive: active("/cartas"),
@@ -121,7 +143,7 @@ export default function PrivateRoutes() {
         },
       ]
       : []),
-    ...(canManage
+    ...(isAdmin
       ? [
         {
           id: "reportes",

@@ -27,6 +27,7 @@ export default function UserFormPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [form, setForm] = useState({
     username: "",
+    email: "",
     password: "",
     name: "",
     role: "EMPLEADO" as "ADMIN" | "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO",
@@ -50,6 +51,7 @@ export default function UserFormPage() {
       usersApi.get(id).then((u: User) => {
         setForm({
           username: u.username,
+          email: u.email ?? "",
           password: "",
           name: u.name,
           role: u.role,
@@ -74,6 +76,7 @@ export default function UserFormPage() {
       if (isEdit) {
         await usersApi.update(id!, {
           username: form.username,
+          email: form.email || null,
           name: form.name,
           role: form.role,
           numeroEmpleado: form.numeroEmpleado || undefined,
@@ -84,6 +87,7 @@ export default function UserFormPage() {
       } else {
         await usersApi.create({
           username: form.username,
+          email: form.email || undefined,
           password: form.password,
           name: form.name,
           role: form.role,
@@ -158,6 +162,16 @@ export default function UserFormPage() {
 
       <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
         <ITGrid container columns={12} spacing={4}>
+          <ITGrid item xs={12} md={4}>
+            <ITInput
+              name="u_email"
+              type="email"
+              label="Correo"
+              value={form.email}
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              placeholder="usuario@empresa.com"
+            />
+          </ITGrid>
           <ITGrid item xs={12} md={4}>
             <ITInput
               name="u_username"

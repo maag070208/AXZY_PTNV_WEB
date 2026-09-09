@@ -48,6 +48,7 @@ import { usersApi, type User } from "@core/api/auth.api";
 import { formatFechaHora } from "@core/store/cartas/types";
 import { useAblyTicket } from "@core/hooks/useAbly";
 import { downloadTicketPDF } from "../utils/pdf";
+import TicketAttachments from "../components/TicketAttachments";
 
 const STATUS_BADGE: Record<string, { color: string; label: string }> = {
   ABIERTO: { color: "warning", label: "Abierto" },
@@ -93,6 +94,8 @@ export default function TicketDetailPage() {
   const ticket = useSelector((s: RootState) => s.tickets.current);
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const isAdmin = currentUser?.role === "ADMIN";
+  const isJefeArea = currentUser?.role === "JEFE_DE_AREA";
+  const canManage = isAdmin || (isJefeArea && ticket?.creadoPorId === currentUser?.id);
   const isInvolved =
     !!ticket &&
     (ticket.creadoPorId === currentUser?.id ||
@@ -487,7 +490,7 @@ export default function TicketDetailPage() {
                         name={`status-${a.id}`}
                         label="Estado de la tarea"
                         options={
-                          canManage
+                          isAdmin
                             ? [
                                 { value: "PENDIENTE", label: "Pendiente" },
                                 { value: "EN_PROGRESO", label: "En progreso" },
@@ -501,10 +504,21 @@ export default function TicketDetailPage() {
                               ]
                         }
                         value={a.status}
-                        disabled={!canEditStatus || (a.status === "COMPLETADA" && !canManage)}
+                        disabled={!canEditStatus || (a.status === "COMPLETADA" && !isAdmin)}
                         onChange={(e) => handleUpdateAssignment(a.id, { status: e.target.value })}
                       />
                     )}
+
+                    <TicketAttachments
+                      ticketId={ticket.id}
+                      assignmentId={a.id}
+                      compact
+                      canUpload={
+                        isAdmin ||
+                        (isJefeArea && ticket.creadoPorId === currentUser?.id) ||
+                        a.userId === currentUser?.id
+                      }
+                    />
 
                     {/* Comentarios de la tarea */}
                     <div className="border-t border-slate-100 pt-2">
@@ -783,8 +797,8 @@ export default function TicketDetailPage() {
             variant="outlined"
             size="small"
             color="secondary"
-            onClick={() => navigate("/tickets/kanban")}
-            title="Seguimiento kanban de todas las tareas"
+            onClick={() => navigate(`/tickets/kanban?ticketId=${ticket.id}`)}
+            title="Seguimiento kanban de las tareas de este ticket"
           >
             <ITFlex align="center" gap={1}>
               <FaTrello size={12} />
@@ -854,6 +868,11 @@ export default function TicketDetailPage() {
                   {ticket.descripcion}
                 </ITText>
               </ITStack>
+
+              <TicketAttachments
+                ticketId={ticket.id}
+                canUpload={isAdmin || isInvolved || (isJefeArea && ticket.creadoPorId === currentUser?.id)}
+              />
 
               <ITGrid container columns={12} spacing={3}>
                 <ITGrid item xs={12} sm={6} md={4}>
@@ -928,8 +947,8 @@ export default function TicketDetailPage() {
             </ITStack>
           </ITFlex>
 
-          {/* Admin panel */}
-          {isAdmin && (
+          {/* Admin/Jefe panel */}
+          {canManage && (
             <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
               <ITStack direction="column" spacing={4} className="w-full">
                 <ITFlex align="center" gap={2}>
@@ -939,41 +958,43 @@ export default function TicketDetailPage() {
                   </ITText>
                 </ITFlex>
 
-                <ITGrid container columns={12} spacing={3}>
-                  <ITGrid item xs={12} sm={6}>
-                    <ITSelect
-                      name="status"
-                      label="Estado"
-                      options={[
-                        { value: "ABIERTO", label: "Abierto" },
-                        { value: "EN_SEGUIMIENTO", label: "En seguimiento" },
-                        { value: "CERRADO", label: "Cerrado" },
-                      ]}
-                      value={ticket.status}
-                      onChange={(e) => handleStatusChange(e.target.value)}
-                      disabled={isClosed}
-                    />
+                {isAdmin && (
+                  <ITGrid container columns={12} spacing={3}>
+                    <ITGrid item xs={12} sm={6}>
+                      <ITSelect
+                        name="status"
+                        label="Estado"
+                        options={[
+                          { value: "ABIERTO", label: "Abierto" },
+                          { value: "EN_SEGUIMIENTO", label: "En seguimiento" },
+                          { value: "CERRADO", label: "Cerrado" },
+                        ]}
+                        value={ticket.status}
+                        onChange={(e) => handleStatusChange(e.target.value)}
+                        disabled={isClosed}
+                      />
+                    </ITGrid>
+                    <ITGrid item xs={12} sm={6}>
+                      <ITInput
+                        name="departmentInfo"
+                        label="Departamento"
+                        value={ticket.department?.name ?? "—"}
+                        disabled
+                        placeholder="Se autollena con el empleado"
+                        onChange={() => {}}
+                      />
+                    </ITGrid>
                   </ITGrid>
-                  <ITGrid item xs={12} sm={6}>
-                    <ITInput
-                      name="departmentInfo"
-                      label="Departamento"
-                      value={ticket.department?.name ?? "—"}
-                      disabled
-                      placeholder="Se autollena con el empleado"
-                      onChange={() => {}}
-                    />
-                  </ITGrid>
-                </ITGrid>
+                )}
 
                 {renderGrafo(true)}
               </ITStack>
             </ITFlex>
           )}
 
-          {/* Grafo para involucrados (no admin): ven sus tareas y pueden
+          {/* Grafo para involucrados (empleados): ven sus tareas y pueden
               marcar su propio estado. */}
-          {!isAdmin && isInvolved && (
+          {!canManage && isInvolved && (
             <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
               {renderGrafo(false)}
             </ITFlex>

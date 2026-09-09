@@ -15,7 +15,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaEye, FaKey, FaPlus, FaTrash, FaUserShield } from "react-icons/fa";
+import { FaEdit, FaEye, FaKey, FaPlus, FaTrash, FaUndo, FaUserShield } from "react-icons/fa";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -30,6 +30,7 @@ export default function UsersListPage() {
   const [reloadKey, setReloadKey] = useState(0);
 
   const [userToToggle, setUserToToggle] = useState<User | null>(null);
+  const [userToReactivate, setUserToReactivate] = useState<User | null>(null);
   const [userToForceDelete, setUserToForceDelete] = useState<User | null>(null);
   const [userToPassword, setUserToPassword] = useState<User | null>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -55,19 +56,15 @@ export default function UsersListPage() {
   const handleToggleActive = async () => {
     if (!userToToggle) return;
     const target = userToToggle;
+    setUserToToggle(null);
     try {
       const res = await usersApi.delete(target.id);
-      setUserToToggle(null);
       setReloadKey((k) => k + 1);
       setToast({
         message: res.soft ? "Usuario desactivado" : "Usuario eliminado definitivamente",
         type: "success",
       });
     } catch (e: any) {
-      setUserToToggle(null);
-      // El usuario ya estaba inactivo y el borrado físico se bloqueó por
-      // tener historial ligado (tickets, cartas, etc.). Solo un admin puede
-      // forzar la eliminación definitiva pese a ese historial.
       if (isAdmin && !target.active) {
         setUserToForceDelete(target);
       } else {
@@ -76,16 +73,28 @@ export default function UsersListPage() {
     }
   };
 
+  const handleReactivate = async () => {
+    if (!userToReactivate) return;
+    const target = userToReactivate;
+    setUserToReactivate(null);
+    try {
+      await usersApi.update(target.id, { active: true });
+      setReloadKey((k) => k + 1);
+      setToast({ message: "Usuario reactivado", type: "success" });
+    } catch (e: any) {
+      setToast({ message: e.message || "Error al reactivar usuario", type: "error" });
+    }
+  };
+
   const handleForceDelete = async () => {
     if (!userToForceDelete) return;
+    setUserToForceDelete(null);
     try {
       await usersApi.delete(userToForceDelete.id, true);
-      setUserToForceDelete(null);
       setReloadKey((k) => k + 1);
       setToast({ message: "Usuario eliminado definitivamente (forzado)", type: "success" });
     } catch (e: any) {
       setToast({ message: e.message || "Error al forzar eliminación", type: "error" });
-      setUserToForceDelete(null);
     }
   };
 
@@ -127,7 +136,14 @@ export default function UsersListPage() {
       type: "string",
       filter: true,
       sortable: false,
-      render: (u) => <ITText className="text-[12px] text-slate-800">{u.name}</ITText>,
+      render: (u) => (
+        <ITFlex align="center" gap={1}>
+          <ITText className="text-[12px] text-slate-800">{u.name}</ITText>
+          {!u.active && (
+            <ITBadget color="danger" size="small">inactivo</ITBadget>
+          )}
+        </ITFlex>
+      ),
     },
     {
       key: "role",
@@ -229,6 +245,15 @@ export default function UsersListPage() {
           >
             <FaTrash size={14} />
           </ITButton>
+          {!u.active && (
+            <ITButton
+              onClick={() => setUserToReactivate(u)}
+              size="small"
+              color="success"
+            >
+              <FaUndo size={14} />
+            </ITButton>
+          )}
         </ITFlex>
       ),
     },
@@ -293,6 +318,17 @@ export default function UsersListPage() {
         confirmLabel="Forzar eliminación"
         cancelLabel="Cancelar"
         variant="danger"
+      />
+
+      <ITConfirmDialog
+        isOpen={!!userToReactivate}
+        onClose={() => setUserToReactivate(null)}
+        onConfirm={handleReactivate}
+        title="Reactivar usuario"
+        message={`¿Reactivar a ${userToReactivate?.username}? Volverá a poder iniciar sesión.`}
+        confirmLabel="Reactivar"
+        cancelLabel="Cancelar"
+        variant="success"
       />
 
       <ITDialog

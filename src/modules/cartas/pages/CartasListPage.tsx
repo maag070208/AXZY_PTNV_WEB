@@ -15,9 +15,9 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { useCallback, useMemo, useState } from "react";
 import { FaEye, FaFileSignature, FaTrash } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import type { AppDispatch } from "@core/store/store";
+import type { AppDispatch, RootState } from "@core/store/store";
 import { cartasApi } from "@core/api/cartas.api";
 import {
   deleteCartaThunk,
@@ -31,6 +31,8 @@ export default function CartasListPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const isMobile = useIsMobile();
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = authUser?.role === "ADMIN" || authUser?.role === "GERENTE";
   const [toDelete, setToDelete] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -170,27 +172,29 @@ export default function CartasListPage() {
 
   return (
     <ITPage
-      title="Cartas Responsivas"
+      title={isAdmin ? "Cartas Responsivas" : "Mis Cartas"}
       backAction={() => navigate(-1)}
       description="Genera y administra cartas responsivas del Departamento de Mantenimiento"
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[
         { label: "Inicio", onClick: () => navigate("/") },
-        { label: "Cartas" },
+        { label: isAdmin ? "Cartas" : "Mis Cartas" },
       ]}
       actions={
-        <ITFlex gap={2}>
-          <ITButton
-            variant="filled"
-            color="primary"
-            onClick={handleNew}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaFileSignature size={14} />
-              <ITText className="font-bold text-[11px]">Nueva Carta</ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
+        isAdmin ? (
+          <ITFlex gap={2}>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={handleNew}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaFileSignature size={14} />
+                <ITText className="font-bold text-[11px]">Nueva Carta</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
+        ) : undefined
       }
     >
       <ITDataTable

@@ -9,8 +9,10 @@ export type UserRole = "ADMIN" | "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO";
 export interface AuthUser {
   id: string;
   username: string;
+  email?: string | null;
   name: string;
   role: UserRole;
+  departmentId?: string | null;
 }
 
 export interface LoginResponse {
@@ -61,6 +63,7 @@ export const usersApi = {
   },
   create: (data: {
     username: string;
+    email?: string;
     password: string;
     name: string;
     role: UserRole;
@@ -74,6 +77,7 @@ export const usersApi = {
     id: string,
     data: {
       username?: string;
+      email?: string | null;
       name?: string;
       role?: UserRole;
       active?: boolean;
