@@ -1,6 +1,6 @@
 import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useEffect, useRef, useState } from "react";
-import { FaCamera, FaFileAlt, FaUpload } from "react-icons/fa";
+import { FaCamera, FaFileAlt, FaFilePdf, FaPlay, FaUpload } from "react-icons/fa";
 import { ticketsApi, type TicketAttachment } from "@core/api/tickets.api";
 
 type Props = {
@@ -9,6 +9,65 @@ type Props = {
   canUpload: boolean;
   compact?: boolean;
 };
+
+const ACCEPTED_TYPES =
+  "image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/3gpp,video/webm";
+
+// Miniatura uniforme para cualquier tipo de archivo: imagen, video (con
+// badge de play) o documento (icono + extensión). Si la imagen/video no
+// carga (URL vencida, red lenta, etc.) cae a un tile de icono en vez de
+// mostrar el "broken image" feo del navegador con el alt desbordado.
+function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number }) {
+  const [broken, setBroken] = useState(false);
+  const isImage = item.mimeType.startsWith("image/");
+  const isVideo = item.mimeType.startsWith("video/");
+  const isPdf = item.mimeType === "application/pdf";
+  const iconSize = size >= 64 ? 20 : 15;
+
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noreferrer"
+      title={item.originalName}
+      className="group relative block shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+      style={{ width: size, height: size }}
+    >
+      {isImage && !broken ? (
+        <img
+          src={item.url}
+          alt={item.originalName}
+          loading="lazy"
+          onError={() => setBroken(true)}
+          className="h-full w-full object-cover"
+        />
+      ) : isVideo && !broken ? (
+        <>
+          <video
+            src={item.url}
+            muted
+            preload="metadata"
+            onError={() => setBroken(true)}
+            className="h-full w-full object-cover bg-slate-900"
+          />
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/35">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow">
+              <FaPlay size={8} className="ml-0.5" />
+            </span>
+          </div>
+        </>
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-1 text-slate-400">
+          {isPdf ? <FaFilePdf size={iconSize} /> : <FaFileAlt size={iconSize} />}
+          <span className="w-full truncate px-0.5 text-center text-[8px] font-bold leading-none">
+            {item.originalName.split(".").pop()?.toUpperCase() ?? "ARCHIVO"}
+          </span>
+        </div>
+      )}
+      <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-black/5" />
+    </a>
+  );
+}
 
 export default function TicketAttachments({ ticketId, assignmentId, canUpload, compact = false }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -51,51 +110,49 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
     }
   };
 
+  const thumbSize = compact ? 48 : 68;
+
   return (
-    <div className={compact ? "mt-2" : "rounded-lg border border-slate-200 bg-slate-50 p-3"}>
+    <div className={compact ? "mt-2" : "rounded-xl border border-slate-200 bg-slate-50 p-3.5"}>
       <ITFlex justify="between" align="center" gap={2}>
         <ITFlex align="center" gap={1.5}>
           {assignmentId ? <FaCamera size={11} className="text-emerald-600" /> : <FaFileAlt size={11} className="text-blue-600" />}
-          <ITText className="text-[12px] font-medium text-slate-500">
+          <ITText className="text-[12px] font-bold text-slate-500">
             {assignmentId ? "Evidencia" : "Fotos del ticket"} ({items.length})
           </ITText>
         </ITFlex>
         {canUpload && (
           <>
-            <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/3gpp,video/webm" className="hidden" onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])} />
+            <input
+              ref={inputRef}
+              type="file"
+              accept={ACCEPTED_TYPES}
+              className="hidden"
+              onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])}
+            />
             <ITButton variant="outlined" size="small" color="secondary" onClick={() => inputRef.current?.click()} disabled={uploading}>
-              <ITFlex align="center" gap={1}><FaUpload size={10} /><ITText className="text-[11px]">{uploading ? "Subiendo..." : "Subir"}</ITText></ITFlex>
+              <ITFlex align="center" gap={1}>
+                <FaUpload size={10} />
+                <ITText className="text-[11px]">{uploading ? "Subiendo..." : "Subir"}</ITText>
+              </ITFlex>
             </ITButton>
           </>
         )}
       </ITFlex>
+
       {loading ? <ITText className="text-[11px] text-slate-400 mt-2">Cargando...</ITText> : null}
       {error ? <ITText className="text-[11px] text-red-600 mt-2">{error}</ITText> : null}
-      {!loading && items.length === 0 && !error ? <ITText className="text-[11px] text-slate-400 mt-2">Sin archivos</ITText> : null}
+      {!loading && items.length === 0 && !error ? (
+        <div className="mt-2.5 rounded-lg border border-dashed border-slate-300 py-3 text-center">
+          <ITText className="text-[11px] text-slate-400">Sin archivos</ITText>
+        </div>
+      ) : null}
+
       {items.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {items.map((item) => {
-            if (item.mimeType.startsWith("image/")) {
-              return (
-                <a key={item.id} href={item.url} target="_blank" rel="noreferrer" title={item.originalName}>
-                  <img src={item.url} alt={item.originalName} className="w-14 h-14 rounded-md object-cover border border-slate-200 hover:ring-2 hover:ring-blue-400" />
-                </a>
-              );
-            }
-            if (item.mimeType.startsWith("video/")) {
-              return (
-                <a key={item.id} href={item.url} target="_blank" rel="noreferrer" title={item.originalName} className="relative block">
-                  <video src={item.url} muted preload="metadata" className="w-14 h-14 rounded-md object-cover border border-slate-200 hover:ring-2 hover:ring-blue-400 bg-black" />
-                  <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white text-[9px]">▶</span>
-                  </span>
-                </a>
-              );
-            }
-            return (
-              <a key={item.id} href={item.url} target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 underline max-w-40 truncate">{item.originalName}</a>
-            );
-          })}
+        <div className="flex flex-wrap gap-2 mt-2.5">
+          {items.map((item) => (
+            <AttachmentThumb key={item.id} item={item} size={thumbSize} />
+          ))}
         </div>
       )}
     </div>

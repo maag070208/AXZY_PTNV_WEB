@@ -659,10 +659,16 @@ export default function KanbanPage() {
                             <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
                           </div>
 
-                          <div className="text-[12.5px] font-bold text-slate-800 mb-1">{t.title}</div>
-                          {t.description ? (
-                            <div className="text-[11.5px] text-slate-500 leading-relaxed mb-2">{t.description}</div>
-                          ) : null}
+                          <div className="flex items-baseline gap-1.5 mb-2 min-w-0">
+                            <span className="text-[12.5px] font-bold text-slate-800 shrink-0 max-w-[55%] truncate">
+                              {t.title}
+                            </span>
+                            {t.description ? (
+                              <span className="text-[11.5px] text-slate-500 min-w-0 flex-1 truncate">
+                                — {t.description}
+                              </span>
+                            ) : null}
+                          </div>
 
                           {(t.startDate || t.dueDate || (t.comments && t.comments.length > 0)) && (
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9.5px] text-slate-400 mb-2">
