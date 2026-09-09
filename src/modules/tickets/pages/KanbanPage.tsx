@@ -49,46 +49,52 @@ const COLUMNS: Array<{ status: Status; label: string }> = [
   { status: "COMPLETADA", label: "Completada" },
 ];
 
-const FALLBACK_TONE: Tone = { bg: "bg-slate-400", text: "text-white" };
+// Los colores se aplican con `style` inline (valores hex reales), NO con
+// clases de Tailwind: en este proyecto las clases de color armadas
+// dinámicamente (desde un arreglo/mapa) no estaban compilando — por eso
+// los avatares y algunas etiquetas se veían en blanco. Un color hex en
+// `style` siempre se aplica, sin depender de que el build de Tailwind
+// detecte nada.
+const FALLBACK_TONE: Tone = { bg: "#94a3b8", text: "#ffffff" };
 
 const PRIORITY_META: Record<string, { label: string; tone: Tone }> = {
-  BAJA: { label: "Baja", tone: { bg: "bg-slate-400", text: "text-white" } },
-  MEDIA: { label: "Media", tone: { bg: "bg-amber-500", text: "text-white" } },
-  ALTA: { label: "Alta", tone: { bg: "bg-orange-600", text: "text-white" } },
-  URGENTE: { label: "Urgente", tone: { bg: "bg-rose-600", text: "text-white" } },
+  BAJA: { label: "Baja", tone: { bg: "#94a3b8", text: "#ffffff" } },
+  MEDIA: { label: "Media", tone: { bg: "#f59e0b", text: "#ffffff" } },
+  ALTA: { label: "Alta", tone: { bg: "#ea580c", text: "#ffffff" } },
+  URGENTE: { label: "Urgente", tone: { bg: "#e11d48", text: "#ffffff" } },
 };
 
 const STATUS_META: Record<string, { label: string; tone: Tone }> = {
-  ABIERTO: { label: "Abierto", tone: { bg: "bg-amber-500", text: "text-white" } },
-  EN_SEGUIMIENTO: { label: "En seguimiento", tone: { bg: "bg-blue-500", text: "text-white" } },
-  CERRADO: { label: "Cerrado", tone: { bg: "bg-emerald-600", text: "text-white" } },
+  ABIERTO: { label: "Abierto", tone: { bg: "#f59e0b", text: "#ffffff" } },
+  EN_SEGUIMIENTO: { label: "En seguimiento", tone: { bg: "#3b82f6", text: "#ffffff" } },
+  CERRADO: { label: "Cerrado", tone: { bg: "#059669", text: "#ffffff" } },
 };
 
 const ASSIGNMENT_STATUS_META: Record<Status, { label: string; tone: Tone }> = {
-  PENDIENTE: { label: "Pendiente", tone: { bg: "bg-slate-400", text: "text-white" } },
-  EN_PROGRESO: { label: "En progreso", tone: { bg: "bg-blue-500", text: "text-white" } },
-  EN_REVISION: { label: "En revisión", tone: { bg: "bg-purple-500", text: "text-white" } },
-  COMPLETADA: { label: "Completada", tone: { bg: "bg-emerald-600", text: "text-white" } },
+  PENDIENTE: { label: "Pendiente", tone: { bg: "#94a3b8", text: "#ffffff" } },
+  EN_PROGRESO: { label: "En progreso", tone: { bg: "#3b82f6", text: "#ffffff" } },
+  EN_REVISION: { label: "En revisión", tone: { bg: "#a855f7", text: "#ffffff" } },
+  COMPLETADA: { label: "Completada", tone: { bg: "#059669", text: "#ffffff" } },
 };
 
 // Paleta determinista para etiquetas de departamento y avatares: mismo
 // nombre siempre obtiene el mismo color, sin tener que mantener un mapa
 // manual por departamento.
 const TAG_PALETTE: Tone[] = [
-  { bg: "bg-blue-500", text: "text-white" },
-  { bg: "bg-purple-500", text: "text-white" },
-  { bg: "bg-emerald-600", text: "text-white" },
-  { bg: "bg-amber-500", text: "text-white" },
-  { bg: "bg-rose-500", text: "text-white" },
-  { bg: "bg-cyan-600", text: "text-white" },
-  { bg: "bg-indigo-500", text: "text-white" },
-  { bg: "bg-teal-600", text: "text-white" },
-  { bg: "bg-fuchsia-500", text: "text-white" },
-  { bg: "bg-orange-500", text: "text-white" },
-  { bg: "bg-lime-600", text: "text-white" },
-  { bg: "bg-sky-600", text: "text-white" },
-  { bg: "bg-pink-500", text: "text-white" },
-  { bg: "bg-violet-500", text: "text-white" },
+  { bg: "#3b82f6", text: "#ffffff" },
+  { bg: "#a855f7", text: "#ffffff" },
+  { bg: "#059669", text: "#ffffff" },
+  { bg: "#f59e0b", text: "#ffffff" },
+  { bg: "#f43f5e", text: "#ffffff" },
+  { bg: "#0891b2", text: "#ffffff" },
+  { bg: "#6366f1", text: "#ffffff" },
+  { bg: "#0d9488", text: "#ffffff" },
+  { bg: "#d946ef", text: "#ffffff" },
+  { bg: "#f97316", text: "#ffffff" },
+  { bg: "#65a30d", text: "#ffffff" },
+  { bg: "#0284c7", text: "#ffffff" },
+  { bg: "#ec4899", text: "#ffffff" },
+  { bg: "#8b5cf6", text: "#ffffff" },
 ];
 
 function hashTone(key: string): Tone {
@@ -106,7 +112,8 @@ function metaFor(map: Record<string, { label: string; tone: Tone }>, key: string
 function Tag({ label, tone, icon }: { label: string; tone: Tone; icon?: React.ReactNode }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide whitespace-nowrap ${tone.bg} ${tone.text}`}
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide whitespace-nowrap"
+      style={{ backgroundColor: tone.bg, color: tone.text }}
     >
       {icon}
       {label}
@@ -137,7 +144,8 @@ function Avatar({ name, seed, size = 7 }: { name: string; seed: string; size?: 6
   return (
     <div
       title={name}
-      className={`${sizeClass} leading-none rounded-full ${tone.bg} ${tone.text} border-2 border-white shadow-sm flex items-center justify-center shrink-0 font-black`}
+      className={`${sizeClass} leading-none rounded-full border-2 border-white shadow-sm flex items-center justify-center shrink-0 font-black`}
+      style={{ backgroundColor: tone.bg, color: tone.text }}
     >
       {initials}
     </div>
@@ -543,7 +551,7 @@ export default function KanbanPage() {
                     >
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <Tag label={deptLabel} tone={deptTone} />
-                        {overdue && <Tag label="Vencida" tone={{ bg: "bg-rose-600", text: "text-white" }} />}
+                        {overdue && <Tag label="Vencida" tone={{ bg: "#e11d48", text: "#ffffff" }} />}
                       </div>
 
                       <ITText className="text-[12.5px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1">
@@ -569,7 +577,8 @@ export default function KanbanPage() {
                         <ITFlex align="center" gap={2} className="shrink-0">
                           <span
                             title={priorityMeta.label}
-                            className={`w-2 h-2 rounded-full ${priorityMeta.tone.bg}`}
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: priorityMeta.tone.bg }}
                           />
                           <Avatar name={a.user.name} seed={a.userId} />
                         </ITFlex>
