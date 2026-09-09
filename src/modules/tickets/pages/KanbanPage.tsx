@@ -17,7 +17,9 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FaBookmark,
+  FaCalendarAlt,
   FaCheckCircle,
+  FaComments,
   FaExternalLinkAlt,
   FaPlus,
   FaSearch,
@@ -584,7 +586,7 @@ export default function KanbanPage() {
       {/* Modal: detalle del ticket (solo lectura, sin alta de tareas) */}
       <ITDialog
         isOpen={modalLoading || !!modalTicket}
-        className="w-[min(1440px,calc(100vw_-_3rem))] max-w-none h-[min(760px,calc(100vh_-_3rem))]"
+        className="w-full max-w-4xl"
         onClose={() => setModalTicket(null)}
       >
         {modalLoading || !modalTicket ? (
@@ -592,7 +594,7 @@ export default function KanbanPage() {
             <ITLoader variant="spinner" size="md" color="primary" />
           </ITFlex>
         ) : (
-          <div className="w-full h-[660px] max-h-[calc(100vh_-_10rem)] overflow-y-auto pr-1">
+          <div className="h-[660px] max-h-[calc(100vh_-_10rem)] overflow-y-auto pr-1">
             <div className="pb-3 border-b border-slate-100 pr-8 mb-4">
               <ITFlex align="center" gap={2} className="mb-1.5">
                 <FaBookmark size={12} className="text-emerald-500" />
@@ -605,7 +607,7 @@ export default function KanbanPage() {
               <ITText className="text-xl font-black text-slate-800 leading-tight">{modalTicket.titulo}</ITText>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6">
               <ITStack direction="column" spacing={4} className="min-w-0">
                 <div className="rounded-xl border border-slate-200 bg-white p-3.5">
                   <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
@@ -623,49 +625,67 @@ export default function KanbanPage() {
                   <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
                     Tareas asignadas ({modalTicket.assignments.length})
                   </ITText>
-                  <div className="max-h-[38vh] overflow-y-auto pr-1 space-y-2">
-                    {modalTicket.assignments.map((t) => (
-                      <div
-                        key={t.id}
-                        className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
-                      >
-                        <ITFlex justify="between" align="center" gap={2} className="mb-1">
-                          <ITText className="text-[11px] font-black text-slate-700">
-                            {t.user.name}
-                            {t.user.numeroEmpleado ? ` · #${t.user.numeroEmpleado}` : ""}
-                          </ITText>
-                          <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
-                        </ITFlex>
-                        <div className="text-[11px] font-black text-slate-800">{t.title}</div>
-                        {t.description ? (
-                          <div className="text-[11px] text-slate-600 mt-0.5">{t.description}</div>
-                        ) : null}
-                        {(t.startDate || t.dueDate) && (
-                          <div className="text-[9px] text-slate-400 mt-1">
-                            {t.startDate
-                              ? `Inicio: ${new Date(t.startDate).toLocaleDateString("es-MX")}`
-                              : ""}
-                            {t.startDate && t.dueDate ? " · " : ""}
-                            {t.dueDate
-                              ? `Fin esperada: ${new Date(t.dueDate).toLocaleDateString("es-MX")}`
-                              : ""}
+                  <div className="max-h-[42vh] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {modalTicket.assignments.map((t) => (
+                        <div
+                          key={t.id}
+                          className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm flex flex-col"
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <ITFlex align="center" gap={2} className="min-w-0">
+                              <Avatar name={t.user.name} seed={t.userId} />
+                              <div className="min-w-0">
+                                <div className="text-[11px] font-black text-slate-700 truncate">{t.user.name}</div>
+                                {t.user.numeroEmpleado && (
+                                  <div className="text-[9px] text-slate-400">#{t.user.numeroEmpleado}</div>
+                                )}
+                              </div>
+                            </ITFlex>
+                            <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
                           </div>
-                        )}
-                        {t.comments && t.comments.length > 0 && (
-                          <div className="mt-1.5 text-[9px] text-slate-400">
-                            {t.comments.length} comentario(s)
+
+                          <div className="text-[12.5px] font-bold text-slate-800 mb-1">{t.title}</div>
+                          {t.description ? (
+                            <div className="text-[11.5px] text-slate-500 leading-relaxed mb-2">{t.description}</div>
+                          ) : null}
+
+                          {(t.startDate || t.dueDate || (t.comments && t.comments.length > 0)) && (
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9.5px] text-slate-400 mb-2">
+                              {t.startDate && (
+                                <span className="inline-flex items-center gap-1">
+                                  <FaCalendarAlt size={9} />
+                                  Inicio {new Date(t.startDate).toLocaleDateString("es-MX")}
+                                </span>
+                              )}
+                              {t.dueDate && (
+                                <span className="inline-flex items-center gap-1">
+                                  <FaCalendarAlt size={9} className="text-rose-400" />
+                                  Límite {new Date(t.dueDate).toLocaleDateString("es-MX")}
+                                </span>
+                              )}
+                              {t.comments && t.comments.length > 0 && (
+                                <span className="inline-flex items-center gap-1">
+                                  <FaComments size={9} />
+                                  {t.comments.length} comentario(s)
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="mt-auto pt-2 border-t border-slate-100">
+                            <TicketAttachments
+                              ticketId={modalTicket.id}
+                              assignmentId={t.id}
+                              compact
+                              canUpload={
+                                canManageModalTicket || t.userId === currentUser?.id
+                              }
+                            />
                           </div>
-                        )}
-                        <TicketAttachments
-                          ticketId={modalTicket.id}
-                          assignmentId={t.id}
-                          compact
-                          canUpload={
-                            canManageModalTicket || t.userId === currentUser?.id
-                          }
-                        />
-                      </div>
-                    ))}
+                        </div>
+                      ))}
+                    </div>
                     {modalTicket.assignments.length === 0 && (
                       <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
                         <ITText className="text-[11px] text-slate-400">Este ticket aún no tiene tareas asignadas.</ITText>
@@ -712,7 +732,7 @@ export default function KanbanPage() {
       {/* Modal: alta rápida de tarea desde el tablero principal */}
       <ITDialog
         isOpen={showCreatePanel}
-        className="w-[min(560px,calc(100vw_-_2rem))] max-w-none"
+        className="w-full max-w-lg"
         onClose={() => {
           setShowCreatePanel(false);
           resetCreateForm();
