@@ -112,7 +112,17 @@ function Tag({ label, tone, icon }: { label: string; tone: Tone; icon?: React.Re
   );
 }
 
-function Avatar({ name, seed, size = 7 }: { name: string; seed: string; size?: number }) {
+// Clases completas y estáticas por tamaño: Tailwind solo genera utilidades
+// que aparecen literalmente en el código, así que un `w-${size}` armado en
+// tiempo de ejecución nunca compila a nada (por eso los avatares se veían
+// vacíos). Este mapa evita ese problema por completo.
+const AVATAR_SIZE_CLASSES: Record<number, string> = {
+  6: "w-6 h-6 text-[8px]",
+  7: "w-7 h-7 text-[9px]",
+  8: "w-8 h-8 text-[10px]",
+};
+
+function Avatar({ name, seed, size = 7 }: { name: string; seed: string; size?: 6 | 7 | 8 }) {
   const tone = hashTone(`avatar:${seed}`);
   const initials = name
     .split(" ")
@@ -121,11 +131,11 @@ function Avatar({ name, seed, size = 7 }: { name: string; seed: string; size?: n
     .slice(0, 2)
     .join("")
     .toUpperCase();
+  const sizeClass = AVATAR_SIZE_CLASSES[size] ?? AVATAR_SIZE_CLASSES[7];
   return (
     <div
       title={name}
-      className={`w-${size} h-${size} rounded-full ${tone.bg} ${tone.text} border-2 border-white shadow-sm flex items-center justify-center shrink-0 font-black`}
-      style={{ width: `${size * 4}px`, height: `${size * 4}px`, fontSize: size >= 8 ? "10px" : "9px" }}
+      className={`${sizeClass} leading-none rounded-full ${tone.bg} ${tone.text} border-2 border-white shadow-sm flex items-center justify-center shrink-0 font-black`}
     >
       {initials}
     </div>
@@ -574,7 +584,7 @@ export default function KanbanPage() {
       {/* Modal: detalle del ticket (solo lectura, sin alta de tareas) */}
       <ITDialog
         isOpen={modalLoading || !!modalTicket}
-        className="w-[min(1180px,calc(100vw_-_2rem))] max-w-none h-[min(700px,calc(100vh_-_2rem))]"
+        className="w-[min(1440px,calc(100vw_-_3rem))] max-w-none h-[min(760px,calc(100vh_-_3rem))]"
         onClose={() => setModalTicket(null)}
       >
         {modalLoading || !modalTicket ? (
@@ -582,7 +592,7 @@ export default function KanbanPage() {
             <ITLoader variant="spinner" size="md" color="primary" />
           </ITFlex>
         ) : (
-          <div className="w-full h-[600px] max-h-[calc(100vh-9rem)] overflow-y-auto pr-1">
+          <div className="w-full h-[660px] max-h-[calc(100vh_-_10rem)] overflow-y-auto pr-1">
             <div className="pb-3 border-b border-slate-100 pr-8 mb-4">
               <ITFlex align="center" gap={2} className="mb-1.5">
                 <FaBookmark size={12} className="text-emerald-500" />
@@ -595,7 +605,7 @@ export default function KanbanPage() {
               <ITText className="text-xl font-black text-slate-800 leading-tight">{modalTicket.titulo}</ITText>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
               <ITStack direction="column" spacing={4} className="min-w-0">
                 <div className="rounded-xl border border-slate-200 bg-white p-3.5">
                   <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
