@@ -1,49 +1,146 @@
 import {
-  ITBadget,
   ITButton,
   ITDialog,
   ITFlex,
+  ITGrid,
+  ITInput,
   ITLoader,
   ITPage,
+  ITSearchSelect,
+  ITSelect,
   ITStack,
+  ITTextarea,
   ITText,
   ITToast,
+  ITDatePicker,
 } from "@axzydev/axzy_ui_system";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FaExternalLinkAlt, FaPlus, FaSync, FaTrello } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaCheckCircle,
+  FaExternalLinkAlt,
+  FaPlus,
+  FaSearch,
+  FaSync,
+  FaTrello,
+  FaUserPlus,
+} from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { RootState } from "@core/store/store";
+import { usersApi, type User } from "@core/api/auth.api";
 import { ticketsApi, type KanbanAssignment, type Ticket } from "@core/api/tickets.api";
 import { formatFechaHora } from "@core/store/cartas/types";
+import TicketAttachments from "../components/TicketAttachments";
 
 type Status = "PENDIENTE" | "EN_PROGRESO" | "EN_REVISION" | "COMPLETADA";
 
-const COLUMNS: Array<{ status: Status; label: string; accent: string; dot: string }> = [
-  { status: "PENDIENTE", label: "Pendiente", accent: "border-t-slate-400", dot: "bg-slate-400" },
-  { status: "EN_PROGRESO", label: "En progreso", accent: "border-t-blue-500", dot: "bg-blue-500" },
-  { status: "EN_REVISION", label: "En revisión", accent: "border-t-purple-500", dot: "bg-purple-500" },
-  { status: "COMPLETADA", label: "Completada", accent: "border-t-emerald-500", dot: "bg-emerald-500" },
+interface Tone {
+  bg: string;
+  text: string;
+}
+
+const COLUMNS: Array<{ status: Status; label: string }> = [
+  { status: "PENDIENTE", label: "Pendiente" },
+  { status: "EN_PROGRESO", label: "En progreso" },
+  { status: "EN_REVISION", label: "En revisión" },
+  { status: "COMPLETADA", label: "Completada" },
 ];
 
-const PRIORITY_BADGE: Record<string, { color: string; label: string }> = {
-  BAJA: { color: "gray", label: "Baja" },
-  MEDIA: { color: "warning", label: "Media" },
-  ALTA: { color: "danger", label: "Alta" },
-  URGENTE: { color: "danger", label: "Urgente" },
+const FALLBACK_TONE: Tone = { bg: "bg-slate-400", text: "text-white" };
+
+const PRIORITY_META: Record<string, { label: string; tone: Tone }> = {
+  BAJA: { label: "Baja", tone: { bg: "bg-slate-400", text: "text-white" } },
+  MEDIA: { label: "Media", tone: { bg: "bg-amber-500", text: "text-white" } },
+  ALTA: { label: "Alta", tone: { bg: "bg-orange-600", text: "text-white" } },
+  URGENTE: { label: "Urgente", tone: { bg: "bg-rose-600", text: "text-white" } },
 };
 
-const STATUS_BADGE: Record<string, { color: string; label: string }> = {
-  ABIERTO: { color: "warning", label: "Abierto" },
-  EN_SEGUIMIENTO: { color: "info", label: "En seguimiento" },
-  CERRADO: { color: "success", label: "Cerrado" },
+const STATUS_META: Record<string, { label: string; tone: Tone }> = {
+  ABIERTO: { label: "Abierto", tone: { bg: "bg-amber-500", text: "text-white" } },
+  EN_SEGUIMIENTO: { label: "En seguimiento", tone: { bg: "bg-blue-500", text: "text-white" } },
+  CERRADO: { label: "Cerrado", tone: { bg: "bg-emerald-600", text: "text-white" } },
 };
+
+const ASSIGNMENT_STATUS_META: Record<Status, { label: string; tone: Tone }> = {
+  PENDIENTE: { label: "Pendiente", tone: { bg: "bg-slate-400", text: "text-white" } },
+  EN_PROGRESO: { label: "En progreso", tone: { bg: "bg-blue-500", text: "text-white" } },
+  EN_REVISION: { label: "En revisión", tone: { bg: "bg-purple-500", text: "text-white" } },
+  COMPLETADA: { label: "Completada", tone: { bg: "bg-emerald-600", text: "text-white" } },
+};
+
+// Paleta determinista para etiquetas de departamento y avatares: mismo
+// nombre siempre obtiene el mismo color, sin tener que mantener un mapa
+// manual por departamento.
+const TAG_PALETTE: Tone[] = [
+  { bg: "bg-blue-500", text: "text-white" },
+  { bg: "bg-purple-500", text: "text-white" },
+  { bg: "bg-emerald-600", text: "text-white" },
+  { bg: "bg-amber-500", text: "text-white" },
+  { bg: "bg-rose-500", text: "text-white" },
+  { bg: "bg-cyan-600", text: "text-white" },
+  { bg: "bg-indigo-500", text: "text-white" },
+  { bg: "bg-teal-600", text: "text-white" },
+  { bg: "bg-fuchsia-500", text: "text-white" },
+  { bg: "bg-orange-500", text: "text-white" },
+  { bg: "bg-lime-600", text: "text-white" },
+  { bg: "bg-sky-600", text: "text-white" },
+  { bg: "bg-pink-500", text: "text-white" },
+  { bg: "bg-violet-500", text: "text-white" },
+];
+
+function hashTone(key: string): Tone {
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  return TAG_PALETTE[hash % TAG_PALETTE.length];
+}
+
+function metaFor(map: Record<string, { label: string; tone: Tone }>, key: string) {
+  return map[key] ?? { label: key, tone: FALLBACK_TONE };
+}
+
+function Tag({ label, tone, icon }: { label: string; tone: Tone; icon?: React.ReactNode }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide whitespace-nowrap ${tone.bg} ${tone.text}`}
+    >
+      {icon}
+      {label}
+    </span>
+  );
+}
+
+function Avatar({ name, seed, size = 7 }: { name: string; seed: string; size?: number }) {
+  const tone = hashTone(`avatar:${seed}`);
+  const initials = name
+    .split(" ")
+    .map((p) => p[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  return (
+    <div
+      title={name}
+      className={`w-${size} h-${size} rounded-full ${tone.bg} ${tone.text} border-2 border-white shadow-sm flex items-center justify-center shrink-0 font-black`}
+      style={{ width: `${size * 4}px`, height: `${size * 4}px`, fontSize: size >= 8 ? "10px" : "9px" }}
+    >
+      {initials}
+    </div>
+  );
+}
 
 export default function KanbanPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ticketId = searchParams.get("ticketId") ?? undefined;
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const isAdmin = currentUser?.role === "ADMIN";
   const isEmpleado = currentUser?.role === "EMPLEADO";
+  const isJefeArea = currentUser?.role === "JEFE_DE_AREA";
+  const canCreate = isAdmin || isJefeArea;
   const [rows, setRows] = useState<KanbanAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,18 +148,30 @@ export default function KanbanPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [modalTicket, setModalTicket] = useState<Ticket | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [employees, setEmployees] = useState<User[]>([]);
+  const [busyEmployees, setBusyEmployees] = useState(false);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskStart, setTaskStart] = useState("");
+  const [taskDue, setTaskDue] = useState("");
+  const [savingTask, setSavingTask] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<Status | null>(null);
+  const [search, setSearch] = useState("");
+  const [assigneeFilter, setAssigneeFilter] = useState<string | null>(null);
+  const [departmentFilter, setDepartmentFilter] = useState("");
 
   const load = useCallback(() => {
     setLoading(true);
     setError(null);
     ticketsApi
-      .kanban()
+      .kanban(ticketId)
       .then((res) => setRows(res.data.filter((a) => !a.ticket.deletedAt)))
       .catch((e: any) => setError(e.message ?? "No se pudo cargar el tablero"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [ticketId]);
 
   useEffect(() => {
     load();
@@ -74,21 +183,61 @@ export default function KanbanPage() {
     return () => clearTimeout(t);
   }, [toast]);
 
+  useEffect(() => {
+    usersApi.empleados().then(setEmployees).catch(() => setEmployees([]));
+  }, []);
+
+  const uniqueAssignees = useMemo(() => {
+    const map = new Map<string, { id: string; name: string }>();
+    rows.forEach((r) => {
+      if (!map.has(r.userId)) map.set(r.userId, { id: r.userId, name: r.user.name });
+    });
+    return Array.from(map.values());
+  }, [rows]);
+
+  const departmentOptions = useMemo(() => {
+    const set = new Set<string>();
+    rows.forEach((r) => set.add(r.ticket.department?.name ?? "General"));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [rows]);
+
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (assigneeFilter && r.userId !== assigneeFilter) return false;
+      const deptName = r.ticket.department?.name ?? "General";
+      if (departmentFilter && deptName !== departmentFilter) return false;
+      if (q && !r.title.toLowerCase().includes(q) && !r.ticket.titulo.toLowerCase().includes(q)) {
+        return false;
+      }
+      return true;
+    });
+  }, [rows, assigneeFilter, departmentFilter, search]);
+
   const byStatus = useMemo(
     () =>
       COLUMNS.reduce(
         (acc, c) => {
-          acc[c.status] = rows.filter((r) => r.status === c.status);
+          acc[c.status] = filteredRows.filter((r) => r.status === c.status);
           return acc;
         },
         {} as Record<Status, KanbanAssignment[]>
       ),
-    [rows]
+    [filteredRows]
   );
+
+  const hasActiveFilters = Boolean(assigneeFilter || departmentFilter || search.trim());
+
+  const clearFilters = () => {
+    setAssigneeFilter(null);
+    setDepartmentFilter("");
+    setSearch("");
+  };
 
   const openTicket = async (ticketId: string) => {
     setModalLoading(true);
     setModalTicket(null);
+    setShowTaskForm(false);
     try {
       const t = await ticketsApi.get(ticketId);
       setModalTicket(t);
@@ -98,6 +247,61 @@ export default function KanbanPage() {
       setModalLoading(false);
     }
   };
+
+  const resetTaskForm = () => {
+    setSelectedUserId("");
+    setTaskTitle("");
+    setTaskDescription("");
+    setTaskStart("");
+    setTaskDue("");
+    setShowTaskForm(false);
+  };
+
+  const handleSearchEmployees = async (query?: string) => {
+    setBusyEmployees(true);
+    try {
+      setEmployees(await usersApi.empleados(undefined, query || undefined));
+    } catch {
+      setEmployees([]);
+    } finally {
+      setBusyEmployees(false);
+    }
+  };
+
+  const handleAddTask = async () => {
+    if (!modalTicket || !selectedUserId || !taskTitle.trim()) return;
+    setSavingTask(true);
+    try {
+      await ticketsApi.addAssignment(modalTicket.id, {
+        userId: selectedUserId,
+        title: taskTitle.trim(),
+        description: taskDescription.trim(),
+        startDate: taskStart || null,
+        dueDate: taskDue || null,
+      });
+      const updatedTicket = await ticketsApi.get(modalTicket.id);
+      setModalTicket(updatedTicket);
+      resetTaskForm();
+      setReloadKey((key) => key + 1);
+      setToast("Tarea asignada");
+    } catch (e: any) {
+      setError(e.message ?? "No se pudo asignar la tarea");
+    } finally {
+      setSavingTask(false);
+    }
+  };
+
+  const employeeOptions = employees.map((employee) => ({
+    value: employee.id,
+    label: [employee.name, employee.numeroEmpleado ? `#${employee.numeroEmpleado}` : null]
+      .filter(Boolean)
+      .join(" "),
+  }));
+
+  const canManageModalTicket = Boolean(
+    modalTicket &&
+      (isAdmin || (isJefeArea && modalTicket.creadoPorId === currentUser?.id))
+  );
 
   const handleStatusChange = async (assignment: KanbanAssignment, status: Status) => {
     try {
@@ -114,15 +318,6 @@ export default function KanbanPage() {
       setError(e.message);
     }
   };
-
-  const initials = (name: string) =>
-    name
-      .split(" ")
-      .map((p) => p[0])
-      .filter(Boolean)
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
 
   const handleDrop = (status: Status) => (e: React.DragEvent) => {
     e.preventDefault();
@@ -144,16 +339,27 @@ export default function KanbanPage() {
 
   return (
     <ITPage
-      title="Tablero de tareas"
-      description="Seguimiento kanban de las tareas asignadas a los tickets"
+      title={ticketId ? "Tareas del ticket" : "Tablero de tareas"}
+      description={ticketId ? "Tareas asignadas a este ticket" : "Seguimiento kanban de las tareas asignadas a los tickets"}
       backAction={() => navigate(-1)}
       icon={<FaTrello size={20} />}
       breadcrumbs={[
         { label: "Tickets", onClick: () => navigate("/tickets") },
-        { label: "Tablero" },
+        ...(ticketId
+          ? [{ label: "Ticket", onClick: () => navigate(`/tickets/${ticketId}`) }, { label: "Tablero" }]
+          : [{ label: "Tablero" }]),
       ]}
       actions={
-        !isEmpleado ? (
+        ticketId ? (
+          canCreate ? (
+            <ITButton variant="filled" color="primary" onClick={() => navigate(`/tickets/${ticketId}`)}>
+              <ITFlex align="center" gap={1}>
+                <FaPlus size={12} />
+                <ITText className="font-bold text-[11px]">Nueva tarea</ITText>
+              </ITFlex>
+            </ITButton>
+          ) : undefined
+        ) : !isEmpleado ? (
           <ITButton variant="filled" color="primary" onClick={() => navigate("/tickets/nuevo")}>
             <ITFlex align="center" gap={1}>
               <FaPlus size={12} />
@@ -163,27 +369,85 @@ export default function KanbanPage() {
         ) : undefined
       }
     >
-      <ITFlex justify="end" align="center" gap={2} className="mb-4">
-        {loading && (
-          <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            Cargando…
-          </ITText>
-        )}
-        {error && <ITText className="text-[11px] font-bold text-red-600">{error}</ITText>}
-        <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
-          <ITFlex align="center" gap={1}>
-            <FaSync size={11} />
-            <ITText className="font-bold text-[11px]">Actualizar</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
+      {/* Barra de herramientas: búsqueda, filtro de departamento, avatares y refrescar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <ITFlex align="center" gap={3} className="flex-wrap">
+          <div className="w-60">
+            <ITInput
+              name="kanbanSearch"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar tarea o ticket..."
+              iconLeft={<FaSearch size={11} className="text-slate-400" />}
+            />
+          </div>
+          <div className="w-48">
+            <ITSelect
+              name="kanbanDepartmentFilter"
+              value={departmentFilter}
+              onChange={(e) => setDepartmentFilter(e.target.value)}
+              options={[
+                { value: "", label: "Todos los departamentos" },
+                ...departmentOptions.map((d) => ({ value: d, label: d })),
+              ]}
+            />
+          </div>
+          {uniqueAssignees.length > 0 && (
+            <div className="flex items-center -space-x-2">
+              {uniqueAssignees.slice(0, 4).map((u) => {
+                const active = assigneeFilter === u.id;
+                return (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => setAssigneeFilter((cur) => (cur === u.id ? null : u.id))}
+                    className={`rounded-full transition-all hover:z-10 hover:-translate-y-0.5 ${
+                      active ? "ring-2 ring-offset-2 ring-blue-400 rounded-full" : ""
+                    }`}
+                  >
+                    <Avatar name={u.name} seed={u.id} />
+                  </button>
+                );
+              })}
+              {uniqueAssignees.length > 4 && (
+                <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[9px] font-black border-2 border-white shadow-sm">
+                  +{uniqueAssignees.length - 4}
+                </div>
+              )}
+            </div>
+          )}
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="text-[10px] font-bold text-slate-400 hover:text-slate-600 underline underline-offset-2"
+            >
+              Limpiar filtros
+            </button>
+          )}
+        </ITFlex>
+        <ITFlex align="center" gap={2}>
+          {loading && (
+            <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Cargando…
+            </ITText>
+          )}
+          {error && <ITText className="text-[11px] font-bold text-red-600">{error}</ITText>}
+          <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
+            <ITFlex align="center" gap={1}>
+              <FaSync size={11} />
+              <ITText className="font-bold text-[11px]">Actualizar</ITText>
+            </ITFlex>
+          </ITButton>
+        </ITFlex>
+      </div>
 
-      {/* Trello: 3 columnas fijas lado a lado, scroll horizontal en pantallas angostas */}
+      {/* Tablero: columnas planas estilo Jira, scroll horizontal en pantallas angostas */}
       <div className="flex items-start gap-4 overflow-x-auto pb-2 -mx-2 px-2">
         {COLUMNS.map((col) => (
           <div
             key={col.status}
-            className={`flex-none w-[300px] sm:w-[320px] rounded-2xl border-t-4 ${col.accent} bg-slate-50/80 border border-slate-200 p-3 transition-colors ${
+            className={`flex-none w-[300px] sm:w-[320px] rounded-2xl bg-slate-100/70 border border-slate-200 p-3 transition-colors ${
               dragOver === col.status ? "bg-blue-50 border-blue-300" : ""
             }`}
             onDragOver={(e) => {
@@ -194,15 +458,15 @@ export default function KanbanPage() {
             onDrop={handleDrop(col.status)}
           >
             <ITFlex justify="between" align="center" className="mb-3 px-1">
-              <ITFlex align="center" gap={2}>
-                <div className={`w-2.5 h-2.5 rounded-full ${col.dot}`} />
-                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-600">
+              <ITFlex align="center" gap={1.5}>
+                {col.status === "COMPLETADA" && <FaCheckCircle size={12} className="text-emerald-500" />}
+                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
                   {col.label}
                 </ITText>
               </ITFlex>
-              <ITBadget color="primary" size="small">
-                {byStatus[col.status].length}
-              </ITBadget>
+              <div className="w-5 h-5 rounded-full bg-white border border-slate-200 flex items-center justify-center">
+                <span className="text-[9px] font-black text-slate-500">{byStatus[col.status].length}</span>
+              </div>
             </ITFlex>
 
             <div className="space-y-2 min-h-[140px]">
@@ -211,139 +475,177 @@ export default function KanbanPage() {
                   <ITText className="text-[10px] text-slate-400 italic">Sin tareas</ITText>
                 </div>
               ) : (
-                byStatus[col.status].map((a) => (
-                  <div
-                    key={a.id}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData("text/plain", a.id);
-                      e.dataTransfer.effectAllowed = "move";
-                      setDraggingId(a.id);
-                    }}
-                    onDragEnd={() => setDraggingId(null)}
-                    className={`rounded-xl bg-white border border-slate-200 shadow-sm p-3 cursor-pointer hover:border-blue-300 hover:shadow transition-all ${
-                      draggingId === a.id ? "opacity-40" : ""
-                    }`}
-                    onClick={() => openTicket(a.ticketId)}
-                  >
-                    <ITFlex justify="between" align="center" gap={2} className="mb-1.5">
-                      <ITText className="text-[11px] font-black text-slate-700 leading-tight truncate">
+                byStatus[col.status].map((a) => {
+                  const deptLabel = a.ticket.department?.name ?? "General";
+                  const deptTone = hashTone(deptLabel);
+                  const priorityMeta = metaFor(PRIORITY_META, a.ticket.priority);
+                  const overdue = Boolean(a.dueDate && a.status !== "COMPLETADA" && new Date(a.dueDate) < new Date());
+                  return (
+                    <div
+                      key={a.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData("text/plain", a.id);
+                        e.dataTransfer.effectAllowed = "move";
+                        setDraggingId(a.id);
+                      }}
+                      onDragEnd={() => setDraggingId(null)}
+                      onClick={() => openTicket(a.ticketId)}
+                      className={`rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all p-3 cursor-pointer ${
+                        draggingId === a.id ? "opacity-40" : ""
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <Tag label={deptLabel} tone={deptTone} />
+                        {overdue && <Tag label="Vencida" tone={{ bg: "bg-rose-600", text: "text-white" }} />}
+                      </div>
+
+                      <ITText className="text-[12.5px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1">
                         {a.title}
                       </ITText>
-                      <ITBadget
-                        color={PRIORITY_BADGE[a.ticket.priority]?.color as any ?? "gray"}
-                        size="small"
-                      >
-                        {PRIORITY_BADGE[a.ticket.priority]?.label ?? a.ticket.priority}
-                      </ITBadget>
-                    </ITFlex>
+                      <ITText className="text-[9.5px] font-semibold text-slate-400 uppercase tracking-wide truncate mb-2">
+                        {a.ticket.titulo}
+                      </ITText>
 
-                    {a.description ? (
-                      <div className="text-[11px] text-slate-600 leading-snug mb-2 line-clamp-2">
-                        {a.description}
-                      </div>
-                    ) : null}
-
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 truncate">
-                      {a.ticket.titulo}
-                    </div>
-
-                    {a.dueDate && a.status !== "COMPLETADA" && new Date(a.dueDate) < new Date() && (
-                      <div className="mb-2">
-                        <ITBadget color="danger" size="small">Vencida</ITBadget>
-                      </div>
-                    )}
-
-                    <ITFlex justify="between" align="center" gap={2}>
-                      <ITFlex align="center" gap={1.5} className="min-w-0">
-                        <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-                          <ITText className="text-[9px] font-black text-slate-600">
-                            {initials(a.user.name)}
-                          </ITText>
+                      {a.description ? (
+                        <div className="text-[11px] text-slate-500 leading-snug mb-2 line-clamp-2">
+                          {a.description}
                         </div>
-                        <ITText className="text-[10px] font-bold text-slate-500 truncate">
-                          {a.user.name}
-                        </ITText>
-                      </ITFlex>
-                    </ITFlex>
-                  </div>
-                ))
+                      ) : null}
+
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                        <ITFlex align="center" gap={1.5} className="min-w-0">
+                          <FaBookmark size={10} className="text-emerald-500 shrink-0" />
+                          <span className="text-[9px] font-bold text-slate-400 truncate">
+                            #{a.ticketId.slice(0, 8).toUpperCase()}
+                          </span>
+                        </ITFlex>
+                        <ITFlex align="center" gap={2} className="shrink-0">
+                          <span
+                            title={priorityMeta.label}
+                            className={`w-2 h-2 rounded-full ${priorityMeta.tone.bg}`}
+                          />
+                          <Avatar name={a.user.name} seed={a.userId} />
+                        </ITFlex>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Modal tipo Trello: detalle del ticket */}
+      {/* Modal: detalle del ticket */}
       <ITDialog
         isOpen={modalLoading || !!modalTicket}
+        className="w-[min(1200px,calc(100vw-2rem))] max-w-none h-[min(700px,calc(100vh-2rem))]"
         onClose={() => {
           setModalTicket(null);
+          resetTaskForm();
         }}
-        title={modalTicket?.titulo ?? "Ticket"}
       >
         {modalLoading || !modalTicket ? (
           <ITFlex justify="center" align="center" className="py-10">
             <ITLoader variant="spinner" size="md" color="primary" />
           </ITFlex>
         ) : (
-          <ITStack direction="column" spacing={4} className="w-full">
-            <ITFlex gap={2} wrap="wrap">
-              <ITBadget color={STATUS_BADGE[modalTicket.status]?.color as any ?? "gray"} size="small">
-                {STATUS_BADGE[modalTicket.status]?.label ?? modalTicket.status}
-              </ITBadget>
-              <ITBadget color={PRIORITY_BADGE[modalTicket.priority]?.color as any ?? "gray"} size="small">
-                {PRIORITY_BADGE[modalTicket.priority]?.label ?? modalTicket.priority}
-              </ITBadget>
-              {modalTicket.department && (
-                <ITBadget color="primary" size="small">
-                  {modalTicket.department.name}
-                </ITBadget>
-              )}
-              <ITBadget color="secondary" size="small">
-                {formatFechaHora(modalTicket.creadoEn)}
-              </ITBadget>
-            </ITFlex>
-
-            <div className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">
-              {modalTicket.descripcion}
+          <div className="w-full h-[600px] max-h-[calc(100vh-9rem)] overflow-y-auto pr-1">
+          <ITStack direction="column" spacing={4} className="w-full min-w-0">
+            <div className="pb-3 border-b border-slate-100 pr-8">
+              <ITFlex align="center" gap={2} className="mb-1.5">
+                <FaBookmark size={12} className="text-emerald-500" />
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  #{modalTicket.id.slice(0, 8).toUpperCase()}
+                </span>
+                <span className="text-slate-300">·</span>
+                <span className="text-[10px] text-slate-400">Creado {formatFechaHora(modalTicket.creadoEn)}</span>
+              </ITFlex>
+              <ITText className="text-xl font-black text-slate-800 leading-tight">{modalTicket.titulo}</ITText>
             </div>
 
-            <div>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                Tareas ({modalTicket.assignments.length})
+            <ITFlex gap={2} wrap="wrap">
+              <Tag {...metaFor(STATUS_META, modalTicket.status)} />
+              <Tag {...metaFor(PRIORITY_META, modalTicket.priority)} />
+              <Tag label={modalTicket.department?.name ?? "General"} tone={hashTone(modalTicket.department?.name ?? "General")} />
+            </ITFlex>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
+              <div className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">
+                {modalTicket.descripcion || "Sin descripción"}
+              </div>
+            </div>
+            <TicketAttachments
+              ticketId={modalTicket.id}
+              canUpload={canManageModalTicket || Boolean(modalTicket.creadoPorId === currentUser?.id)}
+            />
+
+            <ITFlex justify="between" align="center" gap={2}>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                Tareas asignadas ({modalTicket.assignments.length})
               </ITText>
+              {canCreate && (isAdmin || modalTicket.creadoPorId === currentUser?.id) && (
+                <ITButton size="small" variant="outlined" color="primary" onClick={() => setShowTaskForm((value) => !value)}>
+                  <ITFlex align="center" gap={1}><FaUserPlus size={11} /><ITText className="font-bold text-[10px]">Nueva tarea</ITText></ITFlex>
+                </ITButton>
+              )}
+            </ITFlex>
+
+            {showTaskForm && (
+              <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-3">
+                <ITText className="text-[10px] font-black uppercase tracking-widest text-blue-700 mb-3">Asignar nueva tarea</ITText>
+                <ITGrid container columns={12} spacing={2}>
+                  <ITGrid item xs={12}>
+                    <ITSearchSelect
+                      name="kanbanEmployee"
+                      label="Empleado"
+                      placeholder="Buscar empleado..."
+                      options={employeeOptions}
+                      value={selectedUserId}
+                      onChange={(value) => setSelectedUserId(String(value))}
+                      onSearch={handleSearchEmployees}
+                      isLoading={busyEmployees}
+                    />
+                  </ITGrid>
+                  <ITGrid item xs={12}>
+                    <ITInput name="kanbanTaskTitle" label="Título de la tarea *" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Ej. Revisar instalación" />
+                  </ITGrid>
+                  <ITGrid item xs={12}>
+                    <ITTextarea name="kanbanTaskDescription" label="Descripción" value={taskDescription} onChange={setTaskDescription} rows={2} placeholder="Detalles de la tarea..." />
+                  </ITGrid>
+                  <ITGrid item xs={12} sm={6}>
+                    <ITDatePicker name="kanbanStart" label="Inicio" value={taskStart ? new Date(taskStart) : undefined} onChange={(event: any) => setTaskStart(event.target.value ? event.target.value.toISOString() : "")} />
+                  </ITGrid>
+                  <ITGrid item xs={12} sm={6}>
+                    <ITDatePicker name="kanbanDue" label="Fecha límite" value={taskDue ? new Date(taskDue) : undefined} onChange={(event: any) => setTaskDue(event.target.value ? event.target.value.toISOString() : "")} />
+                  </ITGrid>
+                  <ITGrid item xs={12}>
+                    <ITFlex justify="end" gap={2}>
+                      <ITButton variant="outlined" size="small" onClick={resetTaskForm}>Cancelar</ITButton>
+                      <ITButton variant="filled" color="primary" size="small" onClick={handleAddTask} disabled={savingTask || !selectedUserId || !taskTitle.trim()}>
+                        <ITFlex align="center" gap={1}><FaUserPlus size={11} /><ITText className="font-bold text-[10px]">{savingTask ? "Asignando..." : "Asignar tarea"}</ITText></ITFlex>
+                      </ITButton>
+                    </ITFlex>
+                  </ITGrid>
+                </ITGrid>
+              </div>
+            )}
+
+            <div className="max-h-[42vh] overflow-y-auto pr-1 space-y-2">
               <div className="space-y-2">
                 {modalTicket.assignments.map((t) => (
                   <div
                     key={t.id}
-                    className="rounded-lg border border-slate-200 bg-slate-50/60 p-2.5"
+                    className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
                   >
                     <ITFlex justify="between" align="center" gap={2} className="mb-1">
                       <ITText className="text-[11px] font-black text-slate-700">
                         {t.user.name}
                         {t.user.numeroEmpleado ? ` · #${t.user.numeroEmpleado}` : ""}
                       </ITText>
-                      <ITBadget
-                        color={
-                          t.status === "COMPLETADA"
-                            ? "success"
-                            : t.status === "EN_PROGRESO"
-                            ? "info"
-                            : t.status === "EN_REVISION"
-                            ? "purple"
-                            : "gray"
-                        }
-                        size="small"
-                      >
-                        {t.status === "COMPLETADA"
-                          ? "Completada"
-                          : t.status === "EN_PROGRESO"
-                          ? "En progreso"
-                          : t.status === "EN_REVISION"
-                          ? "En revisión"
-                          : "Pendiente"}
-                      </ITBadget>
+                      <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
                     </ITFlex>
                     <div className="text-[11px] font-black text-slate-800">{t.title}</div>
                     {t.description ? (
@@ -365,8 +667,21 @@ export default function KanbanPage() {
                         {t.comments.length} comentario(s)
                       </div>
                     )}
+                    <TicketAttachments
+                      ticketId={modalTicket.id}
+                      assignmentId={t.id}
+                      compact
+                      canUpload={
+                        canManageModalTicket || t.userId === currentUser?.id
+                      }
+                    />
                   </div>
                 ))}
+                {modalTicket.assignments.length === 0 && (
+                  <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
+                    <ITText className="text-[11px] text-slate-400">Este ticket aún no tiene tareas asignadas.</ITText>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -383,6 +698,7 @@ export default function KanbanPage() {
               </ITButton>
             </ITFlex>
           </ITStack>
+          </div>
         )}
       </ITDialog>
 
