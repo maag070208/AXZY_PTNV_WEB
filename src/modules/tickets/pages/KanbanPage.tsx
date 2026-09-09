@@ -4,11 +4,9 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITLoader,
   ITPage,
   ITSearchSelect,
   ITSelect,
-  ITStack,
   ITTextarea,
   ITText,
   ITToast,
@@ -17,10 +15,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FaBookmark,
-  FaCalendarAlt,
   FaCheckCircle,
-  FaComments,
-  FaExternalLinkAlt,
   FaPlus,
   FaSearch,
   FaSync,
@@ -32,15 +27,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import type { RootState } from "@core/store/store";
 import { usersApi, type User } from "@core/api/auth.api";
 import { ticketsApi, type KanbanAssignment, type Ticket } from "@core/api/tickets.api";
-import { formatFechaHora } from "@core/store/cartas/types";
-import TicketAttachments from "../components/TicketAttachments";
-
-type Status = "PENDIENTE" | "EN_PROGRESO" | "EN_REVISION" | "COMPLETADA";
-
-interface Tone {
-  bg: string;
-  text: string;
-}
+import TicketDetailModal from "../components/TicketDetailModal";
+import { Avatar, PRIORITY_META, Tag, hashTone, metaFor, type Status } from "../utils/kanbanUi";
 
 const COLUMNS: Array<{ status: Status; label: string }> = [
   { status: "PENDIENTE", label: "Pendiente" },
@@ -48,109 +36,6 @@ const COLUMNS: Array<{ status: Status; label: string }> = [
   { status: "EN_REVISION", label: "En revisión" },
   { status: "COMPLETADA", label: "Completada" },
 ];
-
-// Los colores se aplican con `style` inline (valores hex reales), NO con
-// clases de Tailwind: en este proyecto las clases de color armadas
-// dinámicamente (desde un arreglo/mapa) no estaban compilando — por eso
-// los avatares y algunas etiquetas se veían en blanco. Un color hex en
-// `style` siempre se aplica, sin depender de que el build de Tailwind
-// detecte nada.
-const FALLBACK_TONE: Tone = { bg: "#94a3b8", text: "#ffffff" };
-
-const PRIORITY_META: Record<string, { label: string; tone: Tone }> = {
-  BAJA: { label: "Baja", tone: { bg: "#94a3b8", text: "#ffffff" } },
-  MEDIA: { label: "Media", tone: { bg: "#f59e0b", text: "#ffffff" } },
-  ALTA: { label: "Alta", tone: { bg: "#ea580c", text: "#ffffff" } },
-  URGENTE: { label: "Urgente", tone: { bg: "#e11d48", text: "#ffffff" } },
-};
-
-const STATUS_META: Record<string, { label: string; tone: Tone }> = {
-  ABIERTO: { label: "Abierto", tone: { bg: "#f59e0b", text: "#ffffff" } },
-  EN_SEGUIMIENTO: { label: "En seguimiento", tone: { bg: "#3b82f6", text: "#ffffff" } },
-  CERRADO: { label: "Cerrado", tone: { bg: "#059669", text: "#ffffff" } },
-};
-
-const ASSIGNMENT_STATUS_META: Record<Status, { label: string; tone: Tone }> = {
-  PENDIENTE: { label: "Pendiente", tone: { bg: "#94a3b8", text: "#ffffff" } },
-  EN_PROGRESO: { label: "En progreso", tone: { bg: "#3b82f6", text: "#ffffff" } },
-  EN_REVISION: { label: "En revisión", tone: { bg: "#a855f7", text: "#ffffff" } },
-  COMPLETADA: { label: "Completada", tone: { bg: "#059669", text: "#ffffff" } },
-};
-
-// Paleta determinista para etiquetas de departamento y avatares: mismo
-// nombre siempre obtiene el mismo color, sin tener que mantener un mapa
-// manual por departamento.
-const TAG_PALETTE: Tone[] = [
-  { bg: "#3b82f6", text: "#ffffff" },
-  { bg: "#a855f7", text: "#ffffff" },
-  { bg: "#059669", text: "#ffffff" },
-  { bg: "#f59e0b", text: "#ffffff" },
-  { bg: "#f43f5e", text: "#ffffff" },
-  { bg: "#0891b2", text: "#ffffff" },
-  { bg: "#6366f1", text: "#ffffff" },
-  { bg: "#0d9488", text: "#ffffff" },
-  { bg: "#d946ef", text: "#ffffff" },
-  { bg: "#f97316", text: "#ffffff" },
-  { bg: "#65a30d", text: "#ffffff" },
-  { bg: "#0284c7", text: "#ffffff" },
-  { bg: "#ec4899", text: "#ffffff" },
-  { bg: "#8b5cf6", text: "#ffffff" },
-];
-
-function hashTone(key: string): Tone {
-  let hash = 0;
-  for (let i = 0; i < key.length; i++) {
-    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-  }
-  return TAG_PALETTE[hash % TAG_PALETTE.length];
-}
-
-function metaFor(map: Record<string, { label: string; tone: Tone }>, key: string) {
-  return map[key] ?? { label: key, tone: FALLBACK_TONE };
-}
-
-function Tag({ label, tone, icon }: { label: string; tone: Tone; icon?: React.ReactNode }) {
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide whitespace-nowrap"
-      style={{ backgroundColor: tone.bg, color: tone.text }}
-    >
-      {icon}
-      {label}
-    </span>
-  );
-}
-
-// Clases completas y estáticas por tamaño: Tailwind solo genera utilidades
-// que aparecen literalmente en el código, así que un `w-${size}` armado en
-// tiempo de ejecución nunca compila a nada (por eso los avatares se veían
-// vacíos). Este mapa evita ese problema por completo.
-const AVATAR_SIZE_CLASSES: Record<number, string> = {
-  6: "w-6 h-6 text-[8px]",
-  7: "w-7 h-7 text-[9px]",
-  8: "w-8 h-8 text-[10px]",
-};
-
-function Avatar({ name, seed, size = 7 }: { name: string; seed: string; size?: 6 | 7 | 8 }) {
-  const tone = hashTone(`avatar:${seed}`);
-  const initials = name
-    .split(" ")
-    .map((p) => p[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-  const sizeClass = AVATAR_SIZE_CLASSES[size] ?? AVATAR_SIZE_CLASSES[7];
-  return (
-    <div
-      title={name}
-      className={`${sizeClass} leading-none rounded-full border-2 border-white shadow-sm flex items-center justify-center shrink-0 font-black`}
-      style={{ backgroundColor: tone.bg, color: tone.text }}
-    >
-      {initials}
-    </div>
-  );
-}
 
 export default function KanbanPage() {
   const navigate = useNavigate();
@@ -592,165 +477,14 @@ export default function KanbanPage() {
         ))}
       </div>
 
-      {/* Modal: detalle del ticket (solo lectura, sin alta de tareas) */}
-      <ITDialog
-        isOpen={modalLoading || !!modalTicket}
-        className="w-full max-w-4xl"
+      <TicketDetailModal
+        ticket={modalTicket}
+        loading={modalLoading}
+        canManage={canManageModalTicket}
+        currentUserId={currentUser?.id}
         onClose={() => setModalTicket(null)}
-      >
-        {modalLoading || !modalTicket ? (
-          <ITFlex justify="center" align="center" className="py-10">
-            <ITLoader variant="spinner" size="md" color="primary" />
-          </ITFlex>
-        ) : (
-          <div>
-            <div className="pb-3 border-b border-slate-100 pr-8 mb-4">
-              <ITFlex align="center" gap={2} className="mb-1.5">
-                <FaBookmark size={12} className="text-emerald-500" />
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  #{modalTicket.id.slice(0, 8).toUpperCase()}
-                </span>
-                <span className="text-slate-300">·</span>
-                <span className="text-[10px] text-slate-400">Creado {formatFechaHora(modalTicket.creadoEn)}</span>
-              </ITFlex>
-              <ITText className="text-xl font-black text-slate-800 leading-tight">{modalTicket.titulo}</ITText>
-            </div>
-
-            {/* Alto máximo forzado por estilo inline: los valores arbitrarios de
-                Tailwind con calc()/min() no estaban compilando en este proyecto,
-                así que aquí no dependemos de eso para evitar que el modal se
-                salga de la pantalla. */}
-            <div className="overflow-y-auto pr-1" style={{ maxHeight: "min(64vh, 600px)" }}>
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6">
-              <ITStack direction="column" spacing={4} className="min-w-0">
-                <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
-                  <div className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">
-                    {modalTicket.descripcion || "Sin descripción"}
-                  </div>
-                </div>
-
-                <TicketAttachments
-                  ticketId={modalTicket.id}
-                  canUpload={canManageModalTicket || Boolean(modalTicket.creadoPorId === currentUser?.id)}
-                />
-
-                <div>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                    Tareas asignadas ({modalTicket.assignments.length})
-                  </ITText>
-                  <div className="max-h-[42vh] overflow-y-auto pr-1">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {modalTicket.assignments.map((t) => (
-                        <div
-                          key={t.id}
-                          className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm flex flex-col"
-                        >
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <ITFlex align="center" gap={2} className="min-w-0">
-                              <Avatar name={t.user.name} seed={t.userId} />
-                              <div className="min-w-0">
-                                <div className="text-[11px] font-black text-slate-700 truncate">{t.user.name}</div>
-                                {t.user.numeroEmpleado && (
-                                  <div className="text-[9px] text-slate-400">#{t.user.numeroEmpleado}</div>
-                                )}
-                              </div>
-                            </ITFlex>
-                            <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
-                          </div>
-
-                          <div className="flex items-baseline gap-1.5 mb-2 min-w-0">
-                            <span className="text-[12.5px] font-bold text-slate-800 shrink-0 max-w-[55%] truncate">
-                              {t.title}
-                            </span>
-                            {t.description ? (
-                              <span className="text-[11.5px] text-slate-500 min-w-0 flex-1 truncate">
-                                — {t.description}
-                              </span>
-                            ) : null}
-                          </div>
-
-                          {(t.startDate || t.dueDate || (t.comments && t.comments.length > 0)) && (
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9.5px] text-slate-400 mb-2">
-                              {t.startDate && (
-                                <span className="inline-flex items-center gap-1">
-                                  <FaCalendarAlt size={9} />
-                                  Inicio {new Date(t.startDate).toLocaleDateString("es-MX")}
-                                </span>
-                              )}
-                              {t.dueDate && (
-                                <span className="inline-flex items-center gap-1">
-                                  <FaCalendarAlt size={9} className="text-rose-400" />
-                                  Límite {new Date(t.dueDate).toLocaleDateString("es-MX")}
-                                </span>
-                              )}
-                              {t.comments && t.comments.length > 0 && (
-                                <span className="inline-flex items-center gap-1">
-                                  <FaComments size={9} />
-                                  {t.comments.length} comentario(s)
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                          <div className="mt-auto pt-2 border-t border-slate-100">
-                            <TicketAttachments
-                              ticketId={modalTicket.id}
-                              assignmentId={t.id}
-                              compact
-                              canUpload={
-                                canManageModalTicket || t.userId === currentUser?.id
-                              }
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    {modalTicket.assignments.length === 0 && (
-                      <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
-                        <ITText className="text-[11px] text-slate-400">Este ticket aún no tiene tareas asignadas.</ITText>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </ITStack>
-
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-3 h-fit">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Estado</span>
-                    <Tag {...metaFor(STATUS_META, modalTicket.status)} />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Prioridad</span>
-                    <Tag {...metaFor(PRIORITY_META, modalTicket.priority)} />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Depto</span>
-                    <Tag label={modalTicket.department?.name ?? "General"} tone={hashTone(modalTicket.department?.name ?? "General")} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 pt-2.5 border-t border-slate-200 text-[11px]">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Creado por</span>
-                  <span className="font-bold text-slate-700">{modalTicket.creadoPor?.name}</span>
-                </div>
-                <ITButton
-                  variant="filled"
-                  color="primary"
-                  className="w-full justify-center"
-                  onClick={() => navigate(`/tickets/${modalTicket.id}`)}
-                >
-                  <ITFlex align="center" gap={1} justify="center">
-                    <FaExternalLinkAlt size={11} />
-                    <ITText className="font-bold text-[11px]">Abrir detalle completo</ITText>
-                  </ITFlex>
-                </ITButton>
-              </div>
-            </div>
-            </div>
-          </div>
-        )}
-      </ITDialog>
+        onOpenFull={(id) => navigate(`/tickets/${id}`)}
+      />
 
       {/* Modal: alta rápida de tarea desde el tablero principal */}
       <ITDialog
