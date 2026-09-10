@@ -12,7 +12,7 @@ import {
   ITStack,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaBoxes, FaLayerGroup, FaLock, FaMagic, FaSave, FaTrash } from "react-icons/fa";
+import { FaBoxes, FaLayerGroup, FaLock, FaMagic, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -108,6 +108,11 @@ export default function DeviceFormPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Agregar más unidades idénticas a un dispositivo ya existente (lo agrupa
+  // en un lote si todavía no pertenecía a uno).
+  const [addQty, setAddQty] = useState(1);
+  const [addingUnits, setAddingUnits] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -302,6 +307,28 @@ export default function DeviceFormPage() {
     }
   };
 
+  const handleAddUnits = async () => {
+    if (!id || addQty < 1) return;
+    setAddingUnits(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await devicesApi.addUnits(id, addQty);
+      const freshLote = await devicesApi.getLote(res.loteId);
+      setLoteId(res.loteId);
+      setLoteRows(freshLote.data.map(toLoteRow));
+      setLoteSize(freshLote.total);
+      setSuccess(
+        `Se agregaron ${res.total} unidad(es) más · ahora hay ${freshLote.total} en total.`
+      );
+      setAddQty(1);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setAddingUnits(false);
+    }
+  };
+
   if (loading) {
     return (
       <ITPage title="Dispositivos" loading backAction={() => navigate(-1)} breadcrumbs={[
@@ -388,6 +415,48 @@ export default function DeviceFormPage() {
         <ITAlert variant="success" dismissible onDismiss={() => setSuccess(null)}>
           {success}
         </ITAlert>
+      )}
+
+      {isEdit && (
+        <ITCard className="p-4 border border-dashed border-emerald-200 bg-emerald-50/40 rounded-2xl mb-6">
+          <ITFlex align="end" gap={3} wrap="wrap" justify="between">
+            <ITFlex direction="column" gap={0.5} className="min-w-[220px]">
+              <ITText className="text-[11px] font-black uppercase tracking-widest text-emerald-700">
+                Agregar más unidades
+              </ITText>
+              <ITText className="text-[10px] font-bold text-slate-500">
+                Crea copias idénticas de este dispositivo (mismo tipo, marca y
+                modelo, sin serie) — cada una con su propio folio de activo,
+                para que también pueda tener su carta responsiva.
+              </ITText>
+            </ITFlex>
+            <ITFlex align="end" gap={2}>
+              <div className="w-24">
+                <ITInput
+                  name="addQty"
+                  label="Cantidad"
+                  type="number"
+                  min={1}
+                  value={String(addQty)}
+                  onChange={(e) => setAddQty(Math.max(1, Number(e.target.value) || 1))}
+                />
+              </div>
+              <ITButton
+                variant="filled"
+                color="secondary"
+                onClick={handleAddUnits}
+                disabled={addingUnits}
+              >
+                <ITFlex align="center" gap={1}>
+                  <FaPlus size={11} />
+                  <ITText className="text-[11px] font-bold">
+                    {addingUnits ? "Agregando…" : `Agregar ${addQty}`}
+                  </ITText>
+                </ITFlex>
+              </ITButton>
+            </ITFlex>
+          </ITFlex>
+        </ITCard>
       )}
 
       {!isLoteEdit && (

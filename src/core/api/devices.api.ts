@@ -177,6 +177,11 @@ export const devicesApi = {
     ram: string;
     almacenamiento: string;
   }>) => api.put<Device>(`/devices/${id}`, data),
+  addUnits: (id: string, cantidad: number) =>
+    api.post<{ loteId: string; data: Device[]; total: number }>(
+      `/devices/${id}/add-units`,
+      { cantidad }
+    ),
   remove: (id: string, force?: boolean) =>
     api.delete<{ soft: boolean; forced?: boolean; data: Device }>(
       `/devices/${id}${force ? "?force=true" : ""}`
