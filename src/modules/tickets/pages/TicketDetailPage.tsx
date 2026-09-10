@@ -45,6 +45,7 @@ import {
 } from "@core/store/tickets/tickets.slice";
 import { ticketsApi } from "@core/api/tickets.api";
 import { usersApi, type User } from "@core/api/auth.api";
+import { departmentsApi, type Department } from "@core/api/departments.api";
 import { formatFechaHora } from "@core/store/cartas/types";
 import { useAblyTicket } from "@core/hooks/useAbly";
 import { downloadTicketPDF } from "../utils/pdf";
@@ -103,6 +104,7 @@ export default function TicketDetailPage() {
 
   const [empleados, setEmpleados] = useState<User[]>([]);
   const [busyEmpleados, setBusyEmpleados] = useState(false);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [commentText, setCommentText] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
@@ -149,6 +151,10 @@ export default function TicketDetailPage() {
     usersApi.empleados().then(setEmpleados).catch(() => setEmpleados([]));
   }, []);
 
+  useEffect(() => {
+    departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
+  }, []);
+
   const buscarEmpleados = async (q?: string) => {
     setBusyEmpleados(true);
     try {
@@ -180,6 +186,34 @@ export default function TicketDetailPage() {
       refresh();
       setToastType("success");
       setToast(`Estado cambiado a ${STATUS_LABELS[newStatus] ?? newStatus}`);
+    }
+  };
+
+  const handleCategoryChange = async (newCategory: string) => {
+    if (!ticket) return;
+    const action = await dispatch(
+      updateTicketThunk({ id: ticket.id, data: { category: newCategory } })
+    );
+    if (updateTicketThunk.fulfilled.match(action)) {
+      refresh();
+      setToastType("success");
+      setToast(`Categoría cambiada a ${CATEGORY_LABELS[newCategory] ?? newCategory}`);
+    }
+  };
+
+  const handleDepartmentChange = async (newDepartmentId: string) => {
+    if (!ticket) return;
+    const action = await dispatch(
+      updateTicketThunk({
+        id: ticket.id,
+        data: { departmentId: newDepartmentId || null },
+      })
+    );
+    if (updateTicketThunk.fulfilled.match(action)) {
+      refresh();
+      setToastType("success");
+      const dept = departments.find((d) => d.id === newDepartmentId);
+      setToast(`Departamento cambiado a ${dept?.name ?? "Sin asignar"}`);
     }
   };
 
@@ -960,7 +994,7 @@ export default function TicketDetailPage() {
 
                 {isAdmin && (
                   <ITGrid container columns={12} spacing={3}>
-                    <ITGrid item xs={12} sm={6}>
+                    <ITGrid item xs={12} sm={4}>
                       <ITSelect
                         name="status"
                         label="Estado"
@@ -974,14 +1008,30 @@ export default function TicketDetailPage() {
                         disabled={isClosed}
                       />
                     </ITGrid>
-                    <ITGrid item xs={12} sm={6}>
-                      <ITInput
-                        name="departmentInfo"
+                    <ITGrid item xs={12} sm={4}>
+                      <ITSelect
+                        name="category"
+                        label="Categoría"
+                        options={Object.entries(CATEGORY_LABELS).map(([value, label]) => ({
+                          value,
+                          label,
+                        }))}
+                        value={ticket.category}
+                        onChange={(e) => handleCategoryChange(e.target.value)}
+                        disabled={isClosed}
+                      />
+                    </ITGrid>
+                    <ITGrid item xs={12} sm={4}>
+                      <ITSelect
+                        name="department"
                         label="Departamento"
-                        value={ticket.department?.name ?? "—"}
-                        disabled
-                        placeholder="Se autollena con el empleado"
-                        onChange={() => {}}
+                        options={[
+                          { value: "", label: "Sin asignar" },
+                          ...departments.map((d) => ({ value: d.id, label: d.name })),
+                        ]}
+                        value={ticket.departmentId ?? ""}
+                        onChange={(e) => handleDepartmentChange(e.target.value)}
+                        disabled={isClosed}
                       />
                     </ITGrid>
                   </ITGrid>

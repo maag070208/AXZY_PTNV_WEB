@@ -148,6 +148,7 @@ export const ticketsApi = {
   update: (id: string, data: Partial<{
     status: string;
     priority: string;
+    category: string;
     asignadoAId: string | null;
     departmentId: string | null;
   }>) => api.put<Ticket>(`/tickets/${id}`, data),
