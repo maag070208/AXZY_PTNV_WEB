@@ -16,7 +16,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaCheckCircle, FaEdit, FaEye, FaExclamationTriangle, FaLayerGroup, FaLock, FaPlus, FaTag, FaTimesCircle, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaBoxOpen, FaCheckCircle, FaEdit, FaEye, FaExclamationTriangle, FaFileExcel, FaLayerGroup, FaLock, FaPlus, FaTag, FaTimesCircle, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -298,6 +298,16 @@ export default function DevicesListPage() {
             <ITFlex align="center" gap={1}>
               <FaTag size={12} />
               <ITText className="font-bold text-[11px]">Tipos</ITText>
+            </ITFlex>
+          </ITButton>
+          <ITButton
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate("/materiales/importar")}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaFileExcel size={12} />
+              <ITText className="font-bold text-[11px]">Cargar Excel</ITText>
             </ITFlex>
           </ITButton>
           <ITButton

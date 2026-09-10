@@ -65,6 +65,15 @@ export const materialsApi = {
     }>
   ) => api.put<Material>(`/materials/${id}`, data),
   remove: (id: string) => api.delete<{ soft: boolean; data: Material }>(`/materials/${id}`),
+  parseImport: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api.post<{ rows: { modelo: string; descripcion: string; cantidad: number }[] }>(
+      `/materials/import/parse`,
+      form,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+  },
   import: (file: File, categoria: string) => {
     const form = new FormData();
     form.append("file", file);
