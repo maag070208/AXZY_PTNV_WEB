@@ -8,7 +8,6 @@ import {
 } from "@react-pdf/renderer";
 import { formatFecha, type CartaResponsiva } from "@core/store/cartas/types";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@core/assets/logoPuertoNuevo";
-import { isITDeviceCode } from "@core/utils/itDevice";
 
 interface Props {
   carta: CartaResponsiva;
@@ -213,7 +212,11 @@ export default function CartaPDF({ carta }: Props) {
     (item?.descripcion || "CONTROL DE TV(5 PIEZAS)") +
     (carta.items.length > 1 ? ` (${carta.items.length} piezas)` : "");
 
-  const showITSpecs = isITDeviceCode(item?.device?.type?.code);
+  const fieldEnabled = (field: "numeroSerie" | "nombreEquipo" | "ip" | "macAddress" | "sistemaOp" | "ram" | "almacenamiento") =>
+    Boolean(item?.device?.type?.fieldConfig?.[field]?.enabled);
+  const showITSpecs = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"].some((field) =>
+    fieldEnabled(field as Parameters<typeof fieldEnabled>[0])
+  );
   const dev = item?.device;
 
   return (
@@ -305,16 +308,16 @@ export default function CartaPDF({ carta }: Props) {
               <Text style={styles.recLabel}>Modelo:</Text>
               <Text style={styles.recVal}>{item?.modelo || "RM-115"}</Text>
             </View>
-            <View style={styles.recursoRow}>
+            {fieldEnabled("numeroSerie") && <View style={styles.recursoRow}>
               <Text style={styles.recLabel}>Número de serie:</Text>
               <Text style={styles.recVal}>{item?.numeroSerie || "N/A"}</Text>
-            </View>
-            <View style={styles.recursoRow}>
+            </View>}
+            {fieldEnabled("nombreEquipo") && <View style={styles.recursoRow}>
               <Text style={styles.recLabel}>Nombre del equipo:</Text>
               <Text style={styles.recVal}>
                 {item?.nombreEquipo || "N/A"}
               </Text>
-            </View>
+            </View>}
             <View style={styles.recursoRow}>
               <Text style={styles.recLabel}>Control de activos:</Text>
               <Text style={styles.recVal}>
@@ -336,28 +339,28 @@ export default function CartaPDF({ carta }: Props) {
                 Especificaciones técnicas:
               </Text>
               <View style={styles.recursoLista}>
-                <View style={styles.recursoRow}>
+                {fieldEnabled("ip") && <View style={styles.recursoRow}>
                   <Text style={styles.recLabel}>Dirección IP:</Text>
                   <Text style={styles.recVal}>{dev?.ip || "N/A"}</Text>
-                </View>
-                <View style={styles.recursoRow}>
+                </View>}
+                {fieldEnabled("macAddress") && <View style={styles.recursoRow}>
                   <Text style={styles.recLabel}>MAC Address:</Text>
                   <Text style={styles.recVal}>{dev?.macAddress || "N/A"}</Text>
-                </View>
-                <View style={styles.recursoRow}>
+                </View>}
+                {fieldEnabled("sistemaOp") && <View style={styles.recursoRow}>
                   <Text style={styles.recLabel}>Sistema Operativo:</Text>
                   <Text style={styles.recVal}>{dev?.sistemaOp || "N/A"}</Text>
-                </View>
-                <View style={styles.recursoRow}>
+                </View>}
+                {fieldEnabled("ram") && <View style={styles.recursoRow}>
                   <Text style={styles.recLabel}>RAM:</Text>
                   <Text style={styles.recVal}>{dev?.ram || "N/A"}</Text>
-                </View>
-                <View style={styles.recursoRow}>
+                </View>}
+                {fieldEnabled("almacenamiento") && <View style={styles.recursoRow}>
                   <Text style={styles.recLabel}>Almacenamiento:</Text>
                   <Text style={styles.recVal}>
                     {dev?.almacenamiento || "N/A"}
                   </Text>
-                </View>
+                </View>}
               </View>
             </View>
           )}

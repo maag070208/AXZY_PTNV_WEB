@@ -122,7 +122,7 @@ export default function AdminTareasPage() {
     },
   ];
 
-  if (user?.role !== "ADMIN") return <Navigate to="/" replace />;
+  if (user?.role !== "ADMIN" && user?.role !== "GERENTE") return <Navigate to="/" replace />;
 
   return (
     <ITPage

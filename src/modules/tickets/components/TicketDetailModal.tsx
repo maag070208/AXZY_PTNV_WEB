@@ -153,16 +153,16 @@ export default function TicketDetailModal({
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-3 h-fit">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Estado</span>
+                  <div className="flex items-center gap-1.5 px-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Estado:</span>
                     <Tag {...metaFor(STATUS_META, ticket.status)} />
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Prioridad</span>
+                  <div className="flex items-center gap-1.5 px-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Prioridad:</span>
                     <Tag {...metaFor(PRIORITY_META, ticket.priority)} />
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Depto</span>
+                  <div className="flex items-center gap-1.5 px-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Depto:</span>
                     <Tag label={ticket.department?.name ?? "General"} tone={hashTone(ticket.department?.name ?? "General")} />
                   </div>
                 </div>

@@ -123,7 +123,7 @@ export default function HomePage() {
           {
             id: "reportes",
             title: "Reportes",
-            description: "Consulta entregas y devoluciones de equipo por periodo",
+            description: "Consulta asignaciones e inventario de dispositivos",
             icon: <FaChartBar size={22} />,
             to: "/reportes",
             count: undefined,

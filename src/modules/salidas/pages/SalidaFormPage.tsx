@@ -250,7 +250,7 @@ export default function SalidaFormPage() {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name={`desc-${idx}`}
-                  label="Descripción *"
+                  label="Descripción"
                   value={r.descripcion}
                   onChange={(e) => handleRowField(idx, "descripcion", e.target.value)}
                   required
@@ -293,7 +293,7 @@ export default function SalidaFormPage() {
               <ITGrid item xs={12} md={3}>
                 <ITInput
                   name={`depto-${idx}`}
-                  label="Departamento *"
+                  label="Departamento"
                   value={r.departamento}
                   onChange={(e) => handleRowField(idx, "departamento", e.target.value)}
                   required
@@ -302,7 +302,7 @@ export default function SalidaFormPage() {
               <ITGrid item xs={12} md={3}>
                 <ITInput
                   name={`usuario-${idx}`}
-                  label="Usuario *"
+                  label="Usuario"
                   value={r.usuario}
                   onChange={(e) => handleRowField(idx, "usuario", e.target.value)}
                   required

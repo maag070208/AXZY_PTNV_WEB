@@ -12,7 +12,38 @@ import {
 import { FaSave } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deviceTypesApi } from "@core/api/devices.api";
+import {
+  DEVICE_FIELD_KEYS,
+  deviceTypesApi,
+  type DeviceFieldConfig,
+  type DeviceFieldKey,
+} from "@core/api/devices.api";
+
+const FIELD_LABELS: Record<DeviceFieldKey, string> = {
+  numeroSerie: "Número de serie",
+  nombreEquipo: "Nombre de equipo",
+  ip: "Dirección IP",
+  macAddress: "MAC Address",
+  sistemaOp: "Sistema operativo",
+  ram: "RAM",
+  almacenamiento: "Almacenamiento",
+};
+
+const emptyFieldConfig = (): DeviceFieldConfig =>
+  DEVICE_FIELD_KEYS.reduce((config, key) => {
+    config[key] = { enabled: false, required: false };
+    return config;
+  }, {} as DeviceFieldConfig);
+
+const normalizeFieldConfig = (config?: Partial<DeviceFieldConfig>): DeviceFieldConfig =>
+  DEVICE_FIELD_KEYS.reduce((result, key) => {
+    const value = config?.[key];
+    result[key] = {
+      enabled: value?.enabled ?? false,
+      required: Boolean(value?.enabled && value.required),
+    };
+    return result;
+  }, emptyFieldConfig());
 
 export default function DeviceTypeFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +54,7 @@ export default function DeviceTypeFormPage() {
     code: "",
     name: "",
     prefix: "",
+    fieldConfig: emptyFieldConfig(),
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -32,7 +64,12 @@ export default function DeviceTypeFormPage() {
     setLoading(true);
     if (isEdit && id) {
       deviceTypesApi.get(id).then((d) => {
-        setForm({ code: d.code, name: d.name, prefix: d.prefix });
+        setForm({
+          code: d.code,
+          name: d.name,
+          prefix: d.prefix,
+          fieldConfig: normalizeFieldConfig(d.fieldConfig),
+        });
       }).finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -97,6 +134,7 @@ export default function DeviceTypeFormPage() {
         { label: isEdit ? "Editar tipo" : "Nuevo tipo" },
       ]}
       actions={actions}
+      maxWidth="7xl"
     >
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -134,6 +172,69 @@ export default function DeviceTypeFormPage() {
             Ej: LPT-0001, LPT-0002…
           </ITText>
         </ITStack>
+      </ITCard>
+
+      <ITCard className="p-6 mt-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
+        <ITFlex direction="column" gap={1} className="mb-4">
+          <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">
+            Campos de este tipo
+          </ITText>
+          <ITText className="text-[11px] text-slate-400">
+            Define qué datos aparecen al dar de alta cada dispositivo y cuáles son obligatorios.
+          </ITText>
+        </ITFlex>
+        <div className="overflow-x-auto rounded-2xl border border-slate-100">
+          <table className="w-full min-w-[620px] border-collapse text-left">
+            <thead className="bg-slate-50">
+              <tr className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                <th className="px-4 py-3">Campo</th>
+                <th className="px-4 py-3 w-32 text-center">Mostrar</th>
+                <th className="px-4 py-3 w-32 text-center">Obligatorio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {DEVICE_FIELD_KEYS.map((key) => {
+                const setting = form.fieldConfig[key];
+                return (
+                  <tr key={key} className="border-t border-slate-100">
+                    <td className="px-4 py-3 text-[11px] font-bold text-slate-700">{FIELD_LABELS[key]}</td>
+                    <td className="px-4 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        aria-label={`Mostrar ${FIELD_LABELS[key]}`}
+                        checked={setting.enabled}
+                        onChange={(e) => setForm((current) => ({
+                          ...current,
+                          fieldConfig: {
+                            ...current.fieldConfig,
+                            [key]: { enabled: e.target.checked, required: e.target.checked && setting.required },
+                          },
+                        }))}
+                        className="h-4 w-4 accent-slate-700"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        aria-label={`Obligatorio ${FIELD_LABELS[key]}`}
+                        checked={setting.required}
+                        disabled={!setting.enabled}
+                        onChange={(e) => setForm((current) => ({
+                          ...current,
+                          fieldConfig: {
+                            ...current.fieldConfig,
+                            [key]: { ...setting, required: e.target.checked },
+                          },
+                        }))}
+                        className="h-4 w-4 accent-slate-700 disabled:opacity-30"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </ITCard>
     </ITPage>
   );

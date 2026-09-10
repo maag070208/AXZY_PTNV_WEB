@@ -33,13 +33,23 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@core/store/store";
-import { devicesApi, type Device, type DeviceHistoryEntry } from "@core/api/devices.api";
+import { devicesApi, type Device, type DeviceFieldKey, type DeviceHistoryEntry } from "@core/api/devices.api";
 import { formatFechaHora } from "@core/store/cartas/types";
 
 const ESTADO_BADGE: Record<string, { color: string; label: string }> = {
   DISPONIBLE: { color: "success", label: "Disponible" },
   ASIGNADO: { color: "warning", label: "Asignado" },
   BAJA: { color: "default", label: "Baja" },
+};
+
+const FIELD_LABELS: Record<DeviceFieldKey, string> = {
+  numeroSerie: "Número de serie",
+  nombreEquipo: "Nombre de equipo",
+  ip: "Dirección IP",
+  macAddress: "MAC Address",
+  sistemaOp: "Sistema operativo",
+  ram: "RAM",
+  almacenamiento: "Almacenamiento",
 };
 
 const HISTORY_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
@@ -163,6 +173,9 @@ export default function DeviceDetailPage() {
 
   // Construir timeline
   const history = device.history ?? [];
+  const configuredFields = (Object.keys(FIELD_LABELS) as DeviceFieldKey[]).filter(
+    (field) => device.type?.fieldConfig?.[field]?.enabled && field !== "numeroSerie" && field !== "nombreEquipo"
+  );
   const timelineEvents: Array<{
     id: string;
     icon: React.ReactNode;
@@ -292,7 +305,7 @@ export default function DeviceDetailPage() {
                     </ITText>
                   </ITStack>
                 </ITGrid>
-                <ITGrid item xs={12} md={3}>
+                {device.type?.fieldConfig?.numeroSerie?.enabled && <ITGrid item xs={12} md={3}>
                   <ITStack direction="column" spacing={1}>
                     <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                       Marca / Modelo
@@ -301,7 +314,7 @@ export default function DeviceDetailPage() {
                       {device.marca} {device.modelo}
                     </ITText>
                   </ITStack>
-                </ITGrid>
+                </ITGrid>}
                 <ITGrid item xs={12} md={3}>
                   <ITStack direction="column" spacing={1}>
                     <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
@@ -324,7 +337,24 @@ export default function DeviceDetailPage() {
                 </ITGrid>
               </ITGrid>
 
-              {device.nombreEquipo && (
+              {configuredFields.length > 0 && (
+                <ITGrid container columns={12} spacing={4} className="mt-2">
+                  {configuredFields.map((field) => (
+                    <ITGrid item xs={12} md={3} key={field}>
+                      <ITStack direction="column" spacing={1}>
+                        <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                          {FIELD_LABELS[field]}
+                        </ITText>
+                        <ITText className="text-[12px] font-bold text-slate-700">
+                          {device[field] ?? "—"}
+                        </ITText>
+                      </ITStack>
+                    </ITGrid>
+                  ))}
+                </ITGrid>
+              )}
+
+              {device.type?.fieldConfig?.nombreEquipo?.enabled && device.nombreEquipo && (
                 <ITStack direction="column" spacing={1}>
                   <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                     Nombre del equipo

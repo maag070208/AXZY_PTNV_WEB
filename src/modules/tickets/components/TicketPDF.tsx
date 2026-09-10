@@ -1,11 +1,12 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import type { Ticket, TicketAssignment } from "@core/api/tickets.api";
+import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import type { Ticket, TicketAssignment, TicketAttachment } from "@core/api/tickets.api";
 import { PDF_COLORS, pdfTheme } from "@core/pdf/theme";
 import PdfLetterhead from "@core/pdf/PdfLetterhead";
 import PdfFooter from "@core/pdf/PdfFooter";
 
 interface Props {
   ticket: Ticket;
+  attachments?: Array<TicketAttachment & { dataUrl?: string }>;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -105,21 +106,28 @@ const styles = StyleSheet.create({
   },
 
   // ── Kanban ──
-  kanbanRow: { flexDirection: "row", gap: 8 },
+  kanbanRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    gap: 8,
+  },
   kanbanCol: {
-    flex: 1,
+    width: "23.5%",
+    alignSelf: "flex-start",
     backgroundColor: PDF_COLORS.light,
     borderRadius: 4,
-    padding: 6,
+    padding: 7,
+    borderTopWidth: 2,
   },
   kanbanColHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 6,
+    marginBottom: 7,
   },
   kanbanColTitle: {
-    fontSize: 7.5,
+    fontSize: 7,
     fontFamily: "Helvetica-Bold",
     color: PDF_COLORS.ink,
     textTransform: "uppercase",
@@ -136,20 +144,20 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     borderWidth: 0.5,
     borderColor: PDF_COLORS.border,
-    padding: 6,
+    padding: 7,
     marginBottom: 5,
   },
-  taskEmployee: { fontSize: 8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink },
-  taskNo: { fontSize: 6.5, color: PDF_COLORS.muted, marginBottom: 3 },
-  taskTitleText: { fontSize: 8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink, marginBottom: 1 },
-  taskText: { fontSize: 7.8, color: "#334155", lineHeight: 1.4 },
-  taskDates: { fontSize: 6.8, color: PDF_COLORS.muted, marginTop: 2 },
+  taskEmployee: { fontSize: 7.5, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink },
+  taskNo: { fontSize: 6, color: PDF_COLORS.muted, marginBottom: 3 },
+  taskTitleText: { fontSize: 7.7, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink, marginBottom: 1 },
+  taskText: { fontSize: 7.2, color: "#334155", lineHeight: 1.35 },
+  taskDates: { fontSize: 6.4, color: PDF_COLORS.muted, marginTop: 2 },
   emptyCol: {
     fontSize: 7.5,
     color: PDF_COLORS.muted,
     fontStyle: "italic",
     textAlign: "center",
-    paddingVertical: 8,
+    paddingVertical: 7,
   },
 
   // ── Historial ──
@@ -159,6 +167,19 @@ const styles = StyleSheet.create({
   historyTitle: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink },
   historyDetail: { fontSize: 7.5, color: PDF_COLORS.muted, marginTop: 1, lineHeight: 1.4 },
   historyTime: { fontSize: 6.8, color: PDF_COLORS.muted, marginTop: 2 },
+  evidenceGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  evidenceCard: {
+    width: "31%",
+    minHeight: 90,
+    borderWidth: 0.5,
+    borderColor: PDF_COLORS.border,
+    borderRadius: 4,
+    padding: 5,
+    backgroundColor: PDF_COLORS.light,
+  },
+  evidenceImage: { width: "100%", height: 72, objectFit: "cover", borderRadius: 3 },
+  evidenceName: { fontSize: 6.5, color: PDF_COLORS.muted, marginTop: 4 },
+  evidenceEmpty: { fontSize: 8, color: PDF_COLORS.muted, fontStyle: "italic" },
 });
 
 const formatDate = (dateStr: string) => {
@@ -194,7 +215,7 @@ const dotColorFor = (type: string, detail?: string | null) => {
   return PDF_COLORS.band;
 };
 
-export const TicketPDF = ({ ticket }: Props) => {
+export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
   const today = formatReportDate();
 
   // Historial + comentarios en una sola línea de tiempo cronológica.
@@ -230,6 +251,7 @@ export const TicketPDF = ({ ticket }: Props) => {
     ...col,
     items: ticket.assignments.filter((a) => a.status === col.status),
   }));
+  const completedTasks = ticket.assignments.filter((assignment) => assignment.status === "COMPLETADA").length;
 
   return (
     <Document title={`Ticket - ${ticket.titulo}`} author="Puerto Nuevo Hotel y Villas">
@@ -294,17 +316,37 @@ export const TicketPDF = ({ ticket }: Props) => {
             <Text style={styles.description}>{ticket.descripcion}</Text>
           </View>
 
+          {attachments.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Evidencias ({attachments.length})</Text>
+              <View style={styles.evidenceGrid}>
+                {attachments.map((attachment) => (
+                  <View key={attachment.id} style={styles.evidenceCard}>
+                    {attachment.mimeType.startsWith("image/") ? (
+                      <Image src={attachment.dataUrl ?? attachment.url} style={styles.evidenceImage} />
+                    ) : (
+                      <Text style={styles.evidenceEmpty}>
+                        {attachment.mimeType.startsWith("video/") ? "Video adjunto" : "Documento adjunto"}
+                      </Text>
+                    )}
+                    <Text style={styles.evidenceName}>{attachment.originalName}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
           {/* ── Tablero kanban ── */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              Tablero de tareas ({ticket.assignments.length})
+              Tablero de tareas ({ticket.assignments.length}) · {completedTasks}/{ticket.assignments.length} completadas
             </Text>
             {ticket.assignments.length === 0 ? (
               <Text style={styles.emptyCol}>Sin tareas asignadas a este ticket.</Text>
             ) : (
               <View style={styles.kanbanRow}>
                 {cols.map((col) => (
-                  <View key={col.status} style={styles.kanbanCol}>
+                  <View key={col.status} style={{ ...styles.kanbanCol, borderTopColor: col.color }}>
                     <View style={styles.kanbanColHeader}>
                       <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <View style={{ ...styles.kanbanDot, backgroundColor: col.color }} />

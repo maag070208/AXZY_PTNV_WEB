@@ -175,7 +175,7 @@ export default function UserFormPage() {
           <ITGrid item xs={12} md={4}>
             <ITInput
               name="u_username"
-              label="Username *"
+              label="Username"
               value={form.username}
               onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
               required
@@ -195,7 +195,7 @@ export default function UserFormPage() {
           <ITGrid item xs={12} md={4}>
             <ITInput
               name="u_name"
-              label="Nombre *"
+              label="Nombre"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               required
@@ -204,7 +204,7 @@ export default function UserFormPage() {
           <ITGrid item xs={12} md={4}>
             <ITSelect
               name="u_role"
-              label="Rol *"
+              label="Rol"
               options={[
                 { value: "ADMIN", label: "ADMIN" },
                 { value: "GERENTE", label: "GERENTE" },

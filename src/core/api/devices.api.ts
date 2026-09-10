@@ -4,6 +4,25 @@ import {
   type ITDataTableFetchParamsPost,
 } from "./table";
 
+export const DEVICE_FIELD_KEYS = [
+  "numeroSerie",
+  "nombreEquipo",
+  "ip",
+  "macAddress",
+  "sistemaOp",
+  "ram",
+  "almacenamiento",
+] as const;
+
+export type DeviceFieldKey = (typeof DEVICE_FIELD_KEYS)[number];
+
+export interface DeviceFieldSetting {
+  enabled: boolean;
+  required: boolean;
+}
+
+export type DeviceFieldConfig = Record<DeviceFieldKey, DeviceFieldSetting>;
+
 export interface DeviceType {
   id: string;
   code: string;
@@ -11,6 +30,7 @@ export interface DeviceType {
   prefix: string;
   contador: number;
   active: boolean;
+  fieldConfig: DeviceFieldConfig;
   _count?: { devices: number };
 }
 
@@ -98,9 +118,9 @@ export const deviceTypesApi = {
   peek: (id: string) => api.get<{ siguiente: string }>(`/device-types/${id}/peek`),
   peekCarta: (id: string) => api.get<{ siguiente: string }>(`/device-types/${id}/peek-carta`),
   get: (id: string) => api.get<DeviceType>(`/device-types/${id}`),
-  create: (data: { code: string; name: string; prefix: string }) =>
+  create: (data: { code: string; name: string; prefix: string; fieldConfig?: DeviceFieldConfig }) =>
     api.post<DeviceType>(`/device-types`, data),
-  update: (id: string, data: { name?: string; prefix?: string; active?: boolean }) =>
+  update: (id: string, data: { name?: string; prefix?: string; active?: boolean; fieldConfig?: DeviceFieldConfig }) =>
     api.put<DeviceType>(`/device-types/${id}`, data),
   remove: (id: string) => api.delete<DeviceType>(`/device-types/${id}`),
 };
@@ -156,7 +176,10 @@ export const devicesApi = {
   importParse: (file: File) => {
     const form = new FormData();
     form.append("file", file);
-    return api.post<{ rows: { modelo: string; descripcion: string; cantidad: number }[] }>(
+    return api.post<{
+      rows: { modelo: string; descripcion: string; cantidad: number; marca?: string; tipo?: string }[];
+      errors?: string[];
+    }>(
       `/devices/import/parse`,
       form,
       { headers: { "Content-Type": "multipart/form-data" } }

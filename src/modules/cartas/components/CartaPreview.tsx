@@ -1,5 +1,4 @@
 import { formatFecha, type CartaResponsiva } from "@core/store/cartas/types";
-import { isITDeviceCode } from "@core/utils/itDevice";
 interface Props {
   carta: CartaResponsiva;
   pageIndex?: number;
@@ -16,6 +15,11 @@ export default function CartaPreview({
   const departamentoNombre = (carta.departamento || "Sistemas").replace(
     /^Departamento de /i,
     ""
+  );
+  const fieldEnabled = (field: "ip" | "macAddress" | "sistemaOp" | "ram" | "almacenamiento") =>
+    Boolean(item?.device?.type?.fieldConfig?.[field]?.enabled);
+  const hasConfiguredSpecs = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"].some((field) =>
+    fieldEnabled(field as Parameters<typeof fieldEnabled>[0])
   );
 
   return (
@@ -91,14 +95,14 @@ export default function CartaPreview({
               <span style={styles.recLabel}>Modelo:</span>
               <span style={styles.recVal}>{item?.modelo || ""}</span>
             </div>
-            <div style={styles.recursoRow}>
+            {item?.device?.type?.fieldConfig?.numeroSerie?.enabled && <div style={styles.recursoRow}>
               <span style={styles.recLabel}>Número de serie:</span>
               <span style={styles.recVal}>{item?.numeroSerie || "N/A"}</span>
-            </div>
-            <div style={styles.recursoRow}>
+            </div>}
+            {item?.device?.type?.fieldConfig?.nombreEquipo?.enabled && <div style={styles.recursoRow}>
               <span style={styles.recLabel}>Nombre del equipo:</span>
               <span style={styles.recVal}>{item?.nombreEquipo || "N/A"}</span>
-            </div>
+            </div>}
             <div style={styles.recursoRow}>
               <span style={styles.recLabel}>Control de activos:</span>
               <span style={styles.recVal}>{item?.controlActivos || ""}</span>
@@ -110,36 +114,36 @@ export default function CartaPreview({
           </div>
 
           {/* Especificaciones técnicas (TIC) */}
-          {isITDeviceCode(item?.device?.type?.code) && (
+          {hasConfiguredSpecs && (
             <div style={styles.especBloque}>
               <strong style={styles.especTitulo}>Especificaciones técnicas:</strong>
               <div style={styles.recursoLista}>
-                <div style={styles.recursoRow}>
+                {fieldEnabled("ip") && <div style={styles.recursoRow}>
                   <span style={styles.recLabel}>Dirección IP:</span>
                   <span style={styles.recVal}>{item?.device?.ip || "N/A"}</span>
-                </div>
-                <div style={styles.recursoRow}>
+                </div>}
+                {fieldEnabled("macAddress") && <div style={styles.recursoRow}>
                   <span style={styles.recLabel}>MAC Address:</span>
                   <span style={styles.recVal}>
                     {item?.device?.macAddress || "N/A"}
                   </span>
-                </div>
-                <div style={styles.recursoRow}>
+                </div>}
+                {fieldEnabled("sistemaOp") && <div style={styles.recursoRow}>
                   <span style={styles.recLabel}>Sistema Operativo:</span>
                   <span style={styles.recVal}>
                     {item?.device?.sistemaOp || "N/A"}
                   </span>
-                </div>
-                <div style={styles.recursoRow}>
+                </div>}
+                {fieldEnabled("ram") && <div style={styles.recursoRow}>
                   <span style={styles.recLabel}>RAM:</span>
                   <span style={styles.recVal}>{item?.device?.ram || "N/A"}</span>
-                </div>
-                <div style={styles.recursoRow}>
+                </div>}
+                {fieldEnabled("almacenamiento") && <div style={styles.recursoRow}>
                   <span style={styles.recLabel}>Almacenamiento:</span>
                   <span style={styles.recVal}>
                     {item?.device?.almacenamiento || "N/A"}
                   </span>
-                </div>
+                </div>}
               </div>
             </div>
           )}

@@ -16,6 +16,8 @@ export default defineConfig({
       "@app": path.resolve(__dirname, "./src"),
       "@core": path.resolve(__dirname, "./src/core"),
       "@modules": path.resolve(__dirname, "./src/modules"),
+      react: path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
     },
   },
 });

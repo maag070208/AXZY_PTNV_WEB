@@ -6,6 +6,7 @@ import {
   ITFlex,
   ITInput,
   ITPage,
+  ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import {
@@ -17,18 +18,33 @@ import {
   FaTrash,
   FaUpload,
 } from "react-icons/fa";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { deviceTypesApi, devicesApi, type DeviceType } from "@core/api/devices.api";
+import {
+  deviceTypesApi,
+  devicesApi,
+  type DeviceFieldKey,
+  type DeviceType,
+} from "@core/api/devices.api";
 
 const GENERIC_TYPE_CODE = "GENERICO";
+interface UnitRow {
+  numeroSerie: string;
+  ip: string;
+  macAddress: string;
+}
 
 interface Row {
   key: string;
+  typeId: string;
   modelo: string;
   descripcion: string;
   cantidad: string;
   marca: string;
+  sistemaOp: string;
+  ram: string;
+  almacenamiento: string;
+  units: UnitRow[];
 }
 
 interface RowResult {
@@ -38,9 +54,11 @@ interface RowResult {
   detail: string;
 }
 
+const SHARED_FIELDS = ["sistemaOp", "ram", "almacenamiento"] as const;
+const UNIT_FIELDS = ["numeroSerie", "ip", "macAddress"] as const;
+
 export default function DeviceImportPage() {
   const navigate = useNavigate();
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const [deviceTypes, setDeviceTypes] = useState<DeviceType[]>([]);
   const [typesLoaded, setTypesLoaded] = useState(false);
@@ -48,6 +66,9 @@ export default function DeviceImportPage() {
   const [parsing, setParsing] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [warnings, setWarnings] = useState<string[]>([]);
+  const [unknownTypes, setUnknownTypes] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [committing, setCommitting] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -56,32 +77,51 @@ export default function DeviceImportPage() {
   useEffect(() => {
     deviceTypesApi
       .list()
-      .then(setDeviceTypes)
+       .then((types) => {
+         setDeviceTypes(types);
+       })
       .catch(() => setDeviceTypes([]))
       .finally(() => setTypesLoaded(true));
   }, []);
 
-  // Todo lo que se carga por este asistente entra como Dispositivo con este
-  // tipo "Genérico" (sin número de serie) — así cada unidad de todas formas
-  // recibe su propio folio de activo y puede tener su carta responsiva.
-  const genericType = deviceTypes.find(
-    (t) => t.code?.toUpperCase() === GENERIC_TYPE_CODE
-  );
+  const defaultTypeId =
+    deviceTypes.find((t) => t.code?.toUpperCase() === GENERIC_TYPE_CODE)?.id ?? deviceTypes[0]?.id ?? "";
 
-  const handleParse = async () => {
-    if (!file) return;
+  const normalizeTypeText = (value: string) => value.trim().toUpperCase().replace(/\s+/g, "_");
+
+  const resolveTypeId = (value?: string) => {
+    if (!value?.trim()) return defaultTypeId;
+    const normalized = normalizeTypeText(value);
+    return deviceTypes.find((type) =>
+      normalizeTypeText(type.code) === normalized || normalizeTypeText(type.name) === normalized
+    )?.id ?? "";
+  };
+
+  const handleParse = async (selectedFile = file) => {
+    if (!selectedFile) return;
+    setFile(selectedFile);
     setParsing(true);
     setError(null);
+    setWarnings([]);
+    setUnknownTypes([]);
     setResults(null);
     try {
-      const res = await devicesApi.importParse(file);
+      const res = await devicesApi.importParse(selectedFile);
+      setWarnings(res.errors ?? []);
+      const unknown = Array.from(new Set(res.rows.map((row) => row.tipo?.trim()).filter((tipo): tipo is string => Boolean(tipo && !resolveTypeId(tipo)))));
+      setUnknownTypes(unknown);
       setRows(
         res.rows.map((r, i) => ({
           key: `${i}-${r.modelo}`,
+          typeId: resolveTypeId(r.tipo),
           modelo: r.modelo,
           descripcion: r.descripcion,
           cantidad: String(r.cantidad || 1),
-          marca: "",
+          marca: r.marca ?? "",
+          sistemaOp: "",
+          ram: "",
+          almacenamiento: "",
+          units: createUnits(r.cantidad || 1),
         }))
       );
     } catch (e: any) {
@@ -91,9 +131,35 @@ export default function DeviceImportPage() {
     }
   };
 
-  const updateRow = (key: string, patch: Partial<Row>) => {
-    setRows((prev) => prev.map((r) => (r.key === key ? { ...r, ...patch } : r)));
+  const createUnits = (cantidad: string | number, previous: UnitRow[] = []) => {
+    const total = Math.max(0, Math.min(500, Math.trunc(Number(cantidad) || 0)));
+    return Array.from({ length: total }, (_, index) => previous[index] ?? {
+      numeroSerie: "",
+      ip: "",
+      macAddress: "",
+    });
   };
+
+  const updateRow = (key: string, patch: Partial<Row>) => {
+    setRows((prev) => prev.map((r) => {
+      if (r.key !== key) return r;
+      const next = { ...r, ...patch };
+      if (patch.cantidad !== undefined) next.units = createUnits(patch.cantidad, r.units);
+      return next;
+    }));
+  };
+
+  const updateUnit = (key: string, index: number, patch: Partial<UnitRow>) => {
+    setRows((prev) => prev.map((r) => {
+      if (r.key !== key) return r;
+      const units = r.units.map((unit, unitIndex) => unitIndex === index ? { ...unit, ...patch } : unit);
+      return { ...r, units };
+    }));
+  };
+
+  const getType = (row: Row) => deviceTypes.find((type) => type.id === row.typeId);
+  const fieldEnabled = (row: Row, field: DeviceFieldKey) => Boolean(getType(row)?.fieldConfig?.[field]?.enabled);
+  const fieldRequired = (row: Row, field: DeviceFieldKey) => Boolean(getType(row)?.fieldConfig?.[field]?.required);
 
   const removeRow = (key: string) => {
     setRows((prev) => prev.filter((r) => r.key !== key));
@@ -102,18 +168,23 @@ export default function DeviceImportPage() {
   const isRowValid = (r: Row): boolean => {
     const cantidad = Number(r.cantidad);
     return (
+      !!r.typeId &&
       !!r.modelo.trim() &&
       !!r.descripcion.trim() &&
       !!r.marca.trim() &&
       Number.isFinite(cantidad) &&
-      cantidad > 0
+      Number.isInteger(cantidad) &&
+      cantidad > 0 &&
+      cantidad <= 500 &&
+      SHARED_FIELDS.every((field) => !fieldRequired(r, field) || Boolean(r[field].trim())) &&
+      UNIT_FIELDS.every((field) => !fieldRequired(r, field) || r.units.slice(0, cantidad).every((unit) => Boolean(unit[field].trim())))
     );
   };
 
   const validCount = rows.filter(isRowValid).length;
 
+
   const handleConfirm = async () => {
-    if (!genericType) return;
     const toProcess = rows.filter(isRowValid);
     const invalid = rows.filter((r) => !isRowValid(r));
     setCommitting(true);
@@ -128,20 +199,29 @@ export default function DeviceImportPage() {
 
     for (let i = 0; i < toProcess.length; i++) {
       const r = toProcess[i];
+      const type = deviceTypes.find((t) => t.id === r.typeId);
+      if (!type) continue;
       try {
         const cantidad = Math.max(1, Math.trunc(Number(r.cantidad)));
         const res = await devicesApi.createBatch({
-          typeId: genericType.id,
-          descripcion: r.descripcion.trim(),
-          marca: r.marca.trim(),
-          modelo: r.modelo.trim(),
-          units: Array.from({ length: cantidad }, () => ({})),
+          typeId: type.id,
+            descripcion: r.descripcion.trim(),
+            marca: r.marca.trim(),
+            modelo: r.modelo.trim(),
+            sistemaOp: fieldEnabled(r, "sistemaOp") ? r.sistemaOp.trim() || undefined : undefined,
+            ram: fieldEnabled(r, "ram") ? r.ram.trim() || undefined : undefined,
+            almacenamiento: fieldEnabled(r, "almacenamiento") ? r.almacenamiento.trim() || undefined : undefined,
+            units: r.units.slice(0, cantidad).map((unit) => ({
+              ...(fieldEnabled(r, "numeroSerie") && unit.numeroSerie.trim() ? { numeroSerie: unit.numeroSerie.trim() } : {}),
+              ...(fieldEnabled(r, "ip") && unit.ip.trim() ? { ip: unit.ip.trim() } : {}),
+              ...(fieldEnabled(r, "macAddress") && unit.macAddress.trim() ? { macAddress: unit.macAddress.trim() } : {}),
+            })),
         });
         outcomes.push({
           key: r.key,
           modelo: r.modelo,
           ok: true,
-          detail: `${res.total} dispositivo(s) creado(s) (Genérico, sin serie, con su propio activo)`,
+          detail: `${res.total} dispositivo(s) creado(s) (${type.name})`,
         });
       } catch (e: any) {
         outcomes.push({ key: r.key, modelo: r.modelo, ok: false, detail: e.message ?? "Error" });
@@ -151,8 +231,7 @@ export default function DeviceImportPage() {
 
     setResults(outcomes);
     setRows([]);
-    setFile(null);
-    if (inputRef.current) inputRef.current.value = "";
+     setFile(null);
     setCommitting(false);
     setProgress(null);
   };
@@ -160,7 +239,7 @@ export default function DeviceImportPage() {
   return (
     <ITPage
       title="Cargar Excel"
-      description='Sube un archivo con columnas "Modelo", "Descripción" y "Cantidad". Cada fila se da de alta como Dispositivo tipo Genérico (sin número de serie), con su propio folio de activo para poder tener su carta responsiva individual.'
+       description='Sube un archivo con columnas "Modelo", "Descripción" y "Cantidad". Define tipo, marca y datos por unidad antes de confirmar la carga.'
       backAction={() => navigate(-1)}
       breadcrumbs={[
         { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
@@ -174,124 +253,192 @@ export default function DeviceImportPage() {
         </ITAlert>
       )}
 
-      {typesLoaded && !genericType && (
+      {warnings.length > 0 && (
         <ITAlert variant="warning">
-          No encontré el tipo de dispositivo "Genérico" (code: GENERICO). Créalo en
-          Dispositivos → Tipos antes de cargar el Excel, o corre el seed de la base de
-          datos para que se agregue automáticamente.
+          <ITText className="font-bold">Filas con observaciones:</ITText>
+          <ul className="mt-1 list-disc pl-5">
+            {warnings.map((warning) => <li key={warning}>{warning}</li>)}
+          </ul>
+        </ITAlert>
+      )}
+
+      {unknownTypes.length > 0 && (
+        <ITAlert variant="error">
+          <ITText className="font-bold">Tipos no registrados:</ITText>{" "}
+          {unknownTypes.join(", ")}. Da de alta esos tipos en Dispositivos → Tipos antes de continuar.
+        </ITAlert>
+      )}
+
+      {typesLoaded && deviceTypes.length === 0 && (
+        <ITAlert variant="warning">
+          No hay tipos de dispositivo disponibles. Créalo en Dispositivos → Tipos antes de
+          cargar el Excel.
         </ITAlert>
       )}
 
       {rows.length === 0 && !results && (
         <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px] mb-6">
-          <ITFlex direction="column" gap={4}>
-            <div>
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".xlsx,.xls"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              />
-              <ITFlex align="center" gap={3}>
-                <ITButton variant="outlined" color="secondary" onClick={() => inputRef.current?.click()}>
-                  <ITFlex align="center" gap={1}>
-                    <FaFileExcel size={12} />
-                    <ITText className="text-[11px] font-bold">Elegir archivo</ITText>
-                  </ITFlex>
-                </ITButton>
-                <ITText className="text-[11px] font-bold text-slate-500">
-                  {file ? file.name : "Ningún archivo seleccionado"}
-                </ITText>
-              </ITFlex>
-            </div>
-            <ITFlex justify="end">
-              <ITButton variant="filled" color="primary" onClick={handleParse} disabled={!file || parsing}>
-                <ITFlex align="center" gap={1}>
-                  <FaUpload size={12} />
-                  <ITText className="text-[11px] font-bold">{parsing ? "Leyendo…" : "Leer archivo"}</ITText>
-                </ITFlex>
-              </ITButton>
-            </ITFlex>
-          </ITFlex>
+           <ITFlex direction="column" gap={4}>
+             <input
+               ref={inputRef}
+               type="file"
+               accept=".xls,.xlsx"
+               className="hidden"
+               onChange={(event) => {
+                 const selected = event.target.files?.[0];
+                 if (selected) void handleParse(selected);
+               }}
+             />
+             <ITButton variant="outlined" color="secondary" onClick={() => inputRef.current?.click()} disabled={parsing}>
+               <ITFlex align="center" gap={1}><FaFileExcel size={12} /><ITText className="text-[11px] font-bold">{parsing ? "Leyendo archivo…" : "Elegir Excel"}</ITText></ITFlex>
+             </ITButton>
+             {file && <ITText className="text-[11px] font-bold text-slate-500">Archivo: {file.name}</ITText>}
+             <ITCard className="border border-blue-100 bg-blue-50/50 p-4 rounded-2xl">
+               <ITFlex direction="column" gap={2}>
+                 <ITText className="text-[11px] font-black uppercase tracking-widest text-blue-800">Schema esperado</ITText>
+                 <ITText className="text-[11px] text-slate-600">La primera hoja debe tener estas columnas, en cualquier orden:</ITText>
+                 <div className="overflow-x-auto rounded-xl border border-blue-100 bg-white">
+                   <table className="w-full min-w-[520px] border-collapse text-left">
+                     <thead className="bg-blue-50 text-[10px] font-black uppercase tracking-wider text-blue-800">
+                       <tr><th className="px-3 py-2">Modelo *</th><th className="px-3 py-2">Descripción *</th><th className="px-3 py-2">Cantidad *</th><th className="px-3 py-2">Marca</th><th className="px-3 py-2">Tipo</th></tr>
+                     </thead>
+                     <tbody className="text-[11px] text-slate-600"><tr><td className="px-3 py-2">Laptop Latitude 5420</td><td className="px-3 py-2">Equipo para oficina</td><td className="px-3 py-2">3</td><td className="px-3 py-2">Dell</td><td className="px-3 py-2">LAPTOP</td></tr></tbody>
+                   </table>
+                 </div>
+                 <ITText className="text-[10px] text-slate-500">Se aceptan `DESCRIPCIÓN` con acento. También puedes incluir `Marca` y `Tipo`; el tipo debe coincidir con código o nombre existente.</ITText>
+               </ITFlex>
+             </ITCard>
+           </ITFlex>
         </ITCard>
       )}
 
       {rows.length > 0 && (
         <>
-          <ITFlex justify="between" align="center" className="mb-3">
-            <ITText className="text-[11px] font-bold text-slate-500">
-              {rows.length} fila(s) leída(s) · {validCount} lista(s) para cargar
-            </ITText>
-            <ITButton
-              variant="filled"
-              color="primary"
-              onClick={handleConfirm}
-              disabled={committing || validCount === 0 || !genericType}
-            >
-              <ITFlex align="center" gap={1}>
-                <FaUpload size={12} />
-                <ITText className="text-[11px] font-bold">
-                  {committing
-                    ? `Cargando ${progress?.done ?? 0}/${progress?.total ?? 0}…`
-                    : `Confirmar carga (${validCount})`}
-                </ITText>
-              </ITFlex>
-            </ITButton>
-          </ITFlex>
-
-          <ITFlex direction="column" gap={3}>
-            {rows.map((r) => (
-              <ITCard
-                key={r.key}
-                className={`p-4 border rounded-2xl ${
-                  isRowValid(r) ? "border-slate-100" : "border-amber-300 bg-amber-50/30"
-                }`}
+          <ITCard className="p-4 mb-4 border border-slate-100 rounded-2xl bg-slate-50/60">
+            <ITFlex justify="between" align="end" gap={4} wrap="wrap">
+              <ITText className="text-[11px] font-bold text-slate-500">
+                {rows.length} fila(s) leída(s) · {validCount} lista(s) · {rows.reduce((sum, r) => sum + (Number(r.cantidad) || 0), 0)} unidad(es)
+              </ITText>
+              <ITButton
+                variant="filled"
+                color="primary"
+                onClick={handleConfirm}
+                disabled={committing || validCount === 0 || deviceTypes.length === 0}
               >
-                <ITFlex justify="between" align="start" gap={3} wrap="wrap">
-                  <ITFlex direction="column" gap={0.5} className="min-w-[220px]">
-                    <ITText className="text-[12px] font-black text-slate-800">{r.modelo || "(sin modelo)"}</ITText>
-                    <ITText className="text-[10px] font-bold text-slate-400">
-                      {r.descripcion || "(sin descripción)"}
-                    </ITText>
-                  </ITFlex>
-
-                  <ITFlex align="end" gap={2} wrap="wrap">
-                    <div className="w-20">
-                      <ITInput
-                        name={`cant-${r.key}`}
-                        label="Cant."
-                        type="number"
-                        min={1}
-                        value={r.cantidad}
-                        onChange={(e) => updateRow(r.key, { cantidad: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="w-36">
-                      <ITInput
-                        name={`marca-${r.key}`}
-                        label="Marca"
-                        value={r.marca}
-                        onChange={(e) => updateRow(r.key, { marca: e.target.value })}
-                        placeholder="Logitech"
-                      />
-                    </div>
-
-                    <ITButton
-                      variant="outlined"
-                      size="small"
-                      color="danger"
-                      onClick={() => removeRow(r.key)}
-                      title="Quitar esta fila (no se importa)"
-                    >
-                      <FaTrash size={11} />
-                    </ITButton>
-                  </ITFlex>
+                <ITFlex align="center" gap={1}>
+                  <FaUpload size={12} />
+                  <ITText className="text-[11px] font-bold">
+                    {committing
+                      ? `Cargando ${progress?.done ?? 0}/${progress?.total ?? 0}…`
+                      : `Confirmar carga (${validCount})`}
+                  </ITText>
                 </ITFlex>
-              </ITCard>
-            ))}
-          </ITFlex>
+              </ITButton>
+            </ITFlex>
+          </ITCard>
+
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+            <table className="w-full min-w-[900px] border-collapse text-left">
+              <thead className="bg-slate-50">
+                <tr className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  <th className="px-3 py-3 w-12">#</th>
+                  <th className="px-3 py-3 min-w-[180px]">Tipo *</th>
+                  <th className="px-3 py-3">Modelo *</th>
+                  <th className="px-3 py-3 min-w-[260px]">Descripción *</th>
+                  <th className="px-3 py-3 w-24">Cantidad *</th>
+                  <th className="px-3 py-3 w-44">Marca *</th>
+                  <th className="px-3 py-3 w-24">Estado</th>
+                  <th className="px-3 py-3 w-14" />
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r, index) => {
+                  const valid = isRowValid(r);
+                  return (
+                    <Fragment key={r.key}>
+                      <tr className={`border-t border-slate-100 ${valid ? "" : "bg-amber-50/50"}`}>
+                        <td className="px-3 py-2 text-[11px] font-bold text-slate-400">{index + 1}</td>
+                        <td className="px-2 py-2">
+                          <ITSelect
+                            name={`tipo-${r.key}`}
+                            aria-label="Tipo de dispositivo"
+                            options={deviceTypes.map((t) => ({ value: t.id, label: `${t.code} · ${t.name}` }))}
+                            value={r.typeId}
+                            onChange={(e) => updateRow(r.key, { typeId: e.target.value })}
+                            disabled={committing}
+                          />
+                        </td>
+                        <td className="px-2 py-2">
+                          <ITInput name={`modelo-${r.key}`} aria-label="Modelo" value={r.modelo} onChange={(e) => updateRow(r.key, { modelo: e.target.value })} />
+                        </td>
+                        <td className="px-2 py-2">
+                          <ITInput name={`descripcion-${r.key}`} aria-label="Descripción" value={r.descripcion} onChange={(e) => updateRow(r.key, { descripcion: e.target.value })} />
+                        </td>
+                        <td className="px-2 py-2">
+                          <ITInput name={`cant-${r.key}`} aria-label="Cantidad" type="number" min={1} max={500} value={r.cantidad} onChange={(e) => updateRow(r.key, { cantidad: e.target.value })} />
+                        </td>
+                        <td className="px-2 py-2">
+                          <ITInput name={`marca-${r.key}`} aria-label="Marca" value={r.marca} onChange={(e) => updateRow(r.key, { marca: e.target.value })} placeholder="Logitech" />
+                        </td>
+                        <td className={`px-3 py-2 text-[10px] font-bold ${valid ? "text-emerald-600" : "text-amber-600"}`}>
+                          {valid ? "Lista" : "Incompleta"}
+                        </td>
+                        <td className="px-2 py-2">
+                          <ITButton variant="outlined" size="small" color="danger" onClick={() => removeRow(r.key)} title="Quitar esta fila">
+                            <FaTrash size={11} />
+                          </ITButton>
+                        </td>
+                      </tr>
+                      {([...UNIT_FIELDS, ...SHARED_FIELDS] as DeviceFieldKey[]).some((field) => fieldEnabled(r, field)) && (
+                        <tr className="border-t border-slate-100 bg-slate-50/70">
+                          <td colSpan={8} className="px-5 py-3">
+                            <ITText className="mb-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                              Datos configurables · {r.modelo || "sin modelo"}
+                            </ITText>
+                            {SHARED_FIELDS.some((field) => fieldEnabled(r, field)) && (
+                              <ITFlex gap={3} wrap="wrap" className="mb-3">
+                                {fieldEnabled(r, "sistemaOp") && <div className="w-full md:w-56"><ITInput name={`so-${r.key}`} label="Sistema operativo" value={r.sistemaOp} onChange={(e) => updateRow(r.key, { sistemaOp: e.target.value })} /></div>}
+                                {fieldEnabled(r, "ram") && <div className="w-full md:w-40"><ITInput name={`ram-${r.key}`} label="RAM" value={r.ram} onChange={(e) => updateRow(r.key, { ram: e.target.value })} /></div>}
+                                {fieldEnabled(r, "almacenamiento") && <div className="w-full md:w-56"><ITInput name={`storage-${r.key}`} label="Almacenamiento" value={r.almacenamiento} onChange={(e) => updateRow(r.key, { almacenamiento: e.target.value })} /></div>}
+                              </ITFlex>
+                            )}
+                            {UNIT_FIELDS.some((field) => fieldEnabled(r, field)) && <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                              <table className="w-full min-w-[650px] border-collapse text-left">
+                                <thead className="bg-slate-50">
+                                  <tr className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                    <th className="px-3 py-2 w-12">#</th>
+                                    {fieldEnabled(r, "numeroSerie") && <th className="px-3 py-2">Número de serie</th>}
+                                    {fieldEnabled(r, "ip") && <th className="px-3 py-2">IP</th>}
+                                    {fieldEnabled(r, "macAddress") && <th className="px-3 py-2">MAC</th>}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {r.units.map((unit, unitIndex) => (
+                                    <tr key={unitIndex} className="border-t border-slate-100">
+                                      <td className="px-3 py-2 text-[10px] font-bold text-slate-400">{unitIndex + 1}</td>
+                                      {fieldEnabled(r, "numeroSerie") && <td className="px-2 py-2">
+                                        <ITInput name={`serie-${r.key}-${unitIndex}`} aria-label={`Número de serie ${unitIndex + 1}`} value={unit.numeroSerie} onChange={(e) => updateUnit(r.key, unitIndex, { numeroSerie: e.target.value })} />
+                                      </td>}
+                                      {fieldEnabled(r, "ip") && <td className="px-2 py-2">
+                                        <ITInput name={`ip-${r.key}-${unitIndex}`} aria-label={`IP ${unitIndex + 1}`} value={unit.ip} onChange={(e) => updateUnit(r.key, unitIndex, { ip: e.target.value })} placeholder="192.168.1.10" />
+                                      </td>}
+                                      {fieldEnabled(r, "macAddress") && <td className="px-2 py-2">
+                                        <ITInput name={`mac-${r.key}-${unitIndex}`} aria-label={`MAC ${unitIndex + 1}`} value={unit.macAddress} onChange={(e) => updateUnit(r.key, unitIndex, { macAddress: e.target.value })} placeholder="AA:BB:CC:DD:EE:FF" />
+                                      </td>}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
 

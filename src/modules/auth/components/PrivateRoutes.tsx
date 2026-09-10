@@ -3,7 +3,6 @@ import { useEffect, useState, useCallback } from "react";
 import {
   FaBuilding,
   FaChartBar,
-  FaClipboardList,
   FaFileSignature,
   FaHouseUser,
   FaTasks,
@@ -70,7 +69,7 @@ export default function PrivateRoutes() {
       action: () => navigate("/tickets"),
       isActive: active("/tickets"),
     },
-    ...(user?.role === "ADMIN"
+    ...(user?.role === "ADMIN" || user?.role === "GERENTE"
       ? [
         {
           id: "adminTareas",
@@ -129,17 +128,6 @@ export default function PrivateRoutes() {
           icon: <FaChartBar size={14} />,
           action: () => navigate("/dispositivos"),
           isActive: active("/dispositivos"),
-        },
-      ]
-      : []),
-    ...(isAdmin
-      ? [
-        {
-          id: "salidas",
-          label: "Salidas",
-          icon: <FaClipboardList size={14} />,
-          action: () => navigate("/salidas"),
-          isActive: active("/salidas"),
         },
       ]
       : []),

@@ -147,7 +147,7 @@ export default function DevolverCartaPage() {
             <ITStack direction="column" spacing={4}>
               <ITInput
                 name="returnedBy"
-                label="Nombre de quien resguarda *"
+                label="Nombre de quien resguarda"
                 value={returnedBy}
                 onChange={(e) => setReturnedBy(e.target.value)}
                 placeholder="Ej. Juan Pérez"
@@ -155,7 +155,7 @@ export default function DevolverCartaPage() {
               />
               <ITTextarea
                 name="returnCondition"
-                label="Condiciones en las que se devuelve *"
+                label="Condiciones en las que se devuelve"
                 value={returnCondition}
                 onChange={setReturnCondition}
                 placeholder="Bueno, con detalles menores en pantalla..."

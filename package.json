@@ -14,7 +14,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@axzydev/axzy_ui_system": "1.2.9",
+   "@axzydev/axzy_ui_system": "1.2.11",
     "@react-pdf/renderer": "^4.6.1",
     "@reduxjs/toolkit": "^2.5.1",
     "ably": "^2.27.0",

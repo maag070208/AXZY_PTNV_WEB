@@ -56,6 +56,7 @@ export interface TicketAttachment {
   kind: string;
   createdAt: string;
   uploadedById: string;
+  assignmentId?: string | null;
   url: string;
 }
 
@@ -76,6 +77,7 @@ export interface Ticket {
   closedBy?: string | null;
   deletedAt?: string | null;
   assignments: TicketAssignment[];
+  attachments?: TicketAttachment[];
   comments: TicketComment[];
   history: TicketHistoryEntry[];
   creadoEn: string;
@@ -126,6 +128,8 @@ export const ticketsApi = {
   },
   get: (id: string) => api.get<Ticket>(`/tickets/${id}`),
   attachments: (id: string) => api.get<TicketAttachment[]>(`/tickets/${id}/attachments`),
+  downloadAttachment: (id: string, attachmentId: string) =>
+    api.get<Blob>(`/tickets/${id}/attachments/${attachmentId}/download`, { responseType: "blob" }),
   uploadAttachment: (id: string, file: File, kind = "FOTO") => {
     const form = new FormData();
     form.append("file", file);
@@ -136,6 +140,8 @@ export const ticketsApi = {
   },
   assignmentAttachments: (id: string, assignmentId: string) =>
     api.get<TicketAttachment[]>(`/tickets/${id}/assignments/${assignmentId}/attachments`),
+  downloadAssignmentAttachment: (id: string, assignmentId: string, attachmentId: string) =>
+    api.get<Blob>(`/tickets/${id}/assignments/${assignmentId}/attachments/${attachmentId}/download`, { responseType: "blob" }),
   uploadAssignmentAttachment: (id: string, assignmentId: string, file: File, kind = "EVIDENCIA") => {
     const form = new FormData();
     form.append("file", file);

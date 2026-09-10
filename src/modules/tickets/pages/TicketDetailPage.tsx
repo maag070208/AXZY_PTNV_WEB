@@ -17,7 +17,6 @@ import {
 import { useEffect, useState } from "react";
 import {
   FaBuilding,
-  FaCheck,
   FaCheckCircle,
   FaClock,
   FaComment,
@@ -44,7 +43,7 @@ import {
   clearCurrent,
 } from "@core/store/tickets/tickets.slice";
 import { ticketsApi } from "@core/api/tickets.api";
-import { usersApi, type User } from "@core/api/auth.api";
+import { usersApi, type User, type UserRole } from "@core/api/auth.api";
 import { departmentsApi, type Department } from "@core/api/departments.api";
 import { formatFechaHora } from "@core/store/cartas/types";
 import { useAblyTicket } from "@core/hooks/useAbly";
@@ -88,6 +87,12 @@ interface TimelineEvent {
   timestamp: string;
 }
 
+const todayInput = () => {
+  const date = new Date();
+  const offset = date.getTimezoneOffset();
+  return new Date(date.getTime() - offset * 60_000).toISOString().slice(0, 10);
+};
+
 export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -95,14 +100,18 @@ export default function TicketDetailPage() {
   const ticket = useSelector((s: RootState) => s.tickets.current);
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const isAdmin = currentUser?.role === "ADMIN";
+  const isGerente = currentUser?.role === "GERENTE";
   const isJefeArea = currentUser?.role === "JEFE_DE_AREA";
-  const canManage = isAdmin || (isJefeArea && ticket?.creadoPorId === currentUser?.id);
+  const canEditTicket = isAdmin || isGerente || (isJefeArea && ticket?.creadoPorId === currentUser?.id);
+  const canCreateTasks = Boolean(ticket && (isAdmin || ticket.creadoPorId === currentUser?.id || ticket.asignadoAId === currentUser?.id));
   const isInvolved =
     !!ticket &&
-    (ticket.creadoPorId === currentUser?.id ||
-      ticket.assignments.some((a) => a.userId === currentUser?.id));
+      (ticket.creadoPorId === currentUser?.id ||
+       ticket.asignadoAId === currentUser?.id ||
+       ticket.assignments.some((a) => a.userId === currentUser?.id));
 
   const [empleados, setEmpleados] = useState<User[]>([]);
+  const [responsables, setResponsables] = useState<User[]>([]);
   const [busyEmpleados, setBusyEmpleados] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [commentText, setCommentText] = useState("");
@@ -114,8 +123,11 @@ export default function TicketDetailPage() {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDesc, setTaskDesc] = useState("");
-  const [taskStart, setTaskStart] = useState("");
-  const [taskDue, setTaskDue] = useState("");
+  const [taskStart, setTaskStart] = useState(todayInput);
+  const [taskDue, setTaskDue] = useState(todayInput);
+  const [tasksOpen, setTasksOpen] = useState(true);
+  const [newTaskOpen, setNewTaskOpen] = useState(false);
+  const [expandedAssignments, setExpandedAssignments] = useState<Record<string, boolean>>({});
   const [savingAssignment, setSavingAssignment] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [commentOpen, setCommentOpen] = useState<Record<string, boolean>>({});
@@ -149,6 +161,7 @@ export default function TicketDetailPage() {
 
   useEffect(() => {
     usersApi.empleados().then(setEmpleados).catch(() => setEmpleados([]));
+    usersApi.empleadosPorRoles(["ADMIN", "GERENTE", "JEFE_DE_AREA", "EMPLEADO"] as UserRole[]).then(setResponsables).catch(() => setResponsables([]));
   }, []);
 
   useEffect(() => {
@@ -217,6 +230,16 @@ export default function TicketDetailPage() {
     }
   };
 
+  const handleResponsibleChange = async (userId: string) => {
+    if (!ticket) return;
+    const action = await dispatch(updateTicketThunk({ id: ticket.id, data: { asignadoAId: userId || null } }));
+    if (updateTicketThunk.fulfilled.match(action)) {
+      refresh();
+      setToastType("success");
+      setToast(userId ? "Responsable asignado" : "Responsable removido");
+    }
+  };
+
   const handleAssign = async (value: string | number) => {
     setSelectedUserId(String(value));
   };
@@ -235,8 +258,8 @@ export default function TicketDetailPage() {
       setSelectedUserId("");
       setTaskTitle("");
       setTaskDesc("");
-      setTaskStart("");
-      setTaskDue("");
+       setTaskStart(todayInput());
+       setTaskDue(todayInput());
       setToastType("success");
       setToast("Tarea asignada");
       refresh();
@@ -330,7 +353,7 @@ export default function TicketDetailPage() {
       await downloadTicketPDF(ticket);
       setToastType("success");
       setToast("PDF descargado");
-    } catch (e) {
+    } catch {
       setToastType("error");
       setToast("Error al generar PDF");
     } finally {
@@ -344,6 +367,10 @@ export default function TicketDetailPage() {
       .filter(Boolean)
       .join(" "),
   }));
+  const responsableOptions = responsables.map((u) => ({
+    value: u.id,
+    label: [u.name, u.puesto, u.numeroEmpleado ? `#${u.numeroEmpleado}` : null].filter(Boolean).join(" · "),
+  }));
 
   const renderGrafo = (canManage: boolean) => {
     if (!ticket) return null;
@@ -354,14 +381,32 @@ export default function TicketDetailPage() {
       COMPLETADA: { dot: "bg-emerald-500", bar: "border-emerald-400", label: "Completada" },
     };
 
+    if (!tasksOpen) {
+      return (
+        <ITFlex justify="between" align="center" className="w-full rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3">
+          <ITFlex align="center" gap={2}>
+            <FaProjectDiagram size={14} className="text-emerald-600" />
+            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">Grafo de tareas</ITText>
+            <ITBadget color="primary" size="small">{ticket.assignments.length}</ITBadget>
+          </ITFlex>
+          <ITButton variant="outlined" color="secondary" size="small" onClick={() => setTasksOpen(true)}>
+            <ITText className="text-[10px] font-bold">Mostrar tareas</ITText>
+          </ITButton>
+        </ITFlex>
+      );
+    }
+
     return (
       <ITStack direction="column" spacing={3} className="w-full">
-        <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
+          <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
           <ITFlex align="center" gap={2}>
             <FaProjectDiagram size={14} className="text-emerald-600" />
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
               Grafo de tareas
             </ITText>
+            <ITButton variant="outlined" color="secondary" size="small" onClick={() => setTasksOpen(false)}>
+              <ITText className="text-[10px] font-bold">Ocultar tareas</ITText>
+            </ITButton>
           </ITFlex>
           <ITBadget color="primary" size="small">
             {ticket.assignments.length} asignación(es)
@@ -404,6 +449,7 @@ export default function TicketDetailPage() {
         ) : (
           ticket.assignments.map((a) => {
             const meta = statusMeta[a.status] ?? statusMeta.PENDIENTE;
+            const assignmentOpen = expandedAssignments[a.id] ?? false;
             // Admin/gerente/jefe editan datos de la tarea; el empleado solo
             // mueve estado y comenta en las suyas.
             const canEditTask = canManage && !isClosed;
@@ -453,26 +499,32 @@ export default function TicketDetailPage() {
                           <FaTrash size={10} />
                         </ITButton>
                       )}
-                      {!canEditStatus && (
-                        <ITBadget
-                          color={
-                            a.status === "COMPLETADA"
-                              ? "success"
-                              : a.status === "EN_PROGRESO"
-                              ? "info"
-                              : a.status === "EN_REVISION"
-                              ? "purple"
-                              : "gray"
-                          }
-                          size="small"
-                        >
-                          {meta.label}
-                        </ITBadget>
-                      )}
+                      <ITBadget
+                        color={
+                          a.status === "COMPLETADA"
+                            ? "success"
+                            : a.status === "EN_PROGRESO"
+                            ? "info"
+                            : a.status === "EN_REVISION"
+                            ? "purple"
+                            : "gray"
+                        }
+                        size="small"
+                      >
+                        {meta.label}
+                      </ITBadget>
+                      <ITButton
+                        variant="outlined"
+                        size="small"
+                        color="secondary"
+                        onClick={() => setExpandedAssignments((current) => ({ ...current, [a.id]: !assignmentOpen }))}
+                      >
+                        <ITText className="text-[10px] font-bold">{assignmentOpen ? "Ocultar" : "Abrir"}</ITText>
+                      </ITButton>
                     </ITFlex>
                   </ITFlex>
 
-                  <ITStack direction="column" spacing={2}>
+                  {assignmentOpen && <ITStack direction="column" spacing={2}>
                     <ITInput
                       name={`title-${a.id}`}
                       label="Título"
@@ -524,7 +576,7 @@ export default function TicketDetailPage() {
                         name={`status-${a.id}`}
                         label="Estado de la tarea"
                         options={
-                          isAdmin
+                             isAdmin || isGerente
                             ? [
                                 { value: "PENDIENTE", label: "Pendiente" },
                                 { value: "EN_PROGRESO", label: "En progreso" },
@@ -538,7 +590,7 @@ export default function TicketDetailPage() {
                               ]
                         }
                         value={a.status}
-                        disabled={!canEditStatus || (a.status === "COMPLETADA" && !isAdmin)}
+                         disabled={!canEditStatus || (a.status === "COMPLETADA" && !isAdmin && !isGerente)}
                         onChange={(e) => handleUpdateAssignment(a.id, { status: e.target.value })}
                       />
                     )}
@@ -549,6 +601,8 @@ export default function TicketDetailPage() {
                       compact
                       canUpload={
                         isAdmin ||
+                        isGerente ||
+                        ticket.asignadoAId === currentUser?.id ||
                         (isJefeArea && ticket.creadoPorId === currentUser?.id) ||
                         a.userId === currentUser?.id
                       }
@@ -632,7 +686,7 @@ export default function TicketDetailPage() {
                         </div>
                       )}
                     </div>
-                  </ITStack>
+                  </ITStack>}
                 </div>
               </div>
             );
@@ -647,9 +701,18 @@ export default function TicketDetailPage() {
               <div className="w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-white" />
               <div className="w-px flex-1 bg-slate-300" />
             </div>
-            <div className="flex-1 min-w-0 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/40 p-3">
-              <ITGrid container columns={12} spacing={3}>
-                <ITGrid item xs={12} md={5}>
+            <div className="flex-1 min-w-0 rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
+              <ITFlex justify="between" align="center" gap={2}>
+                <ITFlex align="center" gap={2}>
+                  <FaPlus size={11} className="text-emerald-600" />
+                  <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-600">Nueva tarea</ITText>
+                </ITFlex>
+                <ITButton variant="outlined" color="secondary" size="small" onClick={() => setNewTaskOpen((open) => !open)}>
+                  <ITText className="text-[10px] font-bold">{newTaskOpen ? "Ocultar" : "Abrir formulario"}</ITText>
+                </ITButton>
+              </ITFlex>
+              {newTaskOpen && <ITGrid container columns={12} spacing={3}>
+                <ITGrid item xs={12} md={7}>
                   <ITSearchSelect
                     name="newUserId"
                     label="Empleado"
@@ -661,10 +724,10 @@ export default function TicketDetailPage() {
                     isLoading={busyEmpleados}
                   />
                 </ITGrid>
-                <ITGrid item xs={12} md={7}>
+                <ITGrid item xs={12} md={5}>
                   <ITInput
                     name="taskTitle"
-                    label="Título de la tarea *"
+                    label="Título de la tarea"
                     placeholder="Ej. Revisar instalación eléctrica"
                     value={taskTitle}
                     onChange={(e) => setTaskTitle(e.target.value)}
@@ -720,7 +783,7 @@ export default function TicketDetailPage() {
                     </ITButton>
                   </ITFlex>
                 </ITGrid>
-              </ITGrid>
+              </ITGrid>}
             </div>
           </div>
         )}
@@ -827,7 +890,7 @@ export default function TicketDetailPage() {
       ]}
       actions={
         <ITFlex gap={2} wrap="wrap">
-          <ITButton
+           {(isAdmin || isGerente || canCreateTasks) && <ITButton
             variant="outlined"
             size="small"
             color="secondary"
@@ -838,8 +901,8 @@ export default function TicketDetailPage() {
               <FaTrello size={12} />
               <ITText className="font-bold text-[11px]">Seguimiento kanban</ITText>
             </ITFlex>
-          </ITButton>
-          <ITButton
+          </ITButton>}
+           <ITButton
             variant="outlined"
             size="small"
             color="primary"
@@ -852,8 +915,8 @@ export default function TicketDetailPage() {
                 {downloadingPDF ? "Generando..." : "PDF"}
               </ITText>
             </ITFlex>
-          </ITButton>
-          {!isClosed && isAdmin && (
+           </ITButton>
+           {!isClosed && (isAdmin || isGerente) && (
             <ITButton variant="filled" size="small" color="danger" onClick={() => handleStatusChange("CERRADO")}>
               <ITFlex align="center" gap={1}>
                 <FaTimesCircle size={12} />
@@ -861,7 +924,7 @@ export default function TicketDetailPage() {
               </ITFlex>
             </ITButton>
           )}
-          <ITButton
+           {isAdmin && <ITButton
             variant="outlined"
             size="small"
             color="danger"
@@ -869,13 +932,13 @@ export default function TicketDetailPage() {
             title={ticket.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
           >
             {ticket.deletedAt ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
-          </ITButton>
+           </ITButton>}
         </ITFlex>
       }
     >
       <div className="flex flex-col md:flex-row gap-5 items-start">
         {/* ── Columna izquierda: contenido principal ── */}
-        <div className="flex-1 min-w-0 w-full flex flex-col gap-5">
+        <div className="flex-1 flex flex-col gap-5">
           {/* Info del ticket */}
           <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
             <ITStack direction="column" spacing={5} className="w-full">
@@ -905,7 +968,7 @@ export default function TicketDetailPage() {
 
               <TicketAttachments
                 ticketId={ticket.id}
-                canUpload={isAdmin || isInvolved || (isJefeArea && ticket.creadoPorId === currentUser?.id)}
+                 canUpload={isAdmin || isGerente || isInvolved || (isJefeArea && ticket.creadoPorId === currentUser?.id)}
               />
 
               <ITGrid container columns={12} spacing={3}>
@@ -982,7 +1045,7 @@ export default function TicketDetailPage() {
           </ITFlex>
 
           {/* Admin/Jefe panel */}
-          {canManage && (
+           {(canEditTicket || canCreateTasks) && (
             <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
               <ITStack direction="column" spacing={4} className="w-full">
                 <ITFlex align="center" gap={2}>
@@ -992,7 +1055,7 @@ export default function TicketDetailPage() {
                   </ITText>
                 </ITFlex>
 
-                {isAdmin && (
+                 {isAdmin && (
                   <ITGrid container columns={12} spacing={3}>
                     <ITGrid item xs={12} sm={4}>
                       <ITSelect
@@ -1035,16 +1098,30 @@ export default function TicketDetailPage() {
                       />
                     </ITGrid>
                   </ITGrid>
-                )}
+                 )}
 
-                {renderGrafo(true)}
+                 {(isAdmin || isGerente) && (
+                   <ITSelect
+                     name="responsable"
+                     label="Responsable"
+                     options={[
+                       { value: "", label: "Sin responsable" },
+                       ...responsableOptions,
+                     ]}
+                     value={ticket.asignadoAId ?? ""}
+                     onChange={(e) => handleResponsibleChange(e.target.value)}
+                     disabled={isClosed}
+                   />
+                 )}
+
+                 {renderGrafo(true)}
               </ITStack>
             </ITFlex>
           )}
 
           {/* Grafo para involucrados (empleados): ven sus tareas y pueden
               marcar su propio estado. */}
-          {!canManage && isInvolved && (
+          {!canEditTicket && !canCreateTasks && isInvolved && (
             <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
               {renderGrafo(false)}
             </ITFlex>
@@ -1096,13 +1173,14 @@ export default function TicketDetailPage() {
                       </ITButton>
                     </div>
                   )}
+
                 </div>
               </ITStack>
             </div>
         </div>
 
         {/* ── Columna derecha: historial (aside lateral) ── */}
-        <aside className="w-full md:w-80 lg:w-96 shrink-0">
+        <aside className="shrink-0">
           <div className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 md:sticky md:top-24">
             <ITFlex align="center" gap={2} className="mb-5">
               <FaClock size={14} className="text-slate-400" />

@@ -87,7 +87,7 @@ export default function GenerarCartasPage() {
             <ITGrid item xs={12} md={7}>
               <ITSelect
                 name="typeId"
-                label="Tipo *"
+                label="Tipo"
                 options={types.map((t) => ({
                   value: t.id,
                   label: `${t.name} · ${t.code}`,

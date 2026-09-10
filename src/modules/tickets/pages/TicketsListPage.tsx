@@ -1,26 +1,24 @@
-import {
-  ITAlert,
-  ITBadget,
-  ITButton,
-  ITCard,
-  ITConfirmDialog,
-  ITDataTable,
-  ITFlex,
-  ITPage,
-  ITStack,
-  ITText,
-} from "@axzydev/axzy_ui_system";
 import type {
   Column,
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
+import {
+  ITAlert,
+  ITBadget,
+  ITButton,
+  ITConfirmDialog,
+  ITDataTable,
+  ITFlex,
+  ITPage,
+  ITText
+} from "@axzydev/axzy_ui_system";
+import { ticketsApi, type Ticket } from "@core/api/tickets.api";
+import type { RootState } from "@core/store/store";
 import { useCallback, useState } from "react";
-import { FaCheckCircle, FaEye, FaPlus, FaTicketAlt, FaTrash, FaTrashRestore, FaTrello } from "react-icons/fa";
+import { FaEye, FaPlus, FaTicketAlt, FaTrash, FaTrashRestore, FaTrello } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import type { RootState } from "@core/store/store";
-import { ticketsApi, type Ticket } from "@core/api/tickets.api";
 
 const STATUS_BADGE: Record<string, { color: string; label: string }> = {
   ABIERTO: { color: "warning", label: "Abierto" },
@@ -52,6 +50,7 @@ export default function TicketsListPage() {
   const navigate = useNavigate();
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const isEmpleado = currentUser?.role === "EMPLEADO";
+  const isAdmin = currentUser?.role === "ADMIN";
   const [reloadKey, setReloadKey] = useState(0);
   const [ticketToDelete, setTicketToDelete] = useState<Ticket | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -174,7 +173,7 @@ export default function TicketsListPage() {
           >
             <FaEye size={12} />
           </ITButton>
-          <ITButton
+          {isAdmin && <ITButton
             variant="outlined"
             size="small"
             color="danger"
@@ -182,7 +181,7 @@ export default function TicketsListPage() {
             title={t.deletedAt ? "Eliminar definitivamente" : "Mover a papelera"}
           >
             {t.deletedAt ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
-          </ITButton>
+          </ITButton>}
         </ITFlex>
       ),
     },
@@ -234,6 +233,9 @@ export default function TicketsListPage() {
         }
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
+        itemsPerPageOptions={[5, 10, 50]}
+        debounceMs={350}
+        variant="bordered"
         size="sm"
       />
 

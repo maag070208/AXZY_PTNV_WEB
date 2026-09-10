@@ -1,6 +1,6 @@
-import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
-import { useEffect, useRef, useState } from "react";
-import { FaCamera, FaFileAlt, FaFilePdf, FaPlay, FaUpload } from "react-icons/fa";
+import { FileTypeEnum, ITButton, ITDialog, ITDropfile, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { useEffect, useState } from "react";
+import { FaCamera, FaFileAlt, FaFilePdf, FaPlay } from "react-icons/fa";
 import { ticketsApi, type TicketAttachment } from "@core/api/tickets.api";
 
 type Props = {
@@ -9,9 +9,6 @@ type Props = {
   canUpload: boolean;
   compact?: boolean;
 };
-
-const ACCEPTED_TYPES =
-  "image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/3gpp,video/webm";
 
 // Miniatura uniforme para cualquier tipo de archivo: imagen, video (con
 // badge de play) o documento (icono + extensión). Si la imagen/video no
@@ -70,11 +67,11 @@ function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number 
 }
 
 export default function TicketAttachments({ ticketId, assignmentId, canUpload, compact = false }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<TicketAttachment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [dropfileKey, setDropfileKey] = useState(0);
 
   const load = async () => {
     try {
@@ -94,19 +91,19 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId, assignmentId]);
 
-  const upload = async (file: File) => {
-    setUploading(true);
+  const upload = async (file: File): Promise<boolean> => {
     setError(null);
     try {
       const item = assignmentId
         ? await ticketsApi.uploadAssignmentAttachment(ticketId, assignmentId, file)
         : await ticketsApi.uploadAttachment(ticketId, file);
       setItems((current) => [item, ...current]);
+      return true;
     } catch (e: any) {
       setError(e.message ?? "No se pudo subir el archivo");
+      return false;
     } finally {
-      setUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
+      // ITDropfile resets its selected file after submit.
     }
   };
 
@@ -122,21 +119,9 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
           </ITText>
         </ITFlex>
         {canUpload && (
-          <>
-            <input
-              ref={inputRef}
-              type="file"
-              accept={ACCEPTED_TYPES}
-              className="hidden"
-              onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])}
-            />
-            <ITButton variant="outlined" size="small" color="secondary" onClick={() => inputRef.current?.click()} disabled={uploading}>
-              <ITFlex align="center" gap={1}>
-                <FaUpload size={10} />
-                <ITText className="text-[11px]">{uploading ? "Subiendo..." : "Subir"}</ITText>
-              </ITFlex>
-            </ITButton>
-          </>
+          <ITButton variant="outlined" size="small" color="secondary" onClick={() => setUploadOpen(true)}>
+            <ITText className="text-[11px] font-bold">Subir archivos</ITText>
+          </ITButton>
         )}
       </ITFlex>
 
@@ -155,6 +140,38 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
           ))}
         </div>
       )}
+
+      <ITDialog
+        isOpen={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        title={assignmentId ? "Subir evidencia" : "Subir archivos del ticket"}
+        className="max-w-xl"
+      >
+        <ITDropfile
+          key={dropfileKey}
+          onFileSelect={() => {}}
+          onSubmit={async (file) => {
+            const uploaded = await upload(file);
+            if (uploaded) {
+              setUploadOpen(false);
+              setDropfileKey((current) => current + 1);
+            }
+          }}
+          acceptedFileTypes={[
+            FileTypeEnum.PNG,
+            FileTypeEnum.JPG,
+            FileTypeEnum.JPEG,
+            FileTypeEnum.PDF,
+            FileTypeEnum.MP4,
+            FileTypeEnum.MOV,
+            FileTypeEnum.AVI,
+            FileTypeEnum.MKV,
+            FileTypeEnum.VIDEO_3GPP,
+            FileTypeEnum.WEBM,
+          ]}
+          showStatusBadge
+        />
+      </ITDialog>
     </div>
   );
 }

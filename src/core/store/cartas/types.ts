@@ -1,3 +1,5 @@
+import type { DeviceFieldConfig } from "@core/api/devices.api";
+
 export interface ITDeviceSummary {
   id: string;
   controlActivos: string;
@@ -9,7 +11,9 @@ export interface ITDeviceSummary {
   sistemaOp?: string | null;
   ram?: string | null;
   almacenamiento?: string | null;
-  type?: { code: string; name: string; prefix: string };
+  numeroSerie?: string | null;
+  nombreEquipo?: string | null;
+  type?: { code: string; name: string; prefix: string; fieldConfig?: DeviceFieldConfig };
 }
 
 export interface TICItem {

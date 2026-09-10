@@ -9,10 +9,9 @@ import {
   ITLoader,
   ITPage,
   ITSelect,
-  ITStack,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaBoxes, FaLayerGroup, FaLock, FaMagic, FaPlus, FaSave, FaTrash } from "react-icons/fa";
+import { FaBoxes, FaBoxOpen, FaLayerGroup, FaLock, FaMagic, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -21,7 +20,7 @@ import {
   type Device,
   type DeviceType,
 } from "@core/api/devices.api";
-import { formatMacInput, isITDeviceCode } from "@core/utils/itDevice";
+import { formatMacInput } from "@core/utils/itDevice";
 
 interface UnitForm {
   numeroSerie: string;
@@ -184,7 +183,11 @@ export default function DeviceFormPage() {
     () => types.find((t) => t.id === form.typeId),
     [types, form.typeId]
   );
-  const showITSpecs = isITDeviceCode(selectedType?.code);
+  const showField = (field: keyof NonNullable<DeviceType["fieldConfig"]>) =>
+    Boolean(selectedType?.fieldConfig?.[field]?.enabled);
+  const showITSpecs = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"].some((field) =>
+    showField(field as keyof DeviceType["fieldConfig"])
+  );
   const isBatch = !isEdit && cantidad > 1;
   const isLoteEdit = isEdit && !!loteId && loteSize > 1;
   const disabledAll = isEdit && blocked;
@@ -241,17 +244,17 @@ export default function DeviceFormPage() {
             descripcion: form.descripcion,
             marca: form.marca,
             modelo: form.modelo,
-            sistemaOp: showITSpecs ? form.sistemaOp || undefined : undefined,
-            ram: showITSpecs ? form.ram || undefined : undefined,
-            almacenamiento: showITSpecs ? form.almacenamiento || undefined : undefined,
+             sistemaOp: showField("sistemaOp") ? form.sistemaOp || undefined : undefined,
+             ram: showField("ram") ? form.ram || undefined : undefined,
+             almacenamiento: showField("almacenamiento") ? form.almacenamiento || undefined : undefined,
             units: loteRows
               .filter((r) => r.estado !== "ASIGNADO")
               .map((r) => ({
                 id: r.id,
                 numeroSerie: r.numeroSerie || undefined,
                 nombreEquipo: r.nombreEquipo || undefined,
-                ip: showITSpecs ? r.ip || undefined : undefined,
-                macAddress: showITSpecs ? r.macAddress || undefined : undefined,
+                 ip: showField("ip") ? r.ip || undefined : undefined,
+                 macAddress: showField("macAddress") ? r.macAddress || undefined : undefined,
                 area: r.area || undefined,
               })),
           });
@@ -267,11 +270,11 @@ export default function DeviceFormPage() {
           area: form.area,
           numeroSerie: editUnit.numeroSerie || undefined,
           nombreEquipo: editUnit.nombreEquipo || undefined,
-          ip: showITSpecs ? editUnit.ip || undefined : undefined,
-          macAddress: showITSpecs ? editUnit.macAddress || undefined : undefined,
-          sistemaOp: showITSpecs ? form.sistemaOp || undefined : undefined,
-          ram: showITSpecs ? form.ram || undefined : undefined,
-          almacenamiento: showITSpecs ? form.almacenamiento || undefined : undefined,
+           ip: showField("ip") ? editUnit.ip || undefined : undefined,
+           macAddress: showField("macAddress") ? editUnit.macAddress || undefined : undefined,
+           sistemaOp: showField("sistemaOp") ? form.sistemaOp || undefined : undefined,
+           ram: showField("ram") ? form.ram || undefined : undefined,
+           almacenamiento: showField("almacenamiento") ? form.almacenamiento || undefined : undefined,
         });
         navigate("/dispositivos");
         return;
@@ -283,14 +286,14 @@ export default function DeviceFormPage() {
         marca: form.marca,
         modelo: form.modelo,
         area: form.area,
-        sistemaOp: showITSpecs ? form.sistemaOp || undefined : undefined,
-        ram: showITSpecs ? form.ram || undefined : undefined,
-        almacenamiento: showITSpecs ? form.almacenamiento || undefined : undefined,
+         sistemaOp: showField("sistemaOp") ? form.sistemaOp || undefined : undefined,
+         ram: showField("ram") ? form.ram || undefined : undefined,
+         almacenamiento: showField("almacenamiento") ? form.almacenamiento || undefined : undefined,
         units: units.slice(0, cantidad).map((u) => ({
           numeroSerie: u.numeroSerie || undefined,
           nombreEquipo: u.nombreEquipo || undefined,
-          ip: showITSpecs ? u.ip || undefined : undefined,
-          macAddress: showITSpecs ? u.macAddress || undefined : undefined,
+           ip: showField("ip") ? u.ip || undefined : undefined,
+           macAddress: showField("macAddress") ? u.macAddress || undefined : undefined,
         })),
       });
 
@@ -418,17 +421,20 @@ export default function DeviceFormPage() {
       )}
 
       {isEdit && (
-        <ITCard className="p-4 border border-dashed border-emerald-200 bg-emerald-50/40 rounded-2xl mb-6">
-          <ITFlex align="end" gap={3} wrap="wrap" justify="between">
-            <ITFlex direction="column" gap={0.5} className="min-w-[220px]">
-              <ITText className="text-[11px] font-black uppercase tracking-widest text-emerald-700">
-                Agregar más unidades
-              </ITText>
-              <ITText className="text-[10px] font-bold text-slate-500">
-                Crea copias idénticas de este dispositivo (mismo tipo, marca y
-                modelo, sin serie) — cada una con su propio folio de activo,
-                para que también pueda tener su carta responsiva.
-              </ITText>
+        <ITCard className="p-5 sm:p-6 border border-blue-100 bg-blue-50/45 rounded-[24px] mb-6 shadow-lg shadow-blue-100/40">
+          <ITFlex align="center" gap={4} wrap="wrap" justify="between">
+            <ITFlex align="center" gap={3} className="min-w-0 flex-1">
+              <ITFlex align="center" justify="center" className="h-11 w-11 shrink-0 rounded-2xl bg-blue-100 text-blue-600">
+                <FaPlus size={16} />
+              </ITFlex>
+              <ITFlex direction="column" gap={0.5} className="min-w-0">
+                <ITText className="text-[12px] font-black uppercase tracking-widest text-blue-800">
+                  Agregar más unidades
+                </ITText>
+                <ITText className="text-[10px] font-bold leading-5 text-slate-600">
+                  Crea copias idénticas sin serie. Cada unidad recibirá su propio folio de activo y podrá tener su carta responsiva.
+                </ITText>
+              </ITFlex>
             </ITFlex>
             <ITFlex align="end" gap={2}>
               <div className="w-24">
@@ -443,7 +449,7 @@ export default function DeviceFormPage() {
               </div>
               <ITButton
                 variant="filled"
-                color="secondary"
+                color="primary"
                 onClick={handleAddUnits}
                 disabled={addingUnits}
               >
@@ -462,11 +468,20 @@ export default function DeviceFormPage() {
       {!isLoteEdit && (
         <>
       <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px] mb-6">
+        <ITFlex align="center" gap={3} className="mb-5">
+          <ITFlex align="center" justify="center" className="h-9 w-9 rounded-xl bg-slate-100 text-slate-500">
+            <FaBoxOpen size={14} />
+          </ITFlex>
+          <ITFlex direction="column" gap={0.25}>
+            <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">Datos del dispositivo</ITText>
+            <ITText className="text-[10px] text-slate-400">Tipo, identificación y características principales</ITText>
+          </ITFlex>
+        </ITFlex>
         <ITGrid container columns={12} spacing={4}>
           <ITGrid item xs={12} md={isEdit ? 6 : 4}>
             <ITSelect
               name="typeId"
-              label="Tipo *"
+              label="Tipo"
               options={types.map((t) => ({
                 value: t.id,
                 label: `${t.name} (${t.prefix})`,
@@ -481,7 +496,7 @@ export default function DeviceFormPage() {
             <ITGrid item xs={12} md={2}>
               <ITInput
                 name="cantidad"
-                label="Cantidad *"
+                label="Cantidad"
                 type="number"
                 min={1}
                 max={500}
@@ -496,7 +511,7 @@ export default function DeviceFormPage() {
           <ITGrid item xs={12}>
             <ITInput
               name="desc"
-              label="Descripción *"
+              label="Descripción"
               value={form.descripcion}
               onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
               required
@@ -506,7 +521,7 @@ export default function DeviceFormPage() {
           <ITGrid item xs={12} md={6}>
             <ITInput
               name="marca"
-              label="Marca *"
+              label="Marca"
               value={form.marca}
               onChange={(e) => setForm((f) => ({ ...f, marca: e.target.value }))}
               required
@@ -516,7 +531,7 @@ export default function DeviceFormPage() {
           <ITGrid item xs={12} md={6}>
             <ITInput
               name="modelo"
-              label="Modelo *"
+              label="Modelo"
               value={form.modelo}
               onChange={(e) => setForm((f) => ({ ...f, modelo: e.target.value }))}
               required
@@ -535,7 +550,7 @@ export default function DeviceFormPage() {
 
           {isEdit && (
             <>
-              <ITGrid item xs={12} md={6}>
+              {showField("numeroSerie") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="serie"
                   label="No. Serie"
@@ -545,8 +560,8 @@ export default function DeviceFormPage() {
                   }
                   disabled={disabledAll}
                 />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
+              </ITGrid>}
+              {showField("nombreEquipo") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="eq"
                   label="Nombre del equipo"
@@ -556,34 +571,34 @@ export default function DeviceFormPage() {
                   }
                   disabled={disabledAll}
                 />
-              </ITGrid>
+              </ITGrid>}
             </>
           )}
 
           {!isEdit && !isBatch && (
             <>
-              <ITGrid item xs={12} md={6}>
+              {showField("numeroSerie") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="serie"
                   label="No. Serie"
                   value={units[0]?.numeroSerie ?? ""}
                   onChange={(e) => handleUnitField(0, "numeroSerie", e.target.value)}
                 />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
+              </ITGrid>}
+              {showField("nombreEquipo") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="eq"
                   label="Nombre del equipo"
                   value={units[0]?.nombreEquipo ?? ""}
                   onChange={(e) => handleUnitField(0, "nombreEquipo", e.target.value)}
                 />
-              </ITGrid>
+              </ITGrid>}
             </>
           )}
 
-          {showITSpecs && isEdit && (
+          {(showField("ip") || showField("macAddress")) && isEdit && (
             <>
-              <ITGrid item xs={12} md={6}>
+              {showField("ip") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="ip"
                   label="Dirección IP"
@@ -592,8 +607,8 @@ export default function DeviceFormPage() {
                   placeholder="192.168.0.1"
                   disabled={disabledAll}
                 />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
+              </ITGrid>}
+              {showField("macAddress") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="mac"
                   label="MAC Address"
@@ -604,13 +619,13 @@ export default function DeviceFormPage() {
                   placeholder="AA:BB:CC:DD:EE:FF"
                   disabled={disabledAll}
                 />
-              </ITGrid>
+              </ITGrid>}
             </>
           )}
 
-          {showITSpecs && !isEdit && !isBatch && (
+          {(showField("ip") || showField("macAddress")) && !isEdit && !isBatch && (
             <>
-              <ITGrid item xs={12} md={6}>
+              {showField("ip") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="ip"
                   label="Dirección IP"
@@ -618,8 +633,8 @@ export default function DeviceFormPage() {
                   onChange={(e) => handleUnitField(0, "ip", e.target.value)}
                   placeholder="192.168.0.1"
                 />
-              </ITGrid>
-              <ITGrid item xs={12} md={6}>
+              </ITGrid>}
+              {showField("macAddress") && <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="mac"
                   label="MAC Address"
@@ -629,13 +644,13 @@ export default function DeviceFormPage() {
                   }
                   placeholder="AA:BB:CC:DD:EE:FF"
                 />
-              </ITGrid>
+              </ITGrid>}
             </>
           )}
 
           {showITSpecs && (
             <>
-              <ITGrid item xs={12} md={4}>
+              {showField("sistemaOp") && <ITGrid item xs={12} md={4}>
                 <ITInput
                   name="sistemaOp"
                   label="Sistema Operativo"
@@ -644,8 +659,8 @@ export default function DeviceFormPage() {
                   placeholder="Android 13 / Windows 11"
                   disabled={disabledAll}
                 />
-              </ITGrid>
-              <ITGrid item xs={12} md={4}>
+              </ITGrid>}
+              {showField("ram") && <ITGrid item xs={12} md={4}>
                 <ITInput
                   name="ram"
                   label="RAM"
@@ -654,8 +669,8 @@ export default function DeviceFormPage() {
                   placeholder="4 GB"
                   disabled={disabledAll}
                 />
-              </ITGrid>
-              <ITGrid item xs={12} md={4}>
+              </ITGrid>}
+              {showField("almacenamiento") && <ITGrid item xs={12} md={4}>
                 <ITInput
                   name="almacenamiento"
                   label="Almacenamiento"
@@ -666,7 +681,7 @@ export default function DeviceFormPage() {
                   placeholder="64 GB"
                   disabled={disabledAll}
                 />
-              </ITGrid>
+              </ITGrid>}
             </>
           )}
         </ITGrid>
@@ -752,25 +767,25 @@ export default function DeviceFormPage() {
                     )}
                   </ITFlex>
                   <ITGrid container columns={12} spacing={3}>
-                    <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
+                    {showField("numeroSerie") && <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
                       <ITInput
                         name={`serie-${idx}`}
                         label="No. Serie"
                         value={u.numeroSerie}
                         onChange={(e) => handleUnitField(idx, "numeroSerie", e.target.value)}
                       />
-                    </ITGrid>
-                    <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
+                    </ITGrid>}
+                    {showField("nombreEquipo") && <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
                       <ITInput
                         name={`eq-${idx}`}
                         label="Nombre del equipo"
                         value={u.nombreEquipo}
                         onChange={(e) => handleUnitField(idx, "nombreEquipo", e.target.value)}
                       />
-                    </ITGrid>
-                    {showITSpecs && (
+                    </ITGrid>}
+                    {(showField("ip") || showField("macAddress")) && (
                       <>
-                        <ITGrid item xs={12} md={2}>
+                        {showField("ip") && <ITGrid item xs={12} md={2}>
                           <ITInput
                             name={`ip-${idx}`}
                             label="IP"
@@ -778,8 +793,8 @@ export default function DeviceFormPage() {
                             onChange={(e) => handleUnitField(idx, "ip", e.target.value)}
                             placeholder="192.168.0.1"
                           />
-                        </ITGrid>
-                        <ITGrid item xs={12} md={2}>
+                        </ITGrid>}
+                        {showField("macAddress") && <ITGrid item xs={12} md={2}>
                           <ITInput
                             name={`mac-${idx}`}
                             label="MAC"
@@ -789,7 +804,7 @@ export default function DeviceFormPage() {
                             }
                             placeholder="AA:BB:CC:DD:EE:FF"
                           />
-                        </ITGrid>
+                        </ITGrid>}
                       </>
                     )}
 </ITGrid>
@@ -815,7 +830,7 @@ export default function DeviceFormPage() {
               <ITGrid item xs={12}>
                 <ITInput
                   name="desc"
-                  label="Descripción *"
+                  label="Descripción"
                   value={form.descripcion}
                   onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
                   required
@@ -824,7 +839,7 @@ export default function DeviceFormPage() {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="marca"
-                  label="Marca *"
+                  label="Marca"
                   value={form.marca}
                   onChange={(e) => setForm((f) => ({ ...f, marca: e.target.value }))}
                   required
@@ -833,7 +848,7 @@ export default function DeviceFormPage() {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="modelo"
-                  label="Modelo *"
+                  label="Modelo"
                   value={form.modelo}
                   onChange={(e) => setForm((f) => ({ ...f, modelo: e.target.value }))}
                   required
@@ -841,7 +856,7 @@ export default function DeviceFormPage() {
               </ITGrid>
               {showITSpecs && (
                 <>
-                  <ITGrid item xs={12} md={4}>
+                  {showField("sistemaOp") && <ITGrid item xs={12} md={4}>
                     <ITInput
                       name="sistemaOp"
                       label="Sistema Operativo"
@@ -849,8 +864,8 @@ export default function DeviceFormPage() {
                       onChange={(e) => setForm((f) => ({ ...f, sistemaOp: e.target.value }))}
                       placeholder="Android 14 / Windows 11"
                     />
-                  </ITGrid>
-                  <ITGrid item xs={12} md={4}>
+                  </ITGrid>}
+                  {showField("ram") && <ITGrid item xs={12} md={4}>
                     <ITInput
                       name="ram"
                       label="RAM"
@@ -858,8 +873,8 @@ export default function DeviceFormPage() {
                       onChange={(e) => setForm((f) => ({ ...f, ram: e.target.value }))}
                       placeholder="4 GB"
                     />
-                  </ITGrid>
-                  <ITGrid item xs={12} md={4}>
+                  </ITGrid>}
+                  {showField("almacenamiento") && <ITGrid item xs={12} md={4}>
                     <ITInput
                       name="almacenamiento"
                       label="Almacenamiento"
@@ -869,7 +884,7 @@ export default function DeviceFormPage() {
                       }
                       placeholder="64 GB"
                     />
-                  </ITGrid>
+                  </ITGrid>}
                 </>
               )}
             </ITGrid>
@@ -920,7 +935,7 @@ export default function DeviceFormPage() {
                         )}
                       </ITFlex>
                       <ITGrid container columns={12} spacing={3}>
-                        <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
+                        {showField("numeroSerie") && <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
                           <ITInput
                             name={`lote-serie-${idx}`}
                             label="No. Serie"
@@ -932,8 +947,8 @@ export default function DeviceFormPage() {
                             }
                             disabled={locked}
                           />
-                        </ITGrid>
-                        <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
+                        </ITGrid>}
+                        {showField("nombreEquipo") && <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
                           <ITInput
                             name={`lote-eq-${idx}`}
                             label="Nombre del equipo"
@@ -945,10 +960,10 @@ export default function DeviceFormPage() {
                             }
                             disabled={locked}
                           />
-                        </ITGrid>
-                        {showITSpecs && (
+                        </ITGrid>}
+                        {(showField("ip") || showField("macAddress")) && (
                           <>
-                            <ITGrid item xs={12} md={3}>
+                            {showField("ip") && <ITGrid item xs={12} md={3}>
                               <ITInput
                                 name={`lote-ip-${idx}`}
                                 label="IP"
@@ -961,8 +976,8 @@ export default function DeviceFormPage() {
                                 placeholder="192.168.0.1"
                                 disabled={locked}
                               />
-                            </ITGrid>
-                            <ITGrid item xs={12} md={3}>
+                            </ITGrid>}
+                            {showField("macAddress") && <ITGrid item xs={12} md={3}>
                               <ITInput
                                 name={`lote-mac-${idx}`}
                                 label="MAC Address"
@@ -975,7 +990,7 @@ export default function DeviceFormPage() {
                                 placeholder="AA:BB:CC:DD:EE:FF"
                                 disabled={locked}
                               />
-                            </ITGrid>
+                            </ITGrid>}
                           </>
                         )}
                         <ITGrid item xs={12} md={showITSpecs ? 12 : 4}>

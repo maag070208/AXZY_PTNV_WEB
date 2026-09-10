@@ -141,7 +141,7 @@ export default function EmployeeFormPage() {
           <ITGrid item xs={12} md={6}>
             <ITInput
               name="emp_name"
-              label="Nombre *"
+              label="Nombre"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               required

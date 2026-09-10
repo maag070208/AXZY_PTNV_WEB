@@ -44,8 +44,8 @@ export default function KanbanPage() {
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const isAdmin = currentUser?.role === "ADMIN";
   const isEmpleado = currentUser?.role === "EMPLEADO";
-  const isJefeArea = currentUser?.role === "JEFE_DE_AREA";
-  const canCreate = isAdmin || isJefeArea;
+  const isGerente = currentUser?.role === "GERENTE";
+  const canCreate = !isEmpleado;
   const [rows, setRows] = useState<KanbanAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -231,7 +231,7 @@ export default function KanbanPage() {
 
   const canManageModalTicket = Boolean(
     modalTicket &&
-      (isAdmin || (isJefeArea && modalTicket.creadoPorId === currentUser?.id))
+      (isAdmin || isGerente || modalTicket.creadoPorId === currentUser?.id || modalTicket.asignadoAId === currentUser?.id)
   );
 
   const handleStatusChange = async (assignment: KanbanAssignment, status: Status) => {
@@ -259,8 +259,8 @@ export default function KanbanPage() {
       setDraggingId(null);
       return;
     }
-    if (status === "COMPLETADA" && !isAdmin) {
-      setToast("Solo el administrador puede cerrar una tarea");
+    if (status === "COMPLETADA" && !isAdmin && !isGerente) {
+      setToast("Solo ADMIN o GERENTE pueden completar una tarea");
       setDraggingId(null);
       return;
     }
@@ -506,7 +506,7 @@ export default function KanbanPage() {
           <ITGrid item xs={12}>
             <ITSearchSelect
               name="createTicket"
-              label="Ticket *"
+              label="Ticket"
               placeholder="Buscar ticket..."
               options={ticketSelectOptions}
               value={createTicketId}
@@ -518,7 +518,7 @@ export default function KanbanPage() {
           <ITGrid item xs={12}>
             <ITSearchSelect
               name="createEmployee"
-              label="Empleado *"
+              label="Empleado"
               placeholder="Buscar empleado..."
               options={employeeOptions}
               value={createUserId}
@@ -528,7 +528,7 @@ export default function KanbanPage() {
             />
           </ITGrid>
           <ITGrid item xs={12}>
-            <ITInput name="createTaskTitle" label="Título de la tarea *" value={createTitle} onChange={(event) => setCreateTitle(event.target.value)} placeholder="Ej. Revisar instalación" />
+            <ITInput name="createTaskTitle" label="Título de la tarea" value={createTitle} onChange={(event) => setCreateTitle(event.target.value)} placeholder="Ej. Revisar instalación" />
           </ITGrid>
           <ITGrid item xs={12}>
             <ITTextarea name="createTaskDescription" label="Descripción" value={createDescription} onChange={setCreateDescription} rows={2} placeholder="Detalles de la tarea..." />

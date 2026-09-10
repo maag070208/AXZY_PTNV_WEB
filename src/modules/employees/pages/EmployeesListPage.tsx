@@ -234,7 +234,7 @@ export default function EmployeesListPage() {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="emp_username"
-                  label="Username *"
+                  label="Username"
                   value={form.username}
                   onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
                   required
@@ -244,7 +244,7 @@ export default function EmployeesListPage() {
                 <ITInput
                   name="emp_password"
                   type="password"
-                  label="Contraseña *"
+                  label="Contraseña"
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   required
@@ -253,7 +253,7 @@ export default function EmployeesListPage() {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="emp_name"
-                  label="Nombre *"
+                  label="Nombre"
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   required

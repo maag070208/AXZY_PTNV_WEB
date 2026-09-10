@@ -10,7 +10,6 @@ import {
 import { usersApi, type User, type UserRole } from "@core/api/auth.api";
 import { devicesApi, deviceTypesApi, type Device, type DeviceType } from "@core/api/devices.api";
 import type { CartaFormErrors } from "../utils/validation";
-import { isITDeviceCode } from "@core/utils/itDevice";
 
 interface Props {
   errors?: CartaFormErrors;
@@ -223,8 +222,10 @@ export default function CartaForm({ errors }: Props) {
           sistemaOp: dev.sistemaOp ?? null,
           ram: dev.ram ?? null,
           almacenamiento: dev.almacenamiento ?? null,
+          numeroSerie: dev.numeroSerie ?? null,
+          nombreEquipo: dev.nombreEquipo ?? null,
           type: dev.type
-            ? { code: dev.type.code, name: dev.type.name, prefix: dev.type.prefix }
+            ? { code: dev.type.code, name: dev.type.name, prefix: dev.type.prefix, fieldConfig: dev.type.fieldConfig }
             : undefined,
         } as any,
       })
@@ -232,6 +233,11 @@ export default function CartaForm({ errors }: Props) {
   };
 
   if (!item) return null;
+
+  const deviceFieldEnabled = (field: keyof NonNullable<DeviceType["fieldConfig"]>) =>
+    Boolean(item.device?.type?.fieldConfig?.[field]?.enabled);
+  const showConfiguredFields = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"]
+    .some((field) => deviceFieldEnabled(field as keyof NonNullable<DeviceType["fieldConfig"]>));
 
   const empleadoOptions = empleados.map((u) => {
     const parts = [
@@ -375,7 +381,7 @@ export default function CartaForm({ errors }: Props) {
             />
 
             {/* Especificaciones técnicas (TIC) — solo lectura, vienen del Device */}
-            {item.device && isITDeviceCode(item.device.type?.code) && (
+            {item.device && showConfiguredFields && (
               <>
                 <ITDivider className="my-2" />
                 <ITFlex justify="between" align="center">
@@ -390,7 +396,7 @@ export default function CartaForm({ errors }: Props) {
                   </ITBadget>
                 </ITFlex>
                 <ITGrid container columns={12} spacing={3}>
-                  <ITGrid item xs={12} md={6}>
+                  {deviceFieldEnabled("ip") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`ip_${item.id}`}
                       label="IP"
@@ -399,8 +405,8 @@ export default function CartaForm({ errors }: Props) {
                       placeholder="Sin IP registrada"
                       onChange={() => {}}
                     />
-                  </ITGrid>
-                  <ITGrid item xs={12} md={6}>
+                  </ITGrid>}
+                  {deviceFieldEnabled("macAddress") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`mac_${item.id}`}
                       label="MAC Address"
@@ -409,8 +415,8 @@ export default function CartaForm({ errors }: Props) {
                       placeholder="Sin MAC registrada"
                       onChange={() => {}}
                     />
-                  </ITGrid>
-                  <ITGrid item xs={12} md={6}>
+                  </ITGrid>}
+                  {deviceFieldEnabled("sistemaOp") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`so_${item.id}`}
                       label="Sistema Operativo"
@@ -419,8 +425,8 @@ export default function CartaForm({ errors }: Props) {
                       placeholder="Sin SO registrado"
                       onChange={() => {}}
                     />
-                  </ITGrid>
-                  <ITGrid item xs={12} md={6}>
+                  </ITGrid>}
+                  {deviceFieldEnabled("ram") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`ram_${item.id}`}
                       label="RAM"
@@ -429,8 +435,8 @@ export default function CartaForm({ errors }: Props) {
                       placeholder="Sin RAM registrada"
                       onChange={() => {}}
                     />
-                  </ITGrid>
-                  <ITGrid item xs={12}>
+                  </ITGrid>}
+                  {deviceFieldEnabled("almacenamiento") && <ITGrid item xs={12}>
                     <ITInput
                       name={`alm_${item.id}`}
                       label="Almacenamiento"
@@ -439,7 +445,7 @@ export default function CartaForm({ errors }: Props) {
                       placeholder="Sin almacenamiento registrado"
                       onChange={() => {}}
                     />
-                  </ITGrid>
+                  </ITGrid>}
                 </ITGrid>
                 <ITText className="text-[9px] text-slate-400 italic">
                   Estas especificaciones se imprimen en el PDF. Para editarlas,
