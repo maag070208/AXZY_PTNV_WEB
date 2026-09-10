@@ -153,6 +153,15 @@ export const devicesApi = {
       macAddress?: string;
     }>;
   }) => api.post<{ data: Device[]; total: number }>(`/devices/batch`, data),
+  importParse: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api.post<{ rows: { modelo: string; descripcion: string; cantidad: number }[] }>(
+      `/devices/import/parse`,
+      form,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+  },
   update: (id: string, data: Partial<{
     typeId: string;
     descripcion: string;

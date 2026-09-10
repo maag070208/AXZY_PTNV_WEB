@@ -6,11 +6,10 @@ import {
   ITFlex,
   ITInput,
   ITPage,
-  ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import {
-  FaBoxes,
+  FaBoxOpen,
   FaCheckCircle,
   FaExclamationTriangle,
   FaFileExcel,
@@ -20,23 +19,16 @@ import {
 } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { materialsApi } from "@core/api/materials.api";
 import { deviceTypesApi, devicesApi, type DeviceType } from "@core/api/devices.api";
 
-type Manejo = "DISPOSITIVO" | "MATERIAL";
-const NEW_TYPE_VALUE = "__nuevo__";
+const GENERIC_TYPE_CODE = "GENERICO";
 
 interface Row {
   key: string;
   modelo: string;
   descripcion: string;
   cantidad: string;
-  manejo: Manejo;
-  typeId: string;
-  newTypeName: string;
-  newTypePrefix: string;
   marca: string;
-  categoria: string;
 }
 
 interface RowResult {
@@ -46,12 +38,12 @@ interface RowResult {
   detail: string;
 }
 
-export default function MaterialImportPage() {
+export default function DeviceImportPage() {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [deviceTypes, setDeviceTypes] = useState<DeviceType[]>([]);
-  const [categorias, setCategorias] = useState<string[]>([]);
+  const [typesLoaded, setTypesLoaded] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [parsing, setParsing] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
@@ -62,9 +54,19 @@ export default function MaterialImportPage() {
   const [results, setResults] = useState<RowResult[] | null>(null);
 
   useEffect(() => {
-    deviceTypesApi.list().then(setDeviceTypes).catch(() => setDeviceTypes([]));
-    materialsApi.categorias().then(setCategorias).catch(() => setCategorias([]));
+    deviceTypesApi
+      .list()
+      .then(setDeviceTypes)
+      .catch(() => setDeviceTypes([]))
+      .finally(() => setTypesLoaded(true));
   }, []);
+
+  // Todo lo que se carga por este asistente entra como Dispositivo con este
+  // tipo "Genérico" (sin número de serie) — así cada unidad de todas formas
+  // recibe su propio folio de activo y puede tener su carta responsiva.
+  const genericType = deviceTypes.find(
+    (t) => t.code?.toUpperCase() === GENERIC_TYPE_CODE
+  );
 
   const handleParse = async () => {
     if (!file) return;
@@ -72,23 +74,14 @@ export default function MaterialImportPage() {
     setError(null);
     setResults(null);
     try {
-      const res = await materialsApi.parseImport(file);
+      const res = await devicesApi.importParse(file);
       setRows(
         res.rows.map((r, i) => ({
           key: `${i}-${r.modelo}`,
           modelo: r.modelo,
           descripcion: r.descripcion,
           cantidad: String(r.cantidad || 1),
-          // La mayoría de lo que se entrega a una persona necesita su propia
-          // carta responsiva (aunque no tenga serie), así que por default
-          // cada fila se da de alta como Dispositivo. Las filas que son
-          // puro consumible (nunca se asignan a nadie) se cambian a Material.
-          manejo: "DISPOSITIVO",
-          typeId: "",
-          newTypeName: "",
-          newTypePrefix: "",
           marca: "",
-          categoria: "",
         }))
       );
     } catch (e: any) {
@@ -108,80 +101,48 @@ export default function MaterialImportPage() {
 
   const isRowValid = (r: Row): boolean => {
     const cantidad = Number(r.cantidad);
-    if (!r.modelo.trim() || !r.descripcion.trim() || !Number.isFinite(cantidad) || cantidad <= 0) {
-      return false;
-    }
-    if (r.manejo === "MATERIAL") return !!r.categoria.trim();
-    if (!r.marca.trim()) return false;
-    if (r.typeId === NEW_TYPE_VALUE) return !!r.newTypeName.trim() && !!r.newTypePrefix.trim();
-    return !!r.typeId;
+    return (
+      !!r.modelo.trim() &&
+      !!r.descripcion.trim() &&
+      !!r.marca.trim() &&
+      Number.isFinite(cantidad) &&
+      cantidad > 0
+    );
   };
 
   const validCount = rows.filter(isRowValid).length;
 
   const handleConfirm = async () => {
+    if (!genericType) return;
     const toProcess = rows.filter(isRowValid);
     const invalid = rows.filter((r) => !isRowValid(r));
     setCommitting(true);
     setProgress({ done: 0, total: toProcess.length });
 
-    const newTypeIds = new Map<string, string>(); // "nombre|prefijo" -> id
     const outcomes: RowResult[] = invalid.map((r) => ({
       key: r.key,
       modelo: r.modelo || "(sin modelo)",
       ok: false,
-      detail: "Fila incompleta — se omitió (falta modelo, descripción, cantidad, marca/tipo o categoría).",
+      detail: "Fila incompleta — se omitió (falta modelo, descripción, marca o cantidad).",
     }));
 
     for (let i = 0; i < toProcess.length; i++) {
       const r = toProcess[i];
       try {
-        if (r.manejo === "MATERIAL") {
-          const m = await materialsApi.create({
-            categoria: r.categoria.trim(),
-            modelo: r.modelo.trim(),
-            descripcion: r.descripcion.trim(),
-            stock: Number(r.cantidad),
-          });
-          outcomes.push({
-            key: r.key,
-            modelo: r.modelo,
-            ok: true,
-            detail: `Material · stock actual: ${m.stock}`,
-          });
-        } else {
-          let typeId = r.typeId;
-          if (typeId === NEW_TYPE_VALUE) {
-            const dedupeKey = `${r.newTypeName.trim().toUpperCase()}|${r.newTypePrefix.trim().toUpperCase()}`;
-            const cached = newTypeIds.get(dedupeKey);
-            if (cached) {
-              typeId = cached;
-            } else {
-              const created = await deviceTypesApi.create({
-                code: r.newTypePrefix.trim().toUpperCase(),
-                name: r.newTypeName.trim(),
-                prefix: r.newTypePrefix.trim().toUpperCase(),
-              });
-              newTypeIds.set(dedupeKey, created.id);
-              setDeviceTypes((prev) => [...prev, created]);
-              typeId = created.id;
-            }
-          }
-          const cantidad = Math.max(1, Math.trunc(Number(r.cantidad)));
-          const res = await devicesApi.createBatch({
-            typeId,
-            descripcion: r.descripcion.trim(),
-            marca: r.marca.trim(),
-            modelo: r.modelo.trim(),
-            units: Array.from({ length: cantidad }, () => ({})),
-          });
-          outcomes.push({
-            key: r.key,
-            modelo: r.modelo,
-            ok: true,
-            detail: `${res.total} dispositivo(s) creado(s) (sin serie, con su propio activo)`,
-          });
-        }
+        const cantidad = Math.max(1, Math.trunc(Number(r.cantidad)));
+        const res = await devicesApi.createBatch({
+          typeId: genericType.id,
+          descripcion: r.descripcion.trim(),
+          marca: r.marca.trim(),
+          modelo: r.modelo.trim(),
+          units: Array.from({ length: cantidad }, () => ({})),
+        });
+        outcomes.push({
+          key: r.key,
+          modelo: r.modelo,
+          ok: true,
+          detail: `${res.total} dispositivo(s) creado(s) (Genérico, sin serie, con su propio activo)`,
+        });
       } catch (e: any) {
         outcomes.push({ key: r.key, modelo: r.modelo, ok: false, detail: e.message ?? "Error" });
       }
@@ -199,10 +160,10 @@ export default function MaterialImportPage() {
   return (
     <ITPage
       title="Cargar Excel"
-      description='Sube un archivo con columnas "Modelo", "Descripción" y "Cantidad". Por cada fila eliges si es un Dispositivo (tiene su propia carta responsiva, aunque no tenga serie) o un Material (solo stock, nunca se asigna a una persona en particular).'
+      description='Sube un archivo con columnas "Modelo", "Descripción" y "Cantidad". Cada fila se da de alta como Dispositivo tipo Genérico (sin número de serie), con su propio folio de activo para poder tener su carta responsiva individual.'
       backAction={() => navigate(-1)}
       breadcrumbs={[
-        { label: "Materiales", onClick: () => navigate("/materiales") },
+        { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
         { label: "Cargar Excel" },
       ]}
       icon={<FaFileExcel size={20} />}
@@ -210,6 +171,14 @@ export default function MaterialImportPage() {
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
           {error}
+        </ITAlert>
+      )}
+
+      {typesLoaded && !genericType && (
+        <ITAlert variant="warning">
+          No encontré el tipo de dispositivo "Genérico" (code: GENERICO). Créalo en
+          Dispositivos → Tipos antes de cargar el Excel, o corre el seed de la base de
+          datos para que se agregue automáticamente.
         </ITAlert>
       )}
 
@@ -258,7 +227,7 @@ export default function MaterialImportPage() {
               variant="filled"
               color="primary"
               onClick={handleConfirm}
-              disabled={committing || validCount === 0}
+              disabled={committing || validCount === 0 || !genericType}
             >
               <ITFlex align="center" gap={1}>
                 <FaUpload size={12} />
@@ -300,78 +269,14 @@ export default function MaterialImportPage() {
                     </div>
 
                     <div className="w-36">
-                      <ITSelect
-                        name={`manejo-${r.key}`}
-                        label="Manejo"
-                        options={[
-                          { value: "DISPOSITIVO", label: "Dispositivo" },
-                          { value: "MATERIAL", label: "Material (stock)" },
-                        ]}
-                        value={r.manejo}
-                        onChange={(e) => updateRow(r.key, { manejo: e.target.value as Manejo })}
+                      <ITInput
+                        name={`marca-${r.key}`}
+                        label="Marca"
+                        value={r.marca}
+                        onChange={(e) => updateRow(r.key, { marca: e.target.value })}
+                        placeholder="Logitech"
                       />
                     </div>
-
-                    {r.manejo === "DISPOSITIVO" ? (
-                      <>
-                        <div className="w-40">
-                          <ITSelect
-                            name={`tipo-${r.key}`}
-                            label="Tipo"
-                            options={[
-                              ...deviceTypes.map((t) => ({ value: t.id, label: t.name })),
-                              { value: NEW_TYPE_VALUE, label: "+ Nuevo tipo…" },
-                            ]}
-                            value={r.typeId}
-                            onChange={(e) => updateRow(r.key, { typeId: e.target.value })}
-                            placeholder="Elegir…"
-                          />
-                        </div>
-                        {r.typeId === NEW_TYPE_VALUE && (
-                          <>
-                            <div className="w-32">
-                              <ITInput
-                                name={`newtype-name-${r.key}`}
-                                label="Nombre tipo"
-                                value={r.newTypeName}
-                                onChange={(e) => updateRow(r.key, { newTypeName: e.target.value })}
-                                placeholder="Teclado"
-                              />
-                            </div>
-                            <div className="w-24">
-                              <ITInput
-                                name={`newtype-prefix-${r.key}`}
-                                label="Prefijo"
-                                value={r.newTypePrefix}
-                                onChange={(e) =>
-                                  updateRow(r.key, { newTypePrefix: e.target.value.toUpperCase() })
-                                }
-                                placeholder="TEC"
-                              />
-                            </div>
-                          </>
-                        )}
-                        <div className="w-32">
-                          <ITInput
-                            name={`marca-${r.key}`}
-                            label="Marca"
-                            value={r.marca}
-                            onChange={(e) => updateRow(r.key, { marca: e.target.value })}
-                            placeholder="Logitech"
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <div className="w-44">
-                        <ITInput
-                          name={`categoria-${r.key}`}
-                          label="Categoría"
-                          value={r.categoria}
-                          onChange={(e) => updateRow(r.key, { categoria: e.target.value })}
-                          placeholder="Consumibles"
-                        />
-                      </div>
-                    )}
 
                     <ITButton
                       variant="outlined"
@@ -384,21 +289,6 @@ export default function MaterialImportPage() {
                     </ITButton>
                   </ITFlex>
                 </ITFlex>
-
-                {r.manejo === "MATERIAL" && categorias.length > 0 && (
-                  <ITFlex gap={1} wrap="wrap" className="mt-2">
-                    {categorias.map((c) => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => updateRow(r.key, { categoria: c })}
-                        className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-bold text-slate-500 hover:border-emerald-300 hover:text-emerald-700"
-                      >
-                        {c}
-                      </button>
-                    ))}
-                  </ITFlex>
-                )}
               </ITCard>
             ))}
           </ITFlex>
@@ -447,16 +337,16 @@ export default function MaterialImportPage() {
           </div>
 
           <ITFlex justify="end" gap={2} className="mt-5">
-            <ITButton variant="outlined" color="secondary" onClick={() => navigate("/dispositivos")}>
+            <ITButton variant="outlined" color="secondary" onClick={() => navigate("/dispositivos/tipos")}>
+              <ITFlex align="center" gap={1}>
+                <FaBoxOpen size={12} />
+                <ITText className="text-[11px] font-bold">Ver tipos</ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton variant="filled" color="primary" onClick={() => navigate("/dispositivos")}>
               <ITFlex align="center" gap={1}>
                 <FaLaptop size={12} />
                 <ITText className="text-[11px] font-bold">Ver dispositivos</ITText>
-              </ITFlex>
-            </ITButton>
-            <ITButton variant="filled" color="primary" onClick={() => navigate("/materiales")}>
-              <ITFlex align="center" gap={1}>
-                <FaBoxes size={12} />
-                <ITText className="text-[11px] font-bold">Ver materiales</ITText>
               </ITFlex>
             </ITButton>
           </ITFlex>

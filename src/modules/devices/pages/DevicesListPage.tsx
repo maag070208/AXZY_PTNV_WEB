@@ -303,7 +303,7 @@ export default function DevicesListPage() {
           <ITButton
             variant="outlined"
             color="secondary"
-            onClick={() => navigate("/materiales/importar")}
+            onClick={() => navigate("/dispositivos/importar")}
           >
             <ITFlex align="center" gap={1}>
               <FaFileExcel size={12} />

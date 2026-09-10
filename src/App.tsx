@@ -16,9 +16,7 @@ import DeviceFormPage from "@modules/devices/pages/DeviceFormPage";
 import DeviceDetailPage from "@modules/devices/pages/DeviceDetailPage";
 import DeviceTypesListPage from "@modules/device-types/pages/DeviceTypesListPage";
 import DeviceTypeFormPage from "@modules/device-types/pages/DeviceTypeFormPage";
-import MaterialsListPage from "@modules/materials/pages/MaterialsListPage";
-import MaterialFormPage from "@modules/materials/pages/MaterialFormPage";
-import MaterialImportPage from "@modules/materials/pages/MaterialImportPage";
+import DeviceImportPage from "@modules/devices/pages/DeviceImportPage";
 import DepartmentsPage from "@modules/departments/pages/DepartmentsPage";
 import DepartmentDetailPage from "@modules/departments/pages/DepartmentDetailPage";
 import EmployeesListPage from "@modules/employees/pages/EmployeesListPage";
@@ -61,16 +59,12 @@ export default function App() {
 
         <Route path="/dispositivos" element={<DevicesListPage />} />
         <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
+        <Route path="/dispositivos/importar" element={<DeviceImportPage />} />
         <Route path="/dispositivos/:id" element={<DeviceDetailPage />} />
         <Route path="/dispositivos/:id/editar" element={<DeviceFormPage />} />
         <Route path="/dispositivos/tipos" element={<DeviceTypesListPage />} />
         <Route path="/dispositivos/tipos/nuevo" element={<DeviceTypeFormPage />} />
         <Route path="/dispositivos/tipos/:id/editar" element={<DeviceTypeFormPage />} />
-
-        <Route path="/materiales" element={<MaterialsListPage />} />
-        <Route path="/materiales/nuevo" element={<MaterialFormPage />} />
-        <Route path="/materiales/importar" element={<MaterialImportPage />} />
-        <Route path="/materiales/:id/editar" element={<MaterialFormPage />} />
 
         <Route path="/inventario" element={<InventoryIndexPage />} />
         <Route path="/inventario/movimientos" element={<InventoryMovementsPage />} />
