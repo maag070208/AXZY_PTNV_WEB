@@ -90,6 +90,16 @@ export const usersApi = {
   ) => api.put<User>(`/users/${id}`, data),
   changePassword: (id: string, password: string) =>
     api.put<void>(`/users/${id}/password`, { password }),
+  import: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api.post<{
+      creados: number;
+      omitidos: { fila: number; username: string; motivo: string }[];
+    }>(`/users/import`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
   delete: (id: string, force?: boolean) =>
     api.delete<{ soft: boolean; forced?: boolean; data: User }>(
       `/users/${id}${force ? "?force=true" : ""}`

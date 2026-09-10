@@ -1,6 +1,7 @@
 import { ITCard, ITLayout, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { useEffect, useState, useCallback } from "react";
 import {
+  FaBoxes,
   FaBuilding,
   FaChartBar,
   FaClipboardList,
@@ -129,6 +130,13 @@ export default function PrivateRoutes() {
           icon: <FaChartBar size={14} />,
           action: () => navigate("/dispositivos"),
           isActive: active("/dispositivos"),
+        },
+        {
+          id: "materiales",
+          label: "Materiales",
+          icon: <FaBoxes size={14} />,
+          action: () => navigate("/materiales"),
+          isActive: active("/materiales"),
         },
       ]
       : []),

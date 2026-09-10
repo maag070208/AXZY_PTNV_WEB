@@ -15,7 +15,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaEye, FaKey, FaPlus, FaTrash, FaUndo, FaUserShield } from "react-icons/fa";
+import { FaEdit, FaEye, FaFileExcel, FaKey, FaPlus, FaTrash, FaUndo, FaUserShield } from "react-icons/fa";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -269,16 +269,28 @@ export default function UsersListPage() {
         { label: "Usuarios" },
       ]}
       actions={
-        <ITButton
-          variant="filled"
-          color="primary"
-          onClick={() => navigate("/usuarios/nuevo")}
-        >
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">Nuevo usuario</ITText>
-          </ITFlex>
-        </ITButton>
+        <ITFlex gap={2}>
+          <ITButton
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate("/usuarios/importar")}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaFileExcel size={12} />
+              <ITText className="font-bold text-[11px]">Cargar Excel</ITText>
+            </ITFlex>
+          </ITButton>
+          <ITButton
+            variant="filled"
+            color="primary"
+            onClick={() => navigate("/usuarios/nuevo")}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaPlus size={12} />
+              <ITText className="font-bold text-[11px]">Nuevo usuario</ITText>
+            </ITFlex>
+          </ITButton>
+        </ITFlex>
       }
       icon={<FaUserShield size={20} />}
     >
