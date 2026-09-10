@@ -198,7 +198,9 @@ export default function DeviceFormPage() {
     setCantidad((c) => Math.max(1, c - 1));
   };
 
-  const applyAutoNombre = () => {
+  // Autocompleta el nombre de cada unidad en vivo conforme se escribe la base
+  // y el número inicial (antes requería presionar "Aplicar a todos").
+  useEffect(() => {
     if (!autoNombreBase.trim()) return;
     const startNum = Number(autoNombreStart) || 1;
     setUnits((prev) =>
@@ -207,9 +209,11 @@ export default function DeviceFormPage() {
         nombreEquipo: `${autoNombreBase.trim()}-${String(startNum + i).padStart(2, "0")}`,
       }))
     );
-  };
+  }, [autoNombreBase, autoNombreStart, cantidad]);
 
-  const applyAutoIp = () => {
+  // Autocompleta la IP de cada unidad en vivo (autoincrementando desde la
+  // base) conforme se escribe, también sin necesidad de un botón "Aplicar".
+  useEffect(() => {
     if (!autoIpBase.trim()) return;
     setUnits((prev) =>
       prev.map((u, i) => {
@@ -217,7 +221,7 @@ export default function DeviceFormPage() {
         return next ? { ...u, ip: next } : u;
       })
     );
-  };
+  }, [autoIpBase, cantidad]);
 
   const handleSubmit = async () => {
     if (disabledAll) return;
@@ -609,7 +613,7 @@ export default function DeviceFormPage() {
               </ITText>
             </ITFlex>
             <ITGrid container columns={12} spacing={3} className="items-end">
-              <ITGrid item xs={12} md={3}>
+              <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
                 <ITInput
                   name="autoNombreBase"
                   label="Nombre de equipo (base)"
@@ -618,7 +622,7 @@ export default function DeviceFormPage() {
                   placeholder="TABLET-AB"
                 />
               </ITGrid>
-              <ITGrid item xs={6} md={2}>
+              <ITGrid item xs={12} md={showITSpecs ? 2 : 3}>
                 <ITInput
                   name="autoNombreStart"
                   label="Inicia en"
@@ -628,30 +632,23 @@ export default function DeviceFormPage() {
                   onChange={(e) => setAutoNombreStart(e.target.value)}
                 />
               </ITGrid>
-              <ITGrid item xs={6} md={2}>
-                <ITButton variant="outlined" color="secondary" onClick={applyAutoNombre}>
-                  Aplicar a todos
-                </ITButton>
-              </ITGrid>
               {showITSpecs && (
-                <>
-                  <ITGrid item xs={12} md={3}>
-                    <ITInput
-                      name="autoIpBase"
-                      label="IP inicial (autoincrementa)"
-                      value={autoIpBase}
-                      onChange={(e) => setAutoIpBase(e.target.value)}
-                      placeholder="192.168.1.10"
-                    />
-                  </ITGrid>
-                  <ITGrid item xs={12} md={2}>
-                    <ITButton variant="outlined" color="secondary" onClick={applyAutoIp}>
-                      Aplicar a todos
-                    </ITButton>
-                  </ITGrid>
-                </>
+                <ITGrid item xs={12} md={4}>
+                  <ITInput
+                    name="autoIpBase"
+                    label="IP inicial (autoincrementa)"
+                    value={autoIpBase}
+                    onChange={(e) => setAutoIpBase(e.target.value)}
+                    placeholder="192.168.1.10"
+                  />
+                </ITGrid>
               )}
             </ITGrid>
+            {(autoNombreBase.trim() || autoIpBase.trim()) && (
+              <ITText className="text-[10px] font-bold text-emerald-600 mt-2">
+                Se está autocompletando cada unidad conforme escribes — no hace falta aplicar nada.
+              </ITText>
+            )}
           </ITCard>
 
           <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
