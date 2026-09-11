@@ -19,6 +19,29 @@ import {
   type Department,
 } from "@core/api/departments.api";
 
+const ROLE_GUIDANCE = {
+  ADMIN: {
+    title: "Administrador del sistema",
+    summary: "Control total de catálogos, usuarios, dispositivos, tickets y reportes.",
+    actions: ["Configura permisos y usuarios", "Administra todos los departamentos", "Puede completar y cerrar tareas"],
+  },
+  GERENTE: {
+    title: "Gerente",
+    summary: "Supervisa tickets y tareas de su departamento.",
+    actions: ["Crea y administra tickets", "Asigna responsables y tareas", "Puede completar tareas y cerrar tickets"],
+  },
+  JEFE_DE_AREA: {
+    title: "Jefe de área",
+    summary: "Da seguimiento operativo a los tickets de su departamento.",
+    actions: ["Crea tickets", "Puede generar tareas de sus tickets", "Mueve tareas asignadas hasta revisión"],
+  },
+  EMPLEADO: {
+    title: "Empleado",
+    summary: "Ejecuta tareas asignadas y reporta avances.",
+    actions: ["No crea tickets", "Solo ve tickets con tareas asignadas", "Mueve sus tareas hasta revisión"],
+  },
+} as const;
+
 export default function UserFormPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -67,6 +90,7 @@ export default function UserFormPage() {
   }, [id]);
 
   const selectedDept = departments.find((d) => d.id === form.departmentId);
+  const roleGuidance = ROLE_GUIDANCE[form.role];
 
   const handleSubmit = async () => {
     if (!form.username || !form.name) return;
@@ -252,8 +276,21 @@ export default function UserFormPage() {
             </ITFlex>
           </ITCard>
           <ITCard className="border border-blue-100 bg-blue-50/50 p-5 rounded-[24px]">
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-blue-800">Nota</ITText>
-            <ITText className="mt-2 text-[11px] leading-5 text-slate-600">El rol define las acciones disponibles dentro del sistema. En edición, deja la contraseña vacía para conservarla.</ITText>
+            <ITFlex align="center" gap={2}>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-blue-800">Guía del rol</ITText>
+              <ITText className="rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700">{form.role}</ITText>
+            </ITFlex>
+            <ITText className="mt-2 text-[12px] font-black text-slate-700">{roleGuidance.title}</ITText>
+            <ITText className="mt-1 text-[11px] leading-5 text-slate-600">{roleGuidance.summary}</ITText>
+            <ul className="mt-3 space-y-2 text-[10px] font-bold text-slate-600">
+              {roleGuidance.actions.map((action) => (
+                <li key={action} className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                  {action}
+                </li>
+              ))}
+            </ul>
+            <ITText className="mt-4 border-t border-blue-100 pt-3 text-[10px] text-slate-500">En edición, deja la contraseña vacía para conservarla.</ITText>
           </ITCard>
         </aside>
       </div>
