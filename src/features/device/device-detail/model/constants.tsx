@@ -1,4 +1,4 @@
-import { FaBoxOpen, FaCheckCircle, FaClock, FaComment, FaEdit, FaExclamationTriangle, FaUserCog } from "react-icons/fa";
+import { FaBoxOpen, FaCheckCircle, FaComment, FaEdit, FaExclamationTriangle, FaUserCog } from "react-icons/fa";
 
 export const ESTADO_BADGE: Record<string, { color: string; label: string }> = {
   DISPONIBLE: { color: "success", label: "Disponible" },
