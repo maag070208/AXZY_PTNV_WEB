@@ -7,7 +7,7 @@ import axios, {
 import { API_CONSTANTS } from "./constants/API_CONSTANTS";
 import { getSessionToken, handleUnauthorized } from "./session";
 
-export class ApiError extends Error {
+class ApiError extends Error {
   constructor(
     public status: number,
     msg: string,
