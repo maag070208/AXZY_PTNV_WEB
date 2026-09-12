@@ -1,0 +1,121 @@
+import {
+  ITBadget,
+  ITButton,
+  ITDataTable,
+  ITFlex,
+  ITText,
+} from "@axzydev/axzy_ui_system";
+import type {
+  Column,
+  ITDataTableFetchParams,
+  ITDataTableResponse,
+} from "@axzydev/axzy_ui_system";
+import { FaTrello } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import type { KanbanAssignment } from "@entities/ticket";
+import { ASSIGNMENT_STATUS_BADGE } from "../model/useAssignmentList";
+import type { UseAssignmentList } from "../model/useAssignmentList";
+
+interface Props {
+  fx: UseAssignmentList;
+  onOpenBoard: () => void;
+}
+
+export default function MyTasksTable({ fx, onOpenBoard }: Props) {
+  const { t: tt } = useTranslation("tickets");
+
+  const columns: Column<KanbanAssignment>[] = [
+    {
+      key: "title",
+      label: "Tarea",
+      type: "string",
+      sortable: false,
+      render: (r) => (
+        <ITFlex direction="column" gap={0.5}>
+          <ITText className="text-[12px] font-black text-slate-800">{r.title}</ITText>
+          {r.description && (
+            <ITText className="text-[10px] text-slate-500 line-clamp-2">{r.description}</ITText>
+          )}
+        </ITFlex>
+      ),
+    },
+    {
+      key: "ticket",
+      label: "Ticket",
+      type: "string",
+      sortable: false,
+      render: (r) => (
+        <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.titulo}</ITText>
+      ),
+    },
+    {
+      key: "status",
+      label: "Estado",
+      type: "string",
+      sortable: false,
+      render: (r) => (
+        <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="small">
+          {ASSIGNMENT_STATUS_BADGE[r.status]?.label ?? r.status}
+        </ITBadget>
+      ),
+    },
+    {
+      key: "dates",
+      label: "Fechas",
+      type: "string",
+      sortable: false,
+      render: (r) => (
+        <ITFlex direction="column" gap={0.5}>
+          {r.startDate && (
+            <ITText className="text-[9px] text-slate-500">
+              Inicio: {new Date(r.startDate).toLocaleDateString("es-MX")}
+            </ITText>
+          )}
+          {r.dueDate && (
+            <ITText className="text-[9px] text-slate-500">
+              Fin: {new Date(r.dueDate).toLocaleDateString("es-MX")}
+            </ITText>
+          )}
+          {r.dueDate &&
+            r.status !== "COMPLETADA" &&
+            new Date(r.dueDate) < new Date() && (
+              <ITBadget color="danger" size="small">Vencida</ITBadget>
+            )}
+        </ITFlex>
+      ),
+    },
+    {
+      key: "acciones",
+      label: "",
+      type: "string",
+      sortable: false,
+      render: () => (
+        <ITFlex justify="end">
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="secondary"
+            onClick={onOpenBoard}
+            title={tt("mytasks.viewBoardTitle")}
+          >
+            <FaTrello size={12} />
+          </ITButton>
+        </ITFlex>
+      ),
+    },
+  ];
+
+  return (
+    <ITDataTable
+      columns={columns as unknown as Column<Record<string, unknown>>[]}
+      fetchData={
+        fx.fetchTableData as unknown as (
+          p: ITDataTableFetchParams
+        ) => Promise<ITDataTableResponse<Record<string, unknown>>>
+      }
+      reloadTrigger={fx.reloadKey}
+      defaultItemsPerPage={10}
+      size="sm"
+    />
+  );
+}
