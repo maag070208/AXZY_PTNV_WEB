@@ -8,11 +8,18 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaSignInAlt } from "react-icons/fa";
-import type { useLogin } from "../model/useLogin";
 
-type LoginFormProps = ReturnType<typeof useLogin> & {
+interface LoginFormProps {
+  username: string;
+  password: string;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
+  setPassword: React.Dispatch<React.SetStateAction<string>>;
+  isSubmitting: boolean;
+  canSubmit: boolean;
+  toast: { message: string; type: "error" | "success" } | null;
+  dismissToast: () => void;
   onSubmit: (e: React.FormEvent) => void;
-};
+}
 
 export default function LoginForm({
   username,
