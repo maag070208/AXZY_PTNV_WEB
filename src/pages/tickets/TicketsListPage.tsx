@@ -14,7 +14,7 @@ import {
   ITText
 } from "@axzydev/axzy_ui_system";
 import { ticketsApi, type Ticket } from "@entities/ticket";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import { useCallback, useState } from "react";
 import { FaEye, FaPlus, FaTicketAlt, FaTrash, FaTrashRestore, FaTrello } from "react-icons/fa";
 import { useSelector } from "react-redux";

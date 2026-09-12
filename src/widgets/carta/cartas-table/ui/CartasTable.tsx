@@ -17,10 +17,10 @@ import { FaEye, FaTrash } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { AppDispatch } from "@core/store/store";
+import type { AppDispatch } from "@app/store";
 import { deleteCartaThunk, cartasApi, type CartaResponsiva } from "@entities/carta";
-import { formatFecha } from "@core/utils/dates";
-import { useIsMobile } from "@core/hooks/useIsMobile";
+import { formatFecha } from "@shared/utils/dates";
+import { useIsMobile } from "@shared/lib/useIsMobile";
 import { CartaResponsivaCard } from "@widgets/carta/carta-card";
 
 export default function CartasTable() {

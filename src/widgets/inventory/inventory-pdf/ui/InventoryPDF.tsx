@@ -2,9 +2,9 @@ import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { InventoryMovement, MovementType } from "@entities/inventory-movement";
 import type { Location } from "@entities/location";
 import { formatLocation } from "@entities/location";
-import { PDF_COLORS, pdfTheme } from "@core/pdf/theme";
-import PdfLetterhead from "@core/pdf/PdfLetterhead";
-import PdfFooter from "@core/pdf/PdfFooter";
+import { PDF_COLORS, pdfTheme } from "@shared/pdf/theme";
+import PdfLetterhead from "@shared/pdf/PdfLetterhead";
+import PdfFooter from "@shared/pdf/PdfFooter";
 
 interface Props {
   movements: InventoryMovement[];

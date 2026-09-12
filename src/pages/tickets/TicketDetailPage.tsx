@@ -36,18 +36,18 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { AppDispatch, RootState } from "@core/store/store";
+import type { AppDispatch, RootState } from "@app/store";
 import {
   fetchTicketById,
   updateTicketThunk,
   addCommentThunk,
   clearCurrent,
-} from "@core/store/tickets/tickets.slice";
+} from "@entities/ticket";
 import { ticketsApi } from "@entities/ticket";
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
-import { formatFechaHora } from "@core/utils/dates";
-import { useAblyTicket } from "@core/hooks/useAbly";
+import { formatFechaHora } from "@shared/utils/dates";
+import { useAblyChannel } from "@shared/lib/ably";
 import { downloadTicketPDF } from "@widgets/tickets/ticket-pdf";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
 
@@ -155,10 +155,12 @@ export default function TicketDetailPage() {
   }, [id, dispatch]);
 
   // Ably: live comments
-  useAblyTicket(id, (data) => {
-    if (data?.comment) {
-      dispatch(fetchTicketById(id!));
-    }
+  useAblyChannel(id ? `tickets:${id}` : undefined, {
+    COMMENT: (data) => {
+      if ((data as { comment?: unknown } | null)?.comment) {
+        dispatch(fetchTicketById(id!));
+      }
+    },
   });
 
   useEffect(() => {

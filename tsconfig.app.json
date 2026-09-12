@@ -17,10 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/*"],
-      "@core/*": ["src/core/*"],
-      "@shared/*": ["src/core/*"],
-      "@modules/*": ["src/modules/*"],
+      "@app/*": ["src/app/*"],
+      "@shared/*": ["src/shared/*"],
       "@entities/*": ["src/entities/*"],
       "@features/*": ["src/features/*"],
       "@widgets/*": ["src/widgets/*"],

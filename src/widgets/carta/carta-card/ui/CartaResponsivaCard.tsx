@@ -1,7 +1,7 @@
 import { ITButton, ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaArrowRight, FaTrash } from "react-icons/fa";
 import type { CartaResponsiva } from "@entities/carta";
-import { formatFecha } from "@core/utils/dates";
+import { formatFecha } from "@shared/utils/dates";
 
 interface Props {
   row: CartaResponsiva;

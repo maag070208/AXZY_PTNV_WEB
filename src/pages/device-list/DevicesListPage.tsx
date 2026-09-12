@@ -4,16 +4,14 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaFileExcel, FaPlus, FaTag } from "react-icons/fa";
-import type { RootState } from "@core/store/store";
-import { useIsMobile } from "@core/hooks/useIsMobile";
+import type { RootState } from "@app/store";
+import { useIsMobile } from "@shared/lib/useIsMobile";
 import { useDeviceSummary } from "@entities/device";
 import { useDeviceTypes } from "@entities/device-type";
-import { useDeviceFilters } from "@features/device/filter-devices/model/useDeviceFilters";
-import DeviceFiltersBar from "@features/device/filter-devices/ui/DeviceFiltersBar";
-import { useDeleteDevice } from "@features/device/delete-device/model/useDeleteDevice";
-import DeleteDeviceDialog from "@features/device/delete-device/ui/DeleteDeviceDialog";
-import DeviceSummaryCards from "@widgets/device-summary-cards/ui/DeviceSummaryCards";
-import DevicesTable from "@widgets/devices-table/ui/DevicesTable";
+import { useDeviceFilters, DeviceFiltersBar } from "@features/device/filter-devices";
+import { useDeleteDevice, DeleteDeviceDialog } from "@features/device/delete-device";
+import { DeviceSummaryCards } from "@widgets/device-summary-cards";
+import { DevicesTable } from "@widgets/devices-table";
 
 /**
  * Orquesta la vista de lista de dispositivos: compone entities + features +

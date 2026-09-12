@@ -13,10 +13,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@app": path.resolve(__dirname, "./src"),
-      "@core": path.resolve(__dirname, "./src/core"),
-      "@shared": path.resolve(__dirname, "./src/core"),
-      "@modules": path.resolve(__dirname, "./src/modules"),
+      "@app": path.resolve(__dirname, "./src/app"),
+      "@shared": path.resolve(__dirname, "./src/shared"),
       "@entities": path.resolve(__dirname, "./src/entities"),
       "@features": path.resolve(__dirname, "./src/features"),
       "@widgets": path.resolve(__dirname, "./src/widgets"),

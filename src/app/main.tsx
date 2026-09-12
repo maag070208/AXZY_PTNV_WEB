@@ -1,7 +1,7 @@
 import { ITThemeProvider } from "@axzydev/axzy_ui_system";
 import "@axzydev/axzy_ui_system/dist/index.css";
-import "@core/i18n/config";
-import { store } from "@core/store/store";
+import "@shared/i18n/config";
+import { store } from "@app/store";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";

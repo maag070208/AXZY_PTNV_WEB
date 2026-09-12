@@ -20,7 +20,7 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import { usersApi, type User } from "@entities/user";
 
 export default function UsersListPage() {

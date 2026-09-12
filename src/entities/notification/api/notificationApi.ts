@@ -1,4 +1,4 @@
-import { api } from "@core/api/client";
+import { api } from "@shared/api/client";
 import type { Notification } from "../model/types";
 
 export const notificationsApi = {

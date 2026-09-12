@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import LoginPage from "@modules/auth/pages/LoginPage";
+import LoginPage from "@pages/auth/LoginPage";
 import PrivateRoutes from "./guards/PrivateRoutes";
-import HomePage from "@modules/home/pages/HomePage";
+import HomePage from "@pages/home/HomePage";
 import CartasListPage from "@pages/cartas/CartasListPage";
 import CartaEditorPage from "@pages/cartas/CartaEditorPage";
 import CartaDetailPage from "@pages/cartas/CartaDetailPage";
@@ -12,16 +12,16 @@ import NewInventoryMovementPage from "@pages/inventory/NewInventoryMovementPage"
 import LocationsPage from "@pages/inventory/LocationsPage";
 import GenerarCartasPage from "@pages/cartas/GenerarCartasPage";
 import DevicesListPage from "@pages/device-list/DevicesListPage";
-import DeviceFormPage from "@modules/devices/pages/DeviceFormPage";
-import DeviceDetailPage from "@modules/devices/pages/DeviceDetailPage";
-import DeviceTypesListPage from "@modules/device-types/pages/DeviceTypesListPage";
-import DeviceTypeFormPage from "@modules/device-types/pages/DeviceTypeFormPage";
-import DeviceImportPage from "@modules/devices/pages/DeviceImportPage";
+import DeviceFormPage from "@pages/devices/DeviceFormPage";
+import DeviceDetailPage from "@pages/devices/DeviceDetailPage";
+import DeviceTypesListPage from "@pages/device-types/DeviceTypesListPage";
+import DeviceTypeFormPage from "@pages/device-types/DeviceTypeFormPage";
+import DeviceImportPage from "@pages/devices/DeviceImportPage";
 import DepartmentsPage from "@pages/departments/DepartmentsPage";
 import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
 import EmployeeFormPage from "@pages/employees/EmployeeFormPage";
-import ReportesPage from "@modules/reports/pages/ReportesPage";
+import ReportesPage from "@pages/reports/ReportesPage";
 import UsersListPage from "@pages/users/UsersListPage";
 import UserFormPage from "@pages/users/UserFormPage";
 import UserHistoryPage from "@pages/users/UserHistoryPage";
@@ -33,7 +33,7 @@ import EditTicketPage from "@pages/tickets/EditTicketPage";
 import KanbanPage from "@pages/tickets/KanbanPage";
 import MisTareasPage from "@pages/tickets/MisTareasPage";
 import AdminTareasPage from "@pages/tickets/AdminTareasPage";
-import NotificationsPage from "@modules/notifications/pages/NotificationsPage";
+import NotificationsPage from "@pages/notifications/NotificationsPage";
 
 export default function App() {
   return (

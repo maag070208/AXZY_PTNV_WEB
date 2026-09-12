@@ -1,5 +1,5 @@
-import { api } from "@core/api/client";
-import { tableRequest, type ITDataTableFetchParamsPost } from "@core/api/table";
+import { api } from "@shared/api/client";
+import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
 import type { DeviceFieldConfig, DeviceType } from "../model/types";
 
 export const deviceTypeApi = {

@@ -22,7 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import { locationsApi, type Location, formatLocation } from "@entities/location";
 import { deviceApi as devicesApi, type Device } from "@entities/device";
 
@@ -66,7 +66,7 @@ export default function LocationsPage() {
   }, [fetchLocations]);
 
   const fetchTableData = useCallback(
-    async (params: ITDataTableFetchParams) => {
+    async (_params: ITDataTableFetchParams) => {
       return {
         data: locations as unknown as Record<string, unknown>[],
         total,

@@ -1,8 +1,8 @@
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { Ticket, TicketAssignment, TicketAttachment } from "@entities/ticket";
-import { PDF_COLORS, pdfTheme } from "@core/pdf/theme";
-import PdfLetterhead from "@core/pdf/PdfLetterhead";
-import PdfFooter from "@core/pdf/PdfFooter";
+import { PDF_COLORS, pdfTheme } from "@shared/pdf/theme";
+import PdfLetterhead from "@shared/pdf/PdfLetterhead";
+import PdfFooter from "@shared/pdf/PdfFooter";
 
 interface Props {
   ticket: Ticket;

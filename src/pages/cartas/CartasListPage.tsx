@@ -8,7 +8,7 @@ import { FaFileSignature } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { AppDispatch, RootState } from "@core/store/store";
+import type { AppDispatch, RootState } from "@app/store";
 import { resetDraft } from "@entities/carta";
 import { CartasTable } from "@widgets/carta/cartas-table";
 

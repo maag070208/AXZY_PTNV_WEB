@@ -32,10 +32,9 @@ export default tseslint.config(
     },
   },
   {
-    // Arquitectura FSD (src/entities, src/features, src/widgets, src/pages)
-    // + src/core como capa "shared" + src/modules como capa legacy en
-    // migración. "warn" por ahora mientras el equipo se acostumbra a las
-    // reglas; se puede subir a "error" cuando se sienta estable.
+    // Arquitectura FSD (src/app, src/shared, src/entities, src/features,
+    // src/widgets, src/pages). Excepción: pages/features/widgets pueden
+    // importar `@app/store` (sólo tipos RootState/AppDispatch) para tipado.
     files: ["src/**/*.{ts,tsx}"],
     plugins: { boundaries },
     settings: {
@@ -43,49 +42,55 @@ export default tseslint.config(
         typescript: { project: "./tsconfig.app.json" },
       },
       "boundaries/elements": [
-        { type: "shared", pattern: "core/*" },
+        { type: "app", pattern: "app/*" },
+        { type: "shared", pattern: "shared/*" },
         { type: "entities", pattern: "entities/*" },
         { type: "features", pattern: "features/*/*" },
         { type: "widgets", pattern: "widgets/*" },
         { type: "pages", pattern: "pages/*" },
-        { type: "legacy-modules", pattern: "modules/*" },
       ],
     },
     rules: {
       "boundaries/dependencies": [
-        "warn",
+        "error",
         {
           default: "disallow",
           policies: [
             {
-              from: { element: { type: "entities" } },
-              allow: { to: { element: { types: { anyOf: ["entities", "shared"] } } } },
-            },
-            {
-              from: { element: { type: "features" } },
-              allow: { to: { element: { types: { anyOf: ["entities", "shared"] } } } },
-            },
-            {
-              from: { element: { type: "widgets" } },
-              allow: { to: { element: { types: { anyOf: ["features", "entities", "shared"] } } } },
-            },
-            {
-              from: { element: { type: "pages" } },
-              allow: {
-                to: {
-                  element: {
-                    types: { anyOf: ["widgets", "features", "entities", "shared", "legacy-modules"] },
-                  },
-                },
-              },
+              from: { element: { type: "app" } },
+              allow: { to: { element: { types: { anyOf: ["app", "shared", "entities", "features", "widgets", "pages"] } } } },
             },
             {
               from: { element: { type: "shared" } },
               allow: { to: { element: { type: "shared" } } },
             },
             {
-              from: { element: { type: "legacy-modules" } },
-              allow: { to: { element: { types: { anyOf: ["entities", "shared", "legacy-modules"] } } } },
+              from: { element: { type: "entities" } },
+              allow: { to: { element: { types: { anyOf: ["entities", "shared"] } } } },
+            },
+            {
+              from: { element: { type: "features" } },
+              allow: { to: { element: { types: { anyOf: ["app", "entities", "shared"] } } } },
+            },
+            {
+              from: { element: { type: "widgets" } },
+              allow: {
+                to: {
+                  element: {
+                    types: { anyOf: ["app", "features", "entities", "shared"] },
+                  },
+                },
+              },
+            },
+            {
+              from: { element: { type: "pages" } },
+              allow: {
+                to: {
+                  element: {
+                    types: { anyOf: ["app", "widgets", "features", "entities", "shared"] },
+                  },
+                },
+              },
             },
           ],
         },

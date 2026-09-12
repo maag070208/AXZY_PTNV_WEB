@@ -25,7 +25,7 @@ import {
 import { useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import { usersApi, type User } from "@entities/user";
 import { ticketsApi, type KanbanAssignment, type Ticket } from "@entities/ticket";
 import TicketDetailModal from "@widgets/tickets/ticket-detail-modal";

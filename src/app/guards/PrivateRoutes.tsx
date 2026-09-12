@@ -12,12 +12,10 @@ import {
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
-import type { AppDispatch, RootState } from "@core/store/store";
-import { logout, meThunk } from "@core/store/auth/auth.slice";
-import {
-  fetchUnreadCount,
-} from "@core/store/notifications/notifications.slice";
-import { useAblyNotifications } from "@core/hooks/useAbly";
+import type { AppDispatch, RootState } from "@app/store";
+import { logout, meThunk } from "@entities/user";
+import { fetchUnreadCount } from "@entities/notification";
+import { useAblyNotifications } from "./useAblyNotifications";
 
 export default function PrivateRoutes() {
   const navigate = useNavigate();

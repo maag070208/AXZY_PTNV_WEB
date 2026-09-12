@@ -19,7 +19,7 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import {
   departmentsApi,
   type Department,

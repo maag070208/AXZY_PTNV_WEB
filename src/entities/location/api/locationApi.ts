@@ -1,4 +1,4 @@
-import { api } from "@core/api/client";
+import { api } from "@shared/api/client";
 import type { Location } from "../model/types";
 
 export const locationsApi = {

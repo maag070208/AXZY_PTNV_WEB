@@ -12,7 +12,7 @@ import { FaDownload, FaFileSignature, FaRedo, FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { AppDispatch, RootState } from "@core/store/store";
+import type { AppDispatch, RootState } from "@app/store";
 import { resetDraft, saveCarta, type CartaResponsiva } from "@entities/carta";
 import { CartaForm, validateCartaDraft } from "@features/carta/create-carta";
 import { downloadCartaPDF } from "@widgets/carta/carta-pdf";

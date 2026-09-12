@@ -20,12 +20,12 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { AppDispatch, RootState } from "@core/store/store";
+import type { AppDispatch, RootState } from "@app/store";
 import {
   fetchTicketById,
   updateTicketThunk,
   clearCurrent,
-} from "@core/store/tickets/tickets.slice";
+} from "@entities/ticket";
 
 const PRIORITIES = [
   { value: "BAJA", label: "Baja", icon: <FaInfoCircle size={11} />, color: "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200", activeColor: "bg-slate-600 text-white border-slate-600" },

@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type InventoryMovement, type MovementType, type CondicionType } from "@entities/inventory-movement";
 import { locationsApi, type Location, formatLocation } from "@entities/location";
-import { formatFechaHora } from "@core/utils/dates";
+import { formatFechaHora } from "@shared/utils/dates";
 import { downloadInventoryPDF } from "@widgets/inventory/inventory-pdf";
 
 const TIPO_ICONS: Record<MovementType, React.ReactNode> = {
@@ -105,7 +105,7 @@ export default function InventoryMovementsPage() {
     try {
       await downloadInventoryPDF(movements, locations);
       setToast({ message: t("messages.pdfDownloaded"), type: "success" });
-    } catch (e: any) {
+    } catch {
       setToast({ message: t("messages.pdfError"), type: "error" });
     } finally {
       setDownloadingPDF(false);

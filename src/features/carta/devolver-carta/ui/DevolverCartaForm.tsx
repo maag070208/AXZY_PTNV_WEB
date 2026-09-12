@@ -10,7 +10,6 @@ import {
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
 import { FaUndo } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { CartaResponsiva } from "@entities/carta";
 

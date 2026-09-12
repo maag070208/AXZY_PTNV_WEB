@@ -2,13 +2,13 @@ import { ITBadget, ITFlex, ITGrid, ITInput, ITSearchSelect, ITSelect, ITStack, I
 import { FaNetworkWired } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@core/store/store";
+import type { AppDispatch, RootState } from "@app/store";
 import {
   setDraftField,
   setItemField,
 } from "@entities/carta";
 import { usersApi, type User, type UserRole } from "@entities/user";
-import { deviceApi as devicesApi, type Device } from "@entities/device";
+import { type Device } from "@entities/device";
 import { deviceTypeApi as deviceTypesApi, type DeviceType } from "@entities/device-type";
 import type { CartaFormErrors } from "../model/validation";
 
@@ -23,7 +23,7 @@ export default function CartaForm({ errors }: Props) {
   const [empleados, setEmpleados] = useState<User[]>([]);
   const [jefes, setJefes] = useState<User[]>([]);
   const [tipos, setTipos] = useState<DeviceType[]>([]);
-  const [devices, setDevices] = useState<Device[]>([]);
+  const [devices] = useState<Device[]>([]);
   const [loadingConsecutivo, setLoadingConsecutivo] = useState(false);
   const [selectedEmpleadoId, setSelectedEmpleadoId] = useState<string>("");
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
@@ -64,31 +64,20 @@ export default function CartaForm({ errors }: Props) {
     deviceTypesApi.list().then(setTipos).catch(() => setTipos([]));
   }, []);
 
+  const itemId = item?.id;
+
   useEffect(() => {
-    devicesApi
-      .list({ estado: "DISPONIBLE", typeId: draft.deviceTypeId || undefined })
-      .then((res) => setDevices(res.data))
-      .catch(() => setDevices([]));
-    setSelectedDeviceId("");
-    if (item) {
-      dispatch(setItemField({ id: item.id, field: "deviceId", value: "" }));
-      dispatch(setItemField({ id: item.id, field: "device", value: null as any }));
-      dispatch(setItemField({ id: item.id, field: "controlActivos", value: "" }));
-      dispatch(setItemField({ id: item.id, field: "descripcion", value: "" }));
-      dispatch(setItemField({ id: item.id, field: "marca", value: "" }));
-      dispatch(setItemField({ id: item.id, field: "modelo", value: "" }));
-      dispatch(setItemField({ id: item.id, field: "numeroSerie", value: "" }));
-      dispatch(setItemField({ id: item.id, field: "nombreEquipo", value: "" }));
-    }
-  }, [draft.deviceTypeId]);
+    if (!itemId) return;
+    dispatch(setItemField({ id: itemId, field: "controlActivos", value: "" }));
+    dispatch(setItemField({ id: itemId, field: "descripcion", value: "" }));
+    dispatch(setItemField({ id: itemId, field: "marca", value: "" }));
+    dispatch(setItemField({ id: itemId, field: "modelo", value: "" }));
+    dispatch(setItemField({ id: itemId, field: "numeroSerie", value: "" }));
+    dispatch(setItemField({ id: itemId, field: "nombreEquipo", value: "" }));
+  }, [draft.deviceTypeId, itemId, dispatch]);
 
   const handleField = (field: keyof typeof draft, value: string | number) => {
     dispatch(setDraftField({ field, value }));
-  };
-
-  const handleItem = (field: keyof typeof item, value: string) => {
-    if (!item) return;
-    dispatch(setItemField({ id: item.id, field, value }));
   };
 
   const handleTypeChange = async (typeId: string) => {

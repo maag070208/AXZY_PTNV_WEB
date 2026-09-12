@@ -2,7 +2,7 @@ import { ITAlert, ITFlex, ITLoader, ITPage } from "@axzydev/axzy_ui_system";
 import { FaFileSignature } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { formatFecha } from "@core/utils/dates";
+import { formatFecha } from "@shared/utils/dates";
 import {
   useDevolverCarta,
   DevolverCartaForm,

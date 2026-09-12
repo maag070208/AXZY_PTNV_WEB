@@ -1,4 +1,4 @@
-import { formatFecha } from "@core/utils/dates";
+import { formatFecha } from "@shared/utils/dates";
 import type { CartaResponsiva } from "@entities/carta";
 interface Props {
   carta: CartaResponsiva;

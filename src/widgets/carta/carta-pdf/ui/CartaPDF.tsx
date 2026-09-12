@@ -6,9 +6,9 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import { formatFecha } from "@core/utils/dates";
+import { formatFecha } from "@shared/utils/dates";
 import type { CartaResponsiva } from "@entities/carta";
-import { LOGO_PUERTO_NUEVO_BASE64 } from "@core/assets/logoPuertoNuevo";
+import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
 
 interface Props {
   carta: CartaResponsiva;

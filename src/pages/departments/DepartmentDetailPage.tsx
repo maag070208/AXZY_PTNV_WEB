@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import {
   departmentsApi,
   type Department,
@@ -35,7 +35,7 @@ export default function DepartmentDetailPage() {
   const [newSubarea, setNewSubarea] = useState("");
   const [subareaToDelete, setSubareaToDelete] = useState<Subarea | null>(null);
   const [deptToDelete, setDeptToDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [, setDeleting] = useState(false);
 
   const confirmDeleteDept = async () => {
     if (!dept) return;

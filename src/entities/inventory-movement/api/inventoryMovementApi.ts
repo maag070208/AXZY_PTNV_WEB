@@ -1,4 +1,4 @@
-import { api } from "@core/api/client";
+import { api } from "@shared/api/client";
 import type { Device } from "@entities/device";
 import type {
   CondicionType,

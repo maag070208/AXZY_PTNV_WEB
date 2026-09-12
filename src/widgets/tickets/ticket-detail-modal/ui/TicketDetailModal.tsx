@@ -1,7 +1,7 @@
 import { ITButton, ITDialog, ITFlex, ITLoader, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaBookmark, FaCalendarAlt, FaComments, FaExternalLinkAlt } from "react-icons/fa";
 import type { Ticket } from "@entities/ticket";
-import { formatFechaHora } from "@core/utils/dates";
+import { formatFechaHora } from "@shared/utils/dates";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
 import {
   ASSIGNMENT_STATUS_META,

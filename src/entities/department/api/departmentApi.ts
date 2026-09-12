@@ -1,8 +1,8 @@
-import { api } from "@core/api/client";
+import { api } from "@shared/api/client";
 import {
   tableRequest,
   type ITDataTableFetchParamsPost,
-} from "@core/api/table";
+} from "@shared/api/table";
 import type { Department, Subarea } from "../model/types";
 
 export const departmentsApi = {

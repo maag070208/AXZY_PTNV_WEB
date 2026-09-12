@@ -20,7 +20,7 @@ import { FaEdit, FaPlus, FaUserTie } from "react-icons/fa";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import { usersApi, type User } from "@entities/user";
 import {
   departmentsApi,

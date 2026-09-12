@@ -20,8 +20,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { AppDispatch, RootState } from "@core/store/store";
-import { createTicketThunk } from "@core/store/tickets/tickets.slice";
+import type { AppDispatch, RootState } from "@app/store";
+import { createTicketThunk } from "@entities/ticket";
 import { ticketsApi } from "@entities/ticket";
 
 const PRIORITIES = [

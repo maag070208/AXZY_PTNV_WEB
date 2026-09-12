@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { usersApi, type User } from "@entities/user";
-import { formatFechaHora } from "@core/utils/dates";
+import { formatFechaHora } from "@shared/utils/dates";
 
 interface HistoryEntry {
   id: string;

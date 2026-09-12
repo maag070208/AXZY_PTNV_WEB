@@ -2,4 +2,5 @@
 // directo desde model/ o api/ — todo pasa por este barrel.
 export * from "./model/types";
 export * from "./model/carta.slice";
+export { default } from "./model/carta.slice";
 export * from "./api/cartaApi";

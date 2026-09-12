@@ -16,7 +16,7 @@ import { FaSync, FaTasks, FaTrello } from "react-icons/fa";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import type { RootState } from "@core/store/store";
+import type { RootState } from "@app/store";
 import { ticketsApi, type KanbanAssignment } from "@entities/ticket";
 
 const STATUS_BADGE: Record<string, { color: string; label: string }> = {

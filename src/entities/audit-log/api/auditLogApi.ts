@@ -1,4 +1,4 @@
-import { api } from "@core/api/client";
+import { api } from "@shared/api/client";
 import type { AuditLog, AuditLogListResult } from "../model/types";
 
 export const auditApi = {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import type { AppDispatch } from "@core/store/store";
+import type { AppDispatch } from "@app/store";
 import {
   cartasApi,
   returnCartaThunk,
