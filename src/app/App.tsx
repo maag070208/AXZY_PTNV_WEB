@@ -20,7 +20,6 @@ import DeviceImportPage from "@pages/devices/DeviceImportPage";
 import DepartmentsPage from "@pages/departments/DepartmentsPage";
 import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
-import EmployeeFormPage from "@pages/employees/EmployeeFormPage";
 import ReportesPage from "@pages/reports/ReportesPage";
 import UsersListPage from "@pages/users/UsersListPage";
 import UserFormPage from "@pages/users/UserFormPage";
@@ -74,7 +73,7 @@ export default function App() {
         <Route path="/departamentos" element={<DepartmentsPage />} />
         <Route path="/departamentos/:id" element={<DepartmentDetailPage />} />
         <Route path="/empleados" element={<EmployeesListPage />} />
-        <Route path="/empleados/:id/editar" element={<EmployeeFormPage />} />
+        <Route path="/empleados/:id/editar" element={<UserFormPage />} />
         <Route path="/reportes" element={<ReportesPage />} />
         <Route path="/usuarios" element={<UsersListPage />} />
         <Route path="/usuarios/nuevo" element={<UserFormPage />} />
