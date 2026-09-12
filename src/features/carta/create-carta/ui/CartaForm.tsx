@@ -10,7 +10,7 @@ import {
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { type Device } from "@entities/device";
 import { deviceTypeApi as deviceTypesApi, type DeviceType } from "@entities/device-type";
-import type { CartaFormErrors } from "../model/validation";
+import type { CartaFormErrors } from "@entities/carta";
 
 interface Props {
   errors?: CartaFormErrors;

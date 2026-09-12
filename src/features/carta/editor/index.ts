@@ -1,0 +1,1 @@
+export { useCartaEditor } from "./model/useCartaEditor";

@@ -1,0 +1,1 @@
+export { useCartaDetail } from "./model/useCartaDetail";

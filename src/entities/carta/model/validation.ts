@@ -1,4 +1,4 @@
-import type { CartaResponsiva } from "@entities/carta";
+import type { CartaResponsiva } from "./types";
 
 export interface CartaFormErrors {
   numeroEmpleado?: string;
