@@ -23,7 +23,7 @@ export const useAssignmentList = (loadErrorKey: string) => {
     ticketsApi
       .kanban()
       .then((res) => setRows(res.data.filter((a) => !a.ticket.deletedAt)))
-      .catch((e: any) => setError(e.message ?? tt(loadErrorKey)))
+      .catch((e: any) => setError(e.message ?? tt(loadErrorKey as any)))
       .finally(() => setLoading(false));
   }, [tt, loadErrorKey]);
 
