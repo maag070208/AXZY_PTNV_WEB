@@ -1,0 +1,165 @@
+import {
+  ITBadget,
+  ITButton,
+  ITDataTable,
+  ITFlex,
+  ITText,
+} from "@axzydev/axzy_ui_system";
+import type {
+  Column,
+  ITDataTableFetchParams,
+  ITDataTableResponse,
+} from "@axzydev/axzy_ui_system";
+import { FaEye, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import {
+  CATEGORY_LABELS,
+  STATUS_LABELS,
+  STATUS_BADGE,
+  PRIORITY_BADGE,
+  type Ticket,
+} from "@entities/ticket";
+
+interface Props {
+  isAdmin: boolean;
+  fetchData: (
+    params: ITDataTableFetchParams
+  ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
+  reloadKey: number;
+  onView: (t: Ticket) => void;
+  onMarkForDelete: (t: Ticket) => void;
+}
+
+export default function TicketsTable({
+  isAdmin,
+  fetchData,
+  reloadKey,
+  onView,
+  onMarkForDelete,
+}: Props) {
+  const { t: tt } = useTranslation("tickets");
+
+  const columns: Column<Ticket>[] = [
+    {
+      key: "titulo",
+      label: "Título",
+      type: "string",
+      filter: true,
+      render: (t) => (
+        <ITFlex direction="column" gap={0.5}>
+          <ITFlex align="center" gap={1}>
+            <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
+            {t.deletedAt && (
+              <ITBadget color="gray" size="small">Eliminado</ITBadget>
+            )}
+          </ITFlex>
+          <ITText className="text-[9px] font-bold text-slate-400 uppercase">
+            {CATEGORY_LABELS[t.category] ?? t.category}
+          </ITText>
+        </ITFlex>
+      ),
+    },
+    {
+      key: "status",
+      label: "Estado",
+      type: "catalog",
+      filter: "catalog",
+      catalogOptions: {
+        data: Object.entries(STATUS_LABELS).map(([id, name]) => ({ id, name })),
+        loading: false,
+        error: false,
+      },
+      render: (t) => (
+        <ITBadget color={(STATUS_BADGE[t.status]?.color as any) ?? "default"} size="small">
+          {STATUS_BADGE[t.status]?.label ?? t.status}
+        </ITBadget>
+      ),
+    },
+    {
+      key: "priority",
+      label: "Prioridad",
+      type: "catalog",
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "BAJA", name: "Baja" },
+          { id: "MEDIA", name: "Media" },
+          { id: "ALTA", name: "Alta" },
+          { id: "URGENTE", name: "Urgente" },
+        ],
+        loading: false,
+        error: false,
+      },
+      render: (t) => (
+        <ITBadget color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"} size="small">
+          {PRIORITY_BADGE[t.priority]?.label ?? t.priority}
+        </ITBadget>
+      ),
+    },
+    {
+      key: "creadoPor",
+      label: "Creado por",
+      type: "string",
+      render: (t) => (
+        <ITText className="text-[11px] font-bold text-slate-600">
+          {t.creadoPor?.name ?? "—"}
+        </ITText>
+      ),
+    },
+    {
+      key: "asignadoA",
+      label: "Asignado a",
+      type: "string",
+      render: (t) => (
+        <ITText className="text-[11px] font-bold text-slate-600">
+          {t.asignadoA?.name ?? "Sin asignar"}
+        </ITText>
+      ),
+    },
+    {
+      key: "acciones",
+      label: "",
+      type: "string",
+      render: (t) => (
+        <ITFlex gap={1}>
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="secondary"
+            onClick={() => onView(t)}
+          >
+            <FaEye size={12} />
+          </ITButton>
+          {isAdmin && (
+            <ITButton
+              variant="outlined"
+              size="small"
+              color="danger"
+              onClick={() => onMarkForDelete(t)}
+              title={t.deletedAt ? tt("list.deleteForever") : tt("list.moveTrash")}
+            >
+              {t.deletedAt ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
+            </ITButton>
+          )}
+        </ITFlex>
+      ),
+    },
+  ];
+
+  return (
+    <ITDataTable
+      columns={columns as unknown as Column<Record<string, unknown>>[]}
+      fetchData={
+        fetchData as unknown as (
+          p: ITDataTableFetchParams
+        ) => Promise<ITDataTableResponse<Record<string, unknown>>>
+      }
+      reloadTrigger={reloadKey}
+      defaultItemsPerPage={10}
+      itemsPerPageOptions={[5, 10, 50]}
+      debounceMs={350}
+      variant="bordered"
+      size="sm"
+    />
+  );
+}
