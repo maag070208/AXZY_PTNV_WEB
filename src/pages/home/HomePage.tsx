@@ -10,8 +10,8 @@ export default function HomePage() {
 
   return (
     <ITPage
-      title="Inicio"
-      description="Panel de control de Cartas Responsivas · Puerto Nuevo Hotel y Villas"
+      title={fx.t("home:title")}
+      description={fx.t("home:description")}
       icon={<FaHouseUser size={20} />}
       maxWidth="6xl"
     >

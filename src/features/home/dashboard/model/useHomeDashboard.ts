@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import type { RootState } from "@app/store";
 import { cartasApi } from "@entities/carta";
@@ -10,6 +11,7 @@ import { ticketsApi } from "@entities/ticket";
 export type HomeCounts = Record<string, number>;
 
 export const useHomeDashboard = () => {
+  const { t } = useTranslation(["home", "common"]);
   const user = useSelector((s: RootState) => s.auth.user);
   const [counts, setCounts] = useState<HomeCounts>({});
 
@@ -54,7 +56,7 @@ export const useHomeDashboard = () => {
     };
   }, [canManage, isAdmin, user?.role]);
 
-  return { user, isAdmin, isJefeArea, canManage, counts };
+  return { user, isAdmin, isJefeArea, canManage, counts, t };
 };
 
 export type UseHomeDashboard = ReturnType<typeof useHomeDashboard>;

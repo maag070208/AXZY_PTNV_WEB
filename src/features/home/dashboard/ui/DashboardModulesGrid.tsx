@@ -24,7 +24,7 @@ interface HomeModule {
 
 export default function DashboardModulesGrid({ fx }: { fx: UseHomeDashboard }) {
   const navigate = useNavigate();
-  const { user, canManage, isAdmin, counts } = fx;
+  const { t, user, canManage, isAdmin, counts } = fx;
 
   const modules: HomeModule[] = [
     // EMPLEADO: solo cartas y tickets
@@ -32,23 +32,23 @@ export default function DashboardModulesGrid({ fx }: { fx: UseHomeDashboard }) {
       ? [
           {
             id: "misTareas",
-            title: "Mis Tareas",
-            description: "Tareas asignadas a ti y su seguimiento kanban",
+            title: t("modules.misTareasTitle"),
+            description: t("modules.misTareasDescription"),
             icon: <FaTasks size={22} />,
             to: "/tickets/mis-tareas",
           },
           {
-            id: "cartas",
-            title: "Mis Cartas",
-            description: "Cartas responsivas asignadas a ti",
+            id: "misCartas",
+            title: t("modules.misCartasTitle"),
+            description: t("modules.misCartasDescription"),
             icon: <FaFileSignature size={22} />,
             to: "/cartas",
             count: counts.cartas,
           },
           {
-            id: "tickets",
-            title: "Mis Tickets",
-            description: "Tickets que has creado o te fueron asignados",
+            id: "misTickets",
+            title: t("modules.misTicketsTitle"),
+            description: t("modules.misTicketsDescription"),
             icon: <FaTicketAlt size={22} />,
             to: "/tickets",
             count: counts.tickets,
@@ -60,33 +60,32 @@ export default function DashboardModulesGrid({ fx }: { fx: UseHomeDashboard }) {
       ? [
           {
             id: "cartas",
-            title: "Cartas Responsivas",
-            description:
-              "Genera y administra cartas responsivas del departamento de Mantenimiento",
+            title: t("modules.cartasTitle"),
+            description: t("modules.cartasDescription"),
             icon: <FaFileSignature size={22} />,
             to: "/cartas",
             count: counts.cartas,
           },
           {
             id: "tickets",
-            title: "Tickets",
-            description: "Gestiona tickets de soporte y mantenimiento",
+            title: t("modules.ticketsTitle"),
+            description: t("modules.ticketsDescription"),
             icon: <FaTicketAlt size={22} />,
             to: "/tickets",
             count: counts.tickets,
           },
           {
             id: "reportes",
-            title: "Reportes",
-            description: "Consulta asignaciones e inventario de dispositivos",
+            title: t("modules.reportesTitle"),
+            description: t("modules.reportesDescription"),
             icon: <FaChartBar size={22} />,
             to: "/reportes",
             count: undefined,
           },
           {
             id: "empleados",
-            title: "Empleados",
-            description: "Catálogo de empleados que reciben equipo",
+            title: t("modules.empleadosTitle"),
+            description: t("modules.empleadosDescription"),
             icon: <FaUserTie size={22} />,
             to: "/empleados",
             count: counts.empleados,
@@ -98,31 +97,31 @@ export default function DashboardModulesGrid({ fx }: { fx: UseHomeDashboard }) {
       ? [
           {
             id: "dispositivos",
-            title: "Dispositivos",
-            description: "Control de activos y estados de cada equipo",
+            title: t("modules.dispositivosTitle"),
+            description: t("modules.dispositivosDescription"),
             icon: <FaLaptop size={22} />,
             to: "/dispositivos",
             count: counts.dispositivos,
           },
           {
             id: "inventario",
-            title: "Inventario",
-            description: "Movimientos, kardex y ubicaciones de equipos",
+            title: t("modules.inventarioTitle"),
+            description: t("modules.inventarioDescription"),
             icon: <FaBoxes size={22} />,
             to: "/inventario",
           },
           {
             id: "departamentos",
-            title: "Departamentos",
-            description: "Estructura organizacional y subáreas",
+            title: t("modules.departamentosTitle"),
+            description: t("modules.departamentosDescription"),
             icon: <FaBuilding size={22} />,
             to: "/departamentos",
             count: counts.departamentos,
           },
           {
             id: "usuarios",
-            title: "Usuarios",
-            description: "Administración de accesos al sistema",
+            title: t("modules.usuariosTitle"),
+            description: t("modules.usuariosDescription"),
             icon: <FaUserShield size={22} />,
             to: "/usuarios",
             count: counts.usuarios,

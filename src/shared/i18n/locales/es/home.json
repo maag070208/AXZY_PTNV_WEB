@@ -1,3 +1,28 @@
 {
-  "placeholder": ""
+  "title": "Inicio",
+  "description": "Panel de control de Cartas Responsivas · Puerto Nuevo Hotel y Villas",
+  "modules": {
+    "misTareasTitle": "Mis Tareas",
+    "misTareasDescription": "Tareas asignadas a ti y su seguimiento kanban",
+    "misCartasTitle": "Mis Cartas",
+    "misCartasDescription": "Cartas responsivas asignadas a ti",
+    "misTicketsTitle": "Mis Tickets",
+    "misTicketsDescription": "Tickets que has creado o te fueron asignados",
+    "cartasTitle": "Cartas Responsivas",
+    "cartasDescription": "Genera y administra cartas responsivas del departamento de Mantenimiento",
+    "ticketsTitle": "Tickets",
+    "ticketsDescription": "Gestiona tickets de soporte y mantenimiento",
+    "reportesTitle": "Reportes",
+    "reportesDescription": "Consulta asignaciones e inventario de dispositivos",
+    "empleadosTitle": "Empleados",
+    "empleadosDescription": "Catálogo de empleados que reciben equipo",
+    "dispositivosTitle": "Dispositivos",
+    "dispositivosDescription": "Control de activos y estados de cada equipo",
+    "inventarioTitle": "Inventario",
+    "inventarioDescription": "Movimientos, kardex y ubicaciones de equipos",
+    "departamentosTitle": "Departamentos",
+    "departamentosDescription": "Estructura organizacional y subáreas",
+    "usuariosTitle": "Usuarios",
+    "usuariosDescription": "Administración de accesos al sistema"
+  }
 }
