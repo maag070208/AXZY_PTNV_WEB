@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { reportsApi, type AsignadoRow } from "@entities/report";
 import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
 
@@ -9,6 +10,7 @@ interface Options {
 }
 
 export const useAsignadosReport = ({ download }: Options) => {
+  const { t } = useTranslation(["reports", "common"]);
   const [rows, setRows] = useState<AsignadoRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,9 +23,9 @@ export const useAsignadosReport = ({ download }: Options) => {
     reportsApi
       .asignados()
       .then((res) => setRows(res.data))
-      .catch((e: any) => setError(e.message ?? "No se pudo cargar el reporte"))
+      .catch((e: any) => setError(e.message ?? t("asignados.errorLoad")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();
@@ -66,6 +68,7 @@ export const useAsignadosReport = ({ download }: Options) => {
   );
 
   return {
+    t,
     rows,
     loading,
     error,

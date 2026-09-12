@@ -1,3 +1,50 @@
 {
-  "placeholder": ""
+  "title": "Reports",
+  "description": "View equipment assignments and inventory",
+  "tabs": {
+    "asignados": "Assigned",
+    "dispositivos": "Devices"
+  },
+  "asignados": {
+    "statAsignados": "Assigned",
+    "statPromedio": "Avg. days",
+    "statMas30": "+30 days assigned",
+    "errorLoad": "Could not load the report",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "export": "Export PDF",
+    "exporting": "Exporting...",
+    "colActivo": "Asset",
+    "colDescripcion": "Description",
+    "colResponsable": "Assignee",
+    "colDepto": "Dept.",
+    "colFolioOrigen": "Folio / Source",
+    "colFecha": "Date",
+    "colDias": "Days assigned",
+    "origenCarta": "Letter",
+    "origenMovimiento": "Movement",
+    "origenDesconocido": "Unknown"
+  },
+  "devices": {
+    "statDispositivos": "Devices",
+    "statDisponibles": "Available",
+    "statAsignados": "Assigned",
+    "statMas30": "+30 days assigned",
+    "statBajas": "Retired",
+    "errorLoad": "Could not load the report",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "export": "Export PDF",
+    "exporting": "Exporting...",
+    "colActivo": "Asset",
+    "colDescripcion": "Description",
+    "colCant": "Qty.",
+    "colEstado": "Status",
+    "colResponsable": "Assignee",
+    "colDepto": "Dept.",
+    "colDias": "Days assigned",
+    "colFolio": "Folio",
+    "colArea": "Area",
+    "loteTag": "Batch ×{{count}}"
+  }
 }

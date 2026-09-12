@@ -11,18 +11,9 @@ import type { Column } from "@axzydev/axzy_ui_system";
 import type { AsignadoRow } from "@entities/report";
 import type { UseAsignadosReport } from "../model/useAsignadosReport";
 
-const origenBadgeColor = (origen: AsignadoRow["origen"]) =>
-  origen === "CARTA" ? "success" : origen === "MOVIMIENTO" ? "warning" : "gray";
-
-const origenLabel = (origen: AsignadoRow["origen"]) =>
-  origen === "CARTA"
-    ? "Carta"
-    : origen === "MOVIMIENTO"
-    ? "Movimiento"
-    : "Desconocido";
-
 export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
   const {
+    t,
     rows,
     loading,
     error,
@@ -35,10 +26,20 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     fetchTableData,
   } = fx;
 
+  const origenBadgeColor = (origen: AsignadoRow["origen"]) =>
+    origen === "CARTA" ? "success" : origen === "MOVIMIENTO" ? "warning" : "gray";
+
+  const origenLabel = (origen: AsignadoRow["origen"]) =>
+    origen === "CARTA"
+      ? t("asignados.origenCarta")
+      : origen === "MOVIMIENTO"
+      ? t("asignados.origenMovimiento")
+      : t("asignados.origenDesconocido");
+
   const columns: Column<AsignadoRow>[] = [
     {
       key: "controlActivos",
-      label: "Activo",
+      label: t("asignados.colActivo"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -49,7 +50,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     },
     {
       key: "descripcion",
-      label: "Descripción",
+      label: t("asignados.colDescripcion"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -65,7 +66,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     },
     {
       key: "responsable",
-      label: "Responsable",
+      label: t("asignados.colResponsable"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -81,7 +82,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     },
     {
       key: "departamento",
-      label: "Depto.",
+      label: t("asignados.colDepto"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -92,7 +93,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     },
     {
       key: "folio",
-      label: "Folio / Origen",
+      label: t("asignados.colFolioOrigen"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -108,7 +109,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     },
     {
       key: "fecha",
-      label: "Fecha",
+      label: t("asignados.colFecha"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -119,7 +120,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     },
     {
       key: "diasAsignado",
-      label: "Días asignado",
+      label: t("asignados.colDias"),
       type: "number",
       sortable: false,
       render: (r) => (
@@ -143,7 +144,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
               {rows.length}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Asignados
+              {t("asignados.statAsignados")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -153,7 +154,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
               {promedioDias}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Días promedio
+              {t("asignados.statPromedio")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -163,7 +164,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
               {masDe30}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              +30 días asignado
+              {t("asignados.statMas30")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -179,13 +180,15 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
         {loading && (
           <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            Cargando…
+            {t("asignados.loading")}
           </ITText>
         )}
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
             <FaSync size={11} />
-            <ITText className="font-bold text-[11px]">Actualizar</ITText>
+            <ITText className="font-bold text-[11px]">
+              {t("asignados.refresh")}
+            </ITText>
           </ITFlex>
         </ITButton>
         <ITButton
@@ -197,7 +200,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
           <ITFlex align="center" gap={1}>
             <FaDownload size={12} />
             <ITText className="font-bold text-[11px]">
-              {exporting ? "Exportando..." : "Exportar PDF"}
+              {exporting ? t("asignados.exporting") : t("asignados.export")}
             </ITText>
           </ITFlex>
         </ITButton>

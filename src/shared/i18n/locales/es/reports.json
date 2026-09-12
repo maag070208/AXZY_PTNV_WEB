@@ -1,3 +1,50 @@
 {
-  "placeholder": ""
+  "title": "Reportes",
+  "description": "Consulta asignaciones e inventario de dispositivos",
+  "tabs": {
+    "asignados": "Asignados",
+    "dispositivos": "Dispositivos"
+  },
+  "asignados": {
+    "statAsignados": "Asignados",
+    "statPromedio": "Días promedio",
+    "statMas30": "+30 días asignado",
+    "errorLoad": "No se pudo cargar el reporte",
+    "loading": "Cargando…",
+    "refresh": "Actualizar",
+    "export": "Exportar PDF",
+    "exporting": "Exportando...",
+    "colActivo": "Activo",
+    "colDescripcion": "Descripción",
+    "colResponsable": "Responsable",
+    "colDepto": "Depto.",
+    "colFolioOrigen": "Folio / Origen",
+    "colFecha": "Fecha",
+    "colDias": "Días asignado",
+    "origenCarta": "Carta",
+    "origenMovimiento": "Movimiento",
+    "origenDesconocido": "Desconocido"
+  },
+  "devices": {
+    "statDispositivos": "Dispositivos",
+    "statDisponibles": "Disponibles",
+    "statAsignados": "Asignados",
+    "statMas30": "+30 días asignado",
+    "statBajas": "Baja",
+    "errorLoad": "No se pudo cargar el reporte",
+    "loading": "Cargando…",
+    "refresh": "Actualizar",
+    "export": "Exportar PDF",
+    "exporting": "Exportando...",
+    "colActivo": "Activo",
+    "colDescripcion": "Descripción",
+    "colCant": "Cant.",
+    "colEstado": "Estado",
+    "colResponsable": "Responsable",
+    "colDepto": "Depto.",
+    "colDias": "Días asignado",
+    "colFolio": "Folio",
+    "colArea": "Área",
+    "loteTag": "Lote ×{{count}}"
+  }
 }

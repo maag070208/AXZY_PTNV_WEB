@@ -22,6 +22,7 @@ const estadoBadge = (estado: string) => (
 
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const {
+    t,
     rows,
     loading,
     error,
@@ -36,7 +37,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const columns: Column<DeviceReportRow>[] = [
     {
       key: "controlActivos",
-      label: "Activo",
+      label: t("devices.colActivo"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -46,7 +47,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           </ITText>
           {r.cantidad > 1 && (
             <ITText className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
-              Lote ×{r.cantidad}
+              {t("devices.loteTag", { count: r.cantidad })}
             </ITText>
           )}
         </ITFlex>
@@ -54,7 +55,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     },
     {
       key: "descripcion",
-      label: "Descripción",
+      label: t("devices.colDescripcion"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -70,7 +71,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     },
     {
       key: "cantidad",
-      label: "Cant.",
+      label: t("devices.colCant"),
       type: "number",
       sortable: false,
       render: (r) => (
@@ -81,14 +82,14 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     },
     {
       key: "estado",
-      label: "Estado",
+      label: t("devices.colEstado"),
       type: "string",
       sortable: false,
       render: (r) => estadoBadge(r.estado),
     },
     {
       key: "responsable",
-      label: "Responsable",
+      label: t("devices.colResponsable"),
       type: "string",
       sortable: false,
       render: (r) =>
@@ -109,7 +110,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     },
     {
       key: "departamento",
-      label: "Depto.",
+      label: t("devices.colDepto"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -120,7 +121,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     },
     {
       key: "diasAsignado",
-      label: "Días asignado",
+      label: t("devices.colDias"),
       type: "number",
       sortable: false,
       render: (r) => (
@@ -139,7 +140,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     },
     {
       key: "folio",
-      label: "Folio",
+      label: t("devices.colFolio"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -150,7 +151,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     },
     {
       key: "area",
-      label: "Área",
+      label: t("devices.colArea"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -168,7 +169,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
               {rows.length}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Dispositivos
+              {t("devices.statDispositivos")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -178,7 +179,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
               {stats.disponibles}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Disponibles
+              {t("devices.statDisponibles")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -188,7 +189,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
               {stats.asignados}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Asignados
+              {t("devices.statAsignados")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -198,7 +199,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
               {stats.masDe30}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              +30 días asignado
+              {t("devices.statMas30")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -208,7 +209,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
               {stats.bajas}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              Baja
+              {t("devices.statBajas")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -224,13 +225,15 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
         {loading && (
           <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            Cargando…
+            {t("devices.loading")}
           </ITText>
         )}
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
             <FaSync size={11} />
-            <ITText className="font-bold text-[11px]">Actualizar</ITText>
+            <ITText className="font-bold text-[11px]">
+              {t("devices.refresh")}
+            </ITText>
           </ITFlex>
         </ITButton>
         <ITButton
@@ -242,7 +245,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           <ITFlex align="center" gap={1}>
             <FaDownload size={12} />
             <ITText className="font-bold text-[11px]">
-              {exporting ? "Exportando..." : "Exportar PDF"}
+              {exporting ? t("devices.exporting") : t("devices.export")}
             </ITText>
           </ITFlex>
         </ITButton>
