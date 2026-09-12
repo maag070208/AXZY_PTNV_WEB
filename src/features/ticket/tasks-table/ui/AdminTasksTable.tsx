@@ -11,6 +11,7 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import type { KanbanAssignment } from "@entities/ticket";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import { ASSIGNMENT_STATUS_BADGE } from "../model/useAssignmentList";
 import type { UseAssignmentList } from "../model/useAssignmentList";
 
@@ -65,7 +66,7 @@ export default function AdminTasksTable({ fx }: Props) {
       sortable: false,
       render: (row) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="small">
-          {ASSIGNMENT_STATUS_BADGE[row.status]?.label ?? row.status}
+          {dyn(tt)(`detail.taskStatusOptions.${row.status}`)}
         </ITBadget>
       ),
     },

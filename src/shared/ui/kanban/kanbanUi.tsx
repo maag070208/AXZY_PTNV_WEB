@@ -18,24 +18,24 @@ export interface Tone {
 // detecte nada.
 export const FALLBACK_TONE: Tone = { bg: "#94a3b8", text: "#ffffff" };
 
-export const PRIORITY_META: Record<string, { label: string; tone: Tone }> = {
-  BAJA: { label: "Baja", tone: { bg: "#94a3b8", text: "#ffffff" } },
-  MEDIA: { label: "Media", tone: { bg: "#f59e0b", text: "#ffffff" } },
-  ALTA: { label: "Alta", tone: { bg: "#ea580c", text: "#ffffff" } },
-  URGENTE: { label: "Urgente", tone: { bg: "#e11d48", text: "#ffffff" } },
+export const PRIORITY_META: Record<string, { tone: Tone }> = {
+  BAJA: { tone: { bg: "#94a3b8", text: "#ffffff" } },
+  MEDIA: { tone: { bg: "#f59e0b", text: "#ffffff" } },
+  ALTA: { tone: { bg: "#ea580c", text: "#ffffff" } },
+  URGENTE: { tone: { bg: "#e11d48", text: "#ffffff" } },
 };
 
-export const STATUS_META: Record<string, { label: string; tone: Tone }> = {
-  ABIERTO: { label: "Abierto", tone: { bg: "#f59e0b", text: "#ffffff" } },
-  EN_SEGUIMIENTO: { label: "En seguimiento", tone: { bg: "#3b82f6", text: "#ffffff" } },
-  CERRADO: { label: "Cerrado", tone: { bg: "#059669", text: "#ffffff" } },
+export const STATUS_META: Record<string, { tone: Tone }> = {
+  ABIERTO: { tone: { bg: "#f59e0b", text: "#ffffff" } },
+  EN_SEGUIMIENTO: { tone: { bg: "#3b82f6", text: "#ffffff" } },
+  CERRADO: { tone: { bg: "#059669", text: "#ffffff" } },
 };
 
-export const ASSIGNMENT_STATUS_META: Record<Status, { label: string; tone: Tone }> = {
-  PENDIENTE: { label: "Pendiente", tone: { bg: "#94a3b8", text: "#ffffff" } },
-  EN_PROGRESO: { label: "En progreso", tone: { bg: "#3b82f6", text: "#ffffff" } },
-  EN_REVISION: { label: "En revisión", tone: { bg: "#a855f7", text: "#ffffff" } },
-  COMPLETADA: { label: "Completada", tone: { bg: "#059669", text: "#ffffff" } },
+export const ASSIGNMENT_STATUS_META: Record<Status, { tone: Tone }> = {
+  PENDIENTE: { tone: { bg: "#94a3b8", text: "#ffffff" } },
+  EN_PROGRESO: { tone: { bg: "#3b82f6", text: "#ffffff" } },
+  EN_REVISION: { tone: { bg: "#a855f7", text: "#ffffff" } },
+  COMPLETADA: { tone: { bg: "#059669", text: "#ffffff" } },
 };
 
 // Paleta determinista para etiquetas de departamento y avatares: mismo
@@ -66,8 +66,8 @@ export function hashTone(key: string): Tone {
   return TAG_PALETTE[hash % TAG_PALETTE.length];
 }
 
-export function metaFor(map: Record<string, { label: string; tone: Tone }>, key: string) {
-  return map[key] ?? { label: key, tone: FALLBACK_TONE };
+export function metaFor(map: Record<string, { tone: Tone }>, key: string) {
+  return map[key] ?? { tone: FALLBACK_TONE };
 }
 
 export function Tag({ label, tone, icon }: { label: string; tone: Tone; icon?: React.ReactNode }) {

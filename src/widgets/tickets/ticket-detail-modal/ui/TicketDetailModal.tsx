@@ -1,6 +1,7 @@
 import { ITButton, ITDialog, ITFlex, ITLoader, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaBookmark, FaCalendarAlt, FaComments, FaExternalLinkAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import type { Ticket } from "@entities/ticket";
 import { formatFechaHora } from "@shared/utils/dates";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
@@ -92,7 +93,7 @@ export default function TicketDetailModal({
                                 )}
                               </div>
                             </ITFlex>
-                            <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} />
+                            <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} label={dyn(tt)(`detail.taskStatusOptions.${t.status}`)} />
                           </div>
 
                           <div className="flex items-baseline gap-1.5 mb-2 min-w-0">
@@ -153,11 +154,11 @@ export default function TicketDetailModal({
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <div className="flex items-center gap-1.5 px-2">
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.statusLabel")}</span>
-                    <Tag {...metaFor(STATUS_META, ticket.status)} />
+                    <Tag {...metaFor(STATUS_META, ticket.status)} label={dyn(tt)(`statusLabels.${ticket.status}`)} />
                   </div>
                   <div className="flex items-center gap-1.5 px-2">
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.priorityLabel")}</span>
-                    <Tag {...metaFor(PRIORITY_META, ticket.priority)} />
+                    <Tag {...metaFor(PRIORITY_META, ticket.priority)} label={dyn(tt)(`priorityLabels.${ticket.priority}`)} />
                   </div>
                   <div className="flex items-center gap-1.5 px-2">
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.deptLabel")}</span>

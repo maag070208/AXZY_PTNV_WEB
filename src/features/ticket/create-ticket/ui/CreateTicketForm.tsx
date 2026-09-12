@@ -58,7 +58,7 @@ export default function CreateTicketForm({
                   onClick={() => onFieldChange("priority", p.value)}
                   className={`rounded-full transition-all cursor-pointer ${form.priority === p.value ? "ring-2 ring-blue-200 ring-offset-1" : "opacity-75 hover:opacity-100"}`}
                 >
-                  <ITBadget color={p.badgeColor} size="small">{dyn(tt)(`list.priorities.${p.value}`)}</ITBadget>
+                  <ITBadget color={p.badgeColor} size="small">{dyn(tt)(`priorityLabels.${p.value}`)}</ITBadget>
                 </button>
               ))}
             </div>

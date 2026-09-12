@@ -1,4 +1,21 @@
 {
+  "statusLabels": {
+    "ABIERTO": "Abierto",
+    "EN_SEGUIMIENTO": "En seguimiento",
+    "CERRADO": "Cerrado"
+  },
+  "priorityLabels": {
+    "BAJA": "Baja",
+    "MEDIA": "Media",
+    "ALTA": "Alta",
+    "URGENTE": "Urgente"
+  },
+  "categoryLabels": {
+    "MANTENIMIENTO": "Mantenimiento",
+    "EQUIPO": "Equipo",
+    "SISTEMA": "Sistema",
+    "OTRO": "Otro"
+  },
   "list": {
     "title": "Tickets",
     "description": "Seguimiento de solicitudes y reportes",
@@ -16,12 +33,6 @@
       "priority": "Prioridad",
       "createdBy": "Creado por",
       "assignedTo": "Asignado a"
-    },
-    "priorities": {
-      "BAJA": "Baja",
-      "MEDIA": "Media",
-      "ALTA": "Alta",
-      "URGENTE": "Urgente"
     }
   },
   "new": {
@@ -228,6 +239,34 @@
     "overdue": "Vencida",
     "start": "Inicio: {{date}}",
     "end": "Fin: {{date}}",
+    "employeeNo": "No. {{number}}"
+  },
+  "pdf": {
+    "legend": "Reporte de Ticket",
+    "createdPrefix": "Creado",
+    "priority": "Prioridad",
+    "category": "Categoría",
+    "department": "Departamento",
+    "createdBy": "Creado por",
+    "assignedTo": "Asignado a",
+    "unassigned": "Sin asignar",
+    "closed": "Cerrado",
+    "tasks": "Tareas",
+    "description": "Descripción",
+    "evidence": "Evidencias ({{count}})",
+    "fileVideo": "Video adjunto",
+    "fileDocument": "Documento adjunto",
+    "kanbanTitle": "Tablero de tareas ({{count}}) · {{done}}/{{count}} completadas",
+    "noAssignments": "Sin tareas asignadas a este ticket.",
+    "emptyCol": "Sin tareas",
+    "overdue": "Vencida",
+    "startDate": "Inicio",
+    "endDate": "Fin",
+    "commentsCount": "{{count}} comentario(s)",
+    "historyTitle": "Historial ({{count}})",
+    "commentBy": "Comentario de {{author}}",
+    "fallbackUser": "Usuario",
+    "byAuthor": "Por {{name}}",
     "employeeNo": "No. {{number}}"
   }
 }

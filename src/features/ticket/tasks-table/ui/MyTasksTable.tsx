@@ -12,6 +12,7 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaTrello } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import type { KanbanAssignment } from "@entities/ticket";
 import { ASSIGNMENT_STATUS_BADGE } from "../model/useAssignmentList";
 import type { UseAssignmentList } from "../model/useAssignmentList";
@@ -55,7 +56,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       sortable: false,
       render: (r) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="small">
-          {ASSIGNMENT_STATUS_BADGE[r.status]?.label ?? r.status}
+          {dyn(tt)(`detail.taskStatusOptions.${r.status}`)}
         </ITBadget>
       ),
     },

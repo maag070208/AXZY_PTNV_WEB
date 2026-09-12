@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { CATEGORY_LABELS, STATUS_LABELS } from "@entities/ticket";
+import { dyn } from "@shared/i18n/dyn";
 import { downloadTicketPDF } from "@widgets/tickets/ticket-pdf";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
 import {
@@ -93,8 +93,8 @@ export default function TicketDetailPage() {
     <ITPage
       title={ticket.titulo}
       description={tt("detail.description", {
-        status: STATUS_LABELS[ticket.status] ?? ticket.status,
-        category: CATEGORY_LABELS[ticket.category] ?? ticket.category,
+        status: dyn(tt)(`statusLabels.${ticket.status}`) ?? ticket.status,
+        category: dyn(tt)(`categoryLabels.${ticket.category}`) ?? ticket.category,
       })}
       backAction={() => navigate(-1)}
       icon={<FaTicketAlt size={20} />}

@@ -12,6 +12,7 @@ import {
   FaSync,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import {
   Avatar,
   PRIORITY_META,
@@ -154,6 +155,7 @@ export default function KanbanBoard({ fx }: Props) {
                   const deptLabel = a.ticket.department?.name ?? "General";
                   const deptTone = hashTone(deptLabel);
                   const priorityMeta = metaFor(PRIORITY_META, a.ticket.priority);
+                    const priorityLabel = dyn(tt)(`priorityLabels.${a.ticket.priority}`);
                   const overdue = Boolean(
                     a.dueDate &&
                       a.status !== "COMPLETADA" &&
@@ -203,7 +205,7 @@ export default function KanbanBoard({ fx }: Props) {
                         </ITFlex>
                         <ITFlex align="center" gap={2} className="shrink-0">
                           <span
-                            title={priorityMeta.label}
+                            title={priorityLabel}
                             className="w-2 h-2 rounded-full"
                             style={{ backgroundColor: priorityMeta.tone.bg }}
                           />

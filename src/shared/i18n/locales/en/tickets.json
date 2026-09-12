@@ -1,4 +1,21 @@
 {
+  "statusLabels": {
+    "ABIERTO": "Open",
+    "EN_SEGUIMIENTO": "Following up",
+    "CERRADO": "Closed"
+  },
+  "priorityLabels": {
+    "BAJA": "Low",
+    "MEDIA": "Medium",
+    "ALTA": "High",
+    "URGENTE": "Urgent"
+  },
+  "categoryLabels": {
+    "MANTENIMIENTO": "Maintenance",
+    "EQUIPO": "Equipment",
+    "SISTEMA": "System",
+    "OTRO": "Other"
+  },
   "list": {
     "title": "Tickets",
     "description": "Tracking of requests and reports",
@@ -16,12 +33,6 @@
       "priority": "Priority",
       "createdBy": "Created by",
       "assignedTo": "Assigned to"
-    },
-    "priorities": {
-      "BAJA": "Low",
-      "MEDIA": "Medium",
-      "ALTA": "High",
-      "URGENTE": "Urgent"
     }
   },
   "new": {
@@ -228,6 +239,34 @@
     "overdue": "Overdue",
     "start": "Start: {{date}}",
     "end": "End: {{date}}",
+    "employeeNo": "No. {{number}}"
+  },
+  "pdf": {
+    "legend": "Ticket Report",
+    "createdPrefix": "Created",
+    "priority": "Priority",
+    "category": "Category",
+    "department": "Department",
+    "createdBy": "Created by",
+    "assignedTo": "Assigned to",
+    "unassigned": "Unassigned",
+    "closed": "Closed",
+    "tasks": "Tasks",
+    "description": "Description",
+    "evidence": "Evidence ({{count}})",
+    "fileVideo": "Attached video",
+    "fileDocument": "Attached document",
+    "kanbanTitle": "Task board ({{count}}) · {{done}}/{{count}} completed",
+    "noAssignments": "No tasks assigned to this ticket.",
+    "emptyCol": "No tasks",
+    "overdue": "Overdue",
+    "startDate": "Start",
+    "endDate": "End",
+    "commentsCount": "{{count}} comment(s)",
+    "historyTitle": "History ({{count}})",
+    "commentBy": "Comment by {{author}}",
+    "fallbackUser": "User",
+    "byAuthor": "By {{name}}",
     "employeeNo": "No. {{number}}"
   }
 }

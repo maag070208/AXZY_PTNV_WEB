@@ -2,7 +2,7 @@ import { ITBadget, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_syst
 import { formatFechaHora } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
-import { CATEGORY_LABELS, PRIORITY_BADGE, STATUS_BADGE } from "@entities/ticket";
+import { PRIORITY_BADGE, STATUS_BADGE } from "@entities/ticket";
 import { calculateEfficacy } from "../model/timeline";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 
@@ -23,13 +23,13 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
       <ITStack direction="column" spacing={5} className="w-full">
         <ITFlex gap={2} wrap="wrap">
           <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="small">
-            {STATUS_BADGE[ticket.status]?.label ?? ticket.status}
+            {dyn(tt)(`statusLabels.${ticket.status}`)}
           </ITBadget>
           <ITBadget color={(PRIORITY_BADGE[ticket.priority]?.color as any) ?? "default"} size="small">
-            {PRIORITY_BADGE[ticket.priority]?.label ?? ticket.priority}
+            {dyn(tt)(`priorityLabels.${ticket.priority}`)}
           </ITBadget>
           <ITBadget color="primary" size="small">
-            {CATEGORY_LABELS[ticket.category] ?? ticket.category}
+            {dyn(tt)(`categoryLabels.${ticket.category}`)}
           </ITBadget>
           {ticket.deletedAt && (
             <ITBadget color="gray" size="small">

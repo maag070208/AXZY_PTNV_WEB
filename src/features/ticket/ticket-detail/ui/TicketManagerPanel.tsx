@@ -1,7 +1,8 @@
 import { ITFlex, ITGrid, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaUserCog } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { CATEGORY_LABELS, STATUS_LABELS } from "@entities/ticket";
+import { CATEGORY_KEYS, STATUS_BADGE } from "@entities/ticket";
+import { dyn } from "@shared/i18n/dyn";
 import TasksGraph from "./TasksGraph";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 
@@ -14,15 +15,19 @@ interface Props {
   }) => React.ReactNode;
 }
 
-const STATUS_OPTIONS = Object.entries(STATUS_LABELS).map(([value, label]) => ({
-  value,
-  label,
-}));
-
 export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: Props) {
   const { t: tt } = useTranslation("tickets");
   const ticket = fx.ticket;
   if (!ticket) return null;
+
+  const statusOptions = Object.keys(STATUS_BADGE).map((value) => ({
+    value,
+    label: dyn(tt)(`statusLabels.${value}`),
+  }));
+  const categoryOptions = CATEGORY_KEYS.map((value) => ({
+    value,
+    label: dyn(tt)(`categoryLabels.${value}`),
+  }));
 
   return (
     <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
@@ -40,7 +45,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
               <ITSelect
                 name="status"
                 label={tt("detail.status")}
-                options={STATUS_OPTIONS}
+                options={statusOptions}
                 value={ticket.status}
                 onChange={(e) => fx.handleStatusChange(e.target.value)}
                 disabled={fx.isClosed}
@@ -50,10 +55,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
               <ITSelect
                 name="category"
                 label={tt("detail.category")}
-                options={Object.entries(CATEGORY_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
+                options={categoryOptions}
                 value={ticket.category}
                 onChange={(e) => fx.handleCategoryChange(e.target.value)}
                 disabled={fx.isClosed}

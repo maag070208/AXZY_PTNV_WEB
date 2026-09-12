@@ -1,25 +1,17 @@
-export const STATUS_BADGE: Record<string, { color: string; label: string }> = {
-  ABIERTO: { color: "warning", label: "Abierto" },
-  EN_SEGUIMIENTO: { color: "info", label: "En seguimiento" },
-  CERRADO: { color: "success", label: "Cerrado" },
+export const STATUS_BADGE: Record<string, { color: string }> = {
+  ABIERTO: { color: "warning" },
+  EN_SEGUIMIENTO: { color: "info" },
+  CERRADO: { color: "success" },
 };
 
-export const PRIORITY_BADGE: Record<string, { color: string; label: string }> = {
-  BAJA: { color: "default", label: "Baja" },
-  MEDIA: { color: "warning", label: "Media" },
-  ALTA: { color: "danger", label: "Alta" },
-  URGENTE: { color: "danger", label: "Urgente" },
+export const PRIORITY_BADGE: Record<string, { color: string }> = {
+  BAJA: { color: "default" },
+  MEDIA: { color: "warning" },
+  ALTA: { color: "danger" },
+  URGENTE: { color: "danger" },
 };
 
-export const CATEGORY_LABELS: Record<string, string> = {
-  MANTENIMIENTO: "Mantenimiento",
-  EQUIPO: "Equipo",
-  SISTEMA: "Sistema",
-  OTRO: "Otro",
-};
+export const STATUS_KEYS = Object.keys(STATUS_BADGE);
+export const PRIORITY_KEYS = Object.keys(PRIORITY_BADGE);
 
-export const STATUS_LABELS: Record<string, string> = {
-  ABIERTO: "Abierto",
-  EN_SEGUIMIENTO: "En seguimiento",
-  CERRADO: "Cerrado",
-};
+export const CATEGORY_KEYS = ["MANTENIMIENTO", "EQUIPO", "SISTEMA", "OTRO"] as const;

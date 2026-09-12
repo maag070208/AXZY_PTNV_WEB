@@ -1,4 +1,6 @@
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import type { Ticket, TicketAssignment, TicketAttachment } from "@entities/ticket";
 import { PDF_COLORS, pdfTheme } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
@@ -15,36 +17,15 @@ const STATUS_COLORS: Record<string, string> = {
   CERRADO: PDF_COLORS.success,
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  ABIERTO: "Abierto",
-  EN_SEGUIMIENTO: "En seguimiento",
-  CERRADO: "Cerrado",
-};
-
-const PRIORITY_LABELS: Record<string, string> = {
-  BAJA: "Baja",
-  MEDIA: "Media",
-  ALTA: "Alta",
-  URGENTE: "Urgente",
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  MANTENIMIENTO: "Mantenimiento",
-  EQUIPO: "Equipo",
-  SISTEMA: "Sistema",
-  OTRO: "Otro",
-};
-
 const KANBAN_COLS: Array<{
   status: TicketAssignment["status"];
-  label: string;
   color: string;
   bg: string;
 }> = [
-  { status: "PENDIENTE", label: "Pendiente", color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
-  { status: "EN_PROGRESO", label: "En progreso", color: PDF_COLORS.band, bg: "#bfdbfe" },
-  { status: "EN_REVISION", label: "En revisión", color: "#7c3aed", bg: "#ede9fe" },
-  { status: "COMPLETADA", label: "Completada", color: PDF_COLORS.success, bg: PDF_COLORS.successBg },
+  { status: "PENDIENTE", color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
+  { status: "EN_PROGRESO", color: PDF_COLORS.band, bg: "#bfdbfe" },
+  { status: "EN_REVISION", color: "#7c3aed", bg: "#ede9fe" },
+  { status: "COMPLETADA", color: PDF_COLORS.success, bg: PDF_COLORS.successBg },
 ];
 
 const styles = StyleSheet.create({
@@ -216,6 +197,7 @@ const dotColorFor = (type: string, detail?: string | null) => {
 };
 
 export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
+  const { t: tt } = useTranslation("tickets");
   const today = formatReportDate();
 
   // Historial + comentarios en una sola línea de tiempo cronológica.
@@ -232,7 +214,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
       id: h.id,
       ts: h.createdAt,
       title: h.detail ?? h.type,
-      detail: h.autor?.name ? `Por ${h.autor.name}` : undefined,
+      detail: h.autor?.name ? tt("pdf.byAuthor", { name: h.autor.name }) : undefined,
       dot: dotColorFor(h.type, h.detail),
     });
   });
@@ -240,7 +222,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
     timeline.push({
       id: c.id,
       ts: c.creadoEn,
-      title: `Comentario de ${c.autor?.name ?? "Usuario"}`,
+      title: tt("pdf.commentBy", { author: c.autor?.name ?? tt("pdf.fallbackUser") }),
       detail: c.texto,
       dot: PDF_COLORS.gray,
     });
@@ -256,54 +238,54 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
   return (
     <Document title={`Ticket - ${ticket.titulo}`} author="Puerto Nuevo Hotel y Villas">
       <Page size="A4" style={pdfTheme.page}>
-        <PdfLetterhead title="Reporte de Ticket" pageIndex={0} pageCount={1} generatedAt={today} />
+        <PdfLetterhead title={tt("pdf.legend")} pageIndex={0} pageCount={1} generatedAt={today} />
 
         <View style={pdfTheme.content}>
           {/* ── Encabezado ── */}
           <View style={styles.titleRow}>
             <Text style={styles.ticketTitle}>{ticket.titulo}</Text>
             <Text style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[ticket.status] ?? PDF_COLORS.gray }}>
-              {STATUS_LABELS[ticket.status] ?? ticket.status}
+              {dyn(tt)(`statusLabels.${ticket.status}`) ?? ticket.status}
             </Text>
           </View>
           <Text style={styles.idLine}>
-            Ticket #{ticket.id.slice(0, 8).toUpperCase()} · Creado {formatShortDate(ticket.creadoEn)}
+            Ticket #{ticket.id.slice(0, 8).toUpperCase()} · {tt("pdf.createdPrefix")} {formatShortDate(ticket.creadoEn)}
           </Text>
 
           <View style={styles.metaRow}>
             <View style={styles.metaCard}>
-              <Text style={styles.metaLabel}>Prioridad</Text>
-              <Text style={styles.metaValue}>{PRIORITY_LABELS[ticket.priority] ?? ticket.priority}</Text>
+              <Text style={styles.metaLabel}>{tt("pdf.priority")}</Text>
+              <Text style={styles.metaValue}>{dyn(tt)(`priorityLabels.${ticket.priority}`) ?? ticket.priority}</Text>
             </View>
             <View style={styles.metaCard}>
-              <Text style={styles.metaLabel}>Categoría</Text>
-              <Text style={styles.metaValue}>{CATEGORY_LABELS[ticket.category] ?? ticket.category}</Text>
+              <Text style={styles.metaLabel}>{tt("pdf.category")}</Text>
+              <Text style={styles.metaValue}>{dyn(tt)(`categoryLabels.${ticket.category}`) ?? ticket.category}</Text>
             </View>
             <View style={styles.metaCard}>
-              <Text style={styles.metaLabel}>Departamento</Text>
+              <Text style={styles.metaLabel}>{tt("pdf.department")}</Text>
               <Text style={styles.metaValue}>{ticket.department?.name ?? "—"}</Text>
             </View>
           </View>
 
           <View style={styles.metaRow}>
             <View style={styles.metaCard}>
-              <Text style={styles.metaLabel}>Creado por</Text>
+              <Text style={styles.metaLabel}>{tt("pdf.createdBy")}</Text>
               <Text style={styles.metaValue}>{ticket.creadoPor?.name ?? "—"}</Text>
             </View>
             <View style={styles.metaCard}>
-              <Text style={styles.metaLabel}>Asignado a</Text>
-              <Text style={styles.metaValue}>{ticket.asignadoA?.name ?? "Sin asignar"}</Text>
+              <Text style={styles.metaLabel}>{tt("pdf.assignedTo")}</Text>
+              <Text style={styles.metaValue}>{ticket.asignadoA?.name ?? tt("pdf.unassigned")}</Text>
             </View>
             {ticket.closedAt ? (
               <View style={styles.metaCard}>
-                <Text style={styles.metaLabel}>Cerrado</Text>
+                <Text style={styles.metaLabel}>{tt("pdf.closed")}</Text>
                 <Text style={{ ...styles.metaValue, color: PDF_COLORS.success }}>
                   {formatShortDate(ticket.closedAt)}
                 </Text>
               </View>
             ) : (
               <View style={styles.metaCard}>
-                <Text style={styles.metaLabel}>Tareas</Text>
+                <Text style={styles.metaLabel}>{tt("pdf.tasks")}</Text>
                 <Text style={styles.metaValue}>
                   {ticket.assignments.filter((a) => a.status === "COMPLETADA").length}/{ticket.assignments.length}
                 </Text>
@@ -312,13 +294,13 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Descripción</Text>
+            <Text style={styles.sectionTitle}>{tt("pdf.description")}</Text>
             <Text style={styles.description}>{ticket.descripcion}</Text>
           </View>
 
           {attachments.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Evidencias ({attachments.length})</Text>
+              <Text style={styles.sectionTitle}>{tt("pdf.evidence", { count: attachments.length })}</Text>
               <View style={styles.evidenceGrid}>
                 {attachments.map((attachment) => (
                   <View key={attachment.id} style={styles.evidenceCard}>
@@ -326,7 +308,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
                       <Image src={attachment.dataUrl ?? attachment.url} style={styles.evidenceImage} />
                     ) : (
                       <Text style={styles.evidenceEmpty}>
-                        {attachment.mimeType.startsWith("video/") ? "Video adjunto" : "Documento adjunto"}
+                        {attachment.mimeType.startsWith("video/") ? tt("pdf.fileVideo") : tt("pdf.fileDocument")}
                       </Text>
                     )}
                     <Text style={styles.evidenceName}>{attachment.originalName}</Text>
@@ -339,10 +321,10 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
           {/* ── Tablero kanban ── */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              Tablero de tareas ({ticket.assignments.length}) · {completedTasks}/{ticket.assignments.length} completadas
+              {tt("pdf.kanbanTitle", { count: ticket.assignments.length, done: completedTasks })}
             </Text>
             {ticket.assignments.length === 0 ? (
-              <Text style={styles.emptyCol}>Sin tareas asignadas a este ticket.</Text>
+              <Text style={styles.emptyCol}>{tt("pdf.noAssignments")}</Text>
             ) : (
               <View style={styles.kanbanRow}>
                 {cols.map((col) => (
@@ -350,18 +332,18 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
                     <View style={styles.kanbanColHeader}>
                       <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <View style={{ ...styles.kanbanDot, backgroundColor: col.color }} />
-                        <Text style={styles.kanbanColTitle}>{col.label}</Text>
+                        <Text style={styles.kanbanColTitle}>{dyn(tt)(`detail.taskStatusOptions.${col.status}`)}</Text>
                       </View>
                       <Text style={styles.kanbanCount}>{col.items.length}</Text>
                     </View>
                     {col.items.length === 0 ? (
-                      <Text style={styles.emptyCol}>Sin tareas</Text>
+                      <Text style={styles.emptyCol}>{tt("pdf.emptyCol")}</Text>
                     ) : (
                       col.items.map((a) => (
                         <View key={a.id} style={styles.taskCard}>
                           <Text style={styles.taskEmployee}>{a.user.name}</Text>
                           <Text style={styles.taskNo}>
-                            {a.user.numeroEmpleado ? `No. ${a.user.numeroEmpleado}` : ""}
+                            {a.user.numeroEmpleado ? tt("pdf.employeeNo", { number: a.user.numeroEmpleado }) : ""}
                           </Text>
                           <Text style={{ ...styles.taskTitleText }}>{a.title}</Text>
                           {a.description ? (
@@ -369,19 +351,19 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
                           ) : null}
                           {a.dueDate && a.status !== "COMPLETADA" && new Date(a.dueDate) < new Date() && (
                             <Text style={{ ...styles.taskText, color: PDF_COLORS.danger, fontFamily: "Helvetica-Bold" }}>
-                              Vencida
+                              {tt("pdf.overdue")}
                             </Text>
                           )}
                           {(a.startDate || a.dueDate) && (
                             <Text style={styles.taskDates}>
-                              {a.startDate ? `Inicio ${formatShortDate(a.startDate)}` : ""}
+                              {a.startDate ? `${tt("pdf.startDate")} ${formatShortDate(a.startDate)}` : ""}
                               {a.startDate && a.dueDate ? " · " : ""}
-                              {a.dueDate ? `Fin ${formatShortDate(a.dueDate)}` : ""}
+                              {a.dueDate ? `${tt("pdf.endDate")} ${formatShortDate(a.dueDate)}` : ""}
                             </Text>
                           )}
                           {a.comments && a.comments.length > 0 && (
                             <Text style={styles.taskDates}>
-                              {a.comments.length} comentario(s)
+                              {tt("pdf.commentsCount", { count: a.comments.length })}
                             </Text>
                           )}
                         </View>
@@ -396,7 +378,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
           {/* ── Historial ── */}
           {timeline.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Historial ({timeline.length})</Text>
+              <Text style={styles.sectionTitle}>{tt("pdf.historyTitle", { count: timeline.length })}</Text>
               {timeline.map((item) => (
                 <View key={item.id} style={styles.historyItem}>
                   <View style={{ ...styles.historyDot, backgroundColor: item.dot }} />

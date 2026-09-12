@@ -79,7 +79,7 @@ export default function EditTicketForm({ form, onFieldChange }: Props) {
                   }`}
                 >
                   {p.icon}
-                  {dyn(tt)(`list.priorities.${p.value}`)}
+                  {dyn(tt)(`priorityLabels.${p.value}`)}
                 </button>
               ))}
             </ITFlex>

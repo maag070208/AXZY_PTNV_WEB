@@ -103,7 +103,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
               </ITText>
             </ITFlex>
             <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="small">
-              {STATUS_BADGE[ticket.status]?.label ?? ticket.status}
+              {dyn(tt)(`statusLabels.${ticket.status}`)}
             </ITBadget>
           </ITFlex>
         </div>

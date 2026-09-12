@@ -3,11 +3,11 @@ import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { ticketsApi, type KanbanAssignment } from "@entities/ticket";
 
-export const ASSIGNMENT_STATUS_BADGE: Record<string, { color: string; label: string }> = {
-  PENDIENTE: { color: "gray", label: "Pendiente" },
-  EN_PROGRESO: { color: "info", label: "En progreso" },
-  EN_REVISION: { color: "purple", label: "En revisión" },
-  COMPLETADA: { color: "success", label: "Completada" },
+export const ASSIGNMENT_STATUS_BADGE: Record<string, { color: string }> = {
+  PENDIENTE: { color: "gray" },
+  EN_PROGRESO: { color: "info" },
+  EN_REVISION: { color: "purple" },
+  COMPLETADA: { color: "success" },
 };
 
 export const useAssignmentList = (loadErrorKey: string) => {

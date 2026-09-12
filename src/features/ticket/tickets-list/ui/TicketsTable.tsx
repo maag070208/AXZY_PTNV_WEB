@@ -14,8 +14,6 @@ import { FaEye, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import {
-  CATEGORY_LABELS,
-  STATUS_LABELS,
   STATUS_BADGE,
   PRIORITY_BADGE,
   type Ticket,
@@ -55,7 +53,7 @@ export default function TicketsTable({
             )}
           </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
-            {CATEGORY_LABELS[t.category] ?? t.category}
+            {dyn(tt)(`categoryLabels.${t.category}`)}
           </ITText>
         </ITFlex>
       ),
@@ -66,13 +64,16 @@ export default function TicketsTable({
       type: "catalog",
       filter: "catalog",
       catalogOptions: {
-        data: Object.entries(STATUS_LABELS).map(([id, name]) => ({ id, name })),
+        data: Object.keys(STATUS_BADGE).map((id) => ({
+          id,
+          name: dyn(tt)(`statusLabels.${id}`),
+        })),
         loading: false,
         error: false,
       },
       render: (t) => (
         <ITBadget color={(STATUS_BADGE[t.status]?.color as any) ?? "default"} size="small">
-          {STATUS_BADGE[t.status]?.label ?? t.status}
+          {dyn(tt)(`statusLabels.${t.status}`)}
         </ITBadget>
       ),
     },
@@ -84,14 +85,14 @@ export default function TicketsTable({
       catalogOptions: {
         data: Object.keys(PRIORITY_BADGE).map((id) => ({
           id,
-          name: dyn(tt)(`list.priorities.${id}`),
+          name: dyn(tt)(`priorityLabels.${id}`),
         })),
         loading: false,
         error: false,
       },
       render: (t) => (
         <ITBadget color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"} size="small">
-          {PRIORITY_BADGE[t.priority]?.label ?? t.priority}
+          {dyn(tt)(`priorityLabels.${t.priority}`)}
         </ITBadget>
       ),
     },
