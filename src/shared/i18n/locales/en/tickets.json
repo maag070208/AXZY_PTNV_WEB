@@ -5,7 +5,24 @@
     "board": "Board",
     "new": "New ticket",
     "moveTrash": "Move to trash",
-    "deleteForever": "Delete permanently"
+    "deleteForever": "Delete permanently",
+    "deleted": "Deleted",
+    "unassigned": "Unassigned",
+    "confirmMoveTrash": "Move \"{{title}}\" to trash? It will be hidden in a deleted state and you can delete it permanently later.",
+    "confirmDeleteForever": "Delete \"{{title}}\" permanently? Its comments and history will be deleted. This action cannot be undone.",
+    "columns": {
+      "title": "Title",
+      "status": "Status",
+      "priority": "Priority",
+      "createdBy": "Created by",
+      "assignedTo": "Assigned to"
+    },
+    "priorities": {
+      "BAJA": "Low",
+      "MEDIA": "Medium",
+      "ALTA": "High",
+      "URGENTE": "Urgent"
+    }
   },
   "new": {
     "title": "New Ticket",
@@ -15,7 +32,21 @@
     "created": "Ticket created successfully",
     "saving": "Saving…",
     "required": "Title and description are required",
-    "createError": "Error creating ticket"
+    "createError": "Error creating ticket",
+    "formHeadline": "Support request",
+    "formTitle": "Tell us what's happening.",
+    "formSub": "The more context you share, the faster the right team can help.",
+    "urgency": "Urgency",
+    "step1Title": "Issue information",
+    "step1Sub": "Main details of your request",
+    "titleLabel": "Title",
+    "titlePlaceholder": "E.g. The reception printer is not responding",
+    "categoryLabel": "Category",
+    "descLabel": "Description",
+    "descPlaceholder": "What happened, where it happened and what you need…",
+    "evidenceTitle": "Evidence",
+    "evidenceSub": "Images or PDF of the issue",
+    "removeFile": "Remove"
   },
   "edit": {
     "title": "Edit Ticket",
@@ -28,7 +59,13 @@
     "required": "Title and description are required",
     "updateError": "Error updating ticket",
     "ticketNotFound": "Ticket not found",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "formInfoTitle": "Ticket information",
+    "priorityTitle": "Priority",
+    "titleLabel": "Title",
+    "titlePlaceholder": "E.g. Water leak in office 302",
+    "descLabel": "Description",
+    "descPlaceholder": "Describe the issue or request in as much detail as possible…"
   },
   "detail": {
     "title": "Ticket",
@@ -66,7 +103,66 @@
     "assign": "Assign",
     "removeTask": "Remove task",
     "commentsCount": "Comments ({{count}})",
-    "noComments": "No comments"
+    "noComments": "No comments",
+    "historyTitle": "History ({{count}})",
+    "noHistory": "No activity recorded.",
+    "manageTitle": "Manage ticket",
+    "status": "Status",
+    "category": "Category",
+    "department": "Department",
+    "responsible": "Responsible",
+    "unassigned": "Unassigned",
+    "noResponsible": "No responsible",
+    "createdBy": "Created by",
+    "assignedTo": "Assigned to",
+    "deletedBadge": "Deleted",
+    "description": "Description",
+    "noDescription": "No description",
+    "efficacyTitle": "Resolution efficacy",
+    "efficacyLabels": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "resolvedIn": "Resolved in {{hours}}h",
+    "taskTitle": "Title",
+    "taskDescription": "Description",
+    "taskTitlePlaceholder": "E.g. Check electrical installation",
+    "taskDescPlaceholder": "Task details...",
+    "startDate": "Start date",
+    "dueDate": "Expected end date",
+    "taskStatus": "Task status",
+    "taskStatusOptions": {
+      "PENDIENTE": "Pending",
+      "EN_PROGRESO": "In progress",
+      "EN_REVISION": "In review",
+      "COMPLETADA": "Completed"
+    },
+    "employeeNo": "No. {{number}}",
+    "employeeLabel": "Employee",
+    "searchEmployee": "Search by name or employee no...",
+    "addCommentPlaceholder": "Add a comment...",
+    "commentsReadonly": "Comments (read-only)",
+    "addComment": "Add comment",
+    "commentClosedPlaceholder": "This ticket is closed",
+    "commentPlaceholder": "Write a comment or follow-up for this ticket...",
+    "charCount": "{{count}} characters",
+    "publicFollowup": "Public follow-up",
+    "sendingComment": "Sending...",
+    "sendComment": "Comment",
+    "createdOn": "Created {{date}}",
+    "assignmentsTitle": "Assigned tasks ({{count}})",
+    "noAssignmentsYet": "This ticket has no assigned tasks yet.",
+    "assignmentComments": "{{count}} comment(s)",
+    "openFullDetail": "Open full detail",
+    "statusLabel": "Status:",
+    "priorityLabel": "Priority:",
+    "deptLabel": "Dept:",
+    "createdByLabel": "Created by",
+    "startShort": "Start",
+    "dueShort": "Due",
+    "systemUser": "System"
   },
   "kanban": {
     "byTicket": "Ticket tasks",
@@ -87,7 +183,20 @@
     "refresh": "Refresh",
     "emptyColumn": "No tasks",
     "clearFilters": "Clear filters",
-    "loadError": "Unable to load the board"
+    "loadError": "Unable to load the board",
+    "searchPlaceholder": "Search task or ticket...",
+    "overdue": "Overdue",
+    "subtitle": "Assign a task to an existing ticket",
+    "ticketLabel": "Ticket",
+    "searchTicket": "Search ticket...",
+    "employeeLabel": "Employee",
+    "searchEmployee": "Search employee...",
+    "taskTitle": "Task title",
+    "taskTitleExample": "E.g. Check installation",
+    "taskDescription": "Description",
+    "taskDescPlaceholder": "Task details...",
+    "startDate": "Start date",
+    "dueDate": "Due date"
   },
   "mytasks": {
     "title": "My Tasks",
@@ -97,7 +206,8 @@
     "refresh": "Refresh",
     "viewBoard": "View kanban board",
     "viewBoardTitle": "View in kanban board",
-    "loadError": "Unable to load your tasks"
+    "loadError": "Unable to load your tasks",
+    "overdueTasks": "{{count}} overdue"
   },
   "admintasks": {
     "title": "Task management",
@@ -106,6 +216,18 @@
     "loading": "Loading...",
     "refresh": "Refresh",
     "viewBoard": "View full kanban",
-    "loadError": "Unable to load the tasks"
+    "loadError": "Unable to load the tasks",
+    "overdueTasks": "{{count}} overdue"
+  },
+  "tasksTable": {
+    "task": "Task",
+    "ticket": "Ticket",
+    "status": "Status",
+    "dates": "Dates",
+    "employee": "Employee",
+    "overdue": "Overdue",
+    "start": "Start: {{date}}",
+    "end": "End: {{date}}",
+    "employeeNo": "No. {{number}}"
   }
 }

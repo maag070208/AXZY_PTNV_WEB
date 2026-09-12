@@ -10,6 +10,7 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import type { KanbanAssignment } from "@entities/ticket";
+import { useTranslation } from "react-i18next";
 import { ASSIGNMENT_STATUS_BADGE } from "../model/useAssignmentList";
 import type { UseAssignmentList } from "../model/useAssignmentList";
 
@@ -18,10 +19,11 @@ interface Props {
 }
 
 export default function AdminTasksTable({ fx }: Props) {
+  const { t: tt } = useTranslation("tickets");
   const columns: Column<KanbanAssignment>[] = [
     {
       key: "title",
-      label: "Tarea",
+      label: tt("tasksTable.task"),
       type: "string",
       sortable: false,
       render: (row) => (
@@ -35,21 +37,21 @@ export default function AdminTasksTable({ fx }: Props) {
     },
     {
       key: "employee",
-      label: "Empleado",
+      label: tt("tasksTable.employee"),
       type: "string",
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
           {row.user.numeroEmpleado && (
-            <ITText className="text-[9px] text-slate-400">No. {row.user.numeroEmpleado}</ITText>
+            <ITText className="text-[9px] text-slate-400">{tt("tasksTable.employeeNo", { number: row.user.numeroEmpleado })}</ITText>
           )}
         </ITFlex>
       ),
     },
     {
       key: "ticket",
-      label: "Ticket",
+      label: tt("tasksTable.ticket"),
       type: "string",
       sortable: false,
       render: (row) => (
@@ -58,7 +60,7 @@ export default function AdminTasksTable({ fx }: Props) {
     },
     {
       key: "status",
-      label: "Estado",
+      label: tt("tasksTable.status"),
       type: "string",
       sortable: false,
       render: (row) => (
@@ -69,25 +71,25 @@ export default function AdminTasksTable({ fx }: Props) {
     },
     {
       key: "dates",
-      label: "Fechas",
+      label: tt("tasksTable.dates"),
       type: "string",
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           {row.startDate && (
             <ITText className="text-[9px] text-slate-500">
-              Inicio: {new Date(row.startDate).toLocaleDateString("es-MX")}
+              {tt("tasksTable.start", { date: new Date(row.startDate).toLocaleDateString("es-MX") })}
             </ITText>
           )}
           {row.dueDate && (
             <ITText className="text-[9px] text-slate-500">
-              Fin: {new Date(row.dueDate).toLocaleDateString("es-MX")}
+              {tt("tasksTable.end", { date: new Date(row.dueDate).toLocaleDateString("es-MX") })}
             </ITText>
           )}
           {row.dueDate &&
             row.status !== "COMPLETADA" &&
             new Date(row.dueDate) < new Date() && (
-              <ITBadget color="danger" size="small">Vencida</ITBadget>
+              <ITBadget color="danger" size="small">{tt("tasksTable.overdue")}</ITBadget>
             )}
         </ITFlex>
       ),

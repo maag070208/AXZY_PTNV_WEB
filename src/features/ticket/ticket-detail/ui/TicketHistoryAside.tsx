@@ -8,6 +8,7 @@ import {
   FaBuilding,
   FaComment,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { formatFechaHora } from "@shared/utils/dates";
 import type { TimelineEvent } from "../model/timeline";
 
@@ -28,17 +29,18 @@ const EVENT_ICON: Record<string, React.ReactNode> = {
 };
 
 export default function TicketHistoryAside({ events }: Props) {
+  const { t: tt } = useTranslation("tickets");
   return (
     <div className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 md:sticky md:top-24">
       <div className="flex items-center gap-2 mb-5">
         <FaClock size={14} className="text-slate-400" />
         <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          Historial ({events.length})
+          {tt("detail.historyTitle", { count: events.length })}
         </p>
       </div>
 
       {events.length === 0 ? (
-        <p className="text-[12px] text-slate-400 italic">Sin actividad registrada.</p>
+        <p className="text-[12px] text-slate-400 italic">{tt("detail.noHistory")}</p>
       ) : (
         <div className="space-y-0 max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
           {[...events].reverse().map((event, idx) => {

@@ -1,5 +1,6 @@
 import { ITButton, ITFlex, ITStack, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
 import { FaComment, FaPaperPlane } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function TicketComments({ fx }: Props) {
+  const { t: tt } = useTranslation("tickets");
   const ticket = fx.ticket;
   if (!ticket) return null;
 
@@ -18,7 +20,7 @@ export default function TicketComments({ fx }: Props) {
         <ITFlex align="center" gap={2}>
           <FaComment size={14} className="text-slate-400" />
           <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            {isClosed ? "Comentarios (solo lectura)" : "Agregar comentario"}
+            {isClosed ? tt("detail.commentsReadonly") : tt("detail.addComment")}
           </ITText>
         </ITFlex>
 
@@ -34,7 +36,7 @@ export default function TicketComments({ fx }: Props) {
             value={fx.commentText}
             onChange={(v) => fx.setCommentText(v)}
             placeholder={
-              isClosed ? "Este ticket está cerrado" : "Escribe un comentario o seguimiento para este ticket..."
+              isClosed ? tt("detail.commentClosedPlaceholder") : tt("detail.commentPlaceholder")
             }
             rows={3}
             disabled={isClosed}
@@ -45,8 +47,8 @@ export default function TicketComments({ fx }: Props) {
             <div className="flex items-center justify-between pt-2 mt-1 border-t border-slate-200/60">
               <span className="text-[10px] text-slate-400 font-medium">
                 {fx.commentText.trim().length > 0
-                  ? `${fx.commentText.trim().length} caracteres`
-                  : "Seguimiento público"}
+                  ? tt("detail.charCount", { count: fx.commentText.trim().length })
+                  : tt("detail.publicFollowup")}
               </span>
 
               <ITButton
@@ -60,7 +62,7 @@ export default function TicketComments({ fx }: Props) {
                 <ITFlex align="center" gap={1.5}>
                   <FaPaperPlane size={11} />
                   <span className="text-[11px]">
-                    {fx.sendingComment ? "Enviando..." : "Comentar"}
+                    {fx.sendingComment ? tt("detail.sendingComment") : tt("detail.sendComment")}
                   </span>
                 </ITFlex>
               </ITButton>

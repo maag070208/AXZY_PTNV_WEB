@@ -1,5 +1,6 @@
 import { ITFlex, ITGrid, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaUserCog } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { CATEGORY_LABELS, STATUS_LABELS } from "@entities/ticket";
 import TasksGraph from "./TasksGraph";
 import type { UseTicketDetail } from "../model/useTicketDetail";
@@ -19,6 +20,7 @@ const STATUS_OPTIONS = Object.entries(STATUS_LABELS).map(([value, label]) => ({
 }));
 
 export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: Props) {
+  const { t: tt } = useTranslation("tickets");
   const ticket = fx.ticket;
   if (!ticket) return null;
 
@@ -28,7 +30,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
         <ITFlex align="center" gap={2}>
           <FaUserCog size={14} className="text-slate-400" />
           <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            Administrar ticket
+            {tt("detail.manageTitle")}
           </ITText>
         </ITFlex>
 
@@ -37,7 +39,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
             <ITGrid item xs={12} sm={4}>
               <ITSelect
                 name="status"
-                label="Estado"
+                label={tt("detail.status")}
                 options={STATUS_OPTIONS}
                 value={ticket.status}
                 onChange={(e) => fx.handleStatusChange(e.target.value)}
@@ -47,7 +49,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
             <ITGrid item xs={12} sm={4}>
               <ITSelect
                 name="category"
-                label="Categoría"
+                label={tt("detail.category")}
                 options={Object.entries(CATEGORY_LABELS).map(([value, label]) => ({
                   value,
                   label,
@@ -60,9 +62,9 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
             <ITGrid item xs={12} sm={4}>
               <ITSelect
                 name="department"
-                label="Departamento"
+                label={tt("detail.department")}
                 options={[
-                  { value: "", label: "Sin asignar" },
+                  { value: "", label: tt("detail.unassigned") },
                   ...fx.departments.map((d) => ({ value: d.id, label: d.name })),
                 ]}
                 value={ticket.departmentId ?? ""}
@@ -76,9 +78,9 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
         {(fx.isAdmin || fx.isGerente) && (
           <ITSelect
             name="responsable"
-            label="Responsable"
+            label={tt("detail.responsible")}
             options={[
-              { value: "", label: "Sin responsable" },
+              { value: "", label: tt("detail.noResponsible") },
               ...fx.responsableOptions,
             ]}
             value={ticket.asignadoAId ?? ""}

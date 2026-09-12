@@ -38,7 +38,7 @@ export default function KanbanBoard({ fx }: Props) {
               name="kanbanSearch"
               value={fx.search}
               onChange={(e) => fx.setSearch(e.target.value)}
-              placeholder="Buscar tarea o ticket..."
+              placeholder={tt("kanban.searchPlaceholder")}
               iconLeft={<FaSearch size={11} className="text-slate-400" />}
             />
           </div>
@@ -114,8 +114,8 @@ export default function KanbanBoard({ fx }: Props) {
         {fx.COLUMNS.map((col) => (
           <div
             key={col.status}
-            className={`flex-none w-[300px] sm:w-[320px] rounded-2xl bg-slate-100/70 border border-slate-200 p-3 transition-colors ${
-              fx.dragOver === col.status ? "bg-blue-50 border-blue-300" : ""
+            className={`flex-none w-[300px] sm:w-[320px] rounded-2xl bg-slate-200/60 border border-slate-300/60 p-3 transition-colors ${
+              fx.dragOver === col.status ? "bg-blue-100 border-blue-400" : ""
             }`}
             onDragOver={(e) => {
               e.preventDefault();
@@ -177,7 +177,7 @@ export default function KanbanBoard({ fx }: Props) {
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <Tag label={deptLabel} tone={deptTone} />
                         {overdue && (
-                          <Tag label="Vencida" tone={{ bg: "#e11d48", text: "#ffffff" }} />
+                          <Tag label={tt("kanban.overdue")} tone={{ bg: "#e11d48", text: "#ffffff" }} />
                         )}
                       </div>
 

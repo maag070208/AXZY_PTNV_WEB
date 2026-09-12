@@ -12,6 +12,7 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaEye, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import {
   CATEGORY_LABELS,
   STATUS_LABELS,
@@ -42,7 +43,7 @@ export default function TicketsTable({
   const columns: Column<Ticket>[] = [
     {
       key: "titulo",
-      label: "Título",
+      label: tt("list.columns.title"),
       type: "string",
       filter: true,
       render: (t) => (
@@ -50,7 +51,7 @@ export default function TicketsTable({
           <ITFlex align="center" gap={1}>
             <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
             {t.deletedAt && (
-              <ITBadget color="gray" size="small">Eliminado</ITBadget>
+              <ITBadget color="gray" size="small">{tt("list.deleted")}</ITBadget>
             )}
           </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
@@ -61,7 +62,7 @@ export default function TicketsTable({
     },
     {
       key: "status",
-      label: "Estado",
+      label: tt("list.columns.status"),
       type: "catalog",
       filter: "catalog",
       catalogOptions: {
@@ -77,16 +78,14 @@ export default function TicketsTable({
     },
     {
       key: "priority",
-      label: "Prioridad",
+      label: tt("list.columns.priority"),
       type: "catalog",
       filter: "catalog",
       catalogOptions: {
-        data: [
-          { id: "BAJA", name: "Baja" },
-          { id: "MEDIA", name: "Media" },
-          { id: "ALTA", name: "Alta" },
-          { id: "URGENTE", name: "Urgente" },
-        ],
+        data: Object.keys(PRIORITY_BADGE).map((id) => ({
+          id,
+          name: dyn(tt)(`list.priorities.${id}`),
+        })),
         loading: false,
         error: false,
       },
@@ -98,7 +97,7 @@ export default function TicketsTable({
     },
     {
       key: "creadoPor",
-      label: "Creado por",
+      label: tt("list.columns.createdBy"),
       type: "string",
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
@@ -108,11 +107,11 @@ export default function TicketsTable({
     },
     {
       key: "asignadoA",
-      label: "Asignado a",
+      label: tt("list.columns.assignedTo"),
       type: "string",
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
-          {t.asignadoA?.name ?? "Sin asignar"}
+          {t.asignadoA?.name ?? tt("list.unassigned")}
         </ITText>
       ),
     },

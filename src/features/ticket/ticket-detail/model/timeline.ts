@@ -93,13 +93,13 @@ export const calculateEfficacy = (ticket: Ticket) => {
   else if (hours <= t.fair) score = 60;
   else score = 40;
 
-  const label =
+  const label: "excellent" | "good" | "fair" | "poor" =
     score === 100
-      ? "Excelente"
+      ? "excellent"
       : score === 80
-      ? "Bueno"
+      ? "good"
       : score === 60
-      ? "Regular"
-      : "Bajo";
+      ? "fair"
+      : "poor";
   return { score, label, hours: Math.round(hours * 10) / 10 };
 };

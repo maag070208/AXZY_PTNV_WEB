@@ -1,5 +1,6 @@
 import { ITButton, ITDialog, ITFlex, ITLoader, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaBookmark, FaCalendarAlt, FaComments, FaExternalLinkAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { Ticket } from "@entities/ticket";
 import { formatFechaHora } from "@shared/utils/dates";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
@@ -22,10 +23,6 @@ type Props = {
   onOpenFull: (ticketId: string) => void;
 };
 
-// Modal de detalle de ticket (solo lectura, sin alta de tareas), usado desde
-// el tablero Kanban. Vive en su propio componente para no seguir inflando
-// KanbanPage.tsx y poder tocarlo sin tener que leer/entender el tablero
-// completo cada vez.
 export default function TicketDetailModal({
   ticket,
   loading,
@@ -34,6 +31,7 @@ export default function TicketDetailModal({
   onClose,
   onOpenFull,
 }: Props) {
+  const { t: tt } = useTranslation("tickets");
   return (
     <ITDialog isOpen={loading || !!ticket} className="w-full max-w-4xl" onClose={onClose}>
       {loading || !ticket ? (
@@ -49,7 +47,7 @@ export default function TicketDetailModal({
                 #{ticket.id.slice(0, 8).toUpperCase()}
               </span>
               <span className="text-slate-300">·</span>
-              <span className="text-[10px] text-slate-400">Creado {formatFechaHora(ticket.creadoEn)}</span>
+              <span className="text-[10px] text-slate-400">{tt("detail.createdOn", { date: formatFechaHora(ticket.creadoEn) })}</span>
             </ITFlex>
             <ITText className="text-xl font-black text-slate-800 leading-tight">{ticket.titulo}</ITText>
           </div>
@@ -62,9 +60,9 @@ export default function TicketDetailModal({
             <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6">
               <ITStack direction="column" spacing={4} className="min-w-0">
                 <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Descripción</ITText>
+                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{tt("detail.description")}</ITText>
                   <div className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">
-                    {ticket.descripcion || "Sin descripción"}
+                    {ticket.descripcion || tt("detail.noDescription")}
                   </div>
                 </div>
 
@@ -75,7 +73,7 @@ export default function TicketDetailModal({
 
                 <div>
                   <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                    Tareas asignadas ({ticket.assignments.length})
+                    {tt("detail.assignmentsTitle", { count: ticket.assignments.length })}
                   </ITText>
                   <div className="max-h-[42vh] overflow-y-auto pr-1">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -113,19 +111,19 @@ export default function TicketDetailModal({
                               {t.startDate && (
                                 <span className="inline-flex items-center gap-1">
                                   <FaCalendarAlt size={9} />
-                                  Inicio {new Date(t.startDate).toLocaleDateString("es-MX")}
+                                  {tt("detail.startShort")} {new Date(t.startDate).toLocaleDateString("es-MX")}
                                 </span>
                               )}
                               {t.dueDate && (
                                 <span className="inline-flex items-center gap-1">
                                   <FaCalendarAlt size={9} className="text-rose-400" />
-                                  Límite {new Date(t.dueDate).toLocaleDateString("es-MX")}
+                                  {tt("detail.dueShort")} {new Date(t.dueDate).toLocaleDateString("es-MX")}
                                 </span>
                               )}
                               {t.comments && t.comments.length > 0 && (
                                 <span className="inline-flex items-center gap-1">
                                   <FaComments size={9} />
-                                  {t.comments.length} comentario(s)
+                                  {tt("detail.assignmentComments", { count: t.comments.length })}
                                 </span>
                               )}
                             </div>
@@ -144,7 +142,7 @@ export default function TicketDetailModal({
                     </div>
                     {ticket.assignments.length === 0 && (
                       <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
-                        <ITText className="text-[11px] text-slate-400">Este ticket aún no tiene tareas asignadas.</ITText>
+                        <ITText className="text-[11px] text-slate-400">{tt("detail.noAssignmentsYet")}</ITText>
                       </div>
                     )}
                   </div>
@@ -154,20 +152,20 @@ export default function TicketDetailModal({
               <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-3 h-fit">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <div className="flex items-center gap-1.5 px-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Estado:</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.statusLabel")}</span>
                     <Tag {...metaFor(STATUS_META, ticket.status)} />
                   </div>
                   <div className="flex items-center gap-1.5 px-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Prioridad:</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.priorityLabel")}</span>
                     <Tag {...metaFor(PRIORITY_META, ticket.priority)} />
                   </div>
                   <div className="flex items-center gap-1.5 px-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Depto:</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.deptLabel")}</span>
                     <Tag label={ticket.department?.name ?? "General"} tone={hashTone(ticket.department?.name ?? "General")} />
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 pt-2.5 border-t border-slate-200 text-[11px]">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Creado por</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.createdByLabel")}</span>
                   <span className="font-bold text-slate-700">{ticket.creadoPor?.name}</span>
                 </div>
                 <ITButton
@@ -178,7 +176,7 @@ export default function TicketDetailModal({
                 >
                   <ITFlex align="center" gap={1} justify="center">
                     <FaExternalLinkAlt size={11} />
-                    <ITText className="font-bold text-[11px]">Abrir detalle completo</ITText>
+                    <ITText className="font-bold text-[11px]">{tt("detail.openFullDetail")}</ITText>
                   </ITFlex>
                 </ITButton>
               </div>

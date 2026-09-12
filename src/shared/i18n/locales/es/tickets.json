@@ -5,7 +5,24 @@
     "board": "Tablero",
     "new": "Nuevo ticket",
     "moveTrash": "Mover a papelera",
-    "deleteForever": "Eliminar definitivamente"
+    "deleteForever": "Eliminar definitivamente",
+    "deleted": "Eliminado",
+    "unassigned": "Sin asignar",
+    "confirmMoveTrash": "¿Mover a papelera \"{{title}}\"? Quedará oculto en estado eliminado y podrás borrarlo definitivamente después.",
+    "confirmDeleteForever": "¿Eliminar definitivamente \"{{title}}\"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.",
+    "columns": {
+      "title": "Título",
+      "status": "Estado",
+      "priority": "Prioridad",
+      "createdBy": "Creado por",
+      "assignedTo": "Asignado a"
+    },
+    "priorities": {
+      "BAJA": "Baja",
+      "MEDIA": "Media",
+      "ALTA": "Alta",
+      "URGENTE": "Urgente"
+    }
   },
   "new": {
     "title": "Nuevo Ticket",
@@ -15,7 +32,21 @@
     "created": "Ticket creado correctamente",
     "saving": "Guardando…",
     "required": "Título y descripción son requeridos",
-    "createError": "Error al crear ticket"
+    "createError": "Error al crear ticket",
+    "formHeadline": "Solicitud de soporte",
+    "formTitle": "Cuéntanos qué sucede.",
+    "formSub": "Mientras más contexto compartas, más rápido podrá atenderlo el equipo correcto.",
+    "urgency": "Urgencia",
+    "step1Title": "Información del problema",
+    "step1Sub": "Datos principales de tu solicitud",
+    "titleLabel": "Título",
+    "titlePlaceholder": "Ej. La impresora de recepción no responde",
+    "categoryLabel": "Categoría",
+    "descLabel": "Descripción",
+    "descPlaceholder": "Qué ocurrió, dónde ocurrió y qué necesitas…",
+    "evidenceTitle": "Evidencias",
+    "evidenceSub": "Imágenes o PDF del problema",
+    "removeFile": "Quitar"
   },
   "edit": {
     "title": "Editar Ticket",
@@ -28,7 +59,13 @@
     "required": "Título y descripción son requeridos",
     "updateError": "Error al actualizar ticket",
     "ticketNotFound": "Ticket no encontrado",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "formInfoTitle": "Información del ticket",
+    "priorityTitle": "Prioridad",
+    "titleLabel": "Título",
+    "titlePlaceholder": "Ej. Fuga de agua en oficina 302",
+    "descLabel": "Descripción",
+    "descPlaceholder": "Describe el problema o solicitud con el mayor detalle posible…"
   },
   "detail": {
     "title": "Ticket",
@@ -66,7 +103,66 @@
     "assign": "Asignar",
     "removeTask": "Retirar tarea",
     "commentsCount": "Comentarios ({{count}})",
-    "noComments": "Sin comentarios"
+    "noComments": "Sin comentarios",
+    "historyTitle": "Historial ({{count}})",
+    "noHistory": "Sin actividad registrada.",
+    "manageTitle": "Administrar ticket",
+    "status": "Estado",
+    "category": "Categoría",
+    "department": "Departamento",
+    "responsible": "Responsable",
+    "unassigned": "Sin asignar",
+    "noResponsible": "Sin responsable",
+    "createdBy": "Creado por",
+    "assignedTo": "Asignado a",
+    "deletedBadge": "Eliminado",
+    "description": "Descripción",
+    "noDescription": "Sin descripción",
+    "efficacyTitle": "Eficacia de resolución",
+    "efficacyLabels": {
+      "excellent": "Excelente",
+      "good": "Bueno",
+      "fair": "Regular",
+      "poor": "Bajo"
+    },
+    "resolvedIn": "Resuelto en {{hours}}h",
+    "taskTitle": "Título",
+    "taskDescription": "Descripción",
+    "taskTitlePlaceholder": "Ej. Revisar instalación eléctrica",
+    "taskDescPlaceholder": "Detalles de la tarea...",
+    "startDate": "Fecha de inicio",
+    "dueDate": "Fecha de fin esperada",
+    "taskStatus": "Estado de la tarea",
+    "taskStatusOptions": {
+      "PENDIENTE": "Pendiente",
+      "EN_PROGRESO": "En progreso",
+      "EN_REVISION": "En revisión",
+      "COMPLETADA": "Completada"
+    },
+    "employeeNo": "No. {{number}}",
+    "employeeLabel": "Empleado",
+    "searchEmployee": "Buscar por nombre o no. empleado...",
+    "addCommentPlaceholder": "Agregar comentario...",
+    "commentsReadonly": "Comentarios (solo lectura)",
+    "addComment": "Agregar comentario",
+    "commentClosedPlaceholder": "Este ticket está cerrado",
+    "commentPlaceholder": "Escribe un comentario o seguimiento para este ticket...",
+    "charCount": "{{count}} caracteres",
+    "publicFollowup": "Seguimiento público",
+    "sendingComment": "Enviando...",
+    "sendComment": "Comentar",
+    "createdOn": "Creado {{date}}",
+    "assignmentsTitle": "Tareas asignadas ({{count}})",
+    "noAssignmentsYet": "Este ticket aún no tiene tareas asignadas.",
+    "assignmentComments": "{{count}} comentario(s)",
+    "openFullDetail": "Abrir detalle completo",
+    "statusLabel": "Estado:",
+    "priorityLabel": "Prioridad:",
+    "deptLabel": "Depto:",
+    "createdByLabel": "Creado por",
+    "startShort": "Inicio",
+    "dueShort": "Límite",
+    "systemUser": "Sistema"
   },
   "kanban": {
     "byTicket": "Tareas del ticket",
@@ -87,7 +183,20 @@
     "refresh": "Actualizar",
     "emptyColumn": "Sin tareas",
     "clearFilters": "Limpiar filtros",
-    "loadError": "No se pudo cargar el tablero"
+    "loadError": "No se pudo cargar el tablero",
+    "searchPlaceholder": "Buscar tarea o ticket...",
+    "overdue": "Vencida",
+    "subtitle": "Asigna una tarea a un ticket existente",
+    "ticketLabel": "Ticket",
+    "searchTicket": "Buscar ticket...",
+    "employeeLabel": "Empleado",
+    "searchEmployee": "Buscar empleado...",
+    "taskTitle": "Título de la tarea",
+    "taskTitleExample": "Ej. Revisar instalación",
+    "taskDescription": "Descripción",
+    "taskDescPlaceholder": "Detalles de la tarea...",
+    "startDate": "Fecha de inicio",
+    "dueDate": "Fecha límite"
   },
   "mytasks": {
     "title": "Mis Tareas",
@@ -97,7 +206,8 @@
     "refresh": "Actualizar",
     "viewBoard": "Ver tablero kanban",
     "viewBoardTitle": "Ver en el tablero kanban",
-    "loadError": "No se pudieron cargar tus tareas"
+    "loadError": "No se pudieron cargar tus tareas",
+    "overdueTasks": "{{count}} vencida(s)"
   },
   "admintasks": {
     "title": "Administración de tareas",
@@ -106,6 +216,18 @@
     "loading": "Cargando...",
     "refresh": "Actualizar",
     "viewBoard": "Ver Kanban completo",
-    "loadError": "No se pudieron cargar las tareas"
+    "loadError": "No se pudieron cargar las tareas",
+    "overdueTasks": "{{count}} vencida(s)"
+  },
+  "tasksTable": {
+    "task": "Tarea",
+    "ticket": "Ticket",
+    "status": "Estado",
+    "dates": "Fechas",
+    "employee": "Empleado",
+    "overdue": "Vencida",
+    "start": "Inicio: {{date}}",
+    "end": "Fin: {{date}}",
+    "employeeNo": "No. {{number}}"
   }
 }

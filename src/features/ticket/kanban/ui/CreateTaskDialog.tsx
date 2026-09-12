@@ -37,15 +37,15 @@ export default function CreateTaskDialog({ fx }: Props) {
           </ITText>
         </ITFlex>
         <ITText className="text-[11px] text-slate-400 mt-1">
-          Asigna una tarea a un ticket existente
+          {tt("kanban.subtitle")}
         </ITText>
       </div>
       <ITGrid container columns={12} spacing={2}>
         <ITGrid item xs={12}>
           <ITSearchSelect
             name="createTicket"
-            label="Ticket"
-            placeholder="Buscar ticket..."
+            label={tt("kanban.ticketLabel")}
+            placeholder={tt("kanban.searchTicket")}
             options={fx.ticketSelectOptions}
             value={fx.createTicketId}
             onChange={(value) => fx.setCreateTicketId(String(value))}
@@ -56,8 +56,8 @@ export default function CreateTaskDialog({ fx }: Props) {
         <ITGrid item xs={12}>
           <ITSearchSelect
             name="createEmployee"
-            label="Empleado"
-            placeholder="Buscar empleado..."
+            label={tt("kanban.employeeLabel")}
+            placeholder={tt("kanban.searchEmployee")}
             options={fx.employeeOptions}
             value={fx.createUserId}
             onChange={(value) => fx.setCreateUserId(String(value))}
@@ -68,26 +68,26 @@ export default function CreateTaskDialog({ fx }: Props) {
         <ITGrid item xs={12}>
           <ITInput
             name="createTaskTitle"
-            label="Título de la tarea"
+            label={tt("kanban.taskTitle")}
             value={fx.createTitle}
             onChange={(event) => fx.setCreateTitle(event.target.value)}
-            placeholder="Ej. Revisar instalación"
+            placeholder={tt("kanban.taskTitleExample")}
           />
         </ITGrid>
         <ITGrid item xs={12}>
           <ITTextarea
             name="createTaskDescription"
-            label="Descripción"
+            label={tt("kanban.taskDescription")}
             value={fx.createDescription}
             onChange={fx.setCreateDescription}
             rows={2}
-            placeholder="Detalles de la tarea..."
+            placeholder={tt("kanban.taskDescPlaceholder")}
           />
         </ITGrid>
         <ITGrid item xs={12} sm={6}>
           <ITDatePicker
             name="createStart"
-            label="Inicio"
+            label={tt("kanban.startDate")}
             value={fx.createStart ? new Date(fx.createStart) : undefined}
             onChange={(event: any) =>
               fx.setCreateStart(
@@ -99,7 +99,7 @@ export default function CreateTaskDialog({ fx }: Props) {
         <ITGrid item xs={12} sm={6}>
           <ITDatePicker
             name="createDue"
-            label="Fecha límite"
+            label={tt("kanban.dueDate")}
             value={fx.createDue ? new Date(fx.createDue) : undefined}
             onChange={(event: any) =>
               fx.setCreateDue(

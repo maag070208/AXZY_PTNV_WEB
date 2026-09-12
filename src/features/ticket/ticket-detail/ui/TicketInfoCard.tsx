@@ -1,5 +1,7 @@
 import { ITBadget, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { formatFechaHora } from "@shared/utils/dates";
+import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import { CATEGORY_LABELS, PRIORITY_BADGE, STATUS_BADGE } from "@entities/ticket";
 import { calculateEfficacy } from "../model/timeline";
 import type { UseTicketDetail } from "../model/useTicketDetail";
@@ -10,6 +12,7 @@ interface Props {
 }
 
 export default function TicketInfoCard({ fx, attachments }: Props) {
+  const { t: tt } = useTranslation("tickets");
   const ticket = fx.ticket;
   if (!ticket) return null;
 
@@ -30,14 +33,14 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
           </ITBadget>
           {ticket.deletedAt && (
             <ITBadget color="gray" size="small">
-              Eliminado
+              {tt("detail.deletedBadge")}
             </ITBadget>
           )}
         </ITFlex>
 
         <ITStack direction="column" spacing={2}>
           <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            Descripcion
+            {tt("detail.description")}
           </ITText>
           <ITText className="text-[13px] text-slate-700 whitespace-pre-wrap break-words leading-relaxed">
             {ticket.descripcion}
@@ -50,7 +53,7 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
           <ITGrid item xs={12} sm={6} md={4}>
             <ITStack direction="column" spacing={1}>
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Creado por
+                {tt("detail.createdBy")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700 truncate">
                 {ticket.creadoPor?.name ?? "—"}
@@ -63,17 +66,17 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
           <ITGrid item xs={12} sm={6} md={4}>
             <ITStack direction="column" spacing={1}>
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Asignado a
+                {tt("detail.assignedTo")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700 truncate">
-                {ticket.asignadoA?.name ?? "Sin asignar"}
+                {ticket.asignadoA?.name ?? tt("detail.unassigned")}
               </ITText>
             </ITStack>
           </ITGrid>
           <ITGrid item xs={12} sm={6} md={4}>
             <ITStack direction="column" spacing={1}>
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Departamento
+                {tt("detail.department")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700 truncate">
                 {ticket.department?.name ?? "—"}
@@ -86,7 +89,7 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
           <ITFlex className="mt-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
             <ITStack direction="column" spacing={1} className="flex-1">
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Eficacia de resolución
+                {tt("detail.efficacyTitle")}
               </ITText>
               <ITFlex align="center" gap={2}>
                 <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -128,12 +131,12 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
                         : "text-red-500"
                     }`}
                   >
-                    {efficacy.label}
+                    {dyn(tt)(`detail.efficacyLabels.${efficacy.label}`)}
                   </ITText>
                 </ITFlex>
               </ITFlex>
               <ITText className="text-[9px] text-slate-400">
-                Resuelto en {efficacy.hours}h
+                {tt("detail.resolvedIn", { hours: efficacy.hours })}
               </ITText>
             </ITStack>
           </ITFlex>

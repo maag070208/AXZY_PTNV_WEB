@@ -14,6 +14,7 @@ import {
 import { FaComment, FaPaperPlane, FaPlus, FaProjectDiagram, FaTicketAlt, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatFechaHora } from "@shared/utils/dates";
+import { dyn } from "@shared/i18n/dyn";
 import { STATUS_BADGE } from "@entities/ticket";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 
@@ -27,11 +28,11 @@ interface Props {
   }) => React.ReactNode;
 }
 
-const statusMeta: Record<string, { dot: string; bar: string; label: string }> = {
-  PENDIENTE: { dot: "bg-slate-400", bar: "border-slate-300", label: "Pendiente" },
-  EN_PROGRESO: { dot: "bg-blue-500", bar: "border-blue-400", label: "En progreso" },
-  EN_REVISION: { dot: "bg-purple-500", bar: "border-purple-400", label: "En revisión" },
-  COMPLETADA: { dot: "bg-emerald-500", bar: "border-emerald-400", label: "Completada" },
+const statusMeta: Record<string, { dot: string; bar: string }> = {
+  PENDIENTE: { dot: "bg-slate-400", bar: "border-slate-300" },
+  EN_PROGRESO: { dot: "bg-blue-500", bar: "border-blue-400" },
+  EN_REVISION: { dot: "bg-purple-500", bar: "border-purple-400" },
+  COMPLETADA: { dot: "bg-emerald-500", bar: "border-emerald-400" },
 };
 
 export default function TasksGraph({ fx, canManage, renderAssignmentAttachments }: Props) {
@@ -154,7 +155,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       </ITText>
                       {a.user.numeroEmpleado && (
                         <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                          No. {a.user.numeroEmpleado}
+                          {tt("detail.employeeNo", { number: a.user.numeroEmpleado })}
                         </ITText>
                       )}
                     </ITStack>
@@ -184,7 +185,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       }
                       size="small"
                     >
-                      {meta.label}
+                      {dyn(tt)(`detail.taskStatusOptions.${a.status}`)}
                     </ITBadget>
                     <ITButton
                       variant="outlined"
@@ -208,7 +209,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                   <ITStack direction="column" spacing={2}>
                     <ITInput
                       name={`title-${a.id}`}
-                      label="Título"
+                      label={tt("detail.taskTitle")}
                       value={a.title}
                       disabled={!canEditTask}
                       onChange={(e) => fx.handleUpdateAssignment(a.id, { title: e.target.value })}
@@ -216,7 +217,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
 
                     <ITTextarea
                       name={`desc-${a.id}`}
-                      label="Descripción"
+                      label={tt("detail.taskDescription")}
                       value={a.description}
                       disabled={!canEditTask}
                       rows={2}
@@ -227,7 +228,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       <ITGrid item xs={12} sm={6}>
                         <ITDatePicker
                           name={`start-${a.id}`}
-                          label="Fecha de inicio"
+                          label={tt("detail.startDate")}
                           value={a.startDate ? new Date(a.startDate) : undefined}
                           disabled={!canEditTask}
                           onChange={(e: any) =>
@@ -240,7 +241,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       <ITGrid item xs={12} sm={6}>
                         <ITDatePicker
                           name={`due-${a.id}`}
-                          label="Fecha de fin esperada"
+                          label={tt("detail.dueDate")}
                           value={a.dueDate ? new Date(a.dueDate) : undefined}
                           disabled={!canEditTask}
                           onChange={(e: any) =>
@@ -255,21 +256,16 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                     {canEditStatus && (
                       <ITSelect
                         name={`status-${a.id}`}
-                        label="Estado de la tarea"
-                        options={
-                          fx.isAdmin || fx.isGerente
-                            ? [
-                                { value: "PENDIENTE", label: "Pendiente" },
-                                { value: "EN_PROGRESO", label: "En progreso" },
-                                { value: "EN_REVISION", label: "En revisión" },
-                                { value: "COMPLETADA", label: "Completada" },
-                              ]
-                            : [
-                                { value: "PENDIENTE", label: "Pendiente" },
-                                { value: "EN_PROGRESO", label: "En progreso" },
-                                { value: "EN_REVISION", label: "En revisión" },
-                              ]
-                        }
+                        label={tt("detail.taskStatus")}
+                        options={[
+                          "PENDIENTE",
+                          "EN_PROGRESO",
+                          "EN_REVISION",
+                          ...(fx.isAdmin || fx.isGerente ? ["COMPLETADA"] : []),
+                        ].map((value) => ({
+                          value,
+                          label: dyn(tt)(`detail.taskStatusOptions.${value}`),
+                        }))}
                         value={a.status}
                         disabled={
                           !canEditStatus || (a.status === "COMPLETADA" && !fx.isAdmin && !fx.isGerente)
@@ -321,7 +317,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                               >
                                 <ITFlex justify="between" align="center" className="mb-0.5">
                                   <ITText className="text-[9px] font-black text-slate-600">
-                                    {c.autor?.name ?? "Sistema"}
+                                    {c.autor?.name ?? tt("detail.systemUser")}
                                   </ITText>
                                   <ITText className="text-[8px] text-slate-400">
                                     {formatFechaHora(c.createdAt)}
@@ -338,7 +334,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                             <div className="flex gap-2 items-end">
                               <ITInput
                                 name={`comment-${a.id}`}
-                                placeholder="Agregar comentario..."
+                                placeholder={tt("detail.addCommentPlaceholder")}
                                 value={fx.commentDrafts[a.id] ?? ""}
                                 onChange={(e) =>
                                   fx.setCommentDrafts((d) => ({
@@ -407,8 +403,8 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                 <ITGrid item xs={12} md={7}>
                   <ITSearchSelect
                     name="newUserId"
-                    label="Empleado"
-                    placeholder="Buscar por nombre o no. empleado..."
+                    label={tt("detail.employeeLabel")}
+                    placeholder={tt("detail.searchEmployee")}
                     options={fx.empleadoOptions}
                     value={fx.selectedUserId}
                     onChange={fx.handleAssign}
@@ -419,8 +415,8 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                 <ITGrid item xs={12} md={5}>
                   <ITInput
                     name="taskTitle"
-                    label="Título de la tarea"
-                    placeholder="Ej. Revisar instalación eléctrica"
+                    label={tt("detail.taskTitle")}
+                    placeholder={tt("detail.taskTitlePlaceholder")}
                     value={fx.taskTitle}
                     onChange={(e) => fx.setTaskTitle(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && fx.handleAddAssignment()}
@@ -429,8 +425,8 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                 <ITGrid item xs={12}>
                   <ITTextarea
                     name="taskDesc"
-                    label="Descripción"
-                    placeholder="Detalles de la tarea..."
+                    label={tt("detail.taskDescription")}
+                    placeholder={tt("detail.taskDescPlaceholder")}
                     rows={2}
                     value={fx.taskDesc}
                     onChange={(v) => fx.setTaskDesc(v)}
@@ -439,7 +435,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                 <ITGrid item xs={12} sm={6}>
                   <ITDatePicker
                     name="taskStart"
-                    label="Fecha de inicio"
+                    label={tt("detail.startDate")}
                     value={fx.taskStart ? new Date(fx.taskStart) : undefined}
                     onChange={(e: any) =>
                       fx.setTaskStart(
@@ -451,7 +447,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                 <ITGrid item xs={12} sm={6}>
                   <ITDatePicker
                     name="taskDue"
-                    label="Fecha de fin esperada"
+                    label={tt("detail.dueDate")}
                     value={fx.taskDue ? new Date(fx.taskDue) : undefined}
                     onChange={(e: any) =>
                       fx.setTaskDue(

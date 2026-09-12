@@ -57,7 +57,7 @@ export default function AdminTareasPage() {
         )}
         {fx.vencidas > 0 && (
           <ITBadget color="danger" size="small">
-            {fx.vencidas} vencida(s)
+            {tt("admintasks.overdueTasks", { count: fx.vencidas })}
           </ITBadget>
         )}
       </ITFlex>

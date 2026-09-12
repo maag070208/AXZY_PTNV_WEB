@@ -178,7 +178,7 @@ export default function TicketDetailPage() {
         </div>
 
         {/* Columna derecha: historial */}
-        <aside className="shrink-0">
+        <aside className="w-full md:w-72 shrink-0">
           <TicketHistoryAside events={timelineEvents} />
         </aside>
       </div>

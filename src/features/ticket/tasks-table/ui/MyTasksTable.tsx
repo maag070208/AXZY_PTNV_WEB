@@ -27,7 +27,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
   const columns: Column<KanbanAssignment>[] = [
     {
       key: "title",
-      label: "Tarea",
+      label: tt("tasksTable.task"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -41,7 +41,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
     },
     {
       key: "ticket",
-      label: "Ticket",
+      label: tt("tasksTable.ticket"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -50,7 +50,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
     },
     {
       key: "status",
-      label: "Estado",
+      label: tt("tasksTable.status"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -61,25 +61,25 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
     },
     {
       key: "dates",
-      label: "Fechas",
+      label: tt("tasksTable.dates"),
       type: "string",
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           {r.startDate && (
             <ITText className="text-[9px] text-slate-500">
-              Inicio: {new Date(r.startDate).toLocaleDateString("es-MX")}
+              {tt("tasksTable.start", { date: new Date(r.startDate).toLocaleDateString("es-MX") })}
             </ITText>
           )}
           {r.dueDate && (
             <ITText className="text-[9px] text-slate-500">
-              Fin: {new Date(r.dueDate).toLocaleDateString("es-MX")}
+              {tt("tasksTable.end", { date: new Date(r.dueDate).toLocaleDateString("es-MX") })}
             </ITText>
           )}
           {r.dueDate &&
             r.status !== "COMPLETADA" &&
             new Date(r.dueDate) < new Date() && (
-              <ITBadget color="danger" size="small">Vencida</ITBadget>
+              <ITBadget color="danger" size="small">{tt("tasksTable.overdue")}</ITBadget>
             )}
         </ITFlex>
       ),

@@ -87,8 +87,8 @@ export default function TicketsListPage() {
         }
         message={
           list.ticketToDelete?.deletedAt
-            ? `¿Eliminar definitivamente "${list.ticketToDelete?.titulo}"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.`
-            : `¿Mover a papelera "${list.ticketToDelete?.titulo}"? Quedará oculto en estado eliminado y podrás borrarlo definitivamente después.`
+            ? tt("list.confirmDeleteForever", { title: list.ticketToDelete?.titulo })
+            : tt("list.confirmMoveTrash", { title: list.ticketToDelete?.titulo })
         }
         confirmLabel={
           list.ticketToDelete?.deletedAt

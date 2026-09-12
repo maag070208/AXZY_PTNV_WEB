@@ -43,7 +43,7 @@ export default function MisTareasPage() {
         )}
         {fx.vencidas > 0 && (
           <ITBadget color="danger" size="small">
-            {fx.vencidas} vencida(s)
+            {tt("mytasks.overdueTasks", { count: fx.vencidas })}
           </ITBadget>
         )}
         <ITButton variant="outlined" onClick={fx.reload}>
