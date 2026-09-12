@@ -1,0 +1,37 @@
+import { ITButton, ITFlex, ITStack, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
+import { FaComment, FaPaperPlane } from "react-icons/fa";
+import type { UseDeviceDetail } from "../model/useDeviceDetail";
+
+export default function DeviceCommentBox({ fx }: { fx: UseDeviceDetail }) {
+  return (
+    <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
+      <ITStack direction="column" spacing={4} className="w-full">
+        <ITFlex align="center" gap={2}>
+          <FaComment size={14} className="text-slate-400" />
+          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            Agregar comentario
+          </ITText>
+        </ITFlex>
+
+        <ITFlex gap={2} align="end">
+          <ITTextarea
+            name="comment"
+            value={fx.commentText}
+            onChange={(v) => fx.setCommentText(v)}
+            placeholder="Escribe un comentario sobre este dispositivo..."
+            rows={3}
+          />
+          <ITButton
+            variant="filled"
+            color="primary"
+            size="small"
+            onClick={fx.handleAddComment}
+            disabled={fx.sendingComment || !fx.commentText.trim()}
+          >
+            <FaPaperPlane size={12} />
+          </ITButton>
+        </ITFlex>
+      </ITStack>
+    </ITFlex>
+  );
+}

@@ -1,139 +1,36 @@
 import {
-  ITBadget,
   ITButton,
   ITConfirmDialog,
   ITFlex,
-  ITGrid,
   ITLoader,
   ITPage,
   ITStack,
-  ITTextarea,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   FaBoxOpen,
-  FaCheckCircle,
-  FaClock,
-  FaComment,
   FaEdit,
   FaExclamationTriangle,
-  FaLayerGroup,
   FaLock,
-  FaPaperPlane,
   FaTrash,
   FaTrashRestore,
-  FaUserCog,
 } from "react-icons/fa";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import type { RootState } from "@app/store";
-import { deviceApi as devicesApi, type Device } from "@entities/device";
-import type { DeviceFieldKey } from "@entities/device-type";
-import { formatFechaHora } from "@shared/utils/dates";
-
-const ESTADO_BADGE: Record<string, { color: string; label: string }> = {
-  DISPONIBLE: { color: "success", label: "Disponible" },
-  ASIGNADO: { color: "warning", label: "Asignado" },
-  BAJA: { color: "default", label: "Baja" },
-};
-
-const FIELD_LABELS: Record<DeviceFieldKey, string> = {
-  numeroSerie: "Número de serie",
-  nombreEquipo: "Nombre de equipo",
-  ip: "Dirección IP",
-  macAddress: "MAC Address",
-  sistemaOp: "Sistema operativo",
-  ram: "RAM",
-  almacenamiento: "Almacenamiento",
-};
-
-const HISTORY_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
-  CREATED: { icon: <FaBoxOpen size={9} />, bg: "bg-emerald-500" },
-  ASSIGNED: { icon: <FaUserCog size={9} />, bg: "bg-amber-500" },
-  RETURNED: { icon: <FaCheckCircle size={9} />, bg: "bg-blue-500" },
-  RETIRED: { icon: <FaExclamationTriangle size={9} />, bg: "bg-red-500" },
-  UPDATED: { icon: <FaEdit size={9} />, bg: "bg-purple-500" },
-  COMMENT: { icon: <FaComment size={9} />, bg: "bg-slate-400" },
-};
+import { useTranslation } from "react-i18next";
+import {
+  useDeviceDetail,
+  DeviceInfoCard,
+  DeviceLoteSection,
+  DeviceTimeline,
+  DeviceCommentBox,
+} from "@features/device/device-detail";
 
 export default function DeviceDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { t: tt } = useTranslation(["device", "common"]);
-  const authUser = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = authUser?.role === "ADMIN";
-  const [device, setDevice] = useState<Device | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<string | null>(null);
-  const [toastType, setToastType] = useState<"success" | "error">("success");
-  const [commentText, setCommentText] = useState("");
-  const [sendingComment, setSendingComment] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [loteDevices, setLoteDevices] = useState<Device[]>([]);
-  const [loteLoading, setLoteLoading] = useState(false);
+  const fx = useDeviceDetail();
 
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    devicesApi.get(id)
-      .then(setDevice)
-      .catch(() => setDevice(null))
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  useEffect(() => {
-    if (!device?.loteId || !device.loteSize || device.loteSize <= 1) {
-      setLoteDevices([]);
-      return;
-    }
-    setLoteLoading(true);
-    devicesApi.getLote(device.loteId)
-      .then((res) => setLoteDevices(res.data))
-      .catch(() => setLoteDevices([]))
-      .finally(() => setLoteLoading(false));
-  }, [device?.loteId, device?.loteSize]);
-
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 2500);
-    return () => clearTimeout(t);
-  }, [toast]);
-
-  const handleDeleteDevice = async () => {
-    if (!device) return;
-    try {
-      await devicesApi.remove(device.id, device.estado === "ASIGNADO");
-      setDeleteOpen(false);
-      navigate("/dispositivos");
-    } catch (e: any) {
-      setToastType("error");
-      setToast(e.message);
-      setDeleteOpen(false);
-    }
-  };
-
-  const handleAddComment = async () => {
-    if (!device || !commentText.trim()) return;
-    setSendingComment(true);
-    try {
-      const entry = await devicesApi.addHistory(device.id, {
-        type: "COMMENT",
-        detail: commentText.trim(),
-      });
-      setDevice((prev) => prev ? { ...prev, history: [...(prev.history ?? []), entry] } : prev);
-      setCommentText("");
-      setToastType("success");
-      setToast("Comentario agregado");
-    } catch {
-      setToastType("error");
-      setToast("Error al agregar comentario");
-    } finally {
-      setSendingComment(false);
-    }
-  };
+  const { device, loading, navigate, toast, toastType, isAdmin, setDeleteOpen } =
+    fx;
 
   if (loading) {
     return (
@@ -142,7 +39,10 @@ export default function DeviceDetailPage() {
         backAction={() => navigate(-1)}
         icon={<FaBoxOpen size={20} />}
         breadcrumbs={[
-          { label: tt("device:list.title"), onClick: () => navigate("/dispositivos") },
+          {
+            label: tt("device:list.title"),
+            onClick: () => navigate("/dispositivos"),
+          },
           { label: "Detalle" },
         ]}
         loading
@@ -161,7 +61,10 @@ export default function DeviceDetailPage() {
         backAction={() => navigate(-1)}
         icon={<FaBoxOpen size={20} />}
         breadcrumbs={[
-          { label: tt("device:list.title"), onClick: () => navigate("/dispositivos") },
+          {
+            label: tt("device:list.title"),
+            onClick: () => navigate("/dispositivos"),
+          },
           { label: "Detalle" },
         ]}
       >
@@ -170,45 +73,6 @@ export default function DeviceDetailPage() {
     );
   }
 
-  // Construir timeline
-  const history = device.history ?? [];
-  const configuredFields = (Object.keys(FIELD_LABELS) as DeviceFieldKey[]).filter(
-    (field) => device.type?.fieldConfig?.[field]?.enabled && field !== "numeroSerie" && field !== "nombreEquipo"
-  );
-  const timelineEvents: Array<{
-    id: string;
-    icon: React.ReactNode;
-    iconBg: string;
-    title: string;
-    detail?: string;
-    author?: string;
-    timestamp: string;
-    isComment: boolean;
-  }> = [];
-
-  history.forEach((h) => {
-    const config = HISTORY_ICONS[h.type] ?? HISTORY_ICONS.UPDATED;
-    const typeLabels: Record<string, string> = {
-      CREATED: "Dispositivo registrado",
-      ASSIGNED: "Dispositivo asignado",
-      RETURNED: "Dispositivo devuelto",
-      RETIRED: "Dispositivo retirado",
-      UPDATED: "Información actualizada",
-      COMMENT: "Comentario",
-    };
-
-    timelineEvents.push({
-      id: h.id,
-      icon: config.icon,
-      iconBg: config.bg,
-      title: typeLabels[h.type] ?? h.type,
-      detail: h.detail ?? undefined,
-      author: h.autor?.name,
-      timestamp: h.createdAt,
-      isComment: h.type === "COMMENT",
-    });
-  });
-
   return (
     <ITPage
       title={device.descripcion}
@@ -216,7 +80,10 @@ export default function DeviceDetailPage() {
       backAction={() => navigate(-1)}
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[
-        { label: tt("device:list.title"), onClick: () => navigate("/dispositivos") },
+        {
+          label: tt("device:list.title"),
+          onClick: () => navigate("/dispositivos"),
+        },
         { label: device.controlActivos },
       ]}
       actions={
@@ -225,18 +92,29 @@ export default function DeviceDetailPage() {
             variant="outlined"
             size="small"
             color="secondary"
-            onClick={() => device.estado !== "ASIGNADO" && navigate(`/dispositivos/${device.id}/editar`)}
+            onClick={() =>
+              device.estado !== "ASIGNADO" &&
+              navigate(`/dispositivos/${device.id}/editar`)
+            }
             disabled={device.estado === "ASIGNADO"}
             title={
               device.estado === "ASIGNADO"
-                ? tt("device:actions.editLocked", { code: device.controlActivos })
+                ? tt("device:actions.editLocked", {
+                    code: device.controlActivos,
+                  })
                 : undefined
             }
           >
             <ITFlex align="center" gap={1}>
-              {device.estado === "ASIGNADO" ? <FaLock size={12} /> : <FaEdit size={12} />}
+              {device.estado === "ASIGNADO" ? (
+                <FaLock size={12} />
+              ) : (
+                <FaEdit size={12} />
+              )}
               <ITText className="font-bold text-[11px]">
-                {device.estado === "ASIGNADO" ? "Asignado" : tt("common:actions.edit")}
+                {device.estado === "ASIGNADO"
+                  ? "Asignado"
+                  : tt("common:actions.edit")}
               </ITText>
             </ITFlex>
           </ITButton>
@@ -249,8 +127,12 @@ export default function DeviceDetailPage() {
             title={
               device.estado === "ASIGNADO"
                 ? isAdmin
-                  ? tt("device:actions.forceDeleteWithCode", { code: device.controlActivos })
-                  : tt("device:actions.returnFirst", { code: device.controlActivos })
+                  ? tt("device:actions.forceDeleteWithCode", {
+                      code: device.controlActivos,
+                    })
+                  : tt("device:actions.returnFirst", {
+                      code: device.controlActivos,
+                    })
                 : device.estado === "BAJA"
                 ? tt("device:actions.deletePermanent")
                 : tt("device:actions.decommission")
@@ -269,272 +151,16 @@ export default function DeviceDetailPage() {
     >
       <ITFlex justify="center">
         <ITStack direction="column" spacing={5} className="w-full">
-          {/* Info del dispositivo */}
-          <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
-            <ITStack direction="column" spacing={5} className="w-full">
-              <ITFlex gap={2} wrap="wrap">
-                <ITBadget color={ESTADO_BADGE[device.estado]?.color as any ?? "default"} size="small">
-                  {ESTADO_BADGE[device.estado]?.label ?? device.estado}
-                </ITBadget>
-                {device.type && (
-                  <ITBadget color="primary" size="small">
-                    {device.type.name}
-                  </ITBadget>
-                )}
-                {!!device.loteSize && device.loteSize > 1 && device.loteId && (
-                  <Link
-                    to={`/dispositivos/lotes/${device.loteId}/editar`}
-                    className="inline-flex items-center gap-1 text-[11px] font-black text-emerald-700 hover:underline"
-                    title={tt("device:actions.editLote")}
-                  >
-                    <FaLayerGroup size={11} />
-                    Lote ×{device.loteSize}
-                  </Link>
-                )}
-              </ITFlex>
-
-              <ITGrid container columns={12} spacing={4}>
-                <ITGrid item xs={12} md={3}>
-                  <ITStack direction="column" spacing={1}>
-                    <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                      Control de activos
-                    </ITText>
-                    <ITText className="text-[13px] font-black text-slate-800">
-                      {device.controlActivos}
-                    </ITText>
-                  </ITStack>
-                </ITGrid>
-                {device.type?.fieldConfig?.numeroSerie?.enabled && <ITGrid item xs={12} md={3}>
-                  <ITStack direction="column" spacing={1}>
-                    <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                      Marca / Modelo
-                    </ITText>
-                    <ITText className="text-[13px] font-bold text-slate-700">
-                      {device.marca} {device.modelo}
-                    </ITText>
-                  </ITStack>
-                </ITGrid>}
-                <ITGrid item xs={12} md={3}>
-                  <ITStack direction="column" spacing={1}>
-                    <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                      No. Serie
-                    </ITText>
-                    <ITText className="text-[13px] font-bold text-slate-700">
-                      {device.numeroSerie ?? "—"}
-                    </ITText>
-                  </ITStack>
-                </ITGrid>
-                <ITGrid item xs={12} md={3}>
-                  <ITStack direction="column" spacing={1}>
-                    <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                      Área
-                    </ITText>
-                    <ITText className="text-[13px] font-bold text-slate-700">
-                      {device.area}
-                    </ITText>
-                  </ITStack>
-                </ITGrid>
-              </ITGrid>
-
-              {configuredFields.length > 0 && (
-                <ITGrid container columns={12} spacing={4} className="mt-2">
-                  {configuredFields.map((field) => (
-                    <ITGrid item xs={12} md={3} key={field}>
-                      <ITStack direction="column" spacing={1}>
-                        <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                          {FIELD_LABELS[field]}
-                        </ITText>
-                        <ITText className="text-[12px] font-bold text-slate-700">
-                          {device[field] ?? "—"}
-                        </ITText>
-                      </ITStack>
-                    </ITGrid>
-                  ))}
-                </ITGrid>
-              )}
-
-              {device.type?.fieldConfig?.nombreEquipo?.enabled && device.nombreEquipo && (
-                <ITStack direction="column" spacing={1}>
-                  <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                    Nombre del equipo
-                  </ITText>
-                  <ITText className="text-[12px] font-bold text-slate-700">
-                    {device.nombreEquipo}
-                  </ITText>
-                </ITStack>
-              )}
-
-              <ITStack direction="column" spacing={1}>
-                <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                  Registrado
-                </ITText>
-                <ITText className="text-[11px] text-slate-500">
-                  {formatFechaHora(device.createdAt)}
-                </ITText>
-              </ITStack>
-            </ITStack>
-          </ITFlex>
-
-          {/* Lote: lista de unidades dadas de alta juntas */}
+          <DeviceInfoCard device={device} />
           {device.loteId && device.loteSize && device.loteSize > 1 && (
-            <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
-              <ITStack direction="column" spacing={4} className="w-full">
-                <ITFlex align="center" justify="between" gap={2} wrap="wrap">
-                  <ITFlex align="center" gap={2}>
-                    <FaLayerGroup size={14} className="text-emerald-600" />
-                    <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                      Lote — {loteDevices.length} unidades
-                    </ITText>
-                  </ITFlex>
-                  <Link
-                    to={`/dispositivos/${device.id}/editar`}
-                    className="inline-flex items-center gap-1 text-[11px] font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg px-3 py-1.5 transition-colors"
-                    title="Editar todo el lote"
-                  >
-                    Editar lote completo
-                  </Link>
-                </ITFlex>
-
-                {loteLoading ? (
-                  <ITText className="text-[12px] text-slate-400 italic">Cargando unidades del lote…</ITText>
-                ) : loteDevices.length === 0 ? (
-                  <ITText className="text-[12px] text-slate-400 italic">Sin unidades por mostrar</ITText>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {loteDevices.map((ld) => (
-                      <Link
-                        key={ld.id}
-                        to={`/dispositivos/${ld.id}`}
-                        className={`rounded-xl border p-3 transition-colors ${
-                          ld.id === device.id
-                            ? "border-emerald-300 bg-emerald-50/50"
-                            : "border-slate-100 bg-slate-50/60 hover:border-slate-200 hover:bg-white"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="text-[11px] font-black text-slate-800">
-                            {ld.controlActivos}
-                          </span>
-                          <ITBadget
-                            color={ld.estado === "DISPONIBLE" ? "success" : ld.estado === "ASIGNADO" ? "warning" : "gray"}
-                            size="small"
-                          >
-                            {ld.estado}
-                          </ITBadget>
-                        </div>
-                        {ld.nombreEquipo && (
-                          <div className="text-[10px] font-bold text-slate-500">{ld.nombreEquipo}</div>
-                        )}
-                        {ld.numeroSerie && (
-                          <div className="text-[9px] text-slate-400">Serie: {ld.numeroSerie}</div>
-                        )}
-                        {ld.id === device.id && (
-                          <div className="text-[9px] font-black text-emerald-700 mt-1">Este equipo</div>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </ITStack>
-            </ITFlex>
+            <DeviceLoteSection
+              device={device}
+              loteDevices={fx.loteDevices}
+              loteLoading={fx.loteLoading}
+            />
           )}
-
-          {/* Timeline */}
-          <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
-            <ITStack direction="column" spacing={0} className="w-full">
-              <ITFlex align="center" gap={2} className="mb-5">
-                <FaClock size={14} className="text-slate-400" />
-                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                  Historial ({timelineEvents.length})
-                </ITText>
-              </ITFlex>
-
-              {timelineEvents.length === 0 ? (
-                <ITText className="text-[12px] text-slate-400 italic">
-                  Sin actividad aún
-                </ITText>
-              ) : (
-                <div className="relative">
-                  {timelineEvents.map((event, idx) => {
-                    const isLast = idx === timelineEvents.length - 1;
-
-                    return (
-                      <div key={event.id} className="flex gap-3 relative">
-                        <div className="flex flex-col items-center w-5 shrink-0">
-                          <div
-                            className={`w-5 h-5 rounded-full flex items-center justify-center ${event.iconBg} text-white z-10 ring-4 ring-white`}
-                          >
-                            {event.icon}
-                          </div>
-                          {!isLast && (
-                            <div className="w-px flex-1 bg-gradient-to-b from-slate-200 to-slate-100" />
-                          )}
-                        </div>
-
-                        <div className={`pb-5 min-w-0 flex-1 ${isLast ? "pb-0" : ""}`}>
-                          <div className="rounded-xl p-3 bg-slate-50 border border-slate-100">
-                            <div className="flex items-start justify-between gap-2 mb-1">
-                              <span className="text-[11px] font-black text-slate-700 leading-tight">
-                                {event.title}
-                              </span>
-                              <span className="text-[9px] text-slate-400 shrink-0 tabular-nums">
-                                {formatFechaHora(event.timestamp)}
-                              </span>
-                            </div>
-                            {event.detail && (
-                              <p className={`text-[11px] leading-relaxed whitespace-pre-wrap ${
-                                event.isComment ? "text-slate-600 mt-1" : "text-slate-500"
-                              }`}>
-                                {event.isComment ? `"${event.detail}"` : event.detail}
-                              </p>
-                            )}
-                            {event.author && (
-                              <span className="text-[9px] text-slate-400 mt-1 inline-block">
-                                {event.author}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </ITStack>
-          </ITFlex>
-
-          {/* Comentario */}
-          {device.estado !== "BAJA" && (
-            <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
-              <ITStack direction="column" spacing={4} className="w-full">
-                <ITFlex align="center" gap={2}>
-                  <FaComment size={14} className="text-slate-400" />
-                  <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                    Agregar comentario
-                  </ITText>
-                </ITFlex>
-
-                <ITFlex gap={2} align="end">
-                  <ITTextarea
-                    name="comment"
-                    value={commentText}
-                    onChange={(v) => setCommentText(v)}
-                    placeholder="Escribe un comentario sobre este dispositivo..."
-                    rows={3}
-                  />
-                  <ITButton
-                    variant="filled"
-                    color="primary"
-                    size="small"
-                    onClick={handleAddComment}
-                    disabled={sendingComment || !commentText.trim()}
-                  >
-                    <FaPaperPlane size={12} />
-                  </ITButton>
-                </ITFlex>
-              </ITStack>
-            </ITFlex>
-          )}
+          <DeviceTimeline device={device} />
+          {device.estado !== "BAJA" && <DeviceCommentBox fx={fx} />}
         </ITStack>
       </ITFlex>
 
@@ -544,14 +170,14 @@ export default function DeviceDetailPage() {
           type={toastType}
           position="bottom-center"
           duration={2500}
-          onClose={() => setToast(null)}
+          onClose={() => fx.setToast(null)}
         />
       )}
 
       <ITConfirmDialog
-        isOpen={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        onConfirm={handleDeleteDevice}
+        isOpen={fx.deleteOpen}
+        onClose={() => fx.setDeleteOpen(false)}
+        onConfirm={fx.handleDeleteDevice}
         title={
           device.estado === "ASIGNADO"
             ? tt("device:deleteDialog.forceTitle")
@@ -561,10 +187,16 @@ export default function DeviceDetailPage() {
         }
         message={
           device.estado === "ASIGNADO"
-            ? tt("device:deleteDialog.forceMessage", { code: device.controlActivos })
+            ? tt("device:deleteDialog.forceMessage", {
+                code: device.controlActivos,
+              })
             : device.estado === "BAJA"
-            ? tt("device:deleteDialog.permanentMessage", { code: device.controlActivos })
-            : tt("device:deleteDialog.decommissionMessage", { code: device.controlActivos })
+            ? tt("device:deleteDialog.permanentMessage", {
+                code: device.controlActivos,
+              })
+            : tt("device:deleteDialog.decommissionMessage", {
+                code: device.controlActivos,
+              })
         }
         confirmLabel={
           device.estado === "ASIGNADO"
