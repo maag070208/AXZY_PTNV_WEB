@@ -1,0 +1,1 @@
+export { useDeviceTypesList, type UseDeviceTypesList, deviceTypesColumns } from "./model/useDeviceTypesList";
