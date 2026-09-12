@@ -1,20 +1,13 @@
-import { api } from "./client";
-import type { Location } from "./devices.api";
-
-export const locationsApi = {
-  list: () => api.get<Location[]>(`/locations`),
-  get: (id: string) => api.get<Location>(`/locations/${id}`),
-  create: (data: {
-    lugar?: string;
-    subLugar?: string;
-    numero?: string;
-    descripcion?: string;
-  }) => api.post<Location>(`/locations`, data),
-  update: (id: string, data: {
-    lugar?: string;
-    subLugar?: string;
-    numero?: string;
-    descripcion?: string;
-  }) => api.put<Location>(`/locations/${id}`, data),
-  remove: (id: string) => api.delete<{ success: boolean }>(`/locations/${id}`),
-};
+/**
+ * @deprecated Shim de compatibilidad.
+ *
+ * La fuente de verdad de Location ahora vive en `@entities/location`
+ * (arquitectura Feature-Sliced Design). Este archivo sólo re-exporta los
+ * mismos símbolos bajo sus nombres originales para no romper a los módulos
+ * que aún no se migraron. Código nuevo debe importar directo de
+ * "@entities/location", nunca de este archivo.
+ */
+// eslint-disable-next-line boundaries/dependencies -- shim legacy, ver comentario del archivo
+export * from "@entities/location";
+// eslint-disable-next-line boundaries/dependencies -- shim legacy, ver comentario del archivo
+export { locationsApi } from "@entities/location";

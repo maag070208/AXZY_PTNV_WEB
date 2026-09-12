@@ -14,10 +14,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   DEVICE_FIELD_KEYS,
-  deviceTypesApi,
+  deviceTypeApi as deviceTypesApi,
   type DeviceFieldConfig,
   type DeviceFieldKey,
-} from "@core/api/devices.api";
+} from "@entities/device-type";
 
 const FIELD_LABELS: Record<DeviceFieldKey, string> = {
   numeroSerie: "Número de serie",

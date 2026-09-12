@@ -17,7 +17,7 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "@core/store/notifications/notifications.slice";
-import { formatFechaHora } from "@core/store/cartas/types";
+import { formatFechaHora } from "@core/utils/dates";
 import type { Notification } from "@core/api/notifications.api";
 import { notificationsApi } from "@core/api/notifications.api";
 

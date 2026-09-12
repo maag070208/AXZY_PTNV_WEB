@@ -1,0 +1,19 @@
+{
+  "actions": {
+    "new": "New",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "view": "View details",
+    "save": "Save",
+    "search": "Search...",
+    "back": "Back"
+  },
+  "breadcrumbs": {
+    "home": "Home"
+  },
+  "filters": {
+    "allTypes": "All types",
+    "allStatuses": "All statuses"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "list": {
+    "title": "Devices",
+    "description": "{{total}} device(s) · {{typeCount}} type(s)",
+    "typesButton": "Types",
+    "importButton": "Import Excel"
+  },
+  "summary": {
+    "total": "Total",
+    "available": "Available",
+    "assigned": "Assigned",
+    "decommissioned": "Decommissioned"
+  },
+  "status": {
+    "DISPONIBLE": "AVAILABLE",
+    "ASIGNADO": "ASSIGNED",
+    "BAJA": "DECOMMISSIONED",
+    "loteAvailable": "{{count}} avail.",
+    "loteAssigned": "{{count}} lent",
+    "loteDecommissioned": "{{count}} off",
+    "loteBadge": "Batch ×{{count}}",
+    "loteOf": "Batch of {{count}}"
+  },
+  "table": {
+    "columnAsset": "ASSET",
+    "columnDescription": "DESCRIPTION",
+    "columnType": "TYPE",
+    "columnStatus": "STATUS",
+    "columnQuantity": "QUANTITY"
+  },
+  "actions": {
+    "editLote": "Edit whole batch",
+    "viewDetail": "View details",
+    "editLocked": "Assigned (asset {{code}}) — cannot be edited until returned",
+    "editDevice": "Edit",
+    "forceDeleteWithCode": "Assigned (asset {{code}}) — force delete (admin only)",
+    "returnFirst": "Assigned (asset {{code}}) — record its return before decommissioning",
+    "deletePermanent": "Delete permanently",
+    "decommission": "Decommission"
+  },
+  "deleteDialog": {
+    "forceTitle": "Force delete (assigned device)",
+    "permanentTitle": "Delete permanently",
+    "decommissionTitle": "Decommission",
+    "forceMessage": "{{code}} is currently ASSIGNED/on loan. As an administrator you can force its permanent deletion: it will be unlinked from related responsibility letters and material withdrawals, and deleted along with its history. This action cannot be undone.",
+    "permanentMessage": "Permanently delete {{code}}? Its history and movements will be erased. This action cannot be undone.",
+    "decommissionMessage": "Decommission {{code}}? It will be marked as \"Decommissioned\" and you'll be able to delete it permanently afterwards.",
+    "forceConfirm": "Force delete"
+  }
+}

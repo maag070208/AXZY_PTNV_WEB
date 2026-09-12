@@ -21,11 +21,11 @@ import {
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  deviceTypesApi,
-  devicesApi,
+  deviceTypeApi as deviceTypesApi,
   type DeviceFieldKey,
   type DeviceType,
-} from "@core/api/devices.api";
+} from "@entities/device-type";
+import { deviceApi as devicesApi } from "@entities/device";
 
 const GENERIC_TYPE_CODE = "GENERICO";
 interface UnitRow {

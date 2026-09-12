@@ -1,0 +1,78 @@
+{
+  "list": {
+    "title": "Cartas Responsivas",
+    "titleMine": "Mis Cartas",
+    "description": "Genera y administra cartas responsivas del Departamento de Mantenimiento",
+    "breadcrumb": "Cartas",
+    "breadcrumbMine": "Mis Cartas",
+    "new": "Nueva Carta"
+  },
+  "editor": {
+    "title": "Editor de Carta Responsiva",
+    "breadcrumb": "Editor",
+    "reset": "Reiniciar",
+    "save": "Guardar",
+    "downloadPdf": "Descargar PDF",
+    "generating": "Generando…",
+    "previewNotice": "Vista previa · Carta Tamaño Carta (Letter)",
+    "savedGeneratingPdf": "Carta guardada · generando PDF…",
+    "errorSaving": "Error al guardar",
+    "errorPdfAfterSave": "Guardada, pero falló la generación del PDF",
+    "fillRequiredToDownload": "Completa todos los campos requeridos antes de descargar",
+    "generatingPdf": "Generando PDF…",
+    "pdfDownloaded": "PDF descargado",
+    "errorGeneratingPdf": "Error al generar el PDF",
+    "draftReset": "Borrador reiniciado",
+    "resetDialogTitle": "Reiniciar borrador",
+    "resetDialogMessage": "¿Reiniciar borrador? Se perderán los datos no guardados."
+  },
+  "detail": {
+    "title": "Carta Responsiva",
+    "empty": "Carta no encontrada",
+    "employee": "Empleado"
+  },
+  "generate": {
+    "title": "Generar carta por tipo",
+    "description": "Crea una plantilla de carta con folio consecutivo según el tipo",
+    "breadcrumb": "Generar",
+    "type": "Tipo",
+    "cancel": "Cancelar",
+    "generate": "Generar carta",
+    "generating": "Generando…",
+    "generated": "Carta generada",
+    "generatedOfType": "Se generó la plantilla de tipo {{name}}.",
+    "folioGenerated": "Folio generado",
+    "goToList": "Ir al listado"
+  },
+  "return": {
+    "titleCancel": "Cancelar devolución",
+    "titleMark": "Marcar devolución",
+    "loading": "Devolución",
+    "empty": "Carta no encontrada",
+    "guard": "Nombre de quien resguarda",
+    "conditions": "Condiciones en las que se devuelve",
+    "cancel": "Cancelar",
+    "markReturned": "Marcar devuelto",
+    "processing": "Procesando…",
+    "undo": "Cancelar devolución",
+    "registered": "Devolución registrada",
+    "date": "Fecha",
+    "keptBy": "Resguardó",
+    "conditionsLabel": "Condiciones",
+    "undoDialogTitle": "Cancelar devolución",
+    "undoDialogMessage": "¿Cancelar la devolución? El device volverá a ASIGNADO.",
+    "back": "Volver"
+  },
+  "table": {
+    "folio": "FOLIO",
+    "employeeNo": "NO. EMPLEADO",
+    "resource": "RECURSO",
+    "department": "DEPARTAMENTO",
+    "actions": "ACCIONES",
+    "view": "Ver (solo lectura)",
+    "delete": "Eliminar",
+    "deleteTitle": "Eliminar carta",
+    "deleteMessage": "¿Eliminar esta carta del historial? Esta acción no se puede deshacer.",
+    "cancel": "Cancelar"
+  }
+}

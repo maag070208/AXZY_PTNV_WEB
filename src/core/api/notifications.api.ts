@@ -1,23 +1,13 @@
-import { api } from "./client";
-
-export interface Notification {
-  id: string;
-  userId: string;
-  type: string;
-  title: string;
-  detail?: string | null;
-  ticketId?: string | null;
-  read: boolean;
-  createdAt: string;
-}
-
-export const notificationsApi = {
-  list: (unreadOnly = false) => {
-    const qs = unreadOnly ? "?unread=true" : "";
-    return api.get<{ data: Notification[]; total: number }>(`/notifications${qs}`);
-  },
-  unreadCount: () => api.get<{ count: number }>(`/notifications/unread-count`),
-  markRead: (id: string) => api.post<void>(`/notifications/${id}/read`),
-  markAllRead: () => api.post<void>(`/notifications/read-all`),
-  remove: (id: string) => api.delete<void>(`/notifications/${id}`),
-};
+/**
+ * @deprecated Shim de compatibilidad.
+ *
+ * La fuente de verdad de Notification/notificationsApi ahora vive en
+ * `@entities/notification` (arquitectura Feature-Sliced Design). Este
+ * archivo sólo re-exporta los mismos símbolos bajo sus nombres originales
+ * para no romper a los módulos que aún no se migraron. Código nuevo debe
+ * importar directo de "@entities/notification", nunca de este archivo.
+ */
+// eslint-disable-next-line boundaries/dependencies -- shim legacy, ver comentario del archivo
+export * from "@entities/notification";
+// eslint-disable-next-line boundaries/dependencies -- shim legacy, ver comentario del archivo
+export { notificationsApi } from "@entities/notification";

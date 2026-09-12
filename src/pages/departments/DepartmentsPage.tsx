@@ -1,0 +1,314 @@
+import {
+  ITAlert,
+  ITBadget,
+  ITButton,
+  ITConfirmDialog,
+  ITDataTable,
+  ITDialog,
+  ITFlex,
+  ITInput,
+  ITPage,
+  ITText,
+} from "@axzydev/axzy_ui_system";
+import type {
+  ITDataTableFetchParams,
+  ITDataTableResponse,
+} from "@axzydev/axzy_ui_system";
+import { FaBuilding, FaEdit, FaEye, FaPlus, FaTrash } from "react-icons/fa";
+import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import type { RootState } from "@core/store/store";
+import {
+  departmentsApi,
+  type Department,
+  type Subarea,
+} from "@entities/department";
+
+export default function DepartmentsPage() {
+  const navigate = useNavigate();
+  const { t: tt } = useTranslation(["departments", "common"]);
+  const user = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = user?.role === "ADMIN";
+
+  const [newDept, setNewDept] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [deptToDelete, setDeptToDelete] = useState<Department | null>(null);
+  const [deptToEdit, setDeptToEdit] = useState<Department | null>(null);
+  const [editName, setEditName] = useState("");
+
+  const handleCreateDept = async () => {
+    if (!newDept.trim()) return;
+    try {
+      await departmentsApi.create({ name: newDept });
+      setNewDept("");
+      setCreateOpen(false);
+      setReloadKey((k) => k + 1);
+    } catch (e: any) {
+      setError(e.message);
+    }
+  };
+
+  const openEditDept = (d: Department) => {
+    setDeptToEdit(d);
+    setEditName(d.name);
+  };
+
+  const handleUpdateDept = async () => {
+    if (!deptToEdit || !editName.trim()) return;
+    try {
+      await departmentsApi.update(deptToEdit.id, { name: editName.trim() });
+      setDeptToEdit(null);
+      setEditName("");
+      setReloadKey((k) => k + 1);
+    } catch (e: any) {
+      setError(e.message);
+      setDeptToEdit(null);
+    }
+  };
+
+  const confirmDeleteDept = async () => {
+    if (!deptToDelete) return;
+    try {
+      await departmentsApi.remove(deptToDelete.id);
+      setReloadKey((k) => k + 1);
+    } catch (e: any) {
+      setError(e.message);
+    }
+    setDeptToDelete(null);
+  };
+
+  const fetchTableData = useCallback(
+    async (params: ITDataTableFetchParams) => {
+      const res = await departmentsApi.table({
+        page: params.page,
+        limit: params.limit,
+        filters: params.filters as Record<string, string | number | boolean>,
+        sort: params.sort,
+      });
+      return {
+        data: res.data as unknown as Record<string, unknown>[],
+        total: res.total,
+      };
+    },
+    []
+  );
+
+  const columns: any[] = [
+    {
+      type: "string",
+      key: "name",
+      label: "DEPARTAMENTO",
+      sortable: false,
+      filter: true,
+      render: (d: Department) => (
+        <ITFlex direction="column" gap={0.5}>
+          <ITText className="font-black text-slate-800 uppercase text-[12px] tracking-tight">
+            {d.name}
+          </ITText>
+          {!d.active && (
+            <ITText className="text-[9px] font-bold uppercase tracking-widest text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
+              inactivo
+            </ITText>
+          )}
+        </ITFlex>
+      ),
+    },
+    {
+      type: "string",
+      key: "subareas",
+      label: "ÁREAS",
+      render: (d: Department) =>
+        d.subareas.length === 0 ? (
+          <ITText className="text-[10px] font-bold text-slate-400 uppercase">
+            Sin áreas
+          </ITText>
+        ) : (
+          <ITFlex wrap="wrap" gap={1}>
+            {d.subareas.map((s: Subarea) => (
+              <ITBadget key={s.id} color="primary" size="small">
+                {s.name.toUpperCase()}
+              </ITBadget>
+            ))}
+          </ITFlex>
+        ),
+    },
+    {
+      type: "number",
+      key: "count",
+      label: "USUARIOS",
+      render: (d: Department) => (
+        <ITText className="text-[11px] font-black text-slate-600">
+          {d._count?.users ?? 0}
+        </ITText>
+      ),
+    },
+    {
+      type: "actions" as const,
+      key: "actions",
+      label: "",
+      align: "right" as const,
+      render: (d: Department) => (
+        <ITFlex gap={1}>
+          <ITButton
+            variant="outlined"
+            size="small"
+            color="secondary"
+            onClick={() => navigate(`/departamentos/${d.id}`)}
+            title={tt("common:actions.view")}
+          >
+            <FaEye size={14} />
+          </ITButton>
+          {isAdmin && (
+            <ITButton
+              variant="outlined"
+              size="small"
+              color="secondary"
+              onClick={() => openEditDept(d)}
+              title="Editar nombre"
+            >
+              <FaEdit size={12} />
+            </ITButton>
+          )}
+          {isAdmin && (
+            <ITButton
+              variant="outlined"
+              size="small"
+              color="danger"
+              onClick={() => setDeptToDelete(d)}
+              title="Eliminar departamento"
+            >
+              <FaTrash size={12} />
+            </ITButton>
+          )}
+        </ITFlex>
+      ),
+    },
+  ];
+
+  return (
+    <ITPage
+      title="Departamentos"
+      description="Estructura organizacional de Puerto Nuevo"
+      backAction={() => navigate(-1)}
+      icon={<FaBuilding size={20} />}
+      breadcrumbs={[
+        { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
+        { label: "Departamentos" },
+      ]}
+      actions={
+        isAdmin ? (
+          <ITButton
+            variant="filled"
+            color="primary"
+            onClick={() => setCreateOpen(true)}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaPlus size={12} />
+              <ITText className="font-bold text-[11px]">Nuevo departamento</ITText>
+            </ITFlex>
+          </ITButton>
+        ) : undefined
+      }
+    >
+      {error && (
+        <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
+          {error}
+        </ITAlert>
+      )}
+
+      <ITDataTable
+        columns={columns as any}
+        fetchData={
+          fetchTableData as unknown as (
+            p: ITDataTableFetchParams
+          ) => Promise<ITDataTableResponse<Record<string, unknown>>>
+        }
+        reloadTrigger={reloadKey}
+        defaultItemsPerPage={10}
+        size="sm"
+      />
+
+      <ITDialog
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
+        title="Nuevo departamento"
+      >
+        <ITFlex direction="column" gap={3}>
+          <ITInput
+            name="newDept"
+            value={newDept}
+            onChange={(e) => setNewDept(e.target.value)}
+            placeholder="Ej. RECEPCIÓN"
+            onKeyDown={(e) => e.key === "Enter" && handleCreateDept()}
+            autoFocus
+          />
+          <ITFlex justify="end" gap={2}>
+            <ITButton variant="outlined" onClick={() => setCreateOpen(false)}>
+              {tt("common:actions.cancel")}
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={handleCreateDept}
+              disabled={!newDept.trim()}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaPlus size={12} />
+                <ITText className="font-bold text-[11px]">Crear</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
+        </ITFlex>
+      </ITDialog>
+
+      <ITDialog
+        isOpen={!!deptToEdit}
+        onClose={() => setDeptToEdit(null)}
+        title="Editar departamento"
+      >
+        <ITFlex direction="column" gap={3}>
+          <ITInput
+            name="editDept"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="Nombre del departamento"
+            onKeyDown={(e) => e.key === "Enter" && handleUpdateDept()}
+            autoFocus
+          />
+          <ITFlex justify="end" gap={2}>
+            <ITButton variant="outlined" onClick={() => setDeptToEdit(null)}>
+              {tt("common:actions.cancel")}
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={handleUpdateDept}
+              disabled={!editName.trim()}
+            >
+              <ITText className="font-bold text-[11px]">{tt("common:actions.save")}</ITText>
+            </ITButton>
+          </ITFlex>
+        </ITFlex>
+      </ITDialog>
+
+      <ITConfirmDialog
+        isOpen={!!deptToDelete}
+        onClose={() => setDeptToDelete(null)}
+        onConfirm={confirmDeleteDept}
+        title={deptToDelete?.active ? "Eliminar departamento" : "Eliminar definitivamente"}
+        message={
+          deptToDelete?.active
+            ? `¿Eliminar ${deptToDelete?.name}? Se desactivará; si tiene usuarios asociados no se podrá eliminar.`
+            : `¿Eliminar definitivamente ${deptToDelete?.name}? Se borrarán sus áreas y se desligará de usuarios y tickets. Esta acción no se puede deshacer.`
+        }
+        confirmLabel={deptToDelete?.active ? tt("common:actions.delete") : "Eliminar definitivamente"}
+        cancelLabel={tt("common:actions.cancel")}
+        variant="danger"
+      />
+    </ITPage>
+  );
+}

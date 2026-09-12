@@ -7,9 +7,11 @@ let ablyClient: Ably.Realtime | null = null;
 
 const getAblyClient = (): Ably.Realtime => {
   if (!ablyClient) {
-    ablyClient = new Ably.Realtime({
-      key: "yuJ-ow.7iF_wA:tuWolCDo1xBN4tpDEbZFD7A60KNnT_AsTNvhxkII-go",
-    });
+    const key = import.meta.env.VITE_ABLY_KEY;
+    if (!key) {
+      throw new Error("Falta VITE_ABLY_KEY en el entorno para el realtime de tickets");
+    }
+    ablyClient = new Ably.Realtime({ key });
   }
   return ablyClient;
 };

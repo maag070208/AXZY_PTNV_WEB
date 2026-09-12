@@ -15,11 +15,13 @@ import { FaBoxes, FaBoxOpen, FaLayerGroup, FaLock, FaMagic, FaPlus, FaSave, FaTr
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  deviceTypesApi,
-  devicesApi,
-  type Device,
+  deviceTypeApi as deviceTypesApi,
   type DeviceType,
-} from "@core/api/devices.api";
+} from "@entities/device-type";
+import {
+  deviceApi as devicesApi,
+  type Device,
+} from "@entities/device";
 import { formatMacInput } from "@core/utils/itDevice";
 
 interface UnitForm {

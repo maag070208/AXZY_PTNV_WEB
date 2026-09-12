@@ -16,7 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import type { RootState } from "@core/store/store";
 import { cartasApi } from "@core/api/cartas.api";
-import { devicesApi } from "@core/api/devices.api";
+import { deviceApi as devicesApi } from "@entities/device";
 import { departmentsApi } from "@core/api/departments.api";
 import { usersApi } from "@core/api/auth.api";
 import { ticketsApi } from "@core/api/tickets.api";

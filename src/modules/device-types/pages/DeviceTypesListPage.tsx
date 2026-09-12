@@ -12,7 +12,7 @@ import type {
 import { FaPen, FaPlus, FaTag, FaMicrochip } from "react-icons/fa";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { deviceTypesApi, type DeviceType } from "@core/api/devices.api";
+import { deviceTypeApi as deviceTypesApi, type DeviceType } from "@entities/device-type";
 
 export default function DeviceTypesListPage() {
   const navigate = useNavigate();

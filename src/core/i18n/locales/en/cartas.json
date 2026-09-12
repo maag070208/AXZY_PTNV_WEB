@@ -1,0 +1,78 @@
+{
+  "list": {
+    "title": "Responsibility Letters",
+    "titleMine": "My Letters",
+    "description": "Generate and manage maintenance department responsibility letters",
+    "breadcrumb": "Letters",
+    "breadcrumbMine": "My Letters",
+    "new": "New Letter"
+  },
+  "editor": {
+    "title": "Responsibility Letter Editor",
+    "breadcrumb": "Editor",
+    "reset": "Reset",
+    "save": "Save",
+    "downloadPdf": "Download PDF",
+    "generating": "Generating…",
+    "previewNotice": "Live preview · Letter size (US Letter)",
+    "savedGeneratingPdf": "Letter saved · generating PDF…",
+    "errorSaving": "Error saving",
+    "errorPdfAfterSave": "Saved, but PDF generation failed",
+    "fillRequiredToDownload": "Complete all required fields before downloading",
+    "generatingPdf": "Generating PDF…",
+    "pdfDownloaded": "PDF downloaded",
+    "errorGeneratingPdf": "Error generating the PDF",
+    "draftReset": "Draft reset",
+    "resetDialogTitle": "Reset draft",
+    "resetDialogMessage": "Reset draft? Unsaved data will be lost."
+  },
+  "detail": {
+    "title": "Responsibility Letter",
+    "empty": "Letter not found",
+    "employee": "Employee"
+  },
+  "generate": {
+    "title": "Generate letter by type",
+    "description": "Create a letter template with a consecutive folio by type",
+    "breadcrumb": "Generate",
+    "type": "Type",
+    "cancel": "Cancel",
+    "generate": "Generate letter",
+    "generating": "Generating…",
+    "generated": "Letter generated",
+    "generatedOfType": "Template for type {{name}} was generated.",
+    "folioGenerated": "Generated folio",
+    "goToList": "Go to list"
+  },
+  "return": {
+    "titleCancel": "Cancel return",
+    "titleMark": "Mark return",
+    "loading": "Return",
+    "empty": "Letter not found",
+    "guard": "Name of the custodian",
+    "conditions": "Return condition",
+    "cancel": "Cancel",
+    "markReturned": "Mark returned",
+    "processing": "Processing…",
+    "undo": "Cancel return",
+    "registered": "Return registered",
+    "date": "Date",
+    "keptBy": "Held by",
+    "conditionsLabel": "Conditions",
+    "undoDialogTitle": "Cancel return",
+    "undoDialogMessage": "Cancel the return? The device will go back to ASSIGNED.",
+    "back": "Back"
+  },
+  "table": {
+    "folio": "FOLIO",
+    "employeeNo": "EMPLOYEE NO.",
+    "resource": "RESOURCE",
+    "department": "DEPARTMENT",
+    "actions": "ACTIONS",
+    "view": "View (read only)",
+    "delete": "Delete",
+    "deleteTitle": "Delete letter",
+    "deleteMessage": "Delete this letter from history? This action cannot be undone.",
+    "cancel": "Cancel"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "list": {
+    "title": "Dispositivos",
+    "description": "{{total}} dispositivo(s) · {{typeCount}} tipo(s)",
+    "typesButton": "Tipos",
+    "importButton": "Cargar Excel"
+  },
+  "summary": {
+    "total": "Total",
+    "available": "Disponible",
+    "assigned": "Asignado",
+    "decommissioned": "Baja"
+  },
+  "status": {
+    "DISPONIBLE": "DISPONIBLE",
+    "ASIGNADO": "ASIGNADO",
+    "BAJA": "BAJA",
+    "loteAvailable": "{{count}} disp.",
+    "loteAssigned": "{{count}} prest.",
+    "loteDecommissioned": "{{count}} baja",
+    "loteBadge": "Lote ×{{count}}",
+    "loteOf": "Lote de {{count}}"
+  },
+  "table": {
+    "columnAsset": "ACTIVO",
+    "columnDescription": "DESCRIPCIÓN",
+    "columnType": "TIPO",
+    "columnStatus": "ESTADO",
+    "columnQuantity": "CANTIDAD"
+  },
+  "actions": {
+    "editLote": "Editar todo el lote",
+    "viewDetail": "Ver detalle",
+    "editLocked": "Asignado (activo {{code}}) — no se puede editar hasta que se devuelva",
+    "editDevice": "Editar",
+    "forceDeleteWithCode": "Asignado (activo {{code}}) — forzar eliminación (solo admin)",
+    "returnFirst": "Asignado (activo {{code}}) — registra su devolución antes de dar de baja",
+    "deletePermanent": "Eliminar definitivamente",
+    "decommission": "Dar de baja"
+  },
+  "deleteDialog": {
+    "forceTitle": "Forzar eliminación (dispositivo asignado)",
+    "permanentTitle": "Eliminar definitivamente",
+    "decommissionTitle": "Dar de baja",
+    "forceMessage": "{{code}} está actualmente ASIGNADO/prestado. Como administrador puedes forzar su eliminación definitiva: se desvinculará de cartas responsivas y salidas de material relacionadas, y se borrará junto con su historial. Esta acción no se puede deshacer.",
+    "permanentMessage": "¿Eliminar definitivamente {{code}}? Se borrarán su historial y movimientos. Esta acción no se puede deshacer.",
+    "decommissionMessage": "¿Dar de baja {{code}}? Quedará con estado \"Baja\" y podrás eliminarlo definitivamente después.",
+    "forceConfirm": "Forzar eliminación"
+  }
+}

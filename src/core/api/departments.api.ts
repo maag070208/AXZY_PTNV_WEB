@@ -1,37 +1,13 @@
-import { api } from "./client";
-import {
-  tableRequest,
-  type ITDataTableFetchParamsPost,
-} from "./table";
-
-export interface Subarea {
-  id: string;
-  departmentId: string;
-  name: string;
-  active: boolean;
-}
-
-export interface Department {
-  id: string;
-  name: string;
-  active: boolean;
-  subareas: Subarea[];
-  _count?: { users: number };
-}
-
-export const departmentsApi = {
-  table: (params: ITDataTableFetchParamsPost) =>
-    tableRequest<Department>(`/departments/query`, params),
-  list: (includeInactive = false) =>
-    api.get<Department[]>(`/departments${includeInactive ? "?includeInactive=true" : ""}`),
-  get: (id: string) => api.get<Department>(`/departments/${id}`),
-  create: (data: { name: string }) =>
-    api.post<Department>(`/departments`, data),
-  update: (id: string, data: { name?: string; active?: boolean }) =>
-    api.put<Department>(`/departments/${id}`, data),
-  remove: (id: string) => api.delete<{ soft: boolean; data: Department }>(`/departments/${id}`),
-  addSubarea: (departmentId: string, name: string) =>
-    api.post<Subarea>(`/departments/${departmentId}/subareas`, { name }),
-  removeSubarea: (subareaId: string) =>
-    api.delete<{ soft: boolean; data: Subarea }>(`/departments/subareas/${subareaId}`),
-};
+/**
+ * @deprecated Shim de compatibilidad.
+ *
+ * La fuente de verdad de Department/Subarea ahora vive en
+ * `@entities/department` (arquitectura Feature-Sliced Design). Este
+ * archivo sólo re-exporta los mismos símbolos bajo sus nombres originales
+ * para no romper a los módulos que aún no se migraron. Código nuevo debe
+ * importar directo de "@entities/department", nunca de este archivo.
+ */
+// eslint-disable-next-line boundaries/dependencies -- shim legacy, ver comentario del archivo
+export * from "@entities/department";
+// eslint-disable-next-line boundaries/dependencies -- shim legacy, ver comentario del archivo
+export { departmentsApi } from "@entities/department";

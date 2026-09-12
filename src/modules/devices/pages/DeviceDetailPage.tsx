@@ -33,8 +33,9 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@core/store/store";
-import { devicesApi, type Device, type DeviceFieldKey, type DeviceHistoryEntry } from "@core/api/devices.api";
-import { formatFechaHora } from "@core/store/cartas/types";
+import { deviceApi as devicesApi, type Device, type DeviceHistoryEntry } from "@entities/device";
+import type { DeviceFieldKey } from "@entities/device-type";
+import { formatFechaHora } from "@core/utils/dates";
 
 const ESTADO_BADGE: Record<string, { color: string; label: string }> = {
   DISPONIBLE: { color: "success", label: "Disponible" },
