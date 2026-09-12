@@ -32,3 +32,8 @@ export interface InventorySummary {
     unlocatedDevices: number;
   };
 }
+
+export type DownloadInventoryPdf = (
+  movements: InventoryMovement[],
+  locations: Location[]
+) => Promise<void>;
