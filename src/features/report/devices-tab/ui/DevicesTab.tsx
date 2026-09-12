@@ -6,15 +6,10 @@ import {
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import type {
-  Column,
-  ITDataTableFetchParams,
-  ITDataTableResponse,
-} from "@axzydev/axzy_ui_system";
 import { FaDownload, FaExclamationTriangle, FaSync } from "react-icons/fa";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { reportsApi, type DeviceReportRow } from "@entities/report";
-import { downloadDevicesPDF } from "../model/pdf";
+import type { Column } from "@axzydev/axzy_ui_system";
+import type { DeviceReportRow } from "@entities/report";
+import type { UseDevicesReport } from "../model/useDevicesReport";
 
 const estadoBadge = (estado: string) => (
   <ITBadget
@@ -25,59 +20,18 @@ const estadoBadge = (estado: string) => (
   </ITBadget>
 );
 
-export default function DevicesTab() {
-  const [rows, setRows] = useState<DeviceReportRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
-  const [exporting, setExporting] = useState(false);
-
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    reportsApi
-      .devices()
-      .then((res) => setRows(res.data))
-      .catch((e: any) => setError(e.message ?? "No se pudo cargar el reporte"))
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load, reloadKey]);
-
-  const handleDownloadPdf = async () => {
-    setExporting(true);
-    try {
-      await downloadDevicesPDF(rows);
-    } catch (e) {
-      console.error("Error al exportar PDF de dispositivos", e);
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const stats = useMemo(() => {
-    const asignados = rows.filter((r) => r.estado === "ASIGNADO").length;
-    const disponibles = rows.filter((r) => r.estado === "DISPONIBLE").length;
-    const bajas = rows.filter((r) => r.estado === "BAJA").length;
-    const masDe30 = rows.filter((r) => (r.diasAsignado ?? 0) > 30).length;
-    return { asignados, disponibles, bajas, masDe30 };
-  }, [rows]);
-
-  // ITDataTable exige fetchData asíncrono (page/limit); el universo de
-  // dispositivos es acotado, así que paginamos en el cliente sobre `rows`.
-  const fetchTableData = useCallback(
-    async (params: ITDataTableFetchParams) => {
-      const start = (params.page - 1) * params.limit;
-      const page = rows.slice(start, start + params.limit);
-      return {
-        data: page as unknown as Record<string, unknown>[],
-        total: rows.length,
-      };
-    },
-    [rows]
-  );
+export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
+  const {
+    rows,
+    loading,
+    error,
+    exporting,
+    reloadKey,
+    setReloadKey,
+    stats,
+    handleDownloadPdf,
+    fetchTableData,
+  } = fx;
 
   const columns: Column<DeviceReportRow>[] = [
     {
@@ -87,7 +41,9 @@ export default function DevicesTab() {
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[11px] font-black text-slate-800">{r.controlActivos}</ITText>
+          <ITText className="text-[11px] font-black text-slate-800">
+            {r.controlActivos}
+          </ITText>
           {r.cantidad > 1 && (
             <ITText className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
               Lote ×{r.cantidad}
@@ -103,7 +59,9 @@ export default function DevicesTab() {
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[11px] font-bold text-slate-700">{r.descripcion}</ITText>
+          <ITText className="text-[11px] font-bold text-slate-700">
+            {r.descripcion}
+          </ITText>
           <ITText className="text-[9px] uppercase tracking-widest text-slate-400">
             {r.tipo} · {r.marca} {r.modelo}
           </ITText>
@@ -115,7 +73,11 @@ export default function DevicesTab() {
       label: "Cant.",
       type: "number",
       sortable: false,
-      render: (r) => <ITText className="text-[11px] font-black text-slate-700">{r.cantidad}</ITText>,
+      render: (r) => (
+        <ITText className="text-[11px] font-black text-slate-700">
+          {r.cantidad}
+        </ITText>
+      ),
     },
     {
       key: "estado",
@@ -132,9 +94,13 @@ export default function DevicesTab() {
       render: (r) =>
         r.estado === "ASIGNADO" ? (
           <ITFlex direction="column" gap={0.5}>
-            <ITText className="text-[11px] text-slate-700">{r.responsable ?? "—"}</ITText>
+            <ITText className="text-[11px] text-slate-700">
+              {r.responsable ?? "—"}
+            </ITText>
             {r.numeroEmpleado && (
-              <ITText className="text-[9px] text-slate-400">No. {r.numeroEmpleado}</ITText>
+              <ITText className="text-[9px] text-slate-400">
+                No. {r.numeroEmpleado}
+              </ITText>
             )}
           </ITFlex>
         ) : (
@@ -198,7 +164,9 @@ export default function DevicesTab() {
       <ITFlex gap={3} wrap="wrap">
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-slate-800 leading-none">{rows.length}</ITText>
+            <ITText className="text-[18px] font-black text-slate-800 leading-none">
+              {rows.length}
+            </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               Dispositivos
             </ITText>
@@ -206,7 +174,9 @@ export default function DevicesTab() {
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-emerald-700 leading-none">{stats.disponibles}</ITText>
+            <ITText className="text-[18px] font-black text-emerald-700 leading-none">
+              {stats.disponibles}
+            </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               Disponibles
             </ITText>
@@ -214,7 +184,9 @@ export default function DevicesTab() {
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-amber-700 leading-none">{stats.asignados}</ITText>
+            <ITText className="text-[18px] font-black text-amber-700 leading-none">
+              {stats.asignados}
+            </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               Asignados
             </ITText>
@@ -222,7 +194,9 @@ export default function DevicesTab() {
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-red-600 leading-none">{stats.masDe30}</ITText>
+            <ITText className="text-[18px] font-black text-red-600 leading-none">
+              {stats.masDe30}
+            </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               +30 días asignado
             </ITText>
@@ -230,7 +204,9 @@ export default function DevicesTab() {
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-slate-600 leading-none">{stats.bajas}</ITText>
+            <ITText className="text-[18px] font-black text-slate-600 leading-none">
+              {stats.bajas}
+            </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               Baja
             </ITText>
@@ -276,8 +252,11 @@ export default function DevicesTab() {
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (
-            p: ITDataTableFetchParams
-          ) => Promise<ITDataTableResponse<Record<string, unknown>>>
+            p: Parameters<typeof fetchTableData>[0]
+          ) => Promise<{
+            data: Record<string, unknown>[];
+            total: number;
+          }>
         }
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}

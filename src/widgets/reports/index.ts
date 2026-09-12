@@ -1,10 +1,8 @@
-// API pública del widget "reports". Nada fuera de esta carpeta debe importar
-// directo desde model/ o ui/ — todo pasa por este barrel.
+// API pública del widget "reports". Provee los generadores PDF; los tabs viven
+// en @features/report y reciben el download por DI desde la página.
 export { default as ReportPDF } from "./ui/ReportPDF";
 export { default as DevicePDF } from "./ui/DevicePDF";
 export { default as AsignadosPDF } from "./ui/AsignadosPDF";
-export { default as AsignadosTab } from "./ui/AsignadosTab";
-export { default as DevicesTab } from "./ui/DevicesTab";
 export {
   downloadReportPDF,
   downloadAsignadosPDF,

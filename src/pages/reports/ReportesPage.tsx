@@ -1,10 +1,17 @@
 import { ITPage, ITTabs } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaChartBar, FaHandHolding } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { AsignadosTab, DevicesTab } from "@widgets/reports";
+import {
+  AsignadosTab,
+  useAsignadosReport,
+} from "@features/report/asignados-tab";
+import { DevicesTab, useDevicesReport } from "@features/report/devices-tab";
+import { downloadAsignadosPDF, downloadDevicesPDF } from "@widgets/reports";
 
 export default function ReportesPage() {
   const navigate = useNavigate();
+  const asignadosFx = useAsignadosReport({ download: downloadAsignadosPDF });
+  const devicesFx = useDevicesReport({ download: downloadDevicesPDF });
 
   return (
     <ITPage
@@ -24,13 +31,13 @@ export default function ReportesPage() {
             id: "asignados",
             label: "Asignados",
             icon: <FaHandHolding size={13} />,
-            content: <AsignadosTab />,
+            content: <AsignadosTab fx={asignadosFx} />,
           },
           {
             id: "dispositivos",
             label: "Dispositivos",
             icon: <FaBoxOpen size={13} />,
-            content: <DevicesTab />,
+            content: <DevicesTab fx={devicesFx} />,
           },
         ]}
       />
