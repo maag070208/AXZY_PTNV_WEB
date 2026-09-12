@@ -121,6 +121,7 @@ export default function UsersListPage() {
       <ITDialog
         isOpen={!!fx.userToPassword}
         onClose={() => fx.setUserToPassword(null)}
+        className="it-dialog-panel"
         title={tt("list.passwordTitle", {
           username: fx.userToPassword?.username ?? "",
         })}

@@ -69,6 +69,7 @@ export default function DepartmentsPage() {
       <ITDialog
         isOpen={crud.createOpen}
         onClose={() => crud.setCreateOpen(false)}
+        className="it-dialog-panel"
         title="Nuevo departamento"
       >
         <ITFlex direction="column" gap={3}>
@@ -102,6 +103,7 @@ export default function DepartmentsPage() {
       <ITDialog
         isOpen={!!crud.deptToEdit}
         onClose={() => crud.setDeptToEdit(null)}
+        className="it-dialog-panel"
         title="Editar departamento"
       >
         <ITFlex direction="column" gap={3}>

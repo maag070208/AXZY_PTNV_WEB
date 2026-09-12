@@ -131,10 +131,13 @@ export default function DashboardModulesGrid({ fx }: { fx: UseHomeDashboard }) {
   ];
 
   return (
-    <ITGrid container columns={12} spacing={3}>
+    <ITGrid container columns={12} spacing={4}>
       {modules.map((m) => (
         <ITGrid item key={m.id} xs={12} md={6} lg={4}>
-          <ITCard onClick={() => navigate(m.to)} className="!p-4">
+          <ITCard
+          onClick={() => navigate(m.to)}
+          className="!p-4 h-full cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
             <ITFlex align="center" gap={3}>
               <ITFlex
                 align="center"

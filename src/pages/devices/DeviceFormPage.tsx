@@ -138,7 +138,9 @@ export default function DeviceFormPage() {
         </ITAlert>
       )}
 
-      <DeviceFormBody fx={fx} />
+      <div className="max-w-2xl">
+        <DeviceFormBody fx={fx} />
+      </div>
     </ITPage>
   );
 }

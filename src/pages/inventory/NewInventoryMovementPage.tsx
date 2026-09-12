@@ -61,7 +61,9 @@ export default function NewInventoryMovementPage() {
         </ITAlert>
       )}
 
-      <MovementFormBody fx={fx} />
+      <div className="max-w-2xl">
+        <MovementFormBody fx={fx} />
+      </div>
 
       {fx.toast && (
         <ITToast

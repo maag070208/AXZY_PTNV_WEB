@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* ==== Ajustes globales de distribución ==== */
+
+/* Fondo del área de contenido: slate-100 en light para que las cards
+   blancas floten con contraste. El modo oscuro del kit ya redefine
+   --layout-bg a #090f1d. */
+:root {
+  --layout-bg: #f1f5f9;
+}
+
+/* Diálogos: el panel de ITDialog no tiene ancho por defecto (encoge al
+   contenido). Estas clases fijan un ancho consistente en todos los diálogos. */
+.it-dialog-panel {
+  width: min(92vw, 560px);
+}
+.it-dialog-panel--wide {
+  width: min(94vw, 760px);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

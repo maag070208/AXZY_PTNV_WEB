@@ -1,4 +1,11 @@
-import { ITCard, ITDatePicker, ITFlex, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import {
+  ITCard,
+  ITDatePicker,
+  ITFlex,
+  ITSearchSelect,
+  ITStack,
+  ITText,
+} from "@axzydev/axzy_ui_system";
 import { formatLocation } from "@entities/location";
 import { localDateString } from "../model/constants";
 import type { UseInventoryMovements } from "../model/useInventoryMovements";
@@ -11,24 +18,22 @@ export default function MovementsFiltersCard({ fx }: { fx: UseInventoryMovements
           {fx.t("movements.filters")}
         </ITText>
         <ITFlex gap={3} wrap="wrap">
-          <ITFlex direction="column" gap={1}>
+          <ITFlex direction="column" gap={1} className="min-w-[220px] flex-1">
             <ITText className="text-[9px] text-slate-400 uppercase">
               {fx.t("movements.location")}
             </ITText>
-            <select
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white"
+            <ITSearchSelect
+              name="location"
+              placeholder={fx.t("movements.all")}
+              options={fx.locations.map((l) => ({
+                value: l.id,
+                label: formatLocation(l),
+              }))}
               value={fx.filterLocation}
-              onChange={(e) => fx.setFilterLocation(e.target.value)}
-            >
-              <option value="">{fx.t("movements.all")}</option>
-              {fx.locations.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {formatLocation(l)}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => fx.setFilterLocation(val as string)}
+            />
           </ITFlex>
-          <ITFlex direction="column" gap={1}>
+          <ITFlex direction="column" gap={1} className="min-w-[220px] flex-1">
             <ITText className="text-[9px] text-slate-400 uppercase">
               {fx.t("movements.dateRange")}
             </ITText>

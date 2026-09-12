@@ -6,6 +6,7 @@ export default function LocationFormDialog({ fx }: { fx: UseLocations }) {
     <ITDialog
       isOpen={fx.showForm}
       onClose={() => fx.setShowForm(false)}
+      className="it-dialog-panel"
       title={
         fx.editingLoc
           ? fx.t("locations.editDialog")

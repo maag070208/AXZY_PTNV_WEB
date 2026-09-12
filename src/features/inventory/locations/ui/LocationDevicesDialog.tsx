@@ -16,6 +16,7 @@ export default function LocationDevicesDialog({ fx }: { fx: UseLocations }) {
     <ITDialog
       isOpen={fx.showDevicesDialog}
       onClose={() => fx.setShowDevicesDialog(false)}
+      className="it-dialog-panel--wide"
       title={fx.t("locations.devicesIn", {
         loc: fx.devicesLocation ? formatLocation(fx.devicesLocation) : "",
       })}
