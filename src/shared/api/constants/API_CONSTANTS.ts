@@ -1,5 +1,5 @@
 const BASE_URL =
-  ((import.meta as any).env?.VITE_API_URL as string | undefined) ?? "/api/v1";
+  ((import.meta as any).env?.VITE_API_URL as string | undefined) || "http://192.168.1.176:4001/api/v1";
 
 export const API_CONSTANTS = {
   BASE_URL,
