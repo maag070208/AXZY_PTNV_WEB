@@ -11,8 +11,8 @@ RUN npm install -g pnpm@10 || true
 RUN (pnpm install --frozen-lockfile --no-audit --no-fund 2>/dev/null) || npm install --no-audit --no-fund
 
 COPY . .
-ARG VITE_ABLY_KEY
-ENV VITE_ABLY_KEY=$VITE_ABLY_KEY
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 
