@@ -175,17 +175,7 @@
     "empty": "Sin unidades por mostrar"
   },
   "comment": {
-    "title": {
-      "es": {
-        "es": "Agregar comentario",
-        "en": "Add comment"
-      }
-    },
-    "placeholder": {
-      "es": {
-        "es": "Escribe un comentario sobre este dispositivo...",
-        "en": "Write a comment about this device..."
-      }
-    }
+    "title": "Agregar comentario",
+    "placeholder": "Escribe un comentario sobre este dispositivo..."
   }
 }
