@@ -155,7 +155,7 @@ export default function TicketsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={10}
+      defaultItemsPerPage={5}
       itemsPerPageOptions={[5, 10, 50]}
       debounceMs={350}
       variant="bordered"

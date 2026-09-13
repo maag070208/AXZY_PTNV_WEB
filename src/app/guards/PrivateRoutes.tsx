@@ -204,16 +204,11 @@ export default function PrivateRoutes() {
 
   return (
     <>
-      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-full">
-        <ITCard>
+      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName=" min-w-full min-h-screen overflow-x-hidden">
+        <ITCard className="p-0 m-0">
           <Outlet />
         </ITCard>
       </ITLayout>
-      <div className="w-full py-3 flex justify-center items-center bg-slate-50 border-t border-slate-200">
-        <ITText className="text-[10px] text-slate-400">
-          powered by <span className="font-bold text-slate-500">axzy.dev</span>
-        </ITText>
-      </div>
       {toast && (
         <ITToast
           message={toast}

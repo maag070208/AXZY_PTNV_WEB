@@ -6,15 +6,16 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import {
-  FaBookmark,
   FaCheckCircle,
   FaSearch,
   FaSync,
+  FaTicketAlt,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import {
   Avatar,
+  ASSIGNMENT_STATUS_META,
   PRIORITY_META,
   Tag,
   hashTone,
@@ -31,10 +32,15 @@ export default function KanbanBoard({ fx }: Props) {
 
   return (
     <>
-      {/* Barra de herramientas: búsqueda, filtro de departamento, avatares y refrescar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <ITFlex align="center" gap={3} className="flex-wrap">
-          <div className="w-60">
+      <ITFlex
+        justify="between"
+        align="center"
+        wrap="wrap"
+        gap={3}
+        className="mb-5"
+      >
+        <ITFlex align="center" gap={3} wrap="wrap" className="min-w-0">
+          <ITFlex className="w-56 sm:w-64">
             <ITInput
               name="kanbanSearch"
               value={fx.search}
@@ -42,8 +48,8 @@ export default function KanbanBoard({ fx }: Props) {
               placeholder={tt("kanban.searchPlaceholder")}
               iconLeft={<FaSearch size={11} className="text-slate-400" />}
             />
-          </div>
-          <div className="w-48">
+          </ITFlex>
+          <ITFlex className="w-44 sm:w-52">
             <ITSelect
               name="kanbanDepartmentFilter"
               value={fx.departmentFilter}
@@ -53,9 +59,9 @@ export default function KanbanBoard({ fx }: Props) {
                 ...fx.departmentOptions.map((d) => ({ value: d, label: d })),
               ]}
             />
-          </div>
+          </ITFlex>
           {fx.uniqueAssignees.length > 0 && (
-            <div className="flex items-center -space-x-2">
+            <ITFlex align="center" gap={1} className="pl-1">
               {fx.uniqueAssignees.slice(0, 4).map((u) => {
                 const active = fx.assigneeFilter === u.id;
                 return (
@@ -65,8 +71,10 @@ export default function KanbanBoard({ fx }: Props) {
                     onClick={() =>
                       fx.setAssigneeFilter((cur) => (cur === u.id ? null : u.id))
                     }
-                    className={`rounded-full transition-all hover:z-10 hover:-translate-y-0.5 ${
-                      active ? "ring-2 ring-offset-2 ring-blue-400 rounded-full" : ""
+                    className={`rounded-full transition-all hover:z-10 ${
+                      active
+                        ? "ring-2 ring-offset-2 ring-blue-400"
+                        : "opacity-80 hover:opacity-100"
                     }`}
                   >
                     <Avatar name={u.name} seed={u.id} />
@@ -74,17 +82,23 @@ export default function KanbanBoard({ fx }: Props) {
                 );
               })}
               {fx.uniqueAssignees.length > 4 && (
-                <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[9px] font-black border-2 border-white shadow-sm">
+                <ITFlex
+                  as="span"
+                  align="center"
+                  justify="center"
+                  className="w-7 h-7 shrink-0 rounded-full bg-slate-100 border text-slate-500 text-xs font-semibold"
+                  style={{ borderColor: "#e2e8f0" }}
+                >
                   +{fx.uniqueAssignees.length - 4}
-                </div>
+                </ITFlex>
               )}
-            </div>
+            </ITFlex>
           )}
           {fx.hasActiveFilters && (
             <button
               type="button"
               onClick={fx.clearFilters}
-              className="text-[10px] font-bold text-slate-400 hover:text-slate-600 underline underline-offset-2"
+              className="cursor-pointer text-xs font-medium text-slate-400 hover:text-slate-600 underline underline-offset-2"
             >
               {tt("kanban.clearFilters")}
             </button>
@@ -92,134 +106,142 @@ export default function KanbanBoard({ fx }: Props) {
         </ITFlex>
         <ITFlex align="center" gap={2}>
           {fx.loading && (
-            <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            <ITText className="text-xs text-slate-400">
               {tt("kanban.loading")}
             </ITText>
           )}
           {fx.error && (
-            <ITText className="text-[11px] font-bold text-red-600">
+            <ITText className="text-xs font-medium text-red-600">
               {fx.error}
             </ITText>
           )}
-          <ITButton variant="outlined" onClick={fx.reload}>
+          <ITButton variant="outlined" onClick={fx.reload} className="!h-9">
             <ITFlex align="center" gap={1}>
-              <FaSync size={11} />
-              <ITText className="font-bold text-[11px]">{tt("kanban.refresh")}</ITText>
+              <FaSync size={11} className={fx.loading ? "animate-spin" : ""} />
+              <ITText className="text-xs font-medium">{tt("kanban.refresh")}</ITText>
             </ITFlex>
           </ITButton>
         </ITFlex>
-      </div>
+      </ITFlex>
 
-      {/* Tablero: columnas planas estilo Jira, scroll horizontal en pantallas angostas */}
-      <div className="flex items-start gap-4 overflow-x-auto pb-2 -mx-2 px-2">
-        {fx.COLUMNS.map((col) => (
-          <div
-            key={col.status}
-            className={`flex-none w-[300px] sm:w-[320px] rounded-2xl bg-slate-200/60 border border-slate-300/60 p-3 transition-colors ${
-              fx.dragOver === col.status ? "bg-blue-100 border-blue-400" : ""
-            }`}
-            onDragOver={(e) => {
-              e.preventDefault();
-              fx.setDragOver(col.status);
-            }}
-            onDragLeave={() =>
-              fx.setDragOver((s) => (s === col.status ? null : s))
-            }
-            onDrop={fx.handleDrop(col.status)}
-          >
-            <ITFlex justify="between" align="center" className="mb-3 px-1">
-              <ITFlex align="center" gap={1.5}>
-                {col.status === "COMPLETADA" && (
-                  <FaCheckCircle size={12} className="text-emerald-500" />
-                )}
-                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                  {dyn(tt)(`detail.taskStatusOptions.${col.status}`)}
+      <ITFlex className="items-start gap-4 overflow-x-auto pb-3 -mx-2 px-2">
+        {fx.COLUMNS.map((col) => {
+          const statusMeta = metaFor(ASSIGNMENT_STATUS_META, col.status);
+          const count = fx.byStatus[col.status].length;
+          return (
+            <div
+              key={col.status}
+              className={`flex-none w-[300px] sm:w-[320px] rounded-xl border p-3 transition-colors ${
+                fx.dragOver === col.status ? "bg-blue-50" : "bg-slate-100/70"
+              }`}
+              style={{ borderColor: fx.dragOver === col.status ? "#93c5fd" : "#e2e8f0" }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                fx.setDragOver(col.status);
+              }}
+              onDragLeave={() =>
+                fx.setDragOver((s) => (s === col.status ? null : s))
+              }
+              onDrop={fx.handleDrop(col.status)}
+            >
+              <ITFlex justify="between" align="center" className="mb-3 px-1">
+                <ITFlex align="center" gap={1.5}>
+                  {col.status === "COMPLETADA" && (
+                    <FaCheckCircle size={12} className="text-emerald-500" />
+                  )}
+                  <ITText className="text-[13px] font-semibold text-slate-700">
+                    {dyn(tt)(`detail.taskStatusOptions.${col.status}`)}
+                  </ITText>
+                </ITFlex>
+                <ITText className="text-xs font-medium text-slate-400">
+                  {count}
                 </ITText>
               </ITFlex>
-              <div className="w-5 h-5 rounded-full bg-white border border-slate-200 flex items-center justify-center">
-                <span className="text-[9px] font-black text-slate-500">
-                  {fx.byStatus[col.status].length}
-                </span>
-              </div>
-            </ITFlex>
 
-            <div className="space-y-2 min-h-[140px]">
-              {fx.byStatus[col.status].length === 0 ? (
-                <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center">
-                  <ITText className="text-[10px] text-slate-400 italic">
-                    {tt("kanban.emptyColumn")}
-                  </ITText>
-                </div>
-              ) : (
-                fx.byStatus[col.status].map((a) => {
-                  const deptLabel = a.ticket.department?.name ?? tt("list.general");
-                  const deptTone = hashTone(deptLabel);
-                  const priorityMeta = metaFor(PRIORITY_META, a.ticket.priority);
-                  const priorityLabel = dyn(tt)(`priorityLabels.${a.ticket.priority}`);
-                  const overdue = Boolean(
-                    a.dueDate &&
-                      a.status !== "COMPLETADA" &&
-                      new Date(a.dueDate) < new Date()
-                  );
-                  return (
-                    <div
-                      key={a.id}
-                      draggable
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData("text/plain", a.id);
-                        e.dataTransfer.effectAllowed = "move";
-                        fx.setDraggingId(a.id);
-                      }}
-                      onDragEnd={() => fx.setDraggingId(null)}
-                      onClick={() => fx.openTicket(a.ticketId)}
-                      className={`rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all p-3 cursor-pointer ${
-                        fx.draggingId === a.id ? "opacity-40" : ""
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <Tag label={deptLabel} tone={deptTone} />
-                        {overdue && (
-                          <Tag label={tt("kanban.overdue")} tone={{ bg: "#e11d48", text: "#ffffff" }} />
-                        )}
-                      </div>
-
-                      <ITText className="text-[12.5px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1">
-                        {a.title}
-                      </ITText>
-                      <ITText className="text-[9.5px] font-semibold text-slate-400 uppercase tracking-wide truncate mb-2">
-                        {a.ticket.titulo}
-                      </ITText>
-
-                      {a.description ? (
-                        <div className="text-[11px] text-slate-500 leading-snug mb-2 line-clamp-2">
-                          {a.description}
-                        </div>
-                      ) : null}
-
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                        <ITFlex align="center" gap={1.5} className="min-w-0">
-                          <FaBookmark size={10} className="text-emerald-500 shrink-0" />
-                          <span className="text-[9px] font-bold text-slate-400 truncate">
-                            #{a.ticketId.slice(0, 8).toUpperCase()}
-                          </span>
+              <div className="space-y-1.5 min-h-[120px]">
+                {count === 0 ? (
+                  <div
+                    className="rounded-md border border-dashed bg-white/60 p-3 text-center"
+                    style={{ borderColor: "#e2e8f0" }}
+                  >
+                    <ITText className="text-xs text-slate-400">
+                      {tt("kanban.emptyColumn")}
+                    </ITText>
+                  </div>
+                ) : (
+                  fx.byStatus[col.status].map((a) => {
+                    const deptLabel =
+                      a.ticket.department?.name ?? tt("list.general");
+                    const deptTone = hashTone(deptLabel);
+                    const priorityMeta = metaFor(PRIORITY_META, a.ticket.priority);
+                    const priorityLabel = dyn(tt)(
+                      `priorityLabels.${a.ticket.priority}`
+                    );
+                    const overdue = Boolean(
+                      a.dueDate &&
+                        a.status !== "COMPLETADA" &&
+                        new Date(a.dueDate) < new Date()
+                    );
+                    return (
+                      <div
+                        key={a.id}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData("text/plain", a.id);
+                          e.dataTransfer.effectAllowed = "move";
+                          fx.setDraggingId(a.id);
+                        }}
+                        onDragEnd={() => fx.setDraggingId(null)}
+                        onClick={() => fx.openTicket(a.ticketId)}
+                        className={`rounded-md border bg-white p-2.5 shadow-none hover:shadow-md transition-shadow cursor-pointer ${fx.draggingId === a.id ? "opacity-40" : ""}`}
+                        style={{ borderColor: "#e2e8f0" }}
+                      >
+                        <ITFlex justify="between" align="center" gap={2} className="mb-1.5">
+                          <Tag label={deptLabel} tone={deptTone} />
+                          {overdue && (
+                           <Tag label={tt("kanban.overdue")} tone={PRIORITY_META.URGENTE.tone} />
+                          )}
                         </ITFlex>
-                        <ITFlex align="center" gap={2} className="shrink-0">
-                          <span
-                            title={priorityLabel}
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: priorityMeta.tone.bg }}
-                          />
+
+                        <ITText className="text-xs font-medium text-slate-800 leading-snug line-clamp-2 mb-1">
+                          {a.title}
+                        </ITText>
+
+                        <ITFlex align="center" gap={1} className="mb-2">
+                          <FaTicketAlt size={8} className="text-slate-300 shrink-0" />
+                          <ITText className="text-[10px] text-slate-400 truncate">
+                            {a.ticket.titulo}
+                          </ITText>
+                        </ITFlex>
+
+                        <ITFlex
+                          justify="between"
+                          align="center"
+                          gap={2}
+                          className="pt-1.5 border-t"
+                          style={{ borderTopColor: "#f1f5f9" }}
+                        >
+                          <ITFlex align="center" gap={1.5} className="min-w-0">
+                            <span
+                              className="w-1.5 h-1.5 rounded-full shrink-0"
+                              style={{ backgroundColor: priorityMeta.tone.bg }}
+                              title={priorityLabel}
+                            />
+                            <span className="text-[10px] text-slate-400 truncate">
+                              #{a.ticketId.slice(0, 6).toUpperCase()}
+                            </span>
+                          </ITFlex>
                           <Avatar name={a.user.name} seed={a.userId} />
                         </ITFlex>
                       </div>
-                    </div>
-                  );
-                })
-              )}
+                    );
+                  })
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          );
+        })}
+      </ITFlex>
     </>
   );
 }

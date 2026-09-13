@@ -1,4 +1,4 @@
-import { ITButton, ITDialog, ITFlex, ITLoader, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDialog, ITFlex, ITLoader, ITText } from "@axzydev/axzy_ui_system";
 import { FaBookmark, FaCalendarAlt, FaComments, FaExternalLinkAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
@@ -25,6 +25,19 @@ type Props = {
   onOpenFull: (ticketId: string) => void;
 };
 
+// Colores de borde vía `style`: `border-slate-*` no renderiza el color
+// correcto en este proyecto (ver kanban-ui.tsx / KanbanBoard.tsx).
+const BORDER = { subtle: "#f1f5f9", card: "#e2e8f0", dashed: "#cbd5e1" };
+
+function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col items-start gap-1 py-3" style={{ borderTop: `1px solid ${BORDER.subtle}` }}>
+      <span className="text-xs text-slate-400">{label}</span>
+      {children}
+    </div>
+  );
+}
+
 export default function TicketDetailModal({
   ticket,
   loading,
@@ -42,28 +55,35 @@ export default function TicketDetailModal({
         </ITFlex>
       ) : (
         <div>
-          <div className="pb-3 border-b border-slate-100 pr-8 mb-4">
+          <div className="pb-4 pr-8 mb-5" style={{ borderBottom: `1px solid ${BORDER.subtle}` }}>
             <ITFlex align="center" gap={2} className="mb-1.5">
               <FaBookmark size={12} className="text-emerald-500" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-medium text-slate-400">
                 #{ticket.id.slice(0, 8).toUpperCase()}
               </span>
               <span className="text-slate-300">·</span>
-              <span className="text-[10px] text-slate-400">{tt("detail.createdOn", { date: formatFechaHora(ticket.creadoEn) })}</span>
+              <span className="text-xs text-slate-400">
+                {tt("detail.createdOn", { date: formatFechaHora(ticket.creadoEn) })}
+              </span>
             </ITFlex>
-            <ITText className="text-xl font-black text-slate-800 leading-tight">{ticket.titulo}</ITText>
+            <ITText className="text-xl font-bold text-slate-900 leading-tight">{ticket.titulo}</ITText>
           </div>
 
-          {/* Alto máximo forzado por estilo inline: los valores arbitrarios de
-              Tailwind con calc()/min() no estaban compilando en este proyecto,
-              así que aquí no dependemos de eso para evitar que el modal se
-              salga de la pantalla. */}
+          {/* Alto máximo forzado por estilo inline: `min()`/`calc()` en
+              valores arbitrarios de Tailwind no compilan en este proyecto. */}
           <div className="overflow-y-auto pr-1" style={{ maxHeight: "min(64vh, 600px)" }}>
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6">
-              <ITStack direction="column" spacing={4} className="min-w-0">
-                <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{tt("detail.description")}</ITText>
-                  <div className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">
+            {/* `grid`/`grid-cols-*` no está aplicando en absoluto en este
+                proyecto (probado con valor arbitrario y con clases
+                estándar). Flexbox sí funciona en todo lo demás, así que el
+                layout de dos columnas se arma con flex + un ancho fijo de
+                escala estándar en el aside (nada entre corchetes). */}
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="flex flex-col gap-5 min-w-0 flex-1">
+                <div>
+                  <ITText className="text-xs font-semibold text-slate-500 mb-1.5">
+                    {tt("detail.description")}
+                  </ITText>
+                  <div className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
                     {ticket.descripcion || tt("detail.noDescription")}
                   </div>
                 </div>
@@ -74,114 +94,123 @@ export default function TicketDetailModal({
                 />
 
                 <div>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                  <ITText className="text-xs font-semibold text-slate-500 mb-2">
                     {tt("detail.assignmentsTitle", { count: ticket.assignments.length })}
                   </ITText>
-                  <div className="max-h-[42vh] overflow-y-auto pr-1">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {ticket.assignments.map((t) => (
-                        <div
-                          key={t.id}
-                          className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm flex flex-col"
-                        >
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <ITFlex align="center" gap={2} className="min-w-0">
-                              <Avatar name={t.user.name} seed={t.userId} />
-                              <div className="min-w-0">
-                                <div className="text-[11px] font-black text-slate-700 truncate">{t.user.name}</div>
-                                {t.user.numeroEmpleado && (
-                                  <div className="text-[9px] text-slate-400">#{t.user.numeroEmpleado}</div>
+
+                  {ticket.assignments.length === 0 ? (
+                    <div
+                      className="rounded-lg border border-dashed p-5 text-center"
+                      style={{ borderColor: BORDER.dashed }}
+                    >
+                      <ITText className="text-xs text-slate-400">{tt("detail.noAssignmentsYet")}</ITText>
+                    </div>
+                  ) : (
+                    <div
+                      className="rounded-lg border overflow-y-auto"
+                      style={{ borderColor: BORDER.card, maxHeight: "42vh" }}
+                    >
+                      {ticket.assignments.map((t, i) => {
+                        const overdue = Boolean(
+                          t.dueDate && t.status !== "COMPLETADA" && new Date(t.dueDate) < new Date()
+                        );
+                        return (
+                          <div
+                            key={t.id}
+                            className="flex items-start gap-3 px-3.5 py-3"
+                            style={i > 0 ? { borderTop: `1px solid ${BORDER.subtle}` } : undefined}
+                          >
+                            <Avatar name={t.user.name} seed={t.userId} />
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-baseline gap-1.5 min-w-0">
+                                <span className="text-[13px] font-semibold text-slate-800 truncate">
+                                  {t.title}
+                                </span>
+                                {t.description ? (
+                                  <span className="text-xs text-slate-500 min-w-0 flex-1 truncate">
+                                    — {t.description}
+                                  </span>
+                                ) : null}
+                              </div>
+
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-400">
+                                <span>{t.user.name}</span>
+                                {t.startDate && (
+                                  <span className="inline-flex items-center gap-1">
+                                    <FaCalendarAlt size={9} />
+                                    {tt("detail.startShort")} {formatDate(t.startDate)}
+                                  </span>
+                                )}
+                                {t.dueDate && (
+                                  <span
+                                    className={`inline-flex items-center gap-1 ${overdue ? "text-red-500 font-medium" : ""}`}
+                                  >
+                                    <FaCalendarAlt size={9} />
+                                    {tt("detail.dueShort")} {formatDate(t.dueDate)}
+                                  </span>
+                                )}
+                                {t.comments && t.comments.length > 0 && (
+                                  <span className="inline-flex items-center gap-1">
+                                    <FaComments size={9} />
+                                    {tt("detail.assignmentComments", { count: t.comments.length })}
+                                  </span>
                                 )}
                               </div>
-                            </ITFlex>
-                            <Tag {...metaFor(ASSIGNMENT_STATUS_META, t.status)} label={dyn(tt)(`detail.taskStatusOptions.${t.status}`)} />
-                          </div>
 
-                          <div className="flex items-baseline gap-1.5 mb-2 min-w-0">
-                            <span className="text-[12.5px] font-bold text-slate-800 shrink-0 max-w-[55%] truncate">
-                              {t.title}
-                            </span>
-                            {t.description ? (
-                              <span className="text-[11.5px] text-slate-500 min-w-0 flex-1 truncate">
-                                — {t.description}
-                              </span>
-                            ) : null}
-                          </div>
-
-                          {(t.startDate || t.dueDate || (t.comments && t.comments.length > 0)) && (
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9.5px] text-slate-400 mb-2">
-                              {t.startDate && (
-                                <span className="inline-flex items-center gap-1">
-                                  <FaCalendarAlt size={9} />
-                                  {tt("detail.startShort")} {formatDate(t.startDate)}
-                                </span>
-                              )}
-                              {t.dueDate && (
-                                <span className="inline-flex items-center gap-1">
-                                  <FaCalendarAlt size={9} className="text-rose-400" />
-                                  {tt("detail.dueShort")} {formatDate(t.dueDate)}
-                                </span>
-                              )}
-                              {t.comments && t.comments.length > 0 && (
-                                <span className="inline-flex items-center gap-1">
-                                  <FaComments size={9} />
-                                  {tt("detail.assignmentComments", { count: t.comments.length })}
-                                </span>
-                              )}
+                              <div className="mt-2">
+                                <TicketAttachments
+                                  ticketId={ticket.id}
+                                  assignmentId={t.id}
+                                  compact
+                                  canUpload={canManage || t.userId === currentUserId}
+                                />
+                              </div>
                             </div>
-                          )}
 
-                          <div className="mt-auto pt-2 border-t border-slate-100">
-                            <TicketAttachments
-                              ticketId={ticket.id}
-                              assignmentId={t.id}
-                              compact
-                              canUpload={canManage || t.userId === currentUserId}
+                            <Tag
+                              {...metaFor(ASSIGNMENT_STATUS_META, t.status)}
+                              label={dyn(tt)(`detail.taskStatusOptions.${t.status}`)}
                             />
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
-                    {ticket.assignments.length === 0 && (
-                      <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
-                        <ITText className="text-[11px] text-slate-400">{tt("detail.noAssignmentsYet")}</ITText>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
-              </ITStack>
+              </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-3 h-fit">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <div className="flex items-center gap-1.5 px-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.statusLabel")}</span>
-                    <Tag {...metaFor(STATUS_META, ticket.status)} label={dyn(tt)(`statusLabels.${ticket.status}`)} />
-                  </div>
-                  <div className="flex items-center gap-1.5 px-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.priorityLabel")}</span>
-                    <Tag {...metaFor(PRIORITY_META, ticket.priority)} label={dyn(tt)(`priorityLabels.${ticket.priority}`)} />
-                  </div>
-                  <div className="flex items-center gap-1.5 px-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.deptLabel")}</span>
-                    <Tag label={ticket.department?.name ?? tt("list.general")} tone={hashTone(ticket.department?.name ?? tt("list.general"))} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 pt-2.5 border-t border-slate-200 text-[11px]">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.createdByLabel")}</span>
-                  <span className="font-bold text-slate-700">{ticket.creadoPor?.name}</span>
-                </div>
+              {/* Aside de detalles: ancho estándar de la escala de Tailwind
+                  (w-60 = 240px), no un valor entre corchetes. */}
+              <aside className="w-full md:w-60 shrink-0 flex flex-col">
                 <ITButton
                   variant="filled"
                   color="primary"
-                  className="w-full justify-center"
+                  className="w-full justify-center mb-1"
                   onClick={() => onOpenFull(ticket.id)}
                 >
                   <ITFlex align="center" gap={1} justify="center">
                     <FaExternalLinkAlt size={11} />
-                    <ITText className="font-bold text-[11px]">{tt("detail.openFullDetail")}</ITText>
+                    <ITText className="font-semibold text-xs">{tt("detail.openFullDetail")}</ITText>
                   </ITFlex>
                 </ITButton>
-              </div>
+
+                <DetailRow label={tt("detail.statusLabel")}>
+                  <Tag {...metaFor(STATUS_META, ticket.status)} label={dyn(tt)(`statusLabels.${ticket.status}`)} />
+                </DetailRow>
+                <DetailRow label={tt("detail.priorityLabel")}>
+                  <Tag {...metaFor(PRIORITY_META, ticket.priority)} label={dyn(tt)(`priorityLabels.${ticket.priority}`)} />
+                </DetailRow>
+                <DetailRow label={tt("detail.deptLabel")}>
+                  <Tag
+                    label={ticket.department?.name ?? tt("list.general")}
+                    tone={hashTone(ticket.department?.name ?? tt("list.general"))}
+                  />
+                </DetailRow>
+                <DetailRow label={tt("detail.createdByLabel")}>
+                  <span className="text-sm font-medium text-slate-700">{ticket.creadoPor?.name}</span>
+                </DetailRow>
+              </aside>
             </div>
           </div>
         </div>

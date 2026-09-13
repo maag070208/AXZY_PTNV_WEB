@@ -59,7 +59,8 @@
     "descPlaceholder": "Qué ocurrió, dónde ocurrió y qué necesitas…",
     "evidenceTitle": "Evidencias",
     "evidenceSub": "Imágenes o PDF del problema",
-    "removeFile": "Quitar"
+    "removeFile": "Quitar",
+    "resumenTitle": "Resumen de la solicitud"
   },
   "edit": {
     "title": "Editar Ticket",
