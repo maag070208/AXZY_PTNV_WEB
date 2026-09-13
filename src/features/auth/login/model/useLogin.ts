@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { loginThunk } from "@entities/user";
 import type { AppDispatch } from "@app/store";
 
 export const useLogin = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { t: tt } = useTranslation(["auth"]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +23,7 @@ export const useLogin = () => {
       return true;
     }
     setIsSubmitting(false);
-    setToast({ message: "Credenciales inválidas", type: "error" });
+    setToast({ message: tt("login.invalidCredentials"), type: "error" });
     return false;
   };
 

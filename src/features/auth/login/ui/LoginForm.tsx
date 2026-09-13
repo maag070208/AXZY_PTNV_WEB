@@ -8,6 +8,7 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaSignInAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 interface LoginFormProps {
   username: string;
@@ -32,15 +33,16 @@ export default function LoginForm({
   dismissToast,
   onSubmit,
 }: LoginFormProps) {
+  const { t: tt } = useTranslation(["auth"]);
   return (
     <>
       <ITCard className="w-full p-8 shadow-xl border border-slate-100 rounded-[24px]">
         <ITStack>
           <ITText as="h2" className="text-2xl font-bold text-slate-800 text-center">
-            Iniciar sesión
+            {tt("login.title")}
           </ITText>
           <ITText className="text-sm text-slate-500 block text-center mt-1">
-            Ingresa tus credenciales para acceder al sistema
+            {tt("login.subtitle")}
           </ITText>
         </ITStack>
 
@@ -48,7 +50,7 @@ export default function LoginForm({
           <ITFlex direction="column" gap={4}>
             <ITInput
               name="username"
-              label="Usuario"
+              label={tt("login.userLabel")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="admin"
@@ -57,7 +59,7 @@ export default function LoginForm({
             <ITInput
               name="password"
               type="password"
-              label="Contraseña"
+              label={tt("login.passwordLabel")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -74,7 +76,7 @@ export default function LoginForm({
             <ITFlex align="center" gap={1}>
               <FaSignInAlt size={14} />
               <ITText className="font-bold text-[11px]">
-                {isSubmitting ? "Entrando…" : "Entrar"}
+                {isSubmitting ? tt("login.submitting") : tt("login.submit")}
               </ITText>
             </ITFlex>
           </ITButton>

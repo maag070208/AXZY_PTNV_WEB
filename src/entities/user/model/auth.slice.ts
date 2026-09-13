@@ -5,6 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import { authApi } from "../api/userApi";
 import type { AuthUser } from "../model/types";
+import i18n from "@shared/i18n";
 
 interface State {
   token: string | null;
@@ -78,7 +79,7 @@ const slice = createSlice({
       })
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? "Error de autenticación";
+        state.error = action.error.message ?? i18n.t("auth:login.errorAuth");
       })
       .addCase(meThunk.fulfilled, (state, action: PayloadAction<AuthUser>) => {
         state.user = action.payload;
