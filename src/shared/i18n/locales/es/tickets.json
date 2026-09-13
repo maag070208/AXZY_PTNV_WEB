@@ -27,6 +27,8 @@
     "unassigned": "Sin asignar",
     "confirmMoveTrash": "¿Mover a papelera \"{{title}}\"? Quedará oculto en estado eliminado y podrás borrarlo definitivamente después.",
     "confirmDeleteForever": "¿Eliminar definitivamente \"{{title}}\"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.",
+    "general": "General",
+    "loadError": "No se pudo cargar la lista de tickets",
     "columns": {
       "title": "Título",
       "status": "Estado",
@@ -173,7 +175,8 @@
     "createdByLabel": "Creado por",
     "startShort": "Inicio",
     "dueShort": "Límite",
-    "systemUser": "Sistema"
+    "systemUser": "Sistema",
+    "byUser": "Usuario"
   },
   "kanban": {
     "byTicket": "Tareas del ticket",
@@ -268,5 +271,17 @@
     "fallbackUser": "Usuario",
     "byAuthor": "Por {{name}}",
     "employeeNo": "No. {{number}}"
+  },
+  "attachments": {
+    "loadError": "No se pudieron cargar los archivos",
+    "uploadError": "No se pudo subir el archivo",
+    "evidenceTitle": "Evidencia ({{count}})",
+    "photosTitle": "Fotos del ticket ({{count}})",
+    "uploadButton": "Subir archivos",
+    "loading": "Cargando...",
+    "empty": "Sin archivos",
+    "uploadEvidence": "Subir evidencia",
+    "uploadTicketFiles": "Subir archivos del ticket",
+    "fallbackExt": "ARCHIVO"
   }
 }

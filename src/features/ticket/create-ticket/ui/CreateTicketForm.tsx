@@ -76,7 +76,7 @@ export default function CreateTicketForm({
           <div className="space-y-5">
             <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,1.6fr)_minmax(190px,0.7fr)]">
               <ITInput name="titulo" label={tt("new.titleLabel")} value={form.titulo} onChange={(e) => onFieldChange("titulo", e.target.value)} placeholder={tt("new.titlePlaceholder")} required />
-              <ITSelect name="category" label={tt("new.categoryLabel")} options={CATEGORIES} value={form.category} onChange={(e) => onFieldChange("category", e.target.value)} />
+              <ITSelect name="category" label={tt("new.categoryLabel")} options={CATEGORIES.map((c) => ({ value: c, label: dyn(tt)(`categoryLabels.${c}`) }))} value={form.category} onChange={(e) => onFieldChange("category", e.target.value)} />
             </div>
             <ITTextarea name="descripcion" label={tt("new.descLabel")} value={form.descripcion} onChange={(v) => onFieldChange("descripcion", v)} placeholder={tt("new.descPlaceholder")} rows={7} />
             <ITText className="-mt-4 block text-right text-[9px] text-slate-400">{form.descripcion.length} / 2000</ITText>

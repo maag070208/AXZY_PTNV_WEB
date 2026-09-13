@@ -133,7 +133,7 @@ export default function KanbanBoard({ fx }: Props) {
                   <FaCheckCircle size={12} className="text-emerald-500" />
                 )}
                 <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                  {col.label}
+                  {dyn(tt)(`detail.taskStatusOptions.${col.status}`)}
                 </ITText>
               </ITFlex>
               <div className="w-5 h-5 rounded-full bg-white border border-slate-200 flex items-center justify-center">
@@ -152,10 +152,10 @@ export default function KanbanBoard({ fx }: Props) {
                 </div>
               ) : (
                 fx.byStatus[col.status].map((a) => {
-                  const deptLabel = a.ticket.department?.name ?? "General";
+                  const deptLabel = a.ticket.department?.name ?? tt("list.general");
                   const deptTone = hashTone(deptLabel);
                   const priorityMeta = metaFor(PRIORITY_META, a.ticket.priority);
-                    const priorityLabel = dyn(tt)(`priorityLabels.${a.ticket.priority}`);
+                  const priorityLabel = dyn(tt)(`priorityLabels.${a.ticket.priority}`);
                   const overdue = Boolean(
                     a.dueDate &&
                       a.status !== "COMPLETADA" &&

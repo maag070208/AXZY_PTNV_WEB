@@ -27,6 +27,8 @@
     "unassigned": "Unassigned",
     "confirmMoveTrash": "Move \"{{title}}\" to trash? It will be hidden in a deleted state and you can delete it permanently later.",
     "confirmDeleteForever": "Delete \"{{title}}\" permanently? Its comments and history will be deleted. This action cannot be undone.",
+    "general": "General",
+    "loadError": "Could not load the ticket list",
     "columns": {
       "title": "Title",
       "status": "Status",
@@ -173,7 +175,8 @@
     "createdByLabel": "Created by",
     "startShort": "Start",
     "dueShort": "Due",
-    "systemUser": "System"
+    "systemUser": "System",
+    "byUser": "User"
   },
   "kanban": {
     "byTicket": "Ticket tasks",
@@ -268,5 +271,17 @@
     "fallbackUser": "User",
     "byAuthor": "By {{name}}",
     "employeeNo": "No. {{number}}"
+  },
+  "attachments": {
+    "loadError": "Could not load the files",
+    "uploadError": "Could not upload the file",
+    "evidenceTitle": "Evidence ({{count}})",
+    "photosTitle": "Ticket photos ({{count}})",
+    "uploadButton": "Upload files",
+    "loading": "Loading...",
+    "empty": "No files",
+    "uploadEvidence": "Upload evidence",
+    "uploadTicketFiles": "Upload ticket files",
+    "fallbackExt": "FILE"
   }
 }

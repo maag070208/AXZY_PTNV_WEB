@@ -50,7 +50,7 @@ export const buildTimeline = (ticket: Ticket): TimelineEvent[] => {
         icon: meta.icon,
         iconBg: meta.bg,
         title: h.detail ?? h.type,
-        author: h.autor?.name ?? "Sistema",
+        author: h.autor?.name ?? "",
         timestamp: h.createdAt,
       };
     }),
@@ -59,9 +59,9 @@ export const buildTimeline = (ticket: Ticket): TimelineEvent[] => {
       type: "comment",
       icon: "comment",
       iconBg: "bg-slate-400",
-      title: c.autor?.name ?? "Usuario",
+      title: c.autor?.name ?? "",
       detail: c.texto,
-      author: c.autor?.name ?? "Usuario",
+      author: c.autor?.name ?? "",
       timestamp: c.creadoEn,
     })),
   ];

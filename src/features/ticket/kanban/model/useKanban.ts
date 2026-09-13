@@ -10,11 +10,11 @@ import {
 } from "@entities/ticket";
 import type { Status } from "@shared/ui/kanban";
 
-const COLUMNS: Array<{ status: Status; label: string }> = [
-  { status: "PENDIENTE", label: "Pendiente" },
-  { status: "EN_PROGRESO", label: "En progreso" },
-  { status: "EN_REVISION", label: "En revisión" },
-  { status: "COMPLETADA", label: "Completada" },
+const COLUMNS: Array<{ status: Status }> = [
+  { status: "PENDIENTE" },
+  { status: "EN_PROGRESO" },
+  { status: "EN_REVISION" },
+  { status: "COMPLETADA" },
 ];
 
 export const useKanban = (ticketId?: string) => {
@@ -91,15 +91,15 @@ export const useKanban = (ticketId?: string) => {
 
   const departmentOptions = useMemo(() => {
     const set = new Set<string>();
-    rows.forEach((r) => set.add(r.ticket.department?.name ?? "General"));
+    rows.forEach((r) => set.add(r.ticket.department?.name ?? tt("list.general")));
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [rows]);
+  }, [rows, tt]);
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter((r) => {
       if (assigneeFilter && r.userId !== assigneeFilter) return false;
-      const deptName = r.ticket.department?.name ?? "General";
+      const deptName = r.ticket.department?.name ?? tt("list.general");
       if (departmentFilter && deptName !== departmentFilter) return false;
       if (
         q &&
@@ -110,7 +110,7 @@ export const useKanban = (ticketId?: string) => {
       }
       return true;
     });
-  }, [rows, assigneeFilter, departmentFilter, search]);
+  }, [rows, assigneeFilter, departmentFilter, search, tt]);
 
   const byStatus = useMemo(
     () =>

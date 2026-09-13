@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n/dyn";
 import type { AppDispatch, RootState } from "@app/store";
 import {
   fetchTicketById,
@@ -147,10 +148,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
       setToastType("success");
       setToast(
         tt("detail.statusChanged", {
-          status:
-            { ABIERTO: "Abierto", EN_SEGUIMIENTO: "En seguimiento", CERRADO: "Cerrado" }[
-              newStatus
-            ] ?? newStatus,
+          status: dyn(tt)(`statusLabels.${newStatus}`) ?? newStatus,
         })
       );
     }
@@ -166,13 +164,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
       setToastType("success");
       setToast(
         tt("detail.categoryChanged", {
-          category:
-            {
-              MANTENIMIENTO: "Mantenimiento",
-              EQUIPO: "Equipo",
-              SISTEMA: "Sistema",
-              OTRO: "Otro",
-            }[newCategory] ?? newCategory,
+          category: dyn(tt)(`categoryLabels.${newCategory}`) ?? newCategory,
         })
       );
     }

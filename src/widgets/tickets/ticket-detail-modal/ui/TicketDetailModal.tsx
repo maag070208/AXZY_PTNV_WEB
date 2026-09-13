@@ -162,7 +162,7 @@ export default function TicketDetailModal({
                   </div>
                   <div className="flex items-center gap-1.5 px-2">
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{tt("detail.deptLabel")}</span>
-                    <Tag label={ticket.department?.name ?? "General"} tone={hashTone(ticket.department?.name ?? "General")} />
+                    <Tag label={ticket.department?.name ?? tt("list.general")} tone={hashTone(ticket.department?.name ?? tt("list.general"))} />
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 pt-2.5 border-t border-slate-200 text-[11px]">

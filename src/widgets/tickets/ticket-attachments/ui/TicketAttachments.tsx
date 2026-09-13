@@ -1,6 +1,7 @@
 import { FileTypeEnum, ITButton, ITDialog, ITDropfile, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useEffect, useState } from "react";
 import { FaCamera, FaFileAlt, FaFilePdf, FaPlay } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { ticketsApi, type TicketAttachment } from "@entities/ticket";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 // carga (URL vencida, red lenta, etc.) cae a un tile de icono en vez de
 // mostrar el "broken image" feo del navegador con el alt desbordado.
 function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number }) {
+  const { t: tt } = useTranslation("tickets");
   const [broken, setBroken] = useState(false);
   const isImage = item.mimeType.startsWith("image/");
   const isVideo = item.mimeType.startsWith("video/");
@@ -57,7 +59,7 @@ function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number 
         <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-1 text-slate-400">
           {isPdf ? <FaFilePdf size={iconSize} /> : <FaFileAlt size={iconSize} />}
           <span className="w-full truncate px-0.5 text-center text-[8px] font-bold leading-none">
-            {item.originalName.split(".").pop()?.toUpperCase() ?? "ARCHIVO"}
+            {item.originalName.split(".").pop()?.toUpperCase() ?? tt("attachments.fallbackExt")}
           </span>
         </div>
       )}
@@ -67,6 +69,7 @@ function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number 
 }
 
 export default function TicketAttachments({ ticketId, assignmentId, canUpload, compact = false }: Props) {
+  const { t: tt } = useTranslation("tickets");
   const [items, setItems] = useState<TicketAttachment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +83,7 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
         : await ticketsApi.attachments(ticketId);
       setItems(data);
     } catch (e: any) {
-      setError(e.message ?? "No se pudieron cargar los archivos");
+      setError(e.message ?? tt("attachments.loadError"));
     } finally {
       setLoading(false);
     }
@@ -100,7 +103,7 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
       setItems((current) => [item, ...current]);
       return true;
     } catch (e: any) {
-      setError(e.message ?? "No se pudo subir el archivo");
+      setError(e.message ?? tt("attachments.uploadError"));
       return false;
     } finally {
       // ITDropfile resets its selected file after submit.
@@ -115,21 +118,21 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
         <ITFlex align="center" gap={1.5}>
           {assignmentId ? <FaCamera size={11} className="text-emerald-600" /> : <FaFileAlt size={11} className="text-blue-600" />}
           <ITText className="text-[12px] font-bold text-slate-500">
-            {assignmentId ? "Evidencia" : "Fotos del ticket"} ({items.length})
+            {assignmentId ? tt("attachments.evidenceTitle", { count: items.length }) : tt("attachments.photosTitle", { count: items.length })}
           </ITText>
         </ITFlex>
         {canUpload && (
           <ITButton variant="outlined" size="small" color="secondary" onClick={() => setUploadOpen(true)}>
-            <ITText className="text-[11px] font-bold">Subir archivos</ITText>
+            <ITText className="text-[11px] font-bold">{tt("attachments.uploadButton")}</ITText>
           </ITButton>
         )}
       </ITFlex>
 
-      {loading ? <ITText className="text-[11px] text-slate-400 mt-2">Cargando...</ITText> : null}
+      {loading ? <ITText className="text-[11px] text-slate-400 mt-2">{tt("attachments.loading")}</ITText> : null}
       {error ? <ITText className="text-[11px] text-red-600 mt-2">{error}</ITText> : null}
       {!loading && items.length === 0 && !error ? (
         <div className="mt-2.5 rounded-lg border border-dashed border-slate-300 py-3 text-center">
-          <ITText className="text-[11px] text-slate-400">Sin archivos</ITText>
+          <ITText className="text-[11px] text-slate-400">{tt("attachments.empty")}</ITText>
         </div>
       ) : null}
 
@@ -144,7 +147,7 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
       <ITDialog
         isOpen={uploadOpen}
         onClose={() => setUploadOpen(false)}
-        title={assignmentId ? "Subir evidencia" : "Subir archivos del ticket"}
+        title={assignmentId ? tt("attachments.uploadEvidence") : tt("attachments.uploadTicketFiles")}
         className="max-w-xl"
       >
         <ITDropfile

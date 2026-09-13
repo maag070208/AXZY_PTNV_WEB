@@ -3,6 +3,7 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { ticketsApi } from "../api/ticketApi";
+import i18n from "@shared/i18n";
 import type { Ticket, TicketInput } from "../model/types";
 
 export interface TicketsState {
@@ -104,7 +105,7 @@ const slice = createSlice({
       })
       .addCase(fetchTickets.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? "Error al cargar tickets";
+        state.error = action.error.message ?? i18n.t("tickets:list.loadError");
       })
       .addCase(fetchTicketById.fulfilled, (state, action) => {
         state.current = action.payload;

@@ -67,7 +67,7 @@ export default function TicketHistoryAside({ events }: Props) {
                           event.title.includes("CERRADO") ? "text-red-600" : "text-slate-700"
                         }`}
                       >
-                        {event.title}
+                        {event.title || (isComment ? tt("detail.byUser") : event.type.toUpperCase())}
                       </span>
                       <span className="text-[9px] text-slate-400 tabular-nums whitespace-nowrap bg-white px-1.5 py-0.5 rounded">
                         {formatFechaHora(event.timestamp)}
@@ -80,7 +80,7 @@ export default function TicketHistoryAside({ events }: Props) {
                     )}
                     {event.author && (
                       <span className="text-[9px] text-slate-400 mt-1 block">
-                        {event.author}
+                        {event.author || tt("detail.systemUser")}
                       </span>
                     )}
                   </div>
