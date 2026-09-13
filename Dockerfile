@@ -23,6 +23,7 @@ FROM nginx:1.27-alpine AS runtime
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chmod=755 render-config.sh /docker-entrypoint.d/10-render-config.sh
 
 EXPOSE 80
 

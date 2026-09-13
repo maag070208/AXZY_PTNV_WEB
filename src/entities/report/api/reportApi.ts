@@ -1,4 +1,5 @@
 import { api } from "@shared/api/client";
+import { API_CONSTANTS } from "@shared/api/constants/API_CONSTANTS";
 import {
   tableRequest,
   type ITDataTableFetchParamsPost,
@@ -31,8 +32,6 @@ export const reportsApi = {
     api.get<{ data: DeviceReportRow[]; total: number }>(`/reports/devices`),
   csvUrl: (filters: ReportFilters) => {
     // devuelve la URL completa (sin auth — el navegador la manejará como link de descarga)
-    const base =
-      ((import.meta as any).env?.VITE_API_URL as string | undefined) ?? "/api/v1";
-    return `${base}/reports.csv${buildQS(filters)}`;
+    return `${API_CONSTANTS.BASE_URL}/reports.csv${buildQS(filters)}`;
   },
 };
