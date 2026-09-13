@@ -5,6 +5,7 @@ import type { Ticket, TicketAssignment, TicketAttachment } from "@entities/ticke
 import { PDF_COLORS, pdfTheme } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
+import { formatDate as fmtDate } from "@shared/i18n";
 
 interface Props {
   ticket: Ticket;
@@ -163,21 +164,17 @@ const styles = StyleSheet.create({
   evidenceEmpty: { fontSize: 8, color: PDF_COLORS.muted, fontStyle: "italic" },
 });
 
-const formatDate = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("es-MX", {
+const formatDate = (dateStr: string) =>
+  fmtDate(dateStr, {
     day: "2-digit",
     month: "short",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
-};
 
-const formatShortDate = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
-};
+const formatShortDate = (dateStr: string) =>
+  fmtDate(dateStr, { day: "2-digit", month: "short", year: "numeric" });
 
 const formatReportDate = (): string => {
   const now = new Date();

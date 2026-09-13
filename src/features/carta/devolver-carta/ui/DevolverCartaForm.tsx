@@ -10,6 +10,7 @@ import {
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
 import { FaUndo } from "react-icons/fa";
+import { formatDate } from "@shared/i18n";
 import { useTranslation } from "react-i18next";
 import type { CartaResponsiva } from "@entities/carta";
 
@@ -56,7 +57,7 @@ export default function DevolverCartaForm({
             <ITText as="span" muted>
               {t("return.date")}:{" "}
               {carta.returnDate
-                ? new Date(carta.returnDate).toLocaleDateString("es-MX")
+                ? formatDate(carta.returnDate)
                 : "—"}
             </ITText>
             <ITText as="span" muted>
@@ -83,7 +84,7 @@ export default function DevolverCartaForm({
               label={t("return.guard")}
               value={returnedBy}
               onChange={(e) => onReturnedByChange(e.target.value)}
-              placeholder="Ej. Juan Pérez"
+              placeholder={t("return.guardPlaceholder")}
               required
             />
             <ITTextarea

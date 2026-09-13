@@ -15,5 +15,20 @@
   "filters": {
     "allTypes": "All types",
     "allStatuses": "All statuses"
+  },
+  "nav": {
+    "home": "Home",
+    "tickets": "Tickets",
+    "adminTasks": "Manage tasks",
+    "myTasks": "My Tasks",
+    "myCartas": "My Letters",
+    "cartas": "Letters",
+    "devices": "Devices",
+    "reports": "Reports",
+    "employees": "Employees",
+    "departments": "Departments",
+    "users": "Users",
+    "notifications": "Notifications",
+    "logout": "Sign out"
   }
 }

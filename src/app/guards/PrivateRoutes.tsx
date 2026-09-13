@@ -12,12 +12,14 @@ import {
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
 import { logout, meThunk } from "@entities/user";
 import { fetchUnreadCount } from "@entities/notification";
 import { useAblyNotifications } from "./useAblyNotifications";
 
 export default function PrivateRoutes() {
+  const { t: tt } = useTranslation(["common"]);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -55,14 +57,14 @@ export default function PrivateRoutes() {
   const navigationItems = [
     {
       id: "inicio",
-      label: "Inicio",
+      label: tt("nav.home"),
       icon: <FaHouseUser size={14} />,
       action: () => navigate("/"),
       isActive: active("/") && location.pathname === "/",
     },
     {
       id: "tickets",
-      label: "Tickets",
+      label: tt("nav.tickets"),
       icon: <FaTicketAlt size={14} />,
       action: () => navigate("/tickets"),
       isActive: active("/tickets"),
@@ -71,7 +73,7 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "adminTareas",
-          label: "Administrar tareas",
+          label: tt("nav.adminTasks"),
           icon: <FaTasks size={14} />,
           action: () => navigate("/tickets/tareas"),
           isActive: active("/tickets/tareas"),
@@ -82,14 +84,14 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "misTareas",
-          label: "Mis Tareas",
+          label: tt("nav.myTasks"),
           icon: <FaTasks size={14} />,
           action: () => navigate("/tickets/mis-tareas"),
           isActive: active("/tickets/mis-tareas"),
         },
         {
           id: "misCartas",
-          label: "Mis Cartas",
+          label: tt("nav.myCartas"),
           icon: <FaFileSignature size={14} />,
           action: () => navigate("/cartas"),
           isActive: active("/cartas"),
@@ -111,7 +113,7 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "cartas",
-          label: "Cartas",
+          label: tt("nav.cartas"),
           icon: <FaFileSignature size={14} />,
           action: () => navigate("/cartas"),
           isActive: active("/cartas"),
@@ -122,7 +124,7 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "dispositivos",
-          label: "Dispositivos",
+          label: tt("nav.devices"),
           icon: <FaChartBar size={14} />,
           action: () => navigate("/dispositivos"),
           isActive: active("/dispositivos"),
@@ -133,14 +135,14 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "reportes",
-          label: "Reportes",
+          label: tt("nav.reports"),
           icon: <FaChartBar size={14} />,
           action: () => navigate("/reportes"),
           isActive: active("/reportes"),
         },
         {
           id: "empleados",
-          label: "Empleados",
+          label: tt("nav.employees"),
           icon: <FaUserTie size={14} />,
           action: () => navigate("/empleados"),
           isActive: active("/empleados"),
@@ -151,14 +153,14 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "departamentos",
-          label: "Departamentos",
+          label: tt("nav.departments"),
           icon: <FaBuilding size={14} />,
           action: () => navigate("/departamentos"),
           isActive: active("/departamentos"),
         },
         {
           id: "usuarios",
-          label: "Usuarios",
+          label: tt("nav.users"),
           icon: <FaUserShield size={14} />,
           action: () => navigate("/usuarios"),
           isActive: active("/usuarios"),
@@ -191,10 +193,10 @@ export default function PrivateRoutes() {
         userEmail: user.username,
         menuItems: [
           {
-            label: unreadCount > 0 ? `Notificaciones (${unreadCount})` : "Notificaciones",
+            label: unreadCount > 0 ? tt('nav.notifications', { count: unreadCount }) : tt('nav.notifications'),
             onClick: () => navigate("/notificaciones"),
           },
-          { label: "Cerrar sesión", onClick: handleLogout },
+          { label: tt("nav.logout"), onClick: handleLogout },
         ],
       }
       : undefined,

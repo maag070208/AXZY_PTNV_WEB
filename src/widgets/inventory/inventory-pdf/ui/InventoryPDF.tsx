@@ -4,6 +4,7 @@ import type { InventoryMovement, MovementType } from "@entities/inventory-moveme
 import type { Location } from "@entities/location";
 import { formatLocation } from "@entities/location";
 import { PDF_COLORS, pdfTheme } from "@shared/pdf/theme";
+import { formatDate as fmtDate } from "@shared/i18n";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
 
@@ -21,16 +22,14 @@ const TIPO_COLORS: Record<MovementType, string> = {
   DEVOLUCION: "#14b8a6",
 };
 
-const formatDate = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("es-MX", {
+const formatDate = (dateStr: string) =>
+  fmtDate(dateStr, {
     day: "2-digit",
     month: "short",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
-};
 
 const formatReportDate = (): string => {
   const now = new Date();

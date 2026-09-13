@@ -11,6 +11,7 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import type { KanbanAssignment } from "@entities/ticket";
 import { useTranslation } from "react-i18next";
+import { formatDate } from "@shared/i18n";
 import { dyn } from "@shared/i18n/dyn";
 import { ASSIGNMENT_STATUS_BADGE } from "../model/useAssignmentList";
 import type { UseAssignmentList } from "../model/useAssignmentList";
@@ -79,12 +80,12 @@ export default function AdminTasksTable({ fx }: Props) {
         <ITFlex direction="column" gap={0.5}>
           {row.startDate && (
             <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.start", { date: new Date(row.startDate).toLocaleDateString("es-MX") })}
+              {tt("tasksTable.start", { date: formatDate(row.startDate) })}
             </ITText>
           )}
           {row.dueDate && (
             <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.end", { date: new Date(row.dueDate).toLocaleDateString("es-MX") })}
+              {tt("tasksTable.end", { date: formatDate(row.dueDate) })}
             </ITText>
           )}
           {row.dueDate &&

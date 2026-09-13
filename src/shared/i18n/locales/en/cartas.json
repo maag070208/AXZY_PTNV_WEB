@@ -61,7 +61,8 @@
     "conditionsLabel": "Conditions",
     "undoDialogTitle": "Cancel return",
     "undoDialogMessage": "Cancel the return? The device will go back to ASSIGNED.",
-    "back": "Back"
+    "back": "Back",
+    "guardPlaceholder": "E.g. John Doe"
   },
   "table": {
     "folio": "FOLIO",

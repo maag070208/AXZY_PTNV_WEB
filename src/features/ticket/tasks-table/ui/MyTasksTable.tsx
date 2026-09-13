@@ -12,6 +12,7 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaTrello } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { formatDate } from "@shared/i18n";
 import { dyn } from "@shared/i18n/dyn";
 import type { KanbanAssignment } from "@entities/ticket";
 import { ASSIGNMENT_STATUS_BADGE } from "../model/useAssignmentList";
@@ -69,12 +70,12 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
         <ITFlex direction="column" gap={0.5}>
           {r.startDate && (
             <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.start", { date: new Date(r.startDate).toLocaleDateString("es-MX") })}
+              {tt("tasksTable.start", { date: formatDate(r.startDate) })}
             </ITText>
           )}
           {r.dueDate && (
             <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.end", { date: new Date(r.dueDate).toLocaleDateString("es-MX") })}
+              {tt("tasksTable.end", { date: formatDate(r.dueDate) })}
             </ITText>
           )}
           {r.dueDate &&

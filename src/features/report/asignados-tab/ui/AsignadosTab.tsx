@@ -9,6 +9,7 @@ import {
 import { FaDownload, FaExclamationTriangle, FaSync } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { AsignadoRow } from "@entities/report";
+import { formatDate } from "@shared/i18n";
 import type { UseAsignadosReport } from "../model/useAsignadosReport";
 
 export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
@@ -114,7 +115,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] text-slate-700">
-          {r.fecha ? new Date(r.fecha).toLocaleDateString("es-MX") : "—"}
+          {r.fecha ? formatDate(r.fecha) : "—"}
         </ITText>
       ),
     },

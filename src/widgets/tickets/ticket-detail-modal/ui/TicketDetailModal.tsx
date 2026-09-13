@@ -3,6 +3,7 @@ import { FaBookmark, FaCalendarAlt, FaComments, FaExternalLinkAlt } from "react-
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import type { Ticket } from "@entities/ticket";
+import { formatDate } from "@shared/i18n";
 import { formatFechaHora } from "@shared/utils/dates";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
 import {
@@ -112,13 +113,13 @@ export default function TicketDetailModal({
                               {t.startDate && (
                                 <span className="inline-flex items-center gap-1">
                                   <FaCalendarAlt size={9} />
-                                  {tt("detail.startShort")} {new Date(t.startDate).toLocaleDateString("es-MX")}
+                                  {tt("detail.startShort")} {formatDate(t.startDate)}
                                 </span>
                               )}
                               {t.dueDate && (
                                 <span className="inline-flex items-center gap-1">
                                   <FaCalendarAlt size={9} className="text-rose-400" />
-                                  {tt("detail.dueShort")} {new Date(t.dueDate).toLocaleDateString("es-MX")}
+                                  {tt("detail.dueShort")} {formatDate(t.dueDate)}
                                 </span>
                               )}
                               {t.comments && t.comments.length > 0 && (
