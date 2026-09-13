@@ -1,4 +1,5 @@
 import { formatFecha } from "@shared/utils/dates";
+import { useTranslation } from "react-i18next";
 import type { CartaResponsiva } from "@entities/carta";
 interface Props {
   carta: CartaResponsiva;
@@ -11,7 +12,8 @@ export default function CartaPreview({
   pageIndex = 1,
   totalPages = 1,
 }: Props) {
-  const fechaTxt = formatFecha(carta.fecha) || "DD MES AAAA";
+  const { t: tt } = useTranslation("cartas");
+  const fechaTxt = formatFecha(carta.fecha) || tt("doc.dateLetters");
   const item = carta.items?.[0] ?? null;
   const departamentoNombre = (carta.departamento || "Sistemas").replace(
     /^Departamento de /i,
@@ -36,17 +38,17 @@ export default function CartaPreview({
         </div>
         <div style={styles.metaBox}>
           <div style={styles.metaRow}>
-            <span style={styles.metaLabel}>Fecha:</span>
+            <span style={styles.metaLabel}>{tt("doc.date")}</span>
             <span style={styles.metaVal}>{fechaTxt}</span>
           </div>
           <div style={styles.metaRow}>
-            <span style={styles.metaLabel}>No. de empleado:</span>
+            <span style={styles.metaLabel}>{tt("doc.employeeNo")}</span>
             <span style={styles.metaVal}>{carta.numeroEmpleado || "N/A"}</span>
           </div>
           <div style={{ ...styles.metaRow, marginBottom: 0 }}>
-            <span style={styles.metaLabel}>Página:</span>
+            <span style={styles.metaLabel}>{tt("doc.page")}</span>
             <span style={styles.metaVal}>
-              {pageIndex} &nbsp;&nbsp;&nbsp; de &nbsp;&nbsp;&nbsp; {totalPages}
+              {tt("doc.pageOf", { current: pageIndex, total: totalPages })}
             </span>
           </div>
         </div>
@@ -54,92 +56,92 @@ export default function CartaPreview({
 
       {/* 2. Barra de título con folio */}
       <div style={styles.barraFolio}>
-        {carta.consecutivo || "F-SIS-0001"} Carta responsiva del Departamento de{" "}
-        {departamentoNombre}
+        {tt("doc.barraFolio", {
+          consecutivo: carta.consecutivo || "F-SIS-0001",
+          departamento: departamentoNombre,
+        })}
       </div>
 
       {/* 3. Bloque de contenido principal */}
       <div style={styles.bloquePrincipal}>
         <p style={styles.parrafo}>
-          Recibí autorización de uso y/o acceso al siguiente{" "}
-          <strong>Recurso de TIC (Tecnología de la Información y la Comunicación)</strong>{" "}
-          propiedad de{" "}
-          <strong>{carta.empresa || "Puerto Nuevo Hotel y Villas.,"}</strong>{" "}
-          siendo éste para uso exclusivo de las actividades laborales de la
-          empresa, por lo que tomo responsabilidad sobre el mismo y me comprometo
-          a:
+          {tt("doc.para1a")}{" "}
+          <strong>{tt("doc.recursoTic")}</strong>{" "}
+          {tt("doc.para1b")}{" "}
+          <strong>{carta.empresa || "Puerto Nuevo Hotel y Villas.,"}</strong>
+          {tt("doc.para1c")}
         </p>
 
         <ul style={styles.compromisos}>
-          <li>No divulgar y/o facilitar la información que se encuentra almacenada.</li>
-          <li>No facilitar el acceso a personas internas o externas de la empresa.</li>
-          <li>No utilizarlo en perjuicio de la empresa y/o en beneficio propio.</li>
-          <li>Devolverlo cuando sea solicitado y/o al término de mi relación laboral con la empresa.</li>
-          <li>Prevenir el robo o el daño parcial o total del mismo.</li>
+          <li>{tt("doc.compromiso1")}</li>
+          <li>{tt("doc.compromiso2")}</li>
+          <li>{tt("doc.compromiso3")}</li>
+          <li>{tt("doc.compromiso4")}</li>
+          <li>{tt("doc.compromiso5")}</li>
         </ul>
 
         <div>
-          <strong style={{ display: "block", marginBottom: 6 }}>Recurso TIC:</strong>
+          <strong style={{ display: "block", marginBottom: 6 }}>{tt("doc.recursoTitulo")}</strong>
 
           <div style={styles.recursoLista}>
             <div style={styles.recursoRow}>
-              <span style={styles.recLabel}>Descripción general:</span>
+              <span style={styles.recLabel}>{tt("doc.descripcionGeneral")}</span>
               <span style={styles.recVal}>
                 {item?.descripcion || ""}
               </span>
             </div>
             <div style={styles.recursoRow}>
-              <span style={styles.recLabel}>Marca:</span>
+              <span style={styles.recLabel}>{tt("doc.marca")}</span>
               <span style={styles.recVal}>{item?.marca || ""}</span>
             </div>
             <div style={styles.recursoRow}>
-              <span style={styles.recLabel}>Modelo:</span>
+              <span style={styles.recLabel}>{tt("doc.modelo")}</span>
               <span style={styles.recVal}>{item?.modelo || ""}</span>
             </div>
             {item?.device?.type?.fieldConfig?.numeroSerie?.enabled && <div style={styles.recursoRow}>
-              <span style={styles.recLabel}>Número de serie:</span>
+              <span style={styles.recLabel}>{tt("doc.numeroSerie")}</span>
               <span style={styles.recVal}>{item?.numeroSerie || "N/A"}</span>
             </div>}
             {item?.device?.type?.fieldConfig?.nombreEquipo?.enabled && <div style={styles.recursoRow}>
-              <span style={styles.recLabel}>Nombre del equipo:</span>
+              <span style={styles.recLabel}>{tt("doc.nombreEquipo")}</span>
               <span style={styles.recVal}>{item?.nombreEquipo || "N/A"}</span>
             </div>}
             <div style={styles.recursoRow}>
-              <span style={styles.recLabel}>Control de activos:</span>
+              <span style={styles.recLabel}>{tt("doc.controlActivos")}</span>
               <span style={styles.recVal}>{item?.controlActivos || ""}</span>
             </div>
             <div style={styles.recursoRow}>
-              <span style={styles.recLabel}>Área:</span>
+              <span style={styles.recLabel}>{tt("doc.area")}</span>
               <span style={styles.recVal}>{item?.area || ""}</span>
             </div>
           </div>
 
           {hasConfiguredSpecs && (
             <div style={styles.especBloque}>
-              <strong style={styles.especTitulo}>Especificaciones técnicas:</strong>
+              <strong style={styles.especTitulo}>{tt("doc.especificacionesTitulo")}</strong>
               <div style={styles.recursoLista}>
                 {fieldEnabled("ip") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>Dirección IP:</span>
+                  <span style={styles.recLabel}>{tt("doc.direccionIp")}</span>
                   <span style={styles.recVal}>{item?.device?.ip || "N/A"}</span>
                 </div>}
                 {fieldEnabled("macAddress") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>MAC Address:</span>
+                  <span style={styles.recLabel}>{tt("doc.macAddress")}</span>
                   <span style={styles.recVal}>
                     {item?.device?.macAddress || "N/A"}
                   </span>
                 </div>}
                 {fieldEnabled("sistemaOp") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>Sistema Operativo:</span>
+                  <span style={styles.recLabel}>{tt("doc.sistemaOperativo")}</span>
                   <span style={styles.recVal}>
                     {item?.device?.sistemaOp || "N/A"}
                   </span>
                 </div>}
                 {fieldEnabled("ram") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>RAM:</span>
+                  <span style={styles.recLabel}>{tt("doc.ram")}</span>
                   <span style={styles.recVal}>{item?.device?.ram || "N/A"}</span>
                 </div>}
                 {fieldEnabled("almacenamiento") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>Almacenamiento:</span>
+                  <span style={styles.recLabel}>{tt("doc.almacenamiento")}</span>
                   <span style={styles.recVal}>
                     {item?.device?.almacenamiento || "N/A"}
                   </span>
@@ -150,15 +152,11 @@ export default function CartaPreview({
         </div>
 
         <p style={{ ...styles.parrafo, marginTop: 12 }}>
-          Así mismo, declaro estar enterado del{" "}
-          <strong>Reglamento del Departamento de {departamentoNombre}</strong> y
-          de los compromisos que adquiero al ser usuario del equipo asignado, por
-          lo que queda <strong>estrictamente prohibido</strong> cambiarlo por otro
-          diferente al original y en caso de pérdida y/o daño por negligencia, me
-          comprometo a pagar los daños ocasionados, autorizando a la empresa a
-          realizar los descuentos correspondientes consecuencia de la
-          negligencia y/o aplicar lo estipulado en el{" "}
-          <strong>Reglamento Interior de Trabajo.</strong>
+          {tt("doc.para2a")}{" "}
+          <strong>{tt("doc.reglamentoDepartamento")} {departamentoNombre}</strong>{" "}
+          {tt("doc.para2b")} <strong>{tt("doc.estrictamenteProhibido")}</strong>{" "}
+          {tt("doc.para2c")}{" "}
+          <strong>{tt("doc.reglamentoInterior")}</strong>
         </p>
 
         {/* Diagonal de anulación de espacio en blanco */}
@@ -183,28 +181,27 @@ export default function CartaPreview({
       {/* 4. Bloque de Seguimiento en caso de retorno */}
       <div style={styles.bloqueSeguimiento}>
         <div style={styles.barraSeguimiento}>
-          Seguimiento en caso de retorno
+          {tt("doc.seguimientoBarra")}
         </div>
 
         <div style={styles.seguimientoContenido}>
           <div style={styles.lineaCampo}>
-            <span style={styles.segLabel}>Fecha de devolución:</span>
+            <span style={styles.segLabel}>{tt("doc.fechaDevolucion")}</span>
             <span style={styles.segLine}></span>
           </div>
           <div style={styles.lineaCampo}>
-            <span style={styles.segLabel}>Nombre de quien resguarda:</span>
+            <span style={styles.segLabel}>{tt("doc.nombreResguarda")}</span>
             <span style={styles.segLine}></span>
           </div>
           <div style={styles.lineaCampo}>
-            <span style={styles.segLabel}>Condiciones en las que se devuelve:</span>
+            <span style={styles.segLabel}>{tt("doc.condicionesDevuelve")}</span>
             <span style={styles.segLine}></span>
           </div>
           <div style={styles.lineaVacia}></div>
           <div style={styles.lineaVacia}></div>
 
           <div style={styles.notaRh}>
-            <strong>Nota:</strong> Una vez devuelto, esta carta debe permanecer
-            bajo resguardo del Departamento de Recursos Humanos.
+            <strong>{tt("doc.notaRh1")}</strong> {tt("doc.notaRh2")}
           </div>
         </div>
       </div>
@@ -213,11 +210,11 @@ export default function CartaPreview({
       <div style={styles.firmas}>
         <div style={styles.firmaBox}>
           <div style={styles.lineaFirma}></div>
-          <span>Responsable</span>
+          <span>{tt("doc.firmaResponsable")}</span>
         </div>
         <div style={styles.firmaBox}>
           <div style={styles.lineaFirma}></div>
-          <span>Encargado del área</span>
+          <span>{tt("doc.firmaEncargado")}</span>
         </div>
       </div>
     </div>

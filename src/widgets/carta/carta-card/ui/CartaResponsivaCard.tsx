@@ -1,5 +1,6 @@
 import { ITButton, ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaArrowRight, FaTrash } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { CartaResponsiva } from "@entities/carta";
 import { formatFecha } from "@shared/utils/dates";
 
@@ -34,6 +35,7 @@ function DocRow({ label, value, highlight, uppercase }: RowProps) {
 }
 
 export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
+  const { t: tt } = useTranslation("cartas");
   const item = row.items[0];
   const num = row.consecutivo.replace("F-MMTO-", "");
   const empresa = row.empresa?.trim() || "Puerto Nuevo Hotel y Villas";
@@ -48,7 +50,7 @@ export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
       >
         <ITFlex align="center" gap={2}>
           <ITText className="text-[9px] font-black uppercase tracking-[0.2em] opacity-80">
-            Folio
+            {tt("card.folio")}
           </ITText>
           <ITText className="text-[14px] font-black tracking-tight">
             F-MMTO-{num}
@@ -64,27 +66,27 @@ export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
         className="px-4 py-3 cursor-pointer active:scale-[0.995] transition-transform"
         onClick={() => onView(row.id)}
       >
-        <DocRow label="Fecha" value={formatFecha(row.fecha)} />
-        <DocRow label="No. empleado" value={row.numeroEmpleado || "—"} highlight />
-        <DocRow label="Empresa" value={empresa} uppercase />
+        <DocRow label={tt("card.fecha")} value={formatFecha(row.fecha)} />
+        <DocRow label={tt("card.noEmpleado")} value={row.numeroEmpleado || "—"} highlight />
+        <DocRow label={tt("card.empresa")} value={empresa} uppercase />
 
         <ITFlex direction="column" className="mt-3 pt-3 border-t-2 border-slate-200">
           <ITFlex justify="between" align="center" className="mb-2">
             <ITText className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
-              Recurso TIC
+              {tt("card.recursoTic")}
             </ITText>
             <FaArrowRight
               size={12}
               className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all"
             />
           </ITFlex>
-          <DocRow label="Descripción" value={item?.descripcion || "—"} highlight uppercase />
-          <DocRow label="Marca" value={item?.marca || "—"} uppercase />
-          <DocRow label="Modelo" value={item?.modelo || "—"} uppercase />
-          <DocRow label="No. serie" value={item?.numeroSerie || "—"} />
-          <DocRow label="Equipo" value={item?.nombreEquipo || "—"} />
-          <DocRow label="Activo" value={item?.controlActivos || "—"} highlight />
-          <DocRow label="Área" value={item?.area || "—"} uppercase />
+          <DocRow label={tt("card.descripcion")} value={item?.descripcion || "—"} highlight uppercase />
+          <DocRow label={tt("card.marca")} value={item?.marca || "—"} uppercase />
+          <DocRow label={tt("card.modelo")} value={item?.modelo || "—"} uppercase />
+          <DocRow label={tt("card.noSerie")} value={item?.numeroSerie || "—"} />
+          <DocRow label={tt("card.equipo")} value={item?.nombreEquipo || "—"} />
+          <DocRow label={tt("card.activo")} value={item?.controlActivos || "—"} highlight />
+          <DocRow label={tt("card.area")} value={item?.area || "—"} uppercase />
         </ITFlex>
       </ITFlex>
 
@@ -95,18 +97,18 @@ export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
         className="px-3 py-2 border-t border-slate-200 bg-slate-50/70"
       >
         <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-          Carta responsiva
+          {tt("card.title")}
         </ITText>
         <ITButton
           variant="outlined"
           size="small"
           color="danger"
           onClick={() => onDelete(row.id)}
-          title="Eliminar"
+          title={tt("card.delete")}
         >
           <ITFlex align="center" gap={1}>
             <FaTrash size={11} />
-            <ITText className="font-bold text-[11px]">Eliminar</ITText>
+            <ITText className="font-bold text-[11px]">{tt("card.delete")}</ITText>
           </ITFlex>
         </ITButton>
       </ITFlex>

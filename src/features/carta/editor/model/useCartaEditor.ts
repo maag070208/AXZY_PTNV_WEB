@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n";
 import type { AppDispatch, RootState } from "@app/store";
 import {
   resetDraft,
@@ -43,7 +44,7 @@ export const useCartaEditor = ({ download, onSaved }: Options) => {
 
   const handleSave = async () => {
     if (firstError) {
-      showToast("error", firstError);
+      showToast("error", dyn(t)(firstError));
       return;
     }
     try {

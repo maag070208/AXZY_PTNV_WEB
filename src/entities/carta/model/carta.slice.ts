@@ -9,6 +9,7 @@ import {
   type TICItem,
 } from "../model/types";
 import { cartasApi, type CartaInput } from "../api/cartaApi";
+import i18n from "@shared/i18n";
 
 export interface CartasState {
   draft: CartaResponsiva;
@@ -62,7 +63,7 @@ export const saveCarta = createAsyncThunk(
   async (_, { getState }) => {
     const draft = (getState() as any).cartas.draft as CartaResponsiva;
     const item = draft.items[0];
-    if (!item) throw new Error("Sin item para guardar");
+    if (!item) throw new Error(i18n.t("cartas:form.errNoItem"));
 
     const input: CartaInput = {
       consecutivo: draft.consecutivo,
@@ -184,7 +185,7 @@ const slice = createSlice({
       })
       .addCase(fetchCartas.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? "Error al cargar cartas";
+        state.error = action.error.message ?? i18n.t("cartas:list.loadError");
       })
       .addCase(saveCarta.fulfilled, (state, action) => {
         const saved = action.payload;
@@ -200,7 +201,7 @@ const slice = createSlice({
         persist(state);
       })
       .addCase(saveCarta.rejected, (state, action) => {
-        state.error = action.error.message ?? "Error al guardar";
+        state.error = action.error.message ?? i18n.t("cartas:editor.errorSaving");
       })
       .addCase(deleteCartaThunk.fulfilled, (state, action) => {
         state.list = state.list.filter((c) => c.id !== action.payload);

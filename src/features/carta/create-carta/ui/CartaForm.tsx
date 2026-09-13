@@ -1,6 +1,8 @@
 import { ITBadget, ITFlex, ITGrid, ITInput, ITSearchSelect, ITSelect, ITStack, ITText, ITDivider } from "@axzydev/axzy_ui_system";
 import { FaNetworkWired } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@app/store";
 import {
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export default function CartaForm({ errors }: Props) {
+  const { t: tt } = useTranslation("cartas");
   const dispatch = useDispatch<AppDispatch>();
   const draft = useSelector((s: RootState) => s.cartas.draft);
   const item = draft.items[0];
@@ -251,21 +254,21 @@ export default function CartaForm({ errors }: Props) {
   }));
 
   const devicePlaceholder = draft.deviceTypeId
-    ? "Buscar por activo, marca o modelo..."
-    : "Selecciona primero el tipo de dispositivo";
+    ? tt("form.devicePlaceholderActive")
+    : tt("form.devicePlaceholderFirst");
 
   return (
     <ITStack direction="column" spacing={5}>
       {/* ── Encabezado ── */}
       <ITStack direction="column" spacing={3}>
         <ITText as="h3" className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          Encabezado
+          {tt("form.header")}
         </ITText>
         <ITGrid container columns={12} spacing={3}>
           <ITGrid item xs={12} md={6}>
             <ITSelect
               name="deviceTypeId"
-              label="Tipo de dispositivo"
+              label={tt("form.deviceType")}
               options={tipoOptions}
               value={draft.deviceTypeId ?? ""}
               onChange={(e) => handleTypeChange(e.target.value)}
@@ -275,10 +278,10 @@ export default function CartaForm({ errors }: Props) {
             <ITGrid item xs={12} md={6}>
               <ITInput
                 name="consecutivo"
-                label="Folio (consecutivo)"
+                label={tt("form.folio")}
                 value={draft.consecutivo}
                 onChange={(e) => handleField("consecutivo", e.target.value)}
-                placeholder="Auto-generado"
+                placeholder={tt("form.folioPlaceholder")}
                 disabled={loadingConsecutivo}
               />
             </ITGrid>
@@ -287,15 +290,15 @@ export default function CartaForm({ errors }: Props) {
           <ITGrid item xs={12}>
             <ITSearchSelect
               name="empleadoId"
-              label="Empleado (quien recibe)"
-              placeholder="Buscar por nombre, número, puesto o departamento..."
+              label={tt("form.employee")}
+              placeholder={tt("form.employeePlaceholder")}
               options={empleadoOptions}
               value={selectedEmpleadoId}
               onChange={handleEmpleadoSelect}
               onSearch={buscarEmpleados}
               isLoading={busyEmpleados}
               required
-              error={errors?.responsableId}
+              error={errors?.responsableId ? dyn(tt)(errors.responsableId) : undefined}
             />
           </ITGrid>
 
@@ -303,33 +306,33 @@ export default function CartaForm({ errors }: Props) {
           <ITGrid item xs={12} md={4}>
             <ITInput
               name="numeroEmpleado"
-              label="No. de empleado"
+              label={tt("form.employeeNo")}
               value={draft.numeroEmpleado}
               onChange={(e) => handleField("numeroEmpleado", e.target.value)}
-              placeholder="Selecciona un empleado"
+              placeholder={tt("form.employeeNoPlaceholder")}
               disabled={!selectedEmpleadoId}
               required
-              error={errors?.numeroEmpleado}
+              error={errors?.numeroEmpleado ? dyn(tt)(errors.numeroEmpleado) : undefined}
             />
           </ITGrid>
           <ITGrid item xs={12} md={4}>
             <ITInput
               name="empresa"
-              label="Empresa"
+              label={tt("form.company")}
               value={draft.empresa}
               onChange={(e) => handleField("empresa", e.target.value)}
               disabled={!selectedEmpleadoId}
-              placeholder="Viene del empleado"
+              placeholder={tt("form.companyPlaceholder")}
             />
           </ITGrid>
           <ITGrid item xs={12} md={4}>
             <ITInput
               name="departamento"
-              label="Departamento"
+              label={tt("form.department")}
               value={draft.departamento}
               onChange={(e) => handleField("departamento", e.target.value)}
               disabled={!selectedEmpleadoId}
-              placeholder="Viene del empleado"
+              placeholder={tt("form.departmentPlaceholder")}
             />
           </ITGrid>
         </ITGrid>
@@ -339,10 +342,10 @@ export default function CartaForm({ errors }: Props) {
       <ITStack direction="column" spacing={3} className="border-t border-slate-100 pt-5">
         <ITFlex justify="between" align="center">
           <ITText as="h3" className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            Recurso TIC
+            {tt("form.recursoTic")}
           </ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            1 item
+            {tt("form.itemCount")}
           </ITText>
         </ITFlex>
 
@@ -350,13 +353,13 @@ export default function CartaForm({ errors }: Props) {
           <ITStack direction="column" spacing={3}>
             <ITSearchSelect
               name="deviceSearch"
-              label="Buscar dispositivo existente"
+              label={tt("form.deviceSearch")}
               placeholder={devicePlaceholder}
               value={selectedDeviceId}
               onChange={handleDeviceSelect}
               options={deviceOptions}
               disabled={!draft.deviceTypeId}
-              error={errors?.deviceId}
+              error={errors?.deviceId ? dyn(tt)(errors.deviceId) : undefined}
             />
 
             {/* Especificaciones técnicas (TIC) — solo lectura, vienen del Device */}
@@ -367,7 +370,7 @@ export default function CartaForm({ errors }: Props) {
                   <ITFlex align="center" gap={2}>
                     <FaNetworkWired className="text-slate-400" />
                     <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                      Especificaciones técnicas (del dispositivo)
+                      {tt("form.specTitle")}
                     </ITText>
                   </ITFlex>
                   <ITBadget color="primary" size="small">
@@ -378,57 +381,56 @@ export default function CartaForm({ errors }: Props) {
                   {deviceFieldEnabled("ip") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`ip_${item.id}`}
-                      label="IP"
+                      label={tt("form.specIp")}
                       value={item.device.ip ?? ""}
                       disabled
-                      placeholder="Sin IP registrada"
+                      placeholder={tt("form.specIpPlaceholder")}
                       onChange={() => {}}
                     />
                   </ITGrid>}
                   {deviceFieldEnabled("macAddress") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`mac_${item.id}`}
-                      label="MAC Address"
+                      label={tt("form.specMac")}
                       value={item.device.macAddress ?? ""}
                       disabled
-                      placeholder="Sin MAC registrada"
+                      placeholder={tt("form.specMacPlaceholder")}
                       onChange={() => {}}
                     />
                   </ITGrid>}
                   {deviceFieldEnabled("sistemaOp") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`so_${item.id}`}
-                      label="Sistema Operativo"
+                      label={tt("form.specSo")}
                       value={item.device.sistemaOp ?? ""}
                       disabled
-                      placeholder="Sin SO registrado"
+                      placeholder={tt("form.specSoPlaceholder")}
                       onChange={() => {}}
                     />
                   </ITGrid>}
                   {deviceFieldEnabled("ram") && <ITGrid item xs={12} md={6}>
                     <ITInput
                       name={`ram_${item.id}`}
-                      label="RAM"
+                      label={tt("form.specRam")}
                       value={item.device.ram ?? ""}
                       disabled
-                      placeholder="Sin RAM registrada"
+                      placeholder={tt("form.specRamPlaceholder")}
                       onChange={() => {}}
                     />
                   </ITGrid>}
                   {deviceFieldEnabled("almacenamiento") && <ITGrid item xs={12}>
                     <ITInput
                       name={`alm_${item.id}`}
-                      label="Almacenamiento"
+                      label={tt("form.specStorage")}
                       value={item.device.almacenamiento ?? ""}
                       disabled
-                      placeholder="Sin almacenamiento registrado"
+                      placeholder={tt("form.specStoragePlaceholder")}
                       onChange={() => {}}
                     />
                   </ITGrid>}
                 </ITGrid>
                 <ITText className="text-[9px] text-slate-400 italic">
-                  Estas especificaciones se imprimen en el PDF. Para editarlas,
-                  actualiza el dispositivo desde Dispositivos.
+                  {tt("form.specHint")}
                 </ITText>
               </>
             )}
@@ -439,14 +441,14 @@ export default function CartaForm({ errors }: Props) {
       {/* ── Firmantes ── */}
       <ITStack direction="column" spacing={3} className="border-t border-slate-100 pt-5">
         <ITText as="h3" className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          Firmantes
+          {tt("form.signers")}
         </ITText>
         <ITGrid container columns={12} spacing={3}>
           <ITGrid item xs={12} md={6}>
             <ITSearchSelect
               name="encargadoId"
-              label="Jefe de área (encargado)"
-              placeholder="Buscar administrador, gerente o jefe..."
+              label={tt("form.areaHead")}
+              placeholder={tt("form.areaHeadPlaceholder")}
               options={jefeOptions}
               value={draft.encargadoId ?? ""}
               onChange={handleEncargadoSelect}
@@ -457,10 +459,10 @@ export default function CartaForm({ errors }: Props) {
           <ITGrid item xs={12} md={6}>
             <ITInput
               name="deliveryBy"
-              label="Entrega (quien entrega)"
+              label={tt("form.deliveryBy")}
               value={draft.deliveryBy}
               onChange={(e) => handleField("deliveryBy", e.target.value)}
-              placeholder="Departamento de Mantenimiento"
+              placeholder={tt("form.deliveryByPlaceholder")}
             />
           </ITGrid>
         </ITGrid>

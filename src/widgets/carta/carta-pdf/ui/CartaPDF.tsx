@@ -7,6 +7,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import { formatFecha } from "@shared/utils/dates";
+import { useTranslation } from "react-i18next";
 import type { CartaResponsiva } from "@entities/carta";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
 
@@ -197,7 +198,8 @@ const styles = StyleSheet.create({
 });
 
 export default function CartaPDF({ carta }: Props) {
-  const fechaTxt = formatFecha(carta.fecha) || "DD MES AAAA";
+  const { t: tt } = useTranslation("cartas");
+  const fechaTxt = formatFecha(carta.fecha) || tt("doc.dateLetters");
   const item = carta.items?.[0] ?? null;
   const departamentoNombre = (carta.departamento || "Sistemas").replace(
     /^Departamento de /i,
@@ -221,7 +223,7 @@ export default function CartaPDF({ carta }: Props) {
 
   return (
     <Document
-      title={`${carta.consecutivo} - Carta Responsiva`}
+      title={`${carta.consecutivo} - ${tt("detail.title")}`}
       author="Puerto Nuevo Hotel y Villas"
     >
       <Page size="LETTER" style={styles.page}>
@@ -232,18 +234,18 @@ export default function CartaPDF({ carta }: Props) {
           </View>
           <View style={styles.metaBox}>
             <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>Fecha:</Text>
+              <Text style={styles.metaLabel}>{tt("doc.date")}</Text>
               <Text style={styles.metaVal}>{fechaTxt}</Text>
             </View>
             <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>No. de empleado:</Text>
+              <Text style={styles.metaLabel}>{tt("doc.employeeNo")}</Text>
               <Text style={styles.metaVal}>
                 {carta.numeroEmpleado || "N/A"}
               </Text>
             </View>
             <View style={styles.metaPaginaRow}>
-              <Text style={styles.metaPaginaLabel}>Página:</Text>
-              <Text style={styles.metaVal}>1 de 1</Text>
+              <Text style={styles.metaPaginaLabel}>{tt("doc.page")}</Text>
+              <Text style={styles.metaVal}>{tt("doc.pageOf", { current: 1, total: 1 })}</Text>
             </View>
           </View>
         </View>
@@ -251,81 +253,65 @@ export default function CartaPDF({ carta }: Props) {
         {/* 2. Barra de título con folio */}
         <View style={styles.barraFolio}>
           <Text>
-            {carta.consecutivo || "F-MMTO-0001"} Carta responsiva del
-            Departamento de {departamentoNombre}
+            {tt("doc.barraFolio", {
+              consecutivo: carta.consecutivo || "F-MMTO-0001",
+              departamento: departamentoNombre,
+            })}
           </Text>
         </View>
 
         {/* 3. Bloque de contenido principal */}
         <View style={styles.bloquePrincipal}>
           <Text style={styles.parrafoIntro}>
-            Recibí autorización de uso y/o acceso al siguiente{" "}
-            <Text style={styles.bold}>
-              Recurso de TIC (Tecnología de la Información y la Comunicación)
-            </Text>{" "}
-            propiedad de{" "}
+            {tt("doc.para1a")}{" "}
+            <Text style={styles.bold}>{tt("doc.recursoTic")}</Text>{" "}
+            {tt("doc.para1b")}{" "}
             <Text style={styles.bold}>
               {carta.empresa || "Puerto Nuevo Hotel y Villas."}
             </Text>
-            , siendo éste para uso exclusivo de las actividades laborales de la
-            empresa, por lo que tomo responsabilidad sobre el mismo y me
-            comprometo a:
+            {tt("doc.para1c")}
           </Text>
 
           <View style={styles.compromisos}>
-            <Text style={styles.compromisoItem}>
-              • No divulgar y/o facilitar la información que se encuentra
-              almacenada.
-            </Text>
-            <Text style={styles.compromisoItem}>
-              • No facilitar el acceso a personas internas o externas de la
-              empresa.
-            </Text>
-            <Text style={styles.compromisoItem}>
-              • No utilizarlo en perjuicio de la empresa y/o en beneficio
-              propio.
-            </Text>
-            <Text style={styles.compromisoItem}>
-              • Devolverlo cuando sea solicitado y/o al término de mi relación
-              laboral con la empresa.
-            </Text>
-            <Text style={styles.compromisoItem}>
-              • Prevenir el robo o el daño parcial o total del mismo.
-            </Text>
+            <Text style={styles.compromisoItem}>• {tt("doc.compromiso1")}</Text>
+            <Text style={styles.compromisoItem}>• {tt("doc.compromiso2")}</Text>
+            <Text style={styles.compromisoItem}>• {tt("doc.compromiso3")}</Text>
+            <Text style={styles.compromisoItem}>• {tt("doc.compromiso4")}</Text>
+            <Text style={styles.compromisoItem}>• {tt("doc.compromiso5")}</Text>
           </View>
 
-          <Text style={styles.recursoTitulo}>Recurso TIC:</Text>
+          <Text style={styles.recursoTitulo}>{tt("doc.recursoTitulo")}</Text>
           <View style={styles.recursoLista}>
             <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>Descripción general:</Text>
+              <Text style={styles.recLabel}>{tt("doc.descripcionGeneral")}</Text>
               <Text style={styles.recVal}>{descripcionConCantidad}</Text>
             </View>
             <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>Marca:</Text>
+              <Text style={styles.recLabel}>{tt("doc.marca")}</Text>
               <Text style={styles.recVal}>{item?.marca || "STEREN"}</Text>
             </View>
             <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>Modelo:</Text>
+              <Text style={styles.recLabel}>{tt("doc.modelo")}</Text>
               <Text style={styles.recVal}>{item?.modelo || "RM-115"}</Text>
             </View>
             {fieldEnabled("numeroSerie") && <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>Número de serie:</Text>
+              <Text style={styles.recLabel}>{tt("doc.numeroSerie")}</Text>
               <Text style={styles.recVal}>{item?.numeroSerie || "N/A"}</Text>
             </View>}
             {fieldEnabled("nombreEquipo") && <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>Nombre del equipo:</Text>
+              <Text style={styles.recLabel}>{tt("doc.nombreEquipo")}</Text>
               <Text style={styles.recVal}>
                 {item?.nombreEquipo || "N/A"}
               </Text>
             </View>}
             <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>Control de activos:</Text>
+              <Text style={styles.recLabel}>{tt("doc.controlActivos")}</Text>
               <Text style={styles.recVal}>
                 {item?.controlActivos || "TBE-0001"}
               </Text>
             </View>
             <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>Área:</Text>
+              <Text style={styles.recLabel}>{tt("doc.area")}</Text>
               <Text style={styles.recVal}>
                 {item?.area || "MANTENIMIENTO"}
               </Text>
@@ -335,27 +321,27 @@ export default function CartaPDF({ carta }: Props) {
           {showITSpecs && (
             <View style={styles.especBloque}>
               <Text style={styles.especTitulo}>
-                Especificaciones técnicas:
+                {tt("doc.especificacionesTitulo")}
               </Text>
               <View style={styles.recursoLista}>
                 {fieldEnabled("ip") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>Dirección IP:</Text>
+                  <Text style={styles.recLabel}>{tt("doc.direccionIp")}</Text>
                   <Text style={styles.recVal}>{dev?.ip || "N/A"}</Text>
                 </View>}
                 {fieldEnabled("macAddress") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>MAC Address:</Text>
+                  <Text style={styles.recLabel}>{tt("doc.macAddress")}</Text>
                   <Text style={styles.recVal}>{dev?.macAddress || "N/A"}</Text>
                 </View>}
                 {fieldEnabled("sistemaOp") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>Sistema Operativo:</Text>
+                  <Text style={styles.recLabel}>{tt("doc.sistemaOperativo")}</Text>
                   <Text style={styles.recVal}>{dev?.sistemaOp || "N/A"}</Text>
                 </View>}
                 {fieldEnabled("ram") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>RAM:</Text>
+                  <Text style={styles.recLabel}>{tt("doc.ram")}</Text>
                   <Text style={styles.recVal}>{dev?.ram || "N/A"}</Text>
                 </View>}
                 {fieldEnabled("almacenamiento") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>Almacenamiento:</Text>
+                  <Text style={styles.recLabel}>{tt("doc.almacenamiento")}</Text>
                   <Text style={styles.recVal}>
                     {dev?.almacenamiento || "N/A"}
                   </Text>
@@ -365,38 +351,34 @@ export default function CartaPDF({ carta }: Props) {
           )}
 
           <Text style={{ ...styles.parrafo, marginTop: 6 }}>
-            Así mismo, declaro estar enterado del{" "}
+            {tt("doc.para2a")}{" "}
             <Text style={styles.bold}>
-              Reglamento del Departamento de {departamentoNombre}
+              {tt("doc.reglamentoDepartamento")} {departamentoNombre}
             </Text>{" "}
-            y de los compromisos que adquiero al ser usuario del equipo
-            asignado, por lo que queda{" "}
-            <Text style={styles.bold}>estrictamente prohibido</Text> cambiarlo
-            por otro diferente al original y en caso de pérdida y/o daño por
-            negligencia, me comprometo a pagar los daños ocasionados,
-            autorizando a la empresa a realizar los descuentos correspondientes
-            consecuencia de la negligencia y/o aplicar lo estipulado en el{" "}
-            <Text style={styles.bold}>Reglamento Interior de Trabajo.</Text>
+            {tt("doc.para2b")}{" "}
+            <Text style={styles.bold}>{tt("doc.estrictamenteProhibido")}</Text>{" "}
+            {tt("doc.para2c")}{" "}
+            <Text style={styles.bold}>{tt("doc.reglamentoInterior")}</Text>
           </Text>
         </View>
 
         {/* 4. Bloque de Seguimiento */}
         <View style={styles.bloqueSeguimiento} wrap={false}>
           <View style={styles.barraSeguimiento}>
-            <Text>Seguimiento en caso de retorno</Text>
+            <Text>{tt("doc.seguimientoBarra")}</Text>
           </View>
           <View style={styles.seguimientoContenido}>
             <View style={styles.lineaCampo}>
-              <Text style={styles.segLabel}>Fecha de devolución:</Text>
+              <Text style={styles.segLabel}>{tt("doc.fechaDevolucion")}</Text>
               <View style={styles.segLine} />
             </View>
             <View style={styles.lineaCampo}>
-              <Text style={styles.segLabel}>Nombre de quien resguarda:</Text>
+              <Text style={styles.segLabel}>{tt("doc.nombreResguarda")}</Text>
               <View style={styles.segLine} />
             </View>
             <View style={styles.lineaCampo}>
               <Text style={styles.segLabel}>
-                Condiciones en las que se devuelve:
+                {tt("doc.condicionesDevuelve")}
               </Text>
               <View style={styles.segLine} />
             </View>
@@ -404,9 +386,7 @@ export default function CartaPDF({ carta }: Props) {
             <View style={styles.lineaVacia} />
 
             <Text style={styles.notaRh}>
-              <Text style={styles.bold}>Nota:</Text> Una vez devuelto, esta
-              carta debe permanecer bajo resguardo del Departamento de Recursos
-              Humanos.
+              <Text style={styles.bold}>{tt("doc.notaRh1")}</Text> {tt("doc.notaRh2")}
             </Text>
           </View>
         </View>
@@ -416,17 +396,17 @@ export default function CartaPDF({ carta }: Props) {
           <View style={styles.firmaBox}>
             <View style={styles.lineaFirma} />
             <Text style={styles.firmaNombre}>{responsableName}</Text>
-            <Text style={styles.firmaLabel}>Responsable</Text>
+            <Text style={styles.firmaLabel}>{tt("doc.firmaResponsable")}</Text>
           </View>
           <View style={styles.firmaBox}>
             <View style={styles.lineaFirma} />
             <Text style={styles.firmaNombre}>{encargadoName}</Text>
-            <Text style={styles.firmaLabel}>Jefe de área</Text>
+            <Text style={styles.firmaLabel}>{tt("doc.firmaJefeArea")}</Text>
           </View>
           <View style={styles.firmaBox}>
             <View style={styles.lineaFirma} />
             <Text style={styles.firmaNombre}>{deliveryBy}</Text>
-            <Text style={styles.firmaLabel}>Entrega</Text>
+            <Text style={styles.firmaLabel}>{tt("doc.firmaEntrega")}</Text>
           </View>
         </View>
       </Page>

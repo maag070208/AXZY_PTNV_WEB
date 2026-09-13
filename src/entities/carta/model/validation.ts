@@ -12,19 +12,19 @@ export function validateCartaDraft(draft: CartaResponsiva): CartaFormErrors {
   const errors: CartaFormErrors = {};
 
   if (!draft.responsableId) {
-    errors.responsableId = "Selecciona el empleado que recibe el equipo";
+    errors.responsableId = "form.errResponsable";
   }
   if (!text(draft.numeroEmpleado)) {
-    errors.numeroEmpleado = "El número de empleado es requerido";
+    errors.numeroEmpleado = "form.errNumeroEmpleado";
   }
 
   const item = draft.items[0];
   if (!item) {
-    errors.deviceId = "Agrega al menos un recurso TIC";
+    errors.deviceId = "form.errNoItem";
     return errors;
   }
   if (!item.deviceId) {
-    errors.deviceId = "Selecciona un dispositivo existente";
+    errors.deviceId = "form.errDevice";
   }
 
   return errors;
