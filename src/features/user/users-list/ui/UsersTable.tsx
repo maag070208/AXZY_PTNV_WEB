@@ -11,6 +11,7 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaEye, FaKey, FaTrash, FaUndo } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { User } from "@entities/user";
 import type { UseUsersList } from "../model/useUsersList";
 
@@ -38,10 +39,11 @@ const roleBadge = (role: string) => (
 );
 
 export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
+  const { t: tt } = useTranslation(["users"]);
   const columns: Column<User>[] = [
     {
       key: "username",
-      label: "Username",
+      label: tt("table.username"),
       type: "string",
       filter: true,
       sortable: false,
@@ -51,7 +53,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
     },
     {
       key: "name",
-      label: "Nombre",
+      label: tt("table.name"),
       type: "string",
       filter: true,
       sortable: false,
@@ -66,7 +68,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
     },
     {
       key: "role",
-      label: "Rol",
+      label: tt("table.role"),
       type: "catalog",
       filter: "catalog",
       sortable: false,
@@ -84,7 +86,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
     },
     {
       key: "numeroEmpleado",
-      label: "No. Emp",
+      label: tt("table.employeeNo"),
       type: "string",
       filter: true,
       sortable: false,
@@ -94,7 +96,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
     },
     {
       key: "department",
-      label: "Depto",
+      label: tt("table.department"),
       type: "catalog",
       filter: "catalog",
       catalogOptions: { data: [], loading: false, error: false },
@@ -106,7 +108,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
     },
     {
       key: "subarea",
-      label: "Subárea",
+      label: tt("table.subarea"),
       type: "catalog",
       filter: "catalog",
       catalogOptions: { data: [], loading: false, error: false },

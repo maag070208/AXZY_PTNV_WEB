@@ -9,6 +9,7 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { FaEdit } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
 import type { User } from "@entities/user";
 
@@ -29,6 +30,7 @@ export default function EmployeesTable({
   reloadKey,
   onEdit,
 }: Props) {
+  const { t: tt } = useTranslation(["users"]);
   const departmentOptions = departments
     .filter((d) => d.active)
     .map((d) => ({ id: d.id, name: d.name }));
@@ -42,7 +44,7 @@ export default function EmployeesTable({
   const columns: Column<User>[] = [
     {
       key: "numeroEmpleado",
-      label: "No. Empleado",
+      label: tt("table.employeeNoFull"),
       type: "string",
       filter: true,
       sortable: false,
@@ -54,7 +56,7 @@ export default function EmployeesTable({
     },
     {
       key: "name",
-      label: "Nombre",
+      label: tt("table.name"),
       type: "string",
       filter: true,
       sortable: false,
@@ -69,7 +71,7 @@ export default function EmployeesTable({
     },
     {
       key: "puesto",
-      label: "Puesto",
+      label: tt("table.position"),
       type: "string",
       filter: true,
       sortable: false,
@@ -79,7 +81,7 @@ export default function EmployeesTable({
     },
     {
       key: "department",
-      label: "Departamento",
+      label: tt("table.departmentFull"),
       type: "catalog",
       filter: "catalog",
       catalogOptions: { data: departmentOptions, loading: false, error: false },
@@ -91,7 +93,7 @@ export default function EmployeesTable({
     },
     {
       key: "subarea",
-      label: "Subárea",
+      label: tt("table.subarea"),
       type: "catalog",
       filter: "catalog",
       catalogOptions: { data: subareaOptions, loading: false, error: false },
@@ -113,7 +115,7 @@ export default function EmployeesTable({
                 size={14}
                 className="text-slate-400 hover:text-blue-600 cursor-pointer"
                 onClick={() => onEdit(u)}
-                title="Editar empleado"
+                title={tt("table.editEmployee")}
               />
             ),
           },

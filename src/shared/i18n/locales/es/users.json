@@ -47,7 +47,68 @@
     "updated": "Usuario actualizado correctamente",
     "errorCreate": "Error al crear usuario",
     "errorUpdate": "Error al actualizar usuario",
-    "errorMessages": "Corrige los campos marcados"
+    "errorMessages": "Corrige los campos marcados",
+    "errorLoad": "No se pudo cargar el usuario",
+    "heading": "Cuenta del sistema",
+    "headingEdit": "Actualiza el perfil",
+    "headingNew": "Crea un nuevo usuario",
+    "headingHint": "Configura identidad, acceso y ubicación organizacional.",
+    "sectionPersonal": "Información personal",
+    "sectionPersonalHint": "Datos visibles del usuario",
+    "name": "Nombre",
+    "employeeNo": "No. Empleado",
+    "email": "Correo",
+    "position": "Puesto",
+    "sectionAccess": "Acceso y permisos",
+    "sectionAccessHint": "Credenciales y nivel de acceso",
+    "username": "Username",
+    "role": "Rol",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Dejar en blanco para no cambiar",
+    "sectionOrganization": "Organización",
+    "sectionOrganizationHint": "Área donde trabaja",
+    "department": "Departamento",
+    "subarea": "Subárea",
+    "roleGuide": "Guía del rol",
+    "passwordEditHint": "En edición, deja la contraseña vacía para conservarla.",
+    "roles": {
+      "ADMIN": {
+        "title": "Administrador del sistema",
+        "summary": "Control total de catálogos, usuarios, dispositivos, tickets y reportes.",
+        "actions": [
+          "Configura permisos y usuarios",
+          "Administra todos los departamentos",
+          "Puede completar y cerrar tareas"
+        ]
+      },
+      "GERENTE": {
+        "title": "Gerente",
+        "summary": "Supervisa tickets y tareas de su departamento.",
+        "actions": [
+          "Crea y administra tickets",
+          "Asigna responsables y tareas",
+          "Puede completar tareas y cerrar tickets"
+        ]
+      },
+      "JEFE_DE_AREA": {
+        "title": "Jefe de área",
+        "summary": "Da seguimiento operativo a los tickets de su departamento.",
+        "actions": [
+          "Crea tickets",
+          "Puede generar tareas de sus tickets",
+          "Mueve tareas asignadas hasta revisión"
+        ]
+      },
+      "EMPLEADO": {
+        "title": "Empleado",
+        "summary": "Ejecuta tareas asignadas y reporta avances.",
+        "actions": [
+          "No crea tickets",
+          "Solo ve tickets con tareas asignadas",
+          "Mueve sus tareas hasta revisión"
+        ]
+      }
+    }
   },
   "history": {
     "title": "Historial",
@@ -73,5 +134,17 @@
     "errorImport": "Error al importar usuarios",
     "errorNoFile": "Selecciona un archivo Excel primero",
     "goToList": "Ir a Usuarios"
+  },
+  "table": {
+    "username": "Username",
+    "name": "Nombre",
+    "role": "Rol",
+    "employeeNo": "No. Emp",
+    "employeeNoFull": "No. Empleado",
+    "department": "Depto",
+    "departmentFull": "Departamento",
+    "subarea": "Subárea",
+    "position": "Puesto",
+    "editEmployee": "Editar empleado"
   }
 }

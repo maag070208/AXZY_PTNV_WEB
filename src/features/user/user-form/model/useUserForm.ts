@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n";
 import { useParams } from "react-router-dom";
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
@@ -9,24 +10,24 @@ export const ROLE_GUIDANCE: Record<
   { title: string; summary: string; actions: string[] }
 > = {
   ADMIN: {
-    title: "Administrador del sistema",
-    summary: "Control total de catálogos, usuarios, dispositivos, tickets y reportes.",
-    actions: ["Configura permisos y usuarios", "Administra todos los departamentos", "Puede completar y cerrar tareas"],
+    title: "form.roles.ADMIN.title",
+    summary: "form.roles.ADMIN.summary",
+    actions: ["form.roles.ADMIN.actions.0", "form.roles.ADMIN.actions.1", "form.roles.ADMIN.actions.2"],
   },
   GERENTE: {
-    title: "Gerente",
-    summary: "Supervisa tickets y tareas de su departamento.",
-    actions: ["Crea y administra tickets", "Asigna responsables y tareas", "Puede completar tareas y cerrar tickets"],
+    title: "form.roles.GERENTE.title",
+    summary: "form.roles.GERENTE.summary",
+    actions: ["form.roles.GERENTE.actions.0", "form.roles.GERENTE.actions.1", "form.roles.GERENTE.actions.2"],
   },
   JEFE_DE_AREA: {
-    title: "Jefe de área",
-    summary: "Da seguimiento operativo a los tickets de su departamento.",
-    actions: ["Crea tickets", "Puede generar tareas de sus tickets", "Mueve tareas asignadas hasta revisión"],
+    title: "form.roles.JEFE_DE_AREA.title",
+    summary: "form.roles.JEFE_DE_AREA.summary",
+    actions: ["form.roles.JEFE_DE_AREA.actions.0", "form.roles.JEFE_DE_AREA.actions.1", "form.roles.JEFE_DE_AREA.actions.2"],
   },
   EMPLEADO: {
-    title: "Empleado",
-    summary: "Ejecuta tareas asignadas y reporta avances.",
-    actions: ["No crea tickets", "Solo ve tickets con tareas asignadas", "Mueve sus tareas hasta revisión"],
+    title: "form.roles.EMPLEADO.title",
+    summary: "form.roles.EMPLEADO.summary",
+    actions: ["form.roles.EMPLEADO.actions.0", "form.roles.EMPLEADO.actions.1", "form.roles.EMPLEADO.actions.2"],
   },
 };
 
@@ -94,14 +95,18 @@ export const useUserForm = () => {
           });
         })
         .catch(() => {
-          setError("No se pudo cargar el usuario");
+          setError(dyn(tt)("form.errorLoad"));
         })
         .finally(() => setLoading(false));
     }
   }, [id]);
 
   const selectedDept = departments.find((d) => d.id === form.departmentId);
-  const roleGuidance = ROLE_GUIDANCE[form.role];
+  const roleGuidance = {
+    title: dyn(tt)(ROLE_GUIDANCE[form.role].title),
+    summary: dyn(tt)(ROLE_GUIDANCE[form.role].summary),
+    actions: ROLE_GUIDANCE[form.role].actions.map((a) => dyn(tt)(a)),
+  };
 
   const handleField = (field: keyof UserFormValues, value: string) => {
     setForm((f) => ({ ...f, [field]: value }));

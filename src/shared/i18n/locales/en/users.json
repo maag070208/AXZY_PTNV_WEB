@@ -47,7 +47,68 @@
     "updated": "User updated successfully",
     "errorCreate": "Error creating user",
     "errorUpdate": "Error updating user",
-    "errorMessages": "Fix the highlighted fields"
+    "errorMessages": "Fix the highlighted fields",
+    "errorLoad": "Could not load the user",
+    "heading": "System account",
+    "headingEdit": "Update the profile",
+    "headingNew": "Create a new user",
+    "headingHint": "Set identity, access and organizational location.",
+    "sectionPersonal": "Personal information",
+    "sectionPersonalHint": "User-visible data",
+    "name": "Name",
+    "employeeNo": "Employee No.",
+    "email": "Email",
+    "position": "Position",
+    "sectionAccess": "Access and permissions",
+    "sectionAccessHint": "Credentials and access level",
+    "username": "Username",
+    "role": "Role",
+    "password": "Password",
+    "passwordPlaceholder": "Leave blank to keep unchanged",
+    "sectionOrganization": "Organization",
+    "sectionOrganizationHint": "Area where they work",
+    "department": "Department",
+    "subarea": "Subarea",
+    "roleGuide": "Role guide",
+    "passwordEditHint": "When editing, leave the password blank to keep it.",
+    "roles": {
+      "ADMIN": {
+        "title": "System Administrator",
+        "summary": "Full control of catalogs, users, devices, tickets and reports.",
+        "actions": [
+          "Configures permissions and users",
+          "Manages all departments",
+          "Can complete and close tasks"
+        ]
+      },
+      "GERENTE": {
+        "title": "Manager",
+        "summary": "Oversees tickets and tasks in their department.",
+        "actions": [
+          "Creates and manages tickets",
+          "Assigns owners and tasks",
+          "Can complete tasks and close tickets"
+        ]
+      },
+      "JEFE_DE_AREA": {
+        "title": "Area head",
+        "summary": "Provides operational follow-up on their department's tickets.",
+        "actions": [
+          "Creates tickets",
+          "Can generate tasks from their tickets",
+          "Moves assigned tasks to review"
+        ]
+      },
+      "EMPLEADO": {
+        "title": "Employee",
+        "summary": "Carries out assigned tasks and reports progress.",
+        "actions": [
+          "Does not create tickets",
+          "Only sees tickets with assigned tasks",
+          "Moves their tasks to review"
+        ]
+      }
+    }
   },
   "history": {
     "title": "History",
@@ -73,5 +134,17 @@
     "errorImport": "Error importing users",
     "errorNoFile": "Select an Excel file first",
     "goToList": "Go to Users"
+  },
+  "table": {
+    "username": "Username",
+    "name": "Name",
+    "role": "Role",
+    "employeeNo": "Emp. No",
+    "employeeNoFull": "Employee No.",
+    "department": "Dept",
+    "departmentFull": "Department",
+    "subarea": "Subarea",
+    "position": "Position",
+    "editEmployee": "Edit employee"
   }
 }

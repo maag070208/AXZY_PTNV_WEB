@@ -130,10 +130,10 @@ export default function UsersListPage() {
           <ITInput
             name="newPassword"
             type="password"
-            label="Nueva contraseña"
+            label={tt("list.passwordLabel")}
             value={fx.newPassword}
             onChange={(e) => fx.setNewPassword(e.target.value)}
-            placeholder="Ingresa la nueva contraseña"
+            placeholder={tt("list.passwordPlaceholder")}
             autoFocus
           />
           <ITFlex justify="end" gap={2}>
