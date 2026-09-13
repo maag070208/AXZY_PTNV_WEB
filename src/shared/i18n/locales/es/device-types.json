@@ -1,3 +1,41 @@
 {
-  "placeholder": ""
+  "list": {
+    "title": "Tipos de dispositivo",
+    "description": "Cada tipo tiene su propio consecutivo (prefijo)",
+    "newType": "Nuevo tipo",
+    "breadcrumbDevices": "Dispositivos",
+    "breadcrumbList": "Tipos",
+    "colTipo": "TIPO",
+    "colFolio": "SIGUIENTE FOLIO",
+    "colCount": "DISPOSITIVOS",
+    "inactive": "Inactivo",
+    "code": "Código",
+    "edit": "Editar"
+  },
+  "form": {
+    "titleEdit": "Editar tipo",
+    "titleNew": "Nuevo tipo de dispositivo",
+    "breadcrumbDevices": "Dispositivos",
+    "breadcrumbList": "Tipos",
+    "breadcrumbNew": "Nuevo tipo",
+    "breadcrumbEdit": "Editar tipo",
+    "code": "Código interno",
+    "name": "Nombre",
+    "prefix": "Prefijo (consecutivo)",
+    "prefixHint": "Ej: LPT-0001, LPT-0002…",
+    "fieldsSectionTitle": "Campos de este tipo",
+    "fieldsSectionHint": "Define qué datos aparecen al dar de alta cada dispositivo y cuáles son obligatorios.",
+    "colField": "Campo",
+    "colShow": "Mostrar",
+    "colRequired": "Obligatorio",
+    "fieldLabels": {
+      "numeroSerie": "Número de serie",
+      "nombreEquipo": "Nombre de equipo",
+      "ip": "Dirección IP",
+      "macAddress": "MAC Address",
+      "sistemaOp": "Sistema operativo",
+      "ram": "RAM",
+      "almacenamiento": "Almacenamiento"
+    }
+  }
 }

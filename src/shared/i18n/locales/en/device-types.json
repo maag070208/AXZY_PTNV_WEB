@@ -1,3 +1,41 @@
 {
-  "placeholder": ""
+  "list": {
+    "title": "Device types",
+    "description": "Each type has its own consecutive (prefix)",
+    "newType": "New type",
+    "breadcrumbDevices": "Devices",
+    "breadcrumbList": "Types",
+    "colTipo": "TYPE",
+    "colFolio": "NEXT FOLIO",
+    "colCount": "DEVICES",
+    "inactive": "Inactive",
+    "code": "Code",
+    "edit": "Edit"
+  },
+  "form": {
+    "titleEdit": "Edit type",
+    "titleNew": "New device type",
+    "breadcrumbDevices": "Devices",
+    "breadcrumbList": "Types",
+    "breadcrumbNew": "New type",
+    "breadcrumbEdit": "Edit type",
+    "code": "Internal code",
+    "name": "Name",
+    "prefix": "Prefix (consecutive)",
+    "prefixHint": "E.g. LPT-0001, LPT-0002…",
+    "fieldsSectionTitle": "Fields for this type",
+    "fieldsSectionHint": "Define which data appears when registering a device and which are required.",
+    "colField": "Field",
+    "colShow": "Show",
+    "colRequired": "Required",
+    "fieldLabels": {
+      "numeroSerie": "Serial number",
+      "nombreEquipo": "Equipment name",
+      "ip": "IP address",
+      "macAddress": "MAC Address",
+      "sistemaOp": "Operating system",
+      "ram": "RAM",
+      "almacenamiento": "Storage"
+    }
+  }
 }

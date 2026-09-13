@@ -10,6 +10,7 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaSave } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import {
   useDeviceTypeForm,
   DeviceTypeFieldsTable,
@@ -17,17 +18,18 @@ import {
 
 export default function DeviceTypeFormPage() {
   const fx = useDeviceTypeForm();
+  const { t: tt } = useTranslation(["device-types", "common"]);
   const { isEdit, form, setForm } = fx;
 
   if (fx.loading) {
     return (
       <ITPage
-        title="Tipos de dispositivo"
+        title={tt("list.title")}
         loading
         backAction={() => fx.navigate(-1)}
         breadcrumbs={[
-          { label: "Dispositivos", onClick: () => fx.navigate("/dispositivos") },
-          { label: "Tipos" },
+          { label: tt("form.breadcrumbDevices"), onClick: () => fx.navigate("/dispositivos") },
+          { label: tt("form.breadcrumbList") },
         ]}
       >
         <ITFlex justify="center" align="center">
@@ -40,7 +42,7 @@ export default function DeviceTypeFormPage() {
   const actions = (
     <ITFlex gap={2}>
       <ITButton variant="outlined" onClick={() => fx.navigate(-1)}>
-        Cancelar
+        {tt("common:actions.cancel")}
       </ITButton>
       <ITButton
         variant="filled"
@@ -50,7 +52,7 @@ export default function DeviceTypeFormPage() {
       >
         <ITFlex align="center" gap={1}>
           <FaSave size={12} />
-          <ITText className="font-bold text-[11px]">Guardar</ITText>
+          <ITText className="font-bold text-[11px]">{tt("common:actions.save")}</ITText>
         </ITFlex>
       </ITButton>
     </ITFlex>
@@ -58,11 +60,11 @@ export default function DeviceTypeFormPage() {
 
   return (
     <ITPage
-      title={isEdit ? "Editar tipo" : "Nuevo tipo de dispositivo"}
+      title={isEdit ? tt("form.titleEdit") : tt("form.titleNew")}
       backAction={() => fx.navigate(-1)}
       breadcrumbs={[
-        { label: "Dispositivos", onClick: () => fx.navigate("/dispositivos") },
-        { label: isEdit ? "Editar tipo" : "Nuevo tipo" },
+        { label: tt("form.breadcrumbDevices"), onClick: () => fx.navigate("/dispositivos") },
+        { label: isEdit ? tt("form.breadcrumbEdit") : tt("form.breadcrumbNew") },
       ]}
       actions={actions}
       maxWidth="7xl"
@@ -81,7 +83,7 @@ export default function DeviceTypeFormPage() {
         <ITStack direction="column" spacing={4}>
           <ITInput
             name="code"
-            label="Código interno"
+            label={tt("form.code")}
             value={form.code}
             onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
             placeholder="LAPTOP"
@@ -89,14 +91,14 @@ export default function DeviceTypeFormPage() {
           />
           <ITInput
             name="name"
-            label="Nombre"
+            label={tt("form.name")}
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Laptop"
           />
           <ITInput
             name="prefix"
-            label="Prefijo (consecutivo)"
+            label={tt("form.prefix")}
             value={form.prefix}
             onChange={(e) =>
               setForm((f) => ({ ...f, prefix: e.target.value.toUpperCase() }))
@@ -104,7 +106,7 @@ export default function DeviceTypeFormPage() {
             placeholder="LPT"
           />
           <ITText className="text-[10px] font-bold text-slate-400 uppercase tracking-widest -mt-2">
-            Ej: LPT-0001, LPT-0002…
+            {tt("form.prefixHint")}
           </ITText>
         </ITStack>
       </ITCard>
@@ -112,11 +114,10 @@ export default function DeviceTypeFormPage() {
       <ITCard className="p-6 mt-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
         <ITFlex direction="column" gap={1} className="mb-4">
           <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">
-            Campos de este tipo
+            {tt("form.fieldsSectionTitle")}
           </ITText>
           <ITText className="text-[11px] text-slate-400">
-            Define qué datos aparecen al dar de alta cada dispositivo y cuáles
-            son obligatorios.
+            {tt("form.fieldsSectionHint")}
           </ITText>
         </ITFlex>
         <DeviceTypeFieldsTable fx={fx} />

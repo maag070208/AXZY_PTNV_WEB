@@ -10,23 +10,25 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { FaPlus, FaTag } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import {
   useDeviceTypesList,
   deviceTypesColumns,
 } from "@features/device-type/device-types-list";
 
 export default function DeviceTypesListPage() {
+  const { t: tt } = useTranslation(["device-types"]);
   const { navigate, fetchTableData } = useDeviceTypesList();
   const columns = deviceTypesColumns(navigate);
 
   return (
     <ITPage
-      title="Tipos de dispositivo"
-      description="Cada tipo tiene su propio consecutivo (prefijo)"
+      title={tt("list.title")}
+      description={tt("list.description")}
       backAction={() => navigate(-1)}
       breadcrumbs={[
-        { label: "Dispositivos", onClick: () => navigate("/dispositivos") },
-        { label: "Tipos" },
+        { label: tt("list.breadcrumbDevices"), onClick: () => navigate("/dispositivos") },
+        { label: tt("list.breadcrumbList") },
       ]}
       actions={
         <ITButton
@@ -36,7 +38,7 @@ export default function DeviceTypesListPage() {
         >
           <ITFlex align="center" gap={1}>
             <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">Nuevo tipo</ITText>
+            <ITText className="font-bold text-[11px]">{tt("list.newType")}</ITText>
           </ITFlex>
         </ITButton>
       }

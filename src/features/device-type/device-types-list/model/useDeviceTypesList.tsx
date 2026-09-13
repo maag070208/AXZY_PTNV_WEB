@@ -11,6 +11,7 @@ import {
   deviceTypeApi as deviceTypesApi,
   type DeviceType,
 } from "@entities/device-type";
+import { i18n } from "@shared/i18n";
 
 export const useDeviceTypesList = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
   {
     type: "string",
     key: "prefix",
-    label: "TIPO",
+    label: i18n.t("device-types:list.colTipo"),
     sortable: false,
     filter: true,
     render: (t: DeviceType) => (
@@ -66,12 +67,12 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
                 as="span"
                 className="text-[9px] font-bold uppercase text-rose-500 bg-rose-50 border border-rose-200 rounded-full px-2 py-0.5 leading-none"
               >
-                Inactivo
+                {i18n.t("device-types:list.inactive")}
               </ITText>
             )}
           </ITFlex>
           <ITText className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            Código {t.code}
+            {i18n.t("device-types:list.code")} {t.code}
           </ITText>
         </ITFlex>
       </ITFlex>
@@ -80,7 +81,7 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
   {
     type: "string",
     key: "next",
-    label: "SIGUIENTE FOLIO",
+    label: i18n.t("device-types:list.colFolio"),
     render: (t: DeviceType) => (
       <ITFlex
         align="center"
@@ -96,7 +97,7 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
   {
     type: "number",
     key: "count",
-    label: "DISPOSITIVOS",
+    label: i18n.t("device-types:list.colCount"),
     render: (t: DeviceType) => (
       <ITFlex align="center" gap={0.5}>
         <FaMicrochip size={11} className="text-slate-400" />
@@ -117,7 +118,7 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
         size="small"
         color="secondary"
         onClick={() => navigate(`/dispositivos/tipos/${t.id}/editar`)}
-        title="Editar"
+        title={i18n.t("device-types:list.edit")}
       >
         <FaPen size={12} />
       </ITButton>

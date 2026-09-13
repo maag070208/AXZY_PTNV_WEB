@@ -1,18 +1,7 @@
 import {
   DEVICE_FIELD_KEYS,
   type DeviceFieldConfig,
-  type DeviceFieldKey,
 } from "@entities/device-type";
-
-export const FIELD_LABELS: Record<DeviceFieldKey, string> = {
-  numeroSerie: "Número de serie",
-  nombreEquipo: "Nombre de equipo",
-  ip: "Dirección IP",
-  macAddress: "MAC Address",
-  sistemaOp: "Sistema operativo",
-  ram: "RAM",
-  almacenamiento: "Almacenamiento",
-};
 
 export const emptyFieldConfig = (): DeviceFieldConfig =>
   DEVICE_FIELD_KEYS.reduce((config, key) => {
