@@ -15,7 +15,7 @@ export default function DeviceImportPage() {
   return (
     <ITPage
       title={tt("device:list.importButton")}
-      description='Sube un archivo con columnas "Modelo", "Descripción" y "Cantidad". Define tipo, marca y datos por unidad antes de confirmar la carga.'
+      description={tt("device:import.description")}
       backAction={() => fx.navigate(-1)}
       breadcrumbs={[
         {
@@ -34,7 +34,7 @@ export default function DeviceImportPage() {
 
       {fx.warnings.length > 0 && (
         <ITAlert variant="warning">
-          <ITText className="font-bold">Filas con observaciones:</ITText>
+          <ITText className="font-bold">{tt("device:import.warningsTitle")}</ITText>
           <ul className="mt-1 list-disc pl-5">
             {fx.warnings.map((warning) => (
               <li key={warning}>{warning}</li>
@@ -45,16 +45,14 @@ export default function DeviceImportPage() {
 
       {fx.unknownTypes.length > 0 && (
         <ITAlert variant="error">
-          <ITText className="font-bold">Tipos no registrados:</ITText>{" "}
-          {fx.unknownTypes.join(", ")}. Da de alta esos tipos en Dispositivos →
-          Tipos antes de continuar.
+          <ITText className="font-bold">{tt("device:import.unknownTypesTitle")}</ITText>{" "}
+          {fx.unknownTypes.join(", ")}. {tt("device:import.unknownTypesHint")}
         </ITAlert>
       )}
 
       {fx.typesLoaded && fx.deviceTypes.length === 0 && (
         <ITAlert variant="warning">
-          No hay tipos de dispositivo disponibles. Créalo en Dispositivos →
-          Tipos antes de cargar el Excel.
+          {tt("device:import.noTypesWarning")}
         </ITAlert>
       )}
 

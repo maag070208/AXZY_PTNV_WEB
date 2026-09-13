@@ -1,25 +1,31 @@
 import { ITBadget, ITButton, ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaExclamationTriangle, FaLaptop } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { UseDeviceImport } from "../model/useDeviceImport";
 
 export default function ImportResultsCard({ fx }: { fx: UseDeviceImport }) {
+  const { t: tt } = useTranslation(["device"]);
   if (!fx.results) return null;
   return (
     <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px] mt-6">
       <ITFlex align="center" gap={2} className="mb-4">
         <FaCheckCircle size={14} className="text-emerald-600" />
         <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          Resultado de la carga
+          {tt("import.resultsTitle")}
         </ITText>
       </ITFlex>
 
       <ITFlex gap={4} wrap="wrap" className="mb-4">
         <ITBadget color="success" size="small">
-          {`${fx.results.filter((r) => r.ok).length} procesado(s) correctamente`}
+          {tt("import.resultsOk", {
+            count: fx.results.filter((r) => r.ok).length,
+          })}
         </ITBadget>
         {fx.results.some((r) => !r.ok) && (
           <ITBadget color="warning" size="small">
-            {`${fx.results.filter((r) => !r.ok).length} con error / omitido(s)`}
+            {tt("import.resultsError", {
+              count: fx.results.filter((r) => !r.ok).length,
+            })}
           </ITBadget>
         )}
       </ITFlex>
@@ -57,7 +63,7 @@ export default function ImportResultsCard({ fx }: { fx: UseDeviceImport }) {
         >
           <ITFlex align="center" gap={1}>
             <FaBoxOpen size={12} />
-            <ITText className="text-[11px] font-bold">Ver tipos</ITText>
+            <ITText className="text-[11px] font-bold">{tt("import.viewTypes")}</ITText>
           </ITFlex>
         </ITButton>
         <ITButton
@@ -67,7 +73,7 @@ export default function ImportResultsCard({ fx }: { fx: UseDeviceImport }) {
         >
           <ITFlex align="center" gap={1}>
             <FaLaptop size={12} />
-            <ITText className="text-[11px] font-bold">Ver dispositivos</ITText>
+            <ITText className="text-[11px] font-bold">{tt("import.viewDevices")}</ITText>
           </ITFlex>
         </ITButton>
       </ITFlex>

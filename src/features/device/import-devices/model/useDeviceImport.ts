@@ -6,6 +6,7 @@ import {
   type DeviceType,
 } from "@entities/device-type";
 import { deviceApi as devicesApi } from "@entities/device";
+import { i18n } from "@shared/i18n";
 
 export const GENERIC_TYPE_CODE = "GENERICO";
 
@@ -214,10 +215,9 @@ export const useDeviceImport = () => {
 
     const outcomes: RowResult[] = invalid.map((r) => ({
       key: r.key,
-      modelo: r.modelo || "(sin modelo)",
+      modelo: r.modelo || i18n.t("device:import.noModel"),
       ok: false,
-      detail:
-        "Fila incompleta — se omitió (falta modelo, descripción, marca o cantidad).",
+      detail: i18n.t("device:import.rowIncomplete"),
     }));
 
     for (let i = 0; i < toProcess.length; i++) {

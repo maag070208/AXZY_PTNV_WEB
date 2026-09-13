@@ -1,8 +1,10 @@
 import { ITButton, ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaFileExcel } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { UseDeviceImport } from "../model/useDeviceImport";
 
 export default function ImportDropCard({ fx }: { fx: UseDeviceImport }) {
+  const { t: tt } = useTranslation(["device"]);
   return (
     <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px] mb-6">
       <ITFlex direction="column" gap={4}>
@@ -25,32 +27,32 @@ export default function ImportDropCard({ fx }: { fx: UseDeviceImport }) {
           <ITFlex align="center" gap={1}>
             <FaFileExcel size={12} />
             <ITText className="text-[11px] font-bold">
-              {fx.parsing ? "Leyendo archivo…" : "Elegir Excel"}
+              {fx.parsing ? tt("import.reading") : tt("import.chooseFile")}
             </ITText>
           </ITFlex>
         </ITButton>
         {fx.file && (
           <ITText className="text-[11px] font-bold text-slate-500">
-            Archivo: {fx.file.name}
+            {tt("import.file", { name: fx.file.name })}
           </ITText>
         )}
         <ITCard className="border border-blue-100 bg-blue-50/50 p-4 rounded-2xl">
           <ITFlex direction="column" gap={2}>
             <ITText className="text-[11px] font-black uppercase tracking-widest text-blue-800">
-              Schema esperado
+              {tt("import.schemaTitle")}
             </ITText>
             <ITText className="text-[11px] text-slate-600">
-              La primera hoja debe tener estas columnas, en cualquier orden:
+              {tt("import.schemaHint")}
             </ITText>
             <div className="overflow-x-auto rounded-xl border border-blue-100 bg-white">
               <table className="w-full min-w-[520px] border-collapse text-left">
                 <thead className="bg-blue-50 text-[10px] font-black uppercase tracking-wider text-blue-800">
                   <tr>
-                    <th className="px-3 py-2">Modelo *</th>
-                    <th className="px-3 py-2">Descripción *</th>
-                    <th className="px-3 py-2">Cantidad *</th>
-                    <th className="px-3 py-2">Marca</th>
-                    <th className="px-3 py-2">Tipo</th>
+                    <th className="px-3 py-2">{tt("import.colModelo")}</th>
+                    <th className="px-3 py-2">{tt("import.colDescripcion")}</th>
+                    <th className="px-3 py-2">{tt("import.colCantidad")}</th>
+                    <th className="px-3 py-2">{tt("import.colMarca")}</th>
+                    <th className="px-3 py-2">{tt("import.colTipo")}</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11px] text-slate-600">
@@ -65,9 +67,7 @@ export default function ImportDropCard({ fx }: { fx: UseDeviceImport }) {
               </table>
             </div>
             <ITText className="text-[10px] text-slate-500">
-              Se aceptan `DESCRIPCIÓN` con acento. También puedes incluir
-              `Marca` y `Tipo`; el tipo debe coincidir con código o nombre
-              existente.
+              {tt("import.schemaNote")}
             </ITText>
           </ITFlex>
         </ITCard>

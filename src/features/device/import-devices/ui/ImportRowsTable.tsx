@@ -1,6 +1,7 @@
 import { ITButton, ITCard, ITFlex, ITInput, ITSelect, ITText } from "@axzydev/axzy_ui_system";
 import { FaTrash, FaUpload } from "react-icons/fa";
 import { Fragment } from "react";
+import { useTranslation } from "react-i18next";
 import type { DeviceFieldKey } from "@entities/device-type";
 import {
   SHARED_FIELDS,
@@ -9,13 +10,17 @@ import {
 } from "../model/useDeviceImport";
 
 export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
+  const { t: tt } = useTranslation(["device"]);
   return (
     <>
       <ITCard className="p-4 mb-4 border border-slate-100 rounded-2xl bg-slate-50/60">
         <ITFlex justify="between" align="end" gap={4} wrap="wrap">
           <ITText className="text-[11px] font-bold text-slate-500">
-            {fx.rows.length} fila(s) leída(s) · {fx.validCount} lista(s) ·{" "}
-            {fx.unitTotal} unidad(es)
+            {tt("import.rowsSummary", {
+              count: fx.rows.length,
+              valid: fx.validCount,
+              units: fx.unitTotal,
+            })}
           </ITText>
           <ITButton
             variant="filled"
@@ -31,8 +36,11 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
               <FaUpload size={12} />
               <ITText className="text-[11px] font-bold">
                 {fx.committing
-                  ? `Cargando ${fx.progress?.done ?? 0}/${fx.progress?.total ?? 0}…`
-                  : `Confirmar carga (${fx.validCount})`}
+                  ? tt("import.loading", {
+                      done: fx.progress?.done ?? 0,
+                      total: fx.progress?.total ?? 0,
+                    })
+                  : tt("import.confirming", { count: fx.validCount })}
               </ITText>
             </ITFlex>
           </ITButton>
@@ -44,12 +52,12 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
           <thead className="bg-slate-50">
             <tr className="text-[10px] font-black uppercase tracking-wider text-slate-500">
               <th className="px-3 py-3 w-12">#</th>
-              <th className="px-3 py-3 min-w-[180px]">Tipo *</th>
-              <th className="px-3 py-3">Modelo *</th>
-              <th className="px-3 py-3 min-w-[260px]">Descripción *</th>
-              <th className="px-3 py-3 w-24">Cantidad *</th>
-              <th className="px-3 py-3 w-44">Marca *</th>
-              <th className="px-3 py-3 w-24">Estado</th>
+              <th className="px-3 py-3 min-w-[180px]">{tt("import.thTipo")}</th>
+              <th className="px-3 py-3">{tt("import.thModelo")}</th>
+              <th className="px-3 py-3 min-w-[260px]">{tt("import.thDescripcion")}</th>
+              <th className="px-3 py-3 w-24">{tt("import.thCantidad")}</th>
+              <th className="px-3 py-3 w-44">{tt("import.thMarca")}</th>
+              <th className="px-3 py-3 w-24">{tt("import.thEstado")}</th>
               <th className="px-3 py-3 w-14" />
             </tr>
           </thead>
@@ -67,7 +75,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <td className="px-2 py-2">
                       <ITSelect
                         name={`tipo-${r.key}`}
-                        aria-label="Tipo de dispositivo"
+                        aria-label={tt("import.ariaTipo")}
                         options={fx.deviceTypes.map((t) => ({
                           value: t.id,
                           label: `${t.code} · ${t.name}`,
@@ -82,7 +90,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <td className="px-2 py-2">
                       <ITInput
                         name={`modelo-${r.key}`}
-                        aria-label="Modelo"
+                        aria-label={tt("import.ariaModelo")}
                         value={r.modelo}
                         onChange={(e) =>
                           fx.updateRow(r.key, { modelo: e.target.value })
@@ -92,7 +100,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <td className="px-2 py-2">
                       <ITInput
                         name={`descripcion-${r.key}`}
-                        aria-label="Descripción"
+                        aria-label={tt("import.ariaDescripcion")}
                         value={r.descripcion}
                         onChange={(e) =>
                           fx.updateRow(r.key, { descripcion: e.target.value })
@@ -102,7 +110,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <td className="px-2 py-2">
                       <ITInput
                         name={`cant-${r.key}`}
-                        aria-label="Cantidad"
+                        aria-label={tt("import.ariaCantidad")}
                         type="number"
                         min={1}
                         max={500}
@@ -115,7 +123,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <td className="px-2 py-2">
                       <ITInput
                         name={`marca-${r.key}`}
-                        aria-label="Marca"
+                        aria-label={tt("import.ariaMarca")}
                         value={r.marca}
                         onChange={(e) =>
                           fx.updateRow(r.key, { marca: e.target.value })
@@ -126,7 +134,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <td
                       className={`px-3 py-2 text-[10px] font-bold ${valid ? "text-emerald-600" : "text-amber-600"}`}
                     >
-                      {valid ? "Lista" : "Incompleta"}
+                      {valid ? tt("import.statusReady") : tt("import.statusIncomplete")}
                     </td>
                     <td className="px-2 py-2">
                       <ITButton
@@ -134,7 +142,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                         size="small"
                         color="danger"
                         onClick={() => fx.removeRow(r.key)}
-                        title="Quitar esta fila"
+                        title={tt("import.removeRowTitle")}
                       >
                         <FaTrash size={11} />
                       </ITButton>
@@ -146,7 +154,9 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <tr className="border-t border-slate-100 bg-slate-50/70">
                       <td colSpan={8} className="px-5 py-3">
                         <ITText className="mb-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
-                          Datos configurables · {r.modelo || "sin modelo"}
+                          {tt("import.configurable", {
+                            modelo: r.modelo || tt("import.sinModelo"),
+                          })}
                         </ITText>
                         {SHARED_FIELDS.some((field) =>
                           fx.fieldEnabled(r, field)
@@ -156,7 +166,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                               <div className="w-full md:w-56">
                                 <ITInput
                                   name={`so-${r.key}`}
-                                  label="Sistema operativo"
+                                  label={tt("import.labelSistemaOp")}
                                   value={r.sistemaOp}
                                   onChange={(e) =>
                                     fx.updateRow(r.key, {
@@ -170,7 +180,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                               <div className="w-full md:w-40">
                                 <ITInput
                                   name={`ram-${r.key}`}
-                                  label="RAM"
+                                  label={tt("import.labelRam")}
                                   value={r.ram}
                                   onChange={(e) =>
                                     fx.updateRow(r.key, {
@@ -184,7 +194,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                               <div className="w-full md:w-56">
                                 <ITInput
                                   name={`storage-${r.key}`}
-                                  label="Almacenamiento"
+                                  label={tt("import.labelAlmacenamiento")}
                                   value={r.almacenamiento}
                                   onChange={(e) =>
                                     fx.updateRow(r.key, {
@@ -206,14 +216,14 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                                   <th className="px-3 py-2 w-12">#</th>
                                   {fx.fieldEnabled(r, "numeroSerie") && (
                                     <th className="px-3 py-2">
-                                      Número de serie
+                                      {tt("import.thNumeroSerie")}
                                     </th>
                                   )}
                                   {fx.fieldEnabled(r, "ip") && (
-                                    <th className="px-3 py-2">IP</th>
+                                    <th className="px-3 py-2">{tt("import.thIp")}</th>
                                   )}
                                   {fx.fieldEnabled(r, "macAddress") && (
-                                    <th className="px-3 py-2">MAC</th>
+                                    <th className="px-3 py-2">{tt("import.thMac")}</th>
                                   )}
                                 </tr>
                               </thead>
@@ -230,7 +240,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                                       <td className="px-2 py-2">
                                         <ITInput
                                           name={`serie-${r.key}-${unitIndex}`}
-                                          aria-label={`Número de serie ${unitIndex + 1}`}
+                                          aria-label={`${tt("import.thNumeroSerie")} ${unitIndex + 1}`}
                                           value={unit.numeroSerie}
                                           onChange={(e) =>
                                             fx.updateUnit(r.key, unitIndex, {
@@ -244,7 +254,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                                       <td className="px-2 py-2">
                                         <ITInput
                                           name={`ip-${r.key}-${unitIndex}`}
-                                          aria-label={`IP ${unitIndex + 1}`}
+                                          aria-label={`${tt("import.thIp")} ${unitIndex + 1}`}
                                           value={unit.ip}
                                           onChange={(e) =>
                                             fx.updateUnit(r.key, unitIndex, {
@@ -259,7 +269,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                                       <td className="px-2 py-2">
                                         <ITInput
                                           name={`mac-${r.key}-${unitIndex}`}
-                                          aria-label={`MAC ${unitIndex + 1}`}
+                                          aria-label={`${tt("import.thMac")} ${unitIndex + 1}`}
                                           value={unit.macAddress}
                                           onChange={(e) =>
                                             fx.updateUnit(r.key, unitIndex, {
