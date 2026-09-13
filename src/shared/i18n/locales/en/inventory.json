@@ -128,5 +128,19 @@
     "prestamoFields": "Enter the person's name and return date",
     "selectCondition": "Select the equipment condition",
     "malasAction": "Select an action for equipment in bad condition"
+  },
+  "report": {
+    "title": "Inventory Report",
+    "summaryLocations": "Locations",
+    "summaryDevices": "Devices in location",
+    "summaryMovements": "Movements",
+    "kardex": "Kardex — Movements History",
+    "colDate": "Date",
+    "colType": "Type",
+    "colDevice": "Device",
+    "colLocation": "Location",
+    "colUser": "User",
+    "devicesUnit": "dev.",
+    "note": "Puerto Nuevo Hotel y Villas — Inventory System"
   }
 }

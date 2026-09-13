@@ -128,5 +128,19 @@
     "prestamoFields": "Ingresa el nombre de la persona y fecha de retorno",
     "selectCondition": "Selecciona la condición del equipo",
     "malasAction": "Selecciona una acción para equipo en malas condiciones"
+  },
+  "report": {
+    "title": "Reporte de Inventario",
+    "summaryLocations": "Ubicaciones",
+    "summaryDevices": "Dispositivos en ubicación",
+    "summaryMovements": "Movimientos",
+    "kardex": "Kardex — Historial de Movimientos",
+    "colDate": "Fecha",
+    "colType": "Tipo",
+    "colDevice": "Dispositivo",
+    "colLocation": "Ubicación",
+    "colUser": "Usuario",
+    "devicesUnit": "disp.",
+    "note": "Puerto Nuevo Hotel y Villas — Sistema de Inventario"
   }
 }

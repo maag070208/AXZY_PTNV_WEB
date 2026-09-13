@@ -1,4 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { useTranslation } from "react-i18next";
 import type { InventoryMovement, MovementType } from "@entities/inventory-movement";
 import type { Location } from "@entities/location";
 import { formatLocation } from "@entities/location";
@@ -18,15 +19,6 @@ const TIPO_COLORS: Record<MovementType, string> = {
   BAJA: PDF_COLORS.danger,
   PRESTAMO: "#a855f7",
   DEVOLUCION: "#14b8a6",
-};
-
-const TIPO_LABELS: Record<MovementType, string> = {
-  ENTRADA: "Entrada",
-  SALIDA: "Salida",
-  TRASLADO: "Traslado",
-  BAJA: "Baja",
-  PRESTAMO: "Asignado",
-  DEVOLUCION: "Devolución",
 };
 
 const formatDate = (dateStr: string) => {
@@ -68,6 +60,7 @@ const styles = StyleSheet.create({
 const ROWS_PER_PAGE = 25;
 
 export const InventoryPDF = ({ movements, locations }: Props) => {
+  const { t: tt } = useTranslation(["inventory"]);
   const today = formatReportDate();
   const totalDevices = locations.reduce((sum, l) => sum + (l._count?.devices ?? 0), 0);
 
@@ -77,11 +70,13 @@ export const InventoryPDF = ({ movements, locations }: Props) => {
   }
   if (pages.length === 0) pages.push([]);
 
+  const typeLabel = (tipo: MovementType) => tt(`typeLabels.${tipo}`);
+
   return (
-    <Document title="Reporte de Inventario" author="Puerto Nuevo Hotel y Villas">
+    <Document title={tt("report.title")} author="Puerto Nuevo Hotel y Villas">
       {pages.map((pageMovements, pageIdx) => (
         <Page key={pageIdx} size="LETTER" style={pdfTheme.page}>
-          <PdfLetterhead title="Reporte de Inventario" pageIndex={pageIdx} pageCount={pages.length} generatedAt={today} />
+          <PdfLetterhead title={tt("report.title")} pageIndex={pageIdx} pageCount={pages.length} generatedAt={today} />
 
           <View style={pdfTheme.content}>
             {pageIdx === 0 && (
@@ -89,15 +84,15 @@ export const InventoryPDF = ({ movements, locations }: Props) => {
                 <View style={pdfTheme.summaryRow}>
                   <View style={pdfTheme.summaryCard}>
                     <Text style={pdfTheme.summaryValue}>{locations.length}</Text>
-                    <Text style={pdfTheme.summaryLabel}>Ubicaciones</Text>
+                    <Text style={pdfTheme.summaryLabel}>{tt("report.summaryLocations")}</Text>
                   </View>
                   <View style={[pdfTheme.summaryCard, { borderTopColor: PDF_COLORS.success }]}>
                     <Text style={[pdfTheme.summaryValue, { color: PDF_COLORS.success }]}>{totalDevices}</Text>
-                    <Text style={pdfTheme.summaryLabel}>Dispositivos en ubicación</Text>
+                    <Text style={pdfTheme.summaryLabel}>{tt("report.summaryDevices")}</Text>
                   </View>
                   <View style={[pdfTheme.summaryCard, { borderTopColor: PDF_COLORS.bandAccent }]}>
                     <Text style={[pdfTheme.summaryValue, { color: PDF_COLORS.band }]}>{movements.length}</Text>
-                    <Text style={pdfTheme.summaryLabel}>Movimientos</Text>
+                    <Text style={pdfTheme.summaryLabel}>{tt("report.summaryMovements")}</Text>
                   </View>
                 </View>
 
@@ -108,7 +103,7 @@ export const InventoryPDF = ({ movements, locations }: Props) => {
                         <Text style={styles.locationName}>{formatLocation(loc)}</Text>
                         {loc.descripcion && <Text style={styles.locationDesc}>{loc.descripcion}</Text>}
                       </View>
-                      <Text style={styles.locationCount}>{loc._count?.devices ?? 0} disp.</Text>
+                      <Text style={styles.locationCount}>{loc._count?.devices ?? 0} {tt("report.devicesUnit")}</Text>
                     </View>
                   ))}
                 </View>
@@ -116,19 +111,19 @@ export const InventoryPDF = ({ movements, locations }: Props) => {
             )}
 
             <Text style={{ fontSize: 7.5, fontFamily: "Helvetica-Bold", color: PDF_COLORS.muted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>
-              Kardex — Historial de Movimientos
+              {tt("report.kardex")}
             </Text>
             <View style={pdfTheme.tableHeader}>
-              <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>Fecha</Text>
-              <Text style={{ ...pdfTheme.tableHeaderText, flex: 1.5 }}>Tipo</Text>
-              <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>Dispositivo</Text>
-              <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>Ubicación</Text>
-              <Text style={{ ...pdfTheme.tableHeaderText, flex: 1.5 }}>Usuario</Text>
+              <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>{tt("report.colDate")}</Text>
+              <Text style={{ ...pdfTheme.tableHeaderText, flex: 1.5 }}>{tt("report.colType")}</Text>
+              <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>{tt("report.colDevice")}</Text>
+              <Text style={{ ...pdfTheme.tableHeaderText, flex: 2 }}>{tt("report.colLocation")}</Text>
+              <Text style={{ ...pdfTheme.tableHeaderText, flex: 1.5 }}>{tt("report.colUser")}</Text>
             </View>
             {pageMovements.map((m, i) => (
               <View key={m.id} style={i % 2 === 1 ? pdfTheme.tableRowAlt : pdfTheme.tableRow}>
                 <Text style={{ ...pdfTheme.cellMuted, flex: 2 }}>{formatDate(m.createdAt)}</Text>
-                <Text style={{ ...pdfTheme.cellBold, flex: 1.5, color: TIPO_COLORS[m.tipo] }}>{TIPO_LABELS[m.tipo]}</Text>
+                <Text style={{ ...pdfTheme.cellBold, flex: 1.5, color: TIPO_COLORS[m.tipo] }}>{typeLabel(m.tipo)}</Text>
                 <Text style={{ ...pdfTheme.cellBold, flex: 2 }}>{m.device?.controlActivos ?? "—"}</Text>
                 <Text style={{ ...pdfTheme.cell, flex: 2 }}>{m.location ? formatLocation(m.location) : "—"}</Text>
                 <Text style={{ ...pdfTheme.cell, flex: 1.5 }}>{m.user?.name ?? "—"}</Text>
@@ -136,7 +131,7 @@ export const InventoryPDF = ({ movements, locations }: Props) => {
             ))}
           </View>
 
-          <PdfFooter pageIndex={pageIdx} pageCount={pages.length} note="Puerto Nuevo Hotel y Villas — Sistema de Inventario" />
+          <PdfFooter pageIndex={pageIdx} pageCount={pages.length} note={tt("report.note")} />
         </Page>
       ))}
     </Document>
