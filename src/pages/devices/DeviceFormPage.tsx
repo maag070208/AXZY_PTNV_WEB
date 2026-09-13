@@ -2,6 +2,7 @@ import {
   ITAlert,
   ITButton,
   ITFlex,
+  ITGrid,
   ITLoader,
   ITPage,
   ITText,
@@ -9,7 +10,11 @@ import {
 import { FaLock, FaSave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useDeviceForm, DeviceFormBody } from "@features/device/device-form";
+import {
+  useDeviceForm,
+  DeviceFormBody,
+  DeviceUnitsAside,
+} from "@features/device/device-form";
 
 export default function DeviceFormPage() {
   const { t: tt } = useTranslation(["device", "common"]);
@@ -137,9 +142,20 @@ export default function DeviceFormPage() {
         </ITAlert>
       )}
 
-      <div className="max-w-2xl">
-        <DeviceFormBody fx={fx} />
-      </div>
+      {isBatch || isLoteEdit ? (
+        <ITGrid container columns={12} spacing={5} className="items-start">
+          <ITGrid item xs={12} md={7} className="min-w-0">
+            <DeviceFormBody fx={fx} />
+          </ITGrid>
+          <ITGrid item xs={12} md={5} className="min-w-0">
+            <DeviceUnitsAside fx={fx} />
+          </ITGrid>
+        </ITGrid>
+      ) : (
+        <div className="max-w-2xl">
+          <DeviceFormBody fx={fx} />
+        </div>
+      )}
     </ITPage>
   );
 }

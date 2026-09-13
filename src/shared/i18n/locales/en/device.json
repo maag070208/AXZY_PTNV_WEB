@@ -47,6 +47,8 @@
     "brand": "Brand",
     "model": "Model",
     "area": "Area",
+    "location": "Location",
+    "locationPlaceholder": "No fixed location",
     "serialNo": "Serial No.",
     "equipmentName": "Equipment name",
     "ipAddress": "IP Address",

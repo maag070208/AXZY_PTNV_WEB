@@ -19,6 +19,7 @@ import DeviceTypeFormPage from "@pages/device-types/DeviceTypeFormPage";
 import DeviceImportPage from "@pages/devices/DeviceImportPage";
 import DepartmentsPage from "@pages/departments/DepartmentsPage";
 import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
+import LocationDetailPage from "@pages/inventory/LocationDetailPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
 import ReportesPage from "@pages/reports/ReportesPage";
 import UsersListPage from "@pages/users/UsersListPage";
@@ -69,6 +70,7 @@ export default function App() {
         <Route path="/inventario/movimientos" element={<InventoryMovementsPage />} />
         <Route path="/inventario/movimientos/nuevo" element={<NewInventoryMovementPage />} />
         <Route path="/inventario/ubicaciones" element={<LocationsPage />} />
+        <Route path="/inventario/ubicaciones/:id" element={<LocationDetailPage />} />
 
         <Route path="/departamentos" element={<DepartmentsPage />} />
         <Route path="/departamentos/:id" element={<DepartmentDetailPage />} />

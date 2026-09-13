@@ -1,20 +1,24 @@
 import { api } from "@shared/api/client";
-import type { Location } from "../model/types";
+import {
+  tableRequest,
+  type ITDataTableFetchParamsPost,
+} from "@shared/api/table";
+import type { Location, Sublugar } from "../model/types";
 
 export const locationsApi = {
-  list: () => api.get<Location[]>(`/locations`),
+  table: (params: ITDataTableFetchParamsPost) =>
+    tableRequest<Location>(`/locations/query`, params),
+  list: (includeInactive = false) =>
+    api.get<Location[]>(`/locations${includeInactive ? "?includeInactive=true" : ""}`),
   get: (id: string) => api.get<Location>(`/locations/${id}`),
-  create: (data: {
-    lugar?: string;
-    subLugar?: string;
-    numero?: string;
-    descripcion?: string;
-  }) => api.post<Location>(`/locations`, data),
-  update: (id: string, data: {
-    lugar?: string;
-    subLugar?: string;
-    numero?: string;
-    descripcion?: string;
-  }) => api.put<Location>(`/locations/${id}`, data),
-  remove: (id: string) => api.delete<{ success: boolean }>(`/locations/${id}`),
+  create: (data: { lugar: string; descripcion?: string }) =>
+    api.post<Location>(`/locations`, data),
+  update: (id: string, data: { lugar?: string; descripcion?: string; active?: boolean }) =>
+    api.put<Location>(`/locations/${id}`, data),
+  remove: (id: string) =>
+    api.delete<{ soft: boolean; data: Location }>(`/locations/${id}`),
+  addSublugar: (locationId: string, name: string) =>
+    api.post<Sublugar>(`/locations/${locationId}/sublugares`, { name }),
+  removeSublugar: (id: string) =>
+    api.delete<{ soft: boolean; data: Sublugar }>(`/locations/sublugares/${id}`),
 };

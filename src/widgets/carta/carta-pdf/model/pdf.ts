@@ -15,13 +15,18 @@ export const downloadCartaPDF = async (
   _element: HTMLElement | null,
   opts: DownloadOpcions
 ): Promise<void> => {
-  const controlActivos =
-    opts.carta.items?.[0]?.controlActivos || "SIN-ACTIVO";
-  const filename =
-    opts.filename ||
-    `${opts.consecutivo || "F-MMTO-XXXX"}_${controlActivos}.pdf`;
+  // El nombre del archivo es siempre "SIS-001" — nunca nuestro folio.
+  const filename = opts.filename || "SIS-001.pdf";
 
    
   const blob = await pdf(createElement(CartaPDF, { carta: opts.carta }) as any).toBlob();
   saveAs(blob, filename);
+};
+
+// Genera el PDF y lo abre en una pestaña nueva (sin guardarlo en disco).
+export const openCartaPDF = async (opts: DownloadOpcions): Promise<void> => {
+  const blob = await pdf(createElement(CartaPDF, { carta: opts.carta }) as any).toBlob();
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 };

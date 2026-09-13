@@ -117,6 +117,23 @@ export default function CartasTable() {
         ),
       },
       {
+        key: "asignacion",
+        label: t("table.asignacion"),
+        sortable: false,
+        render: (row: CartaResponsiva) => {
+          const esUbicacion = !!row.ubicacionId;
+          return (
+            <ITBadget
+              color={esUbicacion ? "purple" : "primary"}
+              size="small"
+              variant={esUbicacion ? "outlined" : "filled"}
+            >
+              {esUbicacion ? t("table.asignacionUbicacion") : t("table.asignacionPersonal")}
+            </ITBadget>
+          );
+        },
+      },
+      {
         key: "actions",
         label: t("table.actions"),
         type: "actions",

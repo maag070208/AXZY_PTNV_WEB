@@ -62,6 +62,7 @@ export const useCartaEditor = ({ download, onSaved }: Options) => {
           consecutivo: consecutivoFinal,
           responsable: saved.responsable ?? draft.responsable,
           encargado: saved.encargado ?? draft.encargado,
+          ubicacion: saved.ubicacion ?? draft.ubicacion,
           items:
             saved.items?.map((it: any, idx: number) => ({
               ...(draft.items[idx] ?? {}),

@@ -32,8 +32,10 @@ const defaultState = (): CartasState => ({
     fecha: new Date().toISOString(),
     numeroEmpleado: "",
     empresa: "Puerto Nuevo Hotel y Villas",
-    departamento: "Departamento de Mantenimiento",
-    deliveryBy: "Departamento de Mantenimiento",
+    departamento: "Sistemas",
+    responsableTipo: "PERSONAL",
+    ubicacionId: null,
+    deliveryBy: "Departamento de Sistemas",
     items: [emptyTICItem()],
     creadoEn: new Date().toISOString(),
   },
@@ -61,12 +63,12 @@ export const fetchCartas = createAsyncThunk<CartaResponsiva[], void>(
 export const saveCarta = createAsyncThunk(
   "cartas/save",
   async (_, { getState }) => {
-    const draft = (getState() as any).cartas.draft as CartaResponsiva;
+    const state = (getState() as any).cartas as CartasState;
+    const draft = state.draft;
     const item = draft.items[0];
     if (!item) throw new Error(i18n.t("cartas:form.errNoItem"));
 
     const input: CartaInput = {
-      consecutivo: draft.consecutivo,
       fecha: draft.fecha,
       numeroEmpleado: draft.numeroEmpleado,
       empresa: draft.empresa,
@@ -75,6 +77,7 @@ export const saveCarta = createAsyncThunk(
       deliveryBy: draft.deliveryBy,
       responsableId: draft.responsableId,
       encargadoId: draft.encargadoId,
+      ubicacionId: draft.ubicacionId ?? null,
       item: {
         descripcion: item.descripcion,
         marca: item.marca,
@@ -87,12 +90,12 @@ export const saveCarta = createAsyncThunk(
       },
     };
 
-    if (draft.id && draft.consecutivo) {
-      try {
-        return await cartasApi.update(draft.id, input);
-      } catch {
-        return await cartasApi.create(input);
-      }
+    // Solo se actualiza si la carta ya está persistida (existe en el listado).
+    // El draft.id de una carta nueva es un uuid del cliente: intentarlo en el
+    // backend daría 404 "no encontrada".
+    const isPersisted = state.list.some((c) => c.id === draft.id);
+    if (isPersisted) {
+      return await cartasApi.update(draft.id, input);
     }
     return await cartasApi.create(input);
   }
@@ -152,10 +155,6 @@ const slice = createSlice({
         (item as any)[field] = value;
         persist(state);
       }
-    },
-    setConsecutivo(state, action: PayloadAction<string>) {
-      state.draft.consecutivo = action.payload;
-      persist(state);
     },
     resetDraft(state) {
       const fresh = defaultState();
@@ -220,7 +219,6 @@ const slice = createSlice({
 export const {
   setDraftField,
   setItemField,
-  setConsecutivo,
   resetDraft,
   loadCartaIntoDraft,
   clearError,

@@ -5,6 +5,7 @@ import {
   FaChartBar,
   FaFileSignature,
   FaHouseUser,
+  FaMapMarkerAlt,
   FaTasks,
   FaTicketAlt,
   FaUserShield,
@@ -128,6 +129,17 @@ export default function PrivateRoutes() {
           icon: <FaChartBar size={14} />,
           action: () => navigate("/dispositivos"),
           isActive: active("/dispositivos"),
+        },
+      ]
+      : []),
+    ...(isAdmin
+      ? [
+        {
+          id: "ubicaciones",
+          label: tt("nav.locations"),
+          icon: <FaMapMarkerAlt size={14} />,
+          action: () => navigate("/inventario/ubicaciones"),
+          isActive: active("/inventario/ubicaciones"),
         },
       ]
       : []),

@@ -1,4 +1,5 @@
 import type { DeviceFieldConfig } from "@entities/device-type";
+import type { Location } from "@entities/location";
 
 export interface ITDeviceSummary {
   id: string;
@@ -45,8 +46,11 @@ export interface CartaResponsiva {
   empresa: string;
   departamento: string;
   deviceTypeId?: string;
+  responsableTipo?: "PERSONAL" | "UBICACION";
   responsableId?: string;
   encargadoId?: string;
+  ubicacionId?: string | null;
+  ubicacion?: Location | null;
   areaBoss?: string;
   deliveryBy: string;
   responsable?: Firmante | null;

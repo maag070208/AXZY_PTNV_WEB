@@ -1,4 +1,4 @@
-import { ITBadget, ITFlex, ITGrid, ITInput, ITSearchSelect, ITSelect, ITStack, ITText, ITDivider } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITFlex, ITGrid, ITInput, ITSearchSelect, ITSelect, ITSegmentedControl, ITStack, ITText, ITDivider } from "@axzydev/axzy_ui_system";
 import { FaNetworkWired } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,8 +10,9 @@ import {
   setItemField,
 } from "@entities/carta";
 import { usersApi, type User, type UserRole } from "@entities/user";
-import { type Device } from "@entities/device";
+import { deviceApi as devicesApi, type Device } from "@entities/device";
 import { deviceTypeApi as deviceTypesApi, type DeviceType } from "@entities/device-type";
+import { locationsApi, formatLocation, type Location } from "@entities/location";
 import type { CartaFormErrors } from "@entities/carta";
 
 interface Props {
@@ -26,12 +27,13 @@ export default function CartaForm({ errors }: Props) {
   const [empleados, setEmpleados] = useState<User[]>([]);
   const [jefes, setJefes] = useState<User[]>([]);
   const [tipos, setTipos] = useState<DeviceType[]>([]);
-  const [devices] = useState<Device[]>([]);
-  const [loadingConsecutivo, setLoadingConsecutivo] = useState(false);
+  const [devices, setDevices] = useState<Device[]>([]);
   const [selectedEmpleadoId, setSelectedEmpleadoId] = useState<string>("");
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [busyEmpleados, setBusyEmpleados] = useState(false);
   const [busyJefes, setBusyJefes] = useState(false);
+  const [busyDevices, setBusyDevices] = useState(false);
+  const [ubicaciones, setUbicaciones] = useState<Location[]>([]);
 
   const buscarEmpleados = async (q?: string) => {
     setBusyEmpleados(true);
@@ -61,10 +63,41 @@ export default function CartaForm({ errors }: Props) {
     }
   };
 
+  const buscarDispositivos = async (q?: string, typeId?: string) => {
+    const scopeTypeId = typeId ?? draft.deviceTypeId;
+    if (!scopeTypeId) {
+      setDevices([]);
+      return;
+    }
+    setBusyDevices(true);
+    try {
+      const res = await devicesApi.list({
+        typeId: scopeTypeId,
+        estado: "DISPONIBLE",
+        q: q || undefined,
+      });
+      setDevices(res.data);
+    } catch {
+      setDevices([]);
+    } finally {
+      setBusyDevices(false);
+    }
+  };
+
+  const buscarUbicaciones = async () => {
+    try {
+      const data = await locationsApi.list();
+      setUbicaciones(data);
+    } catch {
+      setUbicaciones([]);
+    }
+  };
+
   useEffect(() => {
     buscarEmpleados();
     buscarJefes();
     deviceTypesApi.list().then(setTipos).catch(() => setTipos([]));
+    buscarUbicaciones();
   }, []);
 
   const itemId = item?.id;
@@ -77,24 +110,22 @@ export default function CartaForm({ errors }: Props) {
     dispatch(setItemField({ id: itemId, field: "modelo", value: "" }));
     dispatch(setItemField({ id: itemId, field: "numeroSerie", value: "" }));
     dispatch(setItemField({ id: itemId, field: "nombreEquipo", value: "" }));
+    setSelectedDeviceId("");
+    // Recarga las unidades disponibles del tipo recién elegido — el select
+    // de "buscar dispositivo existente" está vacío hasta que este tipo tiene
+    // un valor, así que aquí es donde debe refrescarse.
+    buscarDispositivos(undefined, draft.deviceTypeId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draft.deviceTypeId, itemId, dispatch]);
 
   const handleField = (field: keyof typeof draft, value: string | number) => {
     dispatch(setDraftField({ field, value }));
   };
 
-  const handleTypeChange = async (typeId: string) => {
+  const handleTypeChange = (typeId: string) => {
+    // El folio (consecutivo) lo genera el backend al guardar — el front es
+    // agnóstico a él. Solo se registra el tipo para filtrar dispositivos.
     dispatch(setDraftField({ field: "deviceTypeId", value: typeId }));
-    if (!typeId) return;
-    setLoadingConsecutivo(true);
-    try {
-      const res = await deviceTypesApi.peekCarta(typeId);
-      dispatch(setDraftField({ field: "consecutivo", value: res.siguiente }));
-    } catch {
-      /* keep current consecutivo */
-    } finally {
-      setLoadingConsecutivo(false);
-    }
   };
 
   const handleEmpleadoSelect = (value: string | number) => {
@@ -141,6 +172,49 @@ export default function CartaForm({ errors }: Props) {
         })
       );
     }
+  };
+
+  const handleAsignacionChange = (value: string) => {
+    const tipo = value as "PERSONAL" | "UBICACION";
+    dispatch(setDraftField({ field: "responsableTipo", value: tipo }));
+    if (tipo === "UBICACION") {
+      // La carta se asigna a una ubicación: se descartan los datos del empleado.
+      setSelectedEmpleadoId("");
+      dispatch(setDraftField({ field: "responsableId", value: null }));
+      dispatch(setDraftField({ field: "responsable", value: null }));
+      dispatch(setDraftField({ field: "numeroEmpleado", value: "" }));
+    } else {
+      dispatch(setDraftField({ field: "ubicacionId", value: null }));
+      dispatch(setDraftField({ field: "ubicacion", value: null }));
+    }
+  };
+
+  const handleUbicacionSelect = (value: string | number) => {
+    const loc = ubicaciones.find((l) => l.id === String(value));
+    if (!loc) {
+      dispatch(setDraftField({ field: "ubicacionId", value: null }));
+      dispatch(setDraftField({ field: "ubicacion", value: null }));
+      return;
+    }
+    dispatch(setDraftField({ field: "ubicacionId", value: loc.id }));
+    dispatch(
+      setDraftField({
+        field: "ubicacion",
+        value: {
+          id: loc.id,
+          lugar: loc.lugar,
+          descripcion: loc.descripcion,
+        },
+      })
+    );
+    // El departamento se autocompleta con la ubicación para que la barra del
+    // PDF muestre, por ejemplo, "Carta responsiva del Departamento de RECEPCION".
+    dispatch(
+      setDraftField({
+        field: "departamento",
+        value: loc.lugar || loc.descripcion || "",
+      })
+    );
   };
 
   const handleEncargadoSelect = (value: string | number) => {
@@ -257,6 +331,15 @@ export default function CartaForm({ errors }: Props) {
     ? tt("form.devicePlaceholderActive")
     : tt("form.devicePlaceholderFirst");
 
+  const esUbicacion =
+    draft.responsableTipo === "UBICACION" || Boolean(draft.ubicacionId);
+
+  const ubicacionOptions = ubicaciones.map((l) => ({
+    value: l.id,
+    label: formatLocation(l),
+    sublabel: l.descripcion ?? undefined,
+  }));
+
   return (
     <ITStack direction="column" spacing={5}>
       {/* ── Encabezado ── */}
@@ -274,19 +357,39 @@ export default function CartaForm({ errors }: Props) {
               onChange={(e) => handleTypeChange(e.target.value)}
             />
           </ITGrid>
-          {draft.deviceTypeId && (
-            <ITGrid item xs={12} md={6}>
-              <ITInput
-                name="consecutivo"
-                label={tt("form.folio")}
-                value={draft.consecutivo}
-                onChange={(e) => handleField("consecutivo", e.target.value)}
-                placeholder={tt("form.folioPlaceholder")}
-                disabled={loadingConsecutivo}
+
+          {/* Asignación: a personal o a una ubicación */}
+          <ITGrid item xs={12}>
+            <ITFlex align="center" gap={3}>
+              <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                {tt("form.asignacion")}
+              </ITText>
+              <ITSegmentedControl
+                value={esUbicacion ? "UBICACION" : "PERSONAL"}
+                onChange={handleAsignacionChange}
+                options={[
+                  { value: "PERSONAL", label: tt("form.asignacionPersonal") },
+                  { value: "UBICACION", label: tt("form.asignacionUbicacion") },
+                ]}
+              />
+            </ITFlex>
+          </ITGrid>
+
+          {esUbicacion ? (
+            <ITGrid item xs={12}>
+              <ITSearchSelect
+                name="ubicacionId"
+                label={tt("form.location")}
+                placeholder={tt("form.locationPlaceholder")}
+                options={ubicacionOptions}
+                value={draft.ubicacionId ?? ""}
+                onChange={handleUbicacionSelect}
+                required
+                error={errors?.ubicacion ? dyn(tt)(errors.ubicacion) : undefined}
               />
             </ITGrid>
-          )}
-
+          ) : (
+            <>
           <ITGrid item xs={12}>
             <ITSearchSelect
               name="empleadoId"
@@ -335,6 +438,8 @@ export default function CartaForm({ errors }: Props) {
               placeholder={tt("form.departmentPlaceholder")}
             />
           </ITGrid>
+            </>
+          )}
         </ITGrid>
       </ITStack>
 
@@ -357,6 +462,8 @@ export default function CartaForm({ errors }: Props) {
               placeholder={devicePlaceholder}
               value={selectedDeviceId}
               onChange={handleDeviceSelect}
+              onSearch={buscarDispositivos}
+              isLoading={busyDevices}
               options={deviceOptions}
               disabled={!draft.deviceTypeId}
               error={errors?.deviceId ? dyn(tt)(errors.deviceId) : undefined}

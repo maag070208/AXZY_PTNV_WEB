@@ -1,26 +1,16 @@
 import {
-  ITBadget,
   ITButton,
   ITCard,
-  ITConfirmDialog,
   ITFlex,
   ITGrid,
   ITInput,
-  ITLoader,
   ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import {
-  FaBoxes,
-  FaBoxOpen,
-  FaLayerGroup,
-  FaLock,
-  FaMagic,
-  FaPlus,
-  FaTrash,
-} from "react-icons/fa";
+import { FaBoxOpen, FaLayerGroup, FaMagic, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatMacInput } from "@shared/utils/itDevice";
+import { formatLocation } from "@entities/location";
 import type { UseDeviceForm } from "../model/useDeviceForm";
 
 interface Props {
@@ -187,6 +177,25 @@ export default function DeviceFormBody({ fx }: Props) {
                   disabled={disabledAll}
                 />
               </ITGrid>
+
+              {!isBatch && (
+                <ITGrid item xs={12} md={6}>
+                  <ITSelect
+                    name="locationId"
+                    label={tt("form.location")}
+                    options={fx.locations.map((l) => ({
+                      value: l.id,
+                      label: formatLocation(l),
+                    }))}
+                    value={fx.form.locationId}
+                    onChange={(e) =>
+                      fx.setForm((f) => ({ ...f, locationId: e.target.value }))
+                    }
+                    placeholder={tt("form.locationPlaceholder")}
+                    disabled={disabledAll}
+                  />
+                </ITGrid>
+              )}
 
               {isEdit && (
                 <>
@@ -420,104 +429,6 @@ export default function DeviceFormBody({ fx }: Props) {
                   </ITText>
                 )}
               </ITCard>
-
-              <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
-                <ITFlex align="center" gap={2} className="mb-4">
-                  <FaBoxes size={14} className="text-slate-400" />
-                  <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                    {tt("form.unitsHeader", {
-                      count: fx.cantidad,
-                      specs: showITSpecs ? tt("form.unitsHeaderSpecs") : "",
-                    })}
-                  </ITText>
-                </ITFlex>
-
-                <ITFlex direction="column" gap={3}>
-                  {fx.units.slice(0, fx.cantidad).map((u, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4"
-                    >
-                      <ITFlex justify="between" align="center" className="mb-2">
-                        <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                          {tt("form.unitOf", { current: idx + 1, total: fx.cantidad })}
-                        </ITText>
-                        {fx.cantidad > 1 && (
-                          <ITButton
-                            variant="outlined"
-                            size="small"
-                            color="secondary"
-                            onClick={() => fx.removeUnitRow(idx)}
-                            title={tt("form.removeUnit")}
-                          >
-                            <FaTrash size={11} />
-                          </ITButton>
-                        )}
-                      </ITFlex>
-                      <ITGrid container columns={12} spacing={3}>
-                        {showField("numeroSerie") && (
-                          <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
-                            <ITInput
-                              name={`serie-${idx}`}
-                              label={tt("form.serialNo")}
-                              value={u.numeroSerie}
-                              onChange={(e) =>
-                                fx.handleUnitField(idx, "numeroSerie", e.target.value)
-                              }
-                            />
-                          </ITGrid>
-                        )}
-                        {showField("nombreEquipo") && (
-                          <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
-                            <ITInput
-                              name={`eq-${idx}`}
-                              label={tt("form.equipmentName")}
-                              value={u.nombreEquipo}
-                              onChange={(e) =>
-                                fx.handleUnitField(idx, "nombreEquipo", e.target.value)
-                              }
-                            />
-                          </ITGrid>
-                        )}
-                        {(showField("ip") || showField("macAddress")) && (
-                          <>
-                            {showField("ip") && (
-                              <ITGrid item xs={12} md={2}>
-                                <ITInput
-                                  name={`ip-${idx}`}
-                                  label={tt("form.ip")}
-                                  value={u.ip}
-                                  onChange={(e) =>
-                                    fx.handleUnitField(idx, "ip", e.target.value)
-                                  }
-                                  placeholder="192.168.0.1"
-                                />
-                              </ITGrid>
-                            )}
-                            {showField("macAddress") && (
-                              <ITGrid item xs={12} md={2}>
-                                <ITInput
-                                  name={`mac-${idx}`}
-                                  label={tt("form.mac")}
-                                  value={u.macAddress}
-                                  onChange={(e) =>
-                                    fx.handleUnitField(
-                                      idx,
-                                      "macAddress",
-                                      formatMacInput(e.target.value)
-                                    )
-                                  }
-                                  placeholder="AA:BB:CC:DD:EE:FF"
-                                />
-                              </ITGrid>
-                            )}
-                          </>
-                        )}
-                      </ITGrid>
-                    </div>
-                  ))}
-                </ITFlex>
-              </ITCard>
             </>
           )}
         </>
@@ -635,200 +546,6 @@ export default function DeviceFormBody({ fx }: Props) {
               )}
             </ITGrid>
           </ITCard>
-
-          <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
-            <ITFlex align="center" gap={2} className="mb-4">
-              <FaBoxes size={14} className="text-slate-400" />
-              <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                {tt("form.loteUnits", { count: fx.loteRows.length })}
-              </ITText>
-            </ITFlex>
-
-            {fx.loteLoading ? (
-              <ITFlex justify="center" align="center" className="py-8">
-                <ITLoader variant="spinner" size="md" color="primary" />
-              </ITFlex>
-            ) : (
-              <ITFlex direction="column" gap={3}>
-                {fx.loteRows.map((r, idx) => {
-                  const locked = r.estado === "ASIGNADO";
-                  return (
-                    <div
-                      key={r.id}
-                      className={`rounded-2xl border p-4 ${
-                        locked
-                          ? "border-amber-200 bg-amber-50/40"
-                          : "border-slate-100 bg-slate-50/60"
-                      }`}
-                    >
-                      <ITFlex justify="between" align="center" className="mb-2 flex-wrap">
-                        <ITFlex align="center" gap={2}>
-                          <ITText className="text-[11px] font-black text-slate-800">
-                            {r.controlActivos}
-                          </ITText>
-                          <ITBadget
-                            color={
-                              r.estado === "DISPONIBLE"
-                                ? "success"
-                                : r.estado === "ASIGNADO"
-                                ? "warning"
-                                : "gray"
-                            }
-                            size="small"
-                          >
-                            {r.estado}
-                          </ITBadget>
-                        </ITFlex>
-                        {locked ? (
-                          <ITFlex align="center" gap={1}>
-                            <FaLock size={10} className="text-amber-600" />
-                            <ITText className="text-[9px] font-black uppercase tracking-widest text-amber-600">
-                              {tt("form.assignedProtected")}
-                            </ITText>
-                          </ITFlex>
-                        ) : (
-                          fx.loteRows.length > 1 && (
-                            <ITButton
-                              variant="outlined"
-                              size="small"
-                              color="secondary"
-                              onClick={() => fx.requestRemoveLoteUnit(r)}
-                              title={tt("form.removeUnit")}
-                            >
-                              <FaTrash size={11} />
-                            </ITButton>
-                          )
-                        )}
-                      </ITFlex>
-                      <ITGrid container columns={12} spacing={3}>
-                        {showField("numeroSerie") && (
-                          <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
-                            <ITInput
-                              name={`lote-serie-${idx}`}
-                              label={tt("form.serialNo")}
-                              value={r.numeroSerie}
-                              onChange={(e) =>
-                                fx.setLoteRows((prev) =>
-                                  prev.map((x, i) =>
-                                    i === idx
-                                      ? { ...x, numeroSerie: e.target.value }
-                                      : x
-                                  )
-                                )
-                              }
-                              disabled={locked}
-                            />
-                          </ITGrid>
-                        )}
-                        {showField("nombreEquipo") && (
-                          <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
-                            <ITInput
-                              name={`lote-eq-${idx}`}
-                              label={tt("form.equipmentName")}
-                              value={r.nombreEquipo}
-                              onChange={(e) =>
-                                fx.setLoteRows((prev) =>
-                                  prev.map((x, i) =>
-                                    i === idx
-                                      ? { ...x, nombreEquipo: e.target.value }
-                                      : x
-                                  )
-                                )
-                              }
-                              disabled={locked}
-                            />
-                          </ITGrid>
-                        )}
-                        {(showField("ip") || showField("macAddress")) && (
-                          <>
-                            {showField("ip") && (
-                              <ITGrid item xs={12} md={3}>
-                                <ITInput
-                                  name={`lote-ip-${idx}`}
-                                  label={tt("form.ip")}
-                                  value={r.ip}
-                                  onChange={(e) =>
-                                    fx.setLoteRows((prev) =>
-                                      prev.map((x, i) =>
-                                        i === idx ? { ...x, ip: e.target.value } : x
-                                      )
-                                    )
-                                  }
-                                  placeholder="192.168.0.1"
-                                  disabled={locked}
-                                />
-                              </ITGrid>
-                            )}
-                            {showField("macAddress") && (
-                              <ITGrid item xs={12} md={3}>
-                                <ITInput
-                                  name={`lote-mac-${idx}`}
-                                  label={tt("form.macAddress")}
-                                  value={r.macAddress}
-                                  onChange={(e) =>
-                                    fx.setLoteRows((prev) =>
-                                      prev.map((x, i) =>
-                                        i === idx
-                                          ? {
-                                              ...x,
-                                              macAddress: formatMacInput(
-                                                e.target.value
-                                              ),
-                                            }
-                                          : x
-                                      )
-                                    )
-                                  }
-                                  placeholder="AA:BB:CC:DD:EE:FF"
-                                  disabled={locked}
-                                />
-                              </ITGrid>
-                            )}
-                          </>
-                        )}
-                        <ITGrid item xs={12} md={showITSpecs ? 12 : 4}>
-                          <ITInput
-                            name={`lote-area-${idx}`}
-                            label={tt("form.area")}
-                            value={r.area}
-                            onChange={(e) =>
-                              fx.setLoteRows((prev) =>
-                                prev.map((x, i) =>
-                                  i === idx ? { ...x, area: e.target.value } : x
-                                )
-                              )
-                            }
-                            disabled={locked}
-                          />
-                        </ITGrid>
-                      </ITGrid>
-                    </div>
-                  );
-                })}
-              </ITFlex>
-            )}
-          </ITCard>
-
-          <ITConfirmDialog
-            isOpen={!!fx.unitToRemove}
-            onClose={fx.cancelRemoveLoteUnit}
-            onConfirm={fx.confirmRemoveLoteUnit}
-            title={tt("form.removeLoteUnitTitle")}
-            message={
-              fx.unitToRemove
-                ? tt("form.removeLoteUnitMessage", {
-                    code: fx.unitToRemove.controlActivos,
-                  })
-                : ""
-            }
-            confirmLabel={
-              fx.removingUnit
-                ? tt("form.removingUnit")
-                : tt("form.removeLoteUnitConfirm")
-            }
-            cancelLabel={tt("common:actions.cancel")}
-            variant="danger"
-          />
         </>
       )}
     </>

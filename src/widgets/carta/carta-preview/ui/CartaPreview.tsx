@@ -19,6 +19,14 @@ export default function CartaPreview({
     /^Departamento de /i,
     ""
   );
+
+  const fmtUbicacion = (u?: CartaResponsiva["ubicacion"]): string => {
+    if (!u) return "";
+    return u.lugar;
+  };
+  // En modo ubicación la carta se asigna a un lugar, no a un empleado.
+  const responsableTxt =
+    fmtUbicacion(carta.ubicacion) || carta.responsable?.name || "";
   const fieldEnabled = (field: "ip" | "macAddress" | "sistemaOp" | "ram" | "almacenamiento") =>
     Boolean(item?.device?.type?.fieldConfig?.[field]?.enabled);
   const hasConfiguredSpecs = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"].some((field) =>
@@ -42,8 +50,14 @@ export default function CartaPreview({
             <span style={styles.metaVal}>{fechaTxt}</span>
           </div>
           <div style={styles.metaRow}>
-            <span style={styles.metaLabel}>{tt("doc.employeeNo")}</span>
-            <span style={styles.metaVal}>{carta.numeroEmpleado || "N/A"}</span>
+            <span style={styles.metaLabel}>
+              {carta.ubicacion ? tt("doc.ubicacion") : tt("doc.employeeNo")}
+            </span>
+            <span style={styles.metaVal}>
+              {carta.ubicacion
+                ? responsableTxt
+                : carta.numeroEmpleado || "N/A"}
+            </span>
           </div>
           <div style={{ ...styles.metaRow, marginBottom: 0 }}>
             <span style={styles.metaLabel}>{tt("doc.page")}</span>
@@ -57,7 +71,7 @@ export default function CartaPreview({
       {/* 2. Barra de título con folio */}
       <div style={styles.barraFolio}>
         {tt("doc.barraFolio", {
-          consecutivo: carta.consecutivo || "F-SIS-0001",
+          documento: "SIS-001",
           departamento: departamentoNombre,
         })}
       </div>
@@ -210,7 +224,8 @@ export default function CartaPreview({
       <div style={styles.firmas}>
         <div style={styles.firmaBox}>
           <div style={styles.lineaFirma}></div>
-          <span>{tt("doc.firmaResponsable")}</span>
+          <span style={styles.firmaNombre}>{responsableTxt}</span>
+          <span style={styles.firmaLabel}>{tt("doc.firmaResponsable")}</span>
         </div>
         <div style={styles.firmaBox}>
           <div style={styles.lineaFirma}></div>
@@ -389,6 +404,14 @@ const styles: Record<string, React.CSSProperties> = {
     width: "200px",
     textAlign: "center",
     fontSize: "11px",
+  },
+  firmaNombre: {
+    fontWeight: "bold",
+    fontSize: "11px",
+    textTransform: "uppercase",
+  },
+  firmaLabel: {
+    fontSize: "10px",
   },
   lineaFirma: {
     borderTop: "1.5px solid #000",

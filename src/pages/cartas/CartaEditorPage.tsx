@@ -7,20 +7,20 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaDownload, FaFileSignature, FaRedo, FaSave } from "react-icons/fa";
+import { FaFileSignature, FaRedo, FaSave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCartaEditor } from "@features/carta/editor";
 import { CartaForm } from "@features/carta/create-carta";
 import { CartaPreview } from "@widgets/carta/carta-preview";
-import { downloadCartaPDF } from "@widgets/carta/carta-pdf";
+import { openCartaPDF } from "@widgets/carta/carta-pdf";
 
 export default function CartaEditorPage() {
   const navigate = useNavigate();
   const { t } = useTranslation(["cartas", "common"]);
   const editor = useCartaEditor({
     download: (carta) =>
-      downloadCartaPDF(null, {
+      openCartaPDF({
         consecutivo: carta.consecutivo,
         fecha: carta.fecha,
         carta,
@@ -47,31 +47,13 @@ export default function CartaEditorPage() {
           <ITText className="font-bold text-[11px]">{t("editor.save")}</ITText>
         </ITFlex>
       </ITButton>
-      <ITButton
-        variant="filled"
-        size="small"
-        color="primary"
-        onClick={editor.handleDownload}
-        disabled={editor.downloading || !!editor.firstError}
-      >
-        <ITFlex align="center" gap={1}>
-          <FaDownload size={12} />
-          <ITText className="font-bold text-[11px]">
-            {editor.downloading ? t("editor.generating") : t("editor.downloadPdf")}
-          </ITText>
-        </ITFlex>
-      </ITButton>
     </ITFlex>
   );
 
   return (
     <ITPage
       title={t("editor.title")}
-      description={
-        editor.draft.consecutivo
-          ? `Folio ${editor.draft.consecutivo} · Mantenimiento`
-          : "Folio — · Mantenimiento"
-      }
+      description="Mantenimiento · Cartas Responsivas"
       backAction={() => navigate(-1)}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[

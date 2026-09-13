@@ -52,10 +52,17 @@ export default function CartaDetailPage() {
 
   const carta = detail.carta;
 
+  const descripcion =
+    carta.ubicacion
+      ? `Ubicación: ${carta.ubicacion.lugar}`
+      : carta.numeroEmpleado
+        ? `Empleado ${carta.numeroEmpleado}`
+        : undefined;
+
   return (
     <ITPage
       title={`Carta ${carta.consecutivo}`}
-      description={carta.numeroEmpleado ? `Empleado ${carta.numeroEmpleado}` : undefined}
+      description={descripcion}
       backAction={() => navigate("/cartas")}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[

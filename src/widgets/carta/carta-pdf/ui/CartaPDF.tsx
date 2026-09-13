@@ -208,11 +208,24 @@ export default function CartaPDF({ carta }: Props) {
 
   const responsableName = carta.responsable?.name ?? "";
   const encargadoName = carta.encargado?.name ?? "";
-  const deliveryBy = carta.deliveryBy || "Departamento de Mantenimiento";
+  const deliveryBy = carta.deliveryBy || "Departamento de Sistemas";
+
+  const fmtUbicacion = (u?: CartaResponsiva["ubicacion"]): string => {
+    if (!u) return "";
+    return u.lugar;
+  };
+  // En modo ubicación la carta se asigna a un lugar, no a un empleado:
+  // la firma "Responsable" y el dato muestran la ubicación.
+  const responsableTxt =
+    fmtUbicacion(carta.ubicacion) || responsableName || item?.area || "";
 
   const descripcionConCantidad =
     (item?.descripcion || "CONTROL DE TV(5 PIEZAS)") +
     (carta.items.length > 1 ? ` (${carta.items.length} piezas)` : "");
+
+  // El documento oficial se llama "SIS-001" — nuestro folio (consecutivo)
+  // NO debe aparecer en el PDF.
+  const documentoOficial = "SIS-001";
 
   const fieldEnabled = (field: "numeroSerie" | "nombreEquipo" | "ip" | "macAddress" | "sistemaOp" | "ram" | "almacenamiento") =>
     Boolean(item?.device?.type?.fieldConfig?.[field]?.enabled);
@@ -223,7 +236,7 @@ export default function CartaPDF({ carta }: Props) {
 
   return (
     <Document
-      title={`${carta.consecutivo} - ${tt("detail.title")}`}
+      title={`${documentoOficial} - ${tt("detail.title")}`}
       author="Puerto Nuevo Hotel y Villas"
     >
       <Page size="LETTER" style={styles.page}>
@@ -238,9 +251,13 @@ export default function CartaPDF({ carta }: Props) {
               <Text style={styles.metaVal}>{fechaTxt}</Text>
             </View>
             <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>{tt("doc.employeeNo")}</Text>
+              <Text style={styles.metaLabel}>
+                {carta.ubicacion ? tt("doc.ubicacion") : tt("doc.employeeNo")}
+              </Text>
               <Text style={styles.metaVal}>
-                {carta.numeroEmpleado || "N/A"}
+                {carta.ubicacion
+                  ? responsableTxt
+                  : carta.numeroEmpleado || "N/A"}
               </Text>
             </View>
             <View style={styles.metaPaginaRow}>
@@ -254,7 +271,7 @@ export default function CartaPDF({ carta }: Props) {
         <View style={styles.barraFolio}>
           <Text>
             {tt("doc.barraFolio", {
-              consecutivo: carta.consecutivo || "F-MMTO-0001",
+              documento: documentoOficial,
               departamento: departamentoNombre,
             })}
           </Text>
@@ -395,7 +412,7 @@ export default function CartaPDF({ carta }: Props) {
         <View style={styles.firmas}>
           <View style={styles.firmaBox}>
             <View style={styles.lineaFirma} />
-            <Text style={styles.firmaNombre}>{responsableName}</Text>
+            <Text style={styles.firmaNombre}>{responsableTxt}</Text>
             <Text style={styles.firmaLabel}>{tt("doc.firmaResponsable")}</Text>
           </View>
           <View style={styles.firmaBox}>

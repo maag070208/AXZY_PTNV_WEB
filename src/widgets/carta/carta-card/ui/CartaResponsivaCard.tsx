@@ -40,6 +40,11 @@ export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
   const num = row.consecutivo.replace("F-MMTO-", "");
   const empresa = row.empresa?.trim() || "Puerto Nuevo Hotel y Villas";
 
+  const fmtUbicacion = (u?: CartaResponsiva["ubicacion"]): string => {
+    if (!u) return "—";
+    return u.lugar;
+  };
+
   return (
     <ITCard className="border border-slate-200 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all overflow-hidden">
       <ITFlex
@@ -67,7 +72,11 @@ export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
         onClick={() => onView(row.id)}
       >
         <DocRow label={tt("card.fecha")} value={formatFecha(row.fecha)} />
-        <DocRow label={tt("card.noEmpleado")} value={row.numeroEmpleado || "—"} highlight />
+        <DocRow
+            label={row.ubicacion ? tt("card.ubicacion") : tt("card.noEmpleado")}
+            value={row.ubicacion ? fmtUbicacion(row.ubicacion) : row.numeroEmpleado || "—"}
+            highlight
+          />
         <DocRow label={tt("card.empresa")} value={empresa} uppercase />
 
         <ITFlex direction="column" className="mt-3 pt-3 border-t-2 border-slate-200">

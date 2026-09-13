@@ -6,6 +6,7 @@ import {
   type DeviceType,
 } from "@entities/device-type";
 import { deviceApi as devicesApi } from "@entities/device";
+import { locationsApi, type Location } from "@entities/location";
 import { emptyUnit, toLoteRow, incrementIp, type UnitForm } from "./types";
 
 interface BaseForm {
@@ -14,6 +15,7 @@ interface BaseForm {
   marca: string;
   modelo: string;
   area: string;
+  locationId: string;
   sistemaOp: string;
   ram: string;
   almacenamiento: string;
@@ -26,12 +28,14 @@ export const useDeviceForm = () => {
   const isEdit = !!id;
 
   const [types, setTypes] = useState<DeviceType[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [form, setForm] = useState<BaseForm>({
     typeId: "",
     descripcion: "",
     marca: "",
     modelo: "",
     area: "SISTEMAS",
+    locationId: "",
     sistemaOp: "",
     ram: "",
     almacenamiento: "",
@@ -68,6 +72,7 @@ export const useDeviceForm = () => {
 
   useEffect(() => {
     setLoading(true);
+    locationsApi.list().then(setLocations).catch(() => setLocations([]));
     deviceTypesApi
       .list()
       .then((t) => {
@@ -82,6 +87,7 @@ export const useDeviceForm = () => {
             marca: d.marca,
             modelo: d.modelo,
             area: d.area,
+            locationId: d.locationId ?? "",
             sistemaOp: d.sistemaOp ?? "",
             ram: d.ram ?? "",
             almacenamiento: d.almacenamiento ?? "",
@@ -232,6 +238,9 @@ export const useDeviceForm = () => {
           marca: form.marca,
           modelo: form.modelo,
           area: form.area,
+          // Se manda siempre (aunque venga vacío) para poder quitar una
+          // ubicación ya asignada: "" le indica al backend "sin ubicación".
+          locationId: form.locationId,
           numeroSerie: editUnit.numeroSerie || undefined,
           nombreEquipo: editUnit.nombreEquipo || undefined,
           ip: showField("ip") ? editUnit.ip || undefined : undefined,
@@ -254,6 +263,7 @@ export const useDeviceForm = () => {
         marca: form.marca,
         modelo: form.modelo,
         area: form.area,
+        locationId: form.locationId || undefined,
         sistemaOp: showField("sistemaOp") ? form.sistemaOp || undefined : undefined,
         ram: showField("ram") ? form.ram || undefined : undefined,
         almacenamiento: showField("almacenamiento")
@@ -333,6 +343,7 @@ export const useDeviceForm = () => {
     navigate,
     isEdit,
     types,
+    locations,
     form,
     setForm,
     editUnit,

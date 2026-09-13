@@ -47,6 +47,8 @@
     "brand": "Marca",
     "model": "Modelo",
     "area": "Área",
+    "location": "Ubicación",
+    "locationPlaceholder": "Sin ubicación fija",
     "serialNo": "No. Serie",
     "equipmentName": "Nombre del equipo",
     "ipAddress": "Dirección IP",
