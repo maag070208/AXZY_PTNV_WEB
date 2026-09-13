@@ -1,4 +1,4 @@
-import { ITCard, ITLayout, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITCard, ITLayout, ITSidebarProps, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { useEffect, useState, useCallback } from "react";
 import {
   FaBuilding,
@@ -174,8 +174,9 @@ export default function PrivateRoutes() {
     navigate("/login");
   };
 
-  const sidebar = {
+  const sidebar:ITSidebarProps = {
     navigationItems,
+    isCollapsed:true,
   };
 
   const topBar = {

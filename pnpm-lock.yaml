@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@axzydev/axzy_ui_system':
-        specifier: 1.2.12
-        version: 1.2.12(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: 1.2.13
+        version: 1.2.13(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@react-pdf/renderer':
         specifier: ^4.6.1
         version: 4.9.0(react@19.0.0)
@@ -108,8 +108,8 @@ packages:
   '@ably/msgpack-js@0.4.1':
     resolution: {integrity: sha512-Sjxj6SOr17hExAVrsycN7u6oV4PhZcK7Z2S8dM71CH/butgO47cSo/TL6FJPCXUyDAzKkOWjMUpJGyZkEpyu4Q==}
 
-  '@axzydev/axzy_ui_system@1.2.12':
-    resolution: {integrity: sha512-5J6Ec5+Fqsi2q8qvw6DxdSbce988+78VHhBKsrFmO/LoGPevwXe606qrbNIlfEX/gsYu46+W9pJJkvEuKBdXgg==}
+  '@axzydev/axzy_ui_system@1.2.13':
+    resolution: {integrity: sha512-ZSm5KTn3nEyOcZ0CfDy/7r33ecPYtBg0GQX29gyJuglgxHwqmS6gEba4nsmI7bTF3BYgwv9T/nx3sPad5oeF8g==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -2211,7 +2211,7 @@ snapshots:
     dependencies:
       bops: 1.0.1
 
-  '@axzydev/axzy_ui_system@1.2.12(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+  '@axzydev/axzy_ui_system@1.2.13(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       clsx: 2.1.1
       date-fns: 4.4.0

@@ -1,4 +1,5 @@
 import { ITThemeProvider } from "@axzydev/axzy_ui_system";
+import "@axzydev/axzy_ui_system/dist/index.css";
 import "@shared/i18n/config";
 import { store } from "@app/store";
 import React from "react";
@@ -6,12 +7,6 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { HashRouter } from "react-router-dom";
 import App from "./App";
-/* El CSS del kit ya se importa dentro de index.css con
-   `@import "...dist/index.css" layer(axzy-ui-system);`, en un layer propio
-   ordenado explícitamente (`@layer theme, base, axzy-ui-system, components,
-   utilities;`) para que su reset/utilidades no compitan con las de esta app.
-   NO lo vuelvas a importar suelto aquí: hacerlo duplica el CSS del kit sin
-   ese layer y rompe estilos como el fondo/texto del topbar. */
 import "@app/index.css";
 
 if (!localStorage.getItem("it-theme-dark-mode")) {

@@ -3,13 +3,13 @@
 @import "tailwindcss";
 @import "@axzydev/axzy_ui_system/dist/index.css" layer(axzy-ui-system);
 
+@source "../node_modules/@axzydev/axzy_ui_system/src/**/*.{ts,tsx}";
+
 :root {
   --layout-bg: #f1f5f9;
 }
 
+/* Forzar que el modal sea más ancho para que quepan las 2 columnas */
 .it-dialog-panel {
-  width: min(92vw, 560px);
-}
-.it-dialog-panel--wide {
-  width: min(94vw, 760px);
+  width: min(94vw, 900px) !important;
 }

@@ -47,14 +47,20 @@ export default function TicketDetailModal({
   onOpenFull,
 }: Props) {
   const { t: tt } = useTranslation("tickets");
+
   return (
-    <ITDialog isOpen={loading || !!ticket} className="w-full max-w-4xl" onClose={onClose}>
+    <ITDialog 
+      isOpen={loading || !!ticket} 
+      className="w-full !max-w-5xl" 
+      onClose={onClose}
+    >
       {loading || !ticket ? (
         <ITFlex justify="center" align="center" className="py-10">
           <ITLoader variant="spinner" size="md" color="primary" />
         </ITFlex>
       ) : (
-        <div>
+        <div style={{ minWidth: "100%" }}>
+          {/* Header */}
           <div className="pb-4 pr-8 mb-5" style={{ borderBottom: `1px solid ${BORDER.subtle}` }}>
             <ITFlex align="center" gap={2} className="mb-1.5">
               <FaBookmark size={12} className="text-emerald-500" />
@@ -69,16 +75,15 @@ export default function TicketDetailModal({
             <ITText className="text-xl font-bold text-slate-900 leading-tight">{ticket.titulo}</ITText>
           </div>
 
-          {/* Alto máximo forzado por estilo inline: `min()`/`calc()` en
-              valores arbitrarios de Tailwind no compilan en este proyecto. */}
+          {/* Cuerpo en Grid/Flex estricto con estilos inline de respaldo por si fallan las utilidades */}
           <div className="overflow-y-auto pr-1" style={{ maxHeight: "min(64vh, 600px)" }}>
-            {/* `grid`/`grid-cols-*` no está aplicando en absoluto en este
-                proyecto (probado con valor arbitrario y con clases
-                estándar). Flexbox sí funciona en todo lo demás, así que el
-                layout de dos columnas se arma con flex + un ancho fijo de
-                escala estándar en el aside (nada entre corchetes). */}
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="flex flex-col gap-5 min-w-0 flex-1">
+            <div 
+              className="flex flex-col md:flex-row gap-6 items-start" 
+              style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap" }}
+            >
+              
+              {/* Columna Izquierda (Principal) */}
+              <div style={{ flex: "1 1 auto", minWidth: 0 }}>
                 <div>
                   <ITText className="text-xs font-semibold text-slate-500 mb-1.5">
                     {tt("detail.description")}
@@ -88,12 +93,14 @@ export default function TicketDetailModal({
                   </div>
                 </div>
 
-                <TicketAttachments
-                  ticketId={ticket.id}
-                  canUpload={canManage || Boolean(ticket.creadoPorId === currentUserId)}
-                />
+                <div className="mt-4">
+                  <TicketAttachments
+                    ticketId={ticket.id}
+                    canUpload={canManage || Boolean(ticket.creadoPorId === currentUserId)}
+                  />
+                </div>
 
-                <div>
+                <div className="mt-4">
                   <ITText className="text-xs font-semibold text-slate-500 mb-2">
                     {tt("detail.assignmentsTitle", { count: ticket.assignments.length })}
                   </ITText>
@@ -180,13 +187,12 @@ export default function TicketDetailModal({
                 </div>
               </div>
 
-              {/* Aside de detalles: ancho estándar de la escala de Tailwind
-                  (w-60 = 240px), no un valor entre corchetes. */}
-              <aside className="w-full md:w-60 shrink-0 flex flex-col">
+              {/* Columna Derecha (Aside) */}
+              <aside style={{ width: "220px", flexShrink: 0 }} className="flex flex-col">
                 <ITButton
                   variant="filled"
                   color="primary"
-                  className="w-full justify-center mb-1"
+                  className="w-full justify-center mb-2"
                   onClick={() => onOpenFull(ticket.id)}
                 >
                   <ITFlex align="center" gap={1} justify="center">
@@ -211,6 +217,7 @@ export default function TicketDetailModal({
                   <span className="text-sm font-medium text-slate-700">{ticket.creadoPor?.name}</span>
                 </DetailRow>
               </aside>
+
             </div>
           </div>
         </div>
