@@ -1,19 +1,19 @@
 import { FaBoxOpen, FaCheckCircle, FaComment, FaEdit, FaExclamationTriangle, FaUserCog } from "react-icons/fa";
 
-export const ESTADO_BADGE: Record<string, { color: string; label: string }> = {
-  DISPONIBLE: { color: "success", label: "Disponible" },
-  ASIGNADO: { color: "warning", label: "Asignado" },
-  BAJA: { color: "default", label: "Baja" },
+export const ESTADO_BADGE: Record<string, { color: string }> = {
+  DISPONIBLE: { color: "success" },
+  ASIGNADO: { color: "warning" },
+  BAJA: { color: "default" },
 };
 
 export const FIELD_LABELS = {
-  numeroSerie: "Número de serie",
-  nombreEquipo: "Nombre de equipo",
-  ip: "Dirección IP",
-  macAddress: "MAC Address",
-  sistemaOp: "Sistema operativo",
-  ram: "RAM",
-  almacenamiento: "Almacenamiento",
+  numeroSerie: "form.serialNo",
+  nombreEquipo: "form.equipmentName",
+  ip: "form.ipAddress",
+  macAddress: "form.macAddress",
+  sistemaOp: "form.os",
+  ram: "form.ram",
+  almacenamiento: "form.storage",
 } as const;
 
 export const HISTORY_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
@@ -26,10 +26,10 @@ export const HISTORY_ICONS: Record<string, { icon: React.ReactNode; bg: string }
 };
 
 export const TYPE_LABELS: Record<string, string> = {
-  CREATED: "Dispositivo registrado",
-  ASSIGNED: "Dispositivo asignado",
-  RETURNED: "Dispositivo devuelto",
-  RETIRED: "Dispositivo retirado",
-  UPDATED: "Información actualizada",
-  COMMENT: "Comentario",
+  CREATED: "history.CREATED",
+  ASSIGNED: "history.ASSIGNED",
+  RETURNED: "history.RETURNED",
+  RETIRED: "history.RETIRED",
+  UPDATED: "history.UPDATED",
+  COMMENT: "history.COMMENT",
 };

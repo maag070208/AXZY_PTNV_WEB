@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   deviceTypeApi as deviceTypesApi,
   type DeviceType,
@@ -19,6 +20,7 @@ interface BaseForm {
 }
 
 export const useDeviceForm = () => {
+  const { t: tt } = useTranslation(["device", "common"]);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = !!id;
@@ -256,7 +258,7 @@ export const useDeviceForm = () => {
       });
 
       if (cantidad > 1) {
-        setSuccess(`Se dieron de alta ${res.total} dispositivos correctamente.`);
+        setSuccess(tt("device:form.addedCount", { count: res.total }));
         setTimeout(() => navigate("/dispositivos"), 900);
       } else {
         navigate("/dispositivos");

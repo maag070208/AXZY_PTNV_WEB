@@ -44,7 +44,7 @@ export default function DeviceFormPage() {
             label: tt("device:list.title"),
             onClick: () => navigate("/dispositivos"),
           },
-          { label: "Formulario" },
+          { label: tt("device:form.breadcrumb") },
         ]}
       >
         <ITFlex justify="center" align="center">
@@ -76,14 +76,14 @@ export default function DeviceFormPage() {
           {disabledAll ? <FaLock size={12} /> : <FaSave size={12} />}
           <ITText className="font-bold text-[11px]">
             {disabledAll
-              ? "Asignado — bloqueado"
+              ? tt("device:form.locked")
               : saving
-              ? "Guardando…"
+              ? tt("device:form.adding")
               : isBatch
-              ? `Dar de alta ${cantidad} unidades`
+              ? tt("device:form.registerUnits", { count: cantidad })
               : isEdit
-              ? "Guardar cambios"
-              : "Guardar"}
+              ? tt("device:form.saveChanges")
+              : tt("common:actions.save")}
           </ITText>
         </ITFlex>
       </ITButton>
@@ -94,17 +94,17 @@ export default function DeviceFormPage() {
     <ITPage
       title={
         isLoteEdit
-          ? `Editar lote (${fx.loteRows.length} unidades)`
+          ? tt("device:form.editLoteTitle", { count: fx.loteRows.length })
           : isEdit
-          ? "Editar dispositivo"
-          : "Nuevo dispositivo"
+          ? tt("device:form.editDevice")
+          : tt("device:form.newDevice")
       }
       description={
         isLoteEdit
-          ? "Los datos compartidos se aplican a todo el lote. Cada unidad edita su serie, nombre, IP, MAC y área por separado."
+          ? tt("device:form.loteEditDescription")
           : isEdit
-          ? "Si cambias el tipo se generará un nuevo control de activos"
-          : "Indica la cantidad si vas a dar de alta varias unidades iguales"
+          ? tt("device:form.editDescription")
+          : tt("device:form.newDescription")
       }
       backAction={() => navigate(-1)}
       breadcrumbs={[
@@ -121,8 +121,7 @@ export default function DeviceFormPage() {
           <ITFlex align="center" gap={2}>
             <FaLock size={14} />
             <ITText className="text-[12px] font-bold">
-              Este dispositivo (activo {blockedAssetCode}) está asignado y no se
-              puede editar. Registra su devolución para poder modificarlo.
+              {tt("device:form.lockedMessage", { code: blockedAssetCode })}
             </ITText>
           </ITFlex>
         </ITAlert>

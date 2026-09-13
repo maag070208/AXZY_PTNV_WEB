@@ -1,5 +1,7 @@
 import { ITFlex, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaClock } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import { dyn } from "@shared/i18n";
 import { formatFechaHora } from "@shared/utils/dates";
 import type { Device } from "@entities/device";
 import { HISTORY_ICONS, TYPE_LABELS } from "../model/constants";
@@ -20,6 +22,7 @@ interface TimelineEvent {
 }
 
 export default function DeviceTimeline({ device }: Props) {
+  const { t: tt } = useTranslation(["device"]);
   const history = device.history ?? [];
 
   const events: TimelineEvent[] = history.map((h) => {
@@ -42,13 +45,13 @@ export default function DeviceTimeline({ device }: Props) {
         <ITFlex align="center" gap={2} className="mb-5">
           <FaClock size={14} className="text-slate-400" />
           <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            Historial ({events.length})
+            {tt("history.title", { count: events.length })}
           </ITText>
         </ITFlex>
 
         {events.length === 0 ? (
           <ITText className="text-[12px] text-slate-400 italic">
-            Sin actividad aún
+            {tt("history.empty")}
           </ITText>
         ) : (
           <div className="relative">
@@ -73,7 +76,7 @@ export default function DeviceTimeline({ device }: Props) {
                     <div className="rounded-xl p-3 bg-slate-50 border border-slate-100">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <span className="text-[11px] font-black text-slate-700 leading-tight">
-                          {event.title}
+                          {dyn(tt)(event.title)}
                         </span>
                         <span className="text-[9px] text-slate-400 shrink-0 tabular-nums">
                           {formatFechaHora(event.timestamp)}

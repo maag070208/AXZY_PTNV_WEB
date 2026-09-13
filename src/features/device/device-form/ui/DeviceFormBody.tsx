@@ -18,6 +18,7 @@ import {
   FaPlus,
   FaTrash,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { formatMacInput } from "@shared/utils/itDevice";
 import type { UseDeviceForm } from "../model/useDeviceForm";
 
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function DeviceFormBody({ fx }: Props) {
+  const { t: tt } = useTranslation(["device"]);
   const { isEdit, isBatch, isLoteEdit, disabledAll, showField, showITSpecs } = fx;
 
   return (
@@ -43,11 +45,10 @@ export default function DeviceFormBody({ fx }: Props) {
               </ITFlex>
               <ITFlex direction="column" gap={0.5} className="min-w-0">
                 <ITText className="text-[12px] font-black uppercase tracking-widest text-blue-800">
-                  Agregar más unidades
+                  {tt("form.addUnits")}
                 </ITText>
                 <ITText className="text-[10px] font-bold leading-5 text-slate-600">
-                  Crea copias idénticas sin serie. Cada unidad recibirá su propio
-                  folio de activo y podrá tener su carta responsiva.
+                  {tt("form.addUnitsHint")}
                 </ITText>
               </ITFlex>
             </ITFlex>
@@ -55,7 +56,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <div className="w-24">
                 <ITInput
                   name="addQty"
-                  label="Cantidad"
+                  label={tt("form.quantity")}
                   type="number"
                   min={1}
                   value={String(fx.addQty)}
@@ -73,7 +74,7 @@ export default function DeviceFormBody({ fx }: Props) {
                 <ITFlex align="center" gap={1}>
                   <FaPlus size={11} />
                   <ITText className="text-[11px] font-bold">
-                    {fx.addingUnits ? "Agregando…" : `Agregar ${fx.addQty}`}
+                    {fx.addingUnits ? tt("form.adding") : tt("form.add", { count: fx.addQty })}
                   </ITText>
                 </ITFlex>
               </ITButton>
@@ -95,10 +96,10 @@ export default function DeviceFormBody({ fx }: Props) {
               </ITFlex>
               <ITFlex direction="column" gap={0.25}>
                 <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">
-                  Datos del dispositivo
+                  {tt("form.deviceData")}
                 </ITText>
                 <ITText className="text-[10px] text-slate-400">
-                  Tipo, identificación y características principales
+                  {tt("form.deviceDataHint")}
                 </ITText>
               </ITFlex>
             </ITFlex>
@@ -106,7 +107,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <ITGrid item xs={12} md={isEdit ? 6 : 4}>
                 <ITSelect
                   name="typeId"
-                  label="Tipo"
+                  label={tt("form.type")}
                   options={fx.types.map((t) => ({
                     value: t.id,
                     label: `${t.name} (${t.prefix})`,
@@ -123,7 +124,7 @@ export default function DeviceFormBody({ fx }: Props) {
                 <ITGrid item xs={12} md={2}>
                   <ITInput
                     name="cantidad"
-                    label="Cantidad"
+                    label={tt("form.quantity")}
                     type="number"
                     min={1}
                     max={500}
@@ -141,7 +142,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <ITGrid item xs={12}>
                 <ITInput
                   name="desc"
-                  label="Descripción"
+                  label={tt("form.description")}
                   value={fx.form.descripcion}
                   onChange={(e) =>
                     fx.setForm((f) => ({ ...f, descripcion: e.target.value }))
@@ -153,7 +154,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="marca"
-                  label="Marca"
+                  label={tt("form.brand")}
                   value={fx.form.marca}
                   onChange={(e) =>
                     fx.setForm((f) => ({ ...f, marca: e.target.value }))
@@ -165,7 +166,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="modelo"
-                  label="Modelo"
+                  label={tt("form.model")}
                   value={fx.form.modelo}
                   onChange={(e) =>
                     fx.setForm((f) => ({ ...f, modelo: e.target.value }))
@@ -177,7 +178,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="area"
-                  label="Área"
+                  label={tt("form.area")}
                   value={fx.form.area}
                   onChange={(e) =>
                     fx.setForm((f) => ({ ...f, area: e.target.value }))
@@ -192,7 +193,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="serie"
-                        label="No. Serie"
+                        label={tt("form.serialNo")}
                         value={fx.editUnit.numeroSerie}
                         onChange={(e) =>
                           fx.setEditUnit((u) => ({
@@ -208,7 +209,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="eq"
-                        label="Nombre del equipo"
+                        label={tt("form.equipmentName")}
                         value={fx.editUnit.nombreEquipo}
                         onChange={(e) =>
                           fx.setEditUnit((u) => ({
@@ -229,7 +230,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="serie"
-                        label="No. Serie"
+                        label={tt("form.serialNo")}
                         value={fx.units[0]?.numeroSerie ?? ""}
                         onChange={(e) =>
                           fx.handleUnitField(0, "numeroSerie", e.target.value)
@@ -241,7 +242,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="eq"
-                        label="Nombre del equipo"
+                        label={tt("form.equipmentName")}
                         value={fx.units[0]?.nombreEquipo ?? ""}
                         onChange={(e) =>
                           fx.handleUnitField(0, "nombreEquipo", e.target.value)
@@ -258,7 +259,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="ip"
-                        label="Dirección IP"
+                        label={tt("form.ipAddress")}
                         value={fx.editUnit.ip}
                         onChange={(e) =>
                           fx.setEditUnit((u) => ({ ...u, ip: e.target.value }))
@@ -272,7 +273,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="mac"
-                        label="MAC Address"
+                        label={tt("form.macAddress")}
                         value={fx.editUnit.macAddress}
                         onChange={(e) =>
                           fx.setEditUnit((u) => ({
@@ -294,7 +295,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="ip"
-                        label="Dirección IP"
+                        label={tt("form.ipAddress")}
                         value={fx.units[0]?.ip ?? ""}
                         onChange={(e) => fx.handleUnitField(0, "ip", e.target.value)}
                         placeholder="192.168.0.1"
@@ -305,7 +306,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={6}>
                       <ITInput
                         name="mac"
-                        label="MAC Address"
+                        label={tt("form.macAddress")}
                         value={fx.units[0]?.macAddress ?? ""}
                         onChange={(e) =>
                           fx.handleUnitField(0, "macAddress", formatMacInput(e.target.value))
@@ -323,7 +324,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={4}>
                       <ITInput
                         name="sistemaOp"
-                        label="Sistema Operativo"
+                        label={tt("form.os")}
                         value={fx.form.sistemaOp}
                         onChange={(e) =>
                           fx.setForm((f) => ({ ...f, sistemaOp: e.target.value }))
@@ -337,7 +338,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={4}>
                       <ITInput
                         name="ram"
-                        label="RAM"
+                        label={tt("form.ram")}
                         value={fx.form.ram}
                         onChange={(e) =>
                           fx.setForm((f) => ({ ...f, ram: e.target.value }))
@@ -351,7 +352,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={4}>
                       <ITInput
                         name="almacenamiento"
-                        label="Almacenamiento"
+                        label={tt("form.storage")}
                         value={fx.form.almacenamiento}
                         onChange={(e) =>
                           fx.setForm((f) => ({ ...f, almacenamiento: e.target.value }))
@@ -372,7 +373,7 @@ export default function DeviceFormBody({ fx }: Props) {
                 <ITFlex align="center" gap={2} className="mb-3">
                   <FaMagic size={13} className="text-slate-400" />
                   <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                    Llenado rápido (opcional)
+                    {tt("form.quickFill")}
                   </ITText>
                 </ITFlex>
                 <ITGrid
@@ -384,7 +385,7 @@ export default function DeviceFormBody({ fx }: Props) {
                   <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
                     <ITInput
                       name="autoNombreBase"
-                      label="Nombre de equipo (base)"
+                      label={tt("form.autoNameBase")}
                       value={fx.autoNombreBase}
                       onChange={(e) => fx.setAutoNombreBase(e.target.value)}
                       placeholder="TABLET-AB"
@@ -393,7 +394,7 @@ export default function DeviceFormBody({ fx }: Props) {
                   <ITGrid item xs={12} md={showITSpecs ? 2 : 3}>
                     <ITInput
                       name="autoNombreStart"
-                      label="Inicia en"
+                      label={tt("form.autoNameStart")}
                       type="number"
                       min={1}
                       value={fx.autoNombreStart}
@@ -404,7 +405,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={4}>
                       <ITInput
                         name="autoIpBase"
-                        label="IP inicial (autoincrementa)"
+                        label={tt("form.autoIpBase")}
                         value={fx.autoIpBase}
                         onChange={(e) => fx.setAutoIpBase(e.target.value)}
                         placeholder="192.168.1.10"
@@ -414,8 +415,7 @@ export default function DeviceFormBody({ fx }: Props) {
                 </ITGrid>
                 {(fx.autoNombreBase.trim() || fx.autoIpBase.trim()) && (
                   <ITText className="text-[10px] font-bold text-emerald-600 mt-2">
-                    Se está autocompletando cada unidad conforme escribes — no hace
-                    falta aplicar nada.
+                    {tt("form.autoIndicator")}
                   </ITText>
                 )}
               </ITCard>
@@ -424,8 +424,10 @@ export default function DeviceFormBody({ fx }: Props) {
                 <ITFlex align="center" gap={2} className="mb-4">
                   <FaBoxes size={14} className="text-slate-400" />
                   <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                    Unidades ({fx.cantidad}) — captura serie
-                    {showITSpecs ? ", IP y MAC" : ""} de cada equipo
+                    {tt("form.unitsHeader", {
+                      count: fx.cantidad,
+                      specs: showITSpecs ? tt("form.unitsHeaderSpecs") : "",
+                    })}
                   </ITText>
                 </ITFlex>
 
@@ -437,7 +439,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     >
                       <ITFlex justify="between" align="center" className="mb-2">
                         <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                          Unidad {idx + 1} de {fx.cantidad}
+                          {tt("form.unitOf", { current: idx + 1, total: fx.cantidad })}
                         </ITText>
                         {fx.cantidad > 1 && (
                           <ITButton
@@ -445,7 +447,7 @@ export default function DeviceFormBody({ fx }: Props) {
                             size="small"
                             color="secondary"
                             onClick={() => fx.removeUnitRow(idx)}
-                            title="Quitar esta unidad"
+                            title={tt("form.removeUnit")}
                           >
                             <FaTrash size={11} />
                           </ITButton>
@@ -456,7 +458,7 @@ export default function DeviceFormBody({ fx }: Props) {
                           <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
                             <ITInput
                               name={`serie-${idx}`}
-                              label="No. Serie"
+                              label={tt("form.serialNo")}
                               value={u.numeroSerie}
                               onChange={(e) =>
                                 fx.handleUnitField(idx, "numeroSerie", e.target.value)
@@ -468,7 +470,7 @@ export default function DeviceFormBody({ fx }: Props) {
                           <ITGrid item xs={12} md={showITSpecs ? 4 : 6}>
                             <ITInput
                               name={`eq-${idx}`}
-                              label="Nombre del equipo"
+                              label={tt("form.equipmentName")}
                               value={u.nombreEquipo}
                               onChange={(e) =>
                                 fx.handleUnitField(idx, "nombreEquipo", e.target.value)
@@ -482,7 +484,7 @@ export default function DeviceFormBody({ fx }: Props) {
                               <ITGrid item xs={12} md={2}>
                                 <ITInput
                                   name={`ip-${idx}`}
-                                  label="IP"
+                                  label={tt("form.ip")}
                                   value={u.ip}
                                   onChange={(e) =>
                                     fx.handleUnitField(idx, "ip", e.target.value)
@@ -495,7 +497,7 @@ export default function DeviceFormBody({ fx }: Props) {
                               <ITGrid item xs={12} md={2}>
                                 <ITInput
                                   name={`mac-${idx}`}
-                                  label="MAC"
+                                  label={tt("form.mac")}
                                   value={u.macAddress}
                                   onChange={(e) =>
                                     fx.handleUnitField(
@@ -526,14 +528,14 @@ export default function DeviceFormBody({ fx }: Props) {
             <ITFlex align="center" gap={2} className="mb-4">
               <FaLayerGroup size={13} className="text-slate-400" />
               <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                Datos compartidos del lote
+                {tt("form.loteShared")}
               </ITText>
             </ITFlex>
             <ITGrid container columns={12} spacing={4}>
               <ITGrid item xs={12}>
                 <ITInput
                   name="desc"
-                  label="Descripción"
+                  label={tt("form.description")}
                   value={fx.form.descripcion}
                   onChange={(e) =>
                     fx.setForm((f) => ({ ...f, descripcion: e.target.value }))
@@ -544,7 +546,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="marca"
-                  label="Marca"
+                  label={tt("form.brand")}
                   value={fx.form.marca}
                   onChange={(e) =>
                     fx.setForm((f) => ({ ...f, marca: e.target.value }))
@@ -555,7 +557,7 @@ export default function DeviceFormBody({ fx }: Props) {
               <ITGrid item xs={12} md={6}>
                 <ITInput
                   name="modelo"
-                  label="Modelo"
+                  label={tt("form.model")}
                   value={fx.form.modelo}
                   onChange={(e) =>
                     fx.setForm((f) => ({ ...f, modelo: e.target.value }))
@@ -569,7 +571,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={4}>
                       <ITInput
                         name="sistemaOp"
-                        label="Sistema Operativo"
+                        label={tt("form.os")}
                         value={fx.form.sistemaOp}
                         onChange={(e) =>
                           fx.setForm((f) => ({ ...f, sistemaOp: e.target.value }))
@@ -582,7 +584,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={4}>
                       <ITInput
                         name="ram"
-                        label="RAM"
+                        label={tt("form.ram")}
                         value={fx.form.ram}
                         onChange={(e) =>
                           fx.setForm((f) => ({ ...f, ram: e.target.value }))
@@ -595,7 +597,7 @@ export default function DeviceFormBody({ fx }: Props) {
                     <ITGrid item xs={12} md={4}>
                       <ITInput
                         name="almacenamiento"
-                        label="Almacenamiento"
+                        label={tt("form.storage")}
                         value={fx.form.almacenamiento}
                         onChange={(e) =>
                           fx.setForm((f) => ({
@@ -616,7 +618,7 @@ export default function DeviceFormBody({ fx }: Props) {
             <ITFlex align="center" gap={2} className="mb-4">
               <FaBoxes size={14} className="text-slate-400" />
               <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                Unidades ({fx.loteRows.length})
+                {tt("form.loteUnits", { count: fx.loteRows.length })}
               </ITText>
             </ITFlex>
 
@@ -659,7 +661,7 @@ export default function DeviceFormBody({ fx }: Props) {
                           <ITFlex align="center" gap={1}>
                             <FaLock size={10} className="text-amber-600" />
                             <ITText className="text-[9px] font-black uppercase tracking-widest text-amber-600">
-                              Asignado — protegido
+                              {tt("form.assignedProtected")}
                             </ITText>
                           </ITFlex>
                         )}
@@ -669,7 +671,7 @@ export default function DeviceFormBody({ fx }: Props) {
                           <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
                             <ITInput
                               name={`lote-serie-${idx}`}
-                              label="No. Serie"
+                              label={tt("form.serialNo")}
                               value={r.numeroSerie}
                               onChange={(e) =>
                                 fx.setLoteRows((prev) =>
@@ -688,7 +690,7 @@ export default function DeviceFormBody({ fx }: Props) {
                           <ITGrid item xs={12} md={showITSpecs ? 3 : 4}>
                             <ITInput
                               name={`lote-eq-${idx}`}
-                              label="Nombre del equipo"
+                              label={tt("form.equipmentName")}
                               value={r.nombreEquipo}
                               onChange={(e) =>
                                 fx.setLoteRows((prev) =>
@@ -709,7 +711,7 @@ export default function DeviceFormBody({ fx }: Props) {
                               <ITGrid item xs={12} md={3}>
                                 <ITInput
                                   name={`lote-ip-${idx}`}
-                                  label="IP"
+                                  label={tt("form.ip")}
                                   value={r.ip}
                                   onChange={(e) =>
                                     fx.setLoteRows((prev) =>
@@ -727,7 +729,7 @@ export default function DeviceFormBody({ fx }: Props) {
                               <ITGrid item xs={12} md={3}>
                                 <ITInput
                                   name={`lote-mac-${idx}`}
-                                  label="MAC Address"
+                                  label={tt("form.macAddress")}
                                   value={r.macAddress}
                                   onChange={(e) =>
                                     fx.setLoteRows((prev) =>
@@ -753,7 +755,7 @@ export default function DeviceFormBody({ fx }: Props) {
                         <ITGrid item xs={12} md={showITSpecs ? 12 : 4}>
                           <ITInput
                             name={`lote-area-${idx}`}
-                            label="Área"
+                            label={tt("form.area")}
                             value={r.area}
                             onChange={(e) =>
                               fx.setLoteRows((prev) =>

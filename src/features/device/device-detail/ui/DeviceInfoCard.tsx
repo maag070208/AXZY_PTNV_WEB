@@ -2,6 +2,7 @@ import { ITBadget, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_syst
 import { FaLayerGroup } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { formatFechaHora } from "@shared/utils/dates";
+import { dyn } from "@shared/i18n";
 import type { Device } from "@entities/device";
 import type { DeviceFieldKey } from "@entities/device-type";
 import { ESTADO_BADGE, FIELD_LABELS } from "../model/constants";
@@ -30,7 +31,7 @@ export default function DeviceInfoCard({ device }: Props) {
             color={ESTADO_BADGE[device.estado]?.color as any ?? "default"}
             size="small"
           >
-            {ESTADO_BADGE[device.estado]?.label ?? device.estado}
+            {dyn(tt)(`status.labels.${device.estado}`)}
           </ITBadget>
           {device.type && (
             <ITBadget color="primary" size="small">
@@ -53,7 +54,7 @@ export default function DeviceInfoCard({ device }: Props) {
           <ITGrid item xs={12} md={3}>
             <ITStack direction="column" spacing={1}>
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Control de activos
+                {tt("form.controlActivos")}
               </ITText>
               <ITText className="text-[13px] font-black text-slate-800">
                 {device.controlActivos}
@@ -64,7 +65,7 @@ export default function DeviceInfoCard({ device }: Props) {
             <ITGrid item xs={12} md={3}>
               <ITStack direction="column" spacing={1}>
                 <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                  Marca / Modelo
+                  {tt("form.brandModel")}
                 </ITText>
                 <ITText className="text-[13px] font-bold text-slate-700">
                   {device.marca} {device.modelo}
@@ -75,7 +76,7 @@ export default function DeviceInfoCard({ device }: Props) {
           <ITGrid item xs={12} md={3}>
             <ITStack direction="column" spacing={1}>
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                No. Serie
+                {tt("form.serialNo")}
               </ITText>
               <ITText className="text-[13px] font-bold text-slate-700">
                 {device.numeroSerie ?? "—"}
@@ -85,7 +86,7 @@ export default function DeviceInfoCard({ device }: Props) {
           <ITGrid item xs={12} md={3}>
             <ITStack direction="column" spacing={1}>
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Área
+                {tt("form.area")}
               </ITText>
               <ITText className="text-[13px] font-bold text-slate-700">
                 {device.area}
@@ -99,9 +100,11 @@ export default function DeviceInfoCard({ device }: Props) {
             {configuredFields.map((field) => (
               <ITGrid item xs={12} md={3} key={field}>
                 <ITStack direction="column" spacing={1}>
+                  {FIELD_LABELS[field] && (
                   <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                    {FIELD_LABELS[field]}
+                    {dyn(tt)(FIELD_LABELS[field])}
                   </ITText>
+                )}
                   <ITText className="text-[12px] font-bold text-slate-700">
                     {device[field] ?? "—"}
                   </ITText>
@@ -115,7 +118,7 @@ export default function DeviceInfoCard({ device }: Props) {
           device.nombreEquipo && (
             <ITStack direction="column" spacing={1}>
               <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Nombre del equipo
+                {tt("form.equipmentName")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700">
                 {device.nombreEquipo}
@@ -125,7 +128,7 @@ export default function DeviceInfoCard({ device }: Props) {
 
         <ITStack direction="column" spacing={1}>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            Registrado
+            {tt("form.registered")}
           </ITText>
           <ITText className="text-[11px] text-slate-500">
             {formatFechaHora(device.createdAt)}
