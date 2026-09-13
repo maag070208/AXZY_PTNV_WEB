@@ -14,11 +14,12 @@ import { useTranslation } from "react-i18next";
 import {
   useDeviceTypesList,
   deviceTypesColumns,
+  DeviceTypeStatsGrid,
 } from "@features/device-type/device-types-list";
 
 export default function DeviceTypesListPage() {
   const { t: tt } = useTranslation(["device-types"]);
-  const { navigate, fetchTableData } = useDeviceTypesList();
+  const { navigate, stats, fetchTableData } = useDeviceTypesList();
   const columns = deviceTypesColumns(navigate);
 
   return (
@@ -45,17 +46,20 @@ export default function DeviceTypesListPage() {
       icon={<FaTag size={20} />}
       maxWidth="7xl"
     >
-      <ITDataTable
-        columns={columns as any}
-        fetchData={
-          fetchTableData as unknown as (
-            p: ITDataTableFetchParams
-          ) => Promise<ITDataTableResponse<Record<string, unknown>>>
-        }
-        defaultView="table"
-        defaultItemsPerPage={10}
-        size="sm"
-      />
+      <ITFlex direction="column" gap={4}>
+        <DeviceTypeStatsGrid stats={stats} />
+        <ITDataTable
+          columns={columns as any}
+          fetchData={
+            fetchTableData as unknown as (
+              p: ITDataTableFetchParams
+            ) => Promise<ITDataTableResponse<Record<string, unknown>>>
+          }
+          defaultView="table"
+          defaultItemsPerPage={10}
+          size="sm"
+        />
+      </ITFlex>
     </ITPage>
   );
 }

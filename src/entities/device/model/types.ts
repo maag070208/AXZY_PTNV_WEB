@@ -48,6 +48,7 @@ export interface DeviceSummary {
 }
 
 export interface LoteSharedUpdate {
+  typeId?: string;
   descripcion?: string;
   marca?: string;
   modelo?: string;

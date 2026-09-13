@@ -2,6 +2,7 @@ import {
   ITBadget,
   ITButton,
   ITCard,
+  ITConfirmDialog,
   ITFlex,
   ITGrid,
   ITInput,
@@ -27,7 +28,7 @@ interface Props {
 }
 
 export default function DeviceFormBody({ fx }: Props) {
-  const { t: tt } = useTranslation(["device"]);
+  const { t: tt } = useTranslation(["device", "common"]);
   const { isEdit, isBatch, isLoteEdit, disabledAll, showField, showITSpecs } = fx;
 
   return (
@@ -532,6 +533,27 @@ export default function DeviceFormBody({ fx }: Props) {
               </ITText>
             </ITFlex>
             <ITGrid container columns={12} spacing={4}>
+              <ITGrid item xs={12} md={6}>
+                <ITSelect
+                  name="typeId"
+                  label={tt("form.type")}
+                  options={fx.types.map((t) => ({
+                    value: t.id,
+                    label: `${t.name} (${t.prefix})`,
+                  }))}
+                  value={fx.form.typeId}
+                  onChange={(e) =>
+                    fx.setForm((f) => ({ ...f, typeId: e.target.value }))
+                  }
+                  required
+                  disabled={fx.loteHasAssigned}
+                />
+                <ITText className="text-[10px] text-slate-400 mt-1">
+                  {fx.loteHasAssigned
+                    ? tt("form.typeChangeBlockedByAssigned")
+                    : tt("form.editDescription")}
+                </ITText>
+              </ITGrid>
               <ITGrid item xs={12}>
                 <ITInput
                   name="desc"
@@ -657,13 +679,25 @@ export default function DeviceFormBody({ fx }: Props) {
                             {r.estado}
                           </ITBadget>
                         </ITFlex>
-                        {locked && (
+                        {locked ? (
                           <ITFlex align="center" gap={1}>
                             <FaLock size={10} className="text-amber-600" />
                             <ITText className="text-[9px] font-black uppercase tracking-widest text-amber-600">
                               {tt("form.assignedProtected")}
                             </ITText>
                           </ITFlex>
+                        ) : (
+                          fx.loteRows.length > 1 && (
+                            <ITButton
+                              variant="outlined"
+                              size="small"
+                              color="secondary"
+                              onClick={() => fx.requestRemoveLoteUnit(r)}
+                              title={tt("form.removeUnit")}
+                            >
+                              <FaTrash size={11} />
+                            </ITButton>
+                          )
                         )}
                       </ITFlex>
                       <ITGrid container columns={12} spacing={3}>
@@ -774,6 +808,27 @@ export default function DeviceFormBody({ fx }: Props) {
               </ITFlex>
             )}
           </ITCard>
+
+          <ITConfirmDialog
+            isOpen={!!fx.unitToRemove}
+            onClose={fx.cancelRemoveLoteUnit}
+            onConfirm={fx.confirmRemoveLoteUnit}
+            title={tt("form.removeLoteUnitTitle")}
+            message={
+              fx.unitToRemove
+                ? tt("form.removeLoteUnitMessage", {
+                    code: fx.unitToRemove.controlActivos,
+                  })
+                : ""
+            }
+            confirmLabel={
+              fx.removingUnit
+                ? tt("form.removingUnit")
+                : tt("form.removeLoteUnitConfirm")
+            }
+            cancelLabel={tt("common:actions.cancel")}
+            variant="danger"
+          />
         </>
       )}
     </>

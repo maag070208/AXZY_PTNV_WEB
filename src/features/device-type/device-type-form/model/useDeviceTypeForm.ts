@@ -50,7 +50,10 @@ export const useDeviceTypeForm = () => {
     setError(null);
     try {
       if (isEdit && id) {
-        await deviceTypesApi.update(id, form);
+        await deviceTypesApi.update(id, {
+          name: form.name,
+          fieldConfig: form.fieldConfig,
+        });
       } else {
         await deviceTypesApi.create(form);
       }

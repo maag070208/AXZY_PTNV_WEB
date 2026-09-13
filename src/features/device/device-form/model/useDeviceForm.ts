@@ -61,6 +61,11 @@ export const useDeviceForm = () => {
   const [addQty, setAddQty] = useState(1);
   const [addingUnits, setAddingUnits] = useState(false);
 
+  const [unitToRemove, setUnitToRemove] = useState<ReturnType<
+    typeof toLoteRow
+  > | null>(null);
+  const [removingUnit, setRemovingUnit] = useState(false);
+
   useEffect(() => {
     setLoading(true);
     deviceTypesApi
@@ -142,6 +147,10 @@ export const useDeviceForm = () => {
   const isBatch = !isEdit && cantidad > 1;
   const isLoteEdit = isEdit && !!loteId && loteSize > 1;
   const disabledAll = isEdit && blocked;
+  const loteHasAssigned = useMemo(
+    () => loteRows.some((r) => r.estado === "ASIGNADO"),
+    [loteRows]
+  );
 
   const handleUnitField = (idx: number, field: keyof UnitForm, value: string) => {
     setUnits((prev) => {
@@ -193,6 +202,7 @@ export const useDeviceForm = () => {
       if (isEdit && id) {
         if (loteId && loteSize > 1) {
           const res = await devicesApi.updateLote(loteId, {
+            typeId: form.typeId,
             descripcion: form.descripcion,
             marca: form.marca,
             modelo: form.modelo,
@@ -292,6 +302,32 @@ export const useDeviceForm = () => {
     }
   };
 
+  const requestRemoveLoteUnit = (row: ReturnType<typeof toLoteRow>) =>
+    setUnitToRemove(row);
+  const cancelRemoveLoteUnit = () => setUnitToRemove(null);
+
+  const confirmRemoveLoteUnit = async () => {
+    if (!unitToRemove || !loteId) return;
+    setRemovingUnit(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      // force=true: se está deshaciendo un alta reciente (unidad nunca
+      // asignada), así que se borra por completo en lugar de solo darla
+      // de baja — de otro modo seguiría contando en el tamaño del lote.
+      await devicesApi.remove(unitToRemove.id, true);
+      const freshLote = await devicesApi.getLote(loteId);
+      setLoteRows(freshLote.data.map(toLoteRow));
+      setLoteSize(freshLote.total);
+      setSuccess(`Unidad ${unitToRemove.controlActivos} eliminada del lote.`);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setRemovingUnit(false);
+      setUnitToRemove(null);
+    }
+  };
+
   return {
     id,
     navigate,
@@ -308,6 +344,12 @@ export const useDeviceForm = () => {
     loteRows,
     setLoteRows,
     loteLoading,
+    loteHasAssigned,
+    unitToRemove,
+    removingUnit,
+    requestRemoveLoteUnit,
+    cancelRemoveLoteUnit,
+    confirmRemoveLoteUnit,
     cantidad,
     setCantidad,
     units,

@@ -177,6 +177,15 @@ export const useDeviceImport = () => {
     setRows((prev) => prev.filter((r) => r.key !== key));
   };
 
+  const resetImport = () => {
+    setRows([]);
+    setFile(null);
+    setResults(null);
+    setWarnings([]);
+    setUnknownTypes([]);
+    setError(null);
+  };
+
   const isRowValid = (r: Row): boolean => {
     const cantidad = Number(r.cantidad);
     return (
@@ -295,6 +304,7 @@ export const useDeviceImport = () => {
     fieldEnabled,
     fieldRequired,
     removeRow,
+    resetImport,
     isRowValid,
     validCount,
     unitTotal,

@@ -6,11 +6,14 @@ import {
   ImportDropCard,
   ImportRowsTable,
   ImportResultsCard,
+  ImportStepper,
 } from "@features/device/import-devices";
 
 export default function DeviceImportPage() {
   const { t: tt } = useTranslation(["device"]);
   const fx = useDeviceImport();
+
+  const stage = fx.results ? 3 : fx.rows.length > 0 ? 2 : 1;
 
   return (
     <ITPage
@@ -26,6 +29,8 @@ export default function DeviceImportPage() {
       ]}
       icon={<FaFileExcel size={20} />}
     >
+      <ImportStepper stage={stage} />
+
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
           {fx.error}

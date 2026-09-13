@@ -5,16 +5,48 @@ import {
 } from "@axzydev/axzy_ui_system";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { FaMicrochip, FaPen } from "react-icons/fa";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   deviceTypeApi as deviceTypesApi,
   type DeviceType,
 } from "@entities/device-type";
 import { i18n } from "@shared/i18n";
+import { Avatar } from "@shared/ui/kanban";
+
+export interface DeviceTypesStats {
+  types: number;
+  active: number;
+  inactive: number;
+  devices: number;
+  loading: boolean;
+}
 
 export const useDeviceTypesList = () => {
   const navigate = useNavigate();
+
+  const [stats, setStats] = useState<DeviceTypesStats>({
+    types: 0,
+    active: 0,
+    inactive: 0,
+    devices: 0,
+    loading: true,
+  });
+
+  useEffect(() => {
+    deviceTypesApi
+      .list(true)
+      .then((list) =>
+        setStats({
+          types: list.length,
+          active: list.filter((t) => t.active).length,
+          inactive: list.filter((t) => !t.active).length,
+          devices: list.reduce((acc, t) => acc + (t._count?.devices ?? 0), 0),
+          loading: false,
+        })
+      )
+      .catch(() => setStats((s) => ({ ...s, loading: false })));
+  }, []);
 
   const fetchTableData = useCallback(
     async (params: ITDataTableFetchParams) => {
@@ -32,7 +64,7 @@ export const useDeviceTypesList = () => {
     []
   );
 
-  return { navigate, fetchTableData };
+  return { navigate, stats, fetchTableData };
 };
 
 export type UseDeviceTypesList = ReturnType<typeof useDeviceTypesList>;
@@ -46,17 +78,11 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
     filter: true,
     render: (t: DeviceType) => (
       <ITFlex align="center" gap={1.25}>
-        <ITFlex
-          align="center"
-          justify="center"
-          className={`w-11 h-11 rounded-2xl text-white font-black text-[13px] shrink-0 shadow-sm ${
-            t.active
-              ? "bg-gradient-to-br from-emerald-500 to-emerald-600"
-              : "bg-gradient-to-br from-slate-300 to-slate-400"
-          }`}
-        >
-          {t.prefix}
-        </ITFlex>
+        <Avatar
+          name={t.name}
+          seed={t.prefix}
+          size={8}
+        />
         <ITFlex direction="column" gap={0.25}>
           <ITFlex align="center" gap={0.5}>
             <ITText className="font-black text-slate-800 text-[13px] uppercase leading-tight">
@@ -99,9 +125,24 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
     key: "count",
     label: i18n.t("device-types:list.colCount"),
     render: (t: DeviceType) => (
-      <ITFlex align="center" gap={0.5}>
-        <FaMicrochip size={11} className="text-slate-400" />
-        <ITText className="text-[12px] font-black text-slate-700">
+      <ITFlex
+        align="center"
+        gap={1}
+        className={`inline-flex rounded-lg px-2.5 py-1 w-fit border ${(t._count?.devices ?? 0) > 0
+            ? "bg-indigo-50 border-indigo-200"
+            : "bg-slate-50 border-slate-200"
+          }`}
+      >
+        <FaMicrochip
+          size={11}
+          className={
+            (t._count?.devices ?? 0) > 0 ? "text-indigo-500" : "text-slate-400"
+          }
+        />
+        <ITText
+          className={`text-[12px] font-black ${(t._count?.devices ?? 0) > 0 ? "text-indigo-700" : "text-slate-700"
+            }`}
+        >
           {t._count?.devices ?? 0}
         </ITText>
       </ITFlex>

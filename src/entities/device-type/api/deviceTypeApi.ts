@@ -12,7 +12,7 @@ export const deviceTypeApi = {
   get: (id: string) => api.get<DeviceType>(`/device-types/${id}`),
   create: (data: { code: string; name: string; prefix: string; fieldConfig?: DeviceFieldConfig }) =>
     api.post<DeviceType>(`/device-types`, data),
-  update: (id: string, data: { name?: string; prefix?: string; active?: boolean; fieldConfig?: DeviceFieldConfig }) =>
+  update: (id: string, data: { name?: string; active?: boolean; fieldConfig?: DeviceFieldConfig }) =>
     api.put<DeviceType>(`/device-types/${id}`, data),
   remove: (id: string) => api.delete<DeviceType>(`/device-types/${id}`),
 };

@@ -1,11 +1,20 @@
-import { ITBadget, ITButton, ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaCheckCircle, FaExclamationTriangle, FaLaptop } from "react-icons/fa";
+import { ITButton, ITCard, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
+import {
+  FaBoxOpen,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaFileExcel,
+  FaLaptop,
+} from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { StatCard } from "@shared/ui/stat-card";
 import type { UseDeviceImport } from "../model/useDeviceImport";
 
 export default function ImportResultsCard({ fx }: { fx: UseDeviceImport }) {
   const { t: tt } = useTranslation(["device"]);
   if (!fx.results) return null;
+  const ok = fx.results.filter((r) => r.ok).length;
+  const err = fx.results.length - ok;
   return (
     <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px] mt-6">
       <ITFlex align="center" gap={2} className="mb-4">
@@ -15,20 +24,24 @@ export default function ImportResultsCard({ fx }: { fx: UseDeviceImport }) {
         </ITText>
       </ITFlex>
 
-      <ITFlex gap={4} wrap="wrap" className="mb-4">
-        <ITBadget color="success" size="small">
-          {tt("import.resultsOk", {
-            count: fx.results.filter((r) => r.ok).length,
-          })}
-        </ITBadget>
-        {fx.results.some((r) => !r.ok) && (
-          <ITBadget color="warning" size="small">
-            {tt("import.resultsError", {
-              count: fx.results.filter((r) => !r.ok).length,
-            })}
-          </ITBadget>
-        )}
-      </ITFlex>
+      <ITGrid container columns={12} spacing={3} className="mb-4">
+        <ITGrid item xs={6}>
+          <StatCard
+            icon={<FaCheckCircle size={14} className="text-white" />}
+            circleClass="bg-gradient-to-br from-emerald-500 to-emerald-600"
+            value={ok}
+            label={tt("import.resultsOk", { count: ok })}
+          />
+        </ITGrid>
+        <ITGrid item xs={6}>
+          <StatCard
+            icon={<FaExclamationTriangle size={14} className="text-white" />}
+            circleClass="bg-gradient-to-br from-amber-500 to-amber-600"
+            value={err}
+            label={tt("import.resultsError", { count: err })}
+          />
+        </ITGrid>
+      </ITGrid>
 
       <div className="max-h-80 overflow-y-auto rounded-xl border border-slate-100">
         {fx.results.map((r, i) => (
@@ -56,6 +69,12 @@ export default function ImportResultsCard({ fx }: { fx: UseDeviceImport }) {
       </div>
 
       <ITFlex justify="end" gap={2} className="mt-5">
+        <ITButton variant="outlined" color="secondary" onClick={fx.resetImport}>
+          <ITFlex align="center" gap={1}>
+            <FaFileExcel size={12} />
+            <ITText className="text-[11px] font-bold">{tt("import.uploadAnother")}</ITText>
+          </ITFlex>
+        </ITButton>
         <ITButton
           variant="outlined"
           color="secondary"

@@ -1,7 +1,8 @@
-import { ITButton, ITCard, ITFlex, ITInput, ITSelect, ITText } from "@axzydev/axzy_ui_system";
-import { FaTrash, FaUpload } from "react-icons/fa";
+import { ITButton, ITCard, ITFlex, ITGrid, ITInput, ITSelect, ITText } from "@axzydev/axzy_ui_system";
+import { FaCheckCircle, FaExclamationTriangle, FaFileExcel, FaBoxes, FaTrash, FaUpload } from "react-icons/fa";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
+import { StatCard } from "@shared/ui/stat-card";
 import type { DeviceFieldKey } from "@entities/device-type";
 import {
   SHARED_FIELDS,
@@ -11,39 +12,96 @@ import {
 
 export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
   const { t: tt } = useTranslation(["device"]);
+  const incomplete = fx.rows.length - fx.validCount;
   return (
     <>
-      <ITCard className="p-4 mb-4 border border-slate-100 rounded-2xl bg-slate-50/60">
-        <ITFlex justify="between" align="end" gap={4} wrap="wrap">
-          <ITText className="text-[11px] font-bold text-slate-500">
-            {tt("import.rowsSummary", {
-              count: fx.rows.length,
-              valid: fx.validCount,
-              units: fx.unitTotal,
-            })}
-          </ITText>
-          <ITButton
-            variant="filled"
-            color="primary"
-            onClick={fx.handleConfirm}
-            disabled={
-              fx.committing ||
-              fx.validCount === 0 ||
-              fx.deviceTypes.length === 0
+      <ITGrid container columns={12} spacing={3} className="mb-4">
+        <ITGrid item xs={6} md={3}>
+          <StatCard
+            icon={<FaFileExcel size={14} className="text-white" />}
+            circleClass="bg-gradient-to-br from-slate-400 to-slate-600"
+            value={fx.rows.length}
+            label={tt("import.statRows")}
+          />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <StatCard
+            icon={<FaCheckCircle size={14} className="text-white" />}
+            circleClass="bg-gradient-to-br from-emerald-500 to-emerald-600"
+            value={fx.validCount}
+            label={tt("import.statValid")}
+          />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <StatCard
+            icon={<FaExclamationTriangle size={14} className="text-white" />}
+            circleClass={
+              incomplete > 0
+                ? "bg-gradient-to-br from-amber-500 to-amber-600"
+                : "bg-gradient-to-br from-slate-300 to-slate-400"
             }
-          >
-            <ITFlex align="center" gap={1}>
-              <FaUpload size={12} />
-              <ITText className="text-[11px] font-bold">
-                {fx.committing
-                  ? tt("import.loading", {
-                      done: fx.progress?.done ?? 0,
-                      total: fx.progress?.total ?? 0,
-                    })
-                  : tt("import.confirming", { count: fx.validCount })}
+            value={incomplete}
+            label={tt("import.statIncomplete")}
+          />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <StatCard
+            icon={<FaBoxes size={14} className="text-white" />}
+            circleClass="bg-gradient-to-br from-indigo-500 to-indigo-600"
+            value={fx.unitTotal}
+            label={tt("import.statUnits")}
+          />
+        </ITGrid>
+      </ITGrid>
+
+      <ITCard className="p-4 mb-4 border border-slate-100 rounded-2xl bg-slate-50/60">
+        <ITFlex justify="between" align="center" gap={4} wrap="wrap">
+          <ITFlex direction="column" gap={0}>
+            <ITText className="text-[11px] font-bold text-slate-500">
+              {tt("import.rowsSummary", {
+                count: fx.rows.length,
+                valid: fx.validCount,
+                units: fx.unitTotal,
+              })}
+            </ITText>
+            {incomplete > 0 && (
+              <ITText className="text-[10px] font-bold text-amber-600">
+                {tt("import.incompleteHint", { count: incomplete })}
               </ITText>
-            </ITFlex>
-          </ITButton>
+            )}
+          </ITFlex>
+          <ITFlex gap={2} wrap="wrap">
+            <ITButton variant="outlined" color="secondary" onClick={fx.resetImport}>
+              <ITFlex align="center" gap={1}>
+                <FaFileExcel size={12} />
+                <ITText className="text-[11px] font-bold">
+                  {tt("import.uploadAnother")}
+                </ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={fx.handleConfirm}
+              disabled={
+                fx.committing ||
+                fx.validCount === 0 ||
+                fx.deviceTypes.length === 0
+              }
+            >
+              <ITFlex align="center" gap={1}>
+                <FaUpload size={12} />
+                <ITText className="text-[11px] font-bold">
+                  {fx.committing
+                    ? tt("import.loading", {
+                        done: fx.progress?.done ?? 0,
+                        total: fx.progress?.total ?? 0,
+                      })
+                    : tt("import.confirming", { count: fx.validCount })}
+                </ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
         </ITFlex>
       </ITCard>
 
