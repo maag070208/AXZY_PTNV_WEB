@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { dyn } from "@shared/i18n";
+import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
@@ -95,7 +95,7 @@ export const useUserForm = () => {
           });
         })
         .catch(() => {
-          setError(dyn(tt)("form.errorLoad"));
+          setError(i18n.t("users:form.errorLoad"));
         })
         .finally(() => setLoading(false));
     }
