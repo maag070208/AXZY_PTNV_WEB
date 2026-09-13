@@ -1,4 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { useTranslation } from "react-i18next";
 import type { ReportRow } from "@entities/report";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
@@ -62,7 +63,9 @@ const COL = {
   estado: 54,
 };
 
-export default function ReportPDF({ rows, title = "Reporte de Entregas de Activos", filters }: Props) {
+export default function ReportPDF({ rows, title, filters }: Props) {
+  const { t: tt } = useTranslation(["reports"]);
+  const reportTitle = title ?? tt("pdf.deliveredTitle");
   const today = fmtDate(new Date());
 
   const totalEntregas = rows.length;
@@ -71,10 +74,10 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
   const deptos = new Set(rows.map((r) => r.department)).size;
 
   const summary: Array<{ label: string; value: number; color: string }> = [
-    { label: "Total registros", value: totalEntregas, color: PDF_COLORS.band },
-    { label: "Asignados", value: asignados, color: PDF_COLORS.success },
-    { label: "Devueltos", value: devueltos, color: PDF_COLORS.warning },
-    { label: "Departamentos", value: deptos, color: PDF_COLORS.bandAccent },
+    { label: tt("pdf.summaryTotal"), value: totalEntregas, color: PDF_COLORS.band },
+    { label: tt("pdf.summaryAsignados"), value: asignados, color: PDF_COLORS.success },
+    { label: tt("pdf.summaryDevueltos"), value: devueltos, color: PDF_COLORS.warning },
+    { label: tt("pdf.summaryDepartamentos"), value: deptos, color: PDF_COLORS.bandAccent },
   ];
 
   const hasFilters = filters && (filters.start || filters.end || filters.department || filters.employee);
@@ -82,10 +85,10 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
   if (filters?.start || filters?.end) {
     const from = filters?.start ? fmtFilterDate(filters.start) : "…";
     const to = filters?.end ? fmtFilterDate(filters.end) : "…";
-    filterParts.push(`Periodo: ${from} — ${to}`);
+    filterParts.push(tt("pdf.filtroPeriodo", { from, to }));
   }
-  if (filters?.department) filterParts.push(`Departamento: ${filters.department}`);
-  if (filters?.employee) filterParts.push(`Empleado: ${filters.employee}`);
+  if (filters?.department) filterParts.push(tt("pdf.filtroDepartamento", { name: filters.department }));
+  if (filters?.employee) filterParts.push(tt("pdf.filtroEmpleado", { name: filters.employee }));
 
   const ROWS_PER_PAGE = 28;
   const pages: ReportRow[][] = [];
@@ -95,10 +98,10 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
   if (pages.length === 0) pages.push([]);
 
   return (
-    <Document title={title} author="Puerto Nuevo Hotel y Villas">
+    <Document title={reportTitle} author="Puerto Nuevo Hotel y Villas">
       {pages.map((pageRows, pageIdx) => (
         <Page key={pageIdx} size="LETTER" style={pdfTheme.page}>
-          <PdfLetterhead title={title} pageIndex={pageIdx} pageCount={pages.length} generatedAt={today} />
+          <PdfLetterhead title={reportTitle} pageIndex={pageIdx} pageCount={pages.length} generatedAt={today} />
 
           <View style={pdfTheme.content}>
             {pageIdx === 0 && (
@@ -114,19 +117,19 @@ export default function ReportPDF({ rows, title = "Reporte de Entregas de Activo
 
             {pageIdx === 0 && hasFilters && (
               <View style={pdfTheme.filterBox}>
-                <Text style={pdfTheme.filterTitle}>Filtros aplicados</Text>
+                <Text style={pdfTheme.filterTitle}>{tt("pdf.filtrosAplicados")}</Text>
                 <Text style={pdfTheme.filterText}>{filterParts.join("  ·  ")}</Text>
               </View>
             )}
 
             <View style={pdfTheme.tableHeader}>
-              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>Fecha</Text></View>
-              <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>Folio</Text></View>
-              <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>Activo</Text></View>
-              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>Descripción</Text></View>
-              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>Responsable</Text></View>
-              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>Departamento</Text></View>
-              <View style={{ width: COL.estado }}><Text style={pdfTheme.tableHeaderText}>Estado</Text></View>
+              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFecha")}</Text></View>
+              <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFolio")}</Text></View>
+              <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colActivo")}</Text></View>
+              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescripcion")}</Text></View>
+              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colResponsable")}</Text></View>
+              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDepartamento")}</Text></View>
+              <View style={{ width: COL.estado }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colEstado")}</Text></View>
             </View>
 
             {pageRows.map((r, i) => (

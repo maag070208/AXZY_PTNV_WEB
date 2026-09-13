@@ -1,4 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { useTranslation } from "react-i18next";
 import type { AsignadoRow } from "@entities/report";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
@@ -25,9 +26,6 @@ const fmtDate = (d: string | null): string => {
 const origenBadgeStyle = (origen: AsignadoRow["origen"]) =>
   origen === "CARTA" ? badgeStyleFor("success") : origen === "MOVIMIENTO" ? badgeStyleFor("warning") : badgeStyleFor("gray");
 
-const origenLabel = (origen: AsignadoRow["origen"]) =>
-  origen === "CARTA" ? "Carta" : origen === "MOVIMIENTO" ? "Movimiento" : "Desconocido";
-
 const COL = {
   activo: 68,
   desc: 112,
@@ -39,7 +37,9 @@ const COL = {
   origen: 42,
 };
 
-export default function AsignadosPDF({ rows, title = "Reporte de Dispositivos Asignados" }: Props) {
+export default function AsignadosPDF({ rows, title }: Props) {
+  const { t: tt } = useTranslation(["reports"]);
+  const reportTitle = title ?? tt("pdf.asignadosTitle");
   const today = fmtDate(new Date().toISOString());
   const totalAsignados = rows.length;
   const conCarta = rows.filter((r) => r.origen === "CARTA").length;
@@ -48,11 +48,14 @@ export default function AsignadosPDF({ rows, title = "Reporte de Dispositivos As
     : 0;
   const deptos = new Set(rows.map((r) => r.departamento).filter(Boolean)).size;
 
+  const origenLabel = (origen: AsignadoRow["origen"]) =>
+    origen === "CARTA" ? tt("asignados.origenCarta") : origen === "MOVIMIENTO" ? tt("asignados.origenMovimiento") : tt("asignados.origenDesconocido");
+
   const summary: Array<{ label: string; value: number; color: string }> = [
-    { label: "Asignados", value: totalAsignados, color: PDF_COLORS.band },
-    { label: "Con carta responsiva", value: conCarta, color: PDF_COLORS.success },
-    { label: "Días promedio", value: promedioDias, color: PDF_COLORS.danger },
-    { label: "Departamentos", value: deptos, color: PDF_COLORS.bandAccent },
+    { label: tt("pdf.summaryAsignados"), value: totalAsignados, color: PDF_COLORS.band },
+    { label: tt("pdf.summaryCarta"), value: conCarta, color: PDF_COLORS.success },
+    { label: tt("pdf.summaryPromedio"), value: promedioDias, color: PDF_COLORS.danger },
+    { label: tt("pdf.summaryDepartamentos"), value: deptos, color: PDF_COLORS.bandAccent },
   ];
 
   const ROWS_PER_PAGE = 26;
@@ -63,10 +66,10 @@ export default function AsignadosPDF({ rows, title = "Reporte de Dispositivos As
   if (pages.length === 0) pages.push([]);
 
   return (
-    <Document title={title} author="Puerto Nuevo Hotel y Villas">
+    <Document title={reportTitle} author="Puerto Nuevo Hotel y Villas">
       {pages.map((pageRows, pageIdx) => (
         <Page key={pageIdx} size="LETTER" style={pdfTheme.page}>
-          <PdfLetterhead title={title} pageIndex={pageIdx} pageCount={pages.length} generatedAt={today} />
+          <PdfLetterhead title={reportTitle} pageIndex={pageIdx} pageCount={pages.length} generatedAt={today} />
 
           <View style={pdfTheme.content}>
             {pageIdx === 0 && (
@@ -81,14 +84,14 @@ export default function AsignadosPDF({ rows, title = "Reporte de Dispositivos As
             )}
 
             <View style={pdfTheme.tableHeader}>
-              <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>Activo</Text></View>
-              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>Descripción</Text></View>
-              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>Responsable</Text></View>
-              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>Departamento</Text></View>
-              <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>Folio</Text></View>
-              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>Fecha</Text></View>
-              <View style={{ width: COL.dias }}><Text style={pdfTheme.tableHeaderText}>Días</Text></View>
-              <View style={{ width: COL.origen }}><Text style={pdfTheme.tableHeaderText}>Origen</Text></View>
+              <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colActivo")}</Text></View>
+              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescripcion")}</Text></View>
+              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colResponsable")}</Text></View>
+              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDepartamento")}</Text></View>
+              <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFolio")}</Text></View>
+              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFecha")}</Text></View>
+              <View style={{ width: COL.dias }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDias")}</Text></View>
+              <View style={{ width: COL.origen }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colOrigen")}</Text></View>
             </View>
 
             {pageRows.map((r, i) => (
