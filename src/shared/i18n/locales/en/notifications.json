@@ -1,3 +1,8 @@
 {
-  "placeholder": ""
+  "placeholder": "",
+  "title": "Notifications",
+  "description": "Notifications and alerts center",
+  "markAllRead": "Mark all as read",
+  "loading": "Loading…",
+  "empty": "No notifications"
 }

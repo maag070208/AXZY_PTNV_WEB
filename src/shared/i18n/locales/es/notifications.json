@@ -1,3 +1,8 @@
 {
-  "placeholder": ""
+  "placeholder": "",
+  "title": "Notificaciones",
+  "description": "Centro de notificaciones y alertas",
+  "markAllRead": "Marcar todo como leído",
+  "loading": "Cargando…",
+  "empty": "Sin notificaciones"
 }

@@ -133,7 +133,8 @@
     "imported": "{{count}} usuario(s) importado(s) correctamente",
     "errorImport": "Error al importar usuarios",
     "errorNoFile": "Selecciona un archivo Excel primero",
-    "goToList": "Ir a Usuarios"
+    "goToList": "Ir a Usuarios",
+    "noFile": "Ningún archivo seleccionado"
   },
   "table": {
     "username": "Username",

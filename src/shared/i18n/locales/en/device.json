@@ -160,5 +160,31 @@
     "viewDevices": "View devices",
     "rowIncomplete": "Incomplete row — skipped (missing model, description, brand or quantity).",
     "noModel": "(no model)"
+  },
+  "detail": {
+    "title": "Device",
+    "breadcrumb": "Detail",
+    "notFound": "Device not found"
+  },
+  "lote": {
+    "title": "Batch — {{count}} units",
+    "edit": "Edit full batch",
+    "editTitle": "Edit entire batch",
+    "loading": "Loading batch units…",
+    "empty": "No units to display"
+  },
+  "comment": {
+    "title": {
+      "en": {
+        "es": "Agregar comentario",
+        "en": "Add comment"
+      }
+    },
+    "placeholder": {
+      "en": {
+        "es": "Escribe un comentario sobre este dispositivo...",
+        "en": "Write a comment about this device..."
+      }
+    }
   }
 }

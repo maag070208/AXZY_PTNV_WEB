@@ -62,7 +62,8 @@
     "undoDialogTitle": "Cancel return",
     "undoDialogMessage": "Cancel the return? The device will go back to ASSIGNED.",
     "back": "Back",
-    "guardPlaceholder": "E.g. John Doe"
+    "guardPlaceholder": "E.g. John Doe",
+    "placeholder": "Good, with minor on-screen details..."
   },
   "table": {
     "folio": "FOLIO",

@@ -33,7 +33,7 @@ export default function ImportPanel({ fx }: Props) {
               </ITFlex>
             </ITButton>
             <ITText className="text-[11px] font-bold text-slate-500">
-              {fx.file ? fx.file.name : "Ningún archivo seleccionado"}
+              {fx.file ? fx.file.name : tt("import.noFile")}
             </ITText>
           </ITFlex>
         </div>

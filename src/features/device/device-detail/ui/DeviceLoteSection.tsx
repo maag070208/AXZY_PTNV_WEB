@@ -1,6 +1,7 @@
 import { ITBadget, ITFlex, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaLayerGroup } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Device } from "@entities/device";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function DeviceLoteSection({ device, loteDevices, loteLoading }: Props) {
+  const { t: tt } = useTranslation(["device"]);
   return (
     <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
       <ITStack direction="column" spacing={4} className="w-full">
@@ -17,25 +19,25 @@ export default function DeviceLoteSection({ device, loteDevices, loteLoading }: 
           <ITFlex align="center" gap={2}>
             <FaLayerGroup size={14} className="text-emerald-600" />
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-              Lote — {loteDevices.length} unidades
+              {tt("lote.title", { count: loteDevices.length })}
             </ITText>
           </ITFlex>
           <Link
             to={`/dispositivos/${device.id}/editar`}
             className="inline-flex items-center gap-1 text-[11px] font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg px-3 py-1.5 transition-colors"
-            title="Editar todo el lote"
+            title={tt("lote.editTitle")}
           >
-            Editar lote completo
+            {tt("lote.edit")}
           </Link>
         </ITFlex>
 
         {loteLoading ? (
           <ITText className="text-[12px] text-slate-400 italic">
-            Cargando unidades del lote…
+            {tt("lote.loading")}
           </ITText>
         ) : loteDevices.length === 0 ? (
           <ITText className="text-[12px] text-slate-400 italic">
-            Sin unidades por mostrar
+            {tt("lote.empty")}
           </ITText>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

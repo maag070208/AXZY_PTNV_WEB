@@ -1,14 +1,16 @@
 import { ITButton, ITPage, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaBell, FaCheckDouble } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { NotificationItem, useNotificationsList } from "@features/notification/list";
 
 export default function NotificationsPage() {
+  const { t: tt } = useTranslation(["notifications", "common"]);
   const fx = useNotificationsList();
 
   return (
     <ITPage
-      title="Notificaciones"
-      description="Centro de notificaciones y alertas"
+      title={tt("title")}
+      description={tt("description")}
       icon={<FaBell size={20} />}
       maxWidth="3xl"
       actions={
@@ -20,7 +22,7 @@ export default function NotificationsPage() {
             onClick={fx.handleMarkAll}
           >
             <FaCheckDouble size={12} className="mr-1" />
-            Marcar todo como leido
+            {tt("markAllRead")}
           </ITButton>
         ) : undefined
       }
@@ -28,13 +30,13 @@ export default function NotificationsPage() {
       <ITStack direction="column" spacing={2}>
         {fx.loading && fx.items.length === 0 && (
           <ITText className="text-[12px] text-slate-400 italic text-center py-8">
-            Cargando...
+            {tt("loading")}
           </ITText>
         )}
 
         {!fx.loading && fx.items.length === 0 && (
           <ITText className="text-[12px] text-slate-400 italic text-center py-8">
-            Sin notificaciones
+            {tt("empty")}
           </ITText>
         )}
 

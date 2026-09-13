@@ -92,7 +92,7 @@ export default function DevolverCartaForm({
               label={t("return.conditions")}
               value={returnCondition}
               onChange={onReturnConditionChange}
-              placeholder="Bueno, con detalles menores en pantalla..."
+              placeholder={t("return.placeholder")}
               rows={4}
             />
 

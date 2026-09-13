@@ -35,7 +35,7 @@ export default function DeviceDetailPage() {
   if (loading) {
     return (
       <ITPage
-        title="Dispositivo"
+        title={tt("device:detail.title")}
         backAction={() => navigate(-1)}
         icon={<FaBoxOpen size={20} />}
         breadcrumbs={[
@@ -43,7 +43,7 @@ export default function DeviceDetailPage() {
             label: tt("device:list.title"),
             onClick: () => navigate("/dispositivos"),
           },
-          { label: "Detalle" },
+          { label: tt("device:detail.breadcrumb") },
         ]}
         loading
       >
@@ -57,7 +57,7 @@ export default function DeviceDetailPage() {
   if (!device) {
     return (
       <ITPage
-        title="Dispositivo"
+        title={tt("device:detail.title")}
         backAction={() => navigate(-1)}
         icon={<FaBoxOpen size={20} />}
         breadcrumbs={[
@@ -65,10 +65,10 @@ export default function DeviceDetailPage() {
             label: tt("device:list.title"),
             onClick: () => navigate("/dispositivos"),
           },
-          { label: "Detalle" },
+          { label: tt("device:detail.breadcrumb") },
         ]}
       >
-        <ITText className="text-slate-400">Dispositivo no encontrado</ITText>
+        <ITText className="text-slate-400">{tt("device:detail.notFound")}</ITText>
       </ITPage>
     );
   }

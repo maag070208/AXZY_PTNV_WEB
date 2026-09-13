@@ -1,3 +1,7 @@
 {
-  "placeholder": ""
+  "placeholder": "",
+  "title": "Employees",
+  "description": "{{count}} active employee(s)",
+  "breadcrumb": "Employees",
+  "newEmployee": "New employee"
 }

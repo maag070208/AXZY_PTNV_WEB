@@ -63,7 +63,8 @@
     "undoDialogTitle": "Cancelar devolución",
     "undoDialogMessage": "¿Cancelar la devolución? El device volverá a ASIGNADO.",
     "back": "Volver",
-    "guardPlaceholder": "Ej. Juan Pérez"
+    "guardPlaceholder": "Ej. Juan Pérez",
+    "placeholder": "Bueno, con detalles menores en pantalla..."
   },
   "table": {
     "folio": "FOLIO",

@@ -8,6 +8,7 @@ import {
 import { FaPlus, FaUserTie } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { RootState } from "@app/store";
 import {
   EmployeesTable,
@@ -15,6 +16,7 @@ import {
 } from "@features/user/employees-list";
 
 export default function EmployeesListPage() {
+  const { t: tt } = useTranslation(["employees", "common"]);
   const navigate = useNavigate();
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const isAdmin = currentUser?.role === "ADMIN";
@@ -23,12 +25,12 @@ export default function EmployeesListPage() {
 
   return (
     <ITPage
-      title="Empleados"
-      description={`${list.total} empleado(s) activo(s)`}
+      title={tt("title")}
+      description={tt("description", { count: list.total })}
       backAction={() => navigate(-1)}
       breadcrumbs={[
-        { label: "Inicio", onClick: () => navigate("/") },
-        { label: "Empleados" },
+        { label: tt("common:nav.home"), onClick: () => navigate("/") },
+        { label: tt("breadcrumb") },
       ]}
       actions={
         isAdmin ? (
@@ -39,7 +41,7 @@ export default function EmployeesListPage() {
           >
             <ITFlex align="center" gap={1}>
               <FaPlus size={12} />
-              <ITText className="font-bold text-[11px]">Nuevo empleado</ITText>
+              <ITText className="font-bold text-[11px]">{tt("newEmployee")}</ITText>
             </ITFlex>
           </ITButton>
         ) : undefined

@@ -161,5 +161,31 @@
     "viewDevices": "Ver dispositivos",
     "rowIncomplete": "Fila incompleta — se omitió (falta modelo, descripción, marca o cantidad).",
     "noModel": "(sin modelo)"
+  },
+  "detail": {
+    "title": "Dispositivo",
+    "breadcrumb": "Detalle",
+    "notFound": "Dispositivo no encontrado"
+  },
+  "lote": {
+    "title": "Lote — {{count}} unidades",
+    "edit": "Editar lote completo",
+    "editTitle": "Editar todo el lote",
+    "loading": "Cargando unidades del lote…",
+    "empty": "Sin unidades por mostrar"
+  },
+  "comment": {
+    "title": {
+      "es": {
+        "es": "Agregar comentario",
+        "en": "Add comment"
+      }
+    },
+    "placeholder": {
+      "es": {
+        "es": "Escribe un comentario sobre este dispositivo...",
+        "en": "Write a comment about this device..."
+      }
+    }
   }
 }
