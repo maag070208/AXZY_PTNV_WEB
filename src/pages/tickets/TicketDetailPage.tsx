@@ -2,6 +2,7 @@ import {
   ITButton,
   ITConfirmDialog,
   ITFlex,
+  ITGrid,
   ITPage,
   ITText,
   ITToast,
@@ -159,9 +160,9 @@ export default function TicketDetailPage() {
         </ITFlex>
       }
     >
-      <div className="flex flex-col md:flex-row gap-5 items-start">
-        {/* Columna izquierda: contenido principal */}
-        <div className="flex-1 flex flex-col gap-5">
+      <ITGrid container columns={12} spacing={5} className="items-start">
+        {/* Columna izquierda: contenido principal (2/3) */}
+        <ITGrid item xs={12} md={8} className="flex flex-col gap-5 min-w-0">
           <TicketInfoCard fx={fx} attachments={renderTicketAttachments} />
 
           {(fx.canEditTicket || fx.canCreateTasks) && (
@@ -175,13 +176,13 @@ export default function TicketDetailPage() {
           )}
 
           <TicketComments fx={fx} />
-        </div>
+        </ITGrid>
 
-        {/* Columna derecha: historial */}
-        <aside className="w-full md:w-72 shrink-0">
+        {/* Columna derecha: historial (1/3) */}
+        <ITGrid item xs={12} md={4} className="w-full min-w-0">
           <TicketHistoryAside events={timelineEvents} />
-        </aside>
-      </div>
+        </ITGrid>
+      </ITGrid>
 
       {fx.toast && (
         <ITToast

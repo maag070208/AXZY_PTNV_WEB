@@ -17,24 +17,24 @@ interface Props {
 }
 
 const EVENT_ICON: Record<string, React.ReactNode> = {
-  created: <FaTicketAlt size={10} />,
-  closed: <FaTimesCircle size={10} />,
-  follow: <FaSync size={10} />,
-  status: <FaCheckCircle size={10} />,
-  priority: <FaClock size={10} />,
-  assigned: <FaUserPlus size={10} />,
-  department: <FaBuilding size={10} />,
-  comment: <FaComment size={10} />,
-  default: <FaClock size={10} />,
+  created: <FaTicketAlt size={12} />,
+  closed: <FaTimesCircle size={12} />,
+  follow: <FaSync size={12} />,
+  status: <FaCheckCircle size={12} />,
+  priority: <FaClock size={12} />,
+  assigned: <FaUserPlus size={12} />,
+  department: <FaBuilding size={12} />,
+  comment: <FaComment size={12} />,
+  default: <FaClock size={12} />,
 };
 
 export default function TicketHistoryAside({ events }: Props) {
   const { t: tt } = useTranslation("tickets");
   return (
-    <div className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 md:sticky md:top-24">
+    <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-5 md:sticky md:top-24">
       <div className="flex items-center gap-2 mb-5">
-        <FaClock size={14} className="text-slate-400" />
-        <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+        <FaClock size={14} className="text-slate-400 shrink-0" />
+        <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 truncate">
           {tt("detail.historyTitle", { count: events.length })}
         </p>
       </div>
@@ -50,36 +50,36 @@ export default function TicketHistoryAside({ events }: Props) {
             return (
               <div key={event.id} className="flex gap-3 relative">
                 {!isLast && (
-                  <div className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-gradient-to-b from-slate-200 to-slate-100" />
+                  <div className="absolute left-[15px] top-8 bottom-0 w-0.5 bg-gradient-to-b from-slate-200 to-slate-100" />
                 )}
 
                 <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center ${event.iconBg} text-white z-10 ring-2 ring-white shrink-0 shadow-sm`}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center ${event.iconBg} text-white z-10 ring-2 ring-white shrink-0 shadow-sm`}
                 >
                   {EVENT_ICON[event.icon] ?? EVENT_ICON.default}
                 </div>
 
-                <div className={`pb-5 min-w-0 flex-1 ${isLast ? "pb-0" : ""}`}>
-                  <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
-                    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 mb-1">
+                <div className="pb-5 min-w-0 flex-1">
+                  <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 mb-1.5">
                       <span
-                        className={`text-[11px] font-bold leading-tight ${
+                        className={`text-xs font-bold leading-snug ${
                           event.title.includes("CERRADO") ? "text-red-600" : "text-slate-700"
                         }`}
                       >
                         {event.title || (isComment ? tt("detail.byUser") : event.type.toUpperCase())}
                       </span>
-                      <span className="text-[9px] text-slate-400 tabular-nums whitespace-nowrap bg-white px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] text-slate-400 tabular-nums whitespace-nowrap bg-white px-1.5 py-0.5 rounded">
                         {formatFechaHora(event.timestamp)}
                       </span>
                     </div>
                     {event.detail && (
-                      <p className={`text-[11px] leading-snug break-words ${isComment ? "text-slate-600 italic" : "text-slate-500"}`}>
+                      <p className={`text-xs leading-snug break-words ${isComment ? "text-slate-600 italic" : "text-slate-500"}`}>
                         {isComment ? `"${event.detail}"` : event.detail}
                       </p>
                     )}
                     {event.author && (
-                      <span className="text-[9px] text-slate-400 mt-1 block">
+                      <span className="text-[11px] text-slate-400 mt-1.5 block">
                         {event.author || tt("detail.systemUser")}
                       </span>
                     )}
