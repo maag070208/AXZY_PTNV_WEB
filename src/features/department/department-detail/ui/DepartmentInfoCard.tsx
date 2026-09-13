@@ -8,6 +8,7 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaPlus, FaTimes, FaUsers } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import type { Department, Subarea } from "@entities/department";
 
 interface Props {
@@ -27,13 +28,14 @@ export default function DepartmentInfoCard({
   onAddSubarea,
   onRemoveSubarea,
 }: Props) {
+  const { t: tt } = useTranslation(["departments"]);
   return (
     <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
       <ITGrid container columns={12} spacing={4}>
         <ITGrid item xs={12} md={5}>
           <ITFlex direction="column" gap={1}>
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-              Departamento
+              {tt("detail.department")}
             </ITText>
             <ITText className="font-bold uppercase tracking-tight text-slate-800">
               {dept.name}
@@ -44,11 +46,11 @@ export default function DepartmentInfoCard({
         <ITGrid item xs={12} md={3}>
           <ITFlex direction="column" gap={1}>
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-              Estado
+              {tt("detail.status")}
             </ITText>
             <ITFlex align="center" gap={2}>
               <ITBadget color={dept.active ? "success" : "danger"} size="small">
-                {dept.active ? "Activo" : "Inactivo"}
+                {dept.active ? tt("detail.active") : tt("detail.inactive")}
               </ITBadget>
             </ITFlex>
           </ITFlex>
@@ -57,11 +59,11 @@ export default function DepartmentInfoCard({
         <ITGrid item xs={12} md={4}>
           <ITFlex direction="column" gap={1}>
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-              Usuarios
+              {tt("detail.users")}
             </ITText>
             <ITFlex align="center" gap={2} className="text-slate-600">
               <FaUsers size={14} />
-              <ITText className="font-bold">{dept._count?.users ?? 0} usuario(s)</ITText>
+              <ITText className="font-bold">{tt("detail.userCount", { count: dept._count?.users ?? 0 })}</ITText>
             </ITFlex>
           </ITFlex>
         </ITGrid>
@@ -69,11 +71,11 @@ export default function DepartmentInfoCard({
         <ITGrid item xs={12}>
           <ITFlex direction="column" gap={2}>
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-              Áreas
+              {tt("detail.areas")}
             </ITText>
             {dept.subareas.length === 0 ? (
               <ITText className="text-[12px] font-bold text-slate-400">
-                Este departamento aún no tiene subáreas.
+                {tt("detail.noSubareas")}
               </ITText>
             ) : (
               <ITFlex wrap="wrap" gap={2}>
@@ -92,7 +94,7 @@ export default function DepartmentInfoCard({
                         size={10}
                         className="text-slate-400 hover:text-rose-500 cursor-pointer"
                         onClick={() => onRemoveSubarea(s)}
-                        title="Eliminar subárea"
+                        title={tt("detail.removeSubarea")}
                       />
                     )}
                   </ITFlex>
@@ -109,7 +111,7 @@ export default function DepartmentInfoCard({
                 name="newSubarea"
                 value={newSubarea}
                 onChange={(e) => onNewSubarea(e.target.value)}
-                placeholder="Nueva subárea…"
+                placeholder={tt("detail.newSubareaPlaceholder")}
                 onKeyDown={(e) => e.key === "Enter" && onAddSubarea()}
                 className="flex-1"
               />
@@ -118,11 +120,11 @@ export default function DepartmentInfoCard({
                 color="primary"
                 onClick={onAddSubarea}
                 disabled={!newSubarea.trim()}
-                title="Agregar subárea"
+                title={tt("detail.addSubarea")}
               >
                 <ITFlex align="center" gap={1}>
                   <FaPlus size={12} />
-                  <ITText className="font-bold text-[11px]">Agregar</ITText>
+                  <ITText className="font-bold text-[11px]">{tt("detail.add")}</ITText>
                 </ITFlex>
               </ITButton>
             </ITFlex>

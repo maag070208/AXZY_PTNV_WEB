@@ -32,13 +32,13 @@ export default function DepartmentsTable({
   onEdit,
   onDelete,
 }: Props) {
-  const { t: tt } = useTranslation("common");
+  const { t: tt } = useTranslation(["departments", "common"]);
 
   const columns: any[] = [
     {
       type: "string",
       key: "name",
-      label: "DEPARTAMENTO",
+      label: tt("list.colDepartment"),
       sortable: false,
       filter: true,
       render: (d: Department) => (
@@ -48,7 +48,7 @@ export default function DepartmentsTable({
           </ITText>
           {!d.active && (
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
-              inactivo
+              {tt("list.inactive")}
             </ITText>
           )}
         </ITFlex>
@@ -57,11 +57,11 @@ export default function DepartmentsTable({
     {
       type: "string",
       key: "subareas",
-      label: "ÁREAS",
+      label: tt("list.colAreas"),
       render: (d: Department) =>
         d.subareas.length === 0 ? (
           <ITText className="text-[10px] font-bold text-slate-400 uppercase">
-            Sin áreas
+            {tt("list.noAreas")}
           </ITText>
         ) : (
           <ITFlex wrap="wrap" gap={1}>
@@ -76,7 +76,7 @@ export default function DepartmentsTable({
     {
       type: "number",
       key: "count",
-      label: "USUARIOS",
+      label: tt("list.colUsers"),
       render: (d: Department) => (
         <ITText className="text-[11px] font-black text-slate-600">
           {d._count?.users ?? 0}
@@ -95,7 +95,7 @@ export default function DepartmentsTable({
             size="small"
             color="secondary"
             onClick={() => onView(d)}
-            title={tt("actions.view")}
+            title={tt("common:actions.view")}
           >
             <FaEye size={14} />
           </ITButton>
@@ -105,7 +105,7 @@ export default function DepartmentsTable({
               size="small"
               color="secondary"
               onClick={() => onEdit(d)}
-              title="Editar nombre"
+              title={tt("list.editName")}
             >
               <FaEdit size={12} />
             </ITButton>
@@ -116,7 +116,7 @@ export default function DepartmentsTable({
               size="small"
               color="danger"
               onClick={() => onDelete(d)}
-              title="Eliminar departamento"
+              title={tt("list.delete")}
             >
               <FaTrash size={12} />
             </ITButton>

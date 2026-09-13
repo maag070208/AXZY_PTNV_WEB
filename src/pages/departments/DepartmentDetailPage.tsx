@@ -28,12 +28,12 @@ export default function DepartmentDetailPage() {
   if (!detail.dept) {
     return (
       <ITPage
-        title="Detalle de departamento"
+        title={tt("detail.loadingTitle")}
         backAction={() => navigate(-1)}
         icon={<FaBuilding size={20} />}
         breadcrumbs={[
-          { label: "Departamentos", onClick: () => navigate("/departamentos") },
-          { label: "Detalle" },
+          { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departamentos") },
+          { label: tt("detail.breadcrumbDetail") },
         ]}
       >
         {detail.error ? (
@@ -53,12 +53,12 @@ export default function DepartmentDetailPage() {
 
   return (
     <ITPage
-      title="Detalle del departamento"
+      title={tt("detail.title")}
       description={dept.name}
       backAction={() => navigate(-1)}
       icon={<FaBuilding size={20} />}
       breadcrumbs={[
-        { label: "Departamentos", onClick: () => navigate("/departamentos") },
+        { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departamentos") },
         { label: dept.name },
       ]}
       actions={
@@ -68,7 +68,7 @@ export default function DepartmentDetailPage() {
             size="small"
             color="danger"
             onClick={() => detail.setDeptToDelete(true)}
-            title={dept.active ? "Eliminar departamento" : "Eliminar definitivamente"}
+            title={dept.active ? tt("detail.deleteDept") : tt("detail.deleteForever")}
           >
             {dept.active ? <FaTrash size={12} /> : <FaTrashRestore size={12} />}
           </ITButton>
@@ -94,13 +94,13 @@ export default function DepartmentDetailPage() {
         isOpen={!!detail.subareaToDelete}
         onClose={() => detail.setSubareaToDelete(null)}
         onConfirm={detail.confirmRemoveSubarea}
-        title={detail.subareaToDelete?.active ? "Eliminar subárea" : "Eliminar definitivamente"}
+        title={detail.subareaToDelete?.active ? tt("detail.removeSubarea") : tt("detail.deleteForever")}
         message={
           detail.subareaToDelete?.active
-            ? `¿Eliminar la subárea "${detail.subareaToDelete?.name}"? Se desactivará.`
-            : `¿Eliminar definitivamente la subárea "${detail.subareaToDelete?.name}"? Esta acción no se puede deshacer.`
+            ? tt("detail.deleteSubareaActive", { name: detail.subareaToDelete?.name })
+            : tt("detail.deleteSubareaForever", { name: detail.subareaToDelete?.name })
         }
-        confirmLabel={detail.subareaToDelete?.active ? tt("common:actions.delete") : "Eliminar definitivamente"}
+        confirmLabel={detail.subareaToDelete?.active ? tt("common:actions.delete") : tt("detail.deleteForever")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />
@@ -109,13 +109,13 @@ export default function DepartmentDetailPage() {
         isOpen={detail.deptToDelete}
         onClose={() => detail.setDeptToDelete(false)}
         onConfirm={detail.confirmDeleteDept}
-        title={dept.active ? "Eliminar departamento" : "Eliminar definitivamente"}
+        title={dept.active ? tt("detail.deleteDept") : tt("detail.deleteForever")}
         message={
           dept.active
-            ? `¿Eliminar ${dept.name}? Se desactivará; si tiene usuarios asociados no se podrá eliminar.`
-            : `¿Eliminar definitivamente ${dept.name}? Se borrarán sus áreas y se desligará de usuarios y tickets. Esta acción no se puede deshacer.`
+            ? tt("detail.deleteActive", { name: dept.name })
+            : tt("detail.deleteForeverMsg", { name: dept.name })
         }
-        confirmLabel={dept.active ? tt("common:actions.delete") : "Eliminar definitivamente"}
+        confirmLabel={dept.active ? tt("common:actions.delete") : tt("detail.deleteForever")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />

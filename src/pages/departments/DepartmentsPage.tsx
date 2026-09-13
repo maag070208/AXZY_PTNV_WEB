@@ -28,13 +28,13 @@ export default function DepartmentsPage() {
 
   return (
     <ITPage
-      title="Departamentos"
-      description="Estructura organizacional de Puerto Nuevo"
+      title={tt("list.title")}
+      description={tt("list.description")}
       backAction={() => navigate(-1)}
       icon={<FaBuilding size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: "Departamentos" },
+        { label: tt("list.breadcrumb") },
       ]}
       actions={
         isAdmin ? (
@@ -45,7 +45,7 @@ export default function DepartmentsPage() {
           >
             <ITFlex align="center" gap={1}>
               <FaPlus size={12} />
-              <ITText className="font-bold text-[11px]">Nuevo departamento</ITText>
+              <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
             </ITFlex>
           </ITButton>
         ) : undefined
@@ -70,14 +70,14 @@ export default function DepartmentsPage() {
         isOpen={crud.createOpen}
         onClose={() => crud.setCreateOpen(false)}
         className="it-dialog-panel"
-        title="Nuevo departamento"
+        title={tt("list.new")}
       >
         <ITFlex direction="column" gap={3}>
           <ITInput
             name="newDept"
             value={crud.newDept}
             onChange={(e) => crud.setNewDept(e.target.value)}
-            placeholder="Ej. RECEPCIÓN"
+            placeholder={tt("list.newPlaceholder")}
             onKeyDown={(e) => e.key === "Enter" && crud.handleCreateDept()}
             autoFocus
           />
@@ -93,7 +93,7 @@ export default function DepartmentsPage() {
             >
               <ITFlex align="center" gap={1}>
                 <FaPlus size={12} />
-                <ITText className="font-bold text-[11px]">Crear</ITText>
+                <ITText className="font-bold text-[11px]">{tt("list.create")}</ITText>
               </ITFlex>
             </ITButton>
           </ITFlex>
@@ -104,14 +104,14 @@ export default function DepartmentsPage() {
         isOpen={!!crud.deptToEdit}
         onClose={() => crud.setDeptToEdit(null)}
         className="it-dialog-panel"
-        title="Editar departamento"
+        title={tt("list.editTitle")}
       >
         <ITFlex direction="column" gap={3}>
           <ITInput
             name="editDept"
             value={crud.editName}
             onChange={(e) => crud.setEditName(e.target.value)}
-            placeholder="Nombre del departamento"
+            placeholder={tt("list.editPlaceholder")}
             onKeyDown={(e) => e.key === "Enter" && crud.handleUpdateDept()}
             autoFocus
           />
@@ -135,13 +135,13 @@ export default function DepartmentsPage() {
         isOpen={!!crud.deptToDelete}
         onClose={() => crud.setDeptToDelete(null)}
         onConfirm={crud.confirmDeleteDept}
-        title={crud.deptToDelete?.active ? "Eliminar departamento" : "Eliminar definitivamente"}
+        title={crud.deptToDelete?.active ? tt("list.delete") : tt("list.deleteForever")}
         message={
           crud.deptToDelete?.active
-            ? `¿Eliminar ${crud.deptToDelete?.name}? Se desactivará; si tiene usuarios asociados no se podrá eliminar.`
-            : `¿Eliminar definitivamente ${crud.deptToDelete?.name}? Se borrarán sus áreas y se desligará de usuarios y tickets. Esta acción no se puede deshacer.`
+            ? tt("list.deleteActive", { name: crud.deptToDelete?.name })
+            : tt("list.deleteForeverMsg", { name: crud.deptToDelete?.name })
         }
-        confirmLabel={crud.deptToDelete?.active ? tt("common:actions.delete") : "Eliminar definitivamente"}
+        confirmLabel={crud.deptToDelete?.active ? tt("common:actions.delete") : tt("list.deleteForever")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />

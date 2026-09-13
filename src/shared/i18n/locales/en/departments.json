@@ -1,3 +1,46 @@
 {
-  "placeholder": ""
+  "list": {
+    "title": "Departments",
+    "description": "Puerto Nuevo organizational structure",
+    "breadcrumb": "Departments",
+    "new": "New department",
+    "create": "Create",
+    "newPlaceholder": "E.g. RECEPTION",
+    "colDepartment": "DEPARTMENT",
+    "inactive": "inactive",
+    "colAreas": "AREAS",
+    "noAreas": "No areas",
+    "colUsers": "USERS",
+    "editName": "Edit name",
+    "delete": "Delete department",
+    "editTitle": "Edit department",
+    "editPlaceholder": "Department name",
+    "deleteForever": "Delete permanently",
+    "deleteActive": "Delete {{name}}? It will be deactivated; if it has linked users it cannot be deleted.",
+    "deleteForeverMsg": "Permanently delete {{name}}? Its areas will be removed and it will be unlinked from users and tickets. This action cannot be undone."
+  },
+  "detail": {
+    "title": "Department detail",
+    "loadingTitle": "Department detail",
+    "breadcrumbDepartments": "Departments",
+    "breadcrumbDetail": "Detail",
+    "department": "Department",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "users": "Users",
+    "userCount": "{{count}} user(s)",
+    "areas": "Areas",
+    "noSubareas": "This department has no areas yet.",
+    "removeSubarea": "Delete area",
+    "newSubareaPlaceholder": "New area…",
+    "addSubarea": "Add area",
+    "add": "Add",
+    "deleteDept": "Delete department",
+    "deleteForever": "Delete permanently",
+    "deleteActive": "Delete {{name}}? It will be deactivated; if it has linked users it cannot be deleted.",
+    "deleteForeverMsg": "Permanently delete {{name}}? Its areas will be removed and it will be unlinked from users and tickets. This action cannot be undone.",
+    "deleteSubareaActive": "Delete area \"{{name}}\"? It will be deactivated.",
+    "deleteSubareaForever": "Permanently delete area \"{{name}}\"? This action cannot be undone."
+  }
 }
