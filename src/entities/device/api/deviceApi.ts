@@ -2,6 +2,7 @@ import { api } from "@shared/api/client";
 import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
 import type {
   Device,
+  DeviceAvailabilityGroup,
   DeviceHistoryEntry,
   DeviceSummary,
   LoteSharedUpdate,
@@ -12,14 +13,16 @@ export const deviceApi = {
   table: (params: ITDataTableFetchParamsPost) =>
     tableRequest<Device>(`/devices/query`, params),
   summary: () => api.get<DeviceSummary>(`/devices/summary`),
+  availability: () => api.get<DeviceAvailabilityGroup[]>(`/devices/availability`),
   getLote: (loteId: string) => api.get<{ data: Device[]; total: number }>(`/devices/lotes/${loteId}`),
   updateLote: (loteId: string, data: LoteSharedUpdate & { units: LoteUnitUpdate[] }) =>
     api.put<{ data: Device[]; total: number }>(`/devices/lotes/${loteId}`, data),
-  list: (filters: { typeId?: string; estado?: string; q?: string } = {}) => {
+  list: (filters: { typeId?: string; estado?: string; q?: string; disponibleParaCarta?: boolean } = {}) => {
     const params = new URLSearchParams();
     if (filters.typeId) params.set("typeId", filters.typeId);
     if (filters.estado) params.set("estado", filters.estado);
     if (filters.q) params.set("q", filters.q);
+    if (filters.disponibleParaCarta) params.set("disponibleParaCarta", "true");
     const qs = params.toString();
     return api.get<{ data: Device[]; total: number }>(`/devices${qs ? `?${qs}` : ""}`);
   },

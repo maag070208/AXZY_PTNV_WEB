@@ -4,5 +4,6 @@ export * from "./model/types";
 export type { Location } from "@entities/location";
 export { deviceApi } from "./api/deviceApi";
 export { useDeviceSummary } from "./model/useDeviceSummary";
+export { useDeviceAvailability } from "./model/useDeviceAvailability";
 export { default as DeviceCard } from "./ui/DeviceCard";
 export { default as DeviceStatusBadge } from "./ui/DeviceStatusBadge";

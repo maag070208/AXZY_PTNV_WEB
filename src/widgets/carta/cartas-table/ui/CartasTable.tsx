@@ -98,11 +98,21 @@ export default function CartasTable() {
         key: "items",
         label: t("table.resource"),
         filter: true,
-        render: (row: CartaResponsiva) => (
-          <ITBadget color="primary" size="small">
-            {row.items[0]?.descripcion?.slice(0, 28).toUpperCase() || "—"}
-          </ITBadget>
-        ),
+        render: (row: CartaResponsiva) => {
+          const item = row.items[0];
+          return (
+            <ITFlex direction="column" align="start" gap={0.5}>
+              {item?.device?.controlActivos ? (
+                <ITText className="font-black text-emerald-700 text-[12px] tracking-tight">
+                  {item.device.controlActivos}
+                </ITText>
+              ) : null}
+              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                {item?.descripcion?.slice(0, 28).toUpperCase() || "—"}
+              </ITText>
+            </ITFlex>
+          );
+        },
       },
       {
         key: "departamento",

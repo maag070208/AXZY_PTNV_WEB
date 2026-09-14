@@ -64,6 +64,39 @@ export interface DeviceSummary {
   tipos: number;
 }
 
+export interface DeviceAvailabilityCarta {
+  consecutive: string;
+  fecha: string;
+  numeroEmpleado: string;
+  departamento: string;
+  deliveryBy: string;
+  responsable?: string | null;
+  encargado?: string | null;
+  lugar?: string | null;
+}
+
+export interface DeviceAvailabilityRow {
+  id: string;
+  controlActivos: string;
+  descripcion: string;
+  marca: string;
+  modelo: string;
+  estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
+  area: string;
+  ubicacion?: string | null;
+  carta?: DeviceAvailabilityCarta | null;
+}
+
+export interface DeviceAvailabilityGroup {
+  typeId: string;
+  code: string;
+  name: string;
+  total: number;
+  disponible: number;
+  asignado: number;
+  devices: DeviceAvailabilityRow[];
+}
+
 export interface LoteSharedUpdate {
   typeId?: string;
   descripcion?: string;

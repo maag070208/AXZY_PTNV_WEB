@@ -122,6 +122,7 @@ export default function CartaForm({ errors }: Props) {
       const res = await devicesApi.list({
         typeId: scopeTypeId,
         estado: "DISPONIBLE",
+        disponibleParaCarta: true,
         q: q || undefined,
       });
       setDevices(res.data);

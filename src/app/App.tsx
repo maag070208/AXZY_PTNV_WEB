@@ -12,6 +12,7 @@ import NewInventoryMovementPage from "@pages/inventory/NewInventoryMovementPage"
 import LocationsPage from "@pages/inventory/LocationsPage";
 import GenerarCartasPage from "@pages/cartas/GenerarCartasPage";
 import DevicesListPage from "@pages/device-list/DevicesListPage";
+import DeviceAvailabilityPage from "@pages/device-list/DeviceAvailabilityPage";
 import DeviceFormPage from "@pages/devices/DeviceFormPage";
 import DeviceDetailPage from "@pages/devices/DeviceDetailPage";
 import DeviceTypesListPage from "@pages/device-types/DeviceTypesListPage";
@@ -58,6 +59,7 @@ export default function App() {
         <Route path="/tickets/:id" element={<TicketDetailPage />} />
 
         <Route path="/dispositivos" element={<DevicesListPage />} />
+        <Route path="/dispositivos/disponibilidad" element={<DeviceAvailabilityPage />} />
         <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
         <Route path="/dispositivos/importar" element={<DeviceImportPage />} />
         <Route path="/dispositivos/:id" element={<DeviceDetailPage />} />

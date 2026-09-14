@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaFileExcel, FaPlus, FaTag } from "react-icons/fa";
+import { FaBoxOpen, FaClipboardList, FaFileExcel, FaPlus, FaTag } from "react-icons/fa";
 import type { RootState } from "@app/store";
 import { useIsMobile } from "@shared/lib/useIsMobile";
 import { useDeviceSummary } from "@entities/device";
@@ -47,6 +47,12 @@ export default function DevicesListPage() {
       ]}
       actions={
         <ITFlex gap={2}>
+          <ITButton variant="outlined" color="secondary" onClick={() => navigate("/dispositivos/disponibilidad")}>
+            <ITFlex align="center" gap={1}>
+              <FaClipboardList size={12} />
+              <ITText className="font-bold text-[11px]">{t("device:availability.button")}</ITText>
+            </ITFlex>
+          </ITButton>
           <ITButton variant="outlined" color="secondary" onClick={() => navigate("/dispositivos/tipos")}>
             <ITFlex align="center" gap={1}>
               <FaTag size={12} />

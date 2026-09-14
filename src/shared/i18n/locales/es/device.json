@@ -11,6 +11,17 @@
     "assigned": "Asignado",
     "decommissioned": "Baja"
   },
+  "availability": {
+    "button": "Disponibilidad",
+    "title": "Disponibilidad de equipos",
+    "description": "Kardex del inventario: qué equipos están prestados y cuáles disponibles",
+    "total": "{{count}} total",
+    "available": "{{count}} disponibles",
+    "assigned": "{{count}} prestados",
+    "loanedTo": "Folio {{folio}} — {{who}} desde {{date}}",
+    "locatedAt": "Ubicado en {{place}}",
+    "empty": "No hay equipos registrados"
+  },
   "status": {
     "DISPONIBLE": "DISPONIBLE",
     "ASIGNADO": "ASIGNADO",

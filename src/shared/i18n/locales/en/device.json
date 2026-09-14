@@ -11,6 +11,17 @@
     "assigned": "Assigned",
     "decommissioned": "Decommissioned"
   },
+  "availability": {
+    "button": "Availability",
+    "title": "Equipment availability",
+    "description": "Inventory kardex: which equipment is on loan and which is available",
+    "total": "{{count}} total",
+    "available": "{{count}} available",
+    "assigned": "{{count}} on loan",
+    "loanedTo": "Folio {{folio}} — {{who}} since {{date}}",
+    "locatedAt": "Located at {{place}}",
+    "empty": "No equipment registered"
+  },
   "status": {
     "DISPONIBLE": "AVAILABLE",
     "ASIGNADO": "ASSIGNED",
