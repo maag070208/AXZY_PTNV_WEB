@@ -74,11 +74,7 @@
     "returnDate": "Expected return date (YYYY-MM-DD)",
     "returnDatePlaceholder": "YYYY-MM-DD",
     "devolutionTitle": "Equipment condition upon return",
-    "malasTitle": "The equipment is in bad condition. What action do you want to take?",
-    "darDeBaja": "Dispose",
-    "crearTicket": "Create maintenance ticket",
-    "ticketAlert": "An URGENT maintenance ticket will be created for this equipment.",
-    "bajaAlert": "The device will be permanently decommissioned.",
+    "devolutionTicket": "This return will automatically create a maintenance ticket.",
     "retirarDe": "The device will be removed from:",
     "bajaNota": "This action will mark the device as DISPOSED. It cannot be used again.",
     "motivoBaja": "Disposal reason (optional)",
@@ -105,8 +101,7 @@
     "selectType": "Select the movement type",
     "selectLocation": "Select a location",
     "prestamoFields": "Enter the person's name and return date",
-    "selectCondition": "Select the equipment condition",
-    "malasAction": "Select an action for equipment in bad condition"
+    "selectCondition": "Select the equipment condition"
   },
   "report": {
     "title": "Inventory Report",

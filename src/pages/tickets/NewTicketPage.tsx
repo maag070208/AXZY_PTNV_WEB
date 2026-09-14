@@ -7,10 +7,8 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { useState } from "react";
 import { FaSave, FaTicketAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
 import {
   CreateTicketForm,
   useCreateTicket,
@@ -18,7 +16,6 @@ import {
 
 export default function NewTicketPage() {
   const navigate = useNavigate();
-  const currentUser = useSelector((s: RootState) => s.auth.user);
   const { t } = useTranslation(["tickets", "common"]);
   const [dropfileKey, setDropfileKey] = useState(0);
 
@@ -29,10 +26,6 @@ export default function NewTicketPage() {
       if (ok) setTimeout(() => navigate("/tickets"), 1000);
     });
   };
-
-  if (currentUser?.role === "EMPLEADO") {
-    return <Navigate to="/tickets" replace />;
-  }
 
   return (
     <ITPage

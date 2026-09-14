@@ -46,6 +46,8 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
       ticket.asignadoAId === currentUser?.id ||
       ticket.assignments.some((a) => a.userId === currentUser?.id));
   const isClosed = ticket?.status === "CERRADO";
+  const canClose =
+    isAdmin || isGerente || (isJefeArea && ticket?.departmentId === currentUser?.departmentId);
 
   const [empleados, setEmpleados] = useState<User[]>([]);
   const [responsables, setResponsables] = useState<User[]>([]);
@@ -347,6 +349,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     canCreateTasks,
     isInvolved,
     isClosed,
+    canClose,
     empleadoOptions,
     responsableOptions,
     busyEmpleados,

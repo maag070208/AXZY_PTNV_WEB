@@ -74,11 +74,7 @@
     "returnDate": "Fecha de retorno esperada (YYYY-MM-DD)",
     "returnDatePlaceholder": "YYYY-MM-DD",
     "devolutionTitle": "Condición del equipo al regresar",
-    "malasTitle": "El equipo está en malas condiciones. ¿Qué acción deseas tomar?",
-    "darDeBaja": "Dar de baja",
-    "crearTicket": "Crear ticket de mantenimiento",
-    "ticketAlert": "Se creará un ticket de mantenimiento URGENTE para este equipo.",
-    "bajaAlert": "El dispositivo será dado de baja permanentemente.",
+    "devolutionTicket": "Esta devolución generará un ticket de mantenimiento automáticamente.",
     "retirarDe": "El dispositivo se retirará de:",
     "bajaNota": "Esta acción marcará el dispositivo como BAJA. No podrá ser usado nuevamente.",
     "motivoBaja": "Motivo de la baja (opcional)",
@@ -105,8 +101,7 @@
     "selectType": "Selecciona el tipo de movimiento",
     "selectLocation": "Selecciona una ubicación",
     "prestamoFields": "Ingresa el nombre de la persona y fecha de retorno",
-    "selectCondition": "Selecciona la condición del equipo",
-    "malasAction": "Selecciona una acción para equipo en malas condiciones"
+    "selectCondition": "Selecciona la condición del equipo"
   },
   "report": {
     "title": "Reporte de Inventario",

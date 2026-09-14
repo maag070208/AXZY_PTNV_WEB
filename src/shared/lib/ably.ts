@@ -3,11 +3,12 @@ import * as Ably from "ably";
 
 let ablyClient: Ably.Realtime | null = null;
 
+export const ABLY_API_KEY =
+  "yuJ-ow.7iF_wA:tuWolCDo1xBN4tpDEbZFD7A60KNnT_AsTNvhxkII-go";
+
 const getAblyClient = (): Ably.Realtime => {
   if (!ablyClient) {
-    const key = import.meta.env.VITE_ABLY_API_KEY;
-    if (!key) throw new Error("Falta VITE_ABLY_API_KEY en la configuración del frontend");
-    ablyClient = new Ably.Realtime({ key });
+    ablyClient = new Ably.Realtime({ key: ABLY_API_KEY });
   }
   return ablyClient;
 };

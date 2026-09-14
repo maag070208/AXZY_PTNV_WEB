@@ -38,7 +38,6 @@ export const useNewInventoryMovement = () => {
     fechaRetornoEsperado: "",
     condicion: "" as CondicionType | "",
     motivoBaja: "",
-    accionMalasCondiciones: "" as "BAJA" | "TICKET" | "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -68,7 +67,6 @@ export const useNewInventoryMovement = () => {
   const requiresLocation = form.tipo === "ENTRADA" || form.tipo === "TRASLADO";
   const requiresPrestamoFields = form.tipo === "PRESTAMO";
   const requiresDevolucionFields = form.tipo === "DEVOLUCION";
-  const isMalasCondiciones = form.condicion === "MALO" || form.condicion === "ROTO";
 
   const isValid =
     !!form.deviceId &&
@@ -76,8 +74,7 @@ export const useNewInventoryMovement = () => {
     (!requiresLocation || !!form.locationId) &&
     (!requiresPrestamoFields ||
       (!!form.prestadoA.trim() && !!form.fechaRetornoEsperado)) &&
-    (!requiresDevolucionFields || !!form.condicion) &&
-    (!isMalasCondiciones || !!form.accionMalasCondiciones);
+    (!requiresDevolucionFields || !!form.condicion);
 
   const TIPO_OPTIONS: { value: MovementType; label: string }[] = [
     { value: "ENTRADA", label: t("typeTitles.ENTRADA") },
@@ -124,50 +121,23 @@ export const useNewInventoryMovement = () => {
       setToast({ message: t("validation.selectCondition"), type: "error" });
       return;
     }
-    if (isMalasCondiciones && !form.accionMalasCondiciones) {
-      setToast({ message: t("validation.malasAction"), type: "error" });
-      return;
-    }
 
     setSaving(true);
     try {
-      if (isMalasCondiciones && form.accionMalasCondiciones === "BAJA") {
-        await inventoryApi.registerMovement({
-          deviceId: form.deviceId,
-          tipo: "BAJA",
-          notas: form.notas
-            ? `${form.notas} | Condición: ${form.condicion}`
-            : `Condición: ${form.condicion}`,
-          motivoBaja: `Equipo devuelto en condiciones ${form.condicion.toLowerCase()}`,
-        });
-        await inventoryApi.registerMovement({
-          deviceId: form.deviceId,
-          tipo: "DEVOLUCION",
-          notas: form.notas || undefined,
-          condicion: form.condicion as CondicionType,
-        });
-      } else if (isMalasCondiciones && form.accionMalasCondiciones === "TICKET") {
-        await inventoryApi.registerMovement({
-          deviceId: form.deviceId,
-          tipo: "DEVOLUCION",
-          notas: form.notas || undefined,
-          condicion: form.condicion as CondicionType,
-        });
-      } else {
-        await inventoryApi.registerMovement({
-          deviceId: form.deviceId,
-          tipo: form.tipo,
-          locationId: requiresLocation ? form.locationId : undefined,
-          notas: form.notas || undefined,
-          prestadoA: requiresPrestamoFields ? form.prestadoA.trim() : undefined,
-          fechaRetornoEsperado: requiresPrestamoFields
-            ? form.fechaRetornoEsperado
-            : undefined,
-          condicion: requiresDevolucionFields
-            ? (form.condicion as CondicionType)
-            : undefined,
-        });
-      }
+      await inventoryApi.registerMovement({
+        deviceId: form.deviceId,
+        tipo: form.tipo,
+        locationId: requiresLocation ? form.locationId : undefined,
+        notas: form.notas || undefined,
+        prestadoA: requiresPrestamoFields ? form.prestadoA.trim() : undefined,
+        fechaRetornoEsperado: requiresPrestamoFields
+          ? form.fechaRetornoEsperado
+          : undefined,
+        condicion: requiresDevolucionFields
+          ? (form.condicion as CondicionType)
+          : undefined,
+        motivoBaja: form.tipo === "BAJA" ? form.motivoBaja || undefined : undefined,
+      });
       setToast({ message: t("messages.movementRegistered"), type: "success" });
       setTimeout(() => navigate("/inventario/movimientos"), 1200);
     } catch (e: any) {
@@ -195,7 +165,6 @@ export const useNewInventoryMovement = () => {
     requiresLocation,
     requiresPrestamoFields,
     requiresDevolucionFields,
-    isMalasCondiciones,
     TIPO_OPTIONS,
     CONDICION_OPTIONS,
     handleSubmit,

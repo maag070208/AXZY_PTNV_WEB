@@ -14,7 +14,6 @@ import {
   FaMapMarkerAlt,
   FaSignInAlt,
   FaSignOutAlt,
-  FaTicketAlt,
   FaTrashAlt,
   FaTruck,
   FaUndoAlt,
@@ -82,24 +81,6 @@ const CONDITION_PRESETS: Record<
   ROTO: { ring: "ring-red-300", text: "text-red-700", dot: "bg-red-500" },
 };
 
-const ACTION_PRESETS: Record<
-  string,
-  { icon: ReactNode; ring: string; text: string; dot: string }
-> = {
-  BAJA: {
-    icon: <FaTrashAlt size={12} />,
-    ring: "ring-red-300",
-    text: "text-red-700",
-    dot: "bg-red-500",
-  },
-  TICKET: {
-    icon: <FaTicketAlt size={12} />,
-    ring: "ring-orange-300",
-    text: "text-orange-700",
-    dot: "bg-orange-500",
-  },
-};
-
 export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }) {
   const { t, form, setForm, selectedDevice } = fx;
 
@@ -161,7 +142,6 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
                           ...f,
                           tipo: opt.value,
                           condicion: "",
-                          accionMalasCondiciones: "",
                         }))
                       }
                       className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-all ${
@@ -235,7 +215,6 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
                           setForm((f) => ({
                             ...f,
                             condicion: opt.value,
-                            accionMalasCondiciones: "",
                           }))
                         }
                         className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-all ${
@@ -253,46 +232,8 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
               </ITFlex>
             )}
 
-            {fx.isMalasCondiciones && (
-              <ITFlex as="fieldset" direction="column" gap={2}>
-                <ITText as="legend" className="text-sm font-semibold text-slate-700">
-                  {t("new.malasTitle")}
-                </ITText>
-                <ITFlex gap={2} wrap="wrap">
-                  {(["BAJA", "TICKET"] as const).map((action) => {
-                    const preset = ACTION_PRESETS[action];
-                    const isActive = form.accionMalasCondiciones === action;
-                    return (
-                      <button
-                        key={action}
-                        type="button"
-                        onClick={() =>
-                          setForm((f) => ({
-                            ...f,
-                            accionMalasCondiciones: action,
-                          }))
-                        }
-                        className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-all ${
-                          isActive
-                            ? `border-transparent bg-slate-50 ring-2 ${preset.ring} ${preset.text}`
-                            : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        {preset.icon}
-                        <span>
-                          {action === "BAJA" ? t("new.darDeBaja") : t("new.crearTicket")}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </ITFlex>
-                {form.accionMalasCondiciones === "TICKET" && (
-                  <ITAlert variant="warning">{t("new.ticketAlert")}</ITAlert>
-                )}
-                {form.accionMalasCondiciones === "BAJA" && (
-                  <ITAlert variant="error">{t("new.bajaAlert")}</ITAlert>
-                )}
-              </ITFlex>
+            {fx.requiresDevolucionFields && (
+              <ITAlert variant="info">{t("new.devolutionTicket")}</ITAlert>
             )}
 
             {form.tipo === "SALIDA" && selectedDevice?.location && (

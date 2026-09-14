@@ -133,7 +133,7 @@ export default function TicketDetailPage() {
               </ITText>
             </ITFlex>
           </ITButton>
-          {!fx.isClosed && (fx.isAdmin || fx.isGerente) && (
+          {!fx.isClosed && fx.canClose && (
             <ITButton
               variant="filled"
               size="small"

@@ -20,7 +20,6 @@ export default function TicketsListPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const currentUser = useSelector((s: RootState) => s.auth.user);
-  const isEmpleado = currentUser?.role === "EMPLEADO";
   const isAdmin = currentUser?.role === "ADMIN";
 
   const list = useTicketsList();
@@ -47,8 +46,7 @@ export default function TicketsListPage() {
               <ITText className="font-bold text-[11px]">{tt("list.board")}</ITText>
             </ITFlex>
           </ITButton>
-          {!isEmpleado && (
-            <ITButton
+          <ITButton
               variant="filled"
               color="primary"
               onClick={() => navigate("/tickets/nuevo")}
@@ -58,7 +56,6 @@ export default function TicketsListPage() {
                 <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
               </ITFlex>
             </ITButton>
-          )}
         </ITFlex>
       }
     >
