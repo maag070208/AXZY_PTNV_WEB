@@ -41,9 +41,16 @@ export interface CartaResponsable {
 export interface DeviceCartaItem {
   id: string;
   carta: {
+    id: string;
     consecutive: string;
+    fecha: string;
+    numeroEmpleado: string;
+    departamento: string;
+    deliveryBy: string;
+    returnDate?: string | null;
     responsable?: CartaResponsable | null;
     encargado?: CartaResponsable | null;
+    ubicacion?: { id: string; lugar: string } | null;
   };
 }
 

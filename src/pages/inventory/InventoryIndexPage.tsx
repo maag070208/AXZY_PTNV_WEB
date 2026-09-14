@@ -1,5 +1,5 @@
 import { ITButton, ITFlex, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { FaBoxes, FaFilePdf, FaPlus } from "react-icons/fa";
+import { FaBoxes, FaClipboardList, FaFilePdf, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import {
   useInventoryIndex,
@@ -35,6 +35,19 @@ export default function InventoryIndexPage() {
       ]}
       actions={
         <ITFlex gap={2}>
+          <ITButton
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => fx.navigate("/inventario/movimientos")}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaClipboardList size={12} />
+              <ITText className="font-bold text-[11px]">
+                {t("index.viewKardex")}
+              </ITText>
+            </ITFlex>
+          </ITButton>
           <ITButton
             variant="outlined"
             color="primary"

@@ -199,6 +199,17 @@
     "breadcrumb": "Detail",
     "notFound": "Device not found"
   },
+  "loan": {
+    "title": "Current assignment",
+    "personal": "PERSONAL",
+    "ubicacion": "LOCATION",
+    "assignedTo": "Assigned to",
+    "since": "Since",
+    "employeeNo": "Employee No.",
+    "department": "Department",
+    "encargado": "Area manager",
+    "deliveryBy": "Delivered by"
+  },
   "lote": {
     "title": "Batch — {{count}} units",
     "edit": "Edit full batch",

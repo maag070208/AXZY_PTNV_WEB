@@ -200,6 +200,17 @@
     "breadcrumb": "Detalle",
     "notFound": "Dispositivo no encontrado"
   },
+  "loan": {
+    "title": "Asignación actual",
+    "personal": "PERSONAL",
+    "ubicacion": "UBICACIÓN",
+    "assignedTo": "Asignado a",
+    "since": "Desde",
+    "employeeNo": "No. empleado",
+    "department": "Departamento",
+    "encargado": "Jefe de área",
+    "deliveryBy": "Entrega"
+  },
   "lote": {
     "title": "Lote — {{count}} unidades",
     "edit": "Editar lote completo",

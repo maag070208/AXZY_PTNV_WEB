@@ -20,6 +20,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   useDeviceDetail,
+  ActiveLoanCard,
   DeviceInfoCard,
   DeviceLoteSection,
   DeviceTimeline,
@@ -154,6 +155,9 @@ export default function DeviceDetailPage() {
         <ITGrid container columns={12} spacing={5}>
           <ITGrid item xs={12} md={8}>
             <ITStack direction="column" spacing={5} className="w-full">
+              {device.estado === "ASIGNADO" && device.cartaItems?.[0] ? (
+                <ActiveLoanCard item={device.cartaItems[0]} />
+              ) : null}
               <DeviceInfoCard device={device} />
               <DeviceTimeline device={device} />
               {device.estado !== "BAJA" && <DeviceCommentBox fx={fx} />}
