@@ -24,5 +24,24 @@
     "departamentosDescription": "Estructura organizacional y subáreas",
     "usuariosTitle": "Usuarios",
     "usuariosDescription": "Administración de accesos al sistema"
+  },
+  "adminDashboard": {
+    "title": "Panel en tiempo real",
+    "live": "En vivo",
+    "errorLoad": "No se pudo cargar el panel",
+    "devices": "Dispositivos",
+    "openTickets": "Tickets abiertos",
+    "activeCartas": "Cartas activas",
+    "damagedSalidas": "Salidas dañadas",
+    "devicesByStatus": "Dispositivos por estado",
+    "ticketsByStatus": "Tickets por estado",
+    "available": "Disponible",
+    "assigned": "Asignado",
+    "retired": "Baja",
+    "open": "Abierto",
+    "following": "En seguimiento",
+    "closed": "Cerrado",
+    "recentActivity": "Actividad reciente",
+    "noActivity": "Aún no hay actividad registrada."
   }
 }

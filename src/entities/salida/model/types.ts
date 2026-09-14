@@ -1,3 +1,5 @@
+export type MaterialOutputMotivo = "DANADO" | "OBSOLETO" | "EXTRAVIO" | "OTRO";
+
 export interface MaterialOutput {
   id: string;
   fecha: string;
@@ -10,6 +12,7 @@ export interface MaterialOutput {
   usuario: string;
   observaciones?: string | null;
   area: string;
+  motivo?: MaterialOutputMotivo | null;
   deviceId?: string | null;
   device?: { id: string; controlActivos: string } | null;
   registradoPorId?: string | null;
@@ -29,6 +32,7 @@ export interface MaterialOutputInput {
   usuario: string;
   observaciones?: string;
   area?: string;
+  motivo?: MaterialOutputMotivo;
   deviceId?: string;
 }
 
@@ -39,6 +43,7 @@ export interface SalidaFilters {
   usuario?: string;
   area?: string;
   proyecto?: string;
+  motivo?: MaterialOutputMotivo;
   q?: string;
 }
 

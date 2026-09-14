@@ -123,18 +123,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     minHeight: 9,
   },
-  especBloque: {
-    marginTop: 6,
-    borderTopWidth: 0.5,
-    borderTopColor: "#888",
-    borderTopStyle: "dashed",
-    paddingTop: 4,
-  },
-  especTitulo: {
-    fontFamily: "Helvetica-Bold",
-    marginBottom: 2,
-    fontSize: 8.5,
-  },
   bloqueSeguimiento: {
     borderWidth: 0.8,
     borderColor: "#000",
@@ -229,10 +217,6 @@ export default function CartaPDF({ carta }: Props) {
 
   const fieldEnabled = (field: "numeroSerie" | "nombreEquipo" | "ip" | "macAddress" | "sistemaOp" | "ram" | "almacenamiento") =>
     Boolean(item?.device?.type?.fieldConfig?.[field]?.enabled);
-  const showITSpecs = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"].some((field) =>
-    fieldEnabled(field as Parameters<typeof fieldEnabled>[0])
-  );
-  const dev = item?.device;
 
   return (
     <Document
@@ -269,12 +253,7 @@ export default function CartaPDF({ carta }: Props) {
 
         {/* 2. Barra de título con folio */}
         <View style={styles.barraFolio}>
-          <Text>
-            {tt("doc.barraFolio", {
-              documento: documentoOficial,
-              departamento: departamentoNombre,
-            })}
-          </Text>
+          <Text>{tt("doc.barraFolio")}</Text>
         </View>
 
         {/* 3. Bloque de contenido principal */}
@@ -334,38 +313,6 @@ export default function CartaPDF({ carta }: Props) {
               </Text>
             </View>
           </View>
-
-          {showITSpecs && (
-            <View style={styles.especBloque}>
-              <Text style={styles.especTitulo}>
-                {tt("doc.especificacionesTitulo")}
-              </Text>
-              <View style={styles.recursoLista}>
-                {fieldEnabled("ip") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>{tt("doc.direccionIp")}</Text>
-                  <Text style={styles.recVal}>{dev?.ip || "N/A"}</Text>
-                </View>}
-                {fieldEnabled("macAddress") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>{tt("doc.macAddress")}</Text>
-                  <Text style={styles.recVal}>{dev?.macAddress || "N/A"}</Text>
-                </View>}
-                {fieldEnabled("sistemaOp") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>{tt("doc.sistemaOperativo")}</Text>
-                  <Text style={styles.recVal}>{dev?.sistemaOp || "N/A"}</Text>
-                </View>}
-                {fieldEnabled("ram") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>{tt("doc.ram")}</Text>
-                  <Text style={styles.recVal}>{dev?.ram || "N/A"}</Text>
-                </View>}
-                {fieldEnabled("almacenamiento") && <View style={styles.recursoRow}>
-                  <Text style={styles.recLabel}>{tt("doc.almacenamiento")}</Text>
-                  <Text style={styles.recVal}>
-                    {dev?.almacenamiento || "N/A"}
-                  </Text>
-                </View>}
-              </View>
-            </View>
-          )}
 
           <Text style={{ ...styles.parrafo, marginTop: 6 }}>
             {tt("doc.para2a")}{" "}

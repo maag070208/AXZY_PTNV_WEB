@@ -38,6 +38,7 @@ export interface Location {
   lugar: string;
   active?: boolean;
   descripcion?: string | null;
+  departmentId?: string | null;
   createdAt: string;
   updatedAt: string;
   sublugares?: Sublugar[];

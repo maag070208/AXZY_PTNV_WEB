@@ -8,9 +8,8 @@ import {
   ITSegmentedControl,
   ITStack,
   ITText,
-  ITDivider,
 } from "@axzydev/axzy_ui_system";
-import { FaIdCard, FaLaptop, FaNetworkWired, FaPenFancy } from "react-icons/fa";
+import { FaIdCard, FaLaptop, FaPenFancy } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n";
@@ -339,11 +338,6 @@ export default function CartaForm({ errors }: Props) {
 
   if (!item) return null;
 
-  const deviceFieldEnabled = (field: keyof NonNullable<DeviceType["fieldConfig"]>) =>
-    Boolean(item.device?.type?.fieldConfig?.[field]?.enabled);
-  const showConfiguredFields = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"]
-    .some((field) => deviceFieldEnabled(field as keyof NonNullable<DeviceType["fieldConfig"]>));
-
   const empleadoOptions = empleados.map((u) => {
     const parts = [
       u.name,
@@ -528,79 +522,6 @@ export default function CartaForm({ errors }: Props) {
               />
             </ITGrid>
           </ITGrid>
-
-          {/* Especificaciones técnicas (TIC) — solo lectura, vienen del Device */}
-          {item.device && showConfiguredFields && (
-            <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-              <ITFlex justify="between" align="center" className="mb-3">
-                <ITFlex align="center" gap={2}>
-                  <FaNetworkWired className="text-slate-400" />
-                  <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                    {tt("form.specTitle")}
-                  </ITText>
-                </ITFlex>
-                <ITBadget color="primary" size="small">
-                  {item.device.type?.code}
-                </ITBadget>
-              </ITFlex>
-              <ITGrid container columns={12} spacing={3}>
-                {deviceFieldEnabled("ip") && <ITGrid item xs={12}>
-                  <ITInput
-                    name={`ip_${item.id}`}
-                    label={tt("form.specIp")}
-                    value={item.device.ip ?? ""}
-                    disabled
-                    placeholder={tt("form.specIpPlaceholder")}
-                    onChange={() => {}}
-                  />
-                </ITGrid>}
-                {deviceFieldEnabled("macAddress") && <ITGrid item xs={12}>
-                  <ITInput
-                    name={`mac_${item.id}`}
-                    label={tt("form.specMac")}
-                    value={item.device.macAddress ?? ""}
-                    disabled
-                    placeholder={tt("form.specMacPlaceholder")}
-                    onChange={() => {}}
-                  />
-                </ITGrid>}
-                {deviceFieldEnabled("sistemaOp") && <ITGrid item xs={12}>
-                  <ITInput
-                    name={`so_${item.id}`}
-                    label={tt("form.specSo")}
-                    value={item.device.sistemaOp ?? ""}
-                    disabled
-                    placeholder={tt("form.specSoPlaceholder")}
-                    onChange={() => {}}
-                  />
-                </ITGrid>}
-                {deviceFieldEnabled("ram") && <ITGrid item xs={12}>
-                  <ITInput
-                    name={`ram_${item.id}`}
-                    label={tt("form.specRam")}
-                    value={item.device.ram ?? ""}
-                    disabled
-                    placeholder={tt("form.specRamPlaceholder")}
-                    onChange={() => {}}
-                  />
-                </ITGrid>}
-                {deviceFieldEnabled("almacenamiento") && <ITGrid item xs={12}>
-                  <ITInput
-                    name={`alm_${item.id}`}
-                    label={tt("form.specStorage")}
-                    value={item.device.almacenamiento ?? ""}
-                    disabled
-                    placeholder={tt("form.specStoragePlaceholder")}
-                    onChange={() => {}}
-                  />
-                </ITGrid>}
-              </ITGrid>
-              <ITDivider className="my-3" />
-              <ITText className="text-[9px] text-slate-400 italic">
-                {tt("form.specHint")}
-              </ITText>
-            </div>
-          )}
         </ITStack>
       </div>
 

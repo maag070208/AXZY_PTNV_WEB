@@ -5,11 +5,13 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
+  ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaPlus, FaTimes, FaUsers } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPlus, FaTimes, FaUsers } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import type { Department, Subarea } from "@entities/department";
+import type { Department, DepartmentLocation, Subarea } from "@entities/department";
+import { formatLocation, type Location } from "@entities/location";
 
 interface Props {
   dept: Department;
@@ -18,6 +20,11 @@ interface Props {
   onNewSubarea: (value: string) => void;
   onAddSubarea: () => void;
   onRemoveSubarea: (s: Subarea) => void;
+  locations: Location[];
+  selectedLocationId: string;
+  onSelectedLocationId: (value: string) => void;
+  onAddLocation: () => void;
+  onRemoveLocation: (l: DepartmentLocation) => void;
 }
 
 export default function DepartmentInfoCard({
@@ -27,6 +34,11 @@ export default function DepartmentInfoCard({
   onNewSubarea,
   onAddSubarea,
   onRemoveSubarea,
+  locations,
+  selectedLocationId,
+  onSelectedLocationId,
+  onAddLocation,
+  onRemoveLocation,
 }: Props) {
   const { t: tt } = useTranslation(["departments"]);
   return (
@@ -121,6 +133,72 @@ export default function DepartmentInfoCard({
                 onClick={onAddSubarea}
                 disabled={!newSubarea.trim()}
                 title={tt("detail.addSubarea")}
+              >
+                <ITFlex align="center" gap={1}>
+                  <FaPlus size={12} />
+                  <ITText className="font-bold text-[11px]">{tt("detail.add")}</ITText>
+                </ITFlex>
+              </ITButton>
+            </ITFlex>
+          </ITGrid>
+        )}
+
+        <ITGrid item xs={12}>
+          <ITFlex direction="column" gap={2}>
+            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+              {tt("detail.locations")}
+            </ITText>
+            {!dept.locations || dept.locations.length === 0 ? (
+              <ITText className="text-[12px] font-bold text-slate-400">
+                {tt("detail.noLocations")}
+              </ITText>
+            ) : (
+              <ITFlex wrap="wrap" gap={2}>
+                {dept.locations.map((l) => (
+                  <ITFlex
+                    key={l.id}
+                    align="center"
+                    gap={2}
+                    className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full border border-slate-200"
+                  >
+                    <FaMapMarkerAlt size={10} className="text-slate-400" />
+                    <ITText className="text-[11px] font-black uppercase tracking-wide">
+                      {formatLocation(l)}
+                    </ITText>
+                    {isAdmin && (
+                      <FaTimes
+                        size={10}
+                        className="text-slate-400 hover:text-rose-500 cursor-pointer"
+                        onClick={() => onRemoveLocation(l)}
+                        title={tt("detail.removeLocation")}
+                      />
+                    )}
+                  </ITFlex>
+                ))}
+              </ITFlex>
+            )}
+          </ITFlex>
+        </ITGrid>
+
+        {isAdmin && (
+          <ITGrid item xs={12}>
+            <ITFlex gap={2}>
+              <ITSelect
+                name="newLocation"
+                options={locations
+                  .filter((l) => !l.departmentId)
+                  .map((l) => ({ value: l.id, label: formatLocation(l) }))}
+                value={selectedLocationId}
+                onChange={(e) => onSelectedLocationId(e.target.value)}
+                placeholder={tt("detail.locationPlaceholder")}
+                className="flex-1"
+              />
+              <ITButton
+                variant="filled"
+                color="primary"
+                onClick={onAddLocation}
+                disabled={!selectedLocationId}
+                title={tt("detail.addLocation")}
               >
                 <ITFlex align="center" gap={1}>
                   <FaPlus size={12} />

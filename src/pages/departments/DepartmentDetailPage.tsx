@@ -3,6 +3,7 @@ import {
   ITButton,
   ITConfirmDialog,
   ITFlex,
+  ITGrid,
   ITLoader,
   ITPage,
 } from "@axzydev/axzy_ui_system";
@@ -12,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "@app/store";
 import {
+  DepartmentDetailAside,
   DepartmentInfoCard,
   useDepartmentDetail,
 } from "@features/department/department-detail";
@@ -81,14 +83,27 @@ export default function DepartmentDetailPage() {
         </ITAlert>
       )}
 
-      <DepartmentInfoCard
-        dept={dept}
-        isAdmin={isAdmin}
-        newSubarea={detail.newSubarea}
-        onNewSubarea={detail.setNewSubarea}
-        onAddSubarea={detail.handleAddSubarea}
-        onRemoveSubarea={detail.setSubareaToDelete}
-      />
+      <ITGrid container columns={12} spacing={5} className="items-start">
+        <ITGrid item xs={12} md={8} className="flex flex-col gap-5 min-w-0">
+          <DepartmentInfoCard
+            dept={dept}
+            isAdmin={isAdmin}
+            newSubarea={detail.newSubarea}
+            onNewSubarea={detail.setNewSubarea}
+            onAddSubarea={detail.handleAddSubarea}
+            onRemoveSubarea={detail.setSubareaToDelete}
+            locations={detail.locations}
+            selectedLocationId={detail.selectedLocationId}
+            onSelectedLocationId={detail.setSelectedLocationId}
+            onAddLocation={detail.handleAddLocation}
+            onRemoveLocation={detail.setLocationToDelete}
+          />
+        </ITGrid>
+
+        <ITGrid item xs={12} md={4} className="w-full min-w-0">
+          <DepartmentDetailAside dept={dept} />
+        </ITGrid>
+      </ITGrid>
 
       <ITConfirmDialog
         isOpen={!!detail.subareaToDelete}
@@ -101,6 +116,19 @@ export default function DepartmentDetailPage() {
             : tt("detail.deleteSubareaForever", { name: detail.subareaToDelete?.name })
         }
         confirmLabel={detail.subareaToDelete?.active ? tt("common:actions.delete") : tt("detail.deleteForever")}
+        cancelLabel={tt("common:actions.cancel")}
+        variant="danger"
+      />
+
+      <ITConfirmDialog
+        isOpen={!!detail.locationToDelete}
+        onClose={() => detail.setLocationToDelete(null)}
+        onConfirm={detail.confirmRemoveLocation}
+        title={tt("detail.removeLocation")}
+        message={tt("detail.deleteLocationMsg", {
+          name: detail.locationToDelete?.lugar ?? "",
+        })}
+        confirmLabel={tt("common:actions.delete")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />

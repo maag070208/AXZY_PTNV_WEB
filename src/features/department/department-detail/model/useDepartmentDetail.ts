@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { departmentsApi, type Department, type Subarea } from "@entities/department";
+import { departmentsApi, type Department, type DepartmentLocation, type Subarea } from "@entities/department";
+import { locationsApi, type Location } from "@entities/location";
 
 export const useDepartmentDetail = (id?: string, onDeleted?: () => void) => {
   const [dept, setDept] = useState<Department | null>(null);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [newSubarea, setNewSubarea] = useState("");
   const [subareaToDelete, setSubareaToDelete] = useState<Subarea | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [locationToDelete, setLocationToDelete] = useState<DepartmentLocation | null>(null);
   const [deptToDelete, setDeptToDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -21,6 +25,14 @@ export const useDepartmentDetail = (id?: string, onDeleted?: () => void) => {
   useEffect(() => {
     load();
   }, [load]);
+
+  const loadLocations = useCallback(() => {
+    locationsApi.list().then(setLocations).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    loadLocations();
+  }, [loadLocations]);
 
   const handleAddSubarea = async () => {
     if (!id || !newSubarea.trim()) return;
@@ -45,6 +57,29 @@ export const useDepartmentDetail = (id?: string, onDeleted?: () => void) => {
     }
   };
 
+  const handleAddLocation = async () => {
+    if (!id || !selectedLocationId) return;
+    try {
+      await departmentsApi.addLocation(id, selectedLocationId);
+      setSelectedLocationId("");
+      await Promise.all([load(), loadLocations()]);
+    } catch (e: any) {
+      setError(e.message);
+    }
+  };
+
+  const confirmRemoveLocation = async () => {
+    if (!id || !locationToDelete) return;
+    try {
+      await departmentsApi.removeLocation(id, locationToDelete.id);
+      setLocationToDelete(null);
+      await Promise.all([load(), loadLocations()]);
+    } catch (e: any) {
+      setError(e.message);
+      setLocationToDelete(null);
+    }
+  };
+
   const confirmDeleteDept = async () => {
     if (!dept) return;
     setDeleting(true);
@@ -61,6 +96,7 @@ export const useDepartmentDetail = (id?: string, onDeleted?: () => void) => {
 
   return {
     dept,
+    locations,
     error,
     setError,
     deleting,
@@ -68,10 +104,16 @@ export const useDepartmentDetail = (id?: string, onDeleted?: () => void) => {
     setNewSubarea,
     subareaToDelete,
     setSubareaToDelete,
+    selectedLocationId,
+    setSelectedLocationId,
+    locationToDelete,
+    setLocationToDelete,
     deptToDelete,
     setDeptToDelete,
     handleAddSubarea,
     confirmRemoveSubarea,
+    handleAddLocation,
+    confirmRemoveLocation,
     confirmDeleteDept,
   };
 };

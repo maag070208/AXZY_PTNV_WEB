@@ -18,6 +18,7 @@ const buildQuery = (filters: SalidaFilters = {}): string => {
   if (filters.usuario) params.set("usuario", filters.usuario);
   if (filters.area) params.set("area", filters.area);
   if (filters.proyecto) params.set("proyecto", filters.proyecto);
+  if (filters.motivo) params.set("motivo", filters.motivo);
   if (filters.q) params.set("q", filters.q);
   const qs = params.toString();
   return qs ? `?${qs}` : "";

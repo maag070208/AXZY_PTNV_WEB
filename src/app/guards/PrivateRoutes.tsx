@@ -1,4 +1,4 @@
-import { ITCard, ITLayout, ITSidebarProps, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITLayout, ITSidebarProps, ITToast } from "@axzydev/axzy_ui_system";
 import { useEffect, useState, useCallback } from "react";
 import {
   FaBoxes,
@@ -230,9 +230,9 @@ export default function PrivateRoutes() {
   return (
     <>
       <ITLayout topBar={topBar} sidebar={sidebar} contentClassName=" min-w-full min-h-screen overflow-x-hidden">
-        <ITCard className="p-0 m-0">
+        <div className="p-0 m-0">
           <Outlet />
-        </ITCard>
+        </div>
       </ITLayout>
       {toast && (
         <ITToast

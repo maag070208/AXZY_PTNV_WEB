@@ -3,7 +3,8 @@
   "description": "View equipment assignments and inventory",
   "tabs": {
     "asignados": "Assigned",
-    "dispositivos": "Devices"
+    "dispositivos": "Devices",
+    "salidas": "Outputs"
   },
   "asignados": {
     "statAsignados": "Assigned",
@@ -47,6 +48,20 @@
     "colArea": "Area",
     "loteTag": "Batch ×{{count}}"
   },
+  "salidas": {
+    "statTotal": "Records",
+    "errorLoad": "Could not load the material output log",
+    "export": "Export PDF",
+    "exporting": "Exporting...",
+    "colFecha": "Date",
+    "colDescripcion": "Description",
+    "colCant": "Qty.",
+    "colDepto": "Department",
+    "colUsuario": "User",
+    "colMotivo": "Reason",
+    "colDispositivo": "Device",
+    "colObservaciones": "Notes"
+  },
   "pdf": {
     "asignadosTitle": "Assigned Devices Report",
     "devicesTitle": "Devices Report",
@@ -77,6 +92,9 @@
     "filtrosAplicados": "Applied filters",
     "filtroPeriodo": "Period: {{from}} — {{to}}",
     "filtroDepartamento": "Department: {{name}}",
-    "filtroEmpleado": "Employee: {{name}}"
+    "filtroEmpleado": "Employee: {{name}}",
+    "salidasTitle": "Material Output Report",
+    "summaryDanados": "Damaged",
+    "summaryConDispositivo": "With linked device"
   }
 }

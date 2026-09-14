@@ -27,11 +27,8 @@ export default function CartaPreview({
   // En modo ubicación la carta se asigna a un lugar, no a un empleado.
   const responsableTxt =
     fmtUbicacion(carta.ubicacion) || carta.responsable?.name || "";
-  const fieldEnabled = (field: "ip" | "macAddress" | "sistemaOp" | "ram" | "almacenamiento") =>
-    Boolean(item?.device?.type?.fieldConfig?.[field]?.enabled);
-  const hasConfiguredSpecs = ["ip", "macAddress", "sistemaOp", "ram", "almacenamiento"].some((field) =>
-    fieldEnabled(field as Parameters<typeof fieldEnabled>[0])
-  );
+  const encargadoName = carta.encargado?.name ?? "";
+  const deliveryBy = carta.deliveryBy || "Departamento de Sistemas";
 
   return (
     <div id="carta-render-target" style={styles.hoja}>
@@ -70,10 +67,7 @@ export default function CartaPreview({
 
       {/* 2. Barra de título con folio */}
       <div style={styles.barraFolio}>
-        {tt("doc.barraFolio", {
-          documento: "SIS-001",
-          departamento: departamentoNombre,
-        })}
+        {tt("doc.barraFolio")}
       </div>
 
       {/* 3. Bloque de contenido principal */}
@@ -129,40 +123,6 @@ export default function CartaPreview({
               <span style={styles.recVal}>{item?.area || ""}</span>
             </div>
           </div>
-
-          {hasConfiguredSpecs && (
-            <div style={styles.especBloque}>
-              <strong style={styles.especTitulo}>{tt("doc.especificacionesTitulo")}</strong>
-              <div style={styles.recursoLista}>
-                {fieldEnabled("ip") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>{tt("doc.direccionIp")}</span>
-                  <span style={styles.recVal}>{item?.device?.ip || "N/A"}</span>
-                </div>}
-                {fieldEnabled("macAddress") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>{tt("doc.macAddress")}</span>
-                  <span style={styles.recVal}>
-                    {item?.device?.macAddress || "N/A"}
-                  </span>
-                </div>}
-                {fieldEnabled("sistemaOp") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>{tt("doc.sistemaOperativo")}</span>
-                  <span style={styles.recVal}>
-                    {item?.device?.sistemaOp || "N/A"}
-                  </span>
-                </div>}
-                {fieldEnabled("ram") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>{tt("doc.ram")}</span>
-                  <span style={styles.recVal}>{item?.device?.ram || "N/A"}</span>
-                </div>}
-                {fieldEnabled("almacenamiento") && <div style={styles.recursoRow}>
-                  <span style={styles.recLabel}>{tt("doc.almacenamiento")}</span>
-                  <span style={styles.recVal}>
-                    {item?.device?.almacenamiento || "N/A"}
-                  </span>
-                </div>}
-              </div>
-            </div>
-          )}
         </div>
 
         <p style={{ ...styles.parrafo, marginTop: 12 }}>
@@ -229,7 +189,13 @@ export default function CartaPreview({
         </div>
         <div style={styles.firmaBox}>
           <div style={styles.lineaFirma}></div>
-          <span>{tt("doc.firmaEncargado")}</span>
+          <span style={styles.firmaNombre}>{encargadoName}</span>
+          <span style={styles.firmaLabel}>{tt("doc.firmaJefeArea")}</span>
+        </div>
+        <div style={styles.firmaBox}>
+          <div style={styles.lineaFirma}></div>
+          <span style={styles.firmaNombre}>{deliveryBy}</span>
+          <span style={styles.firmaLabel}>{tt("doc.firmaEntrega")}</span>
         </div>
       </div>
     </div>
@@ -333,16 +299,6 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: "uppercase",
     fontSize: "11px",
   },
-  especBloque: {
-    marginTop: "10px",
-    paddingTop: "8px",
-    borderTop: "1px dashed #888",
-  },
-  especTitulo: {
-    fontSize: "11px",
-    display: "block",
-    marginBottom: "4px",
-  },
   espacioDiagonal: {
     height: "95px",
     position: "relative",
@@ -397,21 +353,26 @@ const styles: Record<string, React.CSSProperties> = {
   firmas: {
     display: "flex",
     justifyContent: "space-around",
-    marginTop: "65px",
-    marginBottom: "20px",
+    marginTop: "40px",
+    marginBottom: "12px",
   },
   firmaBox: {
-    width: "200px",
+    width: "150px",
     textAlign: "center",
     fontSize: "11px",
   },
   firmaNombre: {
+    display: "block",
     fontWeight: "bold",
-    fontSize: "11px",
+    fontSize: "9px",
     textTransform: "uppercase",
+    lineHeight: "1.3",
   },
   firmaLabel: {
-    fontSize: "10px",
+    display: "block",
+    fontSize: "8.5px",
+    lineHeight: "1.3",
+    marginTop: "1px",
   },
   lineaFirma: {
     borderTop: "1.5px solid #000",

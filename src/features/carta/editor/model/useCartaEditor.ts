@@ -26,6 +26,7 @@ export const useCartaEditor = ({ download, onSaved }: Options) => {
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
   const [downloading, setDownloading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
   useEffect(() => {
@@ -43,10 +44,12 @@ export const useCartaEditor = ({ download, onSaved }: Options) => {
   };
 
   const handleSave = async () => {
+    if (saving) return;
     if (firstError) {
       showToast("error", dyn(t)(firstError));
       return;
     }
+    setSaving(true);
     try {
       const action = await dispatch(saveCarta());
       if (saveCarta.fulfilled.match(action)) {
@@ -84,6 +87,8 @@ export const useCartaEditor = ({ download, onSaved }: Options) => {
       }
     } catch {
       showToast("error", t("editor.errorSaving"));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -117,6 +122,7 @@ export const useCartaEditor = ({ download, onSaved }: Options) => {
     firstError,
     totalPages: 1,
     downloading,
+    saving,
     confirmReset,
     setConfirmReset,
     toast,

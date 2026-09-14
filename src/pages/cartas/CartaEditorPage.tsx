@@ -41,7 +41,7 @@ export default function CartaEditorPage() {
           <ITText className="font-bold text-[11px]">{t("editor.reset")}</ITText>
         </ITFlex>
       </ITButton>
-      <ITButton variant="outlined" size="small" color="secondary" onClick={editor.handleSave}>
+      <ITButton variant="outlined" size="small" color="secondary" onClick={editor.handleSave} disabled={editor.saving}>
         <ITFlex align="center" gap={1}>
           <FaSave size={12} />
           <ITText className="font-bold text-[11px]">{t("editor.save")}</ITText>

@@ -24,5 +24,24 @@
     "departamentosDescription": "Organizational structure and subareas",
     "usuariosTitle": "Users",
     "usuariosDescription": "System access administration"
+  },
+  "adminDashboard": {
+    "title": "Real-time panel",
+    "live": "Live",
+    "errorLoad": "Could not load the panel",
+    "devices": "Devices",
+    "openTickets": "Open tickets",
+    "activeCartas": "Active letters",
+    "damagedSalidas": "Damaged outputs",
+    "devicesByStatus": "Devices by status",
+    "ticketsByStatus": "Tickets by status",
+    "available": "Available",
+    "assigned": "Assigned",
+    "retired": "Retired",
+    "open": "Open",
+    "following": "Following up",
+    "closed": "Closed",
+    "recentActivity": "Recent activity",
+    "noActivity": "No activity recorded yet."
   }
 }

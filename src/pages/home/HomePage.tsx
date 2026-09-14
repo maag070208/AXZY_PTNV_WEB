@@ -4,9 +4,12 @@ import {
   useHomeDashboard,
   DashboardModulesGrid,
 } from "@features/home/dashboard";
+import { AdminDashboard, useAdminDashboard } from "@features/home/admin-dashboard";
 
 export default function HomePage() {
   const fx = useHomeDashboard();
+  const showAdminDashboard = fx.user?.role === "ADMIN" || fx.user?.role === "GERENTE";
+  const adminFx = useAdminDashboard(showAdminDashboard);
 
   return (
     <ITPage
@@ -16,6 +19,7 @@ export default function HomePage() {
       maxWidth="6xl"
     >
       <ITStack direction="column" spacing={6}>
+        {showAdminDashboard && <AdminDashboard fx={adminFx} />}
         <DashboardModulesGrid fx={fx} />
       </ITStack>
     </ITPage>

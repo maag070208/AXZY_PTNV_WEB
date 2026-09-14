@@ -3,7 +3,8 @@
   "description": "Consulta asignaciones e inventario de dispositivos",
   "tabs": {
     "asignados": "Asignados",
-    "dispositivos": "Dispositivos"
+    "dispositivos": "Dispositivos",
+    "salidas": "Salidas"
   },
   "asignados": {
     "statAsignados": "Asignados",
@@ -47,6 +48,20 @@
     "colArea": "Área",
     "loteTag": "Lote ×{{count}}"
   },
+  "salidas": {
+    "statTotal": "Registros",
+    "errorLoad": "No se pudo cargar la bitácora de salidas",
+    "export": "Exportar PDF",
+    "exporting": "Exportando...",
+    "colFecha": "Fecha",
+    "colDescripcion": "Descripción",
+    "colCant": "Cant.",
+    "colDepto": "Departamento",
+    "colUsuario": "Usuario",
+    "colMotivo": "Motivo",
+    "colDispositivo": "Dispositivo",
+    "colObservaciones": "Observaciones"
+  },
   "pdf": {
     "asignadosTitle": "Reporte de Dispositivos Asignados",
     "devicesTitle": "Reporte de Dispositivos",
@@ -77,6 +92,9 @@
     "filtrosAplicados": "Filtros aplicados",
     "filtroPeriodo": "Periodo: {{from}} — {{to}}",
     "filtroDepartamento": "Departamento: {{name}}",
-    "filtroEmpleado": "Empleado: {{name}}"
+    "filtroEmpleado": "Empleado: {{name}}",
+    "salidasTitle": "Reporte de Salida de Material",
+    "summaryDanados": "Dañados",
+    "summaryConDispositivo": "Con dispositivo ligado"
   }
 }
