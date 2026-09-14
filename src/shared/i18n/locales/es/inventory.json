@@ -55,6 +55,12 @@
   "new": {
     "loadingTitle": "Nuevo movimiento",
     "title": "Registrar movimiento",
+    "description": "Registra entradas, salidas, traslados, asignaciones y devoluciones",
+    "formTitle": "Datos del movimiento",
+    "formSub": "Selecciona el dispositivo y el tipo de operación que deseas registrar",
+    "equipmentTitle": "Dispositivo seleccionado",
+    "equipmentEmpty": "Aún no hay equipo seleccionado. Aquí verás su estado y ubicación actuales.",
+    "selectedLocation": "Ubicación",
     "movementData": "Datos del movimiento",
     "device": "Dispositivo",
     "devicePlaceholder": "Buscar por código, descripción o serie...",

@@ -18,6 +18,7 @@ export const useNewInventoryMovement = () => {
   const { t } = useTranslation(["inventory", "common"]);
   const [searchParams] = useSearchParams();
   const deviceIdParam = searchParams.get("deviceId");
+  const tipoParam = searchParams.get("tipo");
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -30,7 +31,7 @@ export const useNewInventoryMovement = () => {
 
   const [form, setForm] = useState({
     deviceId: deviceIdParam || "",
-    tipo: "" as MovementType | "",
+    tipo: (tipoParam || "") as MovementType | "",
     locationId: "",
     notas: "",
     prestadoA: "",
@@ -68,6 +69,15 @@ export const useNewInventoryMovement = () => {
   const requiresPrestamoFields = form.tipo === "PRESTAMO";
   const requiresDevolucionFields = form.tipo === "DEVOLUCION";
   const isMalasCondiciones = form.condicion === "MALO" || form.condicion === "ROTO";
+
+  const isValid =
+    !!form.deviceId &&
+    !!form.tipo &&
+    (!requiresLocation || !!form.locationId) &&
+    (!requiresPrestamoFields ||
+      (!!form.prestadoA.trim() && !!form.fechaRetornoEsperado)) &&
+    (!requiresDevolucionFields || !!form.condicion) &&
+    (!isMalasCondiciones || !!form.accionMalasCondiciones);
 
   const TIPO_OPTIONS: { value: MovementType; label: string }[] = [
     { value: "ENTRADA", label: t("typeTitles.ENTRADA") },
@@ -180,6 +190,7 @@ export const useNewInventoryMovement = () => {
     form,
     setForm,
     saving,
+    isValid,
     selectedDevice,
     requiresLocation,
     requiresPrestamoFields,

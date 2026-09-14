@@ -7,7 +7,7 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaSave } from "react-icons/fa";
+import { FaBoxOpen, FaSave } from "react-icons/fa";
 import {
   useNewInventoryMovement,
   MovementFormBody,
@@ -29,6 +29,8 @@ export default function NewInventoryMovementPage() {
   return (
     <ITPage
       title={fx.t("new.title")}
+      description={fx.t("new.description")}
+      icon={<FaBoxOpen size={20} />}
       backAction={() => fx.navigate("/inventario/movimientos")}
       breadcrumbs={[
         { label: fx.t("common:breadcrumbs.home"), onClick: () => fx.navigate("/") },
@@ -44,7 +46,7 @@ export default function NewInventoryMovementPage() {
           variant="filled"
           color="primary"
           onClick={fx.handleSubmit}
-          disabled={fx.saving}
+          disabled={fx.saving || !fx.isValid}
         >
           <ITFlex align="center" gap={1}>
             <FaSave size={12} />
@@ -61,9 +63,7 @@ export default function NewInventoryMovementPage() {
         </ITAlert>
       )}
 
-      <div className="max-w-2xl">
-        <MovementFormBody fx={fx} />
-      </div>
+      <MovementFormBody fx={fx} />
 
       {fx.toast && (
         <ITToast

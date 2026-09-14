@@ -30,7 +30,8 @@
   "detail": {
     "title": "Carta Responsiva",
     "empty": "Carta no encontrada",
-    "employee": "Empleado"
+    "employee": "Empleado",
+    "return": "Devolución"
   },
   "generate": {
     "title": "Generar carta por tipo",
@@ -74,6 +75,9 @@
     "asignacion": "ASIGNACIÓN",
     "asignacionUbicacion": "UBICACIÓN",
     "asignacionPersonal": "PERSONAL",
+    "status": "ESTADO",
+    "statusPending": "Pendiente",
+    "statusReturned": "Devuelta",
     "actions": "ACCIONES",
     "view": "Ver (solo lectura)",
     "delete": "Eliminar",

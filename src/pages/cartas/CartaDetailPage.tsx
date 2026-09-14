@@ -6,7 +6,7 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaDownload, FaFileSignature } from "react-icons/fa";
+import { FaDownload, FaFileSignature, FaUndoAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCartaDetail } from "@features/carta/carta-detail";
@@ -51,6 +51,9 @@ export default function CartaDetailPage() {
   }
 
   const carta = detail.carta;
+  const firstDeviceId = carta.items?.[0]?.deviceId;
+  const isReturned = !!carta.returnDate;
+  const canReturn = !!firstDeviceId && !isReturned;
 
   const descripcion =
     carta.ubicacion
@@ -70,20 +73,39 @@ export default function CartaDetailPage() {
         { label: carta.consecutivo },
       ]}
       actions={
-        <ITButton
-          variant="filled"
-          color="primary"
-          size="small"
-          onClick={detail.handleDownload}
-          disabled={detail.downloading}
-        >
-          <ITFlex align="center" gap={1}>
-            <FaDownload size={12} />
-            <ITText className="font-bold text-[11px]">
-              {detail.downloading ? t("editor.generating") : t("editor.downloadPdf")}
-            </ITText>
-          </ITFlex>
-        </ITButton>
+        <>
+          {canReturn && (
+            <ITButton
+              variant="outlined"
+              color="secondary"
+              size="small"
+              onClick={() =>
+                navigate(
+                  `/inventario/movimientos/nuevo?deviceId=${firstDeviceId}&tipo=DEVOLUCION`
+                )
+              }
+            >
+              <ITFlex align="center" gap={1}>
+                <FaUndoAlt size={12} />
+                <ITText className="font-bold text-[11px]">{t("detail.return")}</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
+          <ITButton
+            variant="filled"
+            color="primary"
+            size="small"
+            onClick={detail.handleDownload}
+            disabled={detail.downloading || isReturned}
+          >
+            <ITFlex align="center" gap={1}>
+              <FaDownload size={12} />
+              <ITText className="font-bold text-[11px]">
+                {detail.downloading ? t("editor.generating") : t("editor.downloadPdf")}
+              </ITText>
+            </ITFlex>
+          </ITButton>
+        </>
       }
     >
       <ITFlex justify="center">

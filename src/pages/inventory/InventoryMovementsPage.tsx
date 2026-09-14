@@ -63,7 +63,7 @@ export default function InventoryMovementsPage() {
           <ITButton
             variant="filled"
             color="primary"
-            onClick={() => fx.navigate("/inventario/nuevo-movimiento")}
+            onClick={() => fx.navigate("/inventario/movimientos/nuevo")}
           >
             <ITFlex align="center" gap={1}>
               <FaPlus size={12} />

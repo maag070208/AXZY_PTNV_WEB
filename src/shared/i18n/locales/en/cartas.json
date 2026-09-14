@@ -29,7 +29,8 @@
   "detail": {
     "title": "Responsibility Letter",
     "empty": "Letter not found",
-    "employee": "Employee"
+    "employee": "Employee",
+    "return": "Return"
   },
   "generate": {
     "title": "Generate letter by type",
@@ -73,6 +74,9 @@
     "asignacion": "ASSIGNMENT",
     "asignacionUbicacion": "LOCATION",
     "asignacionPersonal": "PERSONAL",
+    "status": "STATUS",
+    "statusPending": "Pending",
+    "statusReturned": "Returned",
     "actions": "ACTIONS",
     "view": "View (read only)",
     "delete": "Delete",

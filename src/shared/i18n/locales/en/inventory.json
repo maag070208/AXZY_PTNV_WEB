@@ -55,6 +55,12 @@
   "new": {
     "loadingTitle": "New movement",
     "title": "Register movement",
+    "description": "Register entries, exits, transfers, assignments and returns",
+    "formTitle": "Movement data",
+    "formSub": "Select the device and the operation type you want to register",
+    "equipmentTitle": "Selected device",
+    "equipmentEmpty": "No device selected yet. Its current status and location will appear here.",
+    "selectedLocation": "Location",
     "movementData": "Movement data",
     "device": "Device",
     "devicePlaceholder": "Search by code, description or serial...",

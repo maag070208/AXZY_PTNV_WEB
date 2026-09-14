@@ -144,6 +144,23 @@ export default function CartasTable() {
         },
       },
       {
+        key: "status",
+        label: t("table.status"),
+        sortable: false,
+        render: (row: CartaResponsiva) => {
+          const esDevuelta = !!row.returnDate;
+          return (
+            <ITBadget
+              color={esDevuelta ? "success" : "warning"}
+              size="small"
+              variant={esDevuelta ? "filled" : "outlined"}
+            >
+              {esDevuelta ? t("table.statusReturned") : t("table.statusPending")}
+            </ITBadget>
+          );
+        },
+      },
+      {
         key: "actions",
         label: t("table.actions"),
         type: "actions",
