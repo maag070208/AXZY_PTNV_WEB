@@ -7,7 +7,7 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { formatLocation } from "@entities/location";
-import { localDateString } from "../model/constants";
+import { localDateString } from "@entities/inventory-movement";
 import type { UseInventoryMovements } from "../model/useInventoryMovements";
 
 export default function MovementsFiltersCard({ fx }: { fx: UseInventoryMovements }) {

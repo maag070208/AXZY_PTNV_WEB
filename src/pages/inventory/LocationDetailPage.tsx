@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "@app/store";
-import { LocationInfoCard, useLocationDetail } from "@features/location/location-detail";
+import { LocationCartasCard, LocationDevicesCard, LocationInfoCard, LocationStatsGrid, useLocationDetail } from "@features/location/location-detail";
 
 export default function LocationDetailPage() {
   const { id } = useParams();
@@ -79,6 +79,8 @@ export default function LocationDetailPage() {
         </ITAlert>
       )}
 
+      <LocationStatsGrid loc={loc} />
+
       <LocationInfoCard
         loc={loc}
         isAdmin={isAdmin}
@@ -87,6 +89,10 @@ export default function LocationDetailPage() {
         onAddSublugar={detail.handleAddSublugar}
         onRemoveSublugar={detail.setSublugarToDelete}
       />
+
+      <LocationDevicesCard devices={loc.devices ?? []} />
+
+      <LocationCartasCard cartas={loc.cartas ?? []} />
 
       <ITConfirmDialog
         isOpen={!!detail.sublugarToDelete}

@@ -1,6 +1,7 @@
 import { ITCard, ITLayout, ITSidebarProps, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { useEffect, useState, useCallback } from "react";
 import {
+  FaBoxes,
   FaBuilding,
   FaChartBar,
   FaFileSignature,
@@ -129,6 +130,17 @@ export default function PrivateRoutes() {
           icon: <FaChartBar size={14} />,
           action: () => navigate("/dispositivos"),
           isActive: active("/dispositivos"),
+        },
+      ]
+      : []),
+    ...(isAdmin
+      ? [
+        {
+          id: "inventario",
+          label: tt("nav.inventory"),
+          icon: <FaBoxes size={14} />,
+          action: () => navigate("/inventario"),
+          isActive: active("/inventario"),
         },
       ]
       : []),

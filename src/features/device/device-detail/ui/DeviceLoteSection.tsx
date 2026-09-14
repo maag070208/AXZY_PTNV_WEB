@@ -40,7 +40,7 @@ export default function DeviceLoteSection({ device, loteDevices, loteLoading }: 
             {tt("lote.empty")}
           </ITText>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="flex flex-col gap-2">
             {loteDevices.map((ld) => (
               <Link
                 key={ld.id}

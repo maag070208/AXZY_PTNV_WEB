@@ -1,4 +1,8 @@
 import { api } from "@shared/api/client";
+import {
+  tableRequest,
+  type ITDataTableFetchParamsPost,
+} from "@shared/api/table";
 import type { Device } from "@entities/device";
 import type {
   CondicionType,
@@ -8,6 +12,8 @@ import type {
 } from "../model/types";
 
 export const inventoryApi = {
+  table: (params: ITDataTableFetchParamsPost) =>
+    tableRequest<InventoryMovement>(`/inventory/movements/query`, params),
   listMovements: (params?: {
     deviceId?: string;
     locationId?: string;

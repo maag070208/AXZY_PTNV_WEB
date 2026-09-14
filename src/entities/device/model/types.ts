@@ -15,6 +15,8 @@ export interface Device {
   estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
   locationId?: string | null;
   location?: Location | null;
+  // Cartas responsivas ACTIVAS en las que figura este dispositivo
+  cartaItems?: DeviceCartaItem[];
   // Especificaciones técnicas (TIC) — solo aplican a PC / TABLET / LAPTOP
   ip?: string | null;
   macAddress?: string | null;
@@ -28,6 +30,21 @@ export interface Device {
   history?: DeviceHistoryEntry[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CartaResponsable {
+  id: string;
+  name: string;
+  username: string;
+}
+
+export interface DeviceCartaItem {
+  id: string;
+  carta: {
+    consecutive: string;
+    responsable?: CartaResponsable | null;
+    encargado?: CartaResponsable | null;
+  };
 }
 
 export interface DeviceHistoryEntry {

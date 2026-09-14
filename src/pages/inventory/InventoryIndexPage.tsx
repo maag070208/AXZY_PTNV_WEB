@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   useInventoryIndex,
   InventoryStatsGrid,
-  LocationsPreviewCard,
-  RecentMovementsCard,
+  InventoryMovementsTable,
 } from "@features/inventory/inventory-index";
 import { downloadInventoryPDF } from "@widgets/inventory/inventory-pdf";
 
@@ -26,6 +25,7 @@ export default function InventoryIndexPage() {
   return (
     <ITPage
       title={t("index.title")}
+      description={t("index.description")}
       backAction={() => fx.navigate(-1)}
       icon={<FaBoxes size={20} />}
       maxWidth="6xl"
@@ -40,7 +40,7 @@ export default function InventoryIndexPage() {
             color="primary"
             size="small"
             onClick={fx.handleDownloadPDF}
-            disabled={fx.downloadingPDF}
+            disabled={fx.downloadingPDF || !fx.summary}
           >
             <ITFlex align="center" gap={1}>
               <FaFilePdf size={12} />
@@ -68,10 +68,7 @@ export default function InventoryIndexPage() {
     >
       <InventoryStatsGrid fx={fx} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <LocationsPreviewCard fx={fx} />
-        <RecentMovementsCard fx={fx} />
-      </div>
+      <InventoryMovementsTable fetchData={fx.fetchTableData} reloadKey={0} />
     </ITPage>
   );
 }

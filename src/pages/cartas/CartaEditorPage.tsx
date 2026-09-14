@@ -64,13 +64,13 @@ export default function CartaEditorPage() {
       className="print-area"
     >
       <ITGrid container columns={12} spacing={6}>
-        <ITGrid item xs={12} md={5}>
-          <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8 sticky top-24">
+        <ITGrid item xs={12} md={6}>
+          <div className="sticky top-24">
             <CartaForm errors={editor.errors} />
-          </ITFlex>
+          </div>
         </ITGrid>
 
-        <ITGrid item xs={12} md={7}>
+        <ITGrid item xs={12} md={6}>
           <ITFlex justify="end" className="mb-3 no-print">
             <ITText className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               {t("editor.previewNotice")}

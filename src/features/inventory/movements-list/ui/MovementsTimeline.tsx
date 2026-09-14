@@ -2,7 +2,7 @@ import { ITBadget, ITCard, ITFlex, ITStack, ITText } from "@axzydev/axzy_ui_syst
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { formatFechaHora } from "@shared/utils/dates";
 import { formatLocation } from "@entities/location";
-import { CONDICION_COLORS, TIPO_COLORS, TIPO_ICONS } from "../model/constants";
+import { CONDICION_COLORS, TIPO_COLORS, TIPO_ICONS } from "@entities/inventory-movement";
 import type { UseInventoryMovements } from "../model/useInventoryMovements";
 
 export default function MovementsTimeline({ fx }: { fx: UseInventoryMovements }) {

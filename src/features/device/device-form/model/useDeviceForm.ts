@@ -229,7 +229,6 @@ export const useDeviceForm = () => {
               })),
           });
           setSuccess(`Lote actualizado: ${res.total} unidad(es).`);
-          setTimeout(() => navigate("/dispositivos"), 900);
           return;
         }
         await devicesApi.update(id, {
@@ -253,7 +252,6 @@ export const useDeviceForm = () => {
             ? form.almacenamiento || undefined
             : undefined,
         });
-        navigate("/dispositivos");
         return;
       }
 

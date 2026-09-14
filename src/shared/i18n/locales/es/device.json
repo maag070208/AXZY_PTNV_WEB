@@ -88,7 +88,9 @@
     "removeLoteUnitTitle": "Quitar unidad del lote",
     "removeLoteUnitMessage": "¿Eliminar definitivamente la unidad {{code}}? Se borrará por completo y no podrás recuperarla.",
     "removeLoteUnitConfirm": "Eliminar unidad",
-    "removingUnit": "Eliminando…"
+    "removingUnit": "Eliminando…",
+    "expandUnit": "Expandir unidad",
+    "collapseUnit": "Colapsar unidad"
   },
   "history": {
     "CREATED": "Dispositivo registrado",

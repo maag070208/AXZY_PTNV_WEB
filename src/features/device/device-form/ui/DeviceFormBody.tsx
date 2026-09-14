@@ -63,7 +63,6 @@ export default function DeviceFormBody({ fx }: Props) {
                 disabled={fx.addingUnits}
               >
                 <ITFlex align="center" gap={1}>
-                  <FaPlus size={11} />
                   <ITText className="text-[11px] font-bold">
                     {fx.addingUnits ? tt("form.adding") : tt("form.add", { count: fx.addQty })}
                   </ITText>

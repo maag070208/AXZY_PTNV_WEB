@@ -87,7 +87,9 @@
     "removeLoteUnitTitle": "Remove unit from batch",
     "removeLoteUnitMessage": "Permanently delete unit {{code}}? It will be fully erased and cannot be recovered.",
     "removeLoteUnitConfirm": "Delete unit",
-    "removingUnit": "Deleting…"
+    "removingUnit": "Deleting…",
+    "expandUnit": "Expand unit",
+    "collapseUnit": "Collapse unit"
   },
   "history": {
     "CREATED": "Device registered",

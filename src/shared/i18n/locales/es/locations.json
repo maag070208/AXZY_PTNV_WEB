@@ -43,6 +43,21 @@
     "addSubarea": "Agregar sub-área",
     "add": "Agregar",
     "deleteLocation": "Eliminar ubicación",
-    "deleteLocationMsg": "¿Eliminar {{name}}? Se desactivará; si tiene equipos o cartas asociados no se podrá eliminar."
+    "deleteLocationMsg": "¿Eliminar {{name}}? Se desactivará; si tiene equipos o cartas asociados no se podrá eliminar.",
+    "devicesTitle": "Dispositivos dentro",
+    "noDevices": "Este lugar no tiene dispositivos asignados.",
+    "colCarta": "CARTA",
+    "withCarta": "Con carta",
+    "withoutCarta": "Sin carta",
+    "cartasTitle": "Cartas responsivas",
+    "noCartas": "Esta ubicación no tiene cartas responsivas ligadas.",
+    "colCartaConsecutive": "CONSECUTIVO",
+    "colFecha": "FECHA",
+    "colResponsable": "RESPONSABLE",
+    "colEstado": "ESTADO",
+    "returned": "Devuelta",
+    "colSerie": "SERIE",
+    "searchDevices": "Buscar por código, descripción, tipo o serie…",
+    "devicesFound": "{{count}} de {{total}}"
   }
 }

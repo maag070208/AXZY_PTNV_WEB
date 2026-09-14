@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import type { RootState } from "@app/store";
 import {
   inventoryApi,
@@ -62,6 +63,22 @@ export const useInventoryIndex = ({ download }: Options) => {
     }
   };
 
+  const fetchTableData = useCallback(
+    async (params: ITDataTableFetchParams) => {
+      const res = await inventoryApi.table({
+        page: params.page,
+        limit: params.limit,
+        filters: params.filters as Record<string, string | number | boolean>,
+        sort: params.sort,
+      });
+      return {
+        data: res.data as unknown as Record<string, unknown>[],
+        total: res.total,
+      };
+    },
+    []
+  );
+
   return {
     navigate,
     isAdmin,
@@ -71,6 +88,7 @@ export const useInventoryIndex = ({ download }: Options) => {
     loading,
     downloadingPDF,
     handleDownloadPDF,
+    fetchTableData,
   };
 };
 

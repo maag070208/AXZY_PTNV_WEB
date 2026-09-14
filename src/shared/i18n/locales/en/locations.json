@@ -43,6 +43,21 @@
     "addSubarea": "Add sub-area",
     "add": "Add",
     "deleteLocation": "Delete location",
-    "deleteLocationMsg": "Delete {{name}}? It will be deactivated; if it has assigned devices or cards it cannot be deleted."
+    "deleteLocationMsg": "Delete {{name}}? It will be deactivated; if it has assigned devices or cards it cannot be deleted.",
+    "devicesTitle": "Devices inside",
+    "noDevices": "This location has no devices assigned yet.",
+    "colCarta": "CARD",
+    "withCarta": "Has card",
+    "withoutCarta": "No card",
+    "cartasTitle": "Responsibility cards",
+    "noCartas": "This location has no linked responsibility cards.",
+    "colCartaConsecutive": "CONSECUTIVE",
+    "colFecha": "DATE",
+    "colResponsable": "RESPONSIBLE",
+    "colEstado": "STATUS",
+    "returned": "Returned",
+    "colSerie": "SERIAL",
+    "searchDevices": "Search by code, description, type or serial…",
+    "devicesFound": "{{count}} of {{total}}"
   }
 }

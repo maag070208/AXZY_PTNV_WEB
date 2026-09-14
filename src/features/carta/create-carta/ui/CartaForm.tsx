@@ -1,5 +1,16 @@
-import { ITBadget, ITFlex, ITGrid, ITInput, ITSearchSelect, ITSelect, ITSegmentedControl, ITStack, ITText, ITDivider } from "@axzydev/axzy_ui_system";
-import { FaNetworkWired } from "react-icons/fa";
+import {
+  ITBadget,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITSearchSelect,
+  ITSelect,
+  ITSegmentedControl,
+  ITStack,
+  ITText,
+  ITDivider,
+} from "@axzydev/axzy_ui_system";
+import { FaIdCard, FaLaptop, FaNetworkWired, FaPenFancy } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n";
@@ -17,6 +28,44 @@ import type { CartaFormErrors } from "@entities/carta";
 
 interface Props {
   errors?: CartaFormErrors;
+}
+
+/** Encabezado reutilizable de cada tarjeta de sección del formulario. */
+function SectionHeader({
+  icon,
+  iconClassName,
+  title,
+  subtitle,
+  trailing,
+}: {
+  icon: React.ReactNode;
+  iconClassName?: string;
+  title: string;
+  subtitle?: string;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <ITFlex align="center" justify="between" gap={3} className="mb-5">
+      <ITFlex align="center" gap={3} className="min-w-0">
+        <ITFlex
+          align="center"
+          justify="center"
+          className={`h-9 w-9 shrink-0 rounded-xl ${iconClassName ?? "bg-slate-100 text-slate-500"}`}
+        >
+          {icon}
+        </ITFlex>
+        <ITFlex direction="column" gap={0.25} className="min-w-0">
+          <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">
+            {title}
+          </ITText>
+          {subtitle && (
+            <ITText className="text-[10px] text-slate-400">{subtitle}</ITText>
+          )}
+        </ITFlex>
+      </ITFlex>
+      {trailing}
+    </ITFlex>
+  );
 }
 
 export default function CartaForm({ errors }: Props) {
@@ -340,218 +389,231 @@ export default function CartaForm({ errors }: Props) {
     sublabel: l.descripcion ?? undefined,
   }));
 
+  const cardClass =
+    "bg-white dark:bg-slate-900 p-6 shadow-xl shadow-slate-200/40 dark:shadow-slate-950/60 border border-slate-100 dark:border-slate-800 rounded-[24px]";
+
   return (
     <ITStack direction="column" spacing={5}>
-      {/* ── Encabezado ── */}
-      <ITStack direction="column" spacing={3}>
-        <ITText as="h3" className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          {tt("form.header")}
-        </ITText>
-        <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12} md={6}>
-            <ITSelect
-              name="deviceTypeId"
-              label={tt("form.deviceType")}
-              options={tipoOptions}
-              value={draft.deviceTypeId ?? ""}
-              onChange={(e) => handleTypeChange(e.target.value)}
-            />
-          </ITGrid>
+      {/* ── Encabezado / asignación ── */}
+      <div className={cardClass}>
+        <SectionHeader
+          icon={<FaIdCard size={14} />}
+          iconClassName="bg-indigo-100 text-indigo-600"
+          title={tt("form.header")}
+          subtitle={tt("form.headerHint")}
+        />
 
-          {/* Asignación: a personal o a una ubicación */}
-          <ITGrid item xs={12}>
-            <ITFlex align="center" gap={3}>
-              <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                {tt("form.asignacion")}
-              </ITText>
-              <ITSegmentedControl
-                value={esUbicacion ? "UBICACION" : "PERSONAL"}
-                onChange={handleAsignacionChange}
-                options={[
-                  { value: "PERSONAL", label: tt("form.asignacionPersonal") },
-                  { value: "UBICACION", label: tt("form.asignacionUbicacion") },
-                ]}
-              />
-            </ITFlex>
-          </ITGrid>
+        <ITStack direction="column" spacing={3}>
+          <ITFlex align="center" gap={3} wrap="wrap">
+            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+              {tt("form.asignacion")}
+            </ITText>
+            <ITSegmentedControl
+              value={esUbicacion ? "UBICACION" : "PERSONAL"}
+              onChange={handleAsignacionChange}
+              options={[
+                { value: "PERSONAL", label: tt("form.asignacionPersonal") },
+                { value: "UBICACION", label: tt("form.asignacionUbicacion") },
+              ]}
+            />
+          </ITFlex>
 
           {esUbicacion ? (
-            <ITGrid item xs={12}>
-              <ITSearchSelect
-                name="ubicacionId"
-                label={tt("form.location")}
-                placeholder={tt("form.locationPlaceholder")}
-                options={ubicacionOptions}
-                value={draft.ubicacionId ?? ""}
-                onChange={handleUbicacionSelect}
-                required
-                error={errors?.ubicacion ? dyn(tt)(errors.ubicacion) : undefined}
-              />
-            </ITGrid>
-          ) : (
-            <>
-          <ITGrid item xs={12}>
             <ITSearchSelect
-              name="empleadoId"
-              label={tt("form.employee")}
-              placeholder={tt("form.employeePlaceholder")}
-              options={empleadoOptions}
-              value={selectedEmpleadoId}
-              onChange={handleEmpleadoSelect}
-              onSearch={buscarEmpleados}
-              isLoading={busyEmpleados}
+              name="ubicacionId"
+              label={tt("form.location")}
+              placeholder={tt("form.locationPlaceholder")}
+              options={ubicacionOptions}
+              value={draft.ubicacionId ?? ""}
+              onChange={handleUbicacionSelect}
               required
-              error={errors?.responsableId ? dyn(tt)(errors.responsableId) : undefined}
+              error={errors?.ubicacion ? dyn(tt)(errors.ubicacion) : undefined}
             />
-          </ITGrid>
+          ) : (
+            <ITGrid container columns={12} spacing={3}>
+              <ITGrid item xs={12}>
+                <ITSearchSelect
+                  name="empleadoId"
+                  label={tt("form.employee")}
+                  placeholder={tt("form.employeePlaceholder")}
+                  options={empleadoOptions}
+                  value={selectedEmpleadoId}
+                  onChange={handleEmpleadoSelect}
+                  onSearch={buscarEmpleados}
+                  isLoading={busyEmpleados}
+                  required
+                  error={errors?.responsableId ? dyn(tt)(errors.responsableId) : undefined}
+                />
+              </ITGrid>
 
-          {/* Campos autollenados del empleado */}
-          <ITGrid item xs={12} md={4}>
-            <ITInput
-              name="numeroEmpleado"
-              label={tt("form.employeeNo")}
-              value={draft.numeroEmpleado}
-              onChange={(e) => handleField("numeroEmpleado", e.target.value)}
-              placeholder={tt("form.employeeNoPlaceholder")}
-              disabled={!selectedEmpleadoId}
-              required
-              error={errors?.numeroEmpleado ? dyn(tt)(errors.numeroEmpleado) : undefined}
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={4}>
-            <ITInput
-              name="empresa"
-              label={tt("form.company")}
-              value={draft.empresa}
-              onChange={(e) => handleField("empresa", e.target.value)}
-              disabled={!selectedEmpleadoId}
-              placeholder={tt("form.companyPlaceholder")}
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={4}>
-            <ITInput
-              name="departamento"
-              label={tt("form.department")}
-              value={draft.departamento}
-              onChange={(e) => handleField("departamento", e.target.value)}
-              disabled={!selectedEmpleadoId}
-              placeholder={tt("form.departmentPlaceholder")}
-            />
-          </ITGrid>
-            </>
+              {/* Campos autollenados del empleado. La columna del formulario
+                  comparte ancho con la vista previa y puede quedar angosta
+                  (hasta ~370px en ventanas medianas) sin importar qué tan
+                  ancha esté la ventana del navegador — por eso van en una
+                  sola columna en vez de dividirse por breakpoint. */}
+              <ITGrid item xs={12}>
+                <ITInput
+                  name="numeroEmpleado"
+                  label={tt("form.employeeNo")}
+                  value={draft.numeroEmpleado}
+                  onChange={(e) => handleField("numeroEmpleado", e.target.value)}
+                  placeholder={tt("form.employeeNoPlaceholder")}
+                  disabled={!selectedEmpleadoId}
+                  required
+                  error={errors?.numeroEmpleado ? dyn(tt)(errors.numeroEmpleado) : undefined}
+                />
+              </ITGrid>
+              <ITGrid item xs={12}>
+                <ITInput
+                  name="empresa"
+                  label={tt("form.company")}
+                  value={draft.empresa}
+                  onChange={(e) => handleField("empresa", e.target.value)}
+                  disabled={!selectedEmpleadoId}
+                  placeholder={tt("form.companyPlaceholder")}
+                />
+              </ITGrid>
+              <ITGrid item xs={12}>
+                <ITInput
+                  name="departamento"
+                  label={tt("form.department")}
+                  value={draft.departamento}
+                  onChange={(e) => handleField("departamento", e.target.value)}
+                  disabled={!selectedEmpleadoId}
+                  placeholder={tt("form.departmentPlaceholder")}
+                />
+              </ITGrid>
+            </ITGrid>
           )}
-        </ITGrid>
-      </ITStack>
+        </ITStack>
+      </div>
 
       {/* ── Recurso TIC ── */}
-      <ITStack direction="column" spacing={3} className="border-t border-slate-100 pt-5">
-        <ITFlex justify="between" align="center">
-          <ITText as="h3" className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            {tt("form.recursoTic")}
-          </ITText>
-          <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            {tt("form.itemCount")}
-          </ITText>
-        </ITFlex>
+      <div className={cardClass}>
+        <SectionHeader
+          icon={<FaLaptop size={14} />}
+          iconClassName="bg-emerald-100 text-emerald-600"
+          title={tt("form.recursoTic")}
+          subtitle={tt("form.recursoTicHint")}
+          trailing={
+            <ITBadget color="secondary" size="small" variant="outlined">
+              {tt("form.itemCount")}
+            </ITBadget>
+          }
+        />
 
-        <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-          <ITStack direction="column" spacing={3}>
-            <ITSearchSelect
-              name="deviceSearch"
-              label={tt("form.deviceSearch")}
-              placeholder={devicePlaceholder}
-              value={selectedDeviceId}
-              onChange={handleDeviceSelect}
-              onSearch={buscarDispositivos}
-              isLoading={busyDevices}
-              options={deviceOptions}
-              disabled={!draft.deviceTypeId}
-              error={errors?.deviceId ? dyn(tt)(errors.deviceId) : undefined}
-            />
+        <ITStack direction="column" spacing={3}>
+          <ITGrid container columns={12} spacing={3}>
+            <ITGrid item xs={12}>
+              <ITSelect
+                name="deviceTypeId"
+                label={tt("form.deviceType")}
+                options={tipoOptions}
+                value={draft.deviceTypeId ?? ""}
+                onChange={(e) => handleTypeChange(e.target.value)}
+              />
+            </ITGrid>
+            <ITGrid item xs={12}>
+              <ITSearchSelect
+                name="deviceSearch"
+                label={tt("form.deviceSearch")}
+                placeholder={devicePlaceholder}
+                value={selectedDeviceId}
+                onChange={handleDeviceSelect}
+                onSearch={buscarDispositivos}
+                isLoading={busyDevices}
+                options={deviceOptions}
+                disabled={!draft.deviceTypeId}
+                error={errors?.deviceId ? dyn(tt)(errors.deviceId) : undefined}
+              />
+            </ITGrid>
+          </ITGrid>
 
-            {/* Especificaciones técnicas (TIC) — solo lectura, vienen del Device */}
-            {item.device && showConfiguredFields && (
-              <>
-                <ITDivider className="my-2" />
-                <ITFlex justify="between" align="center">
-                  <ITFlex align="center" gap={2}>
-                    <FaNetworkWired className="text-slate-400" />
-                    <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                      {tt("form.specTitle")}
-                    </ITText>
-                  </ITFlex>
-                  <ITBadget color="primary" size="small">
-                    {item.device.type?.code}
-                  </ITBadget>
+          {/* Especificaciones técnicas (TIC) — solo lectura, vienen del Device */}
+          {item.device && showConfiguredFields && (
+            <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+              <ITFlex justify="between" align="center" className="mb-3">
+                <ITFlex align="center" gap={2}>
+                  <FaNetworkWired className="text-slate-400" />
+                  <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                    {tt("form.specTitle")}
+                  </ITText>
                 </ITFlex>
-                <ITGrid container columns={12} spacing={3}>
-                  {deviceFieldEnabled("ip") && <ITGrid item xs={12} md={6}>
-                    <ITInput
-                      name={`ip_${item.id}`}
-                      label={tt("form.specIp")}
-                      value={item.device.ip ?? ""}
-                      disabled
-                      placeholder={tt("form.specIpPlaceholder")}
-                      onChange={() => {}}
-                    />
-                  </ITGrid>}
-                  {deviceFieldEnabled("macAddress") && <ITGrid item xs={12} md={6}>
-                    <ITInput
-                      name={`mac_${item.id}`}
-                      label={tt("form.specMac")}
-                      value={item.device.macAddress ?? ""}
-                      disabled
-                      placeholder={tt("form.specMacPlaceholder")}
-                      onChange={() => {}}
-                    />
-                  </ITGrid>}
-                  {deviceFieldEnabled("sistemaOp") && <ITGrid item xs={12} md={6}>
-                    <ITInput
-                      name={`so_${item.id}`}
-                      label={tt("form.specSo")}
-                      value={item.device.sistemaOp ?? ""}
-                      disabled
-                      placeholder={tt("form.specSoPlaceholder")}
-                      onChange={() => {}}
-                    />
-                  </ITGrid>}
-                  {deviceFieldEnabled("ram") && <ITGrid item xs={12} md={6}>
-                    <ITInput
-                      name={`ram_${item.id}`}
-                      label={tt("form.specRam")}
-                      value={item.device.ram ?? ""}
-                      disabled
-                      placeholder={tt("form.specRamPlaceholder")}
-                      onChange={() => {}}
-                    />
-                  </ITGrid>}
-                  {deviceFieldEnabled("almacenamiento") && <ITGrid item xs={12}>
-                    <ITInput
-                      name={`alm_${item.id}`}
-                      label={tt("form.specStorage")}
-                      value={item.device.almacenamiento ?? ""}
-                      disabled
-                      placeholder={tt("form.specStoragePlaceholder")}
-                      onChange={() => {}}
-                    />
-                  </ITGrid>}
-                </ITGrid>
-                <ITText className="text-[9px] text-slate-400 italic">
-                  {tt("form.specHint")}
-                </ITText>
-              </>
-            )}
-          </ITStack>
-        </div>
-      </ITStack>
+                <ITBadget color="primary" size="small">
+                  {item.device.type?.code}
+                </ITBadget>
+              </ITFlex>
+              <ITGrid container columns={12} spacing={3}>
+                {deviceFieldEnabled("ip") && <ITGrid item xs={12}>
+                  <ITInput
+                    name={`ip_${item.id}`}
+                    label={tt("form.specIp")}
+                    value={item.device.ip ?? ""}
+                    disabled
+                    placeholder={tt("form.specIpPlaceholder")}
+                    onChange={() => {}}
+                  />
+                </ITGrid>}
+                {deviceFieldEnabled("macAddress") && <ITGrid item xs={12}>
+                  <ITInput
+                    name={`mac_${item.id}`}
+                    label={tt("form.specMac")}
+                    value={item.device.macAddress ?? ""}
+                    disabled
+                    placeholder={tt("form.specMacPlaceholder")}
+                    onChange={() => {}}
+                  />
+                </ITGrid>}
+                {deviceFieldEnabled("sistemaOp") && <ITGrid item xs={12}>
+                  <ITInput
+                    name={`so_${item.id}`}
+                    label={tt("form.specSo")}
+                    value={item.device.sistemaOp ?? ""}
+                    disabled
+                    placeholder={tt("form.specSoPlaceholder")}
+                    onChange={() => {}}
+                  />
+                </ITGrid>}
+                {deviceFieldEnabled("ram") && <ITGrid item xs={12}>
+                  <ITInput
+                    name={`ram_${item.id}`}
+                    label={tt("form.specRam")}
+                    value={item.device.ram ?? ""}
+                    disabled
+                    placeholder={tt("form.specRamPlaceholder")}
+                    onChange={() => {}}
+                  />
+                </ITGrid>}
+                {deviceFieldEnabled("almacenamiento") && <ITGrid item xs={12}>
+                  <ITInput
+                    name={`alm_${item.id}`}
+                    label={tt("form.specStorage")}
+                    value={item.device.almacenamiento ?? ""}
+                    disabled
+                    placeholder={tt("form.specStoragePlaceholder")}
+                    onChange={() => {}}
+                  />
+                </ITGrid>}
+              </ITGrid>
+              <ITDivider className="my-3" />
+              <ITText className="text-[9px] text-slate-400 italic">
+                {tt("form.specHint")}
+              </ITText>
+            </div>
+          )}
+        </ITStack>
+      </div>
 
       {/* ── Firmantes ── */}
-      <ITStack direction="column" spacing={3} className="border-t border-slate-100 pt-5">
-        <ITText as="h3" className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          {tt("form.signers")}
-        </ITText>
+      <div className={cardClass}>
+        <SectionHeader
+          icon={<FaPenFancy size={14} />}
+          iconClassName="bg-amber-100 text-amber-600"
+          title={tt("form.signers")}
+          subtitle={tt("form.signersHint")}
+        />
         <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12} md={6}>
+          <ITGrid item xs={12}>
             <ITSearchSelect
               name="encargadoId"
               label={tt("form.areaHead")}
@@ -563,7 +625,7 @@ export default function CartaForm({ errors }: Props) {
               isLoading={busyJefes}
             />
           </ITGrid>
-          <ITGrid item xs={12} md={6}>
+          <ITGrid item xs={12}>
             <ITInput
               name="deliveryBy"
               label={tt("form.deliveryBy")}
@@ -573,7 +635,7 @@ export default function CartaForm({ errors }: Props) {
             />
           </ITGrid>
         </ITGrid>
-      </ITStack>
+      </div>
     </ITStack>
   );
 }

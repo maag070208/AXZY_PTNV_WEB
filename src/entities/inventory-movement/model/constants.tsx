@@ -1,5 +1,5 @@
 import { FaArrowDown, FaArrowRight, FaArrowUp, FaHandshake, FaReply, FaTimesCircle } from "react-icons/fa";
-import type { CondicionType, MovementType } from "@entities/inventory-movement";
+import type { CondicionType, MovementType } from "./types";
 
 export const TIPO_ICONS: Record<MovementType, React.ReactNode> = {
   ENTRADA: <FaArrowDown size={10} />,

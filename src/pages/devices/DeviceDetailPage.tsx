@@ -2,6 +2,7 @@ import {
   ITButton,
   ITConfirmDialog,
   ITFlex,
+  ITGrid,
   ITLoader,
   ITPage,
   ITStack,
@@ -149,20 +150,28 @@ export default function DeviceDetailPage() {
         </ITFlex>
       }
     >
-      <ITFlex justify="center">
-        <ITStack direction="column" spacing={5} className="w-full">
-          <DeviceInfoCard device={device} />
+      <div className="w-full">
+        <ITGrid container columns={12} spacing={5}>
+          <ITGrid item xs={12} md={8}>
+            <ITStack direction="column" spacing={5} className="w-full">
+              <DeviceInfoCard device={device} />
+              <DeviceTimeline device={device} />
+              {device.estado !== "BAJA" && <DeviceCommentBox fx={fx} />}
+            </ITStack>
+          </ITGrid>
           {device.loteId && device.loteSize && device.loteSize > 1 && (
-            <DeviceLoteSection
-              device={device}
-              loteDevices={fx.loteDevices}
-              loteLoading={fx.loteLoading}
-            />
+            <ITGrid item xs={12} md={4}>
+              <div className="md:sticky md:top-4">
+                <DeviceLoteSection
+                  device={device}
+                  loteDevices={fx.loteDevices}
+                  loteLoading={fx.loteLoading}
+                />
+              </div>
+            </ITGrid>
           )}
-          <DeviceTimeline device={device} />
-          {device.estado !== "BAJA" && <DeviceCommentBox fx={fx} />}
-        </ITStack>
-      </ITFlex>
+        </ITGrid>
+      </div>
 
       {toast && (
         <ITToast

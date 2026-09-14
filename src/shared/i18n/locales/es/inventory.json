@@ -1,17 +1,18 @@
 {
   "index": {
     "title": "Inventario",
+    "description": "Resumen de dispositivos y movimientos recientes",
     "reportPdf": "Reporte PDF",
     "generating": "Generando...",
     "newMovement": "Nuevo movimiento",
     "totalDevices": "Total dispositivos",
     "locatedDevices": "En ubicación",
     "unlocatedDevices": "Sin ubicación",
-    "locations": "Ubicaciones ({{count}})",
-    "viewAll": "Ver todas",
-    "recentMovements": "Últimos movimientos",
-    "viewKardex": "Ver kardex",
-    "kardexHint": "Ve los últimos movimientos en el kardex"
+    "colFecha": "FECHA",
+    "colTipo": "TIPO",
+    "colDispositivo": "DISPOSITIVO",
+    "colUbicacion": "UBICACIÓN",
+    "colResponsable": "RESPONSABLE"
   },
   "movements": {
     "loadingTitle": "Movimientos",

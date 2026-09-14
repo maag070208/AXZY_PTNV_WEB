@@ -15,14 +15,15 @@ export default function DeviceCommentBox({ fx }: { fx: UseDeviceDetail }) {
           </ITText>
         </ITFlex>
 
-        <ITFlex gap={2} align="end">
-          <ITTextarea
-            name="comment"
-            value={fx.commentText}
-            onChange={(v) => fx.setCommentText(v)}
-            placeholder={tt("comment.placeholder")}
-            rows={3}
-          />
+        <ITTextarea
+          name="comment"
+          value={fx.commentText}
+          onChange={(v) => fx.setCommentText(v)}
+          placeholder={tt("comment.placeholder")}
+          rows={3}
+          className="w-full"
+        />
+        <ITFlex justify="end">
           <ITButton
             variant="filled"
             color="primary"
