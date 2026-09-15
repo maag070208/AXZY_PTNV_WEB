@@ -10,7 +10,6 @@ import {
 import { FaBoxOpen, FaLayerGroup, FaMagic, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatMacInput } from "@shared/utils/itDevice";
-import { formatLocation } from "@entities/location";
 import type { UseDeviceForm } from "../model/useDeviceForm";
 
 interface Props {
@@ -180,17 +179,17 @@ export default function DeviceFormBody({ fx }: Props) {
               {!isBatch && (
                 <ITGrid item xs={12} md={6}>
                   <ITSelect
-                    name="locationId"
-                    label={tt("form.location")}
-                    options={fx.locations.map((l) => ({
-                      value: l.id,
-                      label: formatLocation(l),
+                    name="departmentId"
+                    label={tt("form.department")}
+                    options={fx.departments.map((d) => ({
+                      value: d.id,
+                      label: d.name,
                     }))}
-                    value={fx.form.locationId}
+                    value={fx.form.departmentId}
                     onChange={(e) =>
-                      fx.setForm((f) => ({ ...f, locationId: e.target.value }))
+                      fx.setForm((f) => ({ ...f, departmentId: e.target.value }))
                     }
-                    placeholder={tt("form.locationPlaceholder")}
+                    placeholder={tt("form.departmentPlaceholder")}
                     disabled={disabledAll}
                   />
                 </ITGrid>

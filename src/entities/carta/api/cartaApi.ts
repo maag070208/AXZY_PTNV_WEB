@@ -26,7 +26,7 @@ export interface CartaInput {
   deliveryBy?: string;
   responsableId?: string;
   encargadoId?: string;
-  ubicacionId?: string | null;
+  departmentId?: string | null;
   item: CartaItemInput;
 }
 

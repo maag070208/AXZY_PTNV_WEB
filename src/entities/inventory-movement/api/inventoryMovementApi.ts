@@ -16,13 +16,13 @@ export const inventoryApi = {
     tableRequest<InventoryMovement>(`/inventory/movements/query`, params),
   listMovements: (params?: {
     deviceId?: string;
-    locationId?: string;
+    departmentId?: string;
     start?: string;
     end?: string;
   }) => {
     const searchParams = new URLSearchParams();
     if (params?.deviceId) searchParams.set("deviceId", params.deviceId);
-    if (params?.locationId) searchParams.set("locationId", params.locationId);
+    if (params?.departmentId) searchParams.set("departmentId", params.departmentId);
     if (params?.start) searchParams.set("start", params.start);
     if (params?.end) searchParams.set("end", params.end);
     const qs = searchParams.toString();
@@ -32,7 +32,7 @@ export const inventoryApi = {
   registerMovement: (data: {
     deviceId: string;
     tipo: MovementType;
-    locationId?: string;
+    departmentId?: string;
     notas?: string;
     prestamoId?: string;
     prestadoA?: string;

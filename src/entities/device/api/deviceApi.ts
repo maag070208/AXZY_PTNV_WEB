@@ -36,7 +36,7 @@ export const deviceApi = {
     nombreEquipo?: string;
     area?: string;
     estado?: "DISPONIBLE" | "ASIGNADO" | "BAJA";
-    locationId?: string;
+    departmentId?: string;
     ip?: string;
     macAddress?: string;
     sistemaOp?: string;
@@ -50,7 +50,7 @@ export const deviceApi = {
     modelo: string;
     area?: string;
     estado?: "DISPONIBLE" | "ASIGNADO" | "BAJA";
-    locationId?: string;
+    departmentId?: string;
     sistemaOp?: string;
     ram?: string;
     almacenamiento?: string;
@@ -82,7 +82,7 @@ export const deviceApi = {
     nombreEquipo: string;
     area: string;
     estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
-    locationId: string;
+    departmentId: string;
     ip: string;
     macAddress: string;
     sistemaOp: string;

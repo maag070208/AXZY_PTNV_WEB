@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { deviceApi as devicesApi, type Device } from "@entities/device";
-import {
-  locationsApi,
-  type Location,
-  formatLocation,
-} from "@entities/location";
+import { departmentsApi, type Department } from "@entities/department";
 import {
   inventoryApi,
   type CondicionType,
@@ -21,7 +17,7 @@ export const useNewInventoryMovement = () => {
   const tipoParam = searchParams.get("tipo");
 
   const [devices, setDevices] = useState<Device[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{
@@ -32,7 +28,7 @@ export const useNewInventoryMovement = () => {
   const [form, setForm] = useState({
     deviceId: deviceIdParam || "",
     tipo: (tipoParam || "") as MovementType | "",
-    locationId: "",
+    departmentId: "",
     notas: "",
     prestadoA: "",
     fechaRetornoEsperado: "",
@@ -42,17 +38,17 @@ export const useNewInventoryMovement = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    Promise.all([devicesApi.list({}), locationsApi.list()])
-      .then(([devRes, locRes]) => {
+    Promise.all([devicesApi.list({}), departmentsApi.list()])
+      .then(([devRes, deptRes]) => {
         setDevices(devRes.data ?? []);
-        setLocations(locRes);
+        setDepartments(deptRes);
         if (deviceIdParam) {
           const found = devRes.data?.find((d: Device) => d.id === deviceIdParam);
           if (found) {
             setForm((f) => ({
               ...f,
               deviceId: found.id,
-              locationId: found.locationId ?? "",
+              departmentId: found.departmentId ?? "",
             }));
           }
         }
@@ -71,7 +67,7 @@ export const useNewInventoryMovement = () => {
   const isValid =
     !!form.deviceId &&
     !!form.tipo &&
-    (!requiresLocation || !!form.locationId) &&
+    (!requiresLocation || !!form.departmentId) &&
     (!requiresPrestamoFields ||
       (!!form.prestadoA.trim() && !!form.fechaRetornoEsperado)) &&
     (!requiresDevolucionFields || !!form.condicion);
@@ -109,8 +105,8 @@ export const useNewInventoryMovement = () => {
       setToast({ message: t("validation.selectType"), type: "error" });
       return;
     }
-    if (requiresLocation && !form.locationId) {
-      setToast({ message: t("validation.selectLocation"), type: "error" });
+    if (requiresLocation && !form.departmentId) {
+      setToast({ message: t("validation.selectDepartment"), type: "error" });
       return;
     }
     if (requiresPrestamoFields && (!form.prestadoA.trim() || !form.fechaRetornoEsperado)) {
@@ -127,7 +123,7 @@ export const useNewInventoryMovement = () => {
       await inventoryApi.registerMovement({
         deviceId: form.deviceId,
         tipo: form.tipo,
-        locationId: requiresLocation ? form.locationId : undefined,
+        departmentId: requiresLocation ? form.departmentId : undefined,
         notas: form.notas || undefined,
         prestadoA: requiresPrestamoFields ? form.prestadoA.trim() : undefined,
         fechaRetornoEsperado: requiresPrestamoFields
@@ -151,7 +147,7 @@ export const useNewInventoryMovement = () => {
     navigate,
     t,
     devices,
-    locations,
+    departments,
     loading,
     error,
     setError,
@@ -168,7 +164,6 @@ export const useNewInventoryMovement = () => {
     TIPO_OPTIONS,
     CONDICION_OPTIONS,
     handleSubmit,
-    formatLocation,
   };
 };
 

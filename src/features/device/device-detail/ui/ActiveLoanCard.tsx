@@ -28,8 +28,10 @@ function Field({ label, value }: { label: string; value?: string | null }) {
 export default function ActiveLoanCard({ item }: Props) {
   const { t } = useTranslation("device");
   const carta = item.carta;
-  const esUbicacion = !!carta.ubicacion;
-  const asignadoA = esUbicacion ? carta.ubicacion?.lugar : carta.responsable?.name;
+  const esDepartamento = !!carta.department;
+  const asignadoA = esDepartamento
+    ? carta.department?.name
+    : carta.responsable?.name;
 
   return (
     <ITFlex className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-[24px] shadow-xl shadow-amber-100/60 border border-amber-200 p-6 md:p-8">
@@ -48,11 +50,11 @@ export default function ActiveLoanCard({ item }: Props) {
             </Link>
           </ITFlex>
           <ITBadget
-            color={esUbicacion ? "purple" : "primary"}
+            color={esDepartamento ? "purple" : "primary"}
             size="sm"
-            variant={esUbicacion ? "outlined" : "filled"}
+            variant={esDepartamento ? "outlined" : "filled"}
           >
-            {esUbicacion ? t("loan.ubicacion") : t("loan.personal")}
+            {esDepartamento ? t("loan.departamento") : t("loan.personal")}
           </ITBadget>
         </ITFlex>
 
@@ -60,7 +62,7 @@ export default function ActiveLoanCard({ item }: Props) {
           rows={[
             { label: t("loan.assignedTo"), value: asignadoA },
             { label: t("loan.since"), value: formatFecha(carta.fecha) },
-            ...(esUbicacion
+            ...(esDepartamento
               ? [{ label: t("loan.employeeNo"), value: carta.numeroEmpleado || null }]
               : []),
             { label: t("loan.department"), value: carta.departamento },

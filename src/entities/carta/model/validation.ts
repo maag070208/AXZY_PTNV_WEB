@@ -3,7 +3,7 @@ import type { CartaResponsiva } from "./types";
 export interface CartaFormErrors {
   numeroEmpleado?: string;
   responsableId?: string;
-  ubicacion?: string;
+  departmentId?: string;
   deviceId?: string;
 }
 
@@ -12,13 +12,13 @@ const text = (v?: string): string => (v ?? "").trim();
 export function validateCartaDraft(draft: CartaResponsiva): CartaFormErrors {
   const errors: CartaFormErrors = {};
 
-  const esUbicacion =
-    draft.responsableTipo === "UBICACION" || Boolean(draft.ubicacionId);
+  const esDepartamento =
+    draft.responsableTipo === "DEPARTAMENTO" || Boolean(draft.departmentId);
 
-  if (esUbicacion) {
-    // Modo ubicación: la carta se asigna a un lugar (no a un empleado).
-    if (!draft.ubicacionId) {
-      errors.ubicacion = "form.errUbicacion";
+  if (esDepartamento) {
+    // Modo departamento: la carta se asigna a un departamento (no a un empleado).
+    if (!draft.departmentId) {
+      errors.departmentId = "form.errDepartment";
     }
   } else {
     if (!draft.responsableId) {

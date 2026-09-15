@@ -11,7 +11,6 @@ import deviceEn from "./locales/en/device.json";
 import employeesEn from "./locales/en/employees.json";
 import homeEn from "./locales/en/home.json";
 import inventoryEn from "./locales/en/inventory.json";
-import locationsEn from "./locales/en/locations.json";
 import notificationsEn from "./locales/en/notifications.json";
 import reportsEn from "./locales/en/reports.json";
 import salidasEn from "./locales/en/salidas.json";
@@ -28,7 +27,6 @@ import deviceEs from "./locales/es/device.json";
 import employeesEs from "./locales/es/employees.json";
 import homeEs from "./locales/es/home.json";
 import inventoryEs from "./locales/es/inventory.json";
-import locationsEs from "./locales/es/locations.json";
 import notificationsEs from "./locales/es/notifications.json";
 import reportsEs from "./locales/es/reports.json";
 import salidasEs from "./locales/es/salidas.json";
@@ -48,7 +46,6 @@ export const NS_LIST = [
   "users",
   "employees",
   "departments",
-  "locations",
   "inventory",
   "reports",
   "salidas",
@@ -68,7 +65,6 @@ export const resources = {
     users: usersEn,
     employees: employeesEn,
     departments: departmentsEn,
-    locations: locationsEn,
     inventory: inventoryEn,
     reports: reportsEn,
     salidas: salidasEn,
@@ -86,7 +82,6 @@ export const resources = {
     users: usersEs,
     employees: employeesEs,
     departments: departmentsEs,
-    locations: locationsEs,
     inventory: inventoryEs,
     reports: reportsEs,
     salidas: salidasEs,

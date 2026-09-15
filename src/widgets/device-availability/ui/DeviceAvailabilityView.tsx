@@ -68,7 +68,10 @@ export default function DeviceAvailabilityView({ groups }: Props) {
             {group.devices.map((dev) => {
               const carta = dev.carta;
               const asignadoA =
-                carta?.responsable || carta?.lugar || carta?.departamento || "—";
+                carta?.responsable ||
+                carta?.departmentName ||
+                carta?.departamento ||
+                "—";
               return (
                 <ITFlex
                   key={dev.id}
@@ -97,9 +100,9 @@ export default function DeviceAvailabilityView({ groups }: Props) {
                           date: formatFecha(carta.fecha),
                         })}
                       </ITText>
-                    ) : dev.ubicacion ? (
+                    ) : dev.departmentName ? (
                       <ITText className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
-                        {t("availability.locatedAt", { place: dev.ubicacion })}
+                        {t("availability.locatedAt", { place: dev.departmentName })}
                       </ITText>
                     ) : null}
                   </ITFlex>

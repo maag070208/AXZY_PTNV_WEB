@@ -44,7 +44,7 @@ function AsideSection({
 }
 
 export default function DepartmentDetailAside({ dept }: Props) {
-  const { t: tt } = useTranslation(["departments", "tickets", "locations", "common"]);
+  const { t: tt } = useTranslation(["departments", "tickets", "common"]);
   const navigate = useNavigate();
 
   const tickets = dept.tickets ?? [];
@@ -118,7 +118,7 @@ export default function DepartmentDetailAside({ dept }: Props) {
                       {c.consecutive}
                     </ITText>
                     <ITBadget color={devuelta ? "gray" : "success"} size="sm">
-                      {devuelta ? tt("locations:detail.returned") : tt("locations:detail.active")}
+                      {devuelta ? tt("detail.cartaReturned") : tt("detail.cartaActive")}
                     </ITBadget>
                   </ITFlex>
                   <ITFlex justify="between" align="center" gap={2} className="mt-1.5">

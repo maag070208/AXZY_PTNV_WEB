@@ -1,5 +1,4 @@
-import type { Device } from "@entities/device";
-import type { Location } from "@entities/location";
+import type { Device, DepartmentRef } from "@entities/device";
 
 export type MovementType = "ENTRADA" | "SALIDA" | "TRASLADO" | "BAJA" | "PRESTAMO" | "DEVOLUCION";
 
@@ -9,8 +8,8 @@ export interface InventoryMovement {
   id: string;
   deviceId: string;
   device: Device;
-  locationId?: string | null;
-  location?: Location | null;
+  departmentId?: string | null;
+  department?: DepartmentRef | null;
   tipo: MovementType;
   notas?: string | null;
   userId: string;
@@ -24,16 +23,20 @@ export interface InventoryMovement {
   motivoBaja?: string | null;
 }
 
+export interface InventorySummaryDepartment extends DepartmentRef {
+  _count?: { devices: number };
+}
+
 export interface InventorySummary {
-  locations: Location[];
+  departments: InventorySummaryDepartment[];
   stats: {
     totalDevices: number;
-    locatedDevices: number;
-    unlocatedDevices: number;
+    departmentDevices: number;
+    unassignedDevices: number;
   };
 }
 
 export type DownloadInventoryPdf = (
   movements: InventoryMovement[],
-  locations: Location[]
+  departments: InventorySummaryDepartment[]
 ) => Promise<void>;

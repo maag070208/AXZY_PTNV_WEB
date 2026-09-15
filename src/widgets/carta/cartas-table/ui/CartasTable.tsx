@@ -131,14 +131,14 @@ export default function CartasTable() {
         label: t("table.asignacion"),
         sortable: false,
         render: (row: CartaResponsiva) => {
-          const esUbicacion = !!row.ubicacionId;
+          const esDepartamento = !!row.departmentId;
           return (
             <ITBadget
-              color={esUbicacion ? "purple" : "warning"}
+              color={esDepartamento ? "purple" : "warning"}
               size="md"
               variant={"outlined"}
             >
-             {esUbicacion ? t("table.asignacionUbicacion") : t("table.asignacionPersonal")}
+             {esDepartamento ? t("table.asignacionDepartamento") : t("table.asignacionPersonal")}
             </ITBadget>
           );
         },

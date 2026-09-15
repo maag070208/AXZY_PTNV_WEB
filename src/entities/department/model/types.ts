@@ -5,15 +5,6 @@ export interface Subarea {
   active: boolean;
 }
 
-// Una Location pertenece a lo más a un Department (no se comparten), por eso
-// es la Location completa, no un registro de tabla puente.
-export interface DepartmentLocation {
-  id: string;
-  lugar: string;
-  descripcion?: string | null;
-  active: boolean;
-}
-
 export interface DepartmentPersonRef {
   id: string;
   name: string;
@@ -44,7 +35,6 @@ export interface Department {
   name: string;
   active: boolean;
   subareas: Subarea[];
-  locations?: DepartmentLocation[];
   tickets?: DepartmentTicket[];
   ticketsTotal?: number;
   cartas?: DepartmentCarta[];

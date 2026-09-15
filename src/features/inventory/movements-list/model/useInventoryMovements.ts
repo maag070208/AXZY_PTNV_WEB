@@ -6,7 +6,8 @@ import {
   type DownloadInventoryPdf,
   type InventoryMovement,
 } from "@entities/inventory-movement";
-import { locationsApi, type Location } from "@entities/location";
+import { departmentsApi, type Department } from "@entities/department";
+import type { InventorySummary } from "@entities/inventory-movement";
 
 interface Options {
   download: DownloadInventoryPdf;
@@ -17,7 +18,8 @@ export const useInventoryMovements = ({ download }: Options) => {
   const { t } = useTranslation(["inventory", "common"]);
 
   const [movements, setMovements] = useState<InventoryMovement[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [summary, setSummary] = useState<InventorySummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{
@@ -26,7 +28,7 @@ export const useInventoryMovements = ({ download }: Options) => {
   } | null>(null);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
 
-  const [filterLocation, setFilterLocation] = useState<string>("");
+  const [filterDepartment, setFilterDepartment] = useState<string>("");
   const [filterStart, setFilterStart] = useState<string>("");
   const [filterEnd, setFilterEnd] = useState<string>("");
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
@@ -37,7 +39,7 @@ export const useInventoryMovements = ({ download }: Options) => {
   const fetchMovements = useCallback(async () => {
     try {
       const data = await inventoryApi.listMovements({
-        locationId: filterLocation || undefined,
+        departmentId: filterDepartment || undefined,
         start: filterStart || undefined,
         end: filterEnd || undefined,
       });
@@ -47,20 +49,33 @@ export const useInventoryMovements = ({ download }: Options) => {
     } finally {
       setLoading(false);
     }
-  }, [filterLocation, filterStart, filterEnd]);
+  }, [filterDepartment, filterStart, filterEnd]);
 
-  const fetchLocations = useCallback(async () => {
+  const fetchDepartments = useCallback(async () => {
     try {
-      const data = await locationsApi.list();
-      setLocations(data);
+      const data = await departmentsApi.list();
+      setDepartments(data);
     } catch (e: any) {
-      console.error("Error fetching locations", e);
+      console.error("Error fetching departments", e);
+    }
+  }, []);
+
+  const fetchSummary = useCallback(async () => {
+    try {
+      const data = await inventoryApi.getSummary();
+      setSummary(data);
+    } catch {
+      // el PDF simplemente omitirá el resumen por departamento
     }
   }, []);
 
   useEffect(() => {
-    fetchLocations();
-  }, [fetchLocations]);
+    fetchDepartments();
+  }, [fetchDepartments]);
+
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
 
   useEffect(() => {
     fetchMovements();
@@ -69,7 +84,7 @@ export const useInventoryMovements = ({ download }: Options) => {
   const handleDownloadPDF = async () => {
     setDownloadingPDF(true);
     try {
-      await download(movements, locations);
+      await download(movements, summary?.departments ?? []);
       setToast({ message: t("messages.pdfDownloaded"), type: "success" });
     } catch {
       setToast({ message: t("messages.pdfError"), type: "error" });
@@ -82,7 +97,7 @@ export const useInventoryMovements = ({ download }: Options) => {
     navigate,
     t,
     movements,
-    locations,
+    departments,
     loading,
     error,
     setError,
@@ -90,8 +105,8 @@ export const useInventoryMovements = ({ download }: Options) => {
     setToast,
     downloadingPDF,
     handleDownloadPDF,
-    filterLocation,
-    setFilterLocation,
+    filterDepartment,
+    setFilterDepartment,
     setFilterStart,
     setFilterEnd,
     dateRange,

@@ -1,5 +1,9 @@
 import type { DeviceType } from "@entities/device-type";
-import type { Location } from "@entities/location";
+
+export interface DepartmentRef {
+  id: string;
+  name: string;
+}
 
 export interface Device {
   id: string;
@@ -13,8 +17,8 @@ export interface Device {
   nombreEquipo?: string | null;
   area: string;
   estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
-  locationId?: string | null;
-  location?: Location | null;
+  departmentId?: string | null;
+  department?: DepartmentRef | null;
   // Cartas responsivas ACTIVAS en las que figura este dispositivo
   cartaItems?: DeviceCartaItem[];
   // Especificaciones técnicas (TIC) — solo aplican a PC / TABLET / LAPTOP
@@ -50,7 +54,7 @@ export interface DeviceCartaItem {
     returnDate?: string | null;
     responsable?: CartaResponsable | null;
     encargado?: CartaResponsable | null;
-    ubicacion?: { id: string; lugar: string } | null;
+    department?: DepartmentRef | null;
   };
 }
 
@@ -79,7 +83,7 @@ export interface DeviceAvailabilityCarta {
   deliveryBy: string;
   responsable?: string | null;
   encargado?: string | null;
-  lugar?: string | null;
+  departmentName?: string | null;
 }
 
 export interface DeviceAvailabilityRow {
@@ -90,7 +94,7 @@ export interface DeviceAvailabilityRow {
   modelo: string;
   estado: "DISPONIBLE" | "ASIGNADO" | "BAJA";
   area: string;
-  ubicacion?: string | null;
+  departmentName?: string | null;
   carta?: DeviceAvailabilityCarta | null;
 }
 

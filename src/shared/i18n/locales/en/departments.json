@@ -42,15 +42,11 @@
     "deleteForeverMsg": "Permanently delete {{name}}? Its areas will be removed and it will be unlinked from users and tickets. This action cannot be undone.",
     "deleteSubareaActive": "Delete area \"{{name}}\"? It will be deactivated.",
     "deleteSubareaForever": "Permanently delete area \"{{name}}\"? This action cannot be undone.",
-    "locations": "Locations",
-    "noLocations": "This department has no linked locations yet.",
-    "locationPlaceholder": "Select a location…",
-    "addLocation": "Link location",
-    "removeLocation": "Unlink location",
-    "deleteLocationMsg": "Unlink location \"{{name}}\" from this department?",
     "ticketsTitle": "Tickets",
     "noTickets": "This department has no tickets.",
     "cartasTitle": "Responsibility letters",
-    "noCartas": "This department has no responsibility letters."
+    "noCartas": "This department has no responsibility letters.",
+    "cartaActive": "Active",
+    "cartaReturned": "Returned"
   }
 }

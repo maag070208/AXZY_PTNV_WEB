@@ -1,16 +1,15 @@
 import { createElement } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
-import type { InventoryMovement } from "@entities/inventory-movement";
-import type { Location } from "@entities/location";
+import type { InventoryMovement, InventorySummaryDepartment } from "@entities/inventory-movement";
 import { InventoryPDF } from "../ui/InventoryPDF";
 
 export const downloadInventoryPDF = async (
   movements: InventoryMovement[],
-  locations: Location[]
+  departments: InventorySummaryDepartment[]
 ): Promise<void> => {
   const blob = await pdf(
-    createElement(InventoryPDF, { movements, locations }) as any
+    createElement(InventoryPDF, { movements, departments }) as any
   ).toBlob();
   const now = new Date();
   const dd = String(now.getDate()).padStart(2, "0");

@@ -198,14 +198,11 @@ export default function CartaPDF({ carta }: Props) {
   const encargadoName = carta.encargado?.name ?? "";
   const deliveryBy = carta.deliveryBy || "Departamento de Sistemas";
 
-  const fmtUbicacion = (u?: CartaResponsiva["ubicacion"]): string => {
-    if (!u) return "";
-    return u.lugar;
-  };
-  // En modo ubicación la carta se asigna a un lugar, no a un empleado:
-  // la firma "Responsable" y el dato muestran la ubicación.
+  const observableTxt = (carta.department?.name ?? "").trim();
+  // En modo departamento la carta se asigna a un departamento, no a un
+  // empleado: la firma "Responsable" y el dato muestran el departamento.
   const responsableTxt =
-    fmtUbicacion(carta.ubicacion) || responsableName || item?.area || "";
+    observableTxt || responsableName || item?.area || "";
 
   const descripcionConCantidad =
     (item?.descripcion || "CONTROL DE TV(5 PIEZAS)") +
@@ -236,10 +233,10 @@ export default function CartaPDF({ carta }: Props) {
             </View>
             <View style={styles.metaRow}>
               <Text style={styles.metaLabel}>
-                {carta.ubicacion ? tt("doc.ubicacion") : tt("doc.employeeNo")}
+                {carta.department ? tt("doc.departamento") : tt("doc.employeeNo")}
               </Text>
               <Text style={styles.metaVal}>
-                {carta.ubicacion
+                {carta.department
                   ? responsableTxt
                   : carta.numeroEmpleado || "N/A"}
               </Text>

@@ -20,13 +20,10 @@ export default function CartaPreview({
     ""
   );
 
-  const fmtUbicacion = (u?: CartaResponsiva["ubicacion"]): string => {
-    if (!u) return "";
-    return u.lugar;
-  };
-  // En modo ubicación la carta se asigna a un lugar, no a un empleado.
+  // En modo departamento la carta se asigna a un departamento, no a un
+  // empleado: la firma "Responsable" y el dato muestran el departamento.
   const responsableTxt =
-    fmtUbicacion(carta.ubicacion) || carta.responsable?.name || "";
+    carta.department?.name || carta.responsable?.name || "";
   const encargadoName = carta.encargado?.name ?? "";
   const deliveryBy = carta.deliveryBy || "Departamento de Sistemas";
 
@@ -48,10 +45,10 @@ export default function CartaPreview({
           </div>
           <div style={styles.metaRow}>
             <span style={styles.metaLabel}>
-              {carta.ubicacion ? tt("doc.ubicacion") : tt("doc.employeeNo")}
+              {carta.department ? tt("doc.departamento") : tt("doc.employeeNo")}
             </span>
             <span style={styles.metaVal}>
-              {carta.ubicacion
+              {carta.department
                 ? responsableTxt
                 : carta.numeroEmpleado || "N/A"}
             </span>

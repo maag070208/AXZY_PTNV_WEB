@@ -92,11 +92,6 @@ export default function DepartmentDetailPage() {
             onNewSubarea={detail.setNewSubarea}
             onAddSubarea={detail.handleAddSubarea}
             onRemoveSubarea={detail.setSubareaToDelete}
-            locations={detail.locations}
-            selectedLocationId={detail.selectedLocationId}
-            onSelectedLocationId={detail.setSelectedLocationId}
-            onAddLocation={detail.handleAddLocation}
-            onRemoveLocation={detail.setLocationToDelete}
           />
         </ITGrid>
 
@@ -116,19 +111,6 @@ export default function DepartmentDetailPage() {
             : tt("detail.deleteSubareaForever", { name: detail.subareaToDelete?.name })
         }
         confirmLabel={detail.subareaToDelete?.active ? tt("common:actions.delete") : tt("detail.deleteForever")}
-        cancelLabel={tt("common:actions.cancel")}
-        variant="danger"
-      />
-
-      <ITConfirmDialog
-        isOpen={!!detail.locationToDelete}
-        onClose={() => detail.setLocationToDelete(null)}
-        onConfirm={detail.confirmRemoveLocation}
-        title={tt("detail.removeLocation")}
-        message={tt("detail.deleteLocationMsg", {
-          name: detail.locationToDelete?.lugar ?? "",
-        })}
-        confirmLabel={tt("common:actions.delete")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />

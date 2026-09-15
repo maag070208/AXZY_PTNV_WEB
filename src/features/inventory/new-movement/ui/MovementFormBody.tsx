@@ -120,7 +120,7 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
                 setForm((f) => ({
                   ...f,
                   deviceId: val as string,
-                  locationId: dev?.locationId ?? "",
+                  departmentId: dev?.departmentId ?? "",
                 }));
               }}
             />
@@ -160,15 +160,15 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
 
             {fx.requiresLocation && (
               <ITSearchSelect
-                name="location"
-                label={t("new.destLocation")}
+                name="department"
+                label={t("new.destDepartment")}
                 placeholder={t("new.destPlaceholder")}
-                options={fx.locations.map((l) => ({
-                  value: l.id,
-                  label: fx.formatLocation(l),
+                options={fx.departments.map((d) => ({
+                  value: d.id,
+                  label: d.name,
                 }))}
-                value={form.locationId}
-                onChange={(val) => setForm((f) => ({ ...f, locationId: val as string }))}
+                value={form.departmentId}
+                onChange={(val) => setForm((f) => ({ ...f, departmentId: val as string }))}
               />
             )}
 
@@ -236,7 +236,7 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
               <ITAlert variant="info">{t("new.devolutionTicket")}</ITAlert>
             )}
 
-            {form.tipo === "SALIDA" && selectedDevice?.location && (
+            {form.tipo === "SALIDA" && selectedDevice?.department && (
               <ITFlex
                 align="center"
                 gap={2}
@@ -245,7 +245,7 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
                 <FaSignOutAlt size={13} className="text-orange-500" />
                 <ITText className="text-xs text-orange-700">
                   {t("new.retirarDe")}{" "}
-                  <strong>{fx.formatLocation(selectedDevice.location)}</strong>
+                  <strong>{selectedDevice.department.name}</strong>
                 </ITText>
               </ITFlex>
             )}
@@ -315,9 +315,9 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
                 >
                   <FaMapMarkerAlt className="shrink-0 text-slate-400" size={11} />
                   <ITText className="text-xs font-medium text-slate-600">
-                    {selectedDevice.location
-                      ? fx.formatLocation(selectedDevice.location)
-                      : t("index.unlocatedDevices")}
+                    {selectedDevice.department
+                      ? selectedDevice.department.name
+                      : t("index.unassignedDevices")}
                   </ITText>
                 </ITFlex>
               </ITFlex>

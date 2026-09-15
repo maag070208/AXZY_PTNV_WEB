@@ -42,15 +42,11 @@
     "deleteForeverMsg": "¿Eliminar definitivamente {{name}}? Se borrarán sus áreas y se desligará de usuarios y tickets. Esta acción no se puede deshacer.",
     "deleteSubareaActive": "¿Eliminar la subárea \"{{name}}\"? Se desactivará.",
     "deleteSubareaForever": "¿Eliminar definitivamente la subárea \"{{name}}\"? Esta acción no se puede deshacer.",
-    "locations": "Ubicaciones",
-    "noLocations": "Este departamento aún no tiene ubicaciones ligadas.",
-    "locationPlaceholder": "Selecciona una ubicación…",
-    "addLocation": "Ligar ubicación",
-    "removeLocation": "Desligar ubicación",
-    "deleteLocationMsg": "¿Desligar la ubicación \"{{name}}\" de este departamento?",
     "ticketsTitle": "Tickets",
     "noTickets": "Este departamento no tiene tickets.",
     "cartasTitle": "Cartas responsivas",
-    "noCartas": "Este departamento no tiene cartas responsivas."
+    "noCartas": "Este departamento no tiene cartas responsivas.",
+    "cartaActive": "Activa",
+    "cartaReturned": "Devuelta"
   }
 }

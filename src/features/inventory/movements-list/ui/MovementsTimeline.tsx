@@ -1,7 +1,6 @@
 import { ITBadget, ITCard, ITFlex, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { formatFechaHora } from "@shared/utils/dates";
-import { formatLocation } from "@entities/location";
 import { CONDICION_COLORS, TIPO_COLORS, TIPO_ICONS } from "@entities/inventory-movement";
 import type { UseInventoryMovements } from "../model/useInventoryMovements";
 
@@ -83,7 +82,7 @@ export default function MovementsTimeline({ fx }: { fx: UseInventoryMovements })
                   <ITFlex align="center" gap={1}>
                     <FaMapMarkerAlt size={10} className="text-slate-400" />
                     <ITText className="text-[10px] text-slate-500">
-                      {m.location ? formatLocation(m.location) : "—"}
+                      {m.department?.name ?? "—"}
                     </ITText>
                   </ITFlex>
                   <ITText className="text-[9px] text-slate-400">

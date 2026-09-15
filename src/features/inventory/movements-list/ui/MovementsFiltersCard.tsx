@@ -6,7 +6,6 @@ import {
   ITStack,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { formatLocation } from "@entities/location";
 import { localDateString } from "@entities/inventory-movement";
 import type { UseInventoryMovements } from "../model/useInventoryMovements";
 
@@ -20,17 +19,17 @@ export default function MovementsFiltersCard({ fx }: { fx: UseInventoryMovements
         <ITFlex gap={3} wrap="wrap">
           <ITFlex direction="column" gap={1} className="min-w-[220px] flex-1">
             <ITText className="text-[9px] text-slate-400 uppercase">
-              {fx.t("movements.location")}
+              {fx.t("movements.department")}
             </ITText>
             <ITSearchSelect
-              name="location"
+              name="department"
               placeholder={fx.t("movements.all")}
-              options={fx.locations.map((l) => ({
-                value: l.id,
-                label: formatLocation(l),
+              options={fx.departments.map((d) => ({
+                value: d.id,
+                label: d.name,
               }))}
-              value={fx.filterLocation}
-              onChange={(val) => fx.setFilterLocation(val as string)}
+              value={fx.filterDepartment}
+              onChange={(val) => fx.setFilterDepartment(val as string)}
             />
           </ITFlex>
           <ITFlex direction="column" gap={1} className="min-w-[220px] flex-1">

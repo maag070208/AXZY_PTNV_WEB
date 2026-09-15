@@ -22,7 +22,7 @@ import {
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { deviceApi as devicesApi, type Device } from "@entities/device";
 import { deviceTypeApi as deviceTypesApi, type DeviceType } from "@entities/device-type";
-import { locationsApi, formatLocation, type Location } from "@entities/location";
+import { departmentsApi, type Department } from "@entities/department";
 import type { CartaFormErrors } from "@entities/carta";
 
 interface Props {
@@ -81,7 +81,7 @@ export default function CartaForm({ errors }: Props) {
   const [busyEmpleados, setBusyEmpleados] = useState(false);
   const [busyJefes, setBusyJefes] = useState(false);
   const [busyDevices, setBusyDevices] = useState(false);
-  const [ubicaciones, setUbicaciones] = useState<Location[]>([]);
+  const [departamentos, setDepartamentos] = useState<Department[]>([]);
 
   const buscarEmpleados = async (q?: string) => {
     setBusyEmpleados(true);
@@ -133,12 +133,12 @@ export default function CartaForm({ errors }: Props) {
     }
   };
 
-  const buscarUbicaciones = async () => {
+  const buscarDepartamentos = async () => {
     try {
-      const data = await locationsApi.list();
-      setUbicaciones(data);
+      const data = await departmentsApi.list();
+      setDepartamentos(data);
     } catch {
-      setUbicaciones([]);
+      setDepartamentos([]);
     }
   };
 
@@ -146,7 +146,7 @@ export default function CartaForm({ errors }: Props) {
     buscarEmpleados();
     buscarJefes();
     deviceTypesApi.list().then(setTipos).catch(() => setTipos([]));
-    buscarUbicaciones();
+    buscarDepartamentos();
   }, []);
 
   const itemId = item?.id;
@@ -224,44 +224,43 @@ export default function CartaForm({ errors }: Props) {
   };
 
   const handleAsignacionChange = (value: string) => {
-    const tipo = value as "PERSONAL" | "UBICACION";
+    const tipo = value as "PERSONAL" | "DEPARTAMENTO";
     dispatch(setDraftField({ field: "responsableTipo", value: tipo }));
-    if (tipo === "UBICACION") {
-      // La carta se asigna a una ubicación: se descartan los datos del empleado.
+    if (tipo === "DEPARTAMENTO") {
+      // La carta se asigna a un departamento: se descartan los datos del empleado.
       setSelectedEmpleadoId("");
       dispatch(setDraftField({ field: "responsableId", value: null }));
       dispatch(setDraftField({ field: "responsable", value: null }));
       dispatch(setDraftField({ field: "numeroEmpleado", value: "" }));
     } else {
-      dispatch(setDraftField({ field: "ubicacionId", value: null }));
-      dispatch(setDraftField({ field: "ubicacion", value: null }));
+      dispatch(setDraftField({ field: "departmentId", value: null }));
+      dispatch(setDraftField({ field: "department", value: null }));
     }
   };
 
-  const handleUbicacionSelect = (value: string | number) => {
-    const loc = ubicaciones.find((l) => l.id === String(value));
-    if (!loc) {
-      dispatch(setDraftField({ field: "ubicacionId", value: null }));
-      dispatch(setDraftField({ field: "ubicacion", value: null }));
+  const handleDepartmentSelect = (value: string | number) => {
+    const dept = departamentos.find((d) => d.id === String(value));
+    if (!dept) {
+      dispatch(setDraftField({ field: "departmentId", value: null }));
+      dispatch(setDraftField({ field: "department", value: null }));
       return;
     }
-    dispatch(setDraftField({ field: "ubicacionId", value: loc.id }));
+    dispatch(setDraftField({ field: "departmentId", value: dept.id }));
     dispatch(
       setDraftField({
-        field: "ubicacion",
+        field: "department",
         value: {
-          id: loc.id,
-          lugar: loc.lugar,
-          descripcion: loc.descripcion,
+          id: dept.id,
+          name: dept.name,
         },
       })
     );
-    // El departamento se autocompleta con la ubicación para que la barra del
+    // El departamento se autocompleta con el elegido para que la barra del
     // PDF muestre, por ejemplo, "Carta responsiva del Departamento de RECEPCION".
     dispatch(
       setDraftField({
         field: "departamento",
-        value: loc.lugar || loc.descripcion || "",
+        value: dept.name,
       })
     );
   };
@@ -375,13 +374,12 @@ export default function CartaForm({ errors }: Props) {
     ? tt("form.devicePlaceholderActive")
     : tt("form.devicePlaceholderFirst");
 
-  const esUbicacion =
-    draft.responsableTipo === "UBICACION" || Boolean(draft.ubicacionId);
+  const esDepartamento =
+    draft.responsableTipo === "DEPARTAMENTO" || Boolean(draft.departmentId);
 
-  const ubicacionOptions = ubicaciones.map((l) => ({
-    value: l.id,
-    label: formatLocation(l),
-    sublabel: l.descripcion ?? undefined,
+  const departamentoOptions = departamentos.map((d) => ({
+    value: d.id,
+    label: d.name,
   }));
 
   const cardClass =
@@ -404,25 +402,25 @@ export default function CartaForm({ errors }: Props) {
               {tt("form.asignacion")}
             </ITText>
             <ITSegmentedControl
-              value={esUbicacion ? "UBICACION" : "PERSONAL"}
+              value={esDepartamento ? "DEPARTAMENTO" : "PERSONAL"}
               onChange={handleAsignacionChange}
               options={[
                 { value: "PERSONAL", label: tt("form.asignacionPersonal") },
-                { value: "UBICACION", label: tt("form.asignacionUbicacion") },
+                { value: "DEPARTAMENTO", label: tt("form.asignacionDepartamento") },
               ]}
             />
           </ITFlex>
 
-          {esUbicacion ? (
+          {esDepartamento ? (
             <ITSearchSelect
-              name="ubicacionId"
-              label={tt("form.location")}
-              placeholder={tt("form.locationPlaceholder")}
-              options={ubicacionOptions}
-              value={draft.ubicacionId ?? ""}
-              onChange={handleUbicacionSelect}
+              name="departmentId"
+              label={tt("form.department")}
+              placeholder={tt("form.departmentPlaceholder")}
+              options={departamentoOptions}
+              value={draft.departmentId ?? ""}
+              onChange={handleDepartmentSelect}
               required
-              error={errors?.ubicacion ? dyn(tt)(errors.ubicacion) : undefined}
+              error={errors?.departmentId ? dyn(tt)(errors.departmentId) : undefined}
             />
           ) : (
             <ITGrid container columns={12} spacing={3}>

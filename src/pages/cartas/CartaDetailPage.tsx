@@ -56,8 +56,8 @@ export default function CartaDetailPage() {
   const canReturn = !!firstDeviceId && !isReturned;
 
   const descripcion =
-    carta.ubicacion
-      ? `Ubicación: ${carta.ubicacion.lugar}`
+    carta.department
+      ? `Departamento: ${carta.department.name}`
       : carta.numeroEmpleado
         ? `Empleado ${carta.numeroEmpleado}`
         : undefined;

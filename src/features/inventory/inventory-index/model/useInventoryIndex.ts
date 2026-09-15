@@ -8,7 +8,7 @@ import {
   type DownloadInventoryPdf,
   type InventorySummary,
 } from "@entities/inventory-movement";
-import { locationsApi, type Location } from "@entities/location";
+import { departmentsApi, type Department } from "@entities/department";
 import { deviceApi as devicesApi, type Device } from "@entities/device";
 
 interface Options {
@@ -21,24 +21,24 @@ export const useInventoryIndex = ({ download }: Options) => {
   const isAdmin = currentUser?.role === "ADMIN";
 
   const [summary, setSummary] = useState<InventorySummary | null>(null);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [unlocatedDevices, setUnlocatedDevices] = useState<Device[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [unassignedDevices, setUnassignedDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [sumRes, locRes, devRes] = await Promise.all([
+      const [sumRes, deptRes, devRes] = await Promise.all([
         inventoryApi.getSummary(),
-        locationsApi.list(),
+        departmentsApi.list(),
         devicesApi.list({}),
       ]);
       setSummary(sumRes);
-      setLocations(locRes);
-      const unlocated = (devRes.data ?? []).filter(
-        (d: Device) => !d.locationId
+      setDepartments(deptRes);
+      const unassigned = (devRes.data ?? []).filter(
+        (d: Device) => !d.departmentId
       );
-      setUnlocatedDevices(unlocated);
+      setUnassignedDevices(unassigned);
     } catch (e) {
       console.error(e);
     } finally {
@@ -55,7 +55,7 @@ export const useInventoryIndex = ({ download }: Options) => {
     setDownloadingPDF(true);
     try {
       const movements = await inventoryApi.listMovements();
-      await download(movements, locations);
+      await download(movements, summary.departments);
     } catch (e) {
       console.error(e);
     } finally {
@@ -83,8 +83,8 @@ export const useInventoryIndex = ({ download }: Options) => {
     navigate,
     isAdmin,
     summary,
-    locations,
-    unlocatedDevices,
+    departments,
+    unassignedDevices,
     loading,
     downloadingPDF,
     handleDownloadPDF,

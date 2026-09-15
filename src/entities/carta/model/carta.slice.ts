@@ -34,7 +34,7 @@ const defaultState = (): CartasState => ({
     empresa: "Puerto Nuevo Hotel y Villas",
     departamento: "Sistemas",
     responsableTipo: "PERSONAL",
-    ubicacionId: null,
+    departmentId: null,
     deliveryBy: "Departamento de Sistemas",
     items: [emptyTICItem()],
     creadoEn: new Date().toISOString(),
@@ -77,7 +77,7 @@ export const saveCarta = createAsyncThunk(
       deliveryBy: draft.deliveryBy,
       responsableId: draft.responsableId,
       encargadoId: draft.encargadoId,
-      ubicacionId: draft.ubicacionId ?? null,
+      departmentId: draft.departmentId ?? null,
       item: {
         descripcion: item.descripcion,
         marca: item.marca,

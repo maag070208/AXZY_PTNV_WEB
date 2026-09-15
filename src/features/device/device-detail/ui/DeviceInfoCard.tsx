@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { formatFechaHora } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n";
 import type { Device } from "@entities/device";
-import { formatLocation } from "@entities/location";
 import type { DeviceFieldKey } from "@entities/device-type";
 import { ESTADO_BADGE, FIELD_LABELS } from "../model/constants";
 import { useTranslation } from "react-i18next";
@@ -94,14 +93,14 @@ export default function DeviceInfoCard({ device }: Props) {
               </ITText>
             </ITStack>
           </ITGrid>
-          {device.location && (
+          {device.department && (
             <ITGrid item xs={12} md={3}>
               <ITStack direction="column" spacing={1}>
                 <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                  {tt("form.location")}
+                  {tt("form.department")}
                 </ITText>
                 <ITText className="text-[13px] font-bold text-slate-700">
-                  {formatLocation(device.location)}
+                  {device.department.name}
                 </ITText>
               </ITStack>
             </ITGrid>

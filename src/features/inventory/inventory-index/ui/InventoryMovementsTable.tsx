@@ -10,7 +10,6 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { formatFechaHora } from "@shared/utils/dates";
-import { formatLocation } from "@entities/location";
 import type { InventoryMovement } from "@entities/inventory-movement";
 import {
   CONDICION_COLORS,
@@ -80,13 +79,13 @@ export default function InventoryMovementsTable({ fetchData, reloadKey }: Props)
     },
     {
       type: "string",
-      key: "ubicacion",
-      label: tt("index.colUbicacion"),
+      key: "departamento",
+      label: tt("index.colDepartamento"),
       filter: true,
       render: (m: InventoryMovement) =>
-        m.location ? (
+        m.department ? (
           <ITText className="text-[11px] font-bold text-slate-600">
-            {formatLocation(m.location)}
+            {m.department.name}
           </ITText>
         ) : (
           <ITText className="text-[10px] font-bold text-slate-300 uppercase">
