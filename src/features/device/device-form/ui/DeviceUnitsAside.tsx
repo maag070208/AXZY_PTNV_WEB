@@ -42,7 +42,7 @@ export default function DeviceUnitsAside({ fx }: Props) {
   const chevronBtn = (idx: number) => (
     <ITButton
       variant="outlined"
-      size="small"
+      size="sm"
       color="secondary"
       onClick={() => toggle(idx)}
       title={tt(isOpen(idx) ? "form.collapseUnit" : "form.expandUnit")}
@@ -119,7 +119,7 @@ export default function DeviceUnitsAside({ fx }: Props) {
                     {fx.cantidad > 1 && (
                       <ITButton
                         variant="outlined"
-                        size="small"
+                        size="sm"
                         color="secondary"
                         onClick={() => fx.removeUnitRow(idx)}
                         title={tt("form.removeUnit")}
@@ -285,7 +285,7 @@ export default function DeviceUnitsAside({ fx }: Props) {
                                 ? "warning"
                                 : "gray"
                           }
-                          size="small"
+                          size="sm"
                           className="uppercase text-[9px] font-bold tracking-wide"
                         >
                           {r.estado}
@@ -308,7 +308,7 @@ export default function DeviceUnitsAside({ fx }: Props) {
                           fx.loteRows.length > 1 && (
                             <ITButton
                               variant="outlined"
-                              size="small"
+                              size="sm"
                               color="secondary"
                               onClick={() =>
                                 fx.requestRemoveLoteUnit(r)

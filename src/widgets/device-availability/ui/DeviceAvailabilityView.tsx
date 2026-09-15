@@ -52,13 +52,13 @@ export default function DeviceAvailabilityView({ groups }: Props) {
               ) : null}
             </ITFlex>
             <ITFlex gap={1} wrap="wrap">
-              <ITBadget color="gray" size="small">
+              <ITBadget color="gray" size="sm">
                 {t("availability.total", { count: group.total })}
               </ITBadget>
-              <ITBadget color="success" size="small">
+              <ITBadget color="success" size="sm">
                 {t("availability.available", { count: group.disponible })}
               </ITBadget>
-              <ITBadget color="warning" size="small">
+              <ITBadget color="warning" size="sm">
                 {t("availability.assigned", { count: group.asignado })}
               </ITBadget>
             </ITFlex>

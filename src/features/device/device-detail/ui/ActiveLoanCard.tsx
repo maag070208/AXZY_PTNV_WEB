@@ -36,7 +36,7 @@ export default function ActiveLoanCard({ item }: Props) {
       <ITStack direction="column" spacing={4} className="w-full">
         <ITFlex justify="between" align="center" gap={2} wrap="wrap">
           <ITFlex align="center" gap={2}>
-            <ITBadget color="warning" size="small">
+            <ITBadget color="warning" size="sm">
               {t("loan.title")}
             </ITBadget>
             <Link
@@ -49,7 +49,7 @@ export default function ActiveLoanCard({ item }: Props) {
           </ITFlex>
           <ITBadget
             color={esUbicacion ? "purple" : "primary"}
-            size="small"
+            size="sm"
             variant={esUbicacion ? "outlined" : "filled"}
           >
             {esUbicacion ? t("loan.ubicacion") : t("loan.personal")}

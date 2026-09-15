@@ -56,7 +56,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       type: "string",
       sortable: false,
       render: (r) => (
-        <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="small">
+        <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="sm">
           {dyn(tt)(`detail.taskStatusOptions.${r.status}`)}
         </ITBadget>
       ),
@@ -81,7 +81,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
           {r.dueDate &&
             r.status !== "COMPLETADA" &&
             new Date(r.dueDate) < new Date() && (
-              <ITBadget color="danger" size="small">{tt("tasksTable.overdue")}</ITBadget>
+              <ITBadget color="danger" size="sm">{tt("tasksTable.overdue")}</ITBadget>
             )}
         </ITFlex>
       ),
@@ -95,7 +95,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
         <ITFlex justify="end">
           <ITButton
             variant="outlined"
-            size="small"
+            size="sm"
             color="secondary"
             onClick={onOpenBoard}
             title={tt("mytasks.viewBoardTitle")}

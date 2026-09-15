@@ -10,7 +10,7 @@ function CartaChip({ device }: { device: Device }) {
   const active = device.cartaItems?.[0];
   if (!active) {
     return (
-      <ITBadget color="gray" size="small">
+      <ITBadget color="gray" size="sm">
         {t("detail.withoutCarta")}
       </ITBadget>
     );
@@ -19,7 +19,7 @@ function CartaChip({ device }: { device: Device }) {
     active.carta.responsable?.name ?? active.carta.encargado?.name ?? undefined;
   return (
     <ITFlex gap={2} wrap="wrap" align="center">
-      <ITBadget color="success" size="small">
+      <ITBadget color="success" size="sm">
         {t("detail.withCarta")}
       </ITBadget>
       {responsable && (

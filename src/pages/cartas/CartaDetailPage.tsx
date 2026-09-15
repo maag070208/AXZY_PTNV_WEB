@@ -78,7 +78,7 @@ export default function CartaDetailPage() {
             <ITButton
               variant="outlined"
               color="secondary"
-              size="small"
+              size="sm"
               onClick={() =>
                 navigate(
                   `/inventario/movimientos/nuevo?deviceId=${firstDeviceId}&tipo=DEVOLUCION`
@@ -94,7 +94,7 @@ export default function CartaDetailPage() {
           <ITButton
             variant="filled"
             color="primary"
-            size="small"
+            size="sm"
             onClick={detail.handleDownload}
             disabled={detail.downloading || isReturned}
           >

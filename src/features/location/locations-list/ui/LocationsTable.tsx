@@ -66,7 +66,7 @@ export default function LocationsTable({
         ) : (
           <ITFlex wrap="wrap" gap={1}>
             {loc.sublugares.map((s: Sublugar) => (
-              <ITBadget key={s.id} color="primary" size="small">
+              <ITBadget key={s.id} color="primary" size="sm">
                 {s.name.toUpperCase()}
               </ITBadget>
             ))}
@@ -102,7 +102,7 @@ export default function LocationsTable({
         <ITFlex gap={1}>
           <ITButton
             variant="outlined"
-            size="small"
+            size="sm"
             color="secondary"
             onClick={() => onView(loc)}
             title={tt("common:actions.view")}
@@ -112,7 +112,7 @@ export default function LocationsTable({
           {isAdmin && (
             <ITButton
               variant="outlined"
-              size="small"
+              size="sm"
               color="secondary"
               onClick={() => onEdit(loc)}
               title={tt("list.editName")}
@@ -123,7 +123,7 @@ export default function LocationsTable({
           {isAdmin && (
             <ITButton
               variant="outlined"
-              size="small"
+              size="sm"
               color="danger"
               onClick={() => onDelete(loc)}
               title={tt("list.delete")}

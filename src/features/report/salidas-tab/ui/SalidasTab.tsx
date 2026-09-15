@@ -89,7 +89,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
       type: "string",
       render: (r) =>
         r.motivo ? (
-          <ITBadget color={MOTIVO_COLORS[r.motivo]} size="small">
+          <ITBadget color={MOTIVO_COLORS[r.motivo]} size="sm">
             {t(`salidas:motivo.${r.motivo}`)}
           </ITBadget>
         ) : (

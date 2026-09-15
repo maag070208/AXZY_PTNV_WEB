@@ -87,7 +87,7 @@ function CartaRow({ carta, index }: { carta: LocationCarta; index: number }) {
           </ITGrid>
           <ITGrid item xs={6} sm={2}>
             <ITFlex justify="end" className="sm:justify-start">
-              <ITBadget color={devuelta ? "gray" : "success"} size="small">
+              <ITBadget color={devuelta ? "gray" : "success"} size="sm">
                 {devuelta ? t("detail.returned") : t("detail.active")}
               </ITBadget>
             </ITFlex>

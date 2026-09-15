@@ -63,7 +63,7 @@ export default function DeviceLoteSection({ device, loteDevices, loteLoading }: 
                         ? "warning"
                         : "gray"
                     }
-                    size="small"
+                    size="sm"
                   >
                     {ld.estado}
                   </ITBadget>

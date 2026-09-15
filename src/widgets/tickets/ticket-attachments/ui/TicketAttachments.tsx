@@ -122,7 +122,7 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
           </ITText>
         </ITFlex>
         {canUpload && (
-          <ITButton variant="outlined" size="small" color="secondary" onClick={() => setUploadOpen(true)}>
+          <ITButton variant="outlined" size="sm" color="secondary" onClick={() => setUploadOpen(true)}>
             <ITText className="text-[11px] font-bold">{tt("attachments.uploadButton")}</ITText>
           </ITButton>
         )}

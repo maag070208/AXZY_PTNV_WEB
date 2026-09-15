@@ -31,6 +31,7 @@ export default function DevicesTable({
 
   const fetchTableData = useCallback(
     async (params: ITDataTableFetchParams) => {
+      console.log("fetchTableData", params);
       const res = await deviceApi.table({
         page: params.page,
         limit: params.limit,

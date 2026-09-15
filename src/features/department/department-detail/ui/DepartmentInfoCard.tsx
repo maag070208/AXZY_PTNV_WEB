@@ -61,7 +61,7 @@ export default function DepartmentInfoCard({
               {tt("detail.status")}
             </ITText>
             <ITFlex align="center" gap={2}>
-              <ITBadget color={dept.active ? "success" : "danger"} size="small">
+              <ITBadget color={dept.active ? "success" : "danger"} size="sm">
                 {dept.active ? tt("detail.active") : tt("detail.inactive")}
               </ITBadget>
             </ITFlex>

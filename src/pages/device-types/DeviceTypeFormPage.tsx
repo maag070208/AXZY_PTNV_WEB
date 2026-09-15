@@ -197,7 +197,7 @@ export default function DeviceTypeFormPage() {
           </div>
         </ITStack>
         <ITFlex justify="end" className="mt-4 pt-3 border-t border-slate-100">
-          <ITButton variant="outlined" size="small" onClick={() => setShowHelp(false)}>
+          <ITButton variant="outlined" size="sm" onClick={() => setShowHelp(false)}>
             {tt("common:actions.cancel")}
           </ITButton>
         </ITFlex>

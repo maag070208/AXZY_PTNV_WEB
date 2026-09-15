@@ -14,7 +14,7 @@ import type { UseDevicesReport } from "../model/useDevicesReport";
 const estadoBadge = (estado: string) => (
   <ITBadget
     color={estado === "DISPONIBLE" ? "success" : estado === "ASIGNADO" ? "warning" : "gray"}
-    size="small"
+    size="sm"
   >
     {estado}
   </ITBadget>

@@ -197,7 +197,7 @@ export default function ImportRowsTable({ fx }: { fx: UseDeviceImport }) {
                     <td className="px-2 py-2">
                       <ITButton
                         variant="outlined"
-                        size="small"
+                        size="sm"
                         color="danger"
                         onClick={() => fx.removeRow(r.key)}
                         title={tt("import.removeRowTitle")}

@@ -30,12 +30,12 @@ export default function DeviceInfoCard({ device }: Props) {
         <ITFlex gap={2} wrap="wrap">
           <ITBadget
             color={ESTADO_BADGE[device.estado]?.color as any ?? "default"}
-            size="small"
+            size="sm"
           >
             {dyn(tt)(`status.labels.${device.estado}`)}
           </ITBadget>
           {device.type && (
-            <ITBadget color="primary" size="small">
+            <ITBadget color="primary" size="sm">
               {device.type.name}
             </ITBadget>
           )}

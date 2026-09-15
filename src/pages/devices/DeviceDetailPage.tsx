@@ -92,7 +92,7 @@ export default function DeviceDetailPage() {
         <ITFlex gap={2}>
           <ITButton
             variant="outlined"
-            size="small"
+            size="sm"
             color="secondary"
             onClick={() =>
               device.estado !== "ASIGNADO" &&
@@ -122,7 +122,7 @@ export default function DeviceDetailPage() {
           </ITButton>
           <ITButton
             variant="outlined"
-            size="small"
+            size="sm"
             color="danger"
             onClick={() => setDeleteOpen(true)}
             disabled={device.estado === "ASIGNADO" && !isAdmin}

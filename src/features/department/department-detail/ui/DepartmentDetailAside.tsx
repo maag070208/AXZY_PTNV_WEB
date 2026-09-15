@@ -74,12 +74,12 @@ export default function DepartmentDetailAside({ dept }: Props) {
                   <ITText className="text-[11px] font-bold text-slate-700 leading-snug line-clamp-2 flex-1">
                     {t.titulo}
                   </ITText>
-                  <ITBadget color={STATUS_BADGE[t.status]?.color as any} size="small">
+                  <ITBadget color={STATUS_BADGE[t.status]?.color as any} size="sm">
                     {tt(`tickets:statusLabels.${t.status}`)}
                   </ITBadget>
                 </ITFlex>
                 <ITFlex justify="between" align="center" gap={2} className="mt-1.5">
-                  <ITBadget color={PRIORITY_BADGE[t.priority]?.color as any} size="small">
+                  <ITBadget color={PRIORITY_BADGE[t.priority]?.color as any} size="sm">
                     {tt(`tickets:priorityLabels.${t.priority}`)}
                   </ITBadget>
                   <ITText className="text-[10px] text-slate-400 whitespace-nowrap">
@@ -117,7 +117,7 @@ export default function DepartmentDetailAside({ dept }: Props) {
                     <ITText className="font-mono font-bold text-[11px] text-blue-600">
                       {c.consecutive}
                     </ITText>
-                    <ITBadget color={devuelta ? "gray" : "success"} size="small">
+                    <ITBadget color={devuelta ? "gray" : "success"} size="sm">
                       {devuelta ? tt("locations:detail.returned") : tt("locations:detail.active")}
                     </ITBadget>
                   </ITFlex>

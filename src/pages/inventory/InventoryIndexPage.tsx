@@ -38,7 +38,7 @@ export default function InventoryIndexPage() {
           <ITButton
             variant="outlined"
             color="secondary"
-            size="small"
+            size="sm"
             onClick={() => fx.navigate("/inventario/movimientos")}
           >
             <ITFlex align="center" gap={1}>
@@ -51,7 +51,7 @@ export default function InventoryIndexPage() {
           <ITButton
             variant="outlined"
             color="primary"
-            size="small"
+            size="sm"
             onClick={fx.handleDownloadPDF}
             disabled={fx.downloadingPDF || !fx.summary}
           >

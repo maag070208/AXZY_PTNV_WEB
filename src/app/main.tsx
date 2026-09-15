@@ -14,29 +14,28 @@ if (!localStorage.getItem("it-theme-dark-mode")) {
 }
 
 const customTheme = {
-  primary: "#10b981",
-  secondary: "#54634d",
-  danger: "#BA1A1A",
-  info: "#512bbb",
-  success: "#4ADE80",
+  primary: "#0D5777",    // Azul oscuro principal del logo (texto y contorno superior)
+  secondary: "#1A7499",  // Azul medio del logo (agua)
+  danger: "#BA1A1A",     // Se mantiene el color de peligro original
+  info: "#512bbb",       // Se mantiene el color de información original
+  success: "#4ADE80",    // Se mantiene el color de éxito original
   layout: {
-    sidebarBg: "#ffffff",
-    sidebarText: "#54634d",
-    navbarBg: "#ffffff",
-    navbarText: "#1B1B1F",
+    sidebarBg: "#ffffff",  // Fondo blanco para la barra lateral
+    sidebarText: "#54634d", // Texto oscuro para la barra lateral (mantenido)
+    navbarBg: "#0D5777",   // Azul oscuro del logo como fondo de la barra de navegación
+    navbarText: "#ffffff", // Texto blanco sobre fondo azul oscuro
   },
   table: {
-    headerBg: "#ffffff",
-    headerText: "#1B1B1F",
-    rowBg: "#ffffff",
-    rowText: "#1B1B1F",
+    headerBg: "#F0F4F7",   // Tono muy claro derivado del azul claro para cabeceras
+    headerText: "#0D5777", // Texto de cabecera en el azul oscuro principal
+    rowBg: "#ffffff",     // Fondo de fila blanco
+    rowText: "#1B1B1F",    // Texto de fila oscuro (mantenido)
   },
 };
-
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <ITThemeProvider theme={customTheme} showFab={false}>
+      <ITThemeProvider theme={customTheme} showFab={false} density={1}>
         <HashRouter>
           <App />
         </HashRouter>

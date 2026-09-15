@@ -74,7 +74,7 @@ export default function LocationInfoCard({
               />
             </ITGrid>
             <ITGrid item xs={12}>
-              <ITBadget color={loc.active ? "success" : "danger"} size="small">
+              <ITBadget color={loc.active ? "success" : "danger"} size="sm">
                 {tt(loc.active ? "detail.active" : "detail.inactive")}
               </ITBadget>
             </ITGrid>

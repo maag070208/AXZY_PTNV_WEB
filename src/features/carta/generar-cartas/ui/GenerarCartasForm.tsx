@@ -105,7 +105,7 @@ export default function GenerarCartasForm({
                 {t("generate.folioGenerated")}
               </ITText>
               <ITFlex wrap="wrap" gap={2}>
-                <ITBadget color="primary" size="small">
+                <ITBadget color="primary" size="sm">
                   {result.carta.consecutivo}
                 </ITBadget>
               </ITFlex>

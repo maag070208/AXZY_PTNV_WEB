@@ -32,7 +32,7 @@ const roleBadge = (role: string) => (
         ? "warning"
         : "success"
     }
-    size="small"
+    size="sm"
   >
     {role === "JEFE_DE_AREA" ? "JEFE AREA" : role}
   </ITBadget>
@@ -61,7 +61,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
         <ITFlex align="center" gap={1}>
           <ITText className="text-[12px] text-slate-800">{u.name}</ITText>
           {!u.active && (
-            <ITBadget color="danger" size="small">inactivo</ITBadget>
+            <ITBadget color="danger" size="sm">inactivo</ITBadget>
           )}
         </ITFlex>
       ),
@@ -125,10 +125,10 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
       sortable: false,
       render: (u) => (
         <ITFlex align="center" gap={2}>
-          <ITButton onClick={() => onViewHistory(u)} size="small" color="secondary">
+          <ITButton onClick={() => onViewHistory(u)} size="sm" color="secondary">
             <FaEye size={14} />
           </ITButton>
-          <ITButton onClick={() => onEdit(u)} size="small" color="gray">
+          <ITButton onClick={() => onEdit(u)} size="sm" color="gray">
             <FaEdit size={14} />
           </ITButton>
           <ITButton
@@ -136,14 +136,14 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
               fx.setUserToPassword(u);
               fx.setNewPassword("");
             }}
-            size="small"
+            size="sm"
             color="success"
           >
             <FaKey size={14} />
           </ITButton>
           <ITButton
             onClick={() => fx.setUserToToggle(u)}
-            size="small"
+            size="sm"
             variant={u.active ? "outlined" : "filled"}
             color={u.active ? "error" : "danger"}
           >
@@ -152,7 +152,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
           {!u.active && (
             <ITButton
               onClick={() => fx.setUserToReactivate(u)}
-              size="small"
+              size="sm"
               color="success"
             >
               <FaUndo size={14} />

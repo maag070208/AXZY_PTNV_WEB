@@ -54,7 +54,7 @@ export default function TicketComments({ fx }: Props) {
               <ITButton
                 variant="filled"
                 color="primary"
-                size="small"
+                size="sm"
                 onClick={fx.handleAddComment}
                 disabled={fx.sendingComment || !fx.commentText.trim()}
                 className="px-4 py-1.5 h-auto rounded-lg shadow-sm font-semibold transition-all active:scale-95"

@@ -297,7 +297,7 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
                         ? "warning"
                         : "danger"
                     }
-                    size="small"
+                    size="sm"
                   >
                     {selectedDevice.estado}
                   </ITBadget>
@@ -367,7 +367,7 @@ export default function MovementFormBody({ fx }: { fx: UseNewInventoryMovement }
               {condOption && (
                 <ITBadget
                   color={condOption.color as "success" | "warning" | "danger"}
-                  size="small"
+                  size="sm"
                 >
                   {condOption.label}
                 </ITBadget>

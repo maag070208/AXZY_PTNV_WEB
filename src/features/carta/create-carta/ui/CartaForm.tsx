@@ -491,7 +491,7 @@ export default function CartaForm({ errors }: Props) {
           title={tt("form.recursoTic")}
           subtitle={tt("form.recursoTicHint")}
           trailing={
-            <ITBadget color="secondary" size="small" variant="outlined">
+            <ITBadget color="secondary" size="sm" variant="outlined">
               {tt("form.itemCount")}
             </ITBadget>
           }

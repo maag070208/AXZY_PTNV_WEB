@@ -27,7 +27,7 @@ export default function DeviceCommentBox({ fx }: { fx: UseDeviceDetail }) {
           <ITButton
             variant="filled"
             color="primary"
-            size="small"
+            size="sm"
             onClick={fx.handleAddComment}
             disabled={fx.sendingComment || !fx.commentText.trim()}
           >

@@ -110,7 +110,7 @@ export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
         </ITText>
         <ITButton
           variant="outlined"
-          size="small"
+          size="sm"
           color="danger"
           onClick={() => onDelete(row.id)}
           title={tt("card.delete")}

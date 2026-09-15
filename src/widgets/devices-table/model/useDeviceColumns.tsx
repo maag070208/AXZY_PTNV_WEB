@@ -78,7 +78,7 @@ export function useDeviceColumns(
         label: t("table.columnStatus"),
         sortable: false,
         render: (row: Device) => (
-          <DeviceStatusBadge estado={row.estado} loteCount={(row as any).loteCount} />
+          <DeviceStatusBadge estado={row.estado} loteCount={(row as any).loteCount} size="lg" />
         ),
       },
       {
@@ -113,7 +113,7 @@ export function useDeviceColumns(
             <ITFlex gap={1}>
               <ITButton
                 variant="outlined"
-                size="small"
+                size="sm"
                 color="secondary"
                 onClick={() => navigate(`/dispositivos/${row.id}`)}
                 title={t("actions.viewDetail")}
@@ -122,7 +122,7 @@ export function useDeviceColumns(
               </ITButton>
               <ITButton
                 variant="outlined"
-                size="small"
+                size="sm"
                 color="secondary"
                 onClick={() => !isLoaned && navigate(`/dispositivos/${row.id}/editar`)}
                 disabled={isLoaned}
@@ -132,7 +132,7 @@ export function useDeviceColumns(
               </ITButton>
               <ITButton
                 variant="outlined"
-                size="small"
+                size="sm"
                 color="danger"
                 onClick={() => onDeleteRequest(row)}
                 disabled={row.estado === "ASIGNADO" && !isAdmin}

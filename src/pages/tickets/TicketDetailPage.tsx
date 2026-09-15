@@ -108,7 +108,7 @@ export default function TicketDetailPage() {
           {(fx.isAdmin || fx.isGerente || fx.canCreateTasks) && (
             <ITButton
               variant="outlined"
-              size="small"
+              size="sm"
               color="secondary"
               onClick={() => navigate(`/tickets/kanban?ticketId=${ticket.id}`)}
               title={tt("detail.kanbanTitle")}
@@ -121,7 +121,7 @@ export default function TicketDetailPage() {
           )}
           <ITButton
             variant="outlined"
-            size="small"
+            size="sm"
             color="primary"
             onClick={fx.handleDownloadPDF}
             disabled={fx.downloadingPDF}
@@ -136,7 +136,7 @@ export default function TicketDetailPage() {
           {!fx.isClosed && fx.canClose && (
             <ITButton
               variant="filled"
-              size="small"
+              size="sm"
               color="danger"
               onClick={() => fx.handleStatusChange("CERRADO")}
             >
@@ -149,7 +149,7 @@ export default function TicketDetailPage() {
           {fx.isAdmin && (
             <ITButton
               variant="outlined"
-              size="small"
+              size="sm"
               color="danger"
               onClick={() => fx.setDeleteOpen(true)}
               title={ticket.deletedAt ? tt("detail.deleteForever") : tt("detail.moveTrash")}

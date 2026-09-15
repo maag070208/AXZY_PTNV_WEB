@@ -48,14 +48,14 @@ export default function MovementsTimeline({ fx }: { fx: UseInventoryMovements })
                           ? "danger"
                           : "info"
                       }
-                      size="small"
+                      size="sm"
                     >
                       {t(`typeLabels.${m.tipo}`)}
                     </ITBadget>
                     {m.condicion && (
                       <ITBadget
                         color={CONDICION_COLORS[m.condicion]}
-                        size="small"
+                        size="sm"
                       >
                         {t("movements.condition", {
                           label: t(`conditionLabels.${m.condicion}`),

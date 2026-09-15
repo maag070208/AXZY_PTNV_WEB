@@ -18,7 +18,7 @@ export default function NotificationsPage() {
           <ITButton
             variant="outlined"
             color="primary"
-            size="small"
+            size="sm"
             onClick={fx.handleMarkAll}
           >
             <FaCheckDouble size={12} className="mr-1" />

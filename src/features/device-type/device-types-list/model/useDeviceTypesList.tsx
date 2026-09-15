@@ -156,7 +156,7 @@ export const deviceTypesColumns = (navigate: ReturnType<typeof useNavigate>) => 
     render: (t: DeviceType) => (
       <ITButton
         variant="outlined"
-        size="small"
+        size="sm"
         color="secondary"
         onClick={() => navigate(`/dispositivos/tipos/${t.id}/editar`)}
         title={i18n.t("device-types:list.edit")}

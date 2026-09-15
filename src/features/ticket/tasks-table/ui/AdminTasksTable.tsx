@@ -66,7 +66,7 @@ export default function AdminTasksTable({ fx }: Props) {
       type: "string",
       sortable: false,
       render: (row) => (
-        <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="small">
+        <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="sm">
           {dyn(tt)(`detail.taskStatusOptions.${row.status}`)}
         </ITBadget>
       ),
@@ -91,7 +91,7 @@ export default function AdminTasksTable({ fx }: Props) {
           {row.dueDate &&
             row.status !== "COMPLETADA" &&
             new Date(row.dueDate) < new Date() && (
-              <ITBadget color="danger" size="small">{tt("tasksTable.overdue")}</ITBadget>
+              <ITBadget color="danger" size="sm">{tt("tasksTable.overdue")}</ITBadget>
             )}
         </ITFlex>
       ),

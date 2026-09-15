@@ -47,7 +47,7 @@ export default function InventoryMovementsPage() {
           <ITButton
             variant="outlined"
             color="primary"
-            size="small"
+            size="sm"
             onClick={fx.handleDownloadPDF}
             disabled={fx.downloadingPDF || fx.movements.length === 0}
           >

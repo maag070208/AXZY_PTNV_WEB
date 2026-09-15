@@ -102,7 +102,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
           <ITText className="text-[11px] font-black text-emerald-700">
             {r.folio ?? "—"}
           </ITText>
-          <ITBadget color={origenBadgeColor(r.origen)} size="small">
+          <ITBadget color={origenBadgeColor(r.origen)} size="sm">
             {origenLabel(r.origen)}
           </ITBadget>
         </ITFlex>

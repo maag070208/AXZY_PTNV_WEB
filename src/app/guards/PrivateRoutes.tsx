@@ -208,7 +208,7 @@ export default function PrivateRoutes() {
       <img
         src="/logo-puerto-nuevo.png"
         alt="Puerto Nuevo Hotel y Villas"
-        className="h-9 w-auto object-contain"
+        className="h-12 w-auto object-contain"
       />
     ),
     logoText: "Puerto Nuevo",

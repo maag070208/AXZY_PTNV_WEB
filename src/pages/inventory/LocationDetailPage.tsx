@@ -63,7 +63,7 @@ export default function LocationDetailPage() {
         isAdmin ? (
           <ITButton
             variant="outlined"
-            size="small"
+            size="sm"
             color="danger"
             onClick={() => detail.setLocToDelete(true)}
             title={tt("list.delete")}

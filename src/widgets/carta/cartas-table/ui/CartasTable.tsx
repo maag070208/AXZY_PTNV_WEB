@@ -134,11 +134,11 @@ export default function CartasTable() {
           const esUbicacion = !!row.ubicacionId;
           return (
             <ITBadget
-              color={esUbicacion ? "purple" : "primary"}
-              size="small"
-              variant={esUbicacion ? "outlined" : "filled"}
+              color={esUbicacion ? "purple" : "warning"}
+              size="md"
+              variant={"outlined"}
             >
-              {esUbicacion ? t("table.asignacionUbicacion") : t("table.asignacionPersonal")}
+             {esUbicacion ? t("table.asignacionUbicacion") : t("table.asignacionPersonal")}
             </ITBadget>
           );
         },
@@ -152,8 +152,8 @@ export default function CartasTable() {
           return (
             <ITBadget
               color={esDevuelta ? "success" : "warning"}
-              size="small"
-              variant={esDevuelta ? "filled" : "outlined"}
+              size="md"
+              variant={esDevuelta ? "filled" : "filled"}
             >
               {esDevuelta ? t("table.statusReturned") : t("table.statusPending")}
             </ITBadget>
@@ -168,7 +168,7 @@ export default function CartasTable() {
           <ITFlex justify="end" gap={2}>
             <ITButton
               variant="outlined"
-              size="small"
+              size="sm"
               color="secondary"
               onClick={() => handleLoad(row.id)}
               title={t("table.view")}
@@ -177,7 +177,7 @@ export default function CartasTable() {
             </ITButton>
             <ITButton
               variant="outlined"
-              size="small"
+              size="sm"
               color="danger"
               onClick={() => handleDelete(row.id)}
               title={t("table.delete")}

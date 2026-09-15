@@ -49,7 +49,7 @@ export default function TicketsTable({
           <ITFlex align="center" gap={1}>
             <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
             {t.deletedAt && (
-              <ITBadget color="gray" size="small">{tt("list.deleted")}</ITBadget>
+              <ITBadget color="gray" size="sm">{tt("list.deleted")}</ITBadget>
             )}
           </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
@@ -72,7 +72,7 @@ export default function TicketsTable({
         error: false,
       },
       render: (t) => (
-        <ITBadget color={(STATUS_BADGE[t.status]?.color as any) ?? "default"} size="small">
+        <ITBadget color={(STATUS_BADGE[t.status]?.color as any) ?? "default"} size="sm">
           {dyn(tt)(`statusLabels.${t.status}`)}
         </ITBadget>
       ),
@@ -91,7 +91,7 @@ export default function TicketsTable({
         error: false,
       },
       render: (t) => (
-        <ITBadget color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"} size="small">
+        <ITBadget color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"} size="sm">
           {dyn(tt)(`priorityLabels.${t.priority}`)}
         </ITBadget>
       ),
@@ -124,7 +124,7 @@ export default function TicketsTable({
         <ITFlex gap={1}>
           <ITButton
             variant="outlined"
-            size="small"
+            size="sm"
             color="secondary"
             onClick={() => onView(t)}
           >
@@ -133,7 +133,7 @@ export default function TicketsTable({
           {isAdmin && (
             <ITButton
               variant="outlined"
-              size="small"
+              size="sm"
               color="danger"
               onClick={() => onMarkForDelete(t)}
               title={t.deletedAt ? tt("list.deleteForever") : tt("list.moveTrash")}

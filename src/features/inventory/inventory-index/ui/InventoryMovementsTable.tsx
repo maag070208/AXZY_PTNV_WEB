@@ -53,7 +53,7 @@ export default function InventoryMovementsTable({ fetchData, reloadKey }: Props)
             {TIPO_ICONS[m.tipo]}
           </span>
           {m.condicion && (
-            <ITBadget color={CONDICION_COLORS[m.condicion]} size="small">
+            <ITBadget color={CONDICION_COLORS[m.condicion]} size="sm">
               {tt(`conditionLabels.${m.condicion}`)}
             </ITBadget>
           )}

@@ -5,7 +5,7 @@ import type { Device } from "../model/types";
 interface DeviceStatusBadgeProps {
   estado: Device["estado"];
   loteCount?: { disponible: number; asignado: number; baja: number };
-  size?: "small" | "medium";
+  size?: "sm" | "md" | "lg";
 }
 
 /**
@@ -13,7 +13,7 @@ interface DeviceStatusBadgeProps {
  * (badge simple o desglose por lote). Antes esta lógica estaba duplicada
  * inline dentro de la columna "ESTADO" de DevicesListPage.
  */
-export default function DeviceStatusBadge({ estado, loteCount, size = "small" }: DeviceStatusBadgeProps) {
+export default function DeviceStatusBadge({ estado, loteCount, size = "sm" }: DeviceStatusBadgeProps) {
   const { t } = useTranslation("device");
 
   if (loteCount) {
