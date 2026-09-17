@@ -1,5 +1,4 @@
 import {
-  ITCard,
   ITDatePicker,
   ITFlex,
   ITSearchSelect,
@@ -11,7 +10,7 @@ import type { UseInventoryMovements } from "../model/useInventoryMovements";
 
 export default function MovementsFiltersCard({ fx }: { fx: UseInventoryMovements }) {
   return (
-    <ITCard className="p-4 mb-6">
+    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] shadow-xl shadow-slate-200/40 p-4 mb-6 overflow-visible">
       <ITStack direction="column" spacing={3}>
         <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-500">
           {fx.t("movements.filters")}
@@ -51,6 +50,6 @@ export default function MovementsFiltersCard({ fx }: { fx: UseInventoryMovements
           </ITFlex>
         </ITFlex>
       </ITStack>
-    </ITCard>
+    </div>
   );
 }

@@ -69,7 +69,11 @@ export default function CartaResponsivaCard({ row, onView, onDelete }: Props) {
         <DocRow label={tt("card.fecha")} value={formatFecha(row.fecha)} />
         <DocRow
             label={row.department ? tt("card.departamento") : tt("card.noEmpleado")}
-            value={row.department?.name ?? row.numeroEmpleado ?? "—"}
+            value={
+              row.department
+                ? `${row.department.name}${row.subarea ? ` — ${row.subarea.name}` : ""}`
+                : row.numeroEmpleado ?? "—"
+            }
             highlight
           />
         <DocRow label={tt("card.empresa")} value={empresa} uppercase />

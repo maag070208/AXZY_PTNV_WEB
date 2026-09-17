@@ -7,7 +7,7 @@ import {
   ITInput,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaPlus, FaTimes, FaUsers } from "react-icons/fa";
+import { FaEdit, FaPlus, FaTimes, FaTrashRestore, FaUsers } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department, Subarea } from "@entities/department";
 
@@ -17,6 +17,8 @@ interface Props {
   newSubarea: string;
   onNewSubarea: (value: string) => void;
   onAddSubarea: () => void;
+  onEditSubarea: (s: Subarea) => void;
+  onReactivateSubarea: (s: Subarea) => void;
   onRemoveSubarea: (s: Subarea) => void;
 }
 
@@ -26,6 +28,8 @@ export default function DepartmentInfoCard({
   newSubarea,
   onNewSubarea,
   onAddSubarea,
+  onEditSubarea,
+  onReactivateSubarea,
   onRemoveSubarea,
 }: Props) {
   const { t: tt } = useTranslation(["departments"]);
@@ -84,11 +88,36 @@ export default function DepartmentInfoCard({
                     key={s.id}
                     align="center"
                     gap={2}
-                    className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full border border-slate-200"
+                    className={
+                      s.active
+                        ? "bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full border border-slate-200"
+                        : "bg-rose-50 text-rose-400 px-3 py-1.5 rounded-full border border-rose-200"
+                    }
                   >
                     <ITText className="text-[11px] font-black uppercase tracking-wide">
                       {s.name}
                     </ITText>
+                    {!s.active && (
+                      <ITText className="text-[9px] font-bold uppercase tracking-widest">
+                        {tt("detail.subareaInactive")}
+                      </ITText>
+                    )}
+                    {isAdmin && s.active && (
+                      <FaEdit
+                        size={10}
+                        className="text-slate-400 hover:text-emerald-600 cursor-pointer"
+                        onClick={() => onEditSubarea(s)}
+                        title={tt("detail.editSubarea")}
+                      />
+                    )}
+                    {isAdmin && !s.active && (
+                      <FaTrashRestore
+                        size={10}
+                        className="text-rose-400 hover:text-emerald-600 cursor-pointer"
+                        onClick={() => onReactivateSubarea(s)}
+                        title={tt("detail.reactivateSubarea")}
+                      />
+                    )}
                     {isAdmin && (
                       <FaTimes
                         size={10}

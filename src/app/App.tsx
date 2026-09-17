@@ -19,6 +19,7 @@ import DeviceTypeFormPage from "@pages/device-types/DeviceTypeFormPage";
 import DeviceImportPage from "@pages/devices/DeviceImportPage";
 import DepartmentsPage from "@pages/departments/DepartmentsPage";
 import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
+import SubareasPage from "@pages/subareas/SubareasPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
 import ReportesPage from "@pages/reports/ReportesPage";
 import UsersListPage from "@pages/users/UsersListPage";
@@ -72,6 +73,7 @@ export default function App() {
 
         <Route path="/departamentos" element={<DepartmentsPage />} />
         <Route path="/departamentos/:id" element={<DepartmentDetailPage />} />
+        <Route path="/subareas" element={<SubareasPage />} />
         <Route path="/empleados" element={<EmployeesListPage />} />
         <Route path="/empleados/:id/editar" element={<UserFormPage />} />
         <Route path="/reportes" element={<ReportesPage />} />

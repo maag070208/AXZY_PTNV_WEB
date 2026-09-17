@@ -3,7 +3,7 @@ import {
   tableRequest,
   type ITDataTableFetchParamsPost,
 } from "@shared/api/table";
-import type { Department, Subarea } from "../model/types";
+import type { Department } from "../model/types";
 
 export const departmentsApi = {
   table: (params: ITDataTableFetchParamsPost) =>
@@ -16,8 +16,4 @@ export const departmentsApi = {
   update: (id: string, data: { name?: string; active?: boolean }) =>
     api.put<Department>(`/departments/${id}`, data),
   remove: (id: string) => api.delete<{ soft: boolean; data: Department }>(`/departments/${id}`),
-  addSubarea: (departmentId: string, name: string) =>
-    api.post<Subarea>(`/departments/${departmentId}/subareas`, { name }),
-  removeSubarea: (subareaId: string) =>
-    api.delete<{ soft: boolean; data: Subarea }>(`/departments/subareas/${subareaId}`),
 };

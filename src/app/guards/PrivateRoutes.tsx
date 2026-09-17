@@ -6,6 +6,7 @@ import {
   FaChartBar,
   FaFileSignature,
   FaHouseUser,
+  FaMapMarkerAlt,
   FaTasks,
   FaTicketAlt,
   FaUserShield,
@@ -169,6 +170,13 @@ export default function PrivateRoutes() {
           icon: <FaBuilding size={14} />,
           action: () => navigate("/departamentos"),
           isActive: active("/departamentos"),
+        },
+        {
+          id: "subareas",
+          label: tt("nav.subareas"),
+          icon: <FaMapMarkerAlt size={14} />,
+          action: () => navigate("/subareas"),
+          isActive: active("/subareas"),
         },
         {
           id: "usuarios",

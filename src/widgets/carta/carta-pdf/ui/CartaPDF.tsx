@@ -198,7 +198,9 @@ export default function CartaPDF({ carta }: Props) {
   const encargadoName = carta.encargado?.name ?? "";
   const deliveryBy = carta.deliveryBy || "Departamento de Sistemas";
 
-  const observableTxt = (carta.department?.name ?? "").trim();
+  const observableTxt = carta.department?.name
+    ? `${carta.department.name}${carta.subarea ? ` — ${carta.subarea.name}` : ""}`
+    : "";
   // En modo departamento la carta se asigna a un departamento, no a un
   // empleado: la firma "Responsable" y el dato muestran el departamento.
   const responsableTxt =

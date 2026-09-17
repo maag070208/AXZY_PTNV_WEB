@@ -6,6 +6,7 @@ import authEn from "./locales/en/auth.json";
 import cartasEn from "./locales/en/cartas.json";
 import commonEn from "./locales/en/common.json";
 import departmentsEn from "./locales/en/departments.json";
+import subareasEn from "./locales/en/subareas.json";
 import deviceTypesEn from "./locales/en/device-types.json";
 import deviceEn from "./locales/en/device.json";
 import employeesEn from "./locales/en/employees.json";
@@ -22,6 +23,7 @@ import authEs from "./locales/es/auth.json";
 import cartasEs from "./locales/es/cartas.json";
 import commonEs from "./locales/es/common.json";
 import departmentsEs from "./locales/es/departments.json";
+import subareasEs from "./locales/es/subareas.json";
 import deviceTypesEs from "./locales/es/device-types.json";
 import deviceEs from "./locales/es/device.json";
 import employeesEs from "./locales/es/employees.json";
@@ -46,6 +48,7 @@ export const NS_LIST = [
   "users",
   "employees",
   "departments",
+  "subareas",
   "inventory",
   "reports",
   "salidas",
@@ -65,6 +68,7 @@ export const resources = {
     users: usersEn,
     employees: employeesEn,
     departments: departmentsEn,
+    subareas: subareasEn,
     inventory: inventoryEn,
     reports: reportsEn,
     salidas: salidasEn,
@@ -82,6 +86,7 @@ export const resources = {
     users: usersEs,
     employees: employeesEs,
     departments: departmentsEs,
+    subareas: subareasEs,
     inventory: inventoryEs,
     reports: reportsEs,
     salidas: salidasEs,

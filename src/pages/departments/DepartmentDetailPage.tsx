@@ -2,10 +2,13 @@ import {
   ITAlert,
   ITButton,
   ITConfirmDialog,
+  ITDialog,
   ITFlex,
   ITGrid,
+  ITInput,
   ITLoader,
   ITPage,
+  ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaBuilding, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useSelector } from "react-redux";
@@ -91,6 +94,8 @@ export default function DepartmentDetailPage() {
             newSubarea={detail.newSubarea}
             onNewSubarea={detail.setNewSubarea}
             onAddSubarea={detail.handleAddSubarea}
+            onEditSubarea={detail.openEditSubarea}
+            onReactivateSubarea={detail.handleReactivateSubarea}
             onRemoveSubarea={detail.setSubareaToDelete}
           />
         </ITGrid>
@@ -99,6 +104,37 @@ export default function DepartmentDetailPage() {
           <DepartmentDetailAside dept={dept} />
         </ITGrid>
       </ITGrid>
+
+      <ITDialog
+        isOpen={!!detail.subareaToEdit}
+        onClose={() => detail.setSubareaToEdit(null)}
+        className="it-dialog-panel"
+        title={tt("detail.editSubareaTitle")}
+      >
+        <ITFlex direction="column" gap={3}>
+          <ITInput
+            name="editSubarea"
+            value={detail.editSubareaName}
+            onChange={(e) => detail.setEditSubareaName(e.target.value)}
+            placeholder={tt("detail.editSubareaPlaceholder")}
+            onKeyDown={(e) => e.key === "Enter" && detail.handleUpdateSubarea()}
+            autoFocus
+          />
+          <ITFlex justify="end" gap={2}>
+            <ITButton variant="outlined" onClick={() => detail.setSubareaToEdit(null)}>
+              {tt("common:actions.cancel")}
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={detail.handleUpdateSubarea}
+              disabled={!detail.editSubareaName.trim()}
+            >
+              <ITText className="font-bold text-[11px]">{tt("common:actions.save")}</ITText>
+            </ITButton>
+          </ITFlex>
+        </ITFlex>
+      </ITDialog>
 
       <ITConfirmDialog
         isOpen={!!detail.subareaToDelete}

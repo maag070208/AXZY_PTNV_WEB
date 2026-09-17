@@ -55,6 +55,8 @@ export interface CartaResponsiva {
   encargadoId?: string;
   departmentId?: string | null;
   department?: CartaDepartment | null;
+  subareaId?: string | null;
+  subarea?: CartaDepartment | null;
   areaBoss?: string;
   deliveryBy: string;
   responsable?: Firmante | null;

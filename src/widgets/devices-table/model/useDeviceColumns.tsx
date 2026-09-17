@@ -124,8 +124,7 @@ export function useDeviceColumns(
                 variant="outlined"
                 size="sm"
                 color="secondary"
-                onClick={() => !isLoaned && navigate(`/dispositivos/${row.id}/editar`)}
-                disabled={isLoaned}
+                onClick={() => navigate(`/dispositivos/${row.id}/editar`)}
                 title={isLoaned ? t("actions.editLocked", { code: row.controlActivos }) : t("actions.editDevice")}
               >
                 {isLoaned ? <FaLock size={14} /> : <FaEdit size={14} />}

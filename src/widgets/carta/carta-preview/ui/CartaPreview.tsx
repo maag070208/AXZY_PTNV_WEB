@@ -22,8 +22,9 @@ export default function CartaPreview({
 
   // En modo departamento la carta se asigna a un departamento, no a un
   // empleado: la firma "Responsable" y el dato muestran el departamento.
-  const responsableTxt =
-    carta.department?.name || carta.responsable?.name || "";
+  const responsableTxt = carta.department?.name
+    ? `${carta.department.name}${carta.subarea ? ` — ${carta.subarea.name}` : ""}`
+    : carta.responsable?.name || "";
   const encargadoName = carta.encargado?.name ?? "";
   const deliveryBy = carta.deliveryBy || "Departamento de Sistemas";
 

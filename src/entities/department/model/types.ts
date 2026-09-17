@@ -3,6 +3,7 @@ export interface Subarea {
   departmentId: string;
   name: string;
   active: boolean;
+  department?: { id: string; name: string };
 }
 
 export interface DepartmentPersonRef {

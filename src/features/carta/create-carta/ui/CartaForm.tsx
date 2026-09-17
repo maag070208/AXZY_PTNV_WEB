@@ -23,6 +23,7 @@ import { usersApi, type User, type UserRole } from "@entities/user";
 import { deviceApi as devicesApi, type Device } from "@entities/device";
 import { deviceTypeApi as deviceTypesApi, type DeviceType } from "@entities/device-type";
 import { departmentsApi, type Department } from "@entities/department";
+import { subareaApi, type Subarea } from "@entities/subarea";
 import type { CartaFormErrors } from "@entities/carta";
 
 interface Props {
@@ -82,6 +83,8 @@ export default function CartaForm({ errors }: Props) {
   const [busyJefes, setBusyJefes] = useState(false);
   const [busyDevices, setBusyDevices] = useState(false);
   const [departamentos, setDepartamentos] = useState<Department[]>([]);
+  const [subareas, setSubareas] = useState<Subarea[]>([]);
+  const [busySubareas, setBusySubareas] = useState(false);
 
   const buscarEmpleados = async (q?: string) => {
     setBusyEmpleados(true);
@@ -142,12 +145,33 @@ export default function CartaForm({ errors }: Props) {
     }
   };
 
+  const buscarSubareas = async (departmentId: string) => {
+    setBusySubareas(true);
+    try {
+      const data = await subareaApi.list({ departmentId });
+      setSubareas(data);
+    } catch {
+      setSubareas([]);
+    } finally {
+      setBusySubareas(false);
+    }
+  };
+
   useEffect(() => {
     buscarEmpleados();
     buscarJefes();
     deviceTypesApi.list().then(setTipos).catch(() => setTipos([]));
     buscarDepartamentos();
   }, []);
+
+  useEffect(() => {
+    if (!draft.departmentId) {
+      setSubareas([]);
+      return;
+    }
+    buscarSubareas(draft.departmentId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft.departmentId]);
 
   const itemId = item?.id;
 
@@ -235,14 +259,21 @@ export default function CartaForm({ errors }: Props) {
     } else {
       dispatch(setDraftField({ field: "departmentId", value: null }));
       dispatch(setDraftField({ field: "department", value: null }));
+      dispatch(setDraftField({ field: "subareaId", value: null }));
+      dispatch(setDraftField({ field: "subarea", value: null }));
     }
   };
 
   const handleDepartmentSelect = (value: string | number) => {
     const dept = departamentos.find((d) => d.id === String(value));
+    // Al cambiar de departamento la subárea elegida deja de aplicar — se
+    // limpia siempre, se recarga con las de este departamento en el efecto.
+    dispatch(setDraftField({ field: "subareaId", value: null }));
+    dispatch(setDraftField({ field: "subarea", value: null }));
     if (!dept) {
       dispatch(setDraftField({ field: "departmentId", value: null }));
       dispatch(setDraftField({ field: "department", value: null }));
+      setSubareas([]);
       return;
     }
     dispatch(setDraftField({ field: "departmentId", value: dept.id }));
@@ -261,6 +292,17 @@ export default function CartaForm({ errors }: Props) {
       setDraftField({
         field: "departamento",
         value: dept.name,
+      })
+    );
+  };
+
+  const handleSubareaSelect = (value: string | number) => {
+    const s = subareas.find((sa) => sa.id === String(value));
+    dispatch(setDraftField({ field: "subareaId", value: s?.id ?? null }));
+    dispatch(
+      setDraftField({
+        field: "subarea",
+        value: s ? { id: s.id, name: s.name } : null,
       })
     );
   };
@@ -382,6 +424,11 @@ export default function CartaForm({ errors }: Props) {
     label: d.name,
   }));
 
+  const subareaOptions = subareas.map((s) => ({
+    value: s.id,
+    label: s.name,
+  }));
+
   const cardClass =
     "bg-white dark:bg-slate-900 p-6 shadow-xl shadow-slate-200/40 dark:shadow-slate-950/60 border border-slate-100 dark:border-slate-800 rounded-[24px]";
 
@@ -412,16 +459,32 @@ export default function CartaForm({ errors }: Props) {
           </ITFlex>
 
           {esDepartamento ? (
-            <ITSearchSelect
-              name="departmentId"
-              label={tt("form.department")}
-              placeholder={tt("form.departmentPlaceholder")}
-              options={departamentoOptions}
-              value={draft.departmentId ?? ""}
-              onChange={handleDepartmentSelect}
-              required
-              error={errors?.departmentId ? dyn(tt)(errors.departmentId) : undefined}
-            />
+            <ITStack direction="column" spacing={3}>
+              <ITSearchSelect
+                name="departmentId"
+                label={tt("form.department")}
+                placeholder={tt("form.departmentPlaceholder")}
+                options={departamentoOptions}
+                value={draft.departmentId ?? ""}
+                onChange={handleDepartmentSelect}
+                required
+                error={errors?.departmentId ? dyn(tt)(errors.departmentId) : undefined}
+              />
+              <ITSearchSelect
+                name="subareaId"
+                label={tt("form.subarea")}
+                placeholder={
+                  !draft.departmentId
+                    ? tt("form.subareaPlaceholderFirst")
+                    : tt("form.subareaPlaceholder")
+                }
+                options={subareaOptions}
+                value={draft.subareaId ?? ""}
+                onChange={handleSubareaSelect}
+                isLoading={busySubareas}
+                disabled={!draft.departmentId}
+              />
+            </ITStack>
           ) : (
             <ITGrid container columns={12} spacing={3}>
               <ITGrid item xs={12}>

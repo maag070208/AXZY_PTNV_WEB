@@ -123,6 +123,7 @@ export default function CartasTable() {
         render: (row: CartaResponsiva) => (
           <ITText className="text-[10px] font-black text-slate-600 uppercase">
             {row.departamento}
+            {row.subarea ? ` — ${row.subarea.name}` : ""}
           </ITText>
         ),
       },

@@ -89,7 +89,7 @@
     "newDevice": "New device",
     "editDescription": "If you change the type, a new asset control code will be generated",
     "newDescription": "Enter the quantity if you're registering several identical units",
-    "lockedMessage": "This device (asset {{code}}) is assigned and cannot be edited. Register its return to be able to modify it.",
+    "lockedMessage": "This device (asset {{code}}) is assigned, so its data cannot be edited until it is returned. You can still use \"Add units\" above to register more identical units.",
     "controlActivos": "Asset control",
     "brandModel": "Brand / Model",
     "registered": "Registered",
@@ -115,7 +115,7 @@
   "actions": {
     "editLote": "Edit whole batch",
     "viewDetail": "View details",
-    "editLocked": "Assigned (asset {{code}}) — cannot be edited until returned",
+    "editLocked": "Assigned (asset {{code}}) — data protected, but you can open it to add more units",
     "editDevice": "Edit",
     "forceDeleteWithCode": "Assigned (asset {{code}}) — force delete (admin only)",
     "returnFirst": "Assigned (asset {{code}}) — record its return before decommissioning",

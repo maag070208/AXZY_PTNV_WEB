@@ -27,6 +27,7 @@ export interface CartaInput {
   responsableId?: string;
   encargadoId?: string;
   departmentId?: string | null;
+  subareaId?: string | null;
   item: CartaItemInput;
 }
 

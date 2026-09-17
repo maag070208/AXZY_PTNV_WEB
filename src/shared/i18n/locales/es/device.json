@@ -89,7 +89,7 @@
     "newDevice": "Nuevo dispositivo",
     "editDescription": "Si cambias el tipo se generará un nuevo control de activos",
     "newDescription": "Indica la cantidad si vas a dar de alta varias unidades iguales",
-    "lockedMessage": "Este dispositivo (activo {{code}}) está asignado y no se puede editar. Registra su devolución para poder modificarlo.",
+    "lockedMessage": "Este dispositivo (activo {{code}}) está asignado, así que sus datos no se pueden editar hasta que se devuelva. Aun así puedes usar \"Agregar unidades\" arriba para dar de alta más unidades iguales.",
     "controlActivos": "Control de activos",
     "brandModel": "Marca / Modelo",
     "registered": "Registrado",
@@ -116,7 +116,7 @@
   "actions": {
     "editLote": "Editar todo el lote",
     "viewDetail": "Ver detalle",
-    "editLocked": "Asignado (activo {{code}}) — no se puede editar hasta que se devuelva",
+    "editLocked": "Asignado (activo {{code}}) — datos protegidos, pero puedes entrar para agregar más unidades",
     "editDevice": "Editar",
     "forceDeleteWithCode": "Asignado (activo {{code}}) — forzar eliminación (solo admin)",
     "returnFirst": "Asignado (activo {{code}}) — registra su devolución antes de dar de baja",
