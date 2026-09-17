@@ -10,7 +10,7 @@ interface DevicesTableProps {
   isMobile: boolean;
   externalFilters: Record<string, string | number | boolean>;
   reloadTrigger: number;
-  onTotalChange: (total: number) => void;
+  onTotalChange?: (total: number) => void;
   onDeleteRequest: (device: Device) => void;
 }
 
@@ -38,7 +38,7 @@ export default function DevicesTable({
         filters: params.filters as Record<string, string | number | boolean>,
         sort: params.sort,
       });
-      onTotalChange(res.total);
+      onTotalChange?.(res.total);
       return {
         data: res.data as unknown as Record<string, unknown>[],
         total: res.total,

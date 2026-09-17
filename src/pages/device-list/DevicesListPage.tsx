@@ -28,7 +28,6 @@ export default function DevicesListPage() {
   const authUser = useSelector((s: RootState) => s.auth.user);
   const isAdmin = authUser?.role === "ADMIN";
 
-  const [total, setTotal] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
 
   const { types } = useDeviceTypes();
@@ -39,7 +38,7 @@ export default function DevicesListPage() {
   return (
     <ITPage
       title={t("device:list.title")}
-      description={t("device:list.description", { total, typeCount: types.length })}
+      description={t("device:list.description", { total: summary?.total ?? 0, typeCount: types.length })}
       backAction={() => navigate(-1)}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
@@ -93,7 +92,6 @@ export default function DevicesListPage() {
         isMobile={isMobile}
         externalFilters={filters.externalFilters}
         reloadTrigger={reloadKey}
-        onTotalChange={setTotal}
         onDeleteRequest={deleteDevice.requestDelete}
       />
 

@@ -6,7 +6,7 @@ import type { UseInventoryIndex } from "../model/useInventoryIndex";
 
 export default function InventoryStatsGrid({ fx }: { fx: UseInventoryIndex }) {
   const { t } = useTranslation(["inventory"]);
-  const unassigned = fx.unassignedDevices.length ?? 0;
+  const unassigned = fx.summary?.stats.unassignedDevices ?? 0;
 
   return (
     <ITGrid container columns={12} spacing={4}>

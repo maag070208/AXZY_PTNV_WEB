@@ -9,7 +9,6 @@ import {
   type InventorySummary,
 } from "@entities/inventory-movement";
 import { departmentsApi, type Department } from "@entities/department";
-import { deviceApi as devicesApi, type Device } from "@entities/device";
 
 interface Options {
   download: DownloadInventoryPdf;
@@ -22,23 +21,17 @@ export const useInventoryIndex = ({ download }: Options) => {
 
   const [summary, setSummary] = useState<InventorySummary | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [unassignedDevices, setUnassignedDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [sumRes, deptRes, devRes] = await Promise.all([
+      const [sumRes, deptRes] = await Promise.all([
         inventoryApi.getSummary(),
         departmentsApi.list(),
-        devicesApi.list({}),
       ]);
       setSummary(sumRes);
       setDepartments(deptRes);
-      const unassigned = (devRes.data ?? []).filter(
-        (d: Device) => !d.departmentId
-      );
-      setUnassignedDevices(unassigned);
     } catch (e) {
       console.error(e);
     } finally {
@@ -84,7 +77,6 @@ export const useInventoryIndex = ({ download }: Options) => {
     isAdmin,
     summary,
     departments,
-    unassignedDevices,
     loading,
     downloadingPDF,
     handleDownloadPDF,
