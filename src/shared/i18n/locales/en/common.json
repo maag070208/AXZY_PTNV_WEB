@@ -25,12 +25,20 @@
     "cartas": "Letters",
     "devices": "Devices",
     "inventory": "Inventory",
+    "tipos": "Types",
+    "movimientos": "Movements",
+    "prestamos": "Letters",
+    "devoluciones": "Returns",
     "reports": "Reports",
-    "employees": "Employees",
+    "hr": "Human Resources",
+    "employees": "Personnel",
+    "documentCatalog": "Document Catalog",
     "departments": "Departments",
     "subareas": "Areas",
     "users": "Users",
     "notifications": "Notifications",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "catalogs": "Catalogs",
+    "hrReports": "HR Reports"
   }
 }

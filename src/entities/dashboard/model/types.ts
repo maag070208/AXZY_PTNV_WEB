@@ -14,5 +14,26 @@ export interface DashboardSummary {
   salidas: { total: number; danadas: number };
   departamentos: number;
   empleados: number;
+  ticketMetricas: {
+    tareasResueltas: number;
+    tareasPendientes: number;
+    avgResolucionDias: number | null;
+  };
+  ticketEficiencia: {
+    user: { id: string; name: string; puesto: string | null };
+    resueltas: number;
+    pendientes: number;
+    avgDias: number | null;
+  }[];
+  ticketsUrgentes: {
+    id: string;
+    titulo: string;
+    prioridad: TicketPrioridad;
+    creadoEn: string;
+    diasEnEspera: number;
+    asignado: string | null;
+  }[];
   recentActivity: DashboardActivity[];
 }
+
+export type TicketPrioridad = "BAJA" | "MEDIA" | "ALTA" | "URGENTE";

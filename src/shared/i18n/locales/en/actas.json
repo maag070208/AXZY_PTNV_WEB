@@ -1,0 +1,69 @@
+{
+  "title": "HR Reports",
+  "description": "Administrative letters and records for employees",
+  "breadcrumb": "HR Reports",
+  "newActa": "New record",
+  "motivos": {
+    "INASISTENCIA": "Absence",
+    "RETARDO": "Tardiness",
+    "EBRIEDAD": "Intoxication / inebriated state",
+    "CONDUCTA": "Inappropriate conduct",
+    "INCUMPLIMIENTO": "Failure to comply with duties",
+    "OTRO": "Other"
+  },
+  "table": {
+    "fecha": "Incident date",
+    "motivo": "Reason",
+    "empleado": "Employee",
+    "puesto": "Position",
+    "descripcion": "Description",
+    "sancion": "Penalty",
+    "creadoPor": "Created by"
+  },
+  "form": {
+    "title": "New administrative record",
+    "empleado": "Employee",
+    "empleadoHint": "Search by name or employee number",
+    "motivo": "Reason",
+    "fechaIncidente": "Incident date",
+    "descripcion": "Incident description",
+    "descripcionHint": "Describe the fact clearly and objectively",
+    "sancion": "Penalty / measure applied",
+    "sancionHint": "Optional: warning, suspension, etc.",
+    "guardar": "Save record",
+    "guardando": "Saving...",
+    "emptyEmpleado": "Select an employee",
+    "emptyMotivo": "Select a reason",
+    "emptyDescripcion": "Write the incident description",
+    "eliminarConfirm": "Delete the administrative record for {{name}}? This action cannot be undone."
+  },
+  "preview": {
+    "title": "Record preview",
+    "descargar": "Download PDF"
+  },
+  "actions": {
+    "ver": "View record",
+    "descargar": "Download",
+    "eliminar": "Delete"
+  },
+  "doc": {
+    "tituloDocumento": "ADMINISTRATIVE RECORD",
+    "fecha": "Date",
+    "empleado": "Employee",
+    "motivo": "Reason",
+    "numeroEmpleado": "Employee no.",
+    "puesto": "Position",
+    "departamento": "Department / area",
+    "fechaIncidente": "Incident date",
+    "descripcion": "Fact description",
+    "sancion": "Penalty / measure applied",
+    "para1a": "By means of this document, it is hereby stated that Mr./Ms.",
+    "para1b": ", an employee of this company, incurred in an administrative fault recorded under the reason",
+    "para1c": "regarding the event that occurred on",
+    "para1d": ", as follows:",
+    "cierre": "This administrative record is raised for the relevant legal and labor effects, and to be kept in the worker's file.",
+    "firmaEmpleado": "Employee",
+    "firmaJefe": "Immediate supervisor",
+    "firmaRh": "Human Resources"
+  }
+}

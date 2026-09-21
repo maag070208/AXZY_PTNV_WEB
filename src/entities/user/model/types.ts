@@ -1,4 +1,4 @@
-export type UserRole = "ADMIN" | "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO";
+export type UserRole = "ADMIN" | "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO" | "RECURSOS_HUMANOS";
 
 export interface AuthUser {
   id: string;
@@ -16,6 +16,9 @@ export interface LoginResponse {
 
 export interface User extends AuthUser {
   active: boolean;
+  segundoNombre?: string | null;
+  apellidoPaterno?: string | null;
+  apellidoMaterno?: string | null;
   puesto?: string;
   area?: string;
   numeroEmpleado?: string;

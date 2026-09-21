@@ -1,5 +1,4 @@
 import {
-  ITCard,
   ITFlex,
   ITGrid,
   ITInput,
@@ -9,9 +8,9 @@ import {
 import {
   FaBuilding,
   FaIdCard,
-  FaPencilAlt,
+  FaLock,
   FaShieldAlt,
-  FaUserPlus,
+  FaUserTag,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
@@ -28,6 +27,30 @@ interface Props {
   roleOptions: Array<Record<string, string>>;
 }
 
+function SectionHeader({
+  icon,
+  iconBg,
+  title,
+  hint,
+}: {
+  icon: React.ReactNode;
+  iconBg: string;
+  title: string;
+  hint: string;
+}) {
+  return (
+    <ITFlex align="center" gap={3} className="mb-5">
+      <ITFlex align="center" justify="center" className={`h-10 w-10 shrink-0 rounded-xl shadow-sm ${iconBg}`}>
+        {icon}
+      </ITFlex>
+      <ITFlex direction="column" gap={0.25}>
+        <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">{title}</ITText>
+        <ITText className="text-[10px] text-slate-400">{hint}</ITText>
+      </ITFlex>
+    </ITFlex>
+  );
+}
+
 export default function UserFormFields({
   isEdit,
   form,
@@ -42,79 +65,82 @@ export default function UserFormFields({
   const activeDepartments = departments.filter((d) => d.active);
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px] items-start">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] items-start">
       <div className="space-y-6 min-w-0">
-        <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-white px-6 py-7 sm:px-8 shadow-xl shadow-slate-200/40">
-          <div className="absolute -right-12 -top-16 h-48 w-48 rounded-full bg-blue-50" />
-          <ITFlex align="center" gap={3} className="relative">
-            <ITFlex align="center" justify="center" className="h-11 w-11 shrink-0 rounded-2xl bg-blue-50 text-blue-600">
-              {isEdit ? <FaPencilAlt size={16} /> : <FaUserPlus size={17} />}
-            </ITFlex>
-            <ITFlex direction="column" gap={0.5}>
-              <ITText className="pt-2 text-[10px] font-black uppercase tracking-[0.22em] text-blue-600">{tt("form.heading")}</ITText>
-              <ITText className="text-2xl font-black tracking-tight text-slate-800">{isEdit ? tt("form.headingEdit") : tt("form.headingNew")}</ITText>
-              <ITText className="pb-2 text-[11px] text-slate-500">{tt("form.headingHint")}</ITText>
-            </ITFlex>
-          </ITFlex>
-        </section>
-
-        <ITCard className="p-6 shadow-xl shadow-slate-200/35 border border-slate-100 rounded-[24px]">
-          <ITFlex align="center" gap={3} className="mb-5">
-            <ITFlex align="center" justify="center" className="h-9 w-9 rounded-xl bg-slate-100 text-slate-500"><FaIdCard size={14} /></ITFlex>
-            <ITFlex direction="column" gap={0.25}><ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">{tt("form.sectionPersonal")}</ITText><ITText className="text-[10px] text-slate-400">{tt("form.sectionPersonalHint")}</ITText></ITFlex>
-          </ITFlex>
+        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            icon={<FaIdCard size={15} className="text-blue-600" />}
+            iconBg="bg-blue-50"
+            title={tt("form.sectionPersonal")}
+            hint={tt("form.sectionPersonalHint")}
+          />
           <ITGrid container columns={12} spacing={4}>
-            <ITGrid item xs={12} md={7}>
+            <ITGrid item xs={12} md={4}>
               <ITInput name="u_name" label={tt("form.name")} value={form.name} onChange={(e) => onFieldChange("name", e.target.value)} required />
             </ITGrid>
-            <ITGrid item xs={12} md={5}>
+            <ITGrid item xs={12} md={4}>
+              <ITInput name="u_second" label={tt("form.secondName")} value={form.segundoNombre} onChange={(e) => onFieldChange("segundoNombre", e.target.value)} />
+            </ITGrid>
+            <ITGrid item xs={12} md={4}>
+              <ITInput name="u_apa" label={tt("form.apellidoPaterno")} value={form.apellidoPaterno} onChange={(e) => onFieldChange("apellidoPaterno", e.target.value)} />
+            </ITGrid>
+            <ITGrid item xs={12} md={4}>
+              <ITInput name="u_ama" label={tt("form.apellidoMaterno")} value={form.apellidoMaterno} onChange={(e) => onFieldChange("apellidoMaterno", e.target.value)} />
+            </ITGrid>
+            <ITGrid item xs={12} md={4}>
               <ITInput name="u_num" label={tt("form.employeeNo")} value={form.numeroEmpleado} onChange={(e) => onFieldChange("numeroEmpleado", e.target.value)} />
             </ITGrid>
-            <ITGrid item xs={12} md={7}>
+            <ITGrid item xs={12} md={4}>
               <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} placeholder="usuario@empresa.com" />
             </ITGrid>
-            <ITGrid item xs={12} md={5}>
+            <ITGrid item xs={12} md={4}>
               <ITInput name="u_puesto" label={tt("form.position")} value={form.puesto} onChange={(e) => onFieldChange("puesto", e.target.value)} />
             </ITGrid>
           </ITGrid>
-        </ITCard>
+        </section>
 
-        <ITCard className="p-6 shadow-xl shadow-slate-200/35 border border-slate-100 rounded-[24px]">
-          <ITFlex align="center" gap={3} className="mb-5">
-            <ITFlex align="center" justify="center" className="h-9 w-9 rounded-xl bg-violet-50 text-violet-600"><FaShieldAlt size={14} /></ITFlex>
-            <ITFlex direction="column" gap={0.25}><ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">{tt("form.sectionAccess")}</ITText><ITText className="text-[10px] text-slate-400">{tt("form.sectionAccessHint")}</ITText></ITFlex>
-          </ITFlex>
+        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            icon={<FaShieldAlt size={15} className="text-violet-600" />}
+            iconBg="bg-violet-50"
+            title={tt("form.sectionAccess")}
+            hint={tt("form.sectionAccessHint")}
+          />
           <ITGrid container columns={12} spacing={4}>
-            <ITGrid item xs={12} md={6}>
+            <ITGrid item xs={12} md={4}>
               <ITInput name="u_username" label={tt("form.username")} value={form.username} onChange={(e) => onFieldChange("username", e.target.value)} required />
             </ITGrid>
-            <ITGrid item xs={12} md={6}>
+            <ITGrid item xs={12} md={4}>
               <ITSelect name="u_role" label={tt("form.role")} options={roleOptions} value={form.role} onChange={(e) => onFieldChange("role", e.target.value as any)} required />
             </ITGrid>
-            <ITGrid item xs={12}>
+            <ITGrid item xs={12} md={4}>
               <ITInput name="u_password" type="password" label={`${tt("form.password")} ${!isEdit ? "*" : ""}`} value={form.password} onChange={(e) => onFieldChange("password", e.target.value)} required={!isEdit} placeholder={isEdit ? tt("form.passwordPlaceholder") : ""} />
             </ITGrid>
           </ITGrid>
-        </ITCard>
+        </section>
       </div>
 
       <aside className="space-y-6 lg:sticky lg:top-5">
-        <ITCard className="p-6 shadow-xl shadow-slate-200/35 border border-slate-100 rounded-[24px]">
-          <ITFlex align="center" gap={3} className="mb-5">
-            <ITFlex align="center" justify="center" className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-600"><FaBuilding size={14} /></ITFlex>
-            <ITFlex direction="column" gap={0.25}><ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">{tt("form.sectionOrganization")}</ITText><ITText className="text-[10px] text-slate-400">{tt("form.sectionOrganizationHint")}</ITText></ITFlex>
-          </ITFlex>
+        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            icon={<FaBuilding size={15} className="text-emerald-600" />}
+            iconBg="bg-emerald-50"
+            title={tt("form.sectionOrganization")}
+            hint={tt("form.sectionOrganizationHint")}
+          />
           <ITFlex direction="column" gap={4}>
             <ITSelect name="u_dept" label={tt("form.department")} options={activeDepartments.map((d) => ({ value: d.id, label: d.name }))} value={form.departmentId} onChange={(e) => onDepartmentChange(e.target.value)} />
             <ITSelect name="u_sub" label={tt("form.subarea")} options={(selectedDept?.subareas ?? []).map((s) => ({ value: s.id, label: s.name }))} value={form.subareaId} onChange={(e) => onFieldChange("subareaId", e.target.value)} />
           </ITFlex>
-        </ITCard>
-        <ITCard className="border border-blue-100 bg-blue-50/50 p-5 rounded-[24px]">
+        </section>
+
+        <section className="rounded-[24px] border border-blue-100 bg-gradient-to-br from-blue-50/80 to-indigo-50/60 p-6">
           <ITFlex align="center" gap={2}>
+            <FaUserTag size={11} className="text-blue-700" />
             <ITText className="text-[10px] font-black uppercase tracking-widest text-blue-800">{tt("form.roleGuide")}</ITText>
-            <ITText className="rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700">{form.role}</ITText>
+            <ITText className="rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700 ml-auto">{form.role}</ITText>
           </ITFlex>
-          <ITText className="mt-2 text-[12px] font-black text-slate-700">{roleGuidance.title}</ITText>
+          <ITText className="mt-3 text-[12px] font-black text-slate-700">{roleGuidance.title}</ITText>
           <ITText className="mt-1 text-[11px] leading-5 text-slate-600">{roleGuidance.summary}</ITText>
           <ul className="mt-3 space-y-2 text-[10px] font-bold text-slate-600">
             {roleGuidance.actions.map((action) => (
@@ -124,8 +150,13 @@ export default function UserFormFields({
               </li>
             ))}
           </ul>
-          <ITText className="mt-4 border-t border-blue-100 pt-3 text-[10px] text-slate-500">{tt("form.passwordEditHint")}</ITText>
-        </ITCard>
+          {isEdit && (
+            <ITFlex align="center" gap={2} className="mt-4 border-t border-blue-100 pt-3">
+              <FaLock size={9} className="text-slate-400" />
+              <ITText className="text-[10px] text-slate-500">{tt("form.passwordEditHint")}</ITText>
+            </ITFlex>
+          )}
+        </section>
       </aside>
     </div>
   );

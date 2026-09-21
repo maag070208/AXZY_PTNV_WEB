@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import type { RootState } from "@app/store";
-import { cartasApi } from "@entities/carta";
-import { deviceApi as devicesApi } from "@entities/device";
+import { inventarioApi } from "@entities/inventario";
 import { departmentsApi } from "@entities/department";
 import { usersApi } from "@entities/user";
 import { ticketsApi } from "@entities/ticket";
@@ -22,9 +21,9 @@ export const useHomeDashboard = () => {
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
-      const jobs: Array<[string, Promise<{ total: number }>]> = [];
+      const jobs: Array<[string, Promise<{ total: number } | unknown[]>]> = [];
       if (canManage || user?.role === "EMPLEADO") {
-        jobs.push(["cartas", cartasApi.table({ page: 1, limit: 1, filters: {} })]);
+        jobs.push(["cartas", inventarioApi.prestamos()]);
         jobs.push(["tickets", ticketsApi.table({ page: 1, limit: 1, filters: {} })]);
       }
       if (canManage) {
@@ -34,7 +33,7 @@ export const useHomeDashboard = () => {
         ]);
       }
       if (isAdmin) {
-        jobs.push(["dispositivos", devicesApi.table({ page: 1, limit: 1, filters: {} })]);
+        jobs.push(["dispositivos", inventarioApi.dispositivos()]);
         jobs.push([
           "departamentos",
           departmentsApi.table({ page: 1, limit: 1, filters: {} }),
@@ -46,7 +45,9 @@ export const useHomeDashboard = () => {
       const next: HomeCounts = {};
       jobs.forEach(([key], i) => {
         const r = results[i];
-        if (r.status === "fulfilled") next[key] = r.value.total;
+        if (r.status === "fulfilled") {
+          next[key] = Array.isArray(r.value) ? r.value.length : r.value.total;
+        }
       });
       setCounts(next);
     };

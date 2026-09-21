@@ -13,3 +13,8 @@
 .it-dialog-panel {
   width: min(94vw, 900px) !important;
 }
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}

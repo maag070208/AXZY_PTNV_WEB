@@ -23,11 +23,11 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
       </ITFlex>
 
       <ITFlex gap={4} wrap="wrap" className="mb-4">
-        <ITBadget color="success" size="sm">
+        <ITBadget color="success" size="lg">
           {tt("import.imported", { count: result.creados })}
         </ITBadget>
         {result.omitidos.length > 0 && (
-          <ITBadget color="warning" size="sm">
+          <ITBadget color="warning" size="lg">
             {`${result.omitidos.length} omitido(s)`}
           </ITBadget>
         )}

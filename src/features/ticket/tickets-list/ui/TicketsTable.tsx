@@ -16,6 +16,9 @@ import { dyn } from "@shared/i18n/dyn";
 import {
   STATUS_BADGE,
   PRIORITY_BADGE,
+  RATING_ESPERA_COLOR,
+  diasEnEspera,
+  ratingEspera,
   type Ticket,
 } from "@entities/ticket";
 
@@ -49,7 +52,7 @@ export default function TicketsTable({
           <ITFlex align="center" gap={1}>
             <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
             {t.deletedAt && (
-              <ITBadget color="gray" size="sm">{tt("list.deleted")}</ITBadget>
+              <ITBadget color="gray" size="lg">{tt("list.deleted")}</ITBadget>
             )}
           </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
@@ -72,7 +75,7 @@ export default function TicketsTable({
         error: false,
       },
       render: (t) => (
-        <ITBadget color={(STATUS_BADGE[t.status]?.color as any) ?? "default"} size="sm">
+        <ITBadget size="lg" color={(STATUS_BADGE[t.status]?.color as any) ?? "default"}>
           {dyn(tt)(`statusLabels.${t.status}`)}
         </ITBadget>
       ),
@@ -91,10 +94,27 @@ export default function TicketsTable({
         error: false,
       },
       render: (t) => (
-        <ITBadget color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"} size="sm">
+        <ITBadget size="lg" color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"}>
           {dyn(tt)(`priorityLabels.${t.priority}`)}
         </ITBadget>
       ),
+    },
+    {
+      key: "espera",
+      label: tt("list.columns.espera"),
+      type: "number",
+      render: (t) => {
+        const dias = diasEnEspera(t.creadoEn, t.closedAt);
+        const rating = ratingEspera(dias);
+        return (
+          <ITFlex align="center" gap={1}>
+            <ITText className="text-[11px] font-bold text-slate-700">{dias} d</ITText>
+            <ITBadget size="lg" color={RATING_ESPERA_COLOR[rating] as any}>
+              {dyn(tt)(`list.esperaLabels.${rating}`)}
+            </ITBadget>
+          </ITFlex>
+        );
+      },
     },
     {
       key: "creadoPor",
@@ -124,7 +144,7 @@ export default function TicketsTable({
         <ITFlex gap={1}>
           <ITButton
             variant="outlined"
-            size="sm"
+            size="lg"
             color="secondary"
             onClick={() => onView(t)}
           >
@@ -133,8 +153,8 @@ export default function TicketsTable({
           {isAdmin && (
             <ITButton
               variant="outlined"
-              size="sm"
-              color="danger"
+              size="lg"
+              color="error"
               onClick={() => onMarkForDelete(t)}
               title={t.deletedAt ? tt("list.deleteForever") : tt("list.moveTrash")}
             >
@@ -159,7 +179,7 @@ export default function TicketsTable({
       itemsPerPageOptions={[5, 10, 50]}
       debounceMs={350}
       variant="bordered"
-      size="sm"
+      size="lg"
     />
   );
 }

@@ -39,6 +39,9 @@ export const usersApi = {
     email?: string;
     password: string;
     name: string;
+    segundoNombre?: string;
+    apellidoPaterno?: string;
+    apellidoMaterno?: string;
     role: UserRole;
     puesto?: string;
     area?: string;
@@ -52,6 +55,9 @@ export const usersApi = {
       username?: string;
       email?: string | null;
       name?: string;
+      segundoNombre?: string | null;
+      apellidoPaterno?: string | null;
+      apellidoMaterno?: string | null;
       role?: UserRole;
       active?: boolean;
       puesto?: string;

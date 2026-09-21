@@ -32,7 +32,7 @@ const roleBadge = (role: string) => (
         ? "warning"
         : "success"
     }
-    size="sm"
+    size="lg"
   >
     {role === "JEFE_DE_AREA" ? "JEFE AREA" : role}
   </ITBadget>
@@ -61,7 +61,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
         <ITFlex align="center" gap={1}>
           <ITText className="text-[12px] text-slate-800">{u.name}</ITText>
           {!u.active && (
-            <ITBadget color="danger" size="sm">inactivo</ITBadget>
+            <ITBadget color="danger" size="lg">inactivo</ITBadget>
           )}
         </ITFlex>
       ),
@@ -77,6 +77,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
           { id: "ADMIN", name: "ADMIN" },
           { id: "GERENTE", name: "GERENTE" },
           { id: "JEFE_DE_AREA", name: "JEFE DE AREA" },
+          { id: "RECURSOS HUMANOS", name: "RECURSOS HUMANOS" },
           { id: "EMPLEADO", name: "EMPLEADO" },
         ],
         loading: false,
@@ -125,10 +126,10 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
       sortable: false,
       render: (u) => (
         <ITFlex align="center" gap={2}>
-          <ITButton onClick={() => onViewHistory(u)} size="sm" color="secondary">
+          <ITButton onClick={() => onViewHistory(u)} size="lg" color="secondary">
             <FaEye size={14} />
           </ITButton>
-          <ITButton onClick={() => onEdit(u)} size="sm" color="gray">
+          <ITButton onClick={() => onEdit(u)} size="lg" color="gray">
             <FaEdit size={14} />
           </ITButton>
           <ITButton
@@ -136,14 +137,14 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
               fx.setUserToPassword(u);
               fx.setNewPassword("");
             }}
-            size="sm"
+            size="lg"
             color="success"
           >
             <FaKey size={14} />
           </ITButton>
           <ITButton
             onClick={() => fx.setUserToToggle(u)}
-            size="sm"
+            size="lg"
             variant={u.active ? "outlined" : "filled"}
             color={u.active ? "error" : "danger"}
           >
@@ -152,7 +153,7 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
           {!u.active && (
             <ITButton
               onClick={() => fx.setUserToReactivate(u)}
-              size="sm"
+              size="lg"
               color="success"
             >
               <FaUndo size={14} />
@@ -173,7 +174,8 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
       }
       reloadTrigger={fx.reloadKey}
       defaultItemsPerPage={10}
-      size="sm"
+      itemsPerPageOptions={[5, 10, 50]}
+      size="lg"
     />
   );
 }

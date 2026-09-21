@@ -112,7 +112,7 @@ export default function CreateTaskDialog({ fx }: Props) {
           <ITFlex justify="end" gap={2}>
             <ITButton
               variant="outlined"
-              size="sm"
+              size="lg"
               onClick={() => {
                 fx.setShowCreatePanel(false);
                 fx.resetCreateForm();
@@ -123,7 +123,7 @@ export default function CreateTaskDialog({ fx }: Props) {
             <ITButton
               variant="filled"
               color="primary"
-              size="sm"
+              size="lg"
               onClick={fx.handleCreateTask}
               disabled={
                 fx.creatingTask ||

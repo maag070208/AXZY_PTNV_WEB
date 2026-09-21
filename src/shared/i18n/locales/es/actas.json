@@ -1,0 +1,69 @@
+{
+  "title": "Reportes de personal",
+  "description": "Cartas y actas administrativas de los empleados",
+  "breadcrumb": "Reportes de personal",
+  "newActa": "Nueva acta",
+  "motivos": {
+    "INASISTENCIA": "Inasistencia",
+    "RETARDO": "Retardo",
+    "EBRIEDAD": "Ebriedad / estado de ebriedad",
+    "CONDUCTA": "Conducta inapropiada",
+    "INCUMPLIMIENTO": "Incumplimiento de funciones",
+    "OTRO": "Otro"
+  },
+  "table": {
+    "fecha": "Fecha del incidente",
+    "motivo": "Motivo",
+    "empleado": "Empleado",
+    "puesto": "Puesto",
+    "descripcion": "Descripción",
+    "sancion": "Sanción",
+    "creadoPor": "Creado por"
+  },
+  "form": {
+    "title": "Nueva acta administrativa",
+    "empleado": "Empleado",
+    "empleadoHint": "Busca por nombre o número de empleado",
+    "motivo": "Motivo",
+    "fechaIncidente": "Fecha del incidente",
+    "descripcion": "Descripción del incidente",
+    "descripcionHint": "Describe el hecho de forma clara y objetiva",
+    "sancion": "Sanción / medida aplicada",
+    "sancionHint": "Opcional: llamada de atención, suspensión, etc.",
+    "guardar": "Guardar acta",
+    "guardando": "Guardando...",
+    "emptyEmpleado": "Selecciona un empleado",
+    "emptyMotivo": "Selecciona el motivo",
+    "emptyDescripcion": "Escribe la descripción del incidente",
+    "eliminarConfirm": "¿Eliminar el acta administrativa de {{name}}? Esta acción no se puede deshacer."
+  },
+  "preview": {
+    "title": "Vista previa del acta",
+    "descargar": "Descargar PDF"
+  },
+  "actions": {
+    "ver": "Ver acta",
+    "descargar": "Descargar",
+    "eliminar": "Eliminar"
+  },
+  "doc": {
+    "tituloDocumento": "ACTA ADMINISTRATIVA",
+    "fecha": "Fecha",
+    "empleado": "Empleado",
+    "motivo": "Motivo",
+    "numeroEmpleado": "No. de empleado",
+    "puesto": "Puesto",
+    "departamento": "Departamento / área",
+    "fechaIncidente": "Fecha del incidente",
+    "descripcion": "Descripción del hecho",
+    "sancion": "Sanción / medida aplicada",
+    "para1a": "Por medio de la presente, se hace constar que el C.",
+    "para1b": ", empleado de esta empresa, incurrió en una falta administrativa registrada bajo el motivo",
+    "para1c": "con motivo del hecho ocurrido el día",
+    "para1d": ", de acuerdo con lo siguiente:",
+    "cierre": "Se levanta la presente acta administrativa para los efectos legales y laborales a que haya lugar, y para que obre en el expediente del trabajador.",
+    "firmaEmpleado": "Empleado",
+    "firmaJefe": "Jefe inmediato",
+    "firmaRh": "Recursos Humanos"
+  }
+}

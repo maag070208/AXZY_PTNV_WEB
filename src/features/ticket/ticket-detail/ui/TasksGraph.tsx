@@ -50,14 +50,14 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
           <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
             {tt("detail.tasksGraph")}
           </ITText>
-          <ITBadget color="primary" size="sm">
+          <ITBadget color="primary" size="lg">
             {ticket.assignments.length}
           </ITBadget>
         </ITFlex>
         <ITButton
           variant="outlined"
           color="secondary"
-          size="sm"
+          size="lg"
           onClick={() => fx.setTasksOpen(true)}
         >
           <ITText className="text-[10px] font-bold">{tt("detail.showTasks")}</ITText>
@@ -77,13 +77,13 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
           <ITButton
             variant="outlined"
             color="secondary"
-            size="sm"
+            size="lg"
             onClick={() => fx.setTasksOpen(false)}
           >
             <ITText className="text-[10px] font-bold">{tt("detail.hideTasks")}</ITText>
           </ITButton>
         </ITFlex>
-        <ITBadget color="primary" size="sm">
+        <ITBadget color="primary" size="lg">
           {tt("detail.assignmentsCount", { count: ticket.assignments.length })}
         </ITBadget>
       </ITFlex>
@@ -102,7 +102,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                 {ticket.titulo}
               </ITText>
             </ITFlex>
-            <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="sm">
+            <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="lg">
               {dyn(tt)(`statusLabels.${ticket.status}`)}
             </ITBadget>
           </ITFlex>
@@ -164,8 +164,8 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                     {canManage && !isClosed && (
                       <ITButton
                         variant="outlined"
-                        size="sm"
-                        color="danger"
+                        size="lg"
+                        color="error"
                         onClick={() => fx.handleRemoveAssignment(a.id)}
                         title={tt("detail.removeTask")}
                         disabled={fx.updatingId === a.id}
@@ -183,13 +183,13 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                           ? "purple"
                           : "gray"
                       }
-                      size="sm"
+                      size="lg"
                     >
                       {dyn(tt)(`detail.taskStatusOptions.${a.status}`)}
                     </ITBadget>
                     <ITButton
                       variant="outlined"
-                      size="sm"
+                      size="lg"
                       color="secondary"
                       onClick={() =>
                         fx.setExpandedAssignments((current) => ({
@@ -289,7 +289,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                     <div className="border-t border-slate-100 pt-2">
                       <ITButton
                         variant="outlined"
-                        size="sm"
+                        size="lg"
                         color="secondary"
                         onClick={() =>
                           fx.setCommentOpen((s) => ({ ...s, [a.id]: !s[a.id] }))
@@ -349,7 +349,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                               <ITButton
                                 variant="filled"
                                 color="primary"
-                                size="sm"
+                                size="lg"
                                 onClick={() => fx.handleAddAssignmentComment(a.id)}
                                 disabled={
                                   fx.sendingCommentId === a.id ||
@@ -390,7 +390,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
               <ITButton
                 variant="outlined"
                 color="secondary"
-                size="sm"
+                size="lg"
                 onClick={() => fx.setNewTaskOpen((open) => !open)}
               >
                 <ITText className="text-[10px] font-bold">

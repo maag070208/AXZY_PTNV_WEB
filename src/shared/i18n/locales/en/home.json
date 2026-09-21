@@ -42,6 +42,14 @@
     "following": "Following up",
     "closed": "Closed",
     "recentActivity": "Recent activity",
-    "noActivity": "No activity recorded yet."
+    "noActivity": "No activity recorded yet.",
+    "ticketsResueltos": "Tasks resolved",
+    "avgResolucion": "Avg resolution",
+    "tareasPendientes": "Pending tasks",
+    "teamEfficiency": "Team efficiency",
+    "noEfficiency": "No resolution data",
+    "urgentTitle": "Oldest tickets",
+    "noUrgent": "No stale tickets. All caught up!",
+    "urgentTag": "URGENT"
   }
 }

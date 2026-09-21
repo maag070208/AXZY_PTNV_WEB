@@ -56,7 +56,7 @@ export default function AdminTareasPage() {
           <ITText className="text-[11px] font-bold text-red-600">{fx.error}</ITText>
         )}
         {fx.vencidas > 0 && (
-          <ITBadget color="danger" size="sm">
+          <ITBadget color="danger" size="lg">
             {tt("admintasks.overdueTasks", { count: fx.vencidas })}
           </ITBadget>
         )}

@@ -6,7 +6,7 @@ import {
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaDownload, FaExclamationTriangle, FaSync } from "react-icons/fa";
+import { FaExclamationTriangle, FaFilePdf, FaSync } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { DeviceReportRow } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
@@ -14,7 +14,7 @@ import type { UseDevicesReport } from "../model/useDevicesReport";
 const estadoBadge = (estado: string) => (
   <ITBadget
     color={estado === "DISPONIBLE" ? "success" : estado === "ASIGNADO" ? "warning" : "gray"}
-    size="sm"
+    size="lg"
   >
     {estado}
   </ITBadget>
@@ -126,13 +126,12 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       sortable: false,
       render: (r) => (
         <ITText
-          className={`text-[11px] font-black ${
-            r.estado === "ASIGNADO" && (r.diasAsignado ?? 0) > 30
+          className={`text-[11px] font-black ${r.estado === "ASIGNADO" && (r.diasAsignado ?? 0) > 30
               ? "text-red-600"
               : r.estado === "ASIGNADO"
-              ? "text-slate-700"
-              : "text-slate-300"
-          }`}
+                ? "text-slate-700"
+                : "text-slate-300"
+            }`}
         >
           {r.estado === "ASIGNADO" ? r.diasAsignado ?? "—" : "—"}
         </ITText>
@@ -237,13 +236,13 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           </ITFlex>
         </ITButton>
         <ITButton
-          variant="filled"
+          variant="outlined"
           color="primary"
           onClick={handleDownloadPdf}
           disabled={exporting || rows.length === 0}
         >
           <ITFlex align="center" gap={1}>
-            <FaDownload size={12} />
+            <FaFilePdf className="text-red-600" size={13} />
             <ITText className="font-bold text-[11px]">
               {exporting ? t("devices.exporting") : t("devices.export")}
             </ITText>
@@ -263,7 +262,8 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         }
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
-        size="sm"
+        itemsPerPageOptions={[5, 10, 50]}
+        size="lg"
       />
     </ITFlex>
   );

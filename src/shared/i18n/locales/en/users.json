@@ -55,7 +55,10 @@
     "headingHint": "Set identity, access and organizational location.",
     "sectionPersonal": "Personal information",
     "sectionPersonalHint": "User-visible data",
-    "name": "Name",
+    "name": "First name",
+    "secondName": "Middle name",
+    "apellidoPaterno": "Paternal surname",
+    "apellidoMaterno": "Maternal surname",
     "employeeNo": "Employee No.",
     "email": "Email",
     "position": "Position",
@@ -107,6 +110,15 @@
           "Only sees tickets with assigned tasks",
           "Moves their tasks to review"
         ]
+      },
+      "RECURSOS_HUMANOS": {
+        "title": "Human Resources",
+        "summary": "Manages the full personnel record (medical, official, contact data and documents).",
+        "actions": [
+          "Views and edits the Personnel record",
+          "Uploads and manages personnel documents",
+          "Does not manage tickets, inventory or users"
+        ]
       }
     }
   },
@@ -146,6 +158,7 @@
     "departmentFull": "Department",
     "subarea": "Subarea",
     "position": "Position",
-    "editEmployee": "Edit employee"
+    "editEmployee": "Edit employee",
+    "viewProfile": "View profile"
   }
 }

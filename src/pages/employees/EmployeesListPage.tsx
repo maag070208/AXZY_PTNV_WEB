@@ -59,6 +59,7 @@ export default function EmployeesListPage() {
         isAdmin={isAdmin}
         fetchData={list.fetchTableData}
         reloadKey={list.reloadKey}
+        onView={(u) => navigate(`/empleados/${u.id}`)}
         onEdit={(u) => navigate(`/empleados/${u.id}/editar`)}
       />
     </ITPage>

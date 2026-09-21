@@ -6,7 +6,7 @@ import {
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -28,14 +28,19 @@ export default function UserFormPage() {
   };
 
   const title = isEdit ? tt("form.titleEdit") : tt("form.titleNew");
+  const description = isEdit
+    ? tt("form.descriptionEdit")
+    : tt("form.descriptionNew");
   const breadcrumb = isEdit ? tt("form.breadcrumbEdit") : tt("form.breadcrumbNew");
 
   if (userForm.loading) {
     return (
       <ITPage
         title={title}
+        description={description}
         loading
         backAction={() => navigate(-1)}
+        icon={<FaUserPlus size={20} />}
         breadcrumbs={[
           { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
           { label: breadcrumb },
@@ -76,13 +81,14 @@ export default function UserFormPage() {
   return (
     <ITPage
       title={title}
+      description={description}
       backAction={() => navigate(-1)}
+      icon={<FaUserPlus size={20} />}
       breadcrumbs={[
         { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
         { label: breadcrumb },
       ]}
       actions={actions}
-      maxWidth="7xl"
     >
       {userForm.error && (
         <ITAlert

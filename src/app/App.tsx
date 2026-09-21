@@ -2,25 +2,28 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "@pages/auth/LoginPage";
 import PrivateRoutes from "./guards/PrivateRoutes";
 import HomePage from "@pages/home/HomePage";
-import CartasListPage from "@pages/cartas/CartasListPage";
-import CartaEditorPage from "@pages/cartas/CartaEditorPage";
-import CartaDetailPage from "@pages/cartas/CartaDetailPage";
-import DevolverCartaPage from "@pages/cartas/DevolverCartaPage";
-import InventoryIndexPage from "@pages/inventory/InventoryIndexPage";
-import InventoryMovementsPage from "@pages/inventory/InventoryMovementsPage";
-import NewInventoryMovementPage from "@pages/inventory/NewInventoryMovementPage";
-import GenerarCartasPage from "@pages/cartas/GenerarCartasPage";
-import DevicesListPage from "@pages/device-list/DevicesListPage";
-import DeviceAvailabilityPage from "@pages/device-list/DeviceAvailabilityPage";
-import DeviceFormPage from "@pages/devices/DeviceFormPage";
-import DeviceDetailPage from "@pages/devices/DeviceDetailPage";
-import DeviceTypesListPage from "@pages/device-types/DeviceTypesListPage";
-import DeviceTypeFormPage from "@pages/device-types/DeviceTypeFormPage";
-import DeviceImportPage from "@pages/devices/DeviceImportPage";
+import DashboardPage from "@pages/inventario/DashboardPage";
+import DispositivosPage from "@pages/inventario/DispositivosPage";
+import DispositivoFormPage from "@pages/inventario/DispositivoFormPage";
+import EditDispositivoPage from "@pages/inventario/EditDispositivoPage";
+import DispositivoDetailPage from "@pages/inventario/DispositivoDetailPage";
+import TiposPage from "@pages/inventario/TiposPage";
+import MovimientosPage from "@pages/inventario/MovimientosPage";
+import NewMovimientoPage from "@pages/inventario/NewMovimientoPage";
+import PrestamosPage from "@pages/inventario/PrestamosPage";
+import NewPrestamoPage from "@pages/inventario/NewPrestamoPage";
+import EditPrestamoPage from "@pages/inventario/EditPrestamoPage";
+import PrestamoDetailPage from "@pages/inventario/PrestamoDetailPage";
+import DevolucionesPage from "@pages/inventario/DevolucionesPage";
+import NewDevolucionPage from "@pages/inventario/NewDevolucionPage";
 import DepartmentsPage from "@pages/departments/DepartmentsPage";
 import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
 import SubareasPage from "@pages/subareas/SubareasPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
+import EmployeeDetailPage from "@pages/employees/EmployeeDetailPage";
+import EmployeeProfileEditPage from "@pages/employees/EmployeeProfileEditPage";
+import ReportesPersonalPage from "@pages/employees/ReportesPersonalPage";
+import DocumentCatalogPage from "@pages/employees/DocumentCatalogPage";
 import ReportesPage from "@pages/reports/ReportesPage";
 import UsersListPage from "@pages/users/UsersListPage";
 import UserFormPage from "@pages/users/UserFormPage";
@@ -34,6 +37,7 @@ import KanbanPage from "@pages/tickets/KanbanPage";
 import MisTareasPage from "@pages/tickets/MisTareasPage";
 import AdminTareasPage from "@pages/tickets/AdminTareasPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
+import CatalogPage from "@pages/catalog/CatalogPage";
 
 export default function App() {
   return (
@@ -43,11 +47,20 @@ export default function App() {
       <Route element={<PrivateRoutes />}>
         <Route path="/" element={<HomePage />} />
 
-        <Route path="/cartas" element={<CartasListPage />} />
-        <Route path="/cartas/nueva" element={<CartaEditorPage />} />
-        <Route path="/cartas/generar" element={<GenerarCartasPage />} />
-        <Route path="/cartas/:id" element={<CartaDetailPage />} />
-        <Route path="/cartas/:id/devolver" element={<DevolverCartaPage />} />
+        <Route path="/inventario" element={<DashboardPage />} />
+        <Route path="/inventario/dispositivos" element={<DispositivosPage />} />
+        <Route path="/inventario/dispositivos/nuevo" element={<DispositivoFormPage />} />
+        <Route path="/inventario/dispositivos/:id" element={<DispositivoDetailPage />} />
+        <Route path="/inventario/dispositivos/:id/editar" element={<EditDispositivoPage />} />
+        <Route path="/inventario/tipos" element={<TiposPage />} />
+        <Route path="/inventario/movimientos" element={<MovimientosPage />} />
+        <Route path="/inventario/movimientos/nuevo" element={<NewMovimientoPage />} />
+        <Route path="/inventario/prestamos" element={<PrestamosPage />} />
+        <Route path="/inventario/prestamos/nuevo" element={<NewPrestamoPage />} />
+        <Route path="/inventario/prestamos/:id" element={<PrestamoDetailPage />} />
+        <Route path="/inventario/prestamos/:id/editar" element={<EditPrestamoPage />} />
+        <Route path="/inventario/devoluciones" element={<DevolucionesPage />} />
+        <Route path="/inventario/devoluciones/nueva" element={<NewDevolucionPage />} />
 
         <Route path="/tickets" element={<TicketsListPage />} />
         <Route path="/tickets/kanban" element={<KanbanPage />} />
@@ -57,31 +70,21 @@ export default function App() {
         <Route path="/tickets/:id/editar" element={<EditTicketPage />} />
         <Route path="/tickets/:id" element={<TicketDetailPage />} />
 
-        <Route path="/dispositivos" element={<DevicesListPage />} />
-        <Route path="/dispositivos/disponibilidad" element={<DeviceAvailabilityPage />} />
-        <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
-        <Route path="/dispositivos/importar" element={<DeviceImportPage />} />
-        <Route path="/dispositivos/:id" element={<DeviceDetailPage />} />
-        <Route path="/dispositivos/:id/editar" element={<DeviceFormPage />} />
-        <Route path="/dispositivos/tipos" element={<DeviceTypesListPage />} />
-        <Route path="/dispositivos/tipos/nuevo" element={<DeviceTypeFormPage />} />
-        <Route path="/dispositivos/tipos/:id/editar" element={<DeviceTypeFormPage />} />
-
-        <Route path="/inventario" element={<InventoryIndexPage />} />
-        <Route path="/inventario/movimientos" element={<InventoryMovementsPage />} />
-        <Route path="/inventario/movimientos/nuevo" element={<NewInventoryMovementPage />} />
-
         <Route path="/departamentos" element={<DepartmentsPage />} />
         <Route path="/departamentos/:id" element={<DepartmentDetailPage />} />
         <Route path="/subareas" element={<SubareasPage />} />
         <Route path="/empleados" element={<EmployeesListPage />} />
-        <Route path="/empleados/:id/editar" element={<UserFormPage />} />
+        <Route path="/empleados/catalogos/documentos" element={<DocumentCatalogPage />} />
+        <Route path="/empleados/:id/editar" element={<EmployeeProfileEditPage />} />
+        <Route path="/empleados/reportes" element={<ReportesPersonalPage />} />
+        <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
         <Route path="/reportes" element={<ReportesPage />} />
         <Route path="/usuarios" element={<UsersListPage />} />
         <Route path="/usuarios/nuevo" element={<UserFormPage />} />
         <Route path="/usuarios/:id/editar" element={<UserFormPage />} />
         <Route path="/usuarios/:id/historial" element={<UserHistoryPage />} />
         <Route path="/usuarios/importar" element={<UserImportPage />} />
+        <Route path="/catalogos" element={<CatalogPage />} />
         <Route path="/notificaciones" element={<NotificationsPage />} />
       </Route>
 

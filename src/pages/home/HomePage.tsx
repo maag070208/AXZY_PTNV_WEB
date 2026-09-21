@@ -16,7 +16,6 @@ export default function HomePage() {
       title={fx.t("home:title")}
       description={fx.t("home:description")}
       icon={<FaHouseUser size={20} />}
-      maxWidth="6xl"
     >
       <ITStack direction="column" spacing={6}>
         {showAdminDashboard && <AdminDashboard fx={adminFx} />}

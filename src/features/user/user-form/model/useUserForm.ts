@@ -29,6 +29,15 @@ export const ROLE_GUIDANCE: Record<
     summary: "form.roles.EMPLEADO.summary",
     actions: ["form.roles.EMPLEADO.actions.0", "form.roles.EMPLEADO.actions.1", "form.roles.EMPLEADO.actions.2"],
   },
+  RECURSOS_HUMANOS: {
+    title: "form.roles.RECURSOS_HUMANOS.title",
+    summary: "form.roles.RECURSOS_HUMANOS.summary",
+    actions: [
+      "form.roles.RECURSOS_HUMANOS.actions.0",
+      "form.roles.RECURSOS_HUMANOS.actions.1",
+      "form.roles.RECURSOS_HUMANOS.actions.2",
+    ],
+  },
 };
 
 const ROLE_OPTIONS = [
@@ -36,6 +45,7 @@ const ROLE_OPTIONS = [
   { value: "GERENTE", label: "GERENTE" },
   { value: "JEFE_DE_AREA", label: "JEFE DE AREA" },
   { value: "EMPLEADO", label: "EMPLEADO" },
+  { value: "RECURSOS_HUMANOS", label: "RECURSOS HUMANOS" },
 ];
 
 export interface UserFormValues {
@@ -43,12 +53,39 @@ export interface UserFormValues {
   email: string;
   password: string;
   name: string;
+  segundoNombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
   role: UserRole;
   numeroEmpleado: string;
   puesto: string;
   departmentId: string;
   subareaId: string;
 }
+
+/** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
+export const composeFullName = (v: {
+  name?: string;
+  segundoNombre?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+}): string =>
+  [v.name, v.segundoNombre, v.apellidoPaterno, v.apellidoMaterno]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+/** Divide un nombre completo almacenado en "name" a sus campos separados (fallback para datos viejos). */
+const splitStoredName = (full: string): Pick<UserFormValues, "name" | "segundoNombre" | "apellidoPaterno" | "apellidoMaterno"> => {
+  const parts = full.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return { name: parts[0], segundoNombre: "", apellidoPaterno: "", apellidoMaterno: "" };
+  return {
+    name: parts[0],
+    segundoNombre: "",
+    apellidoPaterno: parts.slice(1).join(" "),
+    apellidoMaterno: "",
+  };
+};
 
 export const useUserForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,6 +98,9 @@ export const useUserForm = () => {
     email: "",
     password: "",
     name: "",
+    segundoNombre: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
     role: "EMPLEADO",
     numeroEmpleado: "",
     puesto: "",
@@ -82,11 +122,15 @@ export const useUserForm = () => {
       usersApi
         .get(id)
         .then((u: User) => {
+          const nameParts = splitStoredName(u.name);
           setForm({
             username: u.username,
             email: u.email ?? "",
             password: "",
-            name: u.name,
+            name: nameParts.name,
+            segundoNombre: u.segundoNombre ?? nameParts.segundoNombre ?? "",
+            apellidoPaterno: u.apellidoPaterno ?? nameParts.apellidoPaterno ?? "",
+            apellidoMaterno: u.apellidoMaterno ?? nameParts.apellidoMaterno ?? "",
             role: u.role,
             numeroEmpleado: u.numeroEmpleado ?? "",
             puesto: u.puesto ?? "",
@@ -119,13 +163,17 @@ export const useUserForm = () => {
   const handleSubmit = async (): Promise<boolean> => {
     if (!form.username || !form.name) return false;
     if (!isEdit && !form.password) return false;
+    const fullName = composeFullName(form);
     setSaving(true);
     try {
       if (isEdit) {
         await usersApi.update(id!, {
           username: form.username,
           email: form.email || null,
-          name: form.name,
+          name: fullName,
+          segundoNombre: form.segundoNombre || null,
+          apellidoPaterno: form.apellidoPaterno || null,
+          apellidoMaterno: form.apellidoMaterno || null,
           role: form.role,
           numeroEmpleado: form.numeroEmpleado || undefined,
           puesto: form.puesto || undefined,
@@ -137,7 +185,10 @@ export const useUserForm = () => {
           username: form.username,
           email: form.email || undefined,
           password: form.password,
-          name: form.name,
+          name: fullName,
+          segundoNombre: form.segundoNombre || undefined,
+          apellidoPaterno: form.apellidoPaterno || undefined,
+          apellidoMaterno: form.apellidoMaterno || undefined,
           role: form.role,
           numeroEmpleado: form.numeroEmpleado || undefined,
           puesto: form.puesto || undefined,

@@ -42,6 +42,14 @@
     "following": "En seguimiento",
     "closed": "Cerrado",
     "recentActivity": "Actividad reciente",
-    "noActivity": "Aún no hay actividad registrada."
+    "noActivity": "Aún no hay actividad registrada.",
+    "ticketsResueltos": "Tareas resueltas",
+    "avgResolucion": "Resolución promedio",
+    "tareasPendientes": "Tareas pendientes",
+    "teamEfficiency": "Eficiencia del equipo",
+    "noEfficiency": "Sin datos de resolución",
+    "urgentTitle": "Tickets antiguos",
+    "noUrgent": "Sin tickets antiguos. ¡Todo al día!",
+    "urgentTag": "URGENTE"
   }
 }

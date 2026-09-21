@@ -2,15 +2,15 @@ import { ITLayout, ITSidebarProps, ITToast } from "@axzydev/axzy_ui_system";
 import { useEffect, useState, useCallback } from "react";
 import {
   FaBoxes,
-  FaBuilding,
   FaChartBar,
-  FaFileSignature,
   FaHouseUser,
   FaMapMarkerAlt,
   FaTasks,
   FaTicketAlt,
   FaUserShield,
   FaUserTie,
+  FaCog,
+  FaClipboardList,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -53,6 +53,9 @@ export default function PrivateRoutes() {
   const isJefeArea = user?.role === "JEFE_DE_AREA";
   const isEmpleado = user?.role === "EMPLEADO";
   const canManage = isAdmin || isJefeArea;
+  // Personal/RH: expediente completo (médico, oficial, contacto de emergencia,
+  // documentos) es exclusivo de ADMIN y RECURSOS_HUMANOS — no de GERENTE.
+  const canManageHR = user?.role === "ADMIN" || user?.role === "RECURSOS_HUMANOS";
 
   const active = (to: string) => location.pathname.startsWith(to);
 
@@ -64,86 +67,85 @@ export default function PrivateRoutes() {
       action: () => navigate("/"),
       isActive: active("/") && location.pathname === "/",
     },
+    // TAREAS (Tickets, Admin Tareas, Mis Tareas)
     {
-      id: "tickets",
-      label: tt("nav.tickets"),
+      id: "tareas",
+      label: "Tareas",
       icon: <FaTicketAlt size={14} />,
-      action: () => navigate("/tickets"),
       isActive: active("/tickets"),
+      subitems: [
+        {
+          id: "tickets",
+          label: tt("nav.tickets"),
+          action: () => navigate("/tickets"),
+          isActive: active("/tickets") && !active("/tickets/tareas") && !active("/tickets/mis-tareas"),
+        },
+        ...(user?.role === "ADMIN" || user?.role === "GERENTE"
+          ? [
+            {
+              id: "adminTareas",
+              label: tt("nav.adminTasks"),
+              action: () => navigate("/tickets/tareas"),
+              isActive: active("/tickets/tareas"),
+            },
+          ]
+          : []),
+        ...(!canManage && isEmpleado
+          ? [
+            {
+              id: "misTareas",
+              label: tt("nav.myTasks"),
+              action: () => navigate("/tickets/mis-tareas"),
+              isActive: active("/tickets/mis-tareas"),
+            },
+          ]
+          : []),
+      ],
     },
-    ...(user?.role === "ADMIN" || user?.role === "GERENTE"
-      ? [
-        {
-          id: "adminTareas",
-          label: tt("nav.adminTasks"),
-          icon: <FaTasks size={14} />,
-          action: () => navigate("/tickets/tareas"),
-          isActive: active("/tickets/tareas"),
-        },
-      ]
-      : []),
-    ...(!canManage && isEmpleado
-      ? [
-        {
-          id: "misTareas",
-          label: tt("nav.myTasks"),
-          icon: <FaTasks size={14} />,
-          action: () => navigate("/tickets/mis-tareas"),
-          isActive: active("/tickets/mis-tareas"),
-        },
-        {
-          id: "misCartas",
-          label: tt("nav.myCartas"),
-          icon: <FaFileSignature size={14} />,
-          action: () => navigate("/cartas"),
-          isActive: active("/cartas"),
-        },
-      ]
-      : []),
-    ...(isJefeArea
-      ? [
-        {
-          id: "misCartas",
-          label: "Mis Cartas",
-          icon: <FaFileSignature size={14} />,
-          action: () => navigate("/cartas"),
-          isActive: active("/cartas"),
-        },
-      ]
-      : []),
-    ...(isAdmin
-      ? [
-        {
-          id: "cartas",
-          label: tt("nav.cartas"),
-          icon: <FaFileSignature size={14} />,
-          action: () => navigate("/cartas"),
-          isActive: active("/cartas"),
-        },
-      ]
-      : []),
-    ...(isAdmin
-      ? [
-        {
-          id: "dispositivos",
-          label: tt("nav.devices"),
-          icon: <FaChartBar size={14} />,
-          action: () => navigate("/dispositivos"),
-          isActive: active("/dispositivos"),
-        },
-      ]
-      : []),
+    // INVENTARIO (solo ADMIN)
     ...(isAdmin
       ? [
         {
           id: "inventario",
           label: tt("nav.inventory"),
           icon: <FaBoxes size={14} />,
-          action: () => navigate("/inventario"),
           isActive: active("/inventario"),
+          subitems: [
+            {
+              id: "dashboard",
+              label: tt("nav.inventory"),
+              action: () => navigate("/inventario"),
+              isActive: active("/inventario") && location.pathname === "/inventario",
+            },
+            {
+              id: "dispositivos",
+              label: tt("nav.devices"),
+              action: () => navigate("/inventario/dispositivos"),
+              isActive: active("/inventario/dispositivos"),
+            },
+            {
+              id: "movimientos",
+              label: tt("nav.movimientos"),
+              action: () => navigate("/inventario/movimientos"),
+              isActive: active("/inventario/movimientos"),
+            },
+            {
+              id: "prestamos",
+              label: tt("nav.prestamos"),
+              action: () => navigate("/inventario/prestamos"),
+              isActive: active("/inventario/prestamos"),
+            },
+            {
+              id: "devoluciones",
+              label: tt("nav.devoluciones"),
+              action: () => navigate("/inventario/devoluciones"),
+              isActive: active("/inventario/devoluciones"),
+            },
+          ],
         },
       ]
       : []),
+    // REPORTES (solo ADMIN)
     ...(isAdmin
       ? [
         {
@@ -153,37 +155,55 @@ export default function PrivateRoutes() {
           action: () => navigate("/reportes"),
           isActive: active("/reportes"),
         },
+      ]
+      : []),
+    // RECURSOS HUMANOS (ADMIN y RECURSOS_HUMANOS — expediente completo del personal)
+    ...(canManageHR
+      ? [
         {
-          id: "empleados",
-          label: tt("nav.employees"),
+          id: "recursosHumanos",
+          label: tt("nav.hr"),
           icon: <FaUserTie size={14} />,
-          action: () => navigate("/empleados"),
           isActive: active("/empleados"),
+          subitems: [
+            {
+              id: "personal",
+              label: tt("nav.employees"),
+              action: () => navigate("/empleados"),
+              isActive: active("/empleados") && !active("/empleados/reportes"),
+            },
+            {
+              id: "reportesPersonal",
+              label: tt("nav.hrReports"),
+              action: () => navigate("/empleados/reportes"),
+              isActive: active("/empleados/reportes"),
+            },
+          ],
         },
       ]
       : []),
+    // CONFIGURACIÓN (solo ADMIN)
     ...(isAdmin
       ? [
         {
-          id: "departamentos",
-          label: tt("nav.departments"),
-          icon: <FaBuilding size={14} />,
-          action: () => navigate("/departamentos"),
-          isActive: active("/departamentos"),
-        },
-        {
-          id: "subareas",
-          label: tt("nav.subareas"),
-          icon: <FaMapMarkerAlt size={14} />,
-          action: () => navigate("/subareas"),
-          isActive: active("/subareas"),
-        },
-        {
-          id: "usuarios",
-          label: tt("nav.users"),
-          icon: <FaUserShield size={14} />,
-          action: () => navigate("/usuarios"),
-          isActive: active("/usuarios"),
+          id: "configuracion",
+          label: "Configuración",
+          icon: <FaCog size={14} />,
+          isActive: active("/catalogos") || active("/usuarios"),
+          subitems: [
+            {
+              id: "catalogos",
+              label: tt("nav.catalogs"),
+              action: () => navigate("/catalogos"),
+              isActive: active("/catalogos"),
+            },
+            {
+              id: "usuarios",
+              label: tt("nav.users"),
+              action: () => navigate("/usuarios"),
+              isActive: active("/usuarios"),
+            },
+          ],
         },
       ]
       : []),
@@ -225,10 +245,8 @@ export default function PrivateRoutes() {
 
   return (
     <>
-      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName=" min-w-full min-h-screen overflow-x-hidden">
-        <div className="p-0 m-0">
-          <Outlet />
-        </div>
+      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-full! m-0! !px-2">
+        <Outlet />
       </ITLayout>
       {toast && (
         <ITToast

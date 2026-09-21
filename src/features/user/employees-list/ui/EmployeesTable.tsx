@@ -1,4 +1,6 @@
 import {
+  ITBadget,
+  ITButton,
   ITDataTable,
   ITFlex,
   ITText,
@@ -8,10 +10,33 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
-import type { User } from "@entities/user";
+import type { PersonalProfile } from "@entities/personal";
+
+const ROLE_LABEL: Record<string, string> = {
+  GERENTE: "GERENTE",
+  JEFE_DE_AREA: "JEFE DE ÁREA",
+  EMPLEADO: "EMPLEADO",
+};
+
+const roleBadge = (role: string, label: string) => (
+  <ITBadget
+    color={
+      role === "GERENTE"
+        ? "danger"
+        : role === "JEFE_DE_AREA"
+        ? "warning"
+        : role === "EMPLEADO"
+        ? "success"
+        : "gray"
+    }
+    size="lg"
+  >
+    {label}
+  </ITBadget>
+);
 
 interface Props {
   departments: Department[];
@@ -20,7 +45,8 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
-  onEdit: (u: User) => void;
+  onView: (u: PersonalProfile) => void;
+  onEdit: (u: PersonalProfile) => void;
 }
 
 export default function EmployeesTable({
@@ -28,6 +54,7 @@ export default function EmployeesTable({
   isAdmin,
   fetchData,
   reloadKey,
+  onView,
   onEdit,
 }: Props) {
   const { t: tt } = useTranslation(["users"]);
@@ -41,7 +68,7 @@ export default function EmployeesTable({
       d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` }))
     );
 
-  const columns: Column<User>[] = [
+  const columns: Column<PersonalProfile>[] = [
     {
       key: "numeroEmpleado",
       label: tt("table.employeeNoFull"),
@@ -61,13 +88,26 @@ export default function EmployeesTable({
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[12px] font-black text-slate-800">{u.name}</ITText>
+        <ITFlex
+          direction="column"
+          gap={0.5}
+          className="cursor-pointer"
+          onClick={() => onView(u)}
+        >
+          <ITText className="text-[12px] font-black text-slate-800 hover:text-blue-600">{u.name}</ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
             @{u.username}
           </ITText>
         </ITFlex>
       ),
+    },
+    {
+      key: "role",
+      label: tt("table.role"),
+      type: "string",
+      filter: false,
+      sortable: false,
+      render: (u) => roleBadge(u.role, ROLE_LABEL[u.role] ?? u.role),
     },
     {
       key: "puesto",
@@ -87,7 +127,7 @@ export default function EmployeesTable({
       catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] font-black text-slate-600 uppercase">
-          {(u as any).department?.name ?? "—"}
+          {u.department?.name ?? "—"}
         </ITText>
       ),
     },
@@ -99,28 +139,38 @@ export default function EmployeesTable({
       catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] font-bold text-slate-500 uppercase">
-          {(u as any).subarea?.name ?? "—"}
+          {u.subarea?.name ?? "—"}
         </ITText>
       ),
     },
-    ...(isAdmin
-      ? [
-          {
-            key: "actions",
-            label: "",
-            type: "string" as const,
-            sortable: false,
-            render: (u: User) => (
-              <FaEdit
-                size={14}
-                className="text-slate-400 hover:text-blue-600 cursor-pointer"
-                onClick={() => onEdit(u)}
-                title={tt("table.editEmployee")}
-              />
-            ),
-          },
-        ]
-      : []),
+    {
+      key: "actions",
+      label: "",
+      type: "string" as const,
+      sortable: false,
+      render: (u: PersonalProfile) => (
+        <ITFlex align="center" gap={2}>
+          <ITButton
+            onClick={() => onView(u)}
+            size="lg"
+            color="secondary"
+            title={tt("table.viewProfile")}
+          >
+            <FaUserTie size={14} />
+          </ITButton>
+          {isAdmin && (
+            <ITButton
+              onClick={() => onEdit(u)}
+              size="lg"
+              color="gray"
+              title={tt("table.editEmployee")}
+            >
+              <FaEdit size={14} />
+            </ITButton>
+          )}
+        </ITFlex>
+      ),
+    },
   ];
 
   return (
@@ -133,7 +183,8 @@ export default function EmployeesTable({
       }
       reloadTrigger={reloadKey}
       defaultItemsPerPage={10}
-      size="sm"
+      itemsPerPageOptions={[5, 10, 50]}
+      size="lg"
     />
   );
 }

@@ -256,7 +256,7 @@ export default function CreateTicketForm({
                 </ITText>
               </ITFlex>
               {selectedPriority && (
-                <ITBadget color={selectedPriority.badgeColor} size="sm">
+                <ITBadget color={selectedPriority.badgeColor} size="lg">
                   {dyn(tt)(`priorityLabels.${selectedPriority.value}`)}
                 </ITBadget>
               )}

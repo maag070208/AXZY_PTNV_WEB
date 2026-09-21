@@ -34,7 +34,14 @@
       "status": "Status",
       "priority": "Priority",
       "createdBy": "Created by",
-      "assignedTo": "Assigned to"
+      "assignedTo": "Assigned to",
+      "espera": "Days waiting"
+    },
+    "esperaLabels": {
+      "EXCELENTE": "EXCELLENT",
+      "BUENO": "GOOD",
+      "REGULAR": "FAIR",
+      "MALO": "BAD"
     }
   },
   "new": {
@@ -83,7 +90,7 @@
   },
   "detail": {
     "title": "Ticket",
-    "description": "{{status}} · {{category}}",
+    "description": "Description",
     "kanbanTitle": "Kanban tracking of this ticket's tasks",
     "moveTrash": "Move to trash",
     "deleteForever": "Delete permanently",
@@ -130,7 +137,6 @@
     "createdBy": "Created by",
     "assignedTo": "Assigned to",
     "deletedBadge": "Deleted",
-    "description": "Description",
     "noDescription": "No description",
     "efficacyTitle": "Resolution efficacy",
     "efficacyLabels": {

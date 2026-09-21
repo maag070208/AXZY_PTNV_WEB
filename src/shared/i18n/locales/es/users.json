@@ -55,8 +55,11 @@
     "headingHint": "Configura identidad, acceso y ubicación organizacional.",
     "sectionPersonal": "Información personal",
     "sectionPersonalHint": "Datos visibles del usuario",
-    "name": "Nombre",
-    "employeeNo": "No. Empleado",
+"name": "Nombre (primer)",
+ "secondName": "Segundo nombre",
+ "apellidoPaterno": "Apellido paterno",
+ "apellidoMaterno": "Apellido materno",
+ "employeeNo": "No. Empleado",
     "email": "Correo",
     "position": "Puesto",
     "sectionAccess": "Acceso y permisos",
@@ -107,6 +110,15 @@
           "Solo ve tickets con tareas asignadas",
           "Mueve sus tareas hasta revisión"
         ]
+      },
+      "RECURSOS_HUMANOS": {
+        "title": "Recursos Humanos",
+        "summary": "Administra el expediente completo del personal (datos médicos, oficiales, contacto y documentos).",
+        "actions": [
+          "Ve y edita el expediente de Personal",
+          "Sube y gestiona documentos del personal",
+          "No administra tickets, inventario ni usuarios"
+        ]
       }
     }
   },
@@ -146,6 +158,7 @@
     "departmentFull": "Departamento",
     "subarea": "Subárea",
     "position": "Puesto",
-    "editEmployee": "Editar empleado"
+    "editEmployee": "Editar empleado",
+    "viewProfile": "Ver expediente"
   }
 }

@@ -1,0 +1,1 @@
+export { default as CatalogTabs } from "./ui/CatalogTabs";

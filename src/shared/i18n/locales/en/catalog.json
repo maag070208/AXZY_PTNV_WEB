@@ -1,0 +1,24 @@
+{
+  "title": "Catalogs",
+  "description": "Configure the system master catalogs (ADMIN only)",
+  "tabs": {
+    "departamentos": "Departments",
+    "subareas": "Subareas",
+    "tiposDispositivo": "Device types",
+    "tiposDocumento": "Document types",
+    "generos": "Genders",
+    "tiposSangre": "Blood types"
+  },
+  "name": "Name",
+  "status": "Status",
+  "active": "Active",
+  "inactive": "Inactive",
+  "new": "New",
+  "edit": "Edit",
+  "activate": "Reactivate",
+  "deactivate": "Deactivate",
+  "deleteForever": "Delete permanently",
+  "deleteForeverConfirm": "This will permanently delete \"{{name}}\". This action cannot be undone.",
+  "saveError": "Could not save",
+  "deleteError": "Could not delete"
+}

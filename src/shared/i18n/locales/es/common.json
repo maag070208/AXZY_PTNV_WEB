@@ -25,12 +25,20 @@
     "cartas": "Cartas",
     "devices": "Dispositivos",
     "inventory": "Inventario",
+    "tipos": "Tipos",
+    "movimientos": "Movimientos",
+    "prestamos": "Cartas",
+    "devoluciones": "Devoluciones",
     "reports": "Reportes",
-    "employees": "Empleados",
+    "hr": "Recursos Humanos",
+    "employees": "Personal",
+    "documentCatalog": "Catálogo de Documentos",
     "departments": "Departamentos",
     "subareas": "Subáreas",
     "users": "Usuarios",
     "notifications": "Notificaciones",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "catalogs": "Catálogos",
+    "hrReports": "Reportes de personal"
   }
 }

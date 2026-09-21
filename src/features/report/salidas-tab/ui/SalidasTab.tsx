@@ -6,7 +6,7 @@ import {
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaDownload, FaExclamationTriangle, FaTrashAlt } from "react-icons/fa";
+import { FaExclamationTriangle, FaFilePdf } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { formatFecha } from "@shared/utils/dates";
@@ -29,7 +29,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
       key: "fecha",
       label: t("salidas.colFecha"),
       type: "date",
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">
           {formatFecha(r.fecha)}
@@ -58,7 +58,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
       key: "cantidad",
       label: t("salidas.colCant"),
       type: "number",
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-700">{r.cantidad}</ITText>
       ),
@@ -68,7 +68,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
       label: t("salidas.colDepto"),
       type: "string",
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">{r.departamento}</ITText>
       ),
@@ -78,7 +78,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
       label: t("salidas.colUsuario"),
       type: "string",
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.usuario}</ITText>
       ),
@@ -89,7 +89,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
       type: "string",
       render: (r) =>
         r.motivo ? (
-          <ITBadget color={MOTIVO_COLORS[r.motivo]} size="sm">
+          <ITBadget color={MOTIVO_COLORS[r.motivo]} size="lg">
             {t(`salidas:motivo.${r.motivo}`)}
           </ITBadget>
         ) : (
@@ -145,13 +145,13 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
 
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
         <ITButton
-          variant="filled"
+          variant="outlined"
           color="primary"
           onClick={handleDownloadPdf}
           disabled={exporting || total === 0}
         >
           <ITFlex align="center" gap={1}>
-            {exporting ? <FaDownload size={12} /> : <FaTrashAlt size={12} />}
+            <FaFilePdf className="text-red-600" size={13} />
             <ITText className="font-bold text-[11px]">
               {exporting ? t("salidas.exporting") : t("salidas.export")}
             </ITText>
@@ -164,7 +164,8 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
         fetchData={fetchTableData}
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
-        size="sm"
+        itemsPerPageOptions={[5, 10, 50]}
+        size="lg"
       />
     </ITFlex>
   );

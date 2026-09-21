@@ -1,0 +1,24 @@
+{
+  "title": "Catálogos",
+  "description": "Configura los catálogos maestros del sistema (solo ADMIN)",
+  "tabs": {
+    "departamentos": "Departamentos",
+    "subareas": "Subáreas",
+    "tiposDispositivo": "Tipos de dispositivo",
+    "tiposDocumento": "Tipos de documento",
+    "generos": "Géneros",
+    "tiposSangre": "Tipos de sangre"
+  },
+  "name": "Nombre",
+  "status": "Estado",
+  "active": "Activo",
+  "inactive": "Inactivo",
+  "new": "Nuevo",
+  "edit": "Editar",
+  "activate": "Reactivar",
+  "deactivate": "Desactivar",
+  "deleteForever": "Eliminar definitivamente",
+  "deleteForeverConfirm": "Esto eliminará definitivamente \"{{name}}\". Esta acción no se puede deshacer.",
+  "saveError": "No se pudo guardar",
+  "deleteError": "No se pudo eliminar"
+}

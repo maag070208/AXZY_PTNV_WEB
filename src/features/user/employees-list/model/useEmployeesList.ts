@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
-import { usersApi } from "@entities/user";
+import { personalApi } from "@entities/personal";
 import {
   departmentsApi,
   type Department,
@@ -20,13 +20,10 @@ export const useEmployeesList = () => {
 
   const fetchTableData = useCallback(
     async (params: ITDataTableFetchParams) => {
-      const res = await usersApi.table({
+      const res = await personalApi.table({
         page: params.page,
         limit: params.limit,
-        filters: {
-          ...(params.filters as Record<string, string | number | boolean>),
-          role: "EMPLEADO",
-        },
+        filters: params.filters as Record<string, string | number | boolean>,
         sort: params.sort,
       });
       setTotal(res.total);

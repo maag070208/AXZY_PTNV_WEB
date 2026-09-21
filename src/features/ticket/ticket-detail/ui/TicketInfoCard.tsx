@@ -22,17 +22,17 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
     <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
       <ITStack direction="column" spacing={5} className="w-full">
         <ITFlex gap={2} wrap="wrap">
-          <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="sm">
+          <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="lg">
             {dyn(tt)(`statusLabels.${ticket.status}`)}
           </ITBadget>
-          <ITBadget color={(PRIORITY_BADGE[ticket.priority]?.color as any) ?? "default"} size="sm">
+          <ITBadget color={(PRIORITY_BADGE[ticket.priority]?.color as any) ?? "default"} size="lg">
             {dyn(tt)(`priorityLabels.${ticket.priority}`)}
           </ITBadget>
-          <ITBadget color="primary" size="sm">
+          <ITBadget color="primary" size="lg">
             {dyn(tt)(`categoryLabels.${ticket.category}`)}
           </ITBadget>
           {ticket.deletedAt && (
-            <ITBadget color="gray" size="sm">
+            <ITBadget color="gray" size="lg">
               {tt("detail.deletedBadge")}
             </ITBadget>
           )}

@@ -72,7 +72,7 @@ export default function SubareasTable({
           {s.active ? (
             <ITButton
               variant="outlined"
-              size="sm"
+              size="lg"
               color="secondary"
               onClick={() => onEdit(s)}
               title={tt("list.editName")}
@@ -82,7 +82,7 @@ export default function SubareasTable({
           ) : (
             <ITButton
               variant="outlined"
-              size="sm"
+              size="lg"
               color="secondary"
               onClick={() => onReactivate(s)}
               title={tt("list.reactivate")}
@@ -92,8 +92,8 @@ export default function SubareasTable({
           )}
           <ITButton
             variant="outlined"
-            size="sm"
-            color="danger"
+            size="lg"
+            color="error"
             onClick={() => onDelete(s)}
             title={s.active ? tt("list.delete") : tt("list.deleteForever")}
           >
@@ -114,7 +114,8 @@ export default function SubareasTable({
       }
       reloadTrigger={reloadKey}
       defaultItemsPerPage={10}
-      size="sm"
+      itemsPerPageOptions={[5, 10, 50]}
+      size="lg"
     />
   );
 }

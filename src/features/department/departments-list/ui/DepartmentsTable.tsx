@@ -66,7 +66,7 @@ export default function DepartmentsTable({
         ) : (
           <ITFlex wrap="wrap" gap={1}>
             {d.subareas.map((s: Subarea) => (
-              <ITBadget key={s.id} color="primary" size="sm">
+              <ITBadget key={s.id} color="primary" size="lg">
                 {s.name.toUpperCase()}
               </ITBadget>
             ))}
@@ -92,7 +92,7 @@ export default function DepartmentsTable({
         <ITFlex gap={1}>
           <ITButton
             variant="outlined"
-            size="sm"
+            size="lg"
             color="secondary"
             onClick={() => onView(d)}
             title={tt("common:actions.view")}
@@ -102,7 +102,7 @@ export default function DepartmentsTable({
           {isAdmin && (
             <ITButton
               variant="outlined"
-              size="sm"
+              size="lg"
               color="secondary"
               onClick={() => onEdit(d)}
               title={tt("list.editName")}
@@ -113,8 +113,8 @@ export default function DepartmentsTable({
           {isAdmin && (
             <ITButton
               variant="outlined"
-              size="sm"
-              color="danger"
+              size="lg"
+              color="error"
               onClick={() => onDelete(d)}
               title={tt("list.delete")}
             >
@@ -136,7 +136,8 @@ export default function DepartmentsTable({
       }
       reloadTrigger={reloadKey}
       defaultItemsPerPage={10}
-      size="sm"
+      itemsPerPageOptions={[5, 10, 50]}
+      size="lg"
     />
   );
 }

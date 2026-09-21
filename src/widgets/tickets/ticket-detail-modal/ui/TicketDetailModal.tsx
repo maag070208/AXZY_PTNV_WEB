@@ -56,7 +56,7 @@ export default function TicketDetailModal({
     >
       {loading || !ticket ? (
         <ITFlex justify="center" align="center" className="py-10">
-          <ITLoader variant="spinner" size="md" color="primary" />
+          <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
       ) : (
         <div style={{ minWidth: "100%" }}>

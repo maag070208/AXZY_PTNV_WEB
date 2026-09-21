@@ -70,8 +70,8 @@ export default function DepartmentDetailPage() {
         isAdmin ? (
           <ITButton
             variant="outlined"
-            size="sm"
-            color="danger"
+            size="lg"
+            color="error"
             onClick={() => detail.setDeptToDelete(true)}
             title={dept.active ? tt("detail.deleteDept") : tt("detail.deleteForever")}
           >

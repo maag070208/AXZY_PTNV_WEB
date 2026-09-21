@@ -6,7 +6,7 @@ import {
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaDownload, FaExclamationTriangle, FaSync } from "react-icons/fa";
+import { FaExclamationTriangle, FaFilePdf, FaSync } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { AsignadoRow } from "@entities/report";
 import { formatDate } from "@shared/i18n";
@@ -102,7 +102,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
           <ITText className="text-[11px] font-black text-emerald-700">
             {r.folio ?? "—"}
           </ITText>
-          <ITBadget color={origenBadgeColor(r.origen)} size="sm">
+          <ITBadget color={origenBadgeColor(r.origen)} size="lg">
             {origenLabel(r.origen)}
           </ITBadget>
         </ITFlex>
@@ -193,13 +193,13 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
           </ITFlex>
         </ITButton>
         <ITButton
-          variant="filled"
-          color="primary"
+          variant="outlined"
+          color="gray"
           onClick={handleDownloadPdf}
           disabled={exporting || rows.length === 0}
         >
           <ITFlex align="center" gap={1}>
-            <FaDownload size={12} />
+            <FaFilePdf className="text-red-600" size={13} />
             <ITText className="font-bold text-[11px]">
               {exporting ? t("asignados.exporting") : t("asignados.export")}
             </ITText>
@@ -219,7 +219,8 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
         }
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
-        size="sm"
+        itemsPerPageOptions={[5, 10, 50]}
+        size="lg"
       />
     </ITFlex>
   );
