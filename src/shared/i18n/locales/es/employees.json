@@ -10,6 +10,10 @@
     "title": "Información del Personal",
     "subtitle": "Detalles completos del empleado",
     "editInfo": "Editar Información",
+    "credential": "Credencial",
+    "credentialTitle": "Credencial de empleado",
+    "download": "Descargar imagen",
+    "credentialError": "No se pudo generar la credencial",
     "stepper": {
       "photoPersonal": "Foto y Datos Personales",
       "laboral": "Laboral",

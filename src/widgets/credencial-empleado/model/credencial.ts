@@ -1,14 +1,23 @@
 import * as QRCode from "qrcode";
 import type { PersonalProfile } from "@entities/personal";
-import { buildQrPayload } from "./buildQrPayload";
+import { PDF_COLORS } from "@shared/pdf/theme";
+import { buildQrPayload, serializeQrPayload } from "./buildQrPayload";
+
+/**
+ * Píxeles de origen por módulo del QR. El símbolo se genera nítido a esta
+ * escala y luego se reduce al tamaño de la credencial sin suavizado (ver
+ * `renderCredencial`), para que los módulos conserven sus bordes duros.
+ */
+const QR_PIXEL_SCALE = 12;
 
 export const generarCredencialQR = async (profile: PersonalProfile): Promise<string> => {
-  const payload = buildQrPayload(profile);
-  return QRCode.toDataURL(JSON.stringify(payload), {
-    width: 320,
-    margin: 1,
+  const text = serializeQrPayload(buildQrPayload(profile));
+  const { modules } = QRCode.create(text, { errorCorrectionLevel: "M" });
+  return QRCode.toDataURL(text, {
+    width: modules.size * QR_PIXEL_SCALE,
+    margin: 0,
     errorCorrectionLevel: "M",
-    color: { dark: "#0a4560", light: "#ffffff" },
+    color: { dark: PDF_COLORS.band, light: PDF_COLORS.white },
   });
 };
 

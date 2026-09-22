@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ITAlert,
   ITButton,
@@ -18,11 +19,13 @@ import {
   EmployeeInfoCards,
   CollapsibleCard,
 } from "@features/personal/employee-detail";
+import { CredencialEmpleadoDialog } from "@widgets/credencial-empleado";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["employees", "common"]);
+  const [credentialOpen, setCredentialOpen] = useState(false);
 
   const detail = useEmployeeDetail(id);
 
@@ -64,6 +67,12 @@ export default function EmployeeDetailPage() {
       ]}
       actions={
         <ITFlex align="center" gap={2}>
+          <ITButton variant="outlined" color="primary" size="lg" onClick={() => setCredentialOpen(true)}>
+            <ITFlex align="center" gap={1}>
+              <FaIdCard size={11} />
+              <ITText className="font-bold text-[11px]">{tt("detail.credential")}</ITText>
+            </ITFlex>
+          </ITButton>
           {profile.active ? (
             <ITButton variant="outlined" color="error" size="lg" onClick={() => detail.setDeactivateOpen(true)}>
               <ITFlex align="center" gap={1}>
@@ -131,6 +140,12 @@ export default function EmployeeDetailPage() {
         confirmLabel={tt("detail.deactivate")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
+      />
+
+      <CredencialEmpleadoDialog
+        isOpen={credentialOpen}
+        onClose={() => setCredentialOpen(false)}
+        profile={profile}
       />
     </ITPage>
   );

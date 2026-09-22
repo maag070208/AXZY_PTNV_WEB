@@ -1,29 +1,20 @@
-import { PDFViewer } from "@react-pdf/renderer";
-import type { PersonalProfile } from "@entities/personal";
-import CredencialEmpleadoPDF from "./CredencialEmpleadoPDF";
+import { useTranslation } from "react-i18next";
 
+/** Vista previa de la credencial ya renderizada como PNG. */
 export default function CredencialEmpleadoPreview({
-  profile,
-  qrDataUrl,
-  fotoDataUrl,
-  iniciales,
+  imagenDataUrl,
 }: {
-  profile: PersonalProfile;
-  qrDataUrl: string | null;
-  fotoDataUrl?: string | null;
-  iniciales?: string;
+  imagenDataUrl: string | null;
 }) {
+  const { t: tt } = useTranslation(["employees"]);
+  if (!imagenDataUrl) return null;
+
   return (
-    <PDFViewer
-      style={{ width: "100%", height: 720, border: "none", borderRadius: 16 }}
-      showToolbar
-    >
-      <CredencialEmpleadoPDF
-        profile={profile}
-        qrDataUrl={qrDataUrl}
-        fotoDataUrl={fotoDataUrl}
-        iniciales={iniciales}
-      />
-    </PDFViewer>
+    <img
+      src={imagenDataUrl}
+      alt={tt("employees:detail.credentialTitle")}
+      className="w-full max-w-3xl h-auto rounded-2xl border border-slate-200"
+      style={{ aspectRatio: "1016 / 638" }}
+    />
   );
 }
