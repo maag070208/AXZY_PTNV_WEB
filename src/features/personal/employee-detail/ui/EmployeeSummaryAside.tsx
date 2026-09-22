@@ -1,9 +1,10 @@
 import { useRef } from "react";
-import { ITAvatar, ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaBriefcase, FaCamera, FaHeartbeat } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PersonalProfile } from "@entities/personal";
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 
 const ROLE_COLOR: Record<string, string> = {
   GERENTE: "purple",
@@ -54,7 +55,7 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
     <div className="w-full min-w-0 flex flex-col gap-5 md:sticky md:top-24">
       <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-5 sm:p-6 text-center">
         <div className="relative inline-block">
-          <ITAvatar src={profile.fotoUrl ?? undefined} initials={initials} alt={profile.name} size="xl" />
+          <ProfileAvatar fotoUrl={profile.fotoUrl} initials={initials} alt={profile.name} size="xl" />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}

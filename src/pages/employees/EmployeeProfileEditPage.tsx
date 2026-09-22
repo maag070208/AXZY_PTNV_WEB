@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ITAlert,
-  ITAvatar,
   ITButton,
   ITFlex,
   ITInput,
@@ -18,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { useEmployeeDetail } from "@features/personal/employee-detail";
 import type { PersonalProfile, PersonalProfileUpdateInput } from "@entities/personal";
 import { DatePickerPortal } from "@shared/ui/date-picker-portal";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import {
   validateCurp,
   validateEmail,
@@ -196,7 +196,7 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={5}>
           <ITFlex align="center" gap={4}>
             <div className="relative inline-block shrink-0">
-              <ITAvatar src={profile.fotoUrl ?? undefined} initials={initials} alt={profile.name} size="xl" />
+              <ProfileAvatar fotoUrl={profile.fotoUrl} initials={initials} alt={profile.name} size="xl" />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
