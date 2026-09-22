@@ -9,6 +9,7 @@ export interface CollapsibleCardProps {
   right?: React.ReactNode;
   defaultOpen?: boolean;
   children: React.ReactNode;
+  mb?: number;
 }
 
 /**
@@ -26,11 +27,14 @@ export default function CollapsibleCard({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-5 sm:p-6">
+    <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-3">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full text-left"
+        className={
+          "w-full text-left" +
+          (open ? " hover:bg-slate-50 mb-4" : "")
+        }
       >
         <ITFlex align="center" justify="between" gap={2}>
           <ITFlex align="center" gap={2}>
