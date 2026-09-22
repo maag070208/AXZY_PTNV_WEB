@@ -110,6 +110,25 @@ export default function EmployeesTable({
       render: (u) => roleBadge(u.role, ROLE_LABEL[u.role] ?? u.role),
     },
     {
+      key: "active",
+      label: tt("table.status"),
+      type: "boolean" as const,
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "true", name: tt("table.statusActive") },
+          { id: "false", name: tt("table.statusInactive") },
+        ],
+        loading: false,
+        error: false,
+      },
+      render: (u) => (
+        <ITBadget color={u.active ? "success" : "danger"} size="lg">
+          {u.active ? tt("table.statusActive") : tt("table.statusInactive")}
+        </ITBadget>
+      ),
+    },
+    {
       key: "puesto",
       label: tt("table.position"),
       type: "string",

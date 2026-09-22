@@ -159,6 +159,9 @@
     "subarea": "Subárea",
     "position": "Puesto",
     "editEmployee": "Editar empleado",
-    "viewProfile": "Ver expediente"
+    "viewProfile": "Ver expediente",
+    "status": "Estatus",
+    "statusActive": "Activo",
+    "statusInactive": "Inactivo"
   }
 }

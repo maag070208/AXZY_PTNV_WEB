@@ -159,6 +159,9 @@
     "subarea": "Subarea",
     "position": "Position",
     "editEmployee": "Edit employee",
-    "viewProfile": "View profile"
+    "viewProfile": "View profile",
+    "status": "Status",
+    "statusActive": "Active",
+    "statusInactive": "Inactive"
   }
 }
