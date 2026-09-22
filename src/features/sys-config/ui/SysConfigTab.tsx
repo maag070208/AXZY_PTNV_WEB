@@ -92,7 +92,6 @@ export default function SysConfigTab() {
 
       <ITCard
         title={t("sysConfig.currentValue")}
-        actions={<FaEnvelope className="text-[#0a4560]" />}
         className="!p-5 border border-slate-200"
       >
         {loading ? (
