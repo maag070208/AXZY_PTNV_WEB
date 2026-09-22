@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-interface Props {
+export interface CollapsibleCardProps {
   icon: React.ReactNode;
   iconBg: string;
   title: string;
@@ -13,7 +13,7 @@ interface Props {
 
 /**
  * Card con encabezado clicable que colapsa/expande su contenido.
- * El kit no expone un collapse genérico, por eso este wrapper local.
+ * El kit no expone un collapse genérico, por eso este wrapper compartido.
  */
 export default function CollapsibleCard({
   icon,
@@ -22,7 +22,7 @@ export default function CollapsibleCard({
   right,
   defaultOpen = true,
   children,
-}: Props) {
+}: CollapsibleCardProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (

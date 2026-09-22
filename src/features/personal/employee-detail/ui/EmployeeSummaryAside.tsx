@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { ITAvatar, ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
-import { FaBriefcase, FaCamera, FaChevronDown, FaChevronUp, FaHeartbeat } from "react-icons/fa";
+import { FaBriefcase, FaCamera, FaHeartbeat } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PersonalProfile } from "@entities/personal";
+import { CollapsibleCard } from "@shared/ui/collapsible-card";
 
 const ROLE_COLOR: Record<string, string> = {
   GERENTE: "purple",
@@ -29,43 +30,6 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
       <ITText className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{label}</ITText>
       <ITText className="text-[11px] font-bold text-slate-700 text-right">{value ?? "—"}</ITText>
     </ITFlex>
-  );
-}
-
-function AsideCard({
-  icon,
-  iconBg,
-  title,
-  children,
-}: {
-  icon: React.ReactNode;
-  iconBg: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(true);
-
-  return (
-    <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-5">
-      <button type="button" className="w-full text-left" onClick={() => setOpen((o) => !o)}>
-        <ITFlex align="center" justify="between" gap={2}>
-          <ITFlex align="center" gap={2}>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shadow-sm shrink-0 ${iconBg}`}>
-              {icon}
-            </div>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">{title}</ITText>
-          </ITFlex>
-          <span className="shrink-0 text-slate-400">
-            {open ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
-          </span>
-        </ITFlex>
-      </button>
-      {open && (
-        <ITFlex direction="column" gap={2.5} className="mt-4">
-          {children}
-        </ITFlex>
-      )}
-    </div>
   );
 }
 
@@ -130,28 +94,34 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
         )}
       </div>
 
-      <AsideCard
+      <CollapsibleCard
+        defaultOpen
         icon={<FaBriefcase size={12} className="text-white" />}
         iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
         title={tt("detail.laboralTitle")}
       >
-        <InfoRow label={tt("detail.fields.employeeType")} value={ROLE_LABEL[profile.role] ?? profile.role} />
-        <InfoRow label={tt("detail.fields.hireDate")} value={formatDateOnly(profile.fechaIngreso)} />
-        <InfoRow label={tt("detail.fields.department")} value={profile.department?.name} />
-        <InfoRow label={tt("detail.fields.subarea")} value={profile.subarea?.name} />
-        <InfoRow label={tt("detail.fields.position")} value={profile.puesto} />
-        <InfoRow label={tt("detail.fields.company")} value={profile.empresa} />
-      </AsideCard>
+        <ITFlex direction="column" gap={2.5}>
+          <InfoRow label={tt("detail.fields.employeeType")} value={ROLE_LABEL[profile.role] ?? profile.role} />
+          <InfoRow label={tt("detail.fields.hireDate")} value={formatDateOnly(profile.fechaIngreso)} />
+          <InfoRow label={tt("detail.fields.department")} value={profile.department?.name} />
+          <InfoRow label={tt("detail.fields.subarea")} value={profile.subarea?.name} />
+          <InfoRow label={tt("detail.fields.position")} value={profile.puesto} />
+          <InfoRow label={tt("detail.fields.company")} value={profile.empresa} />
+        </ITFlex>
+      </CollapsibleCard>
 
-      <AsideCard
+      <CollapsibleCard
+        defaultOpen
         icon={<FaHeartbeat size={12} className="text-white" />}
         iconBg="bg-gradient-to-br from-rose-500 to-red-600"
         title={tt("detail.medicalTitle")}
       >
-        <InfoRow label={tt("detail.fields.bloodType")} value={profile.tipoSangre?.nombre} />
-        <InfoRow label={tt("detail.fields.condition")} value={profile.padecimiento} />
-        <InfoRow label={tt("detail.fields.allergies")} value={profile.alergias} />
-      </AsideCard>
+        <ITFlex direction="column" gap={2.5}>
+          <InfoRow label={tt("detail.fields.bloodType")} value={profile.tipoSangre?.nombre} />
+          <InfoRow label={tt("detail.fields.condition")} value={profile.padecimiento} />
+          <InfoRow label={tt("detail.fields.allergies")} value={profile.alergias} />
+        </ITFlex>
+      </CollapsibleCard>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { ITCard, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
+import { ITDivider, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
 import { FaAddressCard, FaIdCard, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PersonalProfile } from "@entities/personal";
@@ -18,7 +18,7 @@ function Field({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-function SectionCard({
+function SectionBlock({
   icon,
   iconBg,
   title,
@@ -30,8 +30,8 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <ITCard className="p-5 sm:p-6 shadow-xl shadow-slate-200/35 border border-slate-100 rounded-[24px]">
-      <ITFlex align="center" gap={3} className="mb-5">
+    <div>
+      <ITFlex align="center" gap={3} className="mb-3">
         <ITFlex align="center" justify="center" className={`h-9 w-9 rounded-xl shrink-0 ${iconBg}`}>
           {icon}
         </ITFlex>
@@ -40,7 +40,7 @@ function SectionCard({
       <ITGrid container columns={12} spacing={4}>
         {children}
       </ITGrid>
-    </ITCard>
+    </div>
   );
 }
 
@@ -53,8 +53,8 @@ export default function EmployeeInfoCards({ profile }: Props) {
   const f = tt("detail.fields", { returnObjects: true }) as Record<string, string>;
 
   return (
-    <ITFlex direction="column" gap={5}>
-      <SectionCard
+    <ITFlex direction="column" gap={4} className="py-1">
+      <SectionBlock
         icon={<FaIdCard size={14} className="text-blue-600" />}
         iconBg="bg-blue-50"
         title={tt("detail.personalInfoTitle")}
@@ -67,9 +67,11 @@ export default function EmployeeInfoCards({ profile }: Props) {
         <Field label={f.hireDate} value={formatDateOnly(profile.fechaIngreso)} />
         <Field label={f.apellidoPaterno} value={profile.apellidoPaterno} />
         <Field label={f.gender} value={profile.genero?.nombre} />
-      </SectionCard>
+      </SectionBlock>
 
-      <SectionCard
+      <ITDivider className="border-slate-100" />
+
+      <SectionBlock
         icon={<FaAddressCard size={14} className="text-violet-600" />}
         iconBg="bg-violet-50"
         title={tt("detail.officialDocsTitle")}
@@ -77,9 +79,11 @@ export default function EmployeeInfoCards({ profile }: Props) {
         <Field label={f.rfc} value={profile.rfc} />
         <Field label={f.nss} value={profile.nss} />
         <Field label={f.curp} value={profile.curp} />
-      </SectionCard>
+      </SectionBlock>
 
-      <SectionCard
+      <ITDivider className="border-slate-100" />
+
+      <SectionBlock
         icon={<FaPhoneAlt size={14} className="text-emerald-600" />}
         iconBg="bg-emerald-50"
         title={tt("detail.contactTitle")}
@@ -90,9 +94,11 @@ export default function EmployeeInfoCards({ profile }: Props) {
         <Field label={f.emergencyContact} value={profile.contactoEmergenciaNombre} />
         <Field label={f.emergencyPhone} value={profile.contactoEmergenciaTelefono} />
         <Field label={f.emergencyRelation} value={profile.contactoEmergenciaParentesco} />
-      </SectionCard>
+      </SectionBlock>
 
-      <SectionCard
+      <ITDivider className="border-slate-100" />
+
+      <SectionBlock
         icon={<FaMapMarkerAlt size={14} className="text-orange-600" />}
         iconBg="bg-orange-50"
         title={tt("detail.addressTitle")}
@@ -103,7 +109,7 @@ export default function EmployeeInfoCards({ profile }: Props) {
         <Field label={f.state} value={profile.estadoDireccion} />
         <Field label={f.city} value={profile.ciudad} />
         <Field label={f.country} value={profile.pais} />
-      </SectionCard>
+      </SectionBlock>
     </ITFlex>
   );
 }

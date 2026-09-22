@@ -55,7 +55,7 @@ export default function EmployeeDocumentsCard({
   const uploadingType = documentTypes.find((t) => t.id === uploadingDocTypeId);
 
   return (
-    <div className="w-full min-w-0 bg-white mt-2 rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-5 sm:p-6">
+    <>
       <ITFlex justify="between" align="center" gap={2} className="mb-4 flex-wrap">
         <ITFlex align="center" gap={1.5}>
           <FaPaperclip size={10} className="text-slate-400" />
@@ -167,6 +167,6 @@ export default function EmployeeDocumentsCard({
           showStatusBadge
         />
       </ITDialog>
-    </div>
+    </>
   );
 }

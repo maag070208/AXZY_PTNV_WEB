@@ -17,8 +17,8 @@ import {
   EmployeeSummaryAside,
   EmployeeDocumentsCard,
   EmployeeInfoCards,
-  CollapsibleCard,
 } from "@features/personal/employee-detail";
+import { CollapsibleCard } from "@shared/ui/collapsible-card";
 import { CredencialEmpleadoDialog } from "@widgets/credencial-empleado";
 
 export default function EmployeeDetailPage() {
