@@ -17,6 +17,7 @@ import {
   useUsersList,
   UsersTable,
 } from "@features/user/users-list";
+import { DeactivateDialog } from "@features/personal/employee-detail";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
@@ -67,29 +68,24 @@ export default function UsersListPage() {
         onEdit={(u) => navigate(`/usuarios/${u.id}/editar`)}
       />
 
+      {/* Para usuarios activos, baja con captura de motivo */}
+      <DeactivateDialog
+        isOpen={!!fx.userToToggle && fx.userToToggle.active}
+        onClose={() => fx.setUserToToggle(null)}
+        onConfirm={(reason) => fx.handleDeactivate(reason)}
+        userName={fx.userToToggle?.active ? fx.userToToggle.name : undefined}
+      />
+
+      {/* Para usuarios ya inactivos, confirmación de borrado físico */}
       <ITConfirmDialog
-        isOpen={!!fx.userToToggle}
+        isOpen={!!fx.userToToggle && !fx.userToToggle.active}
         onClose={() => fx.setUserToToggle(null)}
         onConfirm={() => fx.handleToggleActive(isAdmin)}
-        title={
-          fx.userToToggle?.active
-            ? tt("list.confirmDeactivateTitle")
-            : tt("list.confirmDeleteTitle")
-        }
-        message={
-          fx.userToToggle?.active
-            ? tt("list.confirmDeactivateMsg", {
-                username: fx.userToToggle?.username ?? "",
-              })
-            : tt("list.confirmDeleteMsg", {
-                username: fx.userToToggle?.username ?? "",
-              })
-        }
-        confirmLabel={
-          fx.userToToggle?.active
-            ? tt("list.confirmDeactivateBtn")
-            : tt("list.confirmDeleteBtn")
-        }
+        title={tt("list.confirmDeleteTitle")}
+        message={tt("list.confirmDeleteMsg", {
+          username: fx.userToToggle?.username ?? "",
+        })}
+        confirmLabel={tt("list.confirmDeleteBtn")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />

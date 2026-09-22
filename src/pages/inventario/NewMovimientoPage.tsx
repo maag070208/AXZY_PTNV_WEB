@@ -59,6 +59,7 @@ export default function NewMovimientoPage() {
   const [dispositivos, setDispositivos] = useState<Dispositivo[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
   const [rows, setRows] = useState<Row[]>([{ key: crypto.randomUUID(), tipoFilter: "", dispositivoId: "", unidadId: "", tipo: "", condicion: "", motivo: "", observaciones: "", unidades: [], unidadesLoading: false }]);
@@ -126,9 +127,27 @@ export default function NewMovimientoPage() {
     (r.tipo === "BAJA" || r.tipo === "MANTENIMIENTO_ENTRADA" ? !!r.motivo.trim() : true) &&
     (r.tipo !== "MANTENIMIENTO_SALIDA" || !!r.condicion);
 
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    rows.forEach((r, idx) => {
+      if ((r.tipo === "BAJA" || r.tipo === "MANTENIMIENTO_ENTRADA") && r.motivo.trim().length < 3) {
+        e[`motivo-${idx}`] = "El motivo debe tener al menos 3 caracteres";
+      }
+      if (r.tipo === "MANTENIMIENTO_SALIDA" && r.observaciones.trim().length > 0 && r.observaciones.trim().length < 3) {
+        e[`observaciones-${idx}`] = "La observación debe tener al menos 3 caracteres";
+      }
+    });
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const isValid = rows.length > 0 && rows.every(rowValida);
 
   const handleSubmit = async () => {
+    if (!validate()) {
+      setToast({ message: "Revisa los campos marcados", type: "error" });
+      return;
+    }
     setSaving(true);
     try {
       const grupos = new Map<TipoMovimiento, Row[]>();
@@ -267,7 +286,21 @@ export default function NewMovimientoPage() {
                 </ITFlex>
 
                 {(r.tipo === "BAJA" || r.tipo === "MANTENIMIENTO_ENTRADA") && (
-                  <ITInput name={`motivo-${r.key}`} label={t("new.motivo")} value={r.motivo} onChange={(e) => updateRow(r.key, { motivo: e.target.value })} required />
+                  <div>
+                    <ITInput
+                      name={`motivo-${r.key}`}
+                      label={t("new.motivo")}
+                      value={r.motivo}
+                      onChange={(e) => updateRow(r.key, { motivo: e.target.value })}
+                      required
+                      aria-invalid={!!errors[`motivo-${idx}`]}
+                    />
+                    {errors[`motivo-${idx}`] && (
+                      <span role="alert" className="text-red-500 text-xs mt-1 block">
+                        {errors[`motivo-${idx}`]}
+                      </span>
+                    )}
+                  </div>
                 )}
 
                 {r.tipo === "MANTENIMIENTO_SALIDA" && (
@@ -290,7 +323,20 @@ export default function NewMovimientoPage() {
                             );
                           })}
                         </ITFlex>
-                        <ITInput name={`observaciones-${r.key}`} label={t("new.comentario")} value={r.observaciones} onChange={(e) => updateRow(r.key, { observaciones: e.target.value })} />
+                        <div>
+                      <ITInput
+                        name={`observaciones-${r.key}`}
+                        label={t("new.comentario")}
+                        value={r.observaciones}
+                        onChange={(e) => updateRow(r.key, { observaciones: e.target.value })}
+                        aria-invalid={!!errors[`observaciones-${idx}`]}
+                      />
+                      {errors[`observaciones-${idx}`] && (
+                        <span role="alert" className="text-red-500 text-xs mt-1 block">
+                          {errors[`observaciones-${idx}`]}
+                        </span>
+                      )}
+                    </div>
                         {r.condicion === "ROTO" && (
                           <ITText className="text-[11px] font-semibold text-red-600">{t("devolucion.rotoBajaHint")}</ITText>
                         )}

@@ -5,6 +5,8 @@ import {
   FaFileAlt,
   FaUserCheck,
   FaUserPlus,
+  FaUserSlash,
+  FaUserClock,
   FaComment,
   FaBoxOpen,
 } from "react-icons/fa";
@@ -20,6 +22,8 @@ const TYPE_CONFIG: Record<string, { icon: React.ReactNode; bg: string }> = {
   TICKET_ASIGNADO: { icon: <FaUserCheck size={9} />, bg: "bg-orange-500" },
   TICKET_COMENTARIO: { icon: <FaComment size={9} />, bg: "bg-purple-500" },
   DISPOSITIVO_HISTORIAL: { icon: <FaBoxOpen size={9} />, bg: "bg-slate-400" },
+  USER_DEACTIVATED: { icon: <FaUserSlash size={9} />, bg: "bg-rose-500" },
+  USER_REACTIVATED: { icon: <FaUserClock size={9} />, bg: "bg-emerald-500" },
 };
 
 interface Props {

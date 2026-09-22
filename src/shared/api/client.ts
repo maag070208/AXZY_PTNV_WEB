@@ -8,13 +8,16 @@ import { API_CONSTANTS } from "./constants/API_CONSTANTS";
 import { getSessionToken, handleUnauthorized } from "./session";
 
 class ApiError extends Error {
+  public readonly code?: string;
   constructor(
     public status: number,
     msg: string,
-    public details?: unknown
+    public details?: unknown,
+    code?: string
   ) {
     super(msg);
     this.name = "ApiError";
+    this.code = code;
   }
 }
 
@@ -44,12 +47,19 @@ axiosInstance.interceptors.request.use(
 );
 
 /* ---------------------------------------------------------
-   3. RESPONSE Interceptor (401 => logout)
+   3. RESPONSE Interceptor (401 => logout; 403 ACCOUNT_DEACTIVATED => no logout)
 --------------------------------------------------------- */
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const code = (error.response?.data as { code?: string } | undefined)?.code;
+    if (status === 401) {
+      // 401 con código explícito (e.g. ACCOUNT_DEACTIVATED) NO debe disparar
+      // el logout silencioso: la UI necesita mostrar el motivo.
+      if (code === "ACCOUNT_DEACTIVATED") {
+        return Promise.reject(error);
+      }
       handleUnauthorized();
     }
     return Promise.reject(error);
@@ -63,12 +73,12 @@ const handleError = (error: any): never => {
   if (error instanceof ApiError) throw error;
 
   const data = error?.response?.data as
-    | { message?: string; details?: unknown }
+    | { message?: string; details?: unknown; code?: string }
     | undefined;
   const status = error?.response?.status ?? 0;
   const message =
     data?.message ?? error?.message ?? "Error de red o del servidor";
-  throw new ApiError(status, message, data);
+  throw new ApiError(status, message, data, data?.code);
 };
 
 /* ---------------------------------------------------------

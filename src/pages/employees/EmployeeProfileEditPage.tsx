@@ -3,7 +3,6 @@ import {
   ITAlert,
   ITAvatar,
   ITButton,
-  ITDatePicker,
   ITFlex,
   ITInput,
   ITLoader,
@@ -18,6 +17,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEmployeeDetail } from "@features/personal/employee-detail";
 import type { PersonalProfile, PersonalProfileUpdateInput } from "@entities/personal";
+import { DatePickerPortal } from "@shared/ui/date-picker-portal";
+import {
+  validateCurp,
+  validateEmail,
+  validateNss,
+  validatePhone,
+  validatePostal,
+  validateRfc,
+} from "@shared/validation";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
 const dateStrToLocal = (value?: string | null): Date | undefined => {
@@ -90,6 +98,7 @@ export default function EmployeeProfileEditPage() {
   const detail = useEmployeeDetail(id);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(emptyForm());
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -110,7 +119,34 @@ export default function EmployeeProfileEditPage() {
       setForm((f) => ({ ...f, [name]: value instanceof Date ? localToDateStr(value) : "" }));
     };
 
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    const rfcErr = validateRfc(form.rfc);
+    if (rfcErr) e.rfc = rfcErr;
+    const curpErr = validateCurp(form.curp);
+    if (curpErr) e.curp = curpErr;
+    const nssErr = validateNss(form.nss);
+    if (nssErr) e.nss = nssErr;
+    const postalErr = validatePostal(form.codigoPostal);
+    if (postalErr) e.codigoPostal = postalErr;
+    const personalPhoneErr = validatePhone(form.celularPersonal);
+    if (personalPhoneErr) e.celularPersonal = personalPhoneErr;
+    const companyPhoneErr = validatePhone(form.celularEmpresa);
+    if (companyPhoneErr) e.celularEmpresa = companyPhoneErr;
+    const emergencyPhoneErr = validatePhone(form.contactoEmergenciaTelefono);
+    if (emergencyPhoneErr) e.contactoEmergenciaTelefono = emergencyPhoneErr;
+    const emailErr = validateEmail(form.email);
+    if (emailErr) e.email = emailErr;
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleFinish = async () => {
+    if (!validate()) {
+      // Surface a generic alert; per-field messages are inline.
+      detail.setError("Por favor revisa los campos marcados");
+      return;
+    }
     const normalized: FormState = Object.fromEntries(
       Object.entries(form).map(([key, value]) => [key, typeof value === "string" && value.trim() === "" ? null : value])
     ) as FormState;
@@ -213,7 +249,12 @@ export default function EmployeeProfileEditPage() {
               />
             </Cell>
             <Cell>
-              <ITDatePicker name="fechaNacimiento" label={tt("detail.fields.birthDate")} value={dateStrToLocal(form.fechaNacimiento)} onChange={dateField("fechaNacimiento")} />
+              <DatePickerPortal
+                name="fechaNacimiento"
+                label={tt("detail.fields.birthDate")}
+                value={dateStrToLocal(form.fechaNacimiento)}
+                onChange={dateField("fechaNacimiento")}
+              />
             </Cell>
             <Cell>
               <ITSelect
@@ -249,18 +290,26 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={4}>
           <Row>
             <Cell>
-              <ITDatePicker name="fechaIngreso" label={tt("detail.fields.hireDate")} value={dateStrToLocal(form.fechaIngreso)} onChange={dateField("fechaIngreso")} />
+              <DatePickerPortal
+                name="fechaIngreso"
+                label={tt("detail.fields.hireDate")}
+                value={dateStrToLocal(form.fechaIngreso)}
+                onChange={dateField("fechaIngreso")}
+              />
             </Cell>
             <Cell>
-              <ITInput name="rfc" label={tt("detail.fields.rfc")} value={form.rfc ?? ""} onChange={field("rfc")} />
+              <ITInput name="rfc" label={tt("detail.fields.rfc")} value={form.rfc ?? ""} onChange={field("rfc")} aria-invalid={!!errors.rfc} />
+              {errors.rfc && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.rfc}</span>}
             </Cell>
           </Row>
           <Row>
             <Cell>
-              <ITInput name="curp" label={tt("detail.fields.curp")} value={form.curp ?? ""} onChange={field("curp")} />
+              <ITInput name="curp" label={tt("detail.fields.curp")} value={form.curp ?? ""} onChange={field("curp")} aria-invalid={!!errors.curp} />
+              {errors.curp && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.curp}</span>}
             </Cell>
             <Cell>
-              <ITInput name="nss" label={tt("detail.fields.nss")} value={form.nss ?? ""} onChange={field("nss")} />
+              <ITInput name="nss" label={tt("detail.fields.nss")} value={form.nss ?? ""} onChange={field("nss")} aria-invalid={!!errors.nss} />
+              {errors.nss && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.nss}</span>}
             </Cell>
           </Row>
         </ITFlex>
@@ -273,13 +322,16 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={4}>
           <Row>
             <Cell>
-              <ITInput name="celularPersonal" label={tt("detail.fields.personalCell")} value={form.celularPersonal ?? ""} onChange={field("celularPersonal")} />
+              <ITInput name="celularPersonal" label={tt("detail.fields.personalCell")} value={form.celularPersonal ?? ""} onChange={field("celularPersonal")} aria-invalid={!!errors.celularPersonal} />
+              {errors.celularPersonal && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.celularPersonal}</span>}
             </Cell>
             <Cell>
-              <ITInput name="celularEmpresa" label={tt("detail.fields.companyCell")} value={form.celularEmpresa ?? ""} onChange={field("celularEmpresa")} />
+              <ITInput name="celularEmpresa" label={tt("detail.fields.companyCell")} value={form.celularEmpresa ?? ""} onChange={field("celularEmpresa")} aria-invalid={!!errors.celularEmpresa} />
+              {errors.celularEmpresa && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.celularEmpresa}</span>}
             </Cell>
             <Cell>
-              <ITInput name="email" type="email" label={tt("detail.fields.email")} value={form.email ?? ""} onChange={field("email")} />
+              <ITInput name="email" type="email" label={tt("detail.fields.email")} value={form.email ?? ""} onChange={field("email")} aria-invalid={!!errors.email} />
+              {errors.email && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</span>}
             </Cell>
           </Row>
           <ITFlex align="center" gap={2}>
@@ -298,7 +350,8 @@ export default function EmployeeProfileEditPage() {
               <ITInput name="colonia" label={tt("detail.fields.colony")} value={form.colonia ?? ""} onChange={field("colonia")} />
             </Cell>
             <Cell min={120}>
-              <ITInput name="codigoPostal" label={tt("detail.fields.zip")} value={form.codigoPostal ?? ""} onChange={field("codigoPostal")} />
+              <ITInput name="codigoPostal" label={tt("detail.fields.zip")} value={form.codigoPostal ?? ""} onChange={field("codigoPostal")} aria-invalid={!!errors.codigoPostal} />
+              {errors.codigoPostal && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.codigoPostal}</span>}
             </Cell>
           </Row>
           <Row>
@@ -321,7 +374,8 @@ export default function EmployeeProfileEditPage() {
               <ITInput name="contactoEmergenciaNombre" label={tt("detail.fields.emergencyContact")} value={form.contactoEmergenciaNombre ?? ""} onChange={field("contactoEmergenciaNombre")} />
             </Cell>
             <Cell>
-              <ITInput name="contactoEmergenciaTelefono" label={tt("detail.fields.emergencyPhone")} value={form.contactoEmergenciaTelefono ?? ""} onChange={field("contactoEmergenciaTelefono")} />
+              <ITInput name="contactoEmergenciaTelefono" label={tt("detail.fields.emergencyPhone")} value={form.contactoEmergenciaTelefono ?? ""} onChange={field("contactoEmergenciaTelefono")} aria-invalid={!!errors.contactoEmergenciaTelefono} />
+              {errors.contactoEmergenciaTelefono && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.contactoEmergenciaTelefono}</span>}
             </Cell>
             <Cell>
               <ITInput name="contactoEmergenciaParentesco" label={tt("detail.fields.emergencyRelation")} value={form.contactoEmergenciaParentesco ?? ""} onChange={field("contactoEmergenciaParentesco")} />

@@ -107,12 +107,21 @@ export const useEmployeeDetail = (id: string | undefined) => {
     }
   };
 
-  const confirmDeactivate = async () => {
+  const confirmDeactivate = async (reason: string) => {
     if (!id) return;
     setError(null);
     try {
-      await usersApi.delete(id);
-      setProfile((p) => (p ? { ...p, active: false } : p));
+      await usersApi.deactivate(id, { reason, notifyUser: true });
+      setProfile((p) =>
+        p
+          ? {
+              ...p,
+              active: false,
+              deactivatedAt: new Date().toISOString(),
+              deactivationReason: reason,
+            }
+          : p
+      );
     } catch (e: any) {
       setError(e.message ?? i18n.t("employees:detail.deactivateError"));
     } finally {

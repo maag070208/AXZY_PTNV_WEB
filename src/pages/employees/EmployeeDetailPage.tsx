@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITFlex,
   ITGrid,
   ITLoader,
@@ -17,6 +16,7 @@ import {
   EmployeeSummaryAside,
   EmployeeDocumentsCard,
   EmployeeInfoCards,
+  DeactivateDialog,
 } from "@features/personal/employee-detail";
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
 import { CredencialEmpleadoDialog } from "@widgets/credencial-empleado";
@@ -131,15 +131,11 @@ export default function EmployeeDetailPage() {
         </ITGrid>
       </ITGrid>
 
-      <ITConfirmDialog
+      <DeactivateDialog
         isOpen={detail.deactivateOpen}
         onClose={() => detail.setDeactivateOpen(false)}
         onConfirm={detail.confirmDeactivate}
-        title={tt("detail.deactivate")}
-        message={tt("detail.deactivateConfirm", { name: profile.name })}
-        confirmLabel={tt("detail.deactivate")}
-        cancelLabel={tt("common:actions.cancel")}
-        variant="danger"
+        userName={profile.name}
       />
 
       <CredencialEmpleadoDialog

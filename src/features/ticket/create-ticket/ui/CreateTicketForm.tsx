@@ -25,6 +25,7 @@ import { CATEGORIES, PRIORITIES } from "../model/constants";
 
 interface Props {
   form: TicketDraft;
+  errors?: Record<string, string>;
   onFieldChange: (field: keyof TicketDraft, value: string) => void;
   files: File[];
   onAddFile: (file: File) => void;
@@ -71,6 +72,7 @@ const PRIORITY_PRESETS: Record<
 
 export default function CreateTicketForm({
   form,
+  errors,
   onFieldChange,
   files,
   onAddFile,
@@ -112,7 +114,13 @@ export default function CreateTicketForm({
                   onChange={(e) => onFieldChange("titulo", e.target.value)}
                   placeholder={tt("new.titlePlaceholder")}
                   required
+                  aria-invalid={!!errors?.titulo}
                 />
+                {errors?.titulo && (
+                  <span role="alert" className="text-red-500 text-xs mt-1 block">
+                    {errors.titulo}
+                  </span>
+                )}
               </ITGrid>
               <ITGrid item xs={12} md={5}>
                 <ITSelect

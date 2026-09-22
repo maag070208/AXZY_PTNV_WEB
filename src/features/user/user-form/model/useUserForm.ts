@@ -4,6 +4,7 @@ import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
+import { validateEmail } from "@shared/validation";
 
 export const ROLE_GUIDANCE: Record<
   UserRole,
@@ -107,6 +108,7 @@ export const useUserForm = () => {
     departmentId: "",
     subareaId: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -160,9 +162,24 @@ export const useUserForm = () => {
     setForm((f) => ({ ...f, departmentId: value, subareaId: "" }));
   };
 
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    if (!form.username.trim()) e.username = "El usuario es obligatorio";
+    else if (form.username.trim().length < 3) e.username = "El usuario debe tener al menos 3 caracteres";
+    if (!form.name.trim()) e.name = "El nombre es obligatorio";
+    if (!isEdit && !form.password) e.password = "La contraseña es obligatoria";
+    else if (form.password && form.password.length < 6)
+      e.password = "La contraseña debe tener al menos 6 caracteres";
+    if (form.email.trim()) {
+      const emailErr = validateEmail(form.email);
+      if (emailErr) e.email = emailErr;
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmit = async (): Promise<boolean> => {
-    if (!form.username || !form.name) return false;
-    if (!isEdit && !form.password) return false;
+    if (!validate()) return false;
     const fullName = composeFullName(form);
     setSaving(true);
     try {
@@ -212,6 +229,7 @@ export const useUserForm = () => {
     isEdit,
     departments,
     form,
+    errors,
     handleField,
     handleDepartmentChange,
     selectedDept,

@@ -24,10 +24,11 @@ const PRIORITIES = [
 
 interface Props {
   form: TicketEditDraft;
+  errors?: Record<string, string>;
   onFieldChange: (field: keyof TicketEditDraft, value: string) => void;
 }
 
-export default function EditTicketForm({ form, onFieldChange }: Props) {
+export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
   const { t: tt } = useTranslation("tickets");
   return (
     <ITFlex justify="center">
@@ -38,13 +39,21 @@ export default function EditTicketForm({ form, onFieldChange }: Props) {
               {tt("edit.formInfoTitle")}
             </ITText>
 
-            <ITInput
-              name="titulo"
-              label={tt("edit.titleLabel")}
-              value={form.titulo}
-              onChange={(e) => onFieldChange("titulo", e.target.value)}
-              placeholder={tt("edit.titlePlaceholder")}
-            />
+            <div>
+              <ITInput
+                name="titulo"
+                label={tt("edit.titleLabel")}
+                value={form.titulo}
+                onChange={(e) => onFieldChange("titulo", e.target.value)}
+                placeholder={tt("edit.titlePlaceholder")}
+                aria-invalid={!!errors?.titulo}
+              />
+              {errors?.titulo && (
+                <span role="alert" className="text-red-500 text-xs mt-1 block">
+                  {errors.titulo}
+                </span>
+              )}
+            </div>
 
             <ITFlex direction="column" gap={1}>
               <ITTextarea

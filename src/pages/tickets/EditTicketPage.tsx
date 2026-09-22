@@ -96,6 +96,7 @@ export default function EditTicketPage() {
     >
       <EditTicketForm
         form={editTicket.form}
+        errors={editTicket.errors}
         onFieldChange={editTicket.handleField}
       />
 

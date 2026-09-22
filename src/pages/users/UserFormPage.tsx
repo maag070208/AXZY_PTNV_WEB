@@ -103,6 +103,7 @@ export default function UserFormPage() {
       <UserFormFields
         isEdit={isEdit}
         form={userForm.form}
+        errors={userForm.errors}
         onFieldChange={userForm.handleField}
         onDepartmentChange={userForm.handleDepartmentChange}
         departments={userForm.departments}

@@ -83,6 +83,9 @@ export const usersApi = {
     api.delete<{ soft: boolean; forced?: boolean; data: User }>(
       `/users/${id}${force ? "?force=true" : ""}`
     ),
+  deactivate: (id: string, body: { reason: string; notifyUser?: boolean }) =>
+    api.patch<User>(`/users/${id}/deactivate`, body),
+  reactivate: (id: string) => api.patch<User>(`/users/${id}/reactivate`),
   history: (id: string) =>
     api.get<Array<{
       id: string;

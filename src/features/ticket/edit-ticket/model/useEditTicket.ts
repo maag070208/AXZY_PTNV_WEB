@@ -28,6 +28,7 @@ export const useEditTicket = () => {
   });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
 
@@ -59,11 +60,18 @@ export const useEditTicket = () => {
     setForm((f) => ({ ...f, [field]: value }));
   };
 
-  const isValid =
-    form.titulo.trim().length > 0 && form.descripcion.trim().length > 0;
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    if (!form.titulo.trim()) e.titulo = "El título es obligatorio";
+    else if (form.titulo.trim().length < 3) e.titulo = "El título debe tener al menos 3 caracteres";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const isValid = form.titulo.trim().length >= 3;
 
   const handleSave = async (): Promise<boolean> => {
-    if (!isValid || !id) {
+    if (!validate() || !id) {
       setToastType("error");
       setToast(t("edit.required"));
       return false;
@@ -101,6 +109,7 @@ export const useEditTicket = () => {
     id,
     ticket,
     form,
+    errors,
     handleField,
     isValid,
     saving,

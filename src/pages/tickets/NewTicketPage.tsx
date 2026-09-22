@@ -55,6 +55,7 @@ export default function NewTicketPage() {
     >
       <CreateTicketForm
         form={createTicket.form}
+        errors={createTicket.errors}
         onFieldChange={createTicket.handleField}
         files={createTicket.files}
         onAddFile={(file) => {

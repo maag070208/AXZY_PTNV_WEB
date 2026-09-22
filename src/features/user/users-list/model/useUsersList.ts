@@ -31,19 +31,40 @@ export const useUsersList = () => {
     };
   }, []);
 
-  const handleToggleActive = async (isAdmin: boolean) => {
+  /**
+   * Confirmación de baja explícita: usa el endpoint /deactivate con motivo.
+   * El diálogo de motivo se gestiona en la UI (DeactivateDialog). Esta función
+   * solo dispara el request.
+   */
+  const handleDeactivate = async (reason: string) => {
     if (!userToToggle) return;
     const target = userToToggle;
     setUserToToggle(null);
     try {
-      const res = await usersApi.delete(target.id);
+      await usersApi.deactivate(target.id, { reason, notifyUser: true });
       setReloadKey((k) => k + 1);
-      setToast({
-        message: res.soft ? tt("list.toastDeactivated") : tt("list.toastDeleted"),
-        type: "success",
-      });
+      setToast({ message: tt("list.toastDeactivated"), type: "success" });
     } catch (e: any) {
-      if (isAdmin && !target.active) {
+      setToast({ message: e.message || tt("list.errorDeactivate"), type: "error" });
+    }
+  };
+
+  /**
+   * Toggle legacy: cuando se llamaba desde ITConfirmDialog sin motivo. Ya
+   * reemplazado por handleDeactivate; se conserva solo para compatibilidad
+   * con flujos donde se quiera desactivar directamente (no debería llamarse
+   * desde la UI nueva).
+   */
+  const handleToggleActive = async (_isAdmin: boolean) => {
+    if (!userToToggle) return;
+    const target = userToToggle;
+    setUserToToggle(null);
+    try {
+      await usersApi.deactivate(target.id, { reason: "Baja sin motivo especificado", notifyUser: true });
+      setReloadKey((k) => k + 1);
+      setToast({ message: tt("list.toastDeactivated"), type: "success" });
+    } catch (e: any) {
+      if (_isAdmin && !target.active) {
         setUserToForceDelete(target);
       } else {
         setToast({ message: e.message || tt("list.errorDeactivate"), type: "error" });
@@ -66,6 +87,7 @@ export const useUsersList = () => {
 
   const handleForceDelete = async () => {
     if (!userToForceDelete) return;
+    const target = userToForceDelete;
     setUserToForceDelete(null);
     try {
       await usersApi.delete(userToForceDelete.id, true);
@@ -105,6 +127,7 @@ export const useUsersList = () => {
     setToast,
     fetchTableData,
     handleToggleActive,
+    handleDeactivate,
     handleReactivate,
     handleForceDelete,
     handleChangePassword,

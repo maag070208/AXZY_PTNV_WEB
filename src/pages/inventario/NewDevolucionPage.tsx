@@ -40,6 +40,7 @@ export default function NewDevolucionPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
   useEffect(() => {
@@ -85,6 +86,18 @@ export default function NewDevolucionPage() {
   const totalADevolver = rows.reduce((sum, r) => sum + (Number(r.cantidad) || 0), 0);
   const totalPendiente = rows.reduce((sum, r) => sum + r.pendiente, 0);
 
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    // observación requerida si MALO/ROTO, mínimo 3 caracteres
+    rows.forEach((r, idx) => {
+      if ((r.condicion === "MALO" || r.condicion === "ROTO") && r.observaciones.trim().length < 3) {
+        e[`observaciones-${idx}`] = "La observación debe tener al menos 3 caracteres";
+      }
+    });
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const isValid =
     !!prestamo &&
     rows.length > 0 &&
@@ -92,6 +105,10 @@ export default function NewDevolucionPage() {
     totalADevolver > 0;
 
   const handleSubmit = async () => {
+    if (!validate()) {
+      setToast({ message: "Revisa las observaciones marcadas", type: "error" });
+      return;
+    }
     setSaving(true);
     try {
       await inventarioApi.crearDevolucion({
@@ -229,13 +246,21 @@ export default function NewDevolucionPage() {
                           <ITText className="text-[11px] font-semibold text-red-600">{t("devolucion.rotoBajaHint")}</ITText>
                         )}
                         {(r.condicion === "MALO" || r.condicion === "ROTO") && (
-                          <ITInput
-                            name={`observaciones-${r.key}`}
-                            label={t("new.comentario")}
-                            placeholder={t("devolucion.comentarioPlaceholder")}
-                            value={r.observaciones}
-                            onChange={(e) => updateRow(r.key, { observaciones: e.target.value })}
-                          />
+                          <div>
+                            <ITInput
+                              name={`observaciones-${r.key}`}
+                              label={t("new.comentario")}
+                              placeholder={t("devolucion.comentarioPlaceholder")}
+                              value={r.observaciones}
+                              onChange={(e) => updateRow(r.key, { observaciones: e.target.value })}
+                              aria-invalid={!!errors[`observaciones-${rows.indexOf(r)}`]}
+                            />
+                            {errors[`observaciones-${rows.indexOf(r)}`] && (
+                              <span role="alert" className="text-red-500 text-xs mt-1 block">
+                                {errors[`observaciones-${rows.indexOf(r)}`]}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </ITFlex>
                     );

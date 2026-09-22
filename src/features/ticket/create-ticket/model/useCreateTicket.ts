@@ -23,6 +23,7 @@ export const useCreateTicket = () => {
   });
   const [files, setFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
 
@@ -41,11 +42,18 @@ export const useCreateTicket = () => {
   const removeFile = (index: number) =>
     setFiles((cur) => cur.filter((_, i) => i !== index));
 
-  const isValid =
-    form.titulo.trim().length > 0 && form.descripcion.trim().length > 0;
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    if (!form.titulo.trim()) e.titulo = "El título es obligatorio";
+    else if (form.titulo.trim().length < 3) e.titulo = "El título debe tener al menos 3 caracteres";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const isValid = form.titulo.trim().length >= 3;
 
   const handleSave = async (): Promise<boolean> => {
-    if (!isValid) {
+    if (!validate()) {
       setToastType("error");
       setToast(t("new.required"));
       return false;
@@ -83,6 +91,7 @@ export const useCreateTicket = () => {
 
   return {
     form,
+    errors,
     handleField,
     isValid,
     saving,

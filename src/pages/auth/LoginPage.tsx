@@ -38,6 +38,8 @@ export default function LoginPage() {
           password={login.password}
           setUsername={login.setUsername}
           setPassword={login.setPassword}
+          errors={login.errors}
+          deactivatedMsg={login.deactivatedMsg}
           isSubmitting={login.isSubmitting}
           canSubmit={login.canSubmit}
           toast={login.toast}

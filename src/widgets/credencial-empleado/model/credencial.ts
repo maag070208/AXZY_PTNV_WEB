@@ -24,18 +24,40 @@ export const generarCredencialQR = async (profile: PersonalProfile): Promise<str
 export const fotoComoDataUrl = async (
   fotoUrl?: string | null
 ): Promise<string | null> => {
-  if (!fotoUrl) return null;
+  if (!fotoUrl) {
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn("[credencial] fotoUrl vacío: el perfil no tiene fotoKey/fotoUrl");
+    }
+    return null;
+  }
   try {
     const res = await fetch(fotoUrl);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn(`[credencial] fetch falló: ${res.status} ${res.statusText}`);
+      }
+      return null;
+    }
     const blob = await res.blob();
     return await new Promise<string | null>((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = () => resolve(null);
+      reader.onerror = () => {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.warn("[credencial] FileReader onerror");
+        }
+        resolve(null);
+      };
       reader.readAsDataURL(blob);
     });
-  } catch {
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn("[credencial] excepción al cargar foto:", err);
+    }
     return null;
   }
 };

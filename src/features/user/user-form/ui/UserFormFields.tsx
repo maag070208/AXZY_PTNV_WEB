@@ -19,6 +19,7 @@ import type { UserFormValues } from "../model/useUserForm";
 interface Props {
   isEdit: boolean;
   form: UserFormValues;
+  errors?: Record<string, string>;
   onFieldChange: (field: keyof UserFormValues, value: string) => void;
   onDepartmentChange: (value: string) => void;
   departments: Department[];
@@ -54,6 +55,7 @@ function SectionHeader({
 export default function UserFormFields({
   isEdit,
   form,
+  errors,
   onFieldChange,
   onDepartmentChange,
   departments,
@@ -63,6 +65,7 @@ export default function UserFormFields({
 }: Props) {
   const { t: tt } = useTranslation(["users", "common"]);
   const activeDepartments = departments.filter((d) => d.active);
+  const fieldError = (key: string) => errors?.[key];
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] items-start">
@@ -76,7 +79,10 @@ export default function UserFormFields({
           />
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_name" label={tt("form.name")} value={form.name} onChange={(e) => onFieldChange("name", e.target.value)} required />
+              <ITInput name="u_name" label={tt("form.name")} value={form.name} onChange={(e) => onFieldChange("name", e.target.value)} required aria-invalid={!!fieldError("name")} />
+              {fieldError("name") && (
+                <span role="alert" className="text-red-500 text-xs mt-1 block">{fieldError("name")}</span>
+              )}
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_second" label={tt("form.secondName")} value={form.segundoNombre} onChange={(e) => onFieldChange("segundoNombre", e.target.value)} />
@@ -91,7 +97,10 @@ export default function UserFormFields({
               <ITInput name="u_num" label={tt("form.employeeNo")} value={form.numeroEmpleado} onChange={(e) => onFieldChange("numeroEmpleado", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} placeholder="usuario@empresa.com" />
+              <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} placeholder="usuario@empresa.com" aria-invalid={!!fieldError("email")} />
+              {fieldError("email") && (
+                <span role="alert" className="text-red-500 text-xs mt-1 block">{fieldError("email")}</span>
+              )}
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_puesto" label={tt("form.position")} value={form.puesto} onChange={(e) => onFieldChange("puesto", e.target.value)} />
@@ -108,13 +117,19 @@ export default function UserFormFields({
           />
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_username" label={tt("form.username")} value={form.username} onChange={(e) => onFieldChange("username", e.target.value)} required />
+              <ITInput name="u_username" label={tt("form.username")} value={form.username} onChange={(e) => onFieldChange("username", e.target.value)} required aria-invalid={!!fieldError("username")} />
+              {fieldError("username") && (
+                <span role="alert" className="text-red-500 text-xs mt-1 block">{fieldError("username")}</span>
+              )}
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITSelect name="u_role" label={tt("form.role")} options={roleOptions} value={form.role} onChange={(e) => onFieldChange("role", e.target.value as any)} required />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_password" type="password" label={`${tt("form.password")} ${!isEdit ? "*" : ""}`} value={form.password} onChange={(e) => onFieldChange("password", e.target.value)} required={!isEdit} placeholder={isEdit ? tt("form.passwordPlaceholder") : ""} />
+              <ITInput name="u_password" type="password" label={`${tt("form.password")} ${!isEdit ? "*" : ""}`} value={form.password} onChange={(e) => onFieldChange("password", e.target.value)} required={!isEdit} placeholder={isEdit ? tt("form.passwordPlaceholder") : ""} aria-invalid={!!fieldError("password")} />
+              {fieldError("password") && (
+                <span role="alert" className="text-red-500 text-xs mt-1 block">{fieldError("password")}</span>
+              )}
             </ITGrid>
           </ITGrid>
         </section>

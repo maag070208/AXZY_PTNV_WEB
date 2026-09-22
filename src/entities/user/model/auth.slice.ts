@@ -44,9 +44,20 @@ const persist = (state: State) => {
 
 export const loginThunk = createAsyncThunk(
   "auth/login",
-  async (creds: { username: string; password: string }) => {
-    const data = await authApi.login(creds.username, creds.password);
-    return data;
+  async (creds: { username: string; password: string }, { rejectWithValue }) => {
+    try {
+      const data = await authApi.login(creds.username, creds.password);
+      return data;
+    } catch (e: any) {
+      // Reenviamos la causa serializable para que el componente de login
+      // pueda distinguir ACCOUNT_DEACTIVATED vs INVALID_CREDENTIALS.
+      return rejectWithValue({
+        code: e?.code,
+        message: e?.message,
+        details: e?.details,
+        status: e?.status,
+      });
+    }
   }
 );
 

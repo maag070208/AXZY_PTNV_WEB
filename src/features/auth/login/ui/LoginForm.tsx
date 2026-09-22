@@ -1,4 +1,5 @@
 import {
+  ITAlert,
   ITButton,
   ITCard,
   ITFlex,
@@ -15,6 +16,8 @@ interface LoginFormProps {
   password: string;
   setUsername: React.Dispatch<React.SetStateAction<string>>;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
+  errors: { username?: string; password?: string };
+  deactivatedMsg?: string | null;
   isSubmitting: boolean;
   canSubmit: boolean;
   toast: { message: string; type: "error" | "success" } | null;
@@ -27,6 +30,8 @@ export default function LoginForm({
   password,
   setUsername,
   setPassword,
+  errors,
+  deactivatedMsg,
   isSubmitting,
   canSubmit,
   toast,
@@ -46,24 +51,48 @@ export default function LoginForm({
           </ITText>
         </ITStack>
 
-        <form onSubmit={onSubmit} className="space-y-4 mt-6">
+        {deactivatedMsg && (
+          <div className="mt-4">
+            <ITAlert variant="warning">
+              {deactivatedMsg}
+            </ITAlert>
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-4 mt-6" noValidate>
           <ITFlex direction="column" gap={4}>
-            <ITInput
-              name="username"
-              label={tt("login.userLabel")}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
-              autoFocus
-            />
-            <ITInput
-              name="password"
-              type="password"
-              label={tt("login.passwordLabel")}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
+            <div>
+              <ITInput
+                name="username"
+                label={tt("login.userLabel")}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+                autoFocus
+                aria-invalid={!!errors.username}
+              />
+              {errors.username && (
+                <span role="alert" className="text-red-500 text-xs mt-1 block">
+                  {errors.username}
+                </span>
+              )}
+            </div>
+            <div>
+              <ITInput
+                name="password"
+                type="password"
+                label={tt("login.passwordLabel")}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                aria-invalid={!!errors.password}
+              />
+              {errors.password && (
+                <span role="alert" className="text-red-500 text-xs mt-1 block">
+                  {errors.password}
+                </span>
+              )}
+            </div>
           </ITFlex>
 
           <ITButton
