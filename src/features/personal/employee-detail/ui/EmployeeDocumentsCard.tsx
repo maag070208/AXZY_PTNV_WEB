@@ -115,29 +115,34 @@ export default function EmployeeDocumentsCard({
               {files.length > 0 && (
                 <ITFlex direction="column" gap={1} className="mt-2">
                   {files.map((file) => (
-                    <ITFlex key={file.id} justify="between" align="center" gap={2}>
+                    <div
+                      key={file.id}
+                      className="group flex items-center justify-between gap-2 rounded-md px-2 py-1.5 -mx-1 hover:bg-slate-100 transition-colors"
+                    >
                       <a
                         href={file.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-1.5 min-w-0 text-blue-600 hover:underline"
+                        className="flex items-center gap-2 min-w-0 text-slate-700 hover:text-blue-600 transition-colors"
                       >
                         {file.mimeType === "application/pdf" ? (
-                          <FaFilePdf size={10} className="shrink-0" />
+                          <FaFilePdf size={11} className="shrink-0 text-red-500" />
                         ) : (
-                          <FaFileAlt size={10} className="shrink-0" />
+                          <FaFileAlt size={11} className="shrink-0 text-slate-400" />
                         )}
-                        <span className="truncate text-[10px] font-bold">{file.originalName}</span>
+                        <span className="truncate text-[11px] font-medium group-hover:text-blue-600 group-hover:underline">
+                          {file.originalName}
+                        </span>
                       </a>
                       <button
                         type="button"
                         onClick={() => onRemove(file.id)}
                         title={tt("common:actions.delete")}
-                        className="shrink-0 text-slate-300 hover:text-red-500"
+                        className="shrink-0 inline-flex items-center justify-center h-6 w-6 rounded-full text-slate-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 transition-all"
                       >
                         <FaTimes size={11} />
                       </button>
-                    </ITFlex>
+                    </div>
                   ))}
                 </ITFlex>
               )}
