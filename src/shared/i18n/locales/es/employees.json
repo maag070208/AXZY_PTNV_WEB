@@ -95,6 +95,12 @@
       "bloodType": "Tipo de Sangre",
       "condition": "Padecimiento",
       "allergies": "Alergias"
+    },
+    "subGroups": {
+      "identification": "Identificación",
+      "fiscal": "Fiscal",
+      "contact": "Contacto",
+      "address": "Dirección"
     }
   },
   "catalog": {
