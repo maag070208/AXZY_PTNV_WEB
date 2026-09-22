@@ -55,14 +55,8 @@ export default function EmployeeDocumentsCard({
   const uploadingType = documentTypes.find((t) => t.id === uploadingDocTypeId);
 
   return (
-    <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-5 sm:p-6">
+    <div className="w-full min-w-0 bg-white mt-2 rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-5 sm:p-6">
       <ITFlex justify="between" align="center" gap={2} className="mb-4 flex-wrap">
-        <ITFlex align="center" gap={2}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
-            <FaPaperclip size={13} className="text-white" />
-          </div>
-          <ITText className="text-[13px] font-black text-slate-800">{tt("detail.documentsTitle")}</ITText>
-        </ITFlex>
         <ITFlex align="center" gap={1.5}>
           <FaPaperclip size={10} className="text-slate-400" />
           <ITText className="text-[11px] font-bold text-slate-400">
