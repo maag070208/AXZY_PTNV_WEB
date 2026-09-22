@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { PersonalProfile } from "@entities/personal";
+import { personalApi } from "@entities/personal";
 import { generarCredencialQR, fotoComoDataUrl, inicialesDe } from "./credencial";
 import { credencialDataUrl } from "./imagen";
 
@@ -43,7 +44,9 @@ export const useCredencialEmpleado = (
       try {
         const [qr, foto] = await Promise.all([
           generarCredencialQR(profile),
-          fotoComoDataUrl(profile.fotoUrl),
+          fotoComoDataUrl(
+            profile.id ? personalApi.fotoRawUrl(profile.id) : null
+          ),
         ]);
         if (cancelado) return;
         const inicialesValor = inicialesDe(profile.name);

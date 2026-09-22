@@ -1,5 +1,6 @@
 import { api } from "@shared/api/client";
 import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
+import { API_CONSTANTS } from "@shared/api/constants/API_CONSTANTS";
 import type {
   PersonalProfile,
   PersonalProfileUpdateInput,
@@ -30,6 +31,8 @@ export const personalApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  fotoRawUrl: (id: string) => `${API_CONSTANTS.BASE_URL}/personal/${id}/foto/raw`,
 
   documents: (id: string) => api.get<EmployeeDocument[]>(`/personal/${id}/documentos`),
   uploadDocument: (id: string, tipoDocumentoId: string, file: File) => {
