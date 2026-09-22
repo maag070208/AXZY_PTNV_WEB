@@ -63,7 +63,7 @@ export default function UsersListPage() {
     >
       <UsersTable
         fx={fx}
-        onView={(u) => navigate(`/usuarios/${u.id}`)}
+        onView={(u) => navigate(`/empleados/${u.id}`)}
         onEdit={(u) => navigate(`/usuarios/${u.id}/editar`)}
       />
 

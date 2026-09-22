@@ -58,7 +58,7 @@ export default function UserHistoryPage() {
       icon={<FaUserShield size={20} />}
       breadcrumbs={[
         { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
-        { label: user.name, onClick: () => navigate(`/usuarios/${id}`) },
+        { label: user.name },
       ]}
     >
       <UserHeaderCard user={user} />
