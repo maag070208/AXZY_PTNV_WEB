@@ -11,7 +11,8 @@ interface Props {
 }
 
 const styles = StyleSheet.create({
-  diasAlerta: { fontSize: 7.8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.danger },
+  diasAlerta: { fontSize: 7.8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.danger, textAlign: "right" },
+  celdaNumero: { textAlign: "right" },
 });
 
 const fmtDate = (d: string | null): string => {
@@ -26,13 +27,15 @@ const fmtDate = (d: string | null): string => {
 const origenBadgeStyle = (origen: AsignadoRow["origen"]) =>
   origen === "CARTA" ? badgeStyleFor("success") : origen === "MOVIMIENTO" ? badgeStyleFor("warning") : badgeStyleFor("gray");
 
+// Anchos en puntos; suman ~526 (folio LETTER − padding horizontal de 36×2),
+// igual que DevicePDF para que ambos reportes se lean igual.
 const COL = {
   activo: 68,
-  desc: 112,
-  resp: 92,
-  depto: 70,
+  desc: 114,
+  resp: 94,
+  depto: 72,
   folio: 50,
-  fecha: 48,
+  fecha: 50,
   dias: 36,
   origen: 42,
 };
@@ -58,7 +61,7 @@ export default function AsignadosPDF({ rows, title }: Props) {
     { label: tt("pdf.summaryDepartamentos"), value: deptos, color: PDF_COLORS.bandAccent },
   ];
 
-  const ROWS_PER_PAGE = 26;
+  const ROWS_PER_PAGE = 24;
   const pages: AsignadoRow[][] = [];
   for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
     pages.push(rows.slice(i, i + ROWS_PER_PAGE));
@@ -83,7 +86,7 @@ export default function AsignadosPDF({ rows, title }: Props) {
               </View>
             )}
 
-            <View style={pdfTheme.tableHeader}>
+            <View style={pdfTheme.tableHeader} fixed>
               <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colActivo")}</Text></View>
               <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescripcion")}</Text></View>
               <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colResponsable")}</Text></View>
@@ -106,7 +109,7 @@ export default function AsignadosPDF({ rows, title }: Props) {
                 <View style={{ width: COL.folio }}><Text style={pdfTheme.cellMuted}>{r.folio ?? "—"}</Text></View>
                 <View style={{ width: COL.fecha }}><Text style={pdfTheme.cellMuted}>{fmtDate(r.fecha)}</Text></View>
                 <View style={{ width: COL.dias }}>
-                  <Text style={(r.diasAsignado ?? 0) > 30 ? styles.diasAlerta : pdfTheme.cell}>
+                  <Text style={(r.diasAsignado ?? 0) > 30 ? styles.diasAlerta : [pdfTheme.cell, styles.celdaNumero]}>
                     {r.diasAsignado ?? "—"}
                   </Text>
                 </View>

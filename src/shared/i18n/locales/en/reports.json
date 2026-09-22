@@ -46,7 +46,11 @@
     "colDias": "Days assigned",
     "colFolio": "Folio",
     "colArea": "Area",
-    "loteTag": "Batch ×{{count}}"
+    "loteTag": "Batch ×{{count}}",
+    "estadoAsignado": "Assigned",
+    "estadoDisponible": "Available",
+    "estadoBaja": "Retired",
+    "estadoOtro": "Other"
   },
   "salidas": {
     "statTotal": "Records",

@@ -30,7 +30,13 @@ export const useAdminDashboard = (enabled: boolean = true) => {
 
   useAblyChannel(enabled ? "dashboard" : undefined, {
     UPDATE: (data: unknown) => {
-      const event = data as { scope?: DashboardActivity["scope"]; message?: string; at?: string };
+      const event = data as {
+        scope?: DashboardActivity["scope"];
+        message?: string;
+        at?: string;
+        targetId?: string | null;
+        deviceId?: string | null;
+      };
       if (event?.message) {
         setLiveActivity((prev) => [
           {
@@ -38,6 +44,8 @@ export const useAdminDashboard = (enabled: boolean = true) => {
             scope: event.scope ?? "inventory",
             message: event.message!,
             at: event.at ?? new Date().toISOString(),
+            targetId: event.targetId ?? null,
+            deviceId: event.deviceId ?? null,
           },
           ...prev,
         ].slice(0, MAX_LIVE_ACTIVITY));

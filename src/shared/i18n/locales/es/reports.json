@@ -46,7 +46,11 @@
     "colDias": "Días asignado",
     "colFolio": "Folio",
     "colArea": "Área",
-    "loteTag": "Lote ×{{count}}"
+    "loteTag": "Lote ×{{count}}",
+    "estadoAsignado": "Asignado",
+    "estadoDisponible": "Disponible",
+    "estadoBaja": "Baja",
+    "estadoOtro": "Otro"
   },
   "salidas": {
     "statTotal": "Registros",

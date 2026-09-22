@@ -5,6 +5,8 @@ export interface DashboardActivity {
   scope: DashboardActivityScope;
   message: string;
   at: string;
+  targetId?: string | null;
+  deviceId?: string | null;
 }
 
 export interface DashboardSummary {

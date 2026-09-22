@@ -11,15 +11,6 @@ import type { Column } from "@axzydev/axzy_ui_system";
 import type { DeviceReportRow } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
 
-const estadoBadge = (estado: string) => (
-  <ITBadget
-    color={estado === "DISPONIBLE" ? "success" : estado === "ASIGNADO" ? "warning" : "gray"}
-    size="lg"
-  >
-    {estado}
-  </ITBadget>
-);
-
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const {
     t,
@@ -33,6 +24,24 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     handleDownloadPdf,
     fetchTableData,
   } = fx;
+
+  const estadoLabel = (estado: string) =>
+    estado === "ASIGNADO"
+      ? t("devices.estadoAsignado")
+      : estado === "DISPONIBLE"
+        ? t("devices.estadoDisponible")
+        : estado === "BAJA"
+          ? t("devices.estadoBaja")
+          : t("devices.estadoOtro");
+
+  const estadoBadge = (estado: string) => (
+    <ITBadget
+      color={estado === "DISPONIBLE" ? "success" : estado === "ASIGNADO" ? "warning" : "gray"}
+      size="lg"
+    >
+      {estadoLabel(estado)}
+    </ITBadget>
+  );
 
   const columns: Column<DeviceReportRow>[] = [
     {

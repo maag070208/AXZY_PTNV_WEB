@@ -130,6 +130,20 @@
     "loading": "Loading…",
     "empty": "No records in the history"
   },
+  "detail": {
+    "title": "Staff detail",
+    "breadcrumb": "Detail",
+    "notFound": "User not found",
+    "historyButton": "History",
+    "editButton": "Edit",
+    "account": "Account",
+    "personal": "Personal",
+    "organization": "Organization",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "fullName": "Full name"
+  },
   "import": {
     "title": "Upload users from Excel",
     "description": "The file must include the columns \"Employee Name\", \"Username\" and \"Password\" in the first sheet. All users are created with the Employee role and no department assigned (you assign it later for each one).",

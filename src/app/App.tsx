@@ -23,10 +23,12 @@ import EmployeesListPage from "@pages/employees/EmployeesListPage";
 import EmployeeDetailPage from "@pages/employees/EmployeeDetailPage";
 import EmployeeProfileEditPage from "@pages/employees/EmployeeProfileEditPage";
 import ReportesPersonalPage from "@pages/employees/ReportesPersonalPage";
+import ActaDetailPage from "@pages/employees/ActaDetailPage";
 import DocumentCatalogPage from "@pages/employees/DocumentCatalogPage";
 import ReportesPage from "@pages/reports/ReportesPage";
 import UsersListPage from "@pages/users/UsersListPage";
 import UserFormPage from "@pages/users/UserFormPage";
+import UserDetailPage from "@pages/users/UserDetailPage";
 import UserHistoryPage from "@pages/users/UserHistoryPage";
 import UserImportPage from "@pages/users/UserImportPage";
 import TicketsListPage from "@pages/tickets/TicketsListPage";
@@ -77,10 +79,12 @@ export default function App() {
         <Route path="/empleados/catalogos/documentos" element={<DocumentCatalogPage />} />
         <Route path="/empleados/:id/editar" element={<EmployeeProfileEditPage />} />
         <Route path="/empleados/reportes" element={<ReportesPersonalPage />} />
+        <Route path="/empleados/reportes/:id" element={<ActaDetailPage />} />
         <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
         <Route path="/reportes" element={<ReportesPage />} />
         <Route path="/usuarios" element={<UsersListPage />} />
         <Route path="/usuarios/nuevo" element={<UserFormPage />} />
+        <Route path="/usuarios/:id" element={<UserDetailPage />} />
         <Route path="/usuarios/:id/editar" element={<UserFormPage />} />
         <Route path="/usuarios/:id/historial" element={<UserHistoryPage />} />
         <Route path="/usuarios/importar" element={<UserImportPage />} />

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ITBadget, ITCard, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
 import {
   FaBoxOpen,
+  FaChevronRight,
   FaClock,
   FaFileSignature,
   FaHourglassHalf,
@@ -17,7 +18,8 @@ import {
   type RatingEspera,
 } from "@entities/ticket";
 import type { UseAdminDashboard } from "../model/useAdminDashboard";
-import BarChart from "./BarChart";
+import { activityHref } from "../model/activityLinks";
+import DonutChart from "./DonutChart";
 
 const SCOPE_ICON: Record<DashboardActivity["scope"], React.ReactNode> = {
   devices: <FaBoxOpen size={11} />,
@@ -79,11 +81,16 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
   if (!summary) return null;
 
   const avgDias = summary.ticketMetricas.avgResolucionDias;
-  const eficienciaBars = summary.ticketEficiencia.map((e, i) => ({
+  const eficienciaSegments = summary.ticketEficiencia.map((e, i) => ({
     label: e.user.name,
     value: e.resueltas,
     color: AGENT_COLORS[i % AGENT_COLORS.length],
   }));
+  const ticketStatusSegments = [
+    { label: t("adminDashboard.open"), value: summary.tickets.abierto, color: "#f59e0b" },
+    { label: t("adminDashboard.following"), value: summary.tickets.enSeguimiento, color: "#3b82f6" },
+    { label: t("adminDashboard.closed"), value: summary.tickets.cerrado, color: "#10b981" },
+  ];
   const urgente = (dias: number): RatingEspera => ratingEspera(dias);
 
   return (
@@ -140,12 +147,12 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
               {t("adminDashboard.teamEfficiency")}
             </ITText>
-            {eficienciaBars.length === 0 ? (
+            {eficienciaSegments.length === 0 ? (
               <ITText className="text-[12px] font-bold text-slate-400">
                 {t("adminDashboard.noEfficiency")}
               </ITText>
             ) : (
-              <BarChart bars={eficienciaBars} />
+              <DonutChart segments={eficienciaSegments} />
             )}
           </ITCard>
 
@@ -153,13 +160,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
               {t("adminDashboard.ticketsByStatus")}
             </ITText>
-            <BarChart
-              bars={[
-                { label: t("adminDashboard.open"), value: summary.tickets.abierto, color: "#f59e0b" },
-                { label: t("adminDashboard.following"), value: summary.tickets.enSeguimiento, color: "#3b82f6" },
-                { label: t("adminDashboard.closed"), value: summary.tickets.cerrado, color: "#10b981" },
-              ]}
-            />
+            <DonutChart segments={ticketStatusSegments} />
           </ITCard>
         </ITGrid>
 
@@ -173,17 +174,17 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
                 {t("adminDashboard.noUrgent")}
               </ITText>
             ) : (
-              <div className="flex flex-col divide-y divide-slate-100">
+              <div className="flex flex-col gap-2">
                 {summary.ticketsUrgentes.map((u) => {
                   const rating = urgente(u.diasEnEspera);
                   return (
                     <button
                       key={u.id}
-                      className="flex items-center gap-2 py-2 text-left hover:bg-slate-50"
+                      className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-left hover:bg-slate-100 transition-colors"
                       onClick={() => navigate(`/tickets/${u.id}`)}
                     >
                       <ITFlex direction="column" gap={0.5} className="min-w-0 flex-1">
-                        <ITText className="text-[11px] font-bold text-slate-700 truncate">
+                        <ITText className="text-[11px] font-semibold text-slate-600 truncate">
                           {u.titulo}
                         </ITText>
                         <ITText className="text-[9px] text-slate-400">
@@ -192,7 +193,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
                         </ITText>
                       </ITFlex>
                       <ITFlex align="center" gap={1} className="shrink-0">
-                        <ITText className="text-[11px] font-black text-slate-700">
+                        <ITText className="text-[11px] font-bold text-slate-600">
                           {u.diasEnEspera} d
                         </ITText>
                         <ITBadget
@@ -219,25 +220,44 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
               </ITText>
             ) : (
               <div className="flex flex-col gap-2 max-h-[260px] overflow-y-auto pr-1">
-                {activity.map((a) => (
-                  <ITFlex key={a.id} align="center" gap={2}>
-                    <ITFlex
-                      align="center"
-                      justify="center"
-                      className={`w-6 h-6 shrink-0 rounded-full text-white ${SCOPE_COLOR[a.scope]}`}
+                {activity.map((a) => {
+                  const href = activityHref(a);
+                  const row = (
+                    <>
+                      <ITFlex
+                        align="center"
+                        justify="center"
+                        className={`w-6 h-6 shrink-0 rounded-full text-white ${SCOPE_COLOR[a.scope]}`}
+                      >
+                        {SCOPE_ICON[a.scope]}
+                      </ITFlex>
+                      <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
+                        <ITText className="text-[11px] font-bold text-slate-700 truncate">
+                          {a.message}
+                        </ITText>
+                        <ITText className="text-[9px] text-slate-400">
+                          {formatFechaHora(a.at)}
+                        </ITText>
+                      </ITFlex>
+                      {href && (
+                        <FaChevronRight size={9} className="text-slate-300 shrink-0" />
+                      )}
+                    </>
+                  );
+                  return href ? (
+                    <button
+                      key={a.id}
+                      className="flex items-center gap-2 rounded-lg px-1.5 py-1 text-left hover:bg-slate-100 cursor-pointer transition-colors"
+                      onClick={() => navigate(href)}
                     >
-                      {SCOPE_ICON[a.scope]}
+                      {row}
+                    </button>
+                  ) : (
+                    <ITFlex key={a.id} align="center" gap={2}>
+                      {row}
                     </ITFlex>
-                    <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
-                      <ITText className="text-[11px] font-bold text-slate-700 truncate">
-                        {a.message}
-                      </ITText>
-                      <ITText className="text-[9px] text-slate-400">
-                        {formatFechaHora(a.at)}
-                      </ITText>
-                    </ITFlex>
-                  </ITFlex>
-                ))}
+                  );
+                })}
               </div>
             )}
           </ITCard>

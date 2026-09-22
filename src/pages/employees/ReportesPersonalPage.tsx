@@ -2,7 +2,6 @@ import {
   ITAlert,
   ITButton,
   ITConfirmDialog,
-  ITDialog,
   ITFlex,
   ITPage,
   ITText,
@@ -17,14 +16,12 @@ import {
   ActasTable,
   ActaAdministrativaForm,
 } from "@features/personal/actas-reporte";
-import { ActaAdministrativaPreview, descargarActaPDF } from "@widgets/acta-administrativa";
 
 export default function ReportesPersonalPage() {
   const { t: tt } = useTranslation(["actas", "common"]);
   const navigate = useNavigate();
   const fx = useActasReporte();
   const [actaParaBorrar, setActaParaBorrar] = useState<ActaAdministrativa | null>(null);
-  const [actaVista, setActaVista] = useState<ActaAdministrativa | null>(null);
 
   return (
     <ITPage
@@ -54,8 +51,7 @@ export default function ReportesPersonalPage() {
       <ActasTable
         fetchData={fx.fetchTableData}
         reloadKey={fx.reloadKey}
-        onView={(acta) => setActaVista(acta)}
-        onDownload={(acta) => void descargarActaPDF(acta)}
+        onView={(acta) => navigate(`/empleados/reportes/${acta.id}`)}
         onDelete={(acta) => setActaParaBorrar(acta)}
       />
 
@@ -65,28 +61,6 @@ export default function ReportesPersonalPage() {
         onClose={() => fx.setShowForm(false)}
         onSave={(input) => void fx.createActa(input)}
       />
-
-      <ITDialog
-        isOpen={!!actaVista}
-        onClose={() => setActaVista(null)}
-        className="w-full max-w-3xl"
-        title={tt("preview.title")}
-      >
-        {actaVista && (
-          <>
-            <ITFlex justify="end" className="mb-3">
-              <ITButton
-                variant="filled"
-                color="primary"
-                onClick={() => void descargarActaPDF(actaVista)}
-              >
-                <ITText className="font-bold text-[11px]">{tt("preview.descargar")}</ITText>
-              </ITButton>
-            </ITFlex>
-            <ActaAdministrativaPreview acta={actaVista} />
-          </>
-        )}
-      </ITDialog>
 
       <ITConfirmDialog
         isOpen={!!actaParaBorrar}

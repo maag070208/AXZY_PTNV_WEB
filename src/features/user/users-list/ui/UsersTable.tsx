@@ -17,7 +17,7 @@ import type { UseUsersList } from "../model/useUsersList";
 
 interface Props {
   fx: UseUsersList;
-  onViewHistory: (u: User) => void;
+  onView: (u: User) => void;
   onEdit: (u: User) => void;
 }
 
@@ -38,8 +38,8 @@ const roleBadge = (role: string) => (
   </ITBadget>
 );
 
-export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
-  const { t: tt } = useTranslation(["users"]);
+export default function UsersTable({ fx, onView, onEdit }: Props) {
+  const { t: tt } = useTranslation(["users", "common"]);
   const columns: Column<User>[] = [
     {
       key: "username",
@@ -126,7 +126,12 @@ export default function UsersTable({ fx, onViewHistory, onEdit }: Props) {
       sortable: false,
       render: (u) => (
         <ITFlex align="center" gap={2}>
-          <ITButton onClick={() => onViewHistory(u)} size="lg" color="secondary">
+          <ITButton
+            onClick={() => onView(u)}
+            size="lg"
+            color="secondary"
+            title={tt("common:actions.view")}
+          >
             <FaEye size={14} />
           </ITButton>
           <ITButton onClick={() => onEdit(u)} size="lg" color="gray">

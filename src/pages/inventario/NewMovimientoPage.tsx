@@ -267,7 +267,7 @@ export default function NewMovimientoPage() {
                 </ITFlex>
 
                 {(r.tipo === "BAJA" || r.tipo === "MANTENIMIENTO_ENTRADA") && (
-                  <ITInput name="motivo" label={t("new.motivo")} value={r.motivo} onChange={(e) => updateRow(r.key, { motivo: e.target.value })} required />
+                  <ITInput name={`motivo-${r.key}`} label={t("new.motivo")} value={r.motivo} onChange={(e) => updateRow(r.key, { motivo: e.target.value })} required />
                 )}
 
                 {r.tipo === "MANTENIMIENTO_SALIDA" && (
@@ -290,7 +290,7 @@ export default function NewMovimientoPage() {
                             );
                           })}
                         </ITFlex>
-                        <ITInput name="observaciones" label={t("new.comentario")} value={r.observaciones} onChange={(e) => updateRow(r.key, { observaciones: e.target.value })} />
+                        <ITInput name={`observaciones-${r.key}`} label={t("new.comentario")} value={r.observaciones} onChange={(e) => updateRow(r.key, { observaciones: e.target.value })} />
                         {r.condicion === "ROTO" && (
                           <ITText className="text-[11px] font-semibold text-red-600">{t("devolucion.rotoBajaHint")}</ITText>
                         )}

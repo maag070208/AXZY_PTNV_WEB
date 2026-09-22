@@ -11,7 +11,13 @@ interface Props {
 }
 
 const styles = StyleSheet.create({
-  diasAlerta: { fontSize: 7.8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.danger },
+  diasAlerta: {
+    fontSize: 7.8,
+    fontFamily: "Helvetica-Bold",
+    color: PDF_COLORS.danger,
+    textAlign: "right",
+  },
+  celdaNumero: { textAlign: "right" },
 });
 
 const fmtDate = (d: string | null): string => {
@@ -26,15 +32,16 @@ const fmtDate = (d: string | null): string => {
 const estadoBadge = (estado: string) =>
   estado === "DISPONIBLE" ? badgeStyleFor("success") : estado === "ASIGNADO" ? badgeStyleFor("warning") : badgeStyleFor("gray");
 
+// Anchos en puntos; suman ~526 (folio LETTER − padding horizontal de 36×2).
+// Responsable es la columna de texto más ancha; Folio y Días quedan compactos.
 const COL = {
-  activo: 68,
-  desc: 144,
-  cant: 28,
-  estado: 50,
-  resp: 94,
-  depto: 72,
-  dias: 34,
-  folio: 36,
+  activo: 60,
+  desc: 148,
+  estado: 48,
+  resp: 118,
+  depto: 82,
+  folio: 46,
+  dias: 24,
 };
 
 export default function DevicePDF({ rows, title }: Props) {
@@ -57,7 +64,7 @@ export default function DevicePDF({ rows, title }: Props) {
     { label: tt("pdf.summaryBaja"), value: bajas, color: PDF_COLORS.gray },
   ];
 
-  const ROWS_PER_PAGE = 26;
+  const ROWS_PER_PAGE = 24;
   const pages: DeviceReportRow[][] = [];
   for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
     pages.push(rows.slice(i, i + ROWS_PER_PAGE));
@@ -82,15 +89,14 @@ export default function DevicePDF({ rows, title }: Props) {
               </View>
             )}
 
-            <View style={pdfTheme.tableHeader}>
+            <View style={pdfTheme.tableHeader} fixed>
               <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colActivo")}</Text></View>
               <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescripcion")}</Text></View>
-              <View style={{ width: COL.cant }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colCant")}</Text></View>
               <View style={{ width: COL.estado }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colEstado")}</Text></View>
               <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colResponsable")}</Text></View>
               <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDepto")}</Text></View>
-              <View style={{ width: COL.dias }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDias")}</Text></View>
               <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFolio")}</Text></View>
+              <View style={{ width: COL.dias }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDias")}</Text></View>
             </View>
 
             {pageRows.map((r, i) => (
@@ -100,18 +106,30 @@ export default function DevicePDF({ rows, title }: Props) {
                   <Text style={pdfTheme.cellDescTitle}>{r.descripcion}</Text>
                   <Text style={pdfTheme.cellDescSub}>{r.tipo} · {r.marca} {r.modelo}</Text>
                 </View>
-                <View style={{ width: COL.cant }}><Text style={pdfTheme.cell}>{r.cantidad}</Text></View>
                 <View style={{ width: COL.estado }}>
                   <Text style={estadoBadge(r.estado)}>{estadoLabel(r.estado)}</Text>
                 </View>
-                <View style={{ width: COL.resp }}><Text style={pdfTheme.cell}>{r.estado === "ASIGNADO" ? r.responsable ?? "—" : "—"}</Text></View>
+                <View style={{ width: COL.resp }}>
+                  {r.estado === "ASIGNADO" ? (
+                    <>
+                      <Text style={pdfTheme.cell}>{r.responsable ?? "—"}</Text>
+                      {r.numeroEmpleado && (
+                        <Text style={pdfTheme.cellDescSub}>No. {r.numeroEmpleado}</Text>
+                      )}
+                    </>
+                  ) : (
+                    <Text style={pdfTheme.cell}>—</Text>
+                  )}
+                </View>
                 <View style={{ width: COL.depto }}><Text style={pdfTheme.cellMuted}>{r.estado === "ASIGNADO" ? r.departamento ?? "—" : "—"}</Text></View>
+                <View style={{ width: COL.folio }}>
+                  <Text style={[pdfTheme.cellMuted, styles.celdaNumero]}>{r.estado === "ASIGNADO" ? r.folio ?? "—" : "—"}</Text>
+                </View>
                 <View style={{ width: COL.dias }}>
-                  <Text style={r.estado === "ASIGNADO" && (r.diasAsignado ?? 0) > 30 ? styles.diasAlerta : pdfTheme.cell}>
+                  <Text style={r.estado === "ASIGNADO" && (r.diasAsignado ?? 0) > 30 ? styles.diasAlerta : [pdfTheme.cell, styles.celdaNumero]}>
                     {r.estado === "ASIGNADO" ? r.diasAsignado ?? "—" : "—"}
                   </Text>
                 </View>
-                <View style={{ width: COL.folio }}><Text style={pdfTheme.cellMuted}>{r.estado === "ASIGNADO" ? r.folio ?? "—" : "—"}</Text></View>
               </View>
             ))}
           </View>

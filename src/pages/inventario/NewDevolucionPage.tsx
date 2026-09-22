@@ -186,7 +186,7 @@ export default function NewDevolucionPage() {
                         <ITGrid container columns={12} spacing={4}>
                           <ITGrid item xs={12} md={3}>
                             <ITInput
-                              name="devolver"
+                              name={`devolver-${r.key}`}
                               label={t("devolucion.devolver")}
                               type="number"
                               min={0}
@@ -230,7 +230,7 @@ export default function NewDevolucionPage() {
                         )}
                         {(r.condicion === "MALO" || r.condicion === "ROTO") && (
                           <ITInput
-                            name="observaciones"
+                            name={`observaciones-${r.key}`}
                             label={t("new.comentario")}
                             placeholder={t("devolucion.comentarioPlaceholder")}
                             value={r.observaciones}

@@ -130,6 +130,20 @@
     "loading": "Cargando…",
     "empty": "Sin registros en el historial"
   },
+  "detail": {
+    "title": "Detalle del personal",
+    "breadcrumb": "Detalle",
+    "notFound": "Usuario no encontrado",
+    "historyButton": "Historial",
+    "editButton": "Editar",
+    "account": "Cuenta",
+    "personal": "Personal",
+    "organization": "Organización",
+    "status": "Estado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "fullName": "Nombre completo"
+  },
   "import": {
     "title": "Cargar usuarios desde Excel",
     "description": "El archivo debe traer columnas \"Nombre del empleado\", \"Nombre de usuario\" y \"Contraseña\" en la primera hoja. Todos se crean con rol Empleado y sin departamento asignado (lo asignas después en cada uno).",

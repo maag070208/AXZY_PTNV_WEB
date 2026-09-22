@@ -10,7 +10,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaFilePdf, FaTrash } from "react-icons/fa6";
+import { FaEye, FaTrash } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
 import type { ActaAdministrativa } from "@entities/personal";
 
@@ -31,7 +31,6 @@ interface Props {
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
   onView: (acta: ActaAdministrativa) => void;
-  onDownload: (acta: ActaAdministrativa) => void;
   onDelete: (acta: ActaAdministrativa) => void;
 }
 
@@ -39,7 +38,6 @@ export default function ActasTable({
   fetchData,
   reloadKey,
   onView,
-  onDownload,
   onDelete,
 }: Props) {
   const { t: tt } = useTranslation("actas");
@@ -138,23 +136,15 @@ export default function ActasTable({
           <ITButton
             onClick={() => onView(a)}
             size="lg"
-            color="danger"
+            color="secondary"
             title={tt("actions.ver")}
           >
-            <FaFilePdf size={14} />
-          </ITButton>
-          <ITButton
-            onClick={() => onDownload(a)}
-            size="lg"
-            color="secondary"
-            title={tt("actions.descargar")}
-          >
-            <FaFilePdf size={14} />
+            <FaEye size={14} />
           </ITButton>
           <ITButton
             onClick={() => onDelete(a)}
             size="lg"
-            color="gray"
+            color="danger"
             title={tt("actions.eliminar")}
           >
             <FaTrash size={14} />
