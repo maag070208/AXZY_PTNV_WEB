@@ -67,18 +67,21 @@ export default function EmployeeDocumentsCard({
 
       <ITFlex gap={3} className="mb-4 flex-wrap">
         <StatCard
+          className="flex-1 min-w-0"
           icon={<FaPaperclip size={14} className="text-blue-600" />}
           circleClass="bg-blue-50"
           value={requiredCount}
           label={tt("detail.requiredTypes")}
         />
         <StatCard
+          className="flex-1 min-w-0"
           icon={<FaCheckCircle size={14} className="text-emerald-600" />}
           circleClass="bg-emerald-50"
           value={uploadedCount}
           label={tt("detail.uploadedUnique")}
         />
         <StatCard
+          className="flex-1 min-w-0"
           icon={<FaHourglassHalf size={14} className="text-orange-600" />}
           circleClass="bg-orange-50"
           value={pendingCount}
