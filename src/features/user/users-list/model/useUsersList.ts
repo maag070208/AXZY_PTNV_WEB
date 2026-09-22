@@ -77,7 +77,7 @@ export const useUsersList = () => {
     const target = userToReactivate;
     setUserToReactivate(null);
     try {
-      await usersApi.update(target.id, { active: true });
+      await usersApi.reactivate(target.id);
       setReloadKey((k) => k + 1);
       setToast({ message: tt("list.toastReactivated"), type: "success" });
     } catch (e: any) {

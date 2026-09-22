@@ -133,7 +133,7 @@ export const useEmployeeDetail = (id: string | undefined) => {
     if (!id) return;
     setError(null);
     try {
-      await usersApi.update(id, { active: true });
+      await usersApi.reactivate(id);
       setProfile((p) => (p ? { ...p, active: true } : p));
     } catch (e: any) {
       setError(e.message ?? i18n.t("employees:detail.reactivateError"));
