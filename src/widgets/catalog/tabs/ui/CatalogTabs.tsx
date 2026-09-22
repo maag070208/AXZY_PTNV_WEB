@@ -1,5 +1,5 @@
 import { ITTabs } from "@axzydev/axzy_ui_system";
-import { FaBuilding, FaTint, FaFileAlt, FaMicrochip, FaNetworkWired, FaVenusMars } from "react-icons/fa";
+import { FaBuilding, FaTint, FaFileAlt, FaMicrochip, FaNetworkWired, FaVenusMars, FaEnvelope } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { DepartamentosPanel } from "@widgets/catalog/departamentos";
 import { SubareasPanel } from "@widgets/catalog/subareas";
@@ -9,6 +9,7 @@ import {
   GenerosTab,
   TiposSangreTab,
 } from "@features/catalog";
+import { SysConfigTab } from "@features/sys-config";
 
 export default function CatalogTabs() {
   const { t } = useTranslation("catalog");
@@ -49,6 +50,12 @@ export default function CatalogTabs() {
       label: t("tabs.tiposSangre"),
       icon: <FaTint size={13} />,
       content: <TiposSangreTab />,
+    },
+    {
+      id: "notificaciones",
+      label: t("tabs.notificaciones"),
+      icon: <FaEnvelope size={13} />,
+      content: <SysConfigTab />,
     },
   ];
 

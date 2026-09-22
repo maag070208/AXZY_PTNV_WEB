@@ -7,7 +7,8 @@
     "tiposDispositivo": "Device types",
     "tiposDocumento": "Document types",
     "generos": "Genders",
-    "tiposSangre": "Blood types"
+    "tiposSangre": "Blood types",
+    "notificaciones": "Notifications"
   },
   "name": "Name",
   "status": "Status",
@@ -20,5 +21,19 @@
   "deleteForever": "Delete permanently",
   "deleteForeverConfirm": "This will permanently delete \"{{name}}\". This action cannot be undone.",
   "saveError": "Could not save",
-  "deleteError": "Could not delete"
+  "deleteError": "Could not delete",
+  "sysConfig": {
+    "title": "Notifications Configuration",
+    "subtitle": "Recipients for system notification copies",
+    "recipientsLabel": "Recipient emails",
+    "recipientsHelp": "Comma separated. E.g.: aamaro@axzy.dev, maag070208@gmail.com",
+    "currentValue": "Current configuration",
+    "invalidCount": "{n} invalid email(s)",
+    "validCount": "{n} valid email(s)",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Configuration saved",
+    "saveError": "Failed to save",
+    "empty": "No recipients configured"
+  }
 }
