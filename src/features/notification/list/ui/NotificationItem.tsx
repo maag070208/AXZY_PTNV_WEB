@@ -1,5 +1,13 @@
 import { ITText } from "@axzydev/axzy_ui_system";
-import { FaCheck, FaComment, FaTicketAlt, FaTrash } from "react-icons/fa";
+import {
+  FaCheck,
+  FaComment,
+  FaFileUpload,
+  FaTicketAlt,
+  FaTrash,
+  FaUserPlus,
+  FaUserSlash,
+} from "react-icons/fa";
 import type { Notification } from "@entities/notification";
 import { formatFechaHora } from "@shared/utils/dates";
 
@@ -8,6 +16,9 @@ const TYPE_STYLES: Record<string, { icon: React.ReactNode; color: string }> = {
   ASSIGNED: { icon: <FaTicketAlt size={12} />, color: "bg-violet-500" },
   TICKET_UPDATED: { icon: <FaTicketAlt size={12} />, color: "bg-amber-500" },
   TICKET_CREATED: { icon: <FaTicketAlt size={12} />, color: "bg-emerald-500" },
+  USER_CREATED: { icon: <FaUserPlus size={12} />, color: "bg-emerald-500" },
+  USER_DEACTIVATED: { icon: <FaUserSlash size={12} />, color: "bg-red-500" },
+  EMPLOYEE_DOC_UPLOADED: { icon: <FaFileUpload size={12} />, color: "bg-blue-600" },
 };
 
 export default function NotificationItem({
