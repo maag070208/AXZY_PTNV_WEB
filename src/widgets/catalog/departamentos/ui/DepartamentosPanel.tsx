@@ -7,6 +7,7 @@ import {
   ITInput,
   ITText,
 } from "@axzydev/axzy_ui_system";
+import { useEffect, useRef } from "react";
 import { FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -15,11 +16,20 @@ import {
   useDepartmentsCrud,
 } from "@features/department/departments-list";
 
-export default function DepartamentosPanel() {
+export default function DepartamentosPanel({ openCreateSignal }: { openCreateSignal?: number }) {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["departments", "common"]);
 
   const crud = useDepartmentsCrud();
+
+  const lastSignal = useRef(openCreateSignal);
+  const openCreate = useRef<() => void>(() => {});
+  openCreate.current = () => crud.setCreateOpen(true);
+  useEffect(() => {
+    if (openCreateSignal === lastSignal.current) return;
+    lastSignal.current = openCreateSignal;
+    openCreate.current();
+  }, [openCreateSignal]);
 
   return (
     <>
@@ -28,19 +38,6 @@ export default function DepartamentosPanel() {
           {crud.error}
         </ITAlert>
       )}
-
-      <div className="mb-4 flex justify-end">
-        <ITButton
-          variant="filled"
-          color="primary"
-          onClick={() => crud.setCreateOpen(true)}
-        >
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </div>
 
       <DepartmentsTable
         fetchData={crud.fetchTableData}

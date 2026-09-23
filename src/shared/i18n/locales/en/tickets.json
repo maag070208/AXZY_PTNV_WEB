@@ -10,12 +10,6 @@
     "ALTA": "High",
     "URGENTE": "Urgent"
   },
-  "categoryLabels": {
-    "MANTENIMIENTO": "Maintenance",
-    "EQUIPO": "Equipment",
-    "SISTEMA": "System",
-    "OTRO": "Other"
-  },
   "list": {
     "title": "Tickets",
     "description": "Tracking of requests and reports",

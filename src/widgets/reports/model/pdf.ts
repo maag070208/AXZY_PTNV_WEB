@@ -5,7 +5,7 @@ import type { ReportFilters, ReportRow, AsignadoRow, DeviceReportRow } from "@en
 import type { MaterialOutput } from "@entities/salida";
 import type {
   AccessReportPdfMeta,
-  AccessReportPersonRow,
+  AccessReportSessionRow,
   AccessReportSummary,
 } from "@entities/access";
 import ReportPDF from "../ui/ReportPDF";
@@ -56,7 +56,7 @@ export const downloadSalidasPDF = async (rows: MaterialOutput[]): Promise<void> 
 };
 
 export const downloadAccessReportPDF = async (
-  rows: AccessReportPersonRow[],
+  rows: AccessReportSessionRow[],
   summary: AccessReportSummary,
   meta: AccessReportPdfMeta
 ): Promise<void> => {

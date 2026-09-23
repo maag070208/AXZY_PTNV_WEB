@@ -95,7 +95,7 @@ export default function TicketDetailPage() {
       title={ticket.titulo}
       description={tt("detail.description", {
         status: dyn(tt)(`statusLabels.${ticket.status}`) ?? ticket.status,
-        category: dyn(tt)(`categoryLabels.${ticket.category}`) ?? ticket.category,
+        category: ticket.category?.nombre ?? "—",
       })}
       backAction={() => navigate(-1)}
       icon={<FaTicketAlt size={20} />}

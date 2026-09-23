@@ -7,6 +7,9 @@ import { sysConfigApi, type SysConfig } from "@entities/sys-config";
 // estricto — solo rechazar basura obvia antes de pegarle a la BD.
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Valida un solo correo (misma regla que usa el editor de destinatarios). */
+export const isValidEmail = (email: string): boolean => EMAIL_REGEX.test(email.trim());
+
 export interface EmailValidationResult {
   valid: string[];
   invalid: string[];

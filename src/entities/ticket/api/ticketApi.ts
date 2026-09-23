@@ -9,6 +9,7 @@ import type {
   TicketAssignment,
   TicketAssignmentComment,
   TicketAttachment,
+  TicketCategory,
   TicketComment,
   TicketInput,
 } from "../model/types";
@@ -52,11 +53,21 @@ export const ticketsApi = {
   update: (id: string, data: Partial<{
     status: string;
     priority: string;
-    category: string;
+    categoryId: string | null;
     asignadoAId: string | null;
     departmentId: string | null;
   }>) => api.put<Ticket>(`/tickets/${id}`, data),
   remove: (id: string) => api.delete<{ soft: boolean; data: Ticket }>(`/tickets/${id}`),
+  categories: (includeInactive?: boolean) =>
+    api.get<TicketCategory[]>(
+      `/tickets/categories${includeInactive ? "?includeInactive=true" : ""}`
+    ),
+  crearCategoria: (nombre: string) =>
+    api.post<TicketCategory>(`/tickets/categories`, { nombre }),
+  actualizarCategoria: (id: string, data: { nombre?: string; activo?: boolean }) =>
+    api.patch<TicketCategory>(`/tickets/categories/${id}`, data),
+  eliminarCategoria: (id: string) =>
+    api.delete<{ soft: boolean; data: TicketCategory }>(`/tickets/categories/${id}`),
   addComment: (id: string, texto: string) =>
     api.post<TicketComment>(`/tickets/${id}/comments`, { texto }),
   addAssignment: (

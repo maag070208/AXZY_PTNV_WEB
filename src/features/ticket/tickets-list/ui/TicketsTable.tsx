@@ -56,7 +56,7 @@ export default function TicketsTable({
             )}
           </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
-            {dyn(tt)(`categoryLabels.${t.category}`)}
+            {t.category?.nombre ?? "—"}
           </ITText>
         </ITFlex>
       ),

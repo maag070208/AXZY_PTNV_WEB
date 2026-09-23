@@ -54,13 +54,22 @@ export interface TicketAttachment {
   url: string;
 }
 
+export interface TicketCategory {
+  id: string;
+  nombre: string;
+  activo: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Ticket {
   id: string;
   titulo: string;
   descripcion: string;
   status: "ABIERTO" | "EN_SEGUIMIENTO" | "CERRADO";
   priority: "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
-  category: "MANTENIMIENTO" | "EQUIPO" | "SISTEMA" | "OTRO";
+  categoryId?: string | null;
+  category?: TicketCategory | null;
   creadoPorId: string;
   creadoPor: { id: string; name: string; username: string; puesto?: string };
   asignadoAId?: string | null;
@@ -82,7 +91,7 @@ export interface TicketInput {
   titulo: string;
   descripcion: string;
   priority?: string;
-  category?: string;
+  categoryId?: string;
   departmentId?: string;
   asignadoAId?: string;
 }

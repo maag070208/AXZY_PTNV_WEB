@@ -1,23 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ITAlert,
-  ITBadget,
   ITButton,
   ITCard,
   ITFlex,
+  ITInput,
   ITText,
-  ITTextarea,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaEnvelope, FaUndo } from "react-icons/fa";
+import { FaEnvelope, FaPlus, FaTrashAlt, FaUndo } from "react-icons/fa";
 import {
-  parseEmailRecipients,
+  isValidEmail,
   useGetSysConfig,
   useUpdateSysConfig,
 } from "@features/sys-config";
 
 const KEY = "EMAIL_NOTIFICATION_RECIPIENTS";
+
+const splitRecipients = (raw: string): string[] =>
+  raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
 interface ToastState {
   message: string;
@@ -29,32 +34,43 @@ export default function SysConfigTab() {
   const { data, loading, error, reload } = useGetSysConfig(KEY);
   const { mutate, loading: saving, error: saveError } = useUpdateSysConfig(KEY);
 
-  const [draft, setDraft] = useState<string>("");
-  const [dirty, setDirty] = useState<boolean>(false);
+  const [recipients, setRecipients] = useState<string[]>([]);
+  const [draftEmail, setDraftEmail] = useState("");
+  const [addError, setAddError] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
 
-  // Hidratar el editor cuando llega el valor remoto (solo si no está editando).
+  // Hidratar la lista cuando llega el valor remoto (solo si no está editando).
   useEffect(() => {
-    if (data && !dirty) setDraft(data.value);
+    if (data && !dirty) setRecipients(splitRecipients(data.value));
   }, [data, dirty]);
 
-  const { valid, invalid } = parseEmailRecipients(draft);
-  const hasErrors = invalid.length > 0;
-  const canSave = dirty && draft.trim().length > 0 && !hasErrors && !saving;
+  const addRecipient = () => {
+    const email = draftEmail.trim();
+    if (!email) return;
+    if (!isValidEmail(email)) {
+      setAddError(t("sysConfig.invalidEmail"));
+      return;
+    }
+    if (recipients.some((r) => r.toLowerCase() === email.toLowerCase())) {
+      setAddError(t("sysConfig.duplicateEmail"));
+      return;
+    }
+    setRecipients((prev) => [...prev, email]);
+    setDraftEmail("");
+    setAddError(null);
+    setDirty(true);
+  };
 
-  const recipientList = useMemo(
-    () =>
-      (data?.value ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-    [data?.value]
-  );
+  const removeRecipient = (email: string) => {
+    setRecipients((prev) => prev.filter((r) => r !== email));
+    setDirty(true);
+  };
 
   const handleSave = async () => {
-    if (!canSave) return;
+    if (!dirty || saving) return;
     try {
-      await mutate(draft);
+      await mutate(recipients.join(", "));
       setDirty(false);
       setToast({ message: t("sysConfig.saved"), type: "success" });
       await reload();
@@ -64,20 +80,22 @@ export default function SysConfigTab() {
   };
 
   const handleReset = () => {
-    setDraft(data?.value ?? "");
+    setRecipients(splitRecipients(data?.value ?? ""));
+    setDraftEmail("");
+    setAddError(null);
     setDirty(false);
   };
 
   return (
     <ITFlex direction="column" gap={4} className="pt-2">
       <ITFlex align="center" gap={2}>
-        <FaEnvelope className="text-[#0a4560]" />
+        <FaEnvelope className="text-[#0D5777]" />
         <ITText className="text-sm font-bold text-slate-800">
           {t("sysConfig.title")}
         </ITText>
       </ITFlex>
 
-      <p className="text-xs text-slate-500 -mt-2">{t("sysConfig.subtitle")}</p>
+      <ITText className="-mt-2 text-xs text-slate-500">{t("sysConfig.subtitle")}</ITText>
 
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => undefined}>
@@ -89,33 +107,6 @@ export default function SysConfigTab() {
           {saveError}
         </ITAlert>
       )}
-
-      <ITCard
-        title={t("sysConfig.currentValue")}
-        className="!p-5 border border-slate-200"
-      >
-        {loading ? (
-          <ITText className="text-xs text-slate-400">—</ITText>
-        ) : recipientList.length > 0 ? (
-          <ITFlex gap={1.5} className="flex-wrap">
-            {recipientList.map((email) => (
-              <ITBadget key={email} color="primary" size="lg">
-                {email}
-              </ITBadget>
-            ))}
-          </ITFlex>
-        ) : (
-          <ITText className="text-xs italic text-slate-400">
-            {t("sysConfig.empty")}
-          </ITText>
-        )}
-        {data?.updatedBy && (
-          <ITText className="text-[10px] text-slate-400 mt-3 block">
-            {data.updatedBy.name} ·{" "}
-            {new Date(data.updatedAt).toLocaleString("es-MX")}
-          </ITText>
-        )}
-      </ITCard>
 
       <ITCard
         title={t("sysConfig.recipientsLabel")}
@@ -139,7 +130,7 @@ export default function SysConfigTab() {
               variant="filled"
               color="primary"
               onClick={handleSave}
-              disabled={!canSave}
+              disabled={!dirty || saving}
             >
               <ITText className="font-bold text-[11px]">
                 {saving ? t("sysConfig.saving") : t("sysConfig.save")}
@@ -148,36 +139,85 @@ export default function SysConfigTab() {
           </ITFlex>
         }
       >
-        <ITTextarea
-          name="recipients"
-          value={draft}
-          onChange={(value) => {
-            setDraft(value);
-            setDirty(true);
-          }}
-          placeholder="aamaro@axzy.dev, maag070208@gmail.com"
-          rows={4}
-        />
-        <ITText className="text-[11px] text-slate-500 mt-1 block">
+        <ITFlex align="end" gap={2}>
+          <ITFlex grow={1} className="min-w-0">
+            <ITInput
+              name="newRecipient"
+              type="email"
+              label={t("sysConfig.newRecipientLabel")}
+              placeholder={t("sysConfig.newRecipientPlaceholder")}
+              value={draftEmail}
+              onChange={(e) => {
+                setDraftEmail(e.target.value);
+                if (addError) setAddError(null);
+              }}
+              onKeyDown={(e) => e.key === "Enter" && addRecipient()}
+              error={addError ?? undefined}
+            />
+          </ITFlex>
+          <ITButton
+            variant="filled"
+            color="primary"
+            onClick={addRecipient}
+            disabled={!draftEmail.trim()}
+            className="mt-1"
+          >
+            <ITFlex align="center" gap={1}>
+              <FaPlus size={11} />
+              <ITText className="font-bold text-[11px]">
+                {t("sysConfig.addRecipient")}
+              </ITText>
+            </ITFlex>
+          </ITButton>
+        </ITFlex>
+
+        <ITText className="mt-2 block text-[11px] text-slate-500">
           {t("sysConfig.recipientsHelp")}
         </ITText>
-        <ITFlex justify="between" align="center" className="mt-2">
-          <ITText
-            className={`text-[11px] font-bold ${
-              hasErrors ? "text-red-600" : "text-emerald-700"
-            }`}
-          >
-            {hasErrors
-              ? t("sysConfig.invalidCount", { n: invalid.length })
-              : t("sysConfig.validCount", { n: valid.length })}
-          </ITText>
-          {hasErrors && (
-            <ITText className="text-[11px] text-red-500 truncate max-w-[60%]">
-              {invalid.slice(0, 3).join(", ")}
-              {invalid.length > 3 ? "…" : ""}
+
+        <ITFlex direction="column" gap={2} className="mt-4">
+          {loading ? (
+            <ITText className="text-xs text-slate-400">—</ITText>
+          ) : recipients.length === 0 ? (
+            <ITText className="text-xs italic text-slate-400">
+              {t("sysConfig.empty")}
             </ITText>
+          ) : (
+            recipients.map((email) => (
+              <ITFlex
+                key={email}
+                align="center"
+                justify="between"
+                gap={2}
+                className="rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2"
+              >
+                <ITFlex align="center" gap={2} className="min-w-0">
+                  <FaEnvelope size={11} className="shrink-0 text-slate-400" />
+                  <ITText className="truncate text-[12px] font-medium text-slate-700">
+                    {email}
+                  </ITText>
+                </ITFlex>
+                <ITButton
+                  variant="icon-only"
+                  color="error"
+                  size="sm"
+                  onClick={() => removeRecipient(email)}
+                  ariaLabel={t("sysConfig.removeRecipient")}
+                  title={t("sysConfig.removeRecipient")}
+                >
+                  <FaTrashAlt size={11} />
+                </ITButton>
+              </ITFlex>
+            ))
           )}
         </ITFlex>
+
+        {data?.updatedBy && (
+          <ITText className="mt-3 block text-[10px] text-slate-400">
+            {data.updatedBy.name} ·{" "}
+            {new Date(data.updatedAt).toLocaleString("es-MX")}
+          </ITText>
+        )}
       </ITCard>
 
       {toast && (

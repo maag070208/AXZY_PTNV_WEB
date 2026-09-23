@@ -59,6 +59,14 @@ export interface Site {
   updatedAt: string;
 }
 
+/** Conteos para los KPIs de la bitácora (POST /access/stats). */
+export interface AccessStats {
+  total: number;
+  entries: number;
+  exits: number;
+  voided: number;
+}
+
 // ---------------------------------------------------------------------------
 // Reporte de entradas/salidas por persona (POST /access/report)
 // ---------------------------------------------------------------------------
@@ -108,6 +116,24 @@ export interface AccessReportPersonRow {
   days: AccessReportDay[];
 }
 
+/** Una fila por SESIÓN (entrada + salida) del periodo. Es la fila del reporte. */
+export interface AccessReportSessionRow {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  numeroEmpleado: string | null;
+  puesto: string | null;
+  departmentId: string | null;
+  departmentName: string | null;
+  active: boolean;
+  date: string;
+  entryAt: string | null;
+  exitAt: string | null;
+  workedMinutes: number;
+  incident: AccessIncidentCode | null;
+  crossesMidnight: boolean;
+}
+
 /** Rango de fechas resuelto por el servidor en la zona horaria efectiva. */
 export interface AccessReportRange {
   start: string;
@@ -129,7 +155,7 @@ export interface AccessReportSummary {
 
 /** Respuesta paginada de `/access/report` y de `/access/report/export`. */
 export interface AccessReportTableResponse {
-  data: AccessReportPersonRow[];
+  data: AccessReportSessionRow[];
   total: number;
   summary: AccessReportSummary;
 }

@@ -12,7 +12,8 @@
     "allDepartments": "Todos los departamentos",
     "employee": "Buscar empleado",
     "employeePlaceholder": "Nombre o número de empleado...",
-    "includeInactive": "Incluir bajas"
+    "includeInactive": "Incluir bajas",
+    "clear": "Limpiar filtros"
   },
   "kpis": {
     "withRecords": "Personas con registros",
@@ -32,13 +33,15 @@
     "department": "Departamento",
     "puesto": "Puesto",
     "status": "Estado",
-    "entry": "Entrada",
-    "exit": "Salida",
+    "entry": "Primera entrada",
+    "exit": "Última salida",
     "hours": "Horas",
     "sessions": "Sesiones",
     "days": "Días con registro",
     "incidents": "Incidencias",
-    "actions": ""
+    "actions": "",
+    "date": "Fecha",
+    "incident": "Incidencia"
   },
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entrada sin salida",
@@ -49,7 +52,9 @@
   "actions": {
     "viewDetail": "Ver detalle",
     "export": "Descargar PDF",
-    "exporting": "Generando…"
+    "exporting": "Generando…",
+    "exportPdf": "PDF",
+    "exportCsv": "CSV"
   },
   "detail": {
     "title": "Detalle por día",
@@ -73,5 +78,30 @@
     "totalPeople": "Personas",
     "totalHours": "Horas",
     "totalIncidents": "Incidencias"
+  },
+  "presets": {
+    "title": "Accesos rápidos",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "week": "Esta semana",
+    "month": "Este mes"
+  },
+  "toolbar": {
+    "title": "Filtros del reporte"
+  },
+  "help": {
+    "title": "¿Cómo leer este reporte?",
+    "entry": "Hora de entrada de la sesión.",
+    "exit": "Hora de salida de la sesión (— si aún no ha salido).",
+    "hours": "Tiempo dentro de la sesión (salida − entrada).",
+    "sessions": "Cuántas entradas/salidas se emparejaron en el periodo (una por cada visita).",
+    "days": "Días del periodo con al menos un registro.",
+    "incidents": "Incidencia de la sesión: entrada sin salida, salida sin entrada o en sitio.",
+    "status": "El estado resume la actividad de la persona en el periodo:",
+    "statusHasRecords": "Con registros: tuvo al menos una entrada o salida.",
+    "statusInside": "En sitio: entró y todavía no registra salida.",
+    "statusNoRecords": "Sin registros: no tuvo actividad en el periodo.",
+    "multiple": "Una persona puede registrar varias entradas y salidas en el periodo. Aquí se muestra la primera entrada y la última salida; el desglose día por día está en \"Ver detalle\".",
+    "intro": "Cada fila es una sesión: una entrada y su salida. Una persona puede tener varias sesiones en el periodo."
   }
 }

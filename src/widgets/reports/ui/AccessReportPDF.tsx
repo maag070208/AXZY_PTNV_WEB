@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type {
   AccessIncidentCode,
   AccessReportPdfMeta,
-  AccessReportPersonRow,
+  AccessReportSessionRow,
   AccessReportSummary,
 } from "@entities/access";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
@@ -12,7 +12,7 @@ import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
 
 interface Props {
-  rows: AccessReportPersonRow[];
+  rows: AccessReportSessionRow[];
   summary: AccessReportSummary;
   meta: AccessReportPdfMeta;
   title?: string;
@@ -29,33 +29,86 @@ const INCIDENT_COLOR: Record<AccessIncidentCode, BadgeKind> = {
 const styles = StyleSheet.create({
   badgeRow: { flexDirection: "row", flexWrap: "wrap" },
   badgeGap: { marginRight: 2, marginBottom: 2 },
-  totals: {
+
+  rangeBand: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: PDF_COLORS.band,
+    borderRadius: 5,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    marginBottom: 14,
+  },
+  rangeBandLabel: {
+    fontSize: 6.3,
+    color: "#bfe0f0",
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  rangeBandValue: { fontSize: 11, color: PDF_COLORS.white, fontFamily: "Helvetica-Bold" },
+  rangeBandTz: { fontSize: 7.5, color: PDF_COLORS.white, fontFamily: "Helvetica-Bold" },
+
+  kpiCard: {
+    flex: 1,
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    alignItems: "center",
+    borderWidth: 0.5,
+    borderColor: PDF_COLORS.border,
+  },
+  kpiValue: { fontSize: 18, fontFamily: "Helvetica-Bold", marginBottom: 3 },
+  kpiLabel: {
+    fontSize: 6.3,
+    fontFamily: "Helvetica-Bold",
+    color: PDF_COLORS.muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
+    textAlign: "center",
+  },
+
+  totalsBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: PDF_COLORS.light,
-    borderRadius: 4,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    marginTop: 6,
+    backgroundColor: PDF_COLORS.band,
+    borderRadius: 5,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    marginTop: 12,
   },
-  totalsText: { fontSize: 8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.ink },
+  totalsItem: { flexDirection: "row", alignItems: "center", gap: 5 },
+  totalsLabel: {
+    fontSize: 6.8,
+    color: "#bfe0f0",
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  totalsValue: { fontSize: 10.5, color: PDF_COLORS.white, fontFamily: "Helvetica-Bold" },
 });
 
 // Anchos en puntos; suman ~526 (folio LETTER − padding horizontal de 36×2).
 const COL = {
-  employee: 118,
-  department: 70,
-  status: 58,
+  employee: 132,
+  department: 92,
+  date: 52,
   entry: 62,
   exit: 62,
-  hours: 40,
-  sessions: 34,
-  days: 30,
-  incidents: 52,
+  hours: 44,
+  incident: 82,
 };
 
 const fmtMinutes = formatMinutesAsHhMm;
+
+/** Fecha civil `DD/MM/YYYY` desde una clave `YYYY-MM-DD` (sin conversión de zona). */
+const fmtDayKey = (dayKey: string): string => {
+  const [y, m, d] = dayKey.split("-");
+  return d && m && y ? `${d}/${m}/${y}` : dayKey;
+};
 
 const fmtStamp = (iso: string | null, period: string, tz?: string): string => {
   if (!iso) return "—";
@@ -75,10 +128,7 @@ const fmtDateTime = (iso: string, tz?: string): string => {
   return `${dd}/${mm}/${yy} ${formatTimeInTZ(iso, tz)}`;
 };
 
-/**
- * Fecha civil `DD/MM/YYYY` de un instante en la zona horaria efectiva.
- * NO usa la fecha local del navegador: `Intl` resuelve las partes en `tz`.
- */
+/** Fecha civil `DD/MM/YYYY` de un instante en la zona horaria efectiva. */
 const fmtDateInTZ = (iso: string, tz?: string): string =>
   new Intl.DateTimeFormat("en-GB", {
     timeZone: tz,
@@ -106,50 +156,35 @@ export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
   const tz = summary.range.timezone || meta.timezone;
   const today = fmtDateTime(new Date().toISOString(), tz);
 
-  /**
-   * Rango con semántica `[start, end)` (el fin es exclusivo): en DÍA solo se
-   * imprime la fecha del día; en SEMANA/MES se muestra `end − 1 día`, sin la
-   * hora "00:00" que hace parecer que el reporte cubre otro día.
-   */
   const rangePeriod = summary.range.period || meta.period;
   const rangeLabel =
     rangePeriod === "DAY"
       ? fmtDateInTZ(summary.range.start, tz)
       : `${fmtDateInTZ(summary.range.start, tz)} — ${prevCivilDay(summary.range.end, tz)}`;
 
-  const statusOf = (row: AccessReportPersonRow): { kind: BadgeKind; label: string } => {
-    if (!row.hasRecords) return { kind: "gray", label: tt("status.noRecords") };
-    if (row.incidents.includes("OPEN_ENTRY")) return { kind: "info", label: tt("status.inside") };
-    return { kind: "success", label: tt("status.hasRecords") };
-  };
-
-  const cards: Array<{ label: string; value: string | number; color: string }> = [
-    { label: tt("kpis.withRecords"), value: summary.peopleWithRecords, color: PDF_COLORS.success },
-    { label: tt("kpis.withoutRecords"), value: summary.peopleWithoutRecords, color: PDF_COLORS.gray },
-    { label: tt("kpis.inside"), value: summary.peopleInside, color: PDF_COLORS.bandAccent },
-    { label: tt("kpis.workedHours"), value: fmtMinutes(summary.totalWorkedMinutes), color: PDF_COLORS.band },
-    { label: tt("kpis.incidents"), value: summary.totalIncidents, color: PDF_COLORS.warning },
+  const cards: Array<{ label: string; value: string | number; color: string; bg: string }> = [
+    { label: tt("kpis.withRecords"), value: summary.peopleWithRecords, color: PDF_COLORS.success, bg: PDF_COLORS.successBg },
+    { label: tt("kpis.withoutRecords"), value: summary.peopleWithoutRecords, color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
+    { label: tt("kpis.inside"), value: summary.peopleInside, color: PDF_COLORS.band, bg: "#dbeafe" },
+    { label: tt("kpis.workedHours"), value: fmtMinutes(summary.totalWorkedMinutes), color: PDF_COLORS.band, bg: PDF_COLORS.light },
+    { label: tt("kpis.incidents"), value: summary.totalIncidents, color: PDF_COLORS.warning, bg: PDF_COLORS.warningBg },
   ];
 
-  const ROWS_PER_PAGE = 20;
-  const pages: AccessReportPersonRow[][] = [];
+  const ROWS_PER_PAGE = 22;
+  const pages: AccessReportSessionRow[][] = [];
   for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
     pages.push(rows.slice(i, i + ROWS_PER_PAGE));
   }
   if (pages.length === 0) pages.push([]);
 
-  const renderIncidents = (incidents: AccessIncidentCode[]) => {
-    if (incidents.length === 0) return <Text style={pdfTheme.cellMuted}>—</Text>;
-    return (
-      <View style={styles.badgeRow}>
-        {incidents.map((code) => (
-          <Text key={code} style={[badgeStyleFor(INCIDENT_COLOR[code]), styles.badgeGap]}>
-            {tt(`incidents.${code}`)}
-          </Text>
-        ))}
-      </View>
+  const renderIncident = (incident: AccessIncidentCode | null) =>
+    incident ? (
+      <Text style={[badgeStyleFor(INCIDENT_COLOR[incident]), styles.badgeGap]}>
+        {tt(`incidents.${incident}`)}
+      </Text>
+    ) : (
+      <Text style={pdfTheme.cellMuted}>—</Text>
     );
-  };
 
   return (
     <Document title={reportTitle} author="Puerto Nuevo Hotel y Villas">
@@ -167,21 +202,22 @@ export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
               <>
                 <View style={pdfTheme.summaryRow}>
                   {cards.map((c) => (
-                    <View key={c.label} style={[pdfTheme.summaryCard, { borderTopColor: c.color }]}>
-                      <Text style={[pdfTheme.summaryValue, { color: c.color }]}>{c.value}</Text>
-                      <Text style={pdfTheme.summaryLabel}>{c.label}</Text>
+                    <View key={c.label} style={[styles.kpiCard, { backgroundColor: c.bg }]}>
+                      <Text style={[styles.kpiValue, { color: c.color }]}>{c.value}</Text>
+                      <Text style={styles.kpiLabel}>{c.label}</Text>
                     </View>
                   ))}
                 </View>
 
-                <View style={pdfTheme.filterBox}>
-                  <Text style={pdfTheme.filterTitle}>{tt("pdf.rangeTitle")}</Text>
-                  <Text style={pdfTheme.filterText}>
-                    {tt(`periods.${meta.period}`)} · {rangeLabel}
-                  </Text>
-                  <Text style={pdfTheme.filterText}>
-                    {tt("pdf.timezone")}: {summary.range.timezone}
-                  </Text>
+                <View style={styles.rangeBand}>
+                  <View>
+                    <Text style={styles.rangeBandLabel}>{tt(`periods.${meta.period}`)}</Text>
+                    <Text style={styles.rangeBandValue}>{rangeLabel}</Text>
+                  </View>
+                  <View style={{ alignItems: "flex-end" }}>
+                    <Text style={styles.rangeBandLabel}>{tt("pdf.timezone")}</Text>
+                    <Text style={styles.rangeBandTz}>{summary.range.timezone}</Text>
+                  </View>
                 </View>
               </>
             )}
@@ -193,8 +229,8 @@ export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
               <View style={{ width: COL.department }}>
                 <Text style={pdfTheme.tableHeaderText}>{tt("columns.department")}</Text>
               </View>
-              <View style={{ width: COL.status }}>
-                <Text style={pdfTheme.tableHeaderText}>{tt("columns.status")}</Text>
+              <View style={{ width: COL.date }}>
+                <Text style={pdfTheme.tableHeaderText}>{tt("columns.date")}</Text>
               </View>
               <View style={{ width: COL.entry }}>
                 <Text style={pdfTheme.tableHeaderText}>{tt("columns.entry")}</Text>
@@ -205,67 +241,55 @@ export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
               <View style={{ width: COL.hours }}>
                 <Text style={pdfTheme.tableHeaderText}>{tt("columns.hours")}</Text>
               </View>
-              <View style={{ width: COL.sessions }}>
-                <Text style={pdfTheme.tableHeaderText}>{tt("columns.sessions")}</Text>
-              </View>
-              <View style={{ width: COL.days }}>
-                <Text style={pdfTheme.tableHeaderText}>{tt("columns.days")}</Text>
-              </View>
-              <View style={{ width: COL.incidents }}>
-                <Text style={pdfTheme.tableHeaderText}>{tt("columns.incidents")}</Text>
+              <View style={{ width: COL.incident }}>
+                <Text style={pdfTheme.tableHeaderText}>{tt("columns.incident")}</Text>
               </View>
             </View>
 
-            {pageRows.map((r, i) => {
-              const status = statusOf(r);
-              return (
-                <View key={r.employeeId + i} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
-                  <View style={{ width: COL.employee }}>
-                    <Text style={pdfTheme.cellDescTitle}>{r.employeeName}</Text>
-                    <Text style={pdfTheme.cellDescSub}>
-                      {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
-                      {!r.active ? ` · ${tt("status.inactive")}` : ""}
-                    </Text>
-                  </View>
-                  <View style={{ width: COL.department }}>
-                    <Text style={pdfTheme.cellMuted}>{r.departmentName ?? tt("noDepartment")}</Text>
-                  </View>
-                  <View style={{ width: COL.status }}>
-                    <Text style={badgeStyleFor(status.kind)}>{status.label}</Text>
-                  </View>
-                  <View style={{ width: COL.entry }}>
-                    <Text style={pdfTheme.cell}>{fmtStamp(r.firstEntryAt, meta.period, tz)}</Text>
-                  </View>
-                  <View style={{ width: COL.exit }}>
-                    <Text style={pdfTheme.cell}>{fmtStamp(r.lastExitAt, meta.period, tz)}</Text>
-                  </View>
-                  <View style={{ width: COL.hours }}>
-                    <Text style={pdfTheme.cellBold}>
-                      {r.hasRecords ? fmtMinutes(r.workedMinutes) : "—"}
-                    </Text>
-                  </View>
-                  <View style={{ width: COL.sessions }}>
-                    <Text style={pdfTheme.cell}>{r.sessionCount}</Text>
-                  </View>
-                  <View style={{ width: COL.days }}>
-                    <Text style={pdfTheme.cell}>{r.daysWithRecords}</Text>
-                  </View>
-                  <View style={{ width: COL.incidents }}>{renderIncidents(r.incidents)}</View>
+            {pageRows.map((r, i) => (
+              <View key={r.id + i} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
+                <View style={{ width: COL.employee }}>
+                  <Text style={pdfTheme.cellDescTitle}>{r.employeeName}</Text>
+                  <Text style={pdfTheme.cellDescSub}>
+                    {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
+                    {!r.active ? ` · ${tt("status.inactive")}` : ""}
+                  </Text>
                 </View>
-              );
-            })}
+                <View style={{ width: COL.department }}>
+                  <Text style={pdfTheme.cellMuted}>{r.departmentName ?? tt("noDepartment")}</Text>
+                </View>
+                <View style={{ width: COL.date }}>
+                  <Text style={pdfTheme.cell}>{fmtDayKey(r.date)}</Text>
+                </View>
+                <View style={{ width: COL.entry }}>
+                  <Text style={pdfTheme.cell}>{fmtStamp(r.entryAt, meta.period, tz)}</Text>
+                </View>
+                <View style={{ width: COL.exit }}>
+                  <Text style={pdfTheme.cell}>{fmtStamp(r.exitAt, meta.period, tz)}</Text>
+                </View>
+                <View style={{ width: COL.hours }}>
+                  <Text style={pdfTheme.cellBold}>
+                    {r.entryAt && r.exitAt ? fmtMinutes(r.workedMinutes) : "—"}
+                  </Text>
+                </View>
+                <View style={{ width: COL.incident }}>{renderIncident(r.incident)}</View>
+              </View>
+            ))}
 
             {pageIdx === pages.length - 1 && (
-              <View style={styles.totals}>
-                <Text style={styles.totalsText}>
-                  {tt("pdf.totalPeople")}: {summary.peopleTotal}
-                </Text>
-                <Text style={styles.totalsText}>
-                  {tt("pdf.totalHours")}: {fmtMinutes(summary.totalWorkedMinutes)}
-                </Text>
-                <Text style={styles.totalsText}>
-                  {tt("pdf.totalIncidents")}: {summary.totalIncidents}
-                </Text>
+              <View style={styles.totalsBar}>
+                <View style={styles.totalsItem}>
+                  <Text style={styles.totalsLabel}>{tt("pdf.totalPeople")}</Text>
+                  <Text style={styles.totalsValue}>{summary.peopleTotal}</Text>
+                </View>
+                <View style={styles.totalsItem}>
+                  <Text style={styles.totalsLabel}>{tt("pdf.totalHours")}</Text>
+                  <Text style={styles.totalsValue}>{fmtMinutes(summary.totalWorkedMinutes)}</Text>
+                </View>
+                <View style={styles.totalsItem}>
+                  <Text style={styles.totalsLabel}>{tt("pdf.totalIncidents")}</Text>
+                  <Text style={styles.totalsValue}>{summary.totalIncidents}</Text>
+                </View>
               </View>
             )}
           </View>

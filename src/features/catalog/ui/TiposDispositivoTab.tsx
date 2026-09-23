@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
-import { ITAlert, ITBadget, ITButton, ITDataTable, ITFlex, ITGrid, ITInput, ITText } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaPlus, FaTag } from "react-icons/fa";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ITAlert, ITBadget, ITButton, ITDataTable, ITDialog, ITFlex, ITGrid, ITInput, ITText } from "@axzydev/axzy_ui_system";
+import { FaEdit, FaTag } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventarioApi, type TipoDispositivo } from "@entities/inventario";
 
-export default function TiposDispositivoTab() {
+export default function TiposDispositivoTab({ openCreateSignal }: { openCreateSignal?: number }) {
   const { t } = useTranslation(["inventario", "common"]);
   const [reloadKey, setReloadKey] = useState(0);
   const [showForm, setShowForm] = useState(false);
@@ -22,7 +22,10 @@ export default function TiposDispositivoTab() {
 
   const fetchData = useMemo(() => makeClientTableFetch<TipoDispositivo>(() => inventarioApi.tipos()), []);
 
-  const abrirNuevo = () => {
+  const lastSignal = useRef(openCreateSignal);
+  useEffect(() => {
+    if (openCreateSignal === lastSignal.current) return;
+    lastSignal.current = openCreateSignal;
     setEditando(null);
     setName("");
     setCode("");
@@ -32,8 +35,8 @@ export default function TiposDispositivoTab() {
     setUseMac(false);
     setUseIp(false);
     setUseEquipo(false);
-    setShowForm((v) => !v);
-  };
+    setShowForm(true);
+  }, [openCreateSignal]);
 
   const abrirEdicion = (tp: TipoDispositivo) => {
     setEditando(tp);
@@ -108,18 +111,13 @@ export default function TiposDispositivoTab() {
         </ITAlert>
       )}
 
-      <div className="mb-4 flex justify-end">
-        <ITButton variant="filled" color="primary" onClick={abrirNuevo}>
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{t("tipos.new")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </div>
-
-      {showForm && (
-        <ITFlex as="section" direction="column" gap={3} className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <ITText className="text-sm font-bold text-slate-800">{editando ? t("tipos.edit") : t("tipos.new")}</ITText>
+      <ITDialog
+        isOpen={showForm}
+        onClose={cerrar}
+        title={editando ? t("tipos.edit") : t("tipos.new")}
+        useFormHeader
+      >
+        <div>
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={4}>
               <ITInput name="name" label={t("tipos.name")} value={name} onChange={(e) => setName(e.target.value)} />
@@ -157,19 +155,19 @@ export default function TiposDispositivoTab() {
                 </label>
               </ITFlex>
             </ITGrid>
-            <ITGrid item xs={6} md={2}>
-              <ITFlex align="end" gap={2} className="h-full">
-                <ITButton variant="outlined" color="secondary" onClick={cerrar} className="mt-1">
+            <ITGrid item xs={12}>
+              <ITFlex justify="end" gap={2}>
+                <ITButton variant="outlined" color="secondary" onClick={cerrar}>
                   <ITText className="font-bold text-[11px]">{t("common:actions.cancel")}</ITText>
                 </ITButton>
-                <ITButton variant="filled" color="primary" onClick={save} className="mt-1">
+                <ITButton variant="filled" color="primary" onClick={save}>
                   <ITText className="font-bold text-[11px]">{t("common:actions.save")}</ITText>
                 </ITButton>
               </ITFlex>
             </ITGrid>
           </ITGrid>
-        </ITFlex>
-      )}
+        </div>
+      </ITDialog>
 
       <ITDataTable
         columns={columns as any}

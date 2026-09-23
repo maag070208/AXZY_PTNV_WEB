@@ -10,6 +10,7 @@ import {
   clearCurrent,
   ticketsApi,
   type Ticket,
+  type TicketCategory,
 } from "@entities/ticket";
 import type { User, UserRole } from "@entities/user";
 import { usersApi } from "@entities/user";
@@ -53,6 +54,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
   const [responsables, setResponsables] = useState<User[]>([]);
   const [busyEmpleados, setBusyEmpleados] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [commentText, setCommentText] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
@@ -118,6 +120,10 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
   }, []);
 
+  useEffect(() => {
+    ticketsApi.categories().then(setCategories).catch(() => setCategories([]));
+  }, []);
+
   const buscarEmpleados = async (q?: string) => {
     setBusyEmpleados(true);
     try {
@@ -156,17 +162,18 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     }
   };
 
-  const handleCategoryChange = async (newCategory: string) => {
+  const handleCategoryChange = async (newCategoryId: string) => {
     if (!ticket) return;
     const action = await dispatch(
-      updateTicketThunk({ id: ticket.id, data: { category: newCategory } })
+      updateTicketThunk({ id: ticket.id, data: { categoryId: newCategoryId || null } })
     );
     if (updateTicketThunk.fulfilled.match(action)) {
       refresh();
       setToastType("success");
       setToast(
         tt("detail.categoryChanged", {
-          category: dyn(tt)(`categoryLabels.${newCategory}`) ?? newCategory,
+          category:
+            categories.find((c) => c.id === newCategoryId)?.nombre ?? newCategoryId,
         })
       );
     }
@@ -354,6 +361,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     responsableOptions,
     busyEmpleados,
     departments,
+    categories,
     commentText,
     setCommentText,
     toast,

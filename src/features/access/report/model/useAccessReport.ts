@@ -5,14 +5,15 @@ import {
   accessApi,
   type AccessReportPdfMeta,
   type AccessReportPeriod,
-  type AccessReportPersonRow,
+  type AccessReportSessionRow,
   type AccessReportSummary,
 } from "@entities/access";
 import { departmentsApi, type Department } from "@entities/department";
+import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
 export type DownloadAccessReportPdf = (
-  rows: AccessReportPersonRow[],
+  rows: AccessReportSessionRow[],
   summary: AccessReportSummary,
   meta: AccessReportPdfMeta
 ) => Promise<void>;
@@ -119,6 +120,58 @@ export const useAccessReport = ({ download }: Options) => {
     }
   }, [download, externalFilters, period, dateKey, t]);
 
+  const handleDownloadCsv = useCallback(async () => {
+    setExporting(true);
+    setError(null);
+    try {
+      const res = await accessApi.reportExport({
+        page: 1,
+        limit: 1000,
+        filters: externalFilters,
+        sort: { key: "departmentName", direction: "asc" },
+      });
+      const tz = res.summary.range.timezone || BROWSER_TIMEZONE;
+      const stamp = (iso: string | null): string => {
+        if (!iso) return "";
+        if (period === "DAY") return formatTimeInTZ(iso, tz);
+        return `${new Date(iso).toLocaleDateString("es-MX")} ${formatTimeInTZ(iso, tz)}`;
+      };
+      const header = [
+        t("columns.date"),
+        t("columns.employee"),
+        t("columns.department"),
+        t("columns.puesto"),
+        t("columns.entry"),
+        t("columns.exit"),
+        t("columns.hours"),
+        t("columns.incident"),
+      ];
+      const lines = res.data.map((r) => [
+        r.date,
+        r.employeeName,
+        r.departmentName ?? t("noDepartment"),
+        r.puesto ?? "",
+        stamp(r.entryAt),
+        stamp(r.exitAt),
+        r.entryAt && r.exitAt ? formatMinutesAsHhMm(r.workedMinutes) : "",
+        r.incident ? t(`incidents.${r.incident}`) : "",
+      ]);
+      const escape = (cell: unknown) => `"${String(cell ?? "").replace(/"/g, '""')}"`;
+      const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `accesos-${period.toLowerCase()}-${dateKey}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t("errors.load"));
+    } finally {
+      setExporting(false);
+    }
+  }, [externalFilters, period, dateKey, t]);
+
   return {
     t,
     period,
@@ -139,6 +192,7 @@ export const useAccessReport = ({ download }: Options) => {
     externalFilters,
     fetchTableData,
     handleDownloadPdf,
+    handleDownloadCsv,
   };
 };
 

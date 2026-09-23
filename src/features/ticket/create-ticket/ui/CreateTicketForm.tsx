@@ -20,13 +20,15 @@ import {
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
+import type { TicketCategory } from "@entities/ticket";
 import type { TicketDraft } from "../model/useCreateTicket";
-import { CATEGORIES, PRIORITIES } from "../model/constants";
+import { PRIORITIES } from "../model/constants";
 
 interface Props {
   form: TicketDraft;
   errors?: Record<string, string>;
   onFieldChange: (field: keyof TicketDraft, value: string) => void;
+  categories: TicketCategory[];
   files: File[];
   onAddFile: (file: File) => void;
   onRemoveFile: (index: number) => void;
@@ -74,6 +76,7 @@ export default function CreateTicketForm({
   form,
   errors,
   onFieldChange,
+  categories,
   files,
   onAddFile,
   onRemoveFile,
@@ -81,6 +84,7 @@ export default function CreateTicketForm({
 }: Props) {
   const { t: tt } = useTranslation("tickets");
 
+  const selectedCategory = categories.find((c) => c.id === form.categoryId);
   const selectedPriority = PRIORITIES.find((p) => p.value === form.priority);
   const selectedPreset = selectedPriority
     ? PRIORITY_PRESETS[selectedPriority.value]
@@ -126,12 +130,12 @@ export default function CreateTicketForm({
                 <ITSelect
                   name="category"
                   label={tt("new.categoryLabel")}
-                  options={CATEGORIES.map((c) => ({
-                    value: c,
-                    label: dyn(tt)(`categoryLabels.${c}`),
+                  options={categories.map((c) => ({
+                    value: c.id,
+                    label: c.nombre,
                   }))}
-                  value={form.category}
-                  onChange={(e) => onFieldChange("category", e.target.value)}
+                  value={form.categoryId}
+                  onChange={(e) => onFieldChange("categoryId", e.target.value)}
                 />
               </ITGrid>
             </ITGrid>
@@ -246,7 +250,7 @@ export default function CreateTicketForm({
 
           {/* Compact status strip instead of a full duplicate card:
               only shows once category or priority is actually picked. */}
-          {(form.category || selectedPriority) && (
+          {(form.categoryId || selectedPriority) && (
             <ITFlex
               align="center"
               justify="between"
@@ -258,8 +262,8 @@ export default function CreateTicketForm({
                   <span className={`h-2 w-2 rounded-full ${selectedPreset.dot}`} />
                 )}
                 <ITText className="text-xs text-slate-500">
-                  {form.category
-                    ? dyn(tt)(`categoryLabels.${form.category}`)
+                  {selectedCategory
+                    ? selectedCategory.nombre
                     : tt("detail.category")}
                 </ITText>
               </ITFlex>

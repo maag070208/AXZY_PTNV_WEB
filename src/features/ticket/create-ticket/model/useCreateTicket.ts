@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch } from "@app/store";
-import { createTicketThunk, ticketsApi } from "@entities/ticket";
+import { createTicketThunk, ticketsApi, type TicketCategory } from "@entities/ticket";
 
 export interface TicketDraft {
   titulo: string;
   descripcion: string;
   priority: string;
-  category: string;
+  categoryId: string;
 }
 
 export const useCreateTicket = () => {
@@ -19,13 +19,24 @@ export const useCreateTicket = () => {
     titulo: "",
     descripcion: "",
     priority: "MEDIA",
-    category: "OTRO",
+    categoryId: "",
   });
+  const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
+
+  useEffect(() => {
+    ticketsApi
+      .categories()
+      .then((cats) => {
+        setCategories(cats);
+        setForm((f) => (f.categoryId ? f : { ...f, categoryId: cats[0]?.id ?? "" }));
+      })
+      .catch(() => setCategories([]));
+  }, []);
 
   useEffect(() => {
     if (!toast) return;
@@ -65,7 +76,7 @@ export const useCreateTicket = () => {
           titulo: form.titulo.trim(),
           descripcion: form.descripcion.trim(),
           priority: form.priority,
-          category: form.category,
+          categoryId: form.categoryId || undefined,
         })
       );
       if (createTicketThunk.fulfilled.match(action)) {
@@ -95,6 +106,7 @@ export const useCreateTicket = () => {
     handleField,
     isValid,
     saving,
+    categories,
     files,
     addFile,
     removeFile,

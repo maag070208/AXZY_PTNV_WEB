@@ -85,6 +85,16 @@ const VALIDATED_FIELDS: (keyof UserFormValues)[] = [
   "puesto",
 ];
 
+/** Paso del stepper al que pertenece cada campo validado (0=datos personales, 1=acceso). */
+const FIELD_STEP: Record<string, number> = {
+  username: 1,
+  password: 1,
+  email: 0,
+  name: 0,
+  numeroEmpleado: 0,
+  puesto: 0,
+};
+
 /** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
 export const composeFullName = (v: {
   name?: string;
@@ -257,6 +267,19 @@ export const useUserForm = () => {
     return Object.keys(e).length === 0;
   };
 
+  /** Devuelve el paso (0=datos personales, 1=acceso) con el primer campo inválido; -1 si todo es válido. */
+  const firstInvalidStep = (): number => {
+    const withErrors = new Set(Object.keys(errors));
+    for (let step = 0; step <= 1; step++) {
+      for (const field of VALIDATED_FIELDS) {
+        if (FIELD_STEP[field] !== step) continue;
+        if (withErrors.has(field)) return step;
+        if (validateField(field, form[field] ?? "")) return step;
+      }
+    }
+    return -1;
+  };
+
   const handleSubmit = async (): Promise<boolean> => {
     if (!validate()) return false;
     const fullName = composeFullName(form);
@@ -329,6 +352,7 @@ export const useUserForm = () => {
     error,
     setError,
     handleSubmit,
+    firstInvalidStep,
     canSubmit,
     tt,
     ROLE_OPTIONS,

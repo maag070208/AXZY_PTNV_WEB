@@ -8,7 +8,15 @@
     "tiposDocumento": "Tipos de documento",
     "generos": "Géneros",
     "tiposSangre": "Tipos de sangre",
+    "categoriasTicket": "Categorías de ticket",
     "notificaciones": "Notificaciones"
+  },
+  "groups": {
+    "organizacion": "Organización",
+    "inventario": "Inventario",
+    "personal": "Personal",
+    "tickets": "Tickets",
+    "sistema": "Sistema"
   },
   "name": "Nombre",
   "status": "Estado",
@@ -26,7 +34,7 @@
     "title": "Configuración de Notificaciones",
     "subtitle": "Destinatarios para copias en notificaciones del sistema",
     "recipientsLabel": "Correos destinatarios",
-    "recipientsHelp": "Separados por coma. Ej: aamaro@axzy.dev, maag070208@gmail.com",
+    "recipientsHelp": "Escribe un correo y presiona Agregar. Se guardan al dar Guardar.",
     "currentValue": "Configuración actual",
     "invalidCount": "{n} correo(s) inválido(s)",
     "validCount": "{n} correo(s) válido(s)",
@@ -34,6 +42,12 @@
     "saving": "Guardando...",
     "saved": "Configuración guardada",
     "saveError": "Error al guardar",
-    "empty": "Sin destinatarios configurados"
+    "empty": "Sin destinatarios configurados",
+    "addRecipient": "Agregar",
+    "newRecipientLabel": "Nuevo destinatario",
+    "newRecipientPlaceholder": "correo@dominio.com",
+    "invalidEmail": "Correo inválido",
+    "duplicateEmail": "Ese correo ya está en la lista",
+    "removeRecipient": "Quitar"
   }
 }

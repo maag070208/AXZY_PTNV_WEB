@@ -5,7 +5,10 @@
     "dateRange": "Date range",
     "employee": "Search employee",
     "employeePlaceholder": "Employee name or number...",
-    "includeVoided": "Show voided"
+    "includeVoided": "Show voided",
+    "type": "Type",
+    "allTypes": "All",
+    "clear": "Clear filters"
   },
   "columns": {
     "occurredAt": "Date and time",
@@ -36,7 +39,10 @@
   },
   "actions": {
     "view": "View details",
-    "void": "Void"
+    "void": "Void",
+    "exportCsv": "CSV",
+    "exporting": "Generating…",
+    "close": "Close"
   },
   "detail": {
     "title": "Event details",
@@ -58,7 +64,9 @@
     "status": "Status",
     "voidReason": "Void reason",
     "voidedAt": "Voided at",
-    "createdAt": "Recorded at"
+    "createdAt": "Recorded at",
+    "map": "Scan location",
+    "viewOnMap": "View on map"
   },
   "void": {
     "title": "Void event",
@@ -82,5 +90,20 @@
   },
   "coordinates": {
     "none": "No coordinates"
+  },
+  "presets": {
+    "title": "Quick ranges",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7": "Last 7 days"
+  },
+  "kpis": {
+    "total": "Events",
+    "entries": "Entries",
+    "exits": "Exits",
+    "voided": "Voided"
+  },
+  "toolbar": {
+    "title": "Filters"
   }
 }

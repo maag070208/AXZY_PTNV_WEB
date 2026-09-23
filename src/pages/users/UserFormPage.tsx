@@ -1,12 +1,12 @@
+import { useState } from "react";
 import {
   ITAlert,
-  ITButton,
   ITFlex,
   ITLoader,
   ITPage,
-  ITText,
+  ITStepper,
 } from "@axzydev/axzy_ui_system";
-import { FaSave, FaUserPlus } from "react-icons/fa";
+import { FaBuilding, FaIdCard, FaShieldAlt, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,16 +14,28 @@ import {
   useUserForm,
 } from "@features/user/user-form";
 
+interface AppStep {
+  label: string;
+  content: React.ReactNode;
+  icon?: React.ReactNode;
+}
+
 export default function UserFormPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["users", "common"]);
+  const [step, setStep] = useState(0);
 
   const userForm = useUserForm();
   const { isEdit } = userForm;
 
-  const handleSubmit = () => {
+  const handleFinish = () => {
     userForm.handleSubmit().then((ok) => {
-      if (ok) navigate("/usuarios");
+      if (ok) {
+        navigate("/usuarios");
+      } else {
+        const invalidStep = userForm.firstInvalidStep();
+        if (invalidStep >= 0) setStep(invalidStep);
+      }
     });
   };
 
@@ -53,30 +65,36 @@ export default function UserFormPage() {
     );
   }
 
-  const actions = (
-    <ITFlex gap={2}>
-      <ITButton variant="outlined" onClick={() => navigate("/usuarios")}>
-        {tt("common:actions.cancel")}
-      </ITButton>
-      <ITButton
-        variant="filled"
-        color="primary"
-        onClick={handleSubmit}
-        disabled={userForm.saving}
-      >
-        <ITFlex align="center" gap={1}>
-          <FaSave size={12} />
-          <ITText className="font-bold text-[11px]">
-            {userForm.saving
-              ? tt("form.saving")
-              : isEdit
-              ? tt("form.buttonEdit")
-              : tt("form.buttonNew")}
-          </ITText>
-        </ITFlex>
-      </ITButton>
-    </ITFlex>
-  );
+  const fieldsProps = {
+    isEdit,
+    form: userForm.form,
+    errors: userForm.errors,
+    onFieldChange: userForm.handleField,
+    onBlur: userForm.handleBlur,
+    onDepartmentChange: userForm.handleDepartmentChange,
+    departments: userForm.departments,
+    selectedDept: userForm.selectedDept,
+    roleGuidance: userForm.roleGuidance,
+    roleOptions: userForm.ROLE_OPTIONS,
+  };
+
+  const steps: AppStep[] = [
+    {
+      label: tt("form.sectionPersonal"),
+      icon: <FaIdCard size={13} />,
+      content: <UserFormFields step="personal" {...fieldsProps} />,
+    },
+    {
+      label: tt("form.sectionAccess"),
+      icon: <FaShieldAlt size={13} />,
+      content: <UserFormFields step="access" {...fieldsProps} />,
+    },
+    {
+      label: tt("form.sectionOrganization"),
+      icon: <FaBuilding size={13} />,
+      content: <UserFormFields step="org" {...fieldsProps} />,
+    },
+  ];
 
   return (
     <ITPage
@@ -88,7 +106,6 @@ export default function UserFormPage() {
         { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
         { label: breadcrumb },
       ]}
-      actions={actions}
     >
       {userForm.error && (
         <ITAlert
@@ -100,17 +117,16 @@ export default function UserFormPage() {
         </ITAlert>
       )}
 
-      <UserFormFields
-        isEdit={isEdit}
-        form={userForm.form}
-        errors={userForm.errors}
-        onFieldChange={userForm.handleField}
-        onBlur={userForm.handleBlur}
-        onDepartmentChange={userForm.handleDepartmentChange}
-        departments={userForm.departments}
-        selectedDept={userForm.selectedDept}
-        roleGuidance={userForm.roleGuidance}
-        roleOptions={userForm.ROLE_OPTIONS}
+      <ITStepper
+        steps={steps}
+        currentStep={step}
+        onStepChange={setStep}
+        onFinish={handleFinish}
+        allowClickToJump
+        useIcons
+        scrollableContent
+        maxContentHeight="60vh"
+        color="primary"
       />
     </ITPage>
   );

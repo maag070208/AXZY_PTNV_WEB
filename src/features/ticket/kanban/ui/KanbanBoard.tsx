@@ -1,22 +1,23 @@
 import {
   ITButton,
   ITFlex,
-  ITInput,
+  ITSearchSelect,
   ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import {
   FaCheckCircle,
-  FaSearch,
   FaSync,
   FaTicketAlt,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
+import { formatDate } from "@shared/i18n";
 import {
   Avatar,
   ASSIGNMENT_STATUS_META,
   PRIORITY_META,
+  STATUS_META,
   Tag,
   hashTone,
   metaFor,
@@ -40,13 +41,16 @@ export default function KanbanBoard({ fx }: Props) {
         className="mb-5"
       >
         <ITFlex align="center" gap={3} wrap="wrap" className="min-w-0">
-          <ITFlex className="w-56 sm:w-64">
-            <ITInput
-              name="kanbanSearch"
-              value={fx.search}
-              onChange={(e) => fx.setSearch(e.target.value)}
+          <ITFlex className="w-64">
+            <ITSearchSelect
+              name="kanbanTaskSearch"
+              options={fx.taskOptions}
+              value={fx.taskFilter}
+              onChange={(value) => fx.setTaskFilter(String(value))}
+              onClear={() => fx.setTaskFilter("")}
               placeholder={tt("kanban.searchPlaceholder")}
-              iconLeft={<FaSearch size={11} className="text-slate-400" />}
+              className="w-full"
+              clearable
             />
           </ITFlex>
           <ITFlex className="w-44 sm:w-52">
@@ -174,9 +178,8 @@ export default function KanbanBoard({ fx }: Props) {
                       a.ticket.department?.name ?? tt("list.general");
                     const deptTone = hashTone(deptLabel);
                     const priorityMeta = metaFor(PRIORITY_META, a.ticket.priority);
-                    const priorityLabel = dyn(tt)(
-                      `priorityLabels.${a.ticket.priority}`
-                    );
+                    const statusMeta = metaFor(ASSIGNMENT_STATUS_META, a.status);
+                    const ticketStatusMeta = metaFor(STATUS_META, a.ticket.status);
                     const overdue = Boolean(
                       a.dueDate &&
                         a.status !== "COMPLETADA" &&
@@ -203,16 +206,56 @@ export default function KanbanBoard({ fx }: Props) {
                           )}
                         </ITFlex>
 
-                        <ITText className="text-xs font-medium text-slate-800 leading-snug line-clamp-2 mb-1">
+                        <ITFlex align="center" justify="between" gap={1} className="mb-1">
+                          <ITFlex align="center" gap={1} className="min-w-0">
+                            <FaTicketAlt size={8} className="text-slate-300 shrink-0" />
+                            <ITText className="text-[10px] text-slate-400 truncate">
+                              {a.ticket.titulo}
+                            </ITText>
+                          </ITFlex>
+                          <Tag
+                            label={dyn(tt)(`statusLabels.${a.ticket.status}`)}
+                            tone={ticketStatusMeta.tone}
+                          />
+                        </ITFlex>
+
+                        <ITText className="text-xs font-medium text-slate-800 leading-snug line-clamp-2 mb-1.5">
                           {a.title}
                         </ITText>
 
-                        <ITFlex align="center" gap={1} className="mb-2">
-                          <FaTicketAlt size={8} className="text-slate-300 shrink-0" />
-                          <ITText className="text-[10px] text-slate-400 truncate">
-                            {a.ticket.titulo}
-                          </ITText>
+                        <ITFlex align="center" gap={1} wrap="wrap" className="mb-2">
+                          <Tag
+                            label={dyn(tt)(`detail.taskStatusOptions.${a.status}`)}
+                            tone={statusMeta.tone}
+                          />
+                          <Tag
+                            label={dyn(tt)(`priorityLabels.${a.ticket.priority}`)}
+                            tone={priorityMeta.tone}
+                          />
                         </ITFlex>
+
+                        {(a.startDate || a.dueDate) && (
+                          <ITFlex align="center" gap={3} className="mb-1.5">
+                            {a.startDate && (
+                              <ITText className="text-[10px] text-slate-400">
+                                {tt("detail.startShort")}:{" "}
+                                <span className="font-medium text-slate-500">
+                                  {formatDate(a.startDate)}
+                                </span>
+                              </ITText>
+                            )}
+                            {a.dueDate && (
+                              <ITText
+                                className={`text-[10px] ${
+                                  overdue ? "text-red-600 font-semibold" : "text-slate-400"
+                                }`}
+                              >
+                                {tt("detail.dueShort")}:{" "}
+                                <span className="font-medium">{formatDate(a.dueDate)}</span>
+                              </ITText>
+                            )}
+                          </ITFlex>
+                        )}
 
                         <ITFlex
                           justify="between"
@@ -221,16 +264,9 @@ export default function KanbanBoard({ fx }: Props) {
                           className="pt-1.5 border-t"
                           style={{ borderTopColor: "#f1f5f9" }}
                         >
-                          <ITFlex align="center" gap={1.5} className="min-w-0">
-                            <span
-                              className="w-1.5 h-1.5 rounded-full shrink-0"
-                              style={{ backgroundColor: priorityMeta.tone.bg }}
-                              title={priorityLabel}
-                            />
-                            <span className="text-[10px] text-slate-400 truncate">
-                              #{a.ticketId.slice(0, 6).toUpperCase()}
-                            </span>
-                          </ITFlex>
+                          <span className="text-[10px] text-slate-400 truncate">
+                            #{a.ticketId.slice(0, 6).toUpperCase()}
+                          </span>
                           <Avatar name={a.user.name} seed={a.userId} />
                         </ITFlex>
                       </div>

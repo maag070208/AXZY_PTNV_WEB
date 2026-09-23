@@ -12,7 +12,8 @@
     "allDepartments": "All departments",
     "employee": "Search employee",
     "employeePlaceholder": "Employee name or number...",
-    "includeInactive": "Include inactive"
+    "includeInactive": "Include inactive",
+    "clear": "Clear filters"
   },
   "kpis": {
     "withRecords": "People with records",
@@ -32,13 +33,15 @@
     "department": "Department",
     "puesto": "Position",
     "status": "Status",
-    "entry": "Entry",
-    "exit": "Exit",
+    "entry": "First entry",
+    "exit": "Last exit",
     "hours": "Hours",
     "sessions": "Sessions",
     "days": "Days with records",
     "incidents": "Incidents",
-    "actions": ""
+    "actions": "",
+    "date": "Date",
+    "incident": "Incident"
   },
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entry without exit",
@@ -49,7 +52,9 @@
   "actions": {
     "viewDetail": "View details",
     "export": "Download PDF",
-    "exporting": "Generating…"
+    "exporting": "Generating…",
+    "exportPdf": "PDF",
+    "exportCsv": "CSV"
   },
   "detail": {
     "title": "Daily detail",
@@ -73,5 +78,30 @@
     "totalPeople": "People",
     "totalHours": "Hours",
     "totalIncidents": "Incidents"
+  },
+  "presets": {
+    "title": "Quick ranges",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "week": "This week",
+    "month": "This month"
+  },
+  "toolbar": {
+    "title": "Report filters"
+  },
+  "help": {
+    "title": "How to read this report?",
+    "entry": "Session entry time.",
+    "exit": "Session exit time (— if still inside).",
+    "hours": "Time inside the session (exit − entry).",
+    "sessions": "How many entry/exit pairs were matched in the period (one per visit).",
+    "days": "Days in the period with at least one record.",
+    "incidents": "Session incident: entry without exit, exit without entry, or open entry.",
+    "status": "Status summarizes the person's activity in the period:",
+    "statusHasRecords": "Has records: at least one entry or exit.",
+    "statusInside": "On site: entered and has not registered an exit yet.",
+    "statusNoRecords": "No records: no activity in the period.",
+    "multiple": "A person can register multiple entries and exits in the period. Here we show the first entry and the last exit; the day-by-day breakdown is under \"View detail\".",
+    "intro": "Each row is a session: an entry and its exit. A person can have several sessions in the period."
   }
 }

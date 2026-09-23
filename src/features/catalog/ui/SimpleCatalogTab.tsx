@@ -1,16 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ITAlert,
   ITBadget,
   ITButton,
   ITConfirmDialog,
   ITDataTable,
+  ITDialog,
   ITFlex,
-  ITGrid,
   ITInput,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaPlus, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 
@@ -19,6 +19,8 @@ interface SimpleCatalogTabProps<T extends { id: string; nombre: string; activo: 
   create: (nombre: string) => Promise<T>;
   update: (id: string, data: { nombre?: string; activo?: boolean }) => Promise<T>;
   remove: (id: string) => Promise<{ soft: boolean; data: T }>;
+  /** Incrementar para abrir el formulario de alta desde fuera (p.ej. botón del aside). */
+  openCreateSignal?: number;
 }
 
 export default function SimpleCatalogTab<T extends { id: string; nombre: string; activo: boolean }>({
@@ -26,6 +28,7 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
   create,
   update,
   remove,
+  openCreateSignal,
 }: SimpleCatalogTabProps<T>) {
   const { t } = useTranslation(["catalog", "common"]);
   const [reloadKey, setReloadKey] = useState(0);
@@ -35,16 +38,19 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
   const [error, setError] = useState<string | null>(null);
   const [toDelete, setToDelete] = useState<T | null>(null);
 
+  const lastSignal = useRef(openCreateSignal);
+  useEffect(() => {
+    if (openCreateSignal === lastSignal.current) return;
+    lastSignal.current = openCreateSignal;
+    setEditando(null);
+    setNombre("");
+    setShowForm(true);
+  }, [openCreateSignal]);
+
   const fetchData = useMemo(
     () => makeClientTableFetch<T>(() => list(true)),
     [reloadKey]
   );
-
-  const abrirNuevo = () => {
-    setEditando(null);
-    setNombre("");
-    setShowForm((v) => !v);
-  };
 
   const abrirEdicion = (item: T) => {
     setEditando(item);
@@ -159,44 +165,31 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
         </ITAlert>
       )}
 
-      <div className="mb-4 flex justify-end">
-        <ITButton variant="filled" color="primary" onClick={abrirNuevo}>
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{t("new")}</ITText>
+      <ITDialog
+        isOpen={showForm}
+        onClose={cerrar}
+        title={editando ? t("edit") : t("new")}
+        useFormHeader
+      >
+        <ITFlex direction="column" gap={4}>
+          <ITInput
+            name="nombre"
+            label={t("name")}
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && save()}
+            autoFocus
+          />
+          <ITFlex justify="end" gap={2}>
+            <ITButton variant="outlined" color="secondary" onClick={cerrar}>
+              <ITText className="font-bold text-[11px]">{t("common:actions.cancel")}</ITText>
+            </ITButton>
+            <ITButton variant="filled" color="primary" onClick={save} disabled={!nombre.trim()}>
+              <ITText className="font-bold text-[11px]">{t("common:actions.save")}</ITText>
+            </ITButton>
           </ITFlex>
-        </ITButton>
-      </div>
-
-      {showForm && (
-        <ITFlex as="section" direction="column" gap={3} className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <ITText className="text-sm font-bold text-slate-800">
-            {editando ? t("edit") : t("new")}
-          </ITText>
-          <ITGrid container columns={12} spacing={4}>
-            <ITGrid item xs={12} md={6}>
-              <ITInput
-                name="nombre"
-                label={t("name")}
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && save()}
-                autoFocus
-              />
-            </ITGrid>
-            <ITGrid item xs={12} md={6}>
-              <ITFlex align="end" gap={2} className="h-full">
-                <ITButton variant="outlined" color="secondary" onClick={cerrar} className="mt-1">
-                  <ITText className="font-bold text-[11px]">{t("common:actions.cancel")}</ITText>
-                </ITButton>
-                <ITButton variant="filled" color="primary" onClick={save} disabled={!nombre.trim()} className="mt-1">
-                  <ITText className="font-bold text-[11px]">{t("common:actions.save")}</ITText>
-                </ITButton>
-              </ITFlex>
-            </ITGrid>
-          </ITGrid>
         </ITFlex>
-      )}
+      </ITDialog>
 
       <ITDataTable
         columns={columns as any}

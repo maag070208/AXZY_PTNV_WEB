@@ -8,7 +8,15 @@
     "tiposDocumento": "Document types",
     "generos": "Genders",
     "tiposSangre": "Blood types",
+    "categoriasTicket": "Ticket categories",
     "notificaciones": "Notifications"
+  },
+  "groups": {
+    "organizacion": "Organization",
+    "inventario": "Inventory",
+    "personal": "Personnel",
+    "tickets": "Tickets",
+    "sistema": "System"
   },
   "name": "Name",
   "status": "Status",
@@ -26,7 +34,7 @@
     "title": "Notifications Configuration",
     "subtitle": "Recipients for system notification copies",
     "recipientsLabel": "Recipient emails",
-    "recipientsHelp": "Comma separated. E.g.: aamaro@axzy.dev, maag070208@gmail.com",
+    "recipientsHelp": "Type an email and press Add. They save when you press Save.",
     "currentValue": "Current configuration",
     "invalidCount": "{n} invalid email(s)",
     "validCount": "{n} valid email(s)",
@@ -34,6 +42,12 @@
     "saving": "Saving...",
     "saved": "Configuration saved",
     "saveError": "Failed to save",
-    "empty": "No recipients configured"
+    "empty": "No recipients configured",
+    "addRecipient": "Add",
+    "newRecipientLabel": "New recipient",
+    "newRecipientPlaceholder": "email@domain.com",
+    "invalidEmail": "Invalid email",
+    "duplicateEmail": "That email is already in the list",
+    "removeRecipient": "Remove"
   }
 }

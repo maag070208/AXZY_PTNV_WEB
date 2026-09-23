@@ -3,5 +3,6 @@ export {
   useGetSysConfig,
   useUpdateSysConfig,
   parseEmailRecipients,
+  isValidEmail,
   type EmailValidationResult,
 } from "./model/useSysConfig";

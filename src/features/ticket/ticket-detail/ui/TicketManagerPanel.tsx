@@ -1,7 +1,7 @@
 import { ITFlex, ITGrid, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaUserCog } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { CATEGORY_KEYS, STATUS_BADGE } from "@entities/ticket";
+import { STATUS_BADGE } from "@entities/ticket";
 import { dyn } from "@shared/i18n/dyn";
 import TasksGraph from "./TasksGraph";
 import type { UseTicketDetail } from "../model/useTicketDetail";
@@ -24,9 +24,9 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
     value,
     label: dyn(tt)(`statusLabels.${value}`),
   }));
-  const categoryOptions = CATEGORY_KEYS.map((value) => ({
-    value,
-    label: dyn(tt)(`categoryLabels.${value}`),
+  const categoryOptions = fx.categories.map((c) => ({
+    value: c.id,
+    label: c.nombre,
   }));
 
   return (
@@ -56,7 +56,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
                 name="category"
                 label={tt("detail.category")}
                 options={categoryOptions}
-                value={ticket.category}
+                value={ticket.categoryId ?? ""}
                 onChange={(e) => fx.handleCategoryChange(e.target.value)}
                 disabled={fx.isClosed}
               />

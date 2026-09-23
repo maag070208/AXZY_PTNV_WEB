@@ -51,7 +51,7 @@ export const updateTicketThunk = createAsyncThunk<
       descripcion: string;
       status: string;
       priority: string;
-      category: string;
+      categoryId: string | null;
       asignadoAId: string | null;
       departmentId: string | null;
     }>;

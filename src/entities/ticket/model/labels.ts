@@ -13,5 +13,3 @@ export const PRIORITY_BADGE: Record<string, { color: string }> = {
 
 export const STATUS_KEYS = Object.keys(STATUS_BADGE);
 export const PRIORITY_KEYS = Object.keys(PRIORITY_BADGE);
-
-export const CATEGORY_KEYS = ["MANTENIMIENTO", "EQUIPO", "SISTEMA", "OTRO"] as const;

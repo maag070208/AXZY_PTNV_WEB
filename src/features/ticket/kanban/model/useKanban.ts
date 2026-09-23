@@ -46,7 +46,7 @@ export const useKanban = (ticketId?: string) => {
   const [creatingTask, setCreatingTask] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<Status | null>(null);
-  const [search, setSearch] = useState("");
+  const [taskFilter, setTaskFilter] = useState("");
   const [assigneeFilter, setAssigneeFilter] = useState<string | null>(null);
   const [departmentFilter, setDepartmentFilter] = useState("");
 
@@ -95,22 +95,31 @@ export const useKanban = (ticketId?: string) => {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [rows, tt]);
 
+  const taskOptions = useMemo(() => {
+    const seen = new Set<string>();
+    const opts: Array<{ value: string; label: string; ticket: string; assignee: string }> = [];
+    rows.forEach((r) => {
+      if (seen.has(r.id)) return;
+      seen.add(r.id);
+      opts.push({
+        value: r.id,
+        label: `${r.title} · #${r.ticketId.slice(0, 6).toUpperCase()} · ${r.user.name}`,
+        ticket: r.ticket.titulo,
+        assignee: r.user.name,
+      });
+    });
+    return opts;
+  }, [rows]);
+
   const filteredRows = useMemo(() => {
-    const q = search.trim().toLowerCase();
     return rows.filter((r) => {
       if (assigneeFilter && r.userId !== assigneeFilter) return false;
       const deptName = r.ticket.department?.name ?? tt("list.general");
       if (departmentFilter && deptName !== departmentFilter) return false;
-      if (
-        q &&
-        !r.title.toLowerCase().includes(q) &&
-        !r.ticket.titulo.toLowerCase().includes(q)
-      ) {
-        return false;
-      }
+      if (taskFilter && r.id !== taskFilter) return false;
       return true;
     });
-  }, [rows, assigneeFilter, departmentFilter, search, tt]);
+  }, [rows, assigneeFilter, departmentFilter, taskFilter, tt]);
 
   const byStatus = useMemo(
     () =>
@@ -125,13 +134,13 @@ export const useKanban = (ticketId?: string) => {
   );
 
   const hasActiveFilters = Boolean(
-    assigneeFilter || departmentFilter || search.trim()
+    assigneeFilter || departmentFilter || taskFilter
   );
 
   const clearFilters = () => {
     setAssigneeFilter(null);
     setDepartmentFilter("");
-    setSearch("");
+    setTaskFilter("");
   };
 
   const openTicket = async (id: string) => {
@@ -303,8 +312,9 @@ export const useKanban = (ticketId?: string) => {
     setDraggingId,
     dragOver,
     setDragOver,
-    search,
-    setSearch,
+    taskFilter,
+    setTaskFilter,
+    taskOptions,
     assigneeFilter,
     setAssigneeFilter,
     departmentFilter,

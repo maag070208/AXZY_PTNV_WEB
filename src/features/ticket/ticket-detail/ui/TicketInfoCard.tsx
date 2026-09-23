@@ -29,7 +29,7 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
             {dyn(tt)(`priorityLabels.${ticket.priority}`)}
           </ITBadget>
           <ITBadget color="primary" size="lg">
-            {dyn(tt)(`categoryLabels.${ticket.category}`)}
+            {ticket.category?.nombre ?? "—"}
           </ITBadget>
           {ticket.deletedAt && (
             <ITBadget color="gray" size="lg">

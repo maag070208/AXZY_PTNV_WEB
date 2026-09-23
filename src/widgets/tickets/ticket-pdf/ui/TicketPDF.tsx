@@ -256,7 +256,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
             </View>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>{tt("pdf.category")}</Text>
-              <Text style={styles.metaValue}>{dyn(tt)(`categoryLabels.${ticket.category}`) ?? ticket.category}</Text>
+              <Text style={styles.metaValue}>{ticket.category?.nombre ?? "—"}</Text>
             </View>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>{tt("pdf.department")}</Text>

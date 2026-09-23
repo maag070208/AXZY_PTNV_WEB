@@ -10,12 +10,6 @@
     "ALTA": "Alta",
     "URGENTE": "Urgente"
   },
-  "categoryLabels": {
-    "MANTENIMIENTO": "Mantenimiento",
-    "EQUIPO": "Equipo",
-    "SISTEMA": "Sistema",
-    "OTRO": "Otro"
-  },
   "list": {
     "title": "Tickets",
     "description": "Seguimiento de solicitudes y reportes",

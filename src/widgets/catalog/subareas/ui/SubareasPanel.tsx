@@ -8,6 +8,7 @@ import {
   ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
+import { useEffect, useRef } from "react";
 import { FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import {
@@ -15,10 +16,19 @@ import {
   useSubareasCrud,
 } from "@features/subarea/subareas-crud";
 
-export default function SubareasPanel() {
+export default function SubareasPanel({ openCreateSignal }: { openCreateSignal?: number }) {
   const { t: tt } = useTranslation(["subareas", "common"]);
 
   const crud = useSubareasCrud();
+
+  const lastSignal = useRef(openCreateSignal);
+  const openCreate = useRef<() => void>(() => {});
+  openCreate.current = () => crud.setCreateOpen(true);
+  useEffect(() => {
+    if (openCreateSignal === lastSignal.current) return;
+    lastSignal.current = openCreateSignal;
+    openCreate.current();
+  }, [openCreateSignal]);
 
   const departmentOptions = crud.departments.map((d) => ({
     value: d.id,
@@ -32,19 +42,6 @@ export default function SubareasPanel() {
           {crud.error}
         </ITAlert>
       )}
-
-      <div className="mb-4 flex justify-end">
-        <ITButton
-          variant="filled"
-          color="primary"
-          onClick={() => crud.setCreateOpen(true)}
-        >
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </div>
 
       <SubareasTable
         fetchData={crud.fetchTableData}
