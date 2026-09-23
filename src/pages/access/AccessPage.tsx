@@ -178,7 +178,7 @@ export default function AccessPage() {
       key: "occurredAt",
       label: tt("columns.occurredAt"),
       type: "date",
-      sortable: true,
+      sortable: false,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
           {formatFechaHora(e.occurredAt)}
@@ -189,7 +189,7 @@ export default function AccessPage() {
       key: "employeeNameSnapshot",
       label: tt("columns.employee"),
       type: "string",
-      sortable: true,
+      sortable: false,
       render: (e) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">
@@ -205,7 +205,7 @@ export default function AccessPage() {
       key: "type",
       label: tt("columns.type"),
       type: "catalog",
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: { data: typeOptions, loading: false, error: false },
       render: (e) => (
