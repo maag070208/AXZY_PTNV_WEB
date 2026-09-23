@@ -10,6 +10,7 @@ import { formatFecha } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
 import type { Prestamo } from "@entities/inventario";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
+import { resolveAreaName } from "../model/carta";
 
 interface Props {
   prestamo: Prestamo;
@@ -189,10 +190,7 @@ export default function CartaResponsivaPDF({ prestamo }: Props) {
   const { t: tt } = useTranslation("cartas");
   const fechaTxt = formatFecha(prestamo.fecha) || tt("doc.dateLetters");
   const primerDetalle = prestamo.detalles?.[0] ?? null;
-  const departamentoNombre = (prestamo.departamento?.name || "Sistemas").replace(
-    /^Departamento de /i,
-    ""
-  );
+  const areaNombre = resolveAreaName(prestamo);
 
   const responsableName = prestamo.responsable?.name ?? "";
   const encargadoName = "";
@@ -308,14 +306,14 @@ export default function CartaResponsivaPDF({ prestamo }: Props) {
             </View>
             <View style={styles.recursoRow}>
               <Text style={styles.recLabel}>{tt("doc.area")}</Text>
-              <Text style={styles.recVal}>{"MANTENIMIENTO"}</Text>
+              <Text style={styles.recVal}>{areaNombre}</Text>
             </View>
           </View>
 
           <Text style={{ ...styles.parrafo, marginTop: 6 }}>
             {tt("doc.para2a")}{" "}
             <Text style={styles.bold}>
-              {tt("doc.reglamentoDepartamento")} {departamentoNombre}
+              {tt("doc.reglamentoDepartamento")} {areaNombre}
             </Text>{" "}
             {tt("doc.para2b")}{" "}
             <Text style={styles.bold}>{tt("doc.estrictamenteProhibido")}</Text>{" "}

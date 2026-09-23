@@ -1,6 +1,9 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "@pages/auth/LoginPage";
 import PrivateRoutes from "./guards/PrivateRoutes";
+import RoleGuard from "./guards/RoleGuard";
+import type { UserRole } from "@entities/user";
+import AccessPage from "@pages/access/AccessPage";
 import HomePage from "@pages/home/HomePage";
 import DashboardPage from "@pages/inventario/DashboardPage";
 import DispositivosPage from "@pages/inventario/DispositivosPage";
@@ -39,6 +42,9 @@ import MisTareasPage from "@pages/tickets/MisTareasPage";
 import AdminTareasPage from "@pages/tickets/AdminTareasPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
 import CatalogPage from "@pages/catalog/CatalogPage";
+
+/** Roles con acceso a la bitácora de accesos (ver ENTRADAS_SALIDAS.md §4). */
+const ACCESS_READ_ROLES: UserRole[] = ["ADMIN", "GERENTE", "RECURSOS_HUMANOS"];
 
 export default function App() {
   return (
@@ -88,6 +94,15 @@ export default function App() {
         <Route path="/usuarios/importar" element={<UserImportPage />} />
         <Route path="/catalogos" element={<CatalogPage />} />
         <Route path="/notificaciones" element={<NotificationsPage />} />
+
+        <Route
+          path="/access"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <AccessPage />
+            </RoleGuard>
+          }
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

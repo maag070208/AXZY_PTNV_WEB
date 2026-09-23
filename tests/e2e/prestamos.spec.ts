@@ -2,6 +2,13 @@ import { test, expect } from "./support/fixtures";
 import { esperarToast } from "./support/pages/componentes";
 import { ruta } from "./support/env";
 
+/** El `Área:` de la carta imprime el departamento sin el prefijo "Departamento de ". */
+const areaEsperada = (nombreDepartamento: string): string =>
+  nombreDepartamento.replace(/^Departamento de /i, "");
+
+const coincidenciaInsensible = (texto: string): RegExp =>
+  new RegExp(texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+
 /**
  * Flujo PRÉSTAMOS por pantalla — `/inventario/prestamos/nuevo` y
  * `/inventario/devoluciones/nueva`.
@@ -114,6 +121,38 @@ test.describe("PRÉSTAMOS desde la web", () => {
     await page.goto(ruta("/inventario/prestamos"));
     await expect(page.getByText(creado.consecutivo)).toBeVisible();
     await expect(page.getByText("ACTIVO").first()).toBeVisible();
+  });
+
+  test("el preview de la carta muestra el departamento elegido en Área", async ({
+    prestamoPage,
+    departamento,
+  }) => {
+    await prestamoPage.ir();
+    await prestamoPage.asignarADepartamento(departamento.name);
+
+    await expect(prestamoPage.areaPreview).toHaveText(
+      coincidenciaInsensible(areaEsperada(departamento.name))
+    );
+  });
+
+  test("Área del preview cambia al cambiar de departamento", async ({
+    prestamoPage,
+    api,
+  }) => {
+    const departamentos = await api.departamentos();
+    test.skip(departamentos.length < 2, "Se necesitan al menos dos departamentos sembrados");
+    const [primero, segundo] = departamentos;
+
+    await prestamoPage.ir();
+    await prestamoPage.asignarADepartamento(primero.name);
+    await expect(prestamoPage.areaPreview).toHaveText(
+      coincidenciaInsensible(areaEsperada(primero.name))
+    );
+
+    await prestamoPage.asignarADepartamento(segundo.name);
+    await expect(prestamoPage.areaPreview).toHaveText(
+      coincidenciaInsensible(areaEsperada(segundo.name))
+    );
   });
 
   test.describe("devoluciones", () => {

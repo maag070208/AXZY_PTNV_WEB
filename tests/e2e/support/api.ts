@@ -65,6 +65,7 @@ export interface Usuario {
   name: string;
   numeroEmpleado: string | null;
   departmentId: string | null;
+  department?: { id: string; name: string } | null;
 }
 
 export const crearContextoApi = async (): Promise<APIRequestContext> => {
@@ -207,6 +208,37 @@ export class ApiInventario {
   /** Usuarios (ADMIN) — para ligar un préstamo a un responsable real. */
   async usuarios(): Promise<Usuario[]> {
     return this.json(await this.api.get("users"), "usuarios", 200);
+  }
+
+  /** Alta de un usuario de prueba (ADMIN), con o sin departamento. */
+  async crearUsuario(input: {
+    username: string;
+    name: string;
+    departmentId?: string;
+    role?: string;
+  }): Promise<Usuario> {
+    return this.json(
+      await this.api.post("users", {
+        data: {
+          username: input.username,
+          password: E2E.password,
+          name: input.name,
+          role: input.role ?? "EMPLEADO",
+          ...(input.departmentId ? { departmentId: input.departmentId } : {}),
+        },
+      }),
+      "crearUsuario",
+      201
+    );
+  }
+
+  /**
+   * Borra físicamente a un usuario de prueba. `force=true` reasigna las FKs
+   * requeridas al admin para no chocar con préstamos/movimientos que lo
+   * referencien (el inventario E2E lo recoge el teardown de `api/`).
+   */
+  async eliminarUsuario(id: string): Promise<void> {
+    await this.json(await this.api.delete(`users/${id}?force=true`), "eliminarUsuario", 200);
   }
 
   /** Espera a que las existencias lleguen al estado esperado (la UI es asíncrona). */

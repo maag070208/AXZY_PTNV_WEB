@@ -25,6 +25,9 @@ export const E2E = {
   password: process.env.E2E_PASSWORD ?? "e2e-Test-2026!",
   admin: { username: "e2e_admin", name: "E2E Admin" },
   empleado: { username: "e2e_empleado", name: "E2E Empleado" },
+  guard: { username: "e2e_guard", name: "E2E Guard" },
+  /** Sitio demo persistente del módulo de acceso (mismo que provisiona `api/`). */
+  demoSite: { name: "E2E Portería Principal", code: "E2E-SITE" },
   /** Dónde el store de la app persiste la sesión. */
   storageKey: "cartas_auth_v1",
   /** Sesión ya iniciada, reutilizada por todos los tests. */

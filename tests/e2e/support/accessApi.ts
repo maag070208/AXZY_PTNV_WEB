@@ -1,0 +1,128 @@
+import type { APIRequestContext } from "@playwright/test";
+import { E2E } from "./env";
+
+/**
+ * Acceso directo a la API del módulo `access`, para **sembrar** el escenario
+ * de la bitácora (crear eventos exige alternar ENTRY/EXIT y respetar la ventana
+ * anti-duplicado; hacerlo por pantalla no es lo que se prueba aquí) y para
+ * **verificar** contra el backend lo que la tabla muestra.
+ *
+ * Reutiliza el contrato real de `api/src/modules/access`: no inventa campos.
+ */
+
+export interface AccessSite {
+  id: string;
+  name: string;
+  code: string | null;
+  active: boolean;
+}
+
+export interface AccessEvent {
+  id: string;
+  type: "ENTRY" | "EXIT";
+  occurredAt: string;
+  employeeId: string;
+  employeeNameSnapshot: string | null;
+  siteId: string | null;
+  locationSource: "GPS" | "SITE_ONLY" | "MANUAL";
+  method: "QR_SCAN" | "MANUAL";
+  voidedAt: string | null;
+  voidReason: string | null;
+}
+
+export interface AccessQueryResult {
+  page: number;
+  limit: number;
+  total: number;
+  data: AccessEvent[];
+}
+
+export interface UsuarioBasico {
+  id: string;
+  username: string;
+  name: string;
+}
+
+/** Payload `v:2` de la credencial (mismo esquema que genera la web). */
+export const qrDe = (id: string): string => JSON.stringify({ v: 2, id });
+
+export class ApiAccess {
+  constructor(private readonly api: APIRequestContext) {}
+
+  private async json<T>(
+    res: Awaited<ReturnType<APIRequestContext["get"]>>,
+    accion: string,
+    esperado: number
+  ): Promise<T> {
+    if (res.status() !== esperado) {
+      throw new Error(`${accion}: HTTP ${res.status()} → ${await res.text()}`);
+    }
+    return (await res.json()) as T;
+  }
+
+  async sitios(): Promise<AccessSite[]> {
+    return this.json(await this.api.get("access/sites"), "sitios", 200);
+  }
+
+  async crearSitio(input: { name: string; code: string }): Promise<AccessSite> {
+    return this.json(await this.api.post("access/sites", { data: input }), "crearSitio", 201);
+  }
+
+  async crearEvento(input: {
+    employeeId?: string;
+    qr?: string;
+    type: "ENTRY" | "EXIT";
+    siteId: string;
+    clientEventId: string;
+    latitude?: number;
+    longitude?: number;
+    accuracy?: number;
+  }): Promise<AccessEvent> {
+    return this.json(
+      await this.api.post("access/events", { data: input }),
+      "crearEvento",
+      201
+    );
+  }
+
+  async estado(employeeId: string): Promise<{
+    hasOpenEntry: boolean;
+    lastEvent: { type: "ENTRY" | "EXIT" } | null;
+  }> {
+    return this.json(
+      await this.api.get(`access/status/${employeeId}`),
+      "estado",
+      200
+    );
+  }
+
+  async query(body: {
+    page?: number;
+    limit?: number;
+    filters?: Record<string, string | number | boolean>;
+    sort?: { key: string; direction: "asc" | "desc" };
+  }): Promise<AccessQueryResult> {
+    return this.json(
+      await this.api.post("access/query", { data: { page: 1, limit: 10, ...body } }),
+      "query",
+      200
+    );
+  }
+
+  async usuarios(): Promise<UsuarioBasico[]> {
+    return this.json(await this.api.get("users"), "usuarios", 200);
+  }
+
+  async usuarioPorUsername(username: string): Promise<string> {
+    const usuario = (await this.usuarios()).find((u) => u.username === username);
+    if (!usuario) {
+      throw new Error(
+        `"${username}" no está provisionado. Corre "npm run test:e2e:provision" en ../api.`
+      );
+    }
+    return usuario.id;
+  }
+}
+
+/** Sitio demo persistente de la suite (ver `api/tests/e2e/support/env.ts`). */
+export const DEMO_SITE_CODE = E2E.demoSite.code;

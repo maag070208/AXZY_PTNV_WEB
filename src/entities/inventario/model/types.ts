@@ -111,7 +111,7 @@ export interface PrestamoDetalle {
 export interface Prestamo {
   id: string;
   responsableId?: string | null;
-  responsable?: { id: string; name: string; username: string; numeroEmpleado?: string | null } | null;
+  responsable?: { id: string; name: string; username: string; numeroEmpleado?: string | null; department?: { id: string; name: string } | null } | null;
   departamentoId?: string | null;
   departamento?: { id: string; name: string } | null;
   subareaId?: string | null;

@@ -43,6 +43,16 @@ export class NuevoPrestamoPage {
     return this.page.getByText(/Disponible:/).first();
   }
 
+  /**
+   * Fila "Área:" del bloque "Recurso TIC:" del preview de la carta responsiva.
+   * El nombre del departamento también aparece en el encabezado, en el párrafo
+   * del reglamento y en la firma, así que se ancla al testid para no dar falso
+   * positivo.
+   */
+  get areaPreview() {
+    return this.page.getByTestId("carta-area");
+  }
+
   get alertaSobreStock() {
     return this.page.getByText("La cantidad no puede superar el disponible");
   }

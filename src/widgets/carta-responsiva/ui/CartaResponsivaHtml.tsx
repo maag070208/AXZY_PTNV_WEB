@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { Prestamo } from "@entities/inventario";
 import { formatFecha } from "@shared/utils/dates";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
+import { resolveAreaName } from "../model/carta";
 
 /**
  * Vista previa HTML de la carta responsiva (sin PDFViewer para evitar
@@ -12,7 +13,7 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
 
   const fechaTxt = formatFecha(prestamo.fecha) || tt("doc.dateLetters");
   const primerDetalle = prestamo.detalles?.[0] ?? null;
-  const departamentoNombre = (prestamo.departamento?.name || "Sistemas").replace(/^Departamento de /i, "");
+  const areaNombre = resolveAreaName(prestamo);
 
   const responsableName = prestamo.responsable?.name ?? "";
   const observableTxt = prestamo.departamento?.name
@@ -39,7 +40,7 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
     tt("doc.compromiso5"),
   ];
 
-  const recursoRows: Array<{ label: string; value: string }> = [
+  const recursoRows: Array<{ label: string; value: string; testId?: string }> = [
     { label: tt("doc.descripcionGeneral"), value: descripcionConCantidad },
     { label: tt("doc.marca"), value: primerDetalle?.dispositivo?.marca || "STEREN" },
     { label: tt("doc.modelo"), value: primerDetalle?.dispositivo?.modelo || "RM-115" },
@@ -47,7 +48,7 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
   if (numeroSerie) recursoRows.push({ label: tt("doc.numeroSerie"), value: numeroSerie });
   if (nombreEquipo) recursoRows.push({ label: tt("doc.nombreEquipo"), value: nombreEquipo });
   recursoRows.push({ label: tt("doc.controlActivos"), value: activoFijo });
-  recursoRows.push({ label: tt("doc.area"), value: "MANTENIMIENTO" });
+  recursoRows.push({ label: tt("doc.area"), value: areaNombre, testId: "carta-area" });
 
   return (
     <div className="mx-auto max-w-[210mm] rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
@@ -78,7 +79,7 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
         </div>
 
         {/* Barra de título */}
-        <div className="border-b border-slate-300 bg-[#b4c6e7] px-2 py-1.5 text-center font-bold">
+        <div className="border-b border-slate-300 bg-[#b4c6e7] px-2 py-1.5 text-left font-bold">
           {tt("doc.barraFolio")}
         </div>
 
@@ -100,7 +101,12 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
             {recursoRows.map((r) => (
               <div key={r.label} className="flex items-end">
                 <span className="w-[96px] shrink-0">{r.label}</span>
-                <span className="flex-1 border-b border-black pl-1 font-bold uppercase">{r.value || " "}</span>
+                <span
+                  data-testid={r.testId}
+                  className="flex-1 border-b border-black pl-1 font-bold uppercase"
+                >
+                  {r.value || " "}
+                </span>
               </div>
             ))}
           </div>
@@ -108,7 +114,7 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
           <p className="mt-2 text-justify">
             {tt("doc.para2a")}{" "}
             <strong>
-              {tt("doc.reglamentoDepartamento")} {departamentoNombre}
+              {tt("doc.reglamentoDepartamento")} {areaNombre}
             </strong>{" "}
             {tt("doc.para2b")} <strong>{tt("doc.estrictamenteProhibido")}</strong> {tt("doc.para2c")}{" "}
             <strong>{tt("doc.reglamentoInterior")}</strong>

@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import accessEn from "./locales/en/access.json";
 import auditEn from "./locales/en/audit.json";
 import authEn from "./locales/en/auth.json";
 import cartasEn from "./locales/en/cartas.json";
@@ -21,6 +22,7 @@ import ticketsEn from "./locales/en/tickets.json";
 import usersEn from "./locales/en/users.json";
 import catalogEn from "./locales/en/catalog.json";
 
+import accessEs from "./locales/es/access.json";
 import auditEs from "./locales/es/audit.json";
 import authEs from "./locales/es/auth.json";
 import cartasEs from "./locales/es/cartas.json";
@@ -63,6 +65,7 @@ export const NS_LIST = [
   "audit",
   "catalog",
   "actas",
+  "access",
 ] as const;
 
 export const resources = {
@@ -86,6 +89,7 @@ export const resources = {
     notifications: notificationsEn,
     audit: auditEn,
     catalog: catalogEn,
+    access: accessEn,
   },
   es: {
     common: commonEs,
@@ -107,6 +111,7 @@ export const resources = {
     notifications: notificationsEs,
     audit: auditEs,
     catalog: catalogEs,
+    access: accessEs,
   },
 } as const;
 

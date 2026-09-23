@@ -39,6 +39,7 @@
     "notifications": "Notifications",
     "logout": "Sign out",
     "catalogs": "Catalogs",
-    "hrReports": "HR Reports"
+    "hrReports": "HR Reports",
+    "accessLog": "Access log"
   }
 }

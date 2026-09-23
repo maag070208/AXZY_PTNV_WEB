@@ -39,6 +39,7 @@
     "notifications": "Notificaciones",
     "logout": "Cerrar sesión",
     "catalogs": "Catálogos",
-    "hrReports": "Reportes de personal"
+    "hrReports": "Reportes de personal",
+    "accessLog": "Bitácora de accesos"
   }
 }

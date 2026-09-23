@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import {
   FaBoxes,
   FaChartBar,
+  FaDoorOpen,
   FaHouseUser,
   FaMapMarkerAlt,
   FaTasks,
@@ -56,6 +57,10 @@ export default function PrivateRoutes() {
   // Personal/RH: expediente completo (médico, oficial, contacto de emergencia,
   // documentos) es exclusivo de ADMIN y RECURSOS_HUMANOS — no de GERENTE.
   const canManageHR = user?.role === "ADMIN" || user?.role === "RECURSOS_HUMANOS";
+  // Bitácora de accesos: ADMIN, GERENTE y RECURSOS_HUMANOS. JEFE_DE_AREA y
+  // EMPLEADO quedan fuera (ver ENTRADAS_SALIDAS.md §4).
+  const canViewAccess =
+    user?.role === "ADMIN" || user?.role === "GERENTE" || user?.role === "RECURSOS_HUMANOS";
 
   const active = (to: string) => location.pathname.startsWith(to);
 
@@ -154,6 +159,18 @@ export default function PrivateRoutes() {
           icon: <FaChartBar size={14} />,
           action: () => navigate("/reportes"),
           isActive: active("/reportes"),
+        },
+      ]
+      : []),
+    // CONTROL DE ACCESO (ADMIN, GERENTE y RECURSOS_HUMANOS — bitácora de entradas/salidas)
+    ...(canViewAccess
+      ? [
+        {
+          id: "accesos",
+          label: tt("nav.accessLog"),
+          icon: <FaDoorOpen size={14} />,
+          action: () => navigate("/access"),
+          isActive: active("/access"),
         },
       ]
       : []),

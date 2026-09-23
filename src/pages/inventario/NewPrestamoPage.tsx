@@ -84,7 +84,7 @@ export default function NewPrestamoPage() {
       responsable: asignacion === "PERSONAL"
         ? (() => {
             const u = responsables.find((x) => x.id === responsableId);
-            return u ? { id: u.id, name: u.name, username: u.username, numeroEmpleado: u.numeroEmpleado ?? null } : null;
+            return u ? { id: u.id, name: u.name, username: u.username, numeroEmpleado: u.numeroEmpleado ?? null, department: u.department ?? null } : null;
           })()
         : null,
       departamentoId: asignacion === "DEPARTAMENTO" ? departamentoId : null,
