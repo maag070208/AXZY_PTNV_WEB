@@ -215,12 +215,13 @@ export const pdfTheme = StyleSheet.create({
   footerPowered: { fontSize: 6.8, color: PDF_COLORS.band, fontFamily: "Helvetica-Bold" },
 });
 
-export const badgeStyleFor = (kind: "success" | "warning" | "danger" | "gray") => {
+export const badgeStyleFor = (kind: "success" | "warning" | "danger" | "gray" | "info") => {
   const map = {
     success: { color: PDF_COLORS.success, backgroundColor: PDF_COLORS.successBg },
     warning: { color: PDF_COLORS.warning, backgroundColor: PDF_COLORS.warningBg },
     danger: { color: PDF_COLORS.danger, backgroundColor: PDF_COLORS.dangerBg },
     gray: { color: PDF_COLORS.gray, backgroundColor: PDF_COLORS.grayBg },
+    info: { color: PDF_COLORS.band, backgroundColor: "#dbeafe" },
   } as const;
   return [pdfTheme.badge, map[kind]];
 };

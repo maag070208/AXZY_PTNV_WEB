@@ -58,3 +58,85 @@ export interface Site {
   createdAt: string;
   updatedAt: string;
 }
+
+// ---------------------------------------------------------------------------
+// Reporte de entradas/salidas por persona (POST /access/report)
+// ---------------------------------------------------------------------------
+
+/** Granularidad del reporte: define la ventana, no la dimensión de la fila. */
+export type AccessReportPeriod = "DAY" | "WEEK" | "MONTH";
+
+/**
+ * Incidencia de una sesión derivada del emparejamiento ENTRY/EXIT.
+ * - `ENTRY_WITHOUT_EXIT`: entrada que quedó sin salida (anomalía).
+ * - `EXIT_WITHOUT_ENTRY`: salida sin entrada previa (anomalía).
+ * - `OPEN_ENTRY`: entrada abierta de un periodo en curso ("En sitio").
+ */
+export type AccessIncidentCode =
+  | "ENTRY_WITHOUT_EXIT"
+  | "EXIT_WITHOUT_ENTRY"
+  | "OPEN_ENTRY";
+
+/** Detalle diario de una persona (atribuido por el día local de su `entryAt`). */
+export interface AccessReportDay {
+  date: string;
+  entryAt: string | null;
+  exitAt: string | null;
+  workedMinutes: number;
+  sessions: number;
+  incidents: AccessIncidentCode[];
+  /** `true` si alguna sesión del día cruzó la medianoche local. */
+  crossesMidnight: boolean;
+}
+
+/** Una fila por persona. `days[]` solo se materializa en las filas de la página. */
+export interface AccessReportPersonRow {
+  employeeId: string;
+  employeeName: string;
+  numeroEmpleado: string | null;
+  puesto: string | null;
+  departmentId: string | null;
+  departmentName: string | null;
+  active: boolean;
+  hasRecords: boolean;
+  firstEntryAt: string | null;
+  lastExitAt: string | null;
+  workedMinutes: number;
+  sessionCount: number;
+  daysWithRecords: number;
+  incidents: AccessIncidentCode[];
+  days: AccessReportDay[];
+}
+
+/** Rango de fechas resuelto por el servidor en la zona horaria efectiva. */
+export interface AccessReportRange {
+  start: string;
+  end: string;
+  timezone: string;
+  period: AccessReportPeriod;
+}
+
+/** Resumen global del reporte (no depende de la página devuelta). */
+export interface AccessReportSummary {
+  peopleTotal: number;
+  peopleWithRecords: number;
+  peopleWithoutRecords: number;
+  peopleInside: number;
+  totalWorkedMinutes: number;
+  totalIncidents: number;
+  range: AccessReportRange;
+}
+
+/** Respuesta paginada de `/access/report` y de `/access/report/export`. */
+export interface AccessReportTableResponse {
+  data: AccessReportPersonRow[];
+  total: number;
+  summary: AccessReportSummary;
+}
+
+/** Metadatos de la exportación a PDF (periodo de referencia y zona horaria). */
+export interface AccessReportPdfMeta {
+  period: AccessReportPeriod;
+  date: string;
+  timezone: string;
+}

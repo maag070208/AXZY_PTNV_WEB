@@ -1,0 +1,76 @@
+{
+  "title": "Reporte de entradas y salidas",
+  "description": "Entradas y salidas por persona, con horas e incidencias del periodo.",
+  "periods": {
+    "DAY": "Diaria",
+    "WEEK": "Semanal",
+    "MONTH": "Mensual"
+  },
+  "filters": {
+    "date": "Periodo",
+    "department": "Departamento",
+    "allDepartments": "Todos los departamentos",
+    "employee": "Buscar empleado",
+    "employeePlaceholder": "Nombre o número de empleado...",
+    "includeInactive": "Incluir bajas"
+  },
+  "kpis": {
+    "withRecords": "Con registro",
+    "withoutRecords": "Sin registro",
+    "inside": "En sitio",
+    "workedHours": "Horas totales",
+    "incidents": "Incidencias"
+  },
+  "status": {
+    "noRecords": "Sin registros",
+    "hasRecords": "Con registros",
+    "inside": "En sitio",
+    "inactive": "Baja"
+  },
+  "columns": {
+    "employee": "Empleado",
+    "department": "Departamento",
+    "status": "Estado",
+    "entry": "Entrada",
+    "exit": "Salida",
+    "hours": "Horas",
+    "sessions": "Sesiones",
+    "days": "Días con registro",
+    "incidents": "Incidencias",
+    "actions": ""
+  },
+  "incidents": {
+    "ENTRY_WITHOUT_EXIT": "Entrada sin salida",
+    "EXIT_WITHOUT_ENTRY": "Salida sin entrada",
+    "OPEN_ENTRY": "En sitio"
+  },
+  "noDepartment": "Sin departamento",
+  "actions": {
+    "viewDetail": "Ver detalle",
+    "export": "Descargar PDF",
+    "exporting": "Generando…"
+  },
+  "detail": {
+    "title": "Detalle por día",
+    "date": "Fecha",
+    "entry": "Entrada",
+    "exit": "Salida",
+    "hours": "Horas",
+    "sessions": "Sesiones",
+    "incidents": "Incidencias",
+    "crossesMidnight": "Turno nocturno",
+    "crossesMidnightBadge": "Cruza medianoche",
+    "noDays": "Sin registros en el periodo."
+  },
+  "errors": {
+    "load": "No se pudo generar el reporte"
+  },
+  "pdf": {
+    "title": "Reporte de Entradas y Salidas",
+    "rangeTitle": "Periodo del reporte",
+    "timezone": "Zona horaria",
+    "totalPeople": "Personas",
+    "totalHours": "Horas",
+    "totalIncidents": "Incidencias"
+  }
+}

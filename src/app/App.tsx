@@ -4,6 +4,7 @@ import PrivateRoutes from "./guards/PrivateRoutes";
 import RoleGuard from "./guards/RoleGuard";
 import type { UserRole } from "@entities/user";
 import AccessPage from "@pages/access/AccessPage";
+import AccessReportPage from "@pages/access/AccessReportPage";
 import HomePage from "@pages/home/HomePage";
 import DashboardPage from "@pages/inventario/DashboardPage";
 import DispositivosPage from "@pages/inventario/DispositivosPage";
@@ -100,6 +101,14 @@ export default function App() {
           element={
             <RoleGuard roles={ACCESS_READ_ROLES}>
               <AccessPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/access/report"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <AccessReportPage />
             </RoleGuard>
           }
         />

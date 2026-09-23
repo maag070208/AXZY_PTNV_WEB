@@ -3,10 +3,16 @@ import { pdf } from "@react-pdf/renderer";
 import { createElement } from "react";
 import type { ReportFilters, ReportRow, AsignadoRow, DeviceReportRow } from "@entities/report";
 import type { MaterialOutput } from "@entities/salida";
+import type {
+  AccessReportPdfMeta,
+  AccessReportPersonRow,
+  AccessReportSummary,
+} from "@entities/access";
 import ReportPDF from "../ui/ReportPDF";
 import AsignadosPDF from "../ui/AsignadosPDF";
 import DevicePDF from "../ui/DevicePDF";
 import SalidasPDF from "../ui/SalidasPDF";
+import AccessReportPDF from "../ui/AccessReportPDF";
 
 export const downloadReportPDF = async (
   rows: ReportRow[],
@@ -47,4 +53,22 @@ export const downloadSalidasPDF = async (rows: MaterialOutput[]): Promise<void> 
   const mm = String(now.getMonth() + 1).padStart(2, "0");
   const yy = now.getFullYear();
   saveAs(blob, `reporte_salidas_${yy}${mm}${dd}.pdf`);
+};
+
+const ACCESS_PERIOD_FILE: Record<AccessReportPdfMeta["period"], string> = {
+  DAY: "diario",
+  WEEK: "semanal",
+  MONTH: "mensual",
+};
+
+export const downloadAccessReportPDF = async (
+  rows: AccessReportPersonRow[],
+  summary: AccessReportSummary,
+  meta: AccessReportPdfMeta
+): Promise<void> => {
+  const blob = await pdf(
+    createElement(AccessReportPDF, { rows, summary, meta }) as any
+  ).toBlob();
+  const stamp = meta.date.replace(/-/g, "");
+  saveAs(blob, `reporte_accesos_${ACCESS_PERIOD_FILE[meta.period]}_${stamp}.pdf`);
 };

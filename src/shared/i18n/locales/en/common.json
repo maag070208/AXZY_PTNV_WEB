@@ -40,6 +40,8 @@
     "logout": "Sign out",
     "catalogs": "Catalogs",
     "hrReports": "HR Reports",
-    "accessLog": "Access log"
+    "access": "Access control",
+    "accessLog": "Access log",
+    "accessReport": "Entry/exit report"
   }
 }

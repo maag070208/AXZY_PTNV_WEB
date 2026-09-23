@@ -40,6 +40,8 @@
     "logout": "Cerrar sesión",
     "catalogs": "Catálogos",
     "hrReports": "Reportes de personal",
-    "accessLog": "Bitácora de accesos"
+    "access": "Control de acceso",
+    "accessLog": "Bitácora de accesos",
+    "accessReport": "Reporte entradas/salidas"
   }
 }

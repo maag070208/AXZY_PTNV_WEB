@@ -1,6 +1,6 @@
-import { api } from "@shared/api/client";
+import { api, post } from "@shared/api/client";
 import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
-import type { AccessEvent, Site } from "../model/types";
+import type { AccessEvent, AccessReportTableResponse, Site } from "../model/types";
 
 export const accessApi = {
   /** Tabla server-side (`{ page, limit, filters, sort }` → `{ data, total }`). */
@@ -10,4 +10,10 @@ export const accessApi = {
   sites: () => api.get<Site[]>(`/access/sites`),
   void: (id: string, reason: string) =>
     api.post<AccessEvent>(`/access/${id}/void`, { reason }),
+  /** Página del reporte por persona + `summary` global (contrato ITDataTable). */
+  report: (params: ITDataTableFetchParamsPost) =>
+    post<AccessReportTableResponse>(`/access/report`, params),
+  /** Universo completo sin paginar, para el PDF. Mismos filtros y `summary`. */
+  reportExport: (params: ITDataTableFetchParamsPost) =>
+    post<AccessReportTableResponse>(`/access/report/export`, params),
 };

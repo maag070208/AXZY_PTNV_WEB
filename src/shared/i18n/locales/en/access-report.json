@@ -1,0 +1,76 @@
+{
+  "title": "Entry and exit report",
+  "description": "Entry and exit per person, with hours and incidents for the period.",
+  "periods": {
+    "DAY": "Daily",
+    "WEEK": "Weekly",
+    "MONTH": "Monthly"
+  },
+  "filters": {
+    "date": "Period",
+    "department": "Department",
+    "allDepartments": "All departments",
+    "employee": "Search employee",
+    "employeePlaceholder": "Employee name or number...",
+    "includeInactive": "Include inactive"
+  },
+  "kpis": {
+    "withRecords": "With records",
+    "withoutRecords": "No records",
+    "inside": "On site",
+    "workedHours": "Total hours",
+    "incidents": "Incidents"
+  },
+  "status": {
+    "noRecords": "No records",
+    "hasRecords": "With records",
+    "inside": "On site",
+    "inactive": "Inactive"
+  },
+  "columns": {
+    "employee": "Employee",
+    "department": "Department",
+    "status": "Status",
+    "entry": "Entry",
+    "exit": "Exit",
+    "hours": "Hours",
+    "sessions": "Sessions",
+    "days": "Days with records",
+    "incidents": "Incidents",
+    "actions": ""
+  },
+  "incidents": {
+    "ENTRY_WITHOUT_EXIT": "Entry without exit",
+    "EXIT_WITHOUT_ENTRY": "Exit without entry",
+    "OPEN_ENTRY": "On site"
+  },
+  "noDepartment": "No department",
+  "actions": {
+    "viewDetail": "View details",
+    "export": "Download PDF",
+    "exporting": "Generating…"
+  },
+  "detail": {
+    "title": "Daily detail",
+    "date": "Date",
+    "entry": "Entry",
+    "exit": "Exit",
+    "hours": "Hours",
+    "sessions": "Sessions",
+    "incidents": "Incidents",
+    "crossesMidnight": "Night shift",
+    "crossesMidnightBadge": "Crosses midnight",
+    "noDays": "No records in the period."
+  },
+  "errors": {
+    "load": "Could not generate the report"
+  },
+  "pdf": {
+    "title": "Entry and Exit Report",
+    "rangeTitle": "Report period",
+    "timezone": "Time zone",
+    "totalPeople": "People",
+    "totalHours": "Hours",
+    "totalIncidents": "Incidents"
+  }
+}

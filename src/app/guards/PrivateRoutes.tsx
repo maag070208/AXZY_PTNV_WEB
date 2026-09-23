@@ -167,10 +167,23 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "accesos",
-          label: tt("nav.accessLog"),
+          label: tt("nav.access"),
           icon: <FaDoorOpen size={14} />,
-          action: () => navigate("/access"),
           isActive: active("/access"),
+          subitems: [
+            {
+              id: "accessLog",
+              label: tt("nav.accessLog"),
+              action: () => navigate("/access"),
+              isActive: active("/access") && !active("/access/report"),
+            },
+            {
+              id: "accessReport",
+              label: tt("nav.accessReport"),
+              action: () => navigate("/access/report"),
+              isActive: active("/access/report"),
+            },
+          ],
         },
       ]
       : []),

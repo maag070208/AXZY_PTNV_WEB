@@ -43,6 +43,35 @@ export interface UsuarioBasico {
   name: string;
 }
 
+export interface AccessReportRow {
+  employeeId: string;
+  employeeName: string;
+  numeroEmpleado: string | null;
+  departmentName: string | null;
+  active: boolean;
+  hasRecords: boolean;
+  workedMinutes: number;
+  sessionCount: number;
+  daysWithRecords: number;
+  incidents: string[];
+}
+
+export interface AccessReportResult {
+  page: number;
+  limit: number;
+  total: number;
+  data: AccessReportRow[];
+  summary: {
+    peopleTotal: number;
+    peopleWithRecords: number;
+    peopleWithoutRecords: number;
+    peopleInside: number;
+    totalWorkedMinutes: number;
+    totalIncidents: number;
+    range: { start: string; end: string; timezone: string; period: string };
+  };
+}
+
 /** Payload `v:2` de la credencial (mismo esquema que genera la web). */
 export const qrDe = (id: string): string => JSON.stringify({ v: 2, id });
 
@@ -111,6 +140,50 @@ export class ApiAccess {
 
   async usuarios(): Promise<UsuarioBasico[]> {
     return this.json(await this.api.get("users"), "usuarios", 200);
+  }
+
+  /** Alta de un usuario de prueba (ADMIN) para sembrar el reporte. */
+  async crearUsuario(input: {
+    username: string;
+    name: string;
+    role?: string;
+    departmentId?: string;
+  }): Promise<UsuarioBasico> {
+    return this.json(
+      await this.api.post("users", {
+        data: {
+          username: input.username,
+          password: E2E.password,
+          name: input.name,
+          role: input.role ?? "EMPLEADO",
+          ...(input.departmentId ? { departmentId: input.departmentId } : {}),
+        },
+      }),
+      "crearUsuario",
+      201
+    );
+  }
+
+  /** Borra físicamente un usuario de prueba sin historial ligado. */
+  async eliminarUsuario(id: string): Promise<void> {
+    const res = await this.api.delete(`users/${id}?force=true`);
+    if (res.status() !== 200) {
+      throw new Error(`eliminarUsuario: HTTP ${res.status()} → ${await res.text()}`);
+    }
+  }
+
+  /** Reporte paginado por persona (contrato ITDataTable + `summary` global). */
+  async report(body: {
+    page?: number;
+    limit?: number;
+    filters: Record<string, string | number | boolean>;
+    sort?: { key: string; direction: "asc" | "desc" };
+  }): Promise<AccessReportResult> {
+    return this.json(
+      await this.api.post("access/report", { data: { page: 1, limit: 10, ...body } }),
+      "report",
+      200
+    );
   }
 
   async usuarioPorUsername(username: string): Promise<string> {
