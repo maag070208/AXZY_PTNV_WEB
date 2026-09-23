@@ -55,12 +55,6 @@ export const downloadSalidasPDF = async (rows: MaterialOutput[]): Promise<void> 
   saveAs(blob, `reporte_salidas_${yy}${mm}${dd}.pdf`);
 };
 
-const ACCESS_PERIOD_FILE: Record<AccessReportPdfMeta["period"], string> = {
-  DAY: "diario",
-  WEEK: "semanal",
-  MONTH: "mensual",
-};
-
 export const downloadAccessReportPDF = async (
   rows: AccessReportPersonRow[],
   summary: AccessReportSummary,
@@ -69,6 +63,6 @@ export const downloadAccessReportPDF = async (
   const blob = await pdf(
     createElement(AccessReportPDF, { rows, summary, meta }) as any
   ).toBlob();
-  const stamp = meta.date.replace(/-/g, "");
-  saveAs(blob, `reporte_accesos_${ACCESS_PERIOD_FILE[meta.period]}_${stamp}.pdf`);
+  const stamp = meta.date;
+  saveAs(blob, `reporte_accessos_${meta.period}_${stamp}.pdf`);
 };

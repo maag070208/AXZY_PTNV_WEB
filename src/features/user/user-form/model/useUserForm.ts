@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { validateEmail } from "@shared/validation";
+import { showToast } from "@app/toast/toast.slice";
+import type { AppDispatch } from "@app/store";
 
 export const ROLE_GUIDANCE: Record<
   UserRole,
@@ -64,6 +67,24 @@ export interface UserFormValues {
   subareaId: string;
 }
 
+/** Límites de caracteres por campo (los mismos que aplica la validación). */
+const LIMITS = {
+  username: { min: 3, max: 30 },
+  password: { min: 6, max: 72 },
+  name: { max: 100 },
+  numeroEmpleado: { max: 30 },
+  puesto: { max: 100 },
+} as const;
+
+const VALIDATED_FIELDS: (keyof UserFormValues)[] = [
+  "username",
+  "password",
+  "email",
+  "name",
+  "numeroEmpleado",
+  "puesto",
+];
+
 /** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
 export const composeFullName = (v: {
   name?: string;
@@ -92,6 +113,7 @@ export const useUserForm = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const { t: tt } = useTranslation(["users", "common"]);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [form, setForm] = useState<UserFormValues>({
@@ -156,6 +178,69 @@ export const useUserForm = () => {
 
   const handleField = (field: keyof UserFormValues, value: string) => {
     setForm((f) => ({ ...f, [field]: value }));
+    // Al escribir se limpia el error del campo; reaparece al salir (blur) o al guardar.
+    setErrors((prev) => {
+      if (!(field in prev)) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const setFieldError = (field: keyof UserFormValues, message: string | null) => {
+    setErrors((prev) => {
+      if (!message) {
+        if (!(field in prev)) return prev;
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      }
+      return { ...prev, [field]: message };
+    });
+  };
+
+  /** Valida un solo campo (min/máx de caracteres, formato, obligatorios). */
+  const validateField = (field: keyof UserFormValues, value: string): string | null => {
+    const trimmed = value.trim();
+    switch (field) {
+      case "username":
+        if (!trimmed) return "El usuario es obligatorio";
+        if (trimmed.length < LIMITS.username.min)
+          return `El usuario debe tener al menos ${LIMITS.username.min} caracteres`;
+        if (trimmed.length > LIMITS.username.max)
+          return `El usuario debe tener máximo ${LIMITS.username.max} caracteres`;
+        return null;
+      case "password":
+        if (!isEdit && !value) return "La contraseña es obligatoria";
+        if (value && value.length < LIMITS.password.min)
+          return `La contraseña debe tener al menos ${LIMITS.password.min} caracteres`;
+        if (value.length > LIMITS.password.max)
+          return `La contraseña debe tener máximo ${LIMITS.password.max} caracteres`;
+        return null;
+      case "name":
+        if (!trimmed) return "El nombre es obligatorio";
+        if (trimmed.length > LIMITS.name.max)
+          return `El nombre debe tener máximo ${LIMITS.name.max} caracteres`;
+        return null;
+      case "email":
+        if (!trimmed) return null;
+        if (trimmed.length > 254) return "El correo debe tener máximo 254 caracteres";
+        return validateEmail(trimmed);
+      case "numeroEmpleado":
+        if (trimmed.length > LIMITS.numeroEmpleado.max)
+          return `El número de empleado debe tener máximo ${LIMITS.numeroEmpleado.max} caracteres`;
+        return null;
+      case "puesto":
+        if (trimmed.length > LIMITS.puesto.max)
+          return `El puesto debe tener máximo ${LIMITS.puesto.max} caracteres`;
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  const handleBlur = (field: keyof UserFormValues) => {
+    setFieldError(field, validateField(field, form[field] ?? ""));
   };
 
   const handleDepartmentChange = (value: string) => {
@@ -164,15 +249,9 @@ export const useUserForm = () => {
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
-    if (!form.username.trim()) e.username = "El usuario es obligatorio";
-    else if (form.username.trim().length < 3) e.username = "El usuario debe tener al menos 3 caracteres";
-    if (!form.name.trim()) e.name = "El nombre es obligatorio";
-    if (!isEdit && !form.password) e.password = "La contraseña es obligatoria";
-    else if (form.password && form.password.length < 6)
-      e.password = "La contraseña debe tener al menos 6 caracteres";
-    if (form.email.trim()) {
-      const emailErr = validateEmail(form.email);
-      if (emailErr) e.email = emailErr;
+    for (const field of VALIDATED_FIELDS) {
+      const err = validateField(field, form[field] ?? "");
+      if (err) e[field] = err;
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -215,7 +294,17 @@ export const useUserForm = () => {
       }
       return true;
     } catch (e: any) {
-      setError(e.message);
+      const code: unknown = e?.code;
+      const msg: string = e?.message ?? "Error al guardar";
+      // Duplicados que manda la API → error inline en el campo + toast global.
+      if (code === "EMAIL_TAKEN" || code === "USERNAME_TAKEN" || code === "NUMERO_EMPLEADO_TAKEN") {
+        const field =
+          code === "EMAIL_TAKEN" ? "email" : code === "USERNAME_TAKEN" ? "username" : "numeroEmpleado";
+        setFieldError(field, msg);
+        dispatch(showToast({ message: msg, type: "error" }));
+      } else {
+        setError(msg);
+      }
       return false;
     } finally {
       setSaving(false);
@@ -231,6 +320,7 @@ export const useUserForm = () => {
     form,
     errors,
     handleField,
+    handleBlur,
     handleDepartmentChange,
     selectedDept,
     roleGuidance,

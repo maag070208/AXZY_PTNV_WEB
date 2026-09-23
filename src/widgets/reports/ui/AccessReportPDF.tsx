@@ -7,6 +7,7 @@ import type {
   AccessReportSummary,
 } from "@entities/access";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
+import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
 
@@ -54,39 +55,67 @@ const COL = {
   incidents: 52,
 };
 
-const fmtMinutes = (minutes: number): string => {
-  const total = Math.max(0, Math.round(minutes));
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-};
+const fmtMinutes = formatMinutesAsHhMm;
 
-const timeOf = (iso: string): string => {
-  const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-};
-
-const fmtStamp = (iso: string | null, period: string): string => {
+const fmtStamp = (iso: string | null, period: string, tz?: string): string => {
   if (!iso) return "—";
-  if (period === "DAY") return timeOf(iso);
+  const time = formatTimeInTZ(iso, tz);
+  if (period === "DAY") return time;
   const d = new Date(iso);
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
-  return `${dd}/${mm} ${timeOf(iso)}`;
+  return `${dd}/${mm} ${time}`;
 };
 
-const fmtDateTime = (iso: string): string => {
+const fmtDateTime = (iso: string, tz?: string): string => {
   const d = new Date(iso);
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const yy = d.getFullYear();
-  return `${dd}/${mm}/${yy} ${timeOf(iso)}`;
+  return `${dd}/${mm}/${yy} ${formatTimeInTZ(iso, tz)}`;
+};
+
+/**
+ * Fecha civil `DD/MM/YYYY` de un instante en la zona horaria efectiva.
+ * NO usa la fecha local del navegador: `Intl` resuelve las partes en `tz`.
+ */
+const fmtDateInTZ = (iso: string, tz?: string): string =>
+  new Intl.DateTimeFormat("en-GB", {
+    timeZone: tz,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(iso));
+
+/**
+ * Día calendario anterior al instante dado, en la zona horaria efectiva.
+ * `summary.range.end` es EXCLUSIVO (medianoche del día siguiente): para que el
+ * rango se lea como `[start, end)` se resta un día civil al límite.
+ */
+const prevCivilDay = (iso: string, tz?: string): string => {
+  const [dd, mm, yyyy] = fmtDateInTZ(iso, tz).split("/").map(Number);
+  const prev = new Date(Date.UTC(yyyy, mm - 1, dd - 1));
+  const pdd = String(prev.getUTCDate()).padStart(2, "0");
+  const pmm = String(prev.getUTCMonth() + 1).padStart(2, "0");
+  return `${pdd}/${pmm}/${prev.getUTCFullYear()}`;
 };
 
 export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
   const { t: tt } = useTranslation(["access-report"]);
   const reportTitle = title ?? tt("pdf.title");
-  const today = fmtDateTime(new Date().toISOString());
+  const tz = summary.range.timezone || meta.timezone;
+  const today = fmtDateTime(new Date().toISOString(), tz);
+
+  /**
+   * Rango con semántica `[start, end)` (el fin es exclusivo): en DÍA solo se
+   * imprime la fecha del día; en SEMANA/MES se muestra `end − 1 día`, sin la
+   * hora "00:00" que hace parecer que el reporte cubre otro día.
+   */
+  const rangePeriod = summary.range.period || meta.period;
+  const rangeLabel =
+    rangePeriod === "DAY"
+      ? fmtDateInTZ(summary.range.start, tz)
+      : `${fmtDateInTZ(summary.range.start, tz)} — ${prevCivilDay(summary.range.end, tz)}`;
 
   const statusOf = (row: AccessReportPersonRow): { kind: BadgeKind; label: string } => {
     if (!row.hasRecords) return { kind: "gray", label: tt("status.noRecords") };
@@ -148,8 +177,7 @@ export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
                 <View style={pdfTheme.filterBox}>
                   <Text style={pdfTheme.filterTitle}>{tt("pdf.rangeTitle")}</Text>
                   <Text style={pdfTheme.filterText}>
-                    {tt(`periods.${meta.period}`)} · {fmtDateTime(summary.range.start)} —{" "}
-                    {fmtDateTime(summary.range.end)}
+                    {tt(`periods.${meta.period}`)} · {rangeLabel}
                   </Text>
                   <Text style={pdfTheme.filterText}>
                     {tt("pdf.timezone")}: {summary.range.timezone}
@@ -206,13 +234,15 @@ export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
                     <Text style={badgeStyleFor(status.kind)}>{status.label}</Text>
                   </View>
                   <View style={{ width: COL.entry }}>
-                    <Text style={pdfTheme.cell}>{fmtStamp(r.firstEntryAt, meta.period)}</Text>
+                    <Text style={pdfTheme.cell}>{fmtStamp(r.firstEntryAt, meta.period, tz)}</Text>
                   </View>
                   <View style={{ width: COL.exit }}>
-                    <Text style={pdfTheme.cell}>{fmtStamp(r.lastExitAt, meta.period)}</Text>
+                    <Text style={pdfTheme.cell}>{fmtStamp(r.lastExitAt, meta.period, tz)}</Text>
                   </View>
                   <View style={{ width: COL.hours }}>
-                    <Text style={pdfTheme.cellBold}>{fmtMinutes(r.workedMinutes)}</Text>
+                    <Text style={pdfTheme.cellBold}>
+                      {r.hasRecords ? fmtMinutes(r.workedMinutes) : "—"}
+                    </Text>
                   </View>
                   <View style={{ width: COL.sessions }}>
                     <Text style={pdfTheme.cell}>{r.sessionCount}</Text>

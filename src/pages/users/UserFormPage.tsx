@@ -62,7 +62,7 @@ export default function UserFormPage() {
         variant="filled"
         color="primary"
         onClick={handleSubmit}
-        disabled={userForm.saving || !userForm.canSubmit}
+        disabled={userForm.saving}
       >
         <ITFlex align="center" gap={1}>
           <FaSave size={12} />
@@ -105,6 +105,7 @@ export default function UserFormPage() {
         form={userForm.form}
         errors={userForm.errors}
         onFieldChange={userForm.handleField}
+        onBlur={userForm.handleBlur}
         onDepartmentChange={userForm.handleDepartmentChange}
         departments={userForm.departments}
         selectedDept={userForm.selectedDept}

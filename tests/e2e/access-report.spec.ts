@@ -99,8 +99,8 @@ test.describe("Reporte de entradas/salidas", () => {
     ).toBeVisible();
 
     // KPIs (labels exactos; no confundir con los badges de la tabla).
-    await expect(page.getByText("Con registro", { exact: true })).toBeVisible();
-    await expect(page.getByText("Sin registro", { exact: true })).toBeVisible();
+    await expect(page.getByText("Personas con registros", { exact: true })).toBeVisible();
+    await expect(page.getByText("Personas sin registros", { exact: true })).toBeVisible();
     await expect(page.getByText("Horas totales", { exact: true })).toBeVisible();
 
     const cuerpo = page.locator("table tbody");

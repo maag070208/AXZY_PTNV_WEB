@@ -15,9 +15,9 @@
     "includeInactive": "Incluir bajas"
   },
   "kpis": {
-    "withRecords": "Con registro",
-    "withoutRecords": "Sin registro",
-    "inside": "En sitio",
+    "withRecords": "Personas con registros",
+    "withoutRecords": "Personas sin registros",
+    "inside": "Personas en sitio",
     "workedHours": "Horas totales",
     "incidents": "Incidencias"
   },
@@ -30,6 +30,7 @@
   "columns": {
     "employee": "Empleado",
     "department": "Departamento",
+    "puesto": "Puesto",
     "status": "Estado",
     "entry": "Entrada",
     "exit": "Salida",

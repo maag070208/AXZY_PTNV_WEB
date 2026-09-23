@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ITAlert,
   ITButton,
+  ITDatePicker,
   ITFlex,
   ITInput,
   ITLoader,
@@ -290,7 +291,7 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={4}>
           <Row>
             <Cell>
-              <DatePickerPortal
+              <ITDatePicker
                 name="fechaIngreso"
                 label={tt("detail.fields.hireDate")}
                 value={dateStrToLocal(form.fechaIngreso)}

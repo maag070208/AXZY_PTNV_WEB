@@ -9,8 +9,8 @@ import {
   ITDialog,
   ITFlex,
   ITInput,
+  ITSearchSelect,
   ITSegmentedControl,
-  ITSelect,
   ITStatCard,
   ITTable,
   ITText,
@@ -30,6 +30,7 @@ import {
   type AccessReportDay,
   type AccessReportPersonRow,
 } from "@entities/access";
+import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import type { UseAccessReport } from "../model/useAccessReport";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
@@ -40,35 +41,10 @@ const INCIDENT_COLOR: Record<AccessIncidentCode, BadgeColor> = {
   EXIT_WITHOUT_ENTRY: "danger",
 };
 
-/** `workedMinutes` → `hh:mm` (legible para RH, no minutos crudos). */
-const formatMinutes = (minutes: number): string => {
-  const total = Math.max(0, Math.round(minutes));
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-};
-
 /** Día local `YYYY-MM-DD` sin conversión de zona (es una clave, no un instante). */
 const formatDayKey = (dayKey: string): string => {
   const [y, m, d] = dayKey.split("-");
   return d && m && y ? `${d}/${m}/${y}` : dayKey;
-};
-
-const timeOf = (iso: string): string => {
-  const d = new Date(iso);
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${hh}:${mi}`;
-};
-
-/** En DÍA, la hora; en SEMANA/MES, fecha + hora del extremo. */
-const formatStamp = (iso: string | null, period: string): string => {
-  if (!iso) return "—";
-  if (period === "DAY") return timeOf(iso);
-  const d = new Date(iso);
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  return `${dd}/${mm} ${timeOf(iso)}`;
 };
 
 export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
@@ -95,6 +71,34 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   } = fx;
 
   const [detail, setDetail] = useState<AccessReportPersonRow | null>(null);
+
+  /**
+   * Firma de los filtros externos. Se pasa como `key` de ITDataTable: al cambiar
+   * periodo/fecha/departamento/búsqueda/estado, la tabla se remonta y `currentPage`
+   * vuelve a 1 (el estado interno de useTableState no expone reset por prop, y
+   * `reloadTrigger` solo dispara refetch conservando la página).
+   */
+  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
+
+  /** Zona horaria resuelta por el servidor en `summary.range`; local antes del 1er fetch. */
+  const tz = summary?.range.timezone;
+
+  const timeOf = (iso: string): string => formatTimeInTZ(iso, tz);
+
+  /** En DÍA, la hora; en SEMANA/MES, fecha + hora del extremo. */
+  const formatStamp = (iso: string | null, periodKey: string): string => {
+    if (!iso) return "—";
+    if (periodKey === "DAY") return timeOf(iso);
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}/${mm} ${timeOf(iso)}`;
+  };
+
+  /** Horas de la fila: `hh:mm` con registros, `—` cuando no hay nada que contar. */
+  const rowHours = (r: AccessReportPersonRow): string =>
+    r.hasRecords ? formatMinutesAsHhMm(r.workedMinutes) : "—";
+
 
   const periodOptions = useMemo(
     () => [
@@ -162,10 +166,22 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.department"),
       type: "string",
       sortable: true,
+      render: (r) =>
+        r.departmentName ? (
+          <ITText className="text-[11px] font-bold text-slate-600">{r.departmentName}</ITText>
+        ) : (
+          <ITBadget color="gray" size="sm">
+            {t("noDepartment")}
+          </ITBadget>
+        ),
+    },
+    {
+      key: "puesto",
+      label: t("columns.puesto"),
+      type: "string",
+      sortable: true,
       render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-600">
-          {r.departmentName ?? t("noDepartment")}
-        </ITText>
+        <ITText className="text-[11px] font-bold text-slate-700">{r.puesto ?? "—"}</ITText>
       ),
     },
     {
@@ -210,7 +226,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       type: "number",
       sortable: true,
       render: (r) => (
-        <ITText className="text-[12px] font-black text-emerald-700">{formatMinutes(r.workedMinutes)}</ITText>
+        <ITText className="text-[12px] font-black text-emerald-700">{rowHours(r)}</ITText>
       ),
     },
     {
@@ -282,7 +298,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("detail.hours"),
       type: "number",
       render: (d) => (
-        <ITText className="text-[11px] font-bold text-emerald-700">{formatMinutes(d.workedMinutes)}</ITText>
+        <ITText className="text-[11px] font-bold text-emerald-700">{formatMinutesAsHhMm(d.workedMinutes)}</ITText>
       ),
     },
     {
@@ -327,12 +343,12 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           onChange={handleDate}
           className="min-w-[200px]"
         />
-        <ITSelect
+        <ITSearchSelect
           name="accessReportDepartment"
           label={t("filters.department")}
           options={departmentOptions}
           value={departmentId}
-          onChange={(e) => setDepartmentId(e.target.value)}
+          onChange={(value) => setDepartmentId(String(value))}
           className="min-w-[220px]"
         />
         <ITInput
@@ -370,7 +386,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         />
         <ITStatCard
           label={t("kpis.workedHours")}
-          value={formatMinutes(summary?.totalWorkedMinutes ?? 0)}
+          value={formatMinutesAsHhMm(summary?.totalWorkedMinutes ?? 0)}
           icon={<FaClock className="text-slate-500" size={13} />}
         />
         <ITStatCard
@@ -398,6 +414,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       </ITFlex>
 
       <ITDataTable
+        key={tableKey}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (
