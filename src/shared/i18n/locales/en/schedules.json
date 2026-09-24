@@ -27,6 +27,11 @@
   "cancel": "Cancel",
   "delete": "Deactivate",
   "reactivate": "Reactivate",
+  "deactivateDialog": {
+    "title": "Deactivate schedule",
+    "message": "Deactivate the schedule “{{name}}”? It will stop applying and won't be used for overtime calculation. You can reactivate it anytime.",
+    "confirm": "Deactivate"
+  },
   "empty": "No schedules",
   "saveError": "Could not save",
   "nameRequired": "Name is required",

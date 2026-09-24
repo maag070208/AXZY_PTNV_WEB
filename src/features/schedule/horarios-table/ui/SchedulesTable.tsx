@@ -4,6 +4,7 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
+  ITConfirmDialog,
   ITDataTable,
   ITFlex,
   ITText,
@@ -47,6 +48,8 @@ export default function SchedulesTable() {
   const navigate = useNavigate();
   const [reloadKey, setReloadKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [horarioToDeactivate, setHorarioToDeactivate] = useState<Horario | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // El fetcher corre en cada refetch; `reloadTrigger` fuerza a ITDataTable a
   // volver a pedir los datos tras un cambio.
@@ -61,6 +64,20 @@ export default function SchedulesTable() {
       setReloadKey((k) => k + 1);
     } catch (e) {
       setError((e as Error).message);
+    }
+  };
+
+  const confirmDeactivate = async () => {
+    if (!horarioToDeactivate) return;
+    setSaving(true);
+    try {
+      await scheduleApi.update(horarioToDeactivate.id, { activo: false });
+      setReloadKey((k) => k + 1);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
+      setHorarioToDeactivate(null);
     }
   };
 
@@ -129,9 +146,9 @@ export default function SchedulesTable() {
           <ITButton
             variant="outlined"
             size="lg"
-            color={h.activo ? "secondary" : "success"}
+            color={h.activo ? "error" : "success"}
             title={h.activo ? t("delete") : t("reactivate")}
-            onClick={() => toggleActive(h)}
+            onClick={() => (h.activo ? setHorarioToDeactivate(h) : void toggleActive(h))}
           >
             <FaTrashRestore size={12} />
           </ITButton>
@@ -164,6 +181,20 @@ export default function SchedulesTable() {
         defaultItemsPerPage={10}
         itemsPerPageOptions={[10, 25, 50]}
         size="lg"
+      />
+
+      <ITConfirmDialog
+        isOpen={!!horarioToDeactivate}
+        onClose={() => {
+          if (!saving) setHorarioToDeactivate(null);
+        }}
+        onConfirm={confirmDeactivate}
+        title={t("deactivateDialog.title")}
+        message={t("deactivateDialog.message", { name: horarioToDeactivate?.nombre ?? "" })}
+        confirmLabel={t("deactivateDialog.confirm")}
+        cancelLabel={t("cancel")}
+        variant="danger"
+        loading={saving}
       />
     </ITFlex>
   );

@@ -27,6 +27,11 @@
   "cancel": "Cancelar",
   "delete": "Desactivar",
   "reactivate": "Reactivar",
+  "deactivateDialog": {
+    "title": "Desactivar horario",
+    "message": "¿Desactivar el horario «{{name}}»? Dejará de aplicarse y no se usará en el cálculo de horas extra. Podrás reactivarlo cuando quieras.",
+    "confirm": "Desactivar"
+  },
   "empty": "Sin horarios",
   "saveError": "No se pudo guardar",
   "nameRequired": "El nombre es obligatorio",
