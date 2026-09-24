@@ -17,6 +17,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import type { Column, ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
+  FaCheckCircle,
   FaClock,
   FaExclamationTriangle,
   FaFileCsv,
@@ -169,6 +170,8 @@ export default function OvertimeReport({ downloadPdf }: { downloadPdf: DownloadO
   const kpis = [
     { key: "withExtra", value: summary?.peopleWithExtra ?? 0, tint: "bg-amber-50", icon: <FaExclamationTriangle className="text-amber-600" size={15} /> },
     { key: "totalExtra", value: formatMinutesAsHhMm(summary?.totalExtraMinutes ?? 0), tint: "bg-rose-50", icon: <FaClock className="text-rose-600" size={15} /> },
+    { key: "approved", value: formatMinutesAsHhMm(summary?.totalApprovedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheckCircle className="text-emerald-600" size={15} /> },
+    { key: "pending", value: formatMinutesAsHhMm(summary?.totalPendingMinutes ?? 0), tint: "bg-amber-50", icon: <FaRegClock className="text-amber-600" size={15} /> },
     { key: "worked", value: formatMinutesAsHhMm(summary?.totalWorkedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaClock className="text-emerald-600" size={15} /> },
     { key: "scheduled", value: formatMinutesAsHhMm(summary?.totalScheduledMinutes ?? 0), tint: "bg-slate-100", icon: <FaRegClock className="text-slate-500" size={15} /> },
   ];
@@ -183,6 +186,8 @@ export default function OvertimeReport({ downloadPdf }: { downloadPdf: DownloadO
         t("overtime.scheduled"),
         t("overtime.worked"),
         t("overtime.extra"),
+        t("overtime.approved"),
+        t("overtime.pending"),
         t("overtime.missing"),
         t("overtime.daysWithExtra"),
       ];
@@ -193,6 +198,8 @@ export default function OvertimeReport({ downloadPdf }: { downloadPdf: DownloadO
         formatMinutesAsHhMm(r.programadasMin),
         formatMinutesAsHhMm(r.trabajadasMin),
         formatMinutesAsHhMm(r.extraMin),
+        formatMinutesAsHhMm(r.aprobadoMin),
+        formatMinutesAsHhMm(r.pendienteMin),
         formatMinutesAsHhMm(r.faltanteMin),
         r.diasConExtra,
       ]);
@@ -275,6 +282,28 @@ export default function OvertimeReport({ downloadPdf }: { downloadPdf: DownloadO
           title={r.extraMin > 0 ? undefined : t("overtime.help.dash")}
         >
           {r.extraMin > 0 ? formatMinutesAsHhMm(r.extraMin) : "—"}
+        </ITText>
+      ),
+    },
+    {
+      key: "aprobadoMin",
+      label: t("overtime.approved"),
+      type: "number",
+      sortable: true,
+      render: (r) => (
+        <ITText className="text-[11px] font-black text-emerald-700">
+          {r.aprobadoMin > 0 ? formatMinutesAsHhMm(r.aprobadoMin) : "—"}
+        </ITText>
+      ),
+    },
+    {
+      key: "pendienteMin",
+      label: t("overtime.pending"),
+      type: "number",
+      sortable: true,
+      render: (r) => (
+        <ITText className="text-[11px] font-bold text-amber-700">
+          {r.pendienteMin > 0 ? formatMinutesAsHhMm(r.pendienteMin) : "—"}
         </ITText>
       ),
     },

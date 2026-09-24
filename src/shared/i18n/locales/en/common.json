@@ -49,6 +49,7 @@
     "schedules": "Schedules",
     "schedulesAdmin": "Schedules",
     "schedulesAssign": "Assign schedules",
-    "overtime": "Overtime"
+    "overtime": "Overtime",
+    "overtimeApproval": "Overtime approval"
   }
 }

@@ -232,8 +232,20 @@ export default function PrivateRoutes() {
               id: "overtime",
               label: tt("nav.overtime"),
               action: () => navigate("/horarios/horas-extra"),
-              isActive: active("/horarios/horas-extra"),
+              isActive:
+                active("/horarios/horas-extra") &&
+                !active("/horarios/horas-extra/aprobacion"),
             },
+            ...(isAdmin
+              ? [
+                {
+                  id: "overtimeApproval",
+                  label: tt("nav.overtimeApproval"),
+                  action: () => navigate("/horarios/horas-extra/aprobacion"),
+                  isActive: active("/horarios/horas-extra/aprobacion"),
+                },
+              ]
+              : []),
           ],
         },
       ]

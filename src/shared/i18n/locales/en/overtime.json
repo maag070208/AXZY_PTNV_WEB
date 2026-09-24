@@ -1,0 +1,59 @@
+{
+  "title": "Overtime approval",
+  "description": "Approve or reject staff overtime. What is not approved is not counted.",
+  "filters": "Filters",
+  "date": "Date",
+  "clear": "Clear",
+  "cancel": "Cancel",
+  "allDepartments": "All departments",
+  "selected": "{{count}} selected · {{time}}",
+  "periods": {
+    "DAY": "Daily",
+    "WEEK": "Weekly",
+    "MONTH": "Monthly"
+  },
+  "status": "Status",
+  "statusAll": "All",
+  "statusPending": "Pending",
+  "statusApproved": "Approved",
+  "statusRejected": "Rejected",
+  "columns": {
+    "employee": "Employee",
+    "department": "Department",
+    "date": "Day",
+    "schedule": "Schedule",
+    "noSchedule": "No schedule",
+    "extra": "Overtime",
+    "decidedBy": "Decided by",
+    "decidedAt": "Decision date",
+    "note": "Note"
+  },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveSelected": "Approve ({{count}})",
+    "rejectSelected": "Reject ({{count}})",
+    "selectPending": "Select pending",
+    "clearSelection": "Clear selection"
+  },
+  "dialog": {
+    "approveTitle": "Approve overtime",
+    "approveMessage": "Approve {{count}} day(s) with {{time}} of overtime? They will be counted.",
+    "rejectTitle": "Reject overtime",
+    "rejectMessage": "Reject {{count}} day(s) with {{time}} of overtime? They will not be counted."
+  },
+  "kpis": {
+    "pending": "Pending approval",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "people": "People with pending"
+  },
+  "rangeDay": "Showing {{date}} · Timezone: {{tz}}",
+  "rangeRange": "Showing {{start}} to {{end}} · Timezone: {{tz}}",
+  "empty": "No overtime days",
+  "toast": {
+    "approved": "{{count}} day(s) approved",
+    "rejected": "{{count}} day(s) rejected",
+    "error": "Could not save the decision"
+  }
+}

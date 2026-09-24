@@ -80,16 +80,17 @@ const styles = StyleSheet.create({
   totalsValue: { fontSize: 10.5, color: PDF_COLORS.white, fontFamily: "Helvetica-Bold" },
 });
 
-// Anchos en puntos; suman ~526 (folio LETTER − padding horizontal de 36×2).
+// Anchos en puntos; suman ~516 (folio LETTER − padding horizontal de 36×2).
 const COL = {
-  employee: 116,
-  department: 80,
-  schedule: 92,
-  scheduled: 48,
-  worked: 48,
-  extra: 48,
-  missing: 48,
-  days: 46,
+  employee: 96,
+  department: 68,
+  schedule: 80,
+  scheduled: 46,
+  worked: 46,
+  extra: 46,
+  approved: 46,
+  missing: 46,
+  days: 42,
 };
 
 const fmtMinutes = formatMinutesAsHhMm;
@@ -195,6 +196,9 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
             <View style={{ width: COL.extra }}>
               <Text style={pdfTheme.tableHeaderText}>{t("overtime.extra")}</Text>
             </View>
+            <View style={{ width: COL.approved }}>
+              <Text style={pdfTheme.tableHeaderText}>{t("overtime.approved")}</Text>
+            </View>
             <View style={{ width: COL.missing }}>
               <Text style={pdfTheme.tableHeaderText}>{t("overtime.missing")}</Text>
             </View>
@@ -238,6 +242,11 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
                   }
                 >
                   {fmtMinutes(r.extraMin)}
+                </Text>
+              </View>
+              <View style={{ width: COL.approved }}>
+                <Text style={r.aprobadoMin > 0 ? pdfTheme.cellBold : pdfTheme.cellMuted}>
+                  {fmtMinutes(r.aprobadoMin)}
                 </Text>
               </View>
               <View style={{ width: COL.missing }}>

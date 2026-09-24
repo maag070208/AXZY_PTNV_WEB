@@ -72,6 +72,15 @@ export interface HorasExtraRow {
   faltanteMin: number;
   diasConExtra: number;
   sinHorario: boolean;
+  /** Minutos aprobados (lo contabilizado). */
+  aprobadoMin: number;
+  /** Minutos calculados aún sin decisión. */
+  pendienteMin: number;
+  /** Minutos rechazados. */
+  rechazadoMin: number;
+  diasAprobados: number;
+  diasPendientes: number;
+  diasRechazados: number;
 }
 
 export interface HorasExtraSummary {
@@ -80,6 +89,12 @@ export interface HorasExtraSummary {
   totalExtraMinutes: number;
   totalWorkedMinutes: number;
   totalScheduledMinutes: number;
+  /** Minutos aprobados (lo contabilizado). */
+  totalApprovedMinutes: number;
+  /** Minutos calculados aún sin decisión. */
+  totalPendingMinutes: number;
+  /** Minutos rechazados. */
+  totalRejectedMinutes: number;
   range: { start: string; end: string; timezone: string; period: string };
 }
 

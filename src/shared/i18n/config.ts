@@ -5,6 +5,7 @@ import accessEn from "./locales/en/access.json";
 import accessReportEn from "./locales/en/access-report.json";
 import checadorEn from "./locales/en/checador.json";
 import schedulesEn from "./locales/en/schedules.json";
+import overtimeEn from "./locales/en/overtime.json";
 import auditEn from "./locales/en/audit.json";
 import authEn from "./locales/en/auth.json";
 import cartasEn from "./locales/en/cartas.json";
@@ -29,6 +30,7 @@ import accessEs from "./locales/es/access.json";
 import accessReportEs from "./locales/es/access-report.json";
 import checadorEs from "./locales/es/checador.json";
 import schedulesEs from "./locales/es/schedules.json";
+import overtimeEs from "./locales/es/overtime.json";
 import auditEs from "./locales/es/audit.json";
 import authEs from "./locales/es/auth.json";
 import cartasEs from "./locales/es/cartas.json";
@@ -75,6 +77,7 @@ export const NS_LIST = [
   "access-report",
   "checador",
   "schedules",
+  "overtime",
 ] as const;
 
 export const resources = {
@@ -102,6 +105,7 @@ export const resources = {
     "access-report": accessReportEn,
     checador: checadorEn,
     schedules: schedulesEn,
+    overtime: overtimeEn,
   },
   es: {
     common: commonEs,
@@ -127,6 +131,7 @@ export const resources = {
     "access-report": accessReportEs,
     checador: checadorEs,
     schedules: schedulesEs,
+    overtime: overtimeEs,
   },
 } as const;
 
