@@ -82,15 +82,11 @@ const styles = StyleSheet.create({
 
 // Anchos en puntos; suman ~516 (folio LETTER − padding horizontal de 36×2).
 const COL = {
-  employee: 96,
-  department: 68,
-  schedule: 80,
-  scheduled: 46,
-  worked: 46,
-  extra: 46,
-  approved: 46,
-  missing: 46,
-  days: 42,
+  employee: 130,
+  department: 100,
+  schedule: 120,
+  approved: 83,
+  days: 83,
 };
 
 const fmtMinutes = formatMinutesAsHhMm;
@@ -125,9 +121,13 @@ const prevCivilDay = (iso: string, tz?: string): string => {
   return `${pdd}/${pmm}/${prev.getUTCFullYear()}`;
 };
 
+/**
+ * Reporte de tiempo extra APROBADO: una fila por persona con minutos y días
+ * aprobados. Las filas ya vienen filtradas por el servidor (solo `aprobadoMin > 0`).
+ */
 export default function OvertimePDF({ rows, summary, meta, title }: Props) {
   const { t } = useTranslation("schedules");
-  const reportTitle = title ?? t("overtime.pdf.title");
+  const reportTitle = title ?? t("overtime.pdf.approvedTitle");
   const tz = summary.range.timezone || meta.timezone;
   const today = fmtDateTime(new Date().toISOString(), tz);
 
@@ -137,11 +137,12 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
       ? fmtDateInTZ(summary.range.start, tz)
       : `${fmtDateInTZ(summary.range.start, tz)} — ${prevCivilDay(summary.range.end, tz)}`;
 
+  const approvedDays = rows.reduce((acc, r) => acc + r.diasAprobados, 0);
+
   const cards: Array<{ label: string; value: string | number; color: string; bg: string }> = [
-    { label: t("overtime.withExtra"), value: summary.peopleWithExtra, color: PDF_COLORS.warning, bg: PDF_COLORS.warningBg },
-    { label: t("overtime.totalExtra"), value: fmtMinutes(summary.totalExtraMinutes), color: PDF_COLORS.danger, bg: PDF_COLORS.dangerBg },
-    { label: t("overtime.worked"), value: fmtMinutes(summary.totalWorkedMinutes), color: PDF_COLORS.band, bg: PDF_COLORS.light },
-    { label: t("overtime.scheduled"), value: fmtMinutes(summary.totalScheduledMinutes), color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
+    { label: t("overtime.pdf.totalPeople"), value: summary.peopleWithExtra, color: PDF_COLORS.band, bg: PDF_COLORS.light },
+    { label: t("overtime.pdf.totalApproved"), value: fmtMinutes(summary.totalApprovedMinutes), color: PDF_COLORS.success, bg: PDF_COLORS.successBg },
+    { label: t("overtime.approvedDays"), value: approvedDays, color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
   ];
 
   // Paginación nativa de @react-pdf/renderer: se declara UNA sola `<Page>` y
@@ -187,23 +188,11 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
             <View style={{ width: COL.schedule }}>
               <Text style={pdfTheme.tableHeaderText}>{t("overtime.schedule")}</Text>
             </View>
-            <View style={{ width: COL.scheduled }}>
-              <Text style={pdfTheme.tableHeaderText}>{t("overtime.scheduled")}</Text>
-            </View>
-            <View style={{ width: COL.worked }}>
-              <Text style={pdfTheme.tableHeaderText}>{t("overtime.worked")}</Text>
-            </View>
-            <View style={{ width: COL.extra }}>
-              <Text style={pdfTheme.tableHeaderText}>{t("overtime.extra")}</Text>
-            </View>
             <View style={{ width: COL.approved }}>
               <Text style={pdfTheme.tableHeaderText}>{t("overtime.approved")}</Text>
             </View>
-            <View style={{ width: COL.missing }}>
-              <Text style={pdfTheme.tableHeaderText}>{t("overtime.missing")}</Text>
-            </View>
             <View style={{ width: COL.days }}>
-              <Text style={pdfTheme.tableHeaderText}>{t("overtime.daysWithExtra")}</Text>
+              <Text style={pdfTheme.tableHeaderText}>{t("overtime.approvedDays")}</Text>
             </View>
           </View>
 
@@ -227,33 +216,13 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
                   {r.horarioNombre ?? t("overtime.noSchedule")}
                 </Text>
               </View>
-              <View style={{ width: COL.scheduled }}>
-                <Text style={pdfTheme.cell}>{fmtMinutes(r.programadasMin)}</Text>
-              </View>
-              <View style={{ width: COL.worked }}>
-                <Text style={pdfTheme.cell}>{fmtMinutes(r.trabajadasMin)}</Text>
-              </View>
-              <View style={{ width: COL.extra }}>
-                <Text
-                  style={
-                    r.extraMin > 0
-                      ? [pdfTheme.cellBold, { color: PDF_COLORS.danger }]
-                      : pdfTheme.cellMuted
-                  }
-                >
-                  {fmtMinutes(r.extraMin)}
-                </Text>
-              </View>
               <View style={{ width: COL.approved }}>
                 <Text style={r.aprobadoMin > 0 ? pdfTheme.cellBold : pdfTheme.cellMuted}>
                   {fmtMinutes(r.aprobadoMin)}
                 </Text>
               </View>
-              <View style={{ width: COL.missing }}>
-                <Text style={pdfTheme.cellMuted}>{fmtMinutes(r.faltanteMin)}</Text>
-              </View>
               <View style={{ width: COL.days }}>
-                <Text style={pdfTheme.cell}>{r.diasConExtra}</Text>
+                <Text style={pdfTheme.cell}>{r.diasAprobados}</Text>
               </View>
             </View>
           ))}
@@ -261,19 +230,11 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
           <View style={styles.totalsBar} wrap={false}>
             <View style={styles.totalsItem}>
               <Text style={styles.totalsLabel}>{t("overtime.pdf.totalPeople")}</Text>
-              <Text style={styles.totalsValue}>{summary.peopleTotal}</Text>
+              <Text style={styles.totalsValue}>{summary.peopleWithExtra}</Text>
             </View>
             <View style={styles.totalsItem}>
-              <Text style={styles.totalsLabel}>{t("overtime.pdf.totalExtra")}</Text>
-              <Text style={styles.totalsValue}>{fmtMinutes(summary.totalExtraMinutes)}</Text>
-            </View>
-            <View style={styles.totalsItem}>
-              <Text style={styles.totalsLabel}>{t("overtime.pdf.totalWorked")}</Text>
-              <Text style={styles.totalsValue}>{fmtMinutes(summary.totalWorkedMinutes)}</Text>
-            </View>
-            <View style={styles.totalsItem}>
-              <Text style={styles.totalsLabel}>{t("overtime.pdf.totalScheduled")}</Text>
-              <Text style={styles.totalsValue}>{fmtMinutes(summary.totalScheduledMinutes)}</Text>
+              <Text style={styles.totalsLabel}>{t("overtime.pdf.totalApproved")}</Text>
+              <Text style={styles.totalsValue}>{fmtMinutes(summary.totalApprovedMinutes)}</Text>
             </View>
           </View>
         </View>

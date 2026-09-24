@@ -22,6 +22,8 @@ import {
   FaCheck,
   FaClock,
   FaExclamationTriangle,
+  FaFileCsv,
+  FaFilePdf,
   FaTimes,
   FaUndo,
   FaUserCheck,
@@ -58,6 +60,7 @@ const toDateInput = (d: Date): string =>
 export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval }) {
   const { t } = useTranslation("overtime");
   const {
+    canApprove,
     period,
     setPeriod,
     date,
@@ -84,6 +87,10 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
     setConfirm,
     confirmDecision,
     saving,
+    exportPdf,
+    exportCsv,
+    exportingPdf,
+    exportingCsv,
     reloadKey,
     error,
     setError,
@@ -174,26 +181,38 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
     setStatus("");
   };
 
-  const kpis = [
-    { key: "pending", value: formatMinutesAsHhMm(summary?.pendingMinutes ?? 0), tint: "bg-amber-50", icon: <FaExclamationTriangle className="text-amber-600" size={15} /> },
-    { key: "approved", value: formatMinutesAsHhMm(summary?.approvedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheck className="text-emerald-600" size={15} /> },
-    { key: "rejected", value: formatMinutesAsHhMm(summary?.rejectedMinutes ?? 0), tint: "bg-rose-50", icon: <FaTimes className="text-rose-600" size={15} /> },
-    { key: "people", value: summary?.peopleWithPending ?? 0, tint: "bg-sky-50", icon: <FaUserCheck className="text-sky-600" size={15} /> },
-  ];
+  // RH solo ve aprobado: KPIs reducidos (minutos y días aprobados).
+  const kpis = canApprove
+    ? [
+        { key: "pending", value: formatMinutesAsHhMm(summary?.pendingMinutes ?? 0), tint: "bg-amber-50", icon: <FaExclamationTriangle className="text-amber-600" size={15} /> },
+        { key: "approved", value: formatMinutesAsHhMm(summary?.approvedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheck className="text-emerald-600" size={15} /> },
+        { key: "rejected", value: formatMinutesAsHhMm(summary?.rejectedMinutes ?? 0), tint: "bg-rose-50", icon: <FaTimes className="text-rose-600" size={15} /> },
+        { key: "people", value: summary?.peopleWithPending ?? 0, tint: "bg-sky-50", icon: <FaUserCheck className="text-sky-600" size={15} /> },
+      ]
+    : [
+        { key: "approved", value: formatMinutesAsHhMm(summary?.approvedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheck className="text-emerald-600" size={15} /> },
+        { key: "approvedDays", value: summary?.approvedDays ?? 0, tint: "bg-sky-50", icon: <FaClock className="text-sky-600" size={15} /> },
+      ];
+
+  // El export muestra solo lo aprobado: sin aprobados, no hay nada que exportar.
+  const hasApproved = (summary?.approvedMinutes ?? 0) > 0;
+
+  // La columna de selección solo existe para quien puede decidir.
+  const selectColumn: Column<OvertimeDayRow> = {
+    key: "select",
+    label: "",
+    type: "actions",
+    actions: (r) => (
+      <ITCheckbox
+        name={`sel-${dayKeyOf(r)}`}
+        checked={selected.has(dayKeyOf(r))}
+        onChange={() => toggleRow(r)}
+      />
+    ),
+  };
 
   const columns: Column<OvertimeDayRow>[] = [
-    {
-      key: "select",
-      label: "",
-      type: "actions",
-      actions: (r) => (
-        <ITCheckbox
-          name={`sel-${dayKeyOf(r)}`}
-          checked={selected.has(dayKeyOf(r))}
-          onChange={() => toggleRow(r)}
-        />
-      ),
-    },
+    ...(canApprove ? [selectColumn] : []),
     {
       key: "employeeName",
       label: t("columns.employee"),
@@ -244,12 +263,12 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
     },
     {
       key: "extraMin",
-      label: t("columns.extra"),
+      label: canApprove ? t("columns.extra") : t("statusApproved"),
       type: "number",
       sortable: true,
       render: (r) => (
-        <ITText className="text-[12px] font-black text-rose-600">
-          {formatMinutesAsHhMm(r.extraMin)}
+        <ITText className={canApprove ? "text-[12px] font-black text-rose-600" : "text-[12px] font-black text-emerald-700"}>
+          {formatMinutesAsHhMm(canApprove ? r.extraMin : r.approvedExtraMin)}
         </ITText>
       ),
     },
@@ -303,12 +322,38 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
               value={period}
               onChange={(v) => handlePeriodChange(v as Period)}
             />
-            <ITButton variant="text" color="gray" size="sm" onClick={clearFilters} className="ml-auto">
-              <ITFlex align="center" gap={1}>
-                <FaUndo size={11} />
-                <ITText className="font-bold text-[11px]">{t("clear")}</ITText>
-              </ITFlex>
-            </ITButton>
+            <ITFlex gap={2} wrap="wrap" className="ml-auto">
+              <ITButton
+                variant="outlined"
+                color="gray"
+                size="sm"
+                onClick={() => void exportPdf()}
+                disabled={exportingPdf || !hasApproved}
+              >
+                <ITFlex align="center" gap={1}>
+                  <FaFilePdf className="text-red-600" size={13} />
+                  <ITText className="font-bold text-[11px]">{t("exportPdf")}</ITText>
+                </ITFlex>
+              </ITButton>
+              <ITButton
+                variant="outlined"
+                color="gray"
+                size="sm"
+                onClick={() => void exportCsv()}
+                disabled={exportingCsv || !hasApproved}
+              >
+                <ITFlex align="center" gap={1}>
+                  <FaFileCsv className="text-emerald-600" size={13} />
+                  <ITText className="font-bold text-[11px]">{t("exportCsv")}</ITText>
+                </ITFlex>
+              </ITButton>
+              <ITButton variant="text" color="gray" size="sm" onClick={clearFilters}>
+                <ITFlex align="center" gap={1}>
+                  <FaUndo size={11} />
+                  <ITText className="font-bold text-[11px]">{t("clear")}</ITText>
+                </ITFlex>
+              </ITButton>
+            </ITFlex>
           </ITFlex>
 
           <ITGrid container columns={12} spacing={4}>
@@ -354,16 +399,18 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
                 className="w-full min-w-0"
               />
             </ITGrid>
-            <ITGrid item xs={12} md={3}>
-              <ITSelect
-                name="overtimeApprovalStatus"
-                label={t("status")}
-                options={statusOptions}
-                value={status}
-                onChange={(e) => setStatus(e.target.value as StatusFilter)}
-                className="w-full min-w-0"
-              />
-            </ITGrid>
+            {canApprove && (
+              <ITGrid item xs={12} md={3}>
+                <ITSelect
+                  name="overtimeApprovalStatus"
+                  label={t("status")}
+                  options={statusOptions}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as StatusFilter)}
+                  className="w-full min-w-0"
+                />
+              </ITGrid>
+            )}
           </ITGrid>
         </ITFlex>
       </ITCard>
@@ -393,56 +440,58 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         ))}
       </ITFlex>
 
-      <ITFlex align="center" wrap="wrap" gap={2} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <ITFlex align="center" gap={1} className="text-slate-500">
-          <FaClock size={12} />
-          <ITText className="text-[11px] font-bold">
-            {t("selected", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })}
-          </ITText>
+      {canApprove && (
+        <ITFlex align="center" wrap="wrap" gap={2} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <ITFlex align="center" gap={1} className="text-slate-500">
+            <FaClock size={12} />
+            <ITText className="text-[11px] font-bold">
+              {t("selected", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })}
+            </ITText>
+          </ITFlex>
+          <ITFlex gap={2} wrap="wrap" className="ml-auto">
+            <ITButton variant="text" color="gray" size="sm" onClick={() => void selectPending()}>
+              <ITText className="font-bold text-[11px]">{t("actions.selectPending")}</ITText>
+            </ITButton>
+            <ITButton
+              variant="text"
+              color="gray"
+              size="sm"
+              onClick={clearSelection}
+              disabled={selectedCount === 0}
+            >
+              <ITText className="font-bold text-[11px]">{t("actions.clearSelection")}</ITText>
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="success"
+              size="sm"
+              onClick={() => requestDecision("APROBADO")}
+              disabled={selectedCount === 0}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaCheck size={11} />
+                <ITText className="font-bold text-[11px]">
+                  {t("actions.approveSelected", { count: selectedCount })}
+                </ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="error"
+              size="sm"
+              onClick={() => requestDecision("RECHAZADO")}
+              disabled={selectedCount === 0}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaTimes size={11} />
+                <ITText className="font-bold text-[11px]">
+                  {t("actions.rejectSelected", { count: selectedCount })}
+                </ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
         </ITFlex>
-        <ITFlex gap={2} wrap="wrap" className="ml-auto">
-          <ITButton variant="text" color="gray" size="sm" onClick={() => void selectPending()}>
-            <ITText className="font-bold text-[11px]">{t("actions.selectPending")}</ITText>
-          </ITButton>
-          <ITButton
-            variant="text"
-            color="gray"
-            size="sm"
-            onClick={clearSelection}
-            disabled={selectedCount === 0}
-          >
-            <ITText className="font-bold text-[11px]">{t("actions.clearSelection")}</ITText>
-          </ITButton>
-          <ITButton
-            variant="filled"
-            color="success"
-            size="sm"
-            onClick={() => requestDecision("APROBADO")}
-            disabled={selectedCount === 0}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaCheck size={11} />
-              <ITText className="font-bold text-[11px]">
-                {t("actions.approveSelected", { count: selectedCount })}
-              </ITText>
-            </ITFlex>
-          </ITButton>
-          <ITButton
-            variant="filled"
-            color="error"
-            size="sm"
-            onClick={() => requestDecision("RECHAZADO")}
-            disabled={selectedCount === 0}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaTimes size={11} />
-              <ITText className="font-bold text-[11px]">
-                {t("actions.rejectSelected", { count: selectedCount })}
-              </ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
-      </ITFlex>
+      )}
 
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -461,27 +510,29 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         size="lg"
       />
 
-      <ITConfirmDialog
-        isOpen={!!confirm}
-        onClose={() => {
-          if (!saving) setConfirm(null);
-        }}
-        onConfirm={() => void confirmDecision()}
-        title={confirm?.status === "APROBADO" ? t("dialog.approveTitle") : t("dialog.rejectTitle")}
-        message={
-          confirm?.status === "APROBADO"
-            ? t("dialog.approveMessage", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })
-            : t("dialog.rejectMessage", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })
-        }
-        confirmLabel={
-          confirm?.status === "APROBADO" ? t("actions.approve") : t("actions.reject")
-        }
-        cancelLabel={t("cancel")}
-        variant={confirm?.status === "APROBADO" ? "success" : "danger"}
-        loading={saving}
-      />
+      {canApprove && (
+        <ITConfirmDialog
+          isOpen={!!confirm}
+          onClose={() => {
+            if (!saving) setConfirm(null);
+          }}
+          onConfirm={() => void confirmDecision()}
+          title={confirm?.status === "APROBADO" ? t("dialog.approveTitle") : t("dialog.rejectTitle")}
+          message={
+            confirm?.status === "APROBADO"
+              ? t("dialog.approveMessage", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })
+              : t("dialog.rejectMessage", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })
+          }
+          confirmLabel={
+            confirm?.status === "APROBADO" ? t("actions.approve") : t("actions.reject")
+          }
+          cancelLabel={t("cancel")}
+          variant={confirm?.status === "APROBADO" ? "success" : "danger"}
+          loading={saving}
+        />
+      )}
 
-      {toast && (
+      {canApprove && toast && (
         <ITToast
           message={toast.message}
           type={toast.type}

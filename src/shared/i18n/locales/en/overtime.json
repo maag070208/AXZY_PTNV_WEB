@@ -1,10 +1,14 @@
 {
-  "title": "Overtime approval",
-  "description": "Approve or reject staff overtime. What is not approved is not counted.",
+  "title": "Overtime",
+  "description": "View and approve staff overtime.",
   "filters": "Filters",
   "date": "Date",
   "clear": "Clear",
   "cancel": "Cancel",
+  "exportPdf": "PDF",
+  "exportCsv": "CSV",
+  "onlyApproved": "Approved only",
+  "exportEmpty": "No approved overtime in the period",
   "allDepartments": "All departments",
   "selected": "{{count}} selected · {{time}}",
   "periods": {
@@ -46,7 +50,8 @@
     "pending": "Pending approval",
     "approved": "Approved",
     "rejected": "Rejected",
-    "people": "People with pending"
+    "people": "People with pending",
+    "approvedDays": "Approved days"
   },
   "rangeDay": "Showing {{date}} · Timezone: {{tz}}",
   "rangeRange": "Showing {{start}} to {{end}} · Timezone: {{tz}}",

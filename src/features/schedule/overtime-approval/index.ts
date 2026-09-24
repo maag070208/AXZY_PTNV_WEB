@@ -5,3 +5,4 @@ export {
   type Period,
   type StatusFilter,
 } from "./model/useOvertimeApproval";
+export type { DownloadOvertimePdf } from "./model/types";

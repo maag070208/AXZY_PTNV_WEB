@@ -92,5 +92,5 @@ export const downloadOvertimePDF = async (
     createElement(OvertimePDF, { rows, summary, meta }) as any
   ).toBlob();
   const stamp = meta.date.replace(/-/g, "");
-  saveAs(blob, `reporte_horas_extra_${meta.period.toLowerCase()}_${stamp}.pdf`);
+  saveAs(blob, `reporte_horas_extra_aprobadas_${meta.period.toLowerCase()}_${stamp}.pdf`);
 };

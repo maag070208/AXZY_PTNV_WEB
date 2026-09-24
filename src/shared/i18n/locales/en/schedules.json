@@ -71,6 +71,7 @@
     "schedule": "Schedule",
     "extra": "Overtime hours",
     "approved": "Approved",
+    "approvedDays": "Approved days",
     "pending": "Pending",
     "rejected": "Rejected",
     "missing": "Missing",
@@ -108,9 +109,11 @@
     "empty": "No data",
     "pdf": {
       "title": "Overtime Report",
+      "approvedTitle": "Approved Overtime Report",
       "timezone": "Time zone",
       "totalPeople": "People",
       "totalExtra": "Overtime",
+      "totalApproved": "Total approved",
       "totalWorked": "Worked",
       "totalScheduled": "Scheduled"
     }

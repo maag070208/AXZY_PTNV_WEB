@@ -1,10 +1,14 @@
 {
-  "title": "Aprobación de tiempo extra",
-  "description": "Aprueba o rechaza las horas extra del personal. Lo que no se aprueba no se contabiliza.",
+  "title": "Tiempo extra",
+  "description": "Consulta y aprobación de horas extra del personal.",
   "filters": "Filtros",
   "date": "Fecha",
   "clear": "Limpiar",
   "cancel": "Cancelar",
+  "exportPdf": "PDF",
+  "exportCsv": "CSV",
+  "onlyApproved": "Solo aprobado",
+  "exportEmpty": "No hay horas extra aprobadas en el periodo",
   "allDepartments": "Todos los departamentos",
   "selected": "{{count}} seleccionado(s) · {{time}}",
   "periods": {
@@ -46,7 +50,8 @@
     "pending": "Pendiente de aprobar",
     "approved": "Aprobado",
     "rejected": "Rechazado",
-    "people": "Personas con pendientes"
+    "people": "Personas con pendientes",
+    "approvedDays": "Días aprobados"
   },
   "rangeDay": "Mostrando el día {{date}} · Zona horaria: {{tz}}",
   "rangeRange": "Mostrando del {{start}} al {{end}} · Zona horaria: {{tz}}",

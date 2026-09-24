@@ -11,7 +11,6 @@ import ChecadorEmpleadosPage from "@pages/access/ChecadorEmpleadosPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
 import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
 import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
-import OvertimePage from "@pages/schedules/OvertimePage";
 import OvertimeApprovalPage from "@pages/overtime/OvertimeApprovalPage";
 import HomePage from "@pages/home/HomePage";
 import DashboardPage from "@pages/inventario/DashboardPage";
@@ -54,8 +53,6 @@ import CatalogPage from "@pages/catalog/CatalogPage";
 
 /** Roles con acceso a la bitácora de accesos (ver ENTRADAS_SALIDAS.md §4). */
 const ACCESS_READ_ROLES: UserRole[] = ["ADMIN", "GERENTE", "RECURSOS_HUMANOS"];
-/** Roles que pueden aprobar tiempo extra. */
-const OVERTIME_APPROVAL_ROLES: UserRole[] = ["ADMIN", "GERENTE"];
 
 export default function App() {
   return (
@@ -181,17 +178,9 @@ export default function App() {
           }
         />
         <Route
-          path="/horarios/horas-extra"
-          element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
-              <OvertimePage />
-            </RoleGuard>
-          }
-        />
-        <Route
           path="/horarios/horas-extra/aprobacion"
           element={
-            <RoleGuard roles={OVERTIME_APPROVAL_ROLES}>
+            <RoleGuard roles={ACCESS_READ_ROLES}>
               <OvertimeApprovalPage />
             </RoleGuard>
           }

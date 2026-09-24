@@ -35,10 +35,7 @@ export const scheduleApi = {
   quitarAsignaciones: (data: { horarioId: string; userIds: string[] }) =>
     api.post<{ quitados: number }>(`/horarios/asignaciones/quitar`, data),
 
-  horasExtra: (params: ITDataTableFetchParamsPost) =>
-    post<HorasExtraResponse>(`/horarios/horas-extra/query`, params),
-
-  /** Universo completo sin paginar (para CSV/KPIs). */
+  /** Universo completo sin paginar, SOLO aprobado (para CSV/KPIs/PDF). */
   horasExtraExport: (params: ITDataTableFetchParamsPost) =>
     post<HorasExtraResponse>(`/horarios/horas-extra/export`, params),
 };

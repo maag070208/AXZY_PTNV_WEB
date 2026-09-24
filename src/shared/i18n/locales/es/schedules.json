@@ -71,6 +71,7 @@
     "schedule": "Horario",
     "extra": "Horas extra",
     "approved": "Aprobado",
+    "approvedDays": "Días aprobados",
     "pending": "Pendiente",
     "rejected": "Rechazado",
     "missing": "Faltante",
@@ -108,9 +109,11 @@
     "empty": "Sin datos",
     "pdf": {
       "title": "Reporte de Horas Extra",
+      "approvedTitle": "Reporte de Horas Extra Aprobadas",
       "timezone": "Zona horaria",
       "totalPeople": "Personas",
       "totalExtra": "Horas extra",
+      "totalApproved": "Total aprobado",
       "totalWorked": "Trabajadas",
       "totalScheduled": "Programadas"
     }

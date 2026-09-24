@@ -49,7 +49,6 @@
     "schedules": "Horarios",
     "schedulesAdmin": "Horarios",
     "schedulesAssign": "Asignar horarios",
-    "overtime": "Horas extra",
-    "overtimeApproval": "Aprobación de tiempo extra"
+    "overtime": "Tiempo extra"
   }
 }

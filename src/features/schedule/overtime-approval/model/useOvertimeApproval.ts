@@ -8,6 +8,9 @@ import {
   type OvertimeSummary,
 } from "@entities/overtime";
 import { departmentsApi, type Department } from "@entities/department";
+import { scheduleApi } from "@entities/schedule";
+import { formatMinutesAsHhMm } from "@shared/utils/dates";
+import type { DownloadOvertimePdf } from "./types";
 
 export type Period = "DAY" | "WEEK" | "MONTH";
 export type StatusFilter = "" | OvertimeDayStatus;
@@ -33,12 +36,23 @@ interface Toast {
   type: "success" | "error";
 }
 
+interface UseOvertimeApprovalOptions {
+  /** ADMIN/GERENTE deciden; el resto (RH) entra en modo solo lectura. */
+  canApprove: boolean;
+  /** Generador del PDF de aprobados, inyectado desde la página. */
+  downloadPdf: DownloadOvertimePdf;
+}
+
 /**
- * Estado de la pantalla de aprobación de tiempo extra: filtros, resumen, selección
- * múltiple y acciones de aprobar/rechazar. El cálculo de los pendientes lo hace la
- * API al vuelo; aquí solo se guardan las decisiones.
+ * Estado de la pantalla de tiempo extra: filtros, resumen, selección múltiple,
+ * aprobar/rechazar y exportación. El cálculo de los pendientes lo hace la API al
+ * vuelo; aquí solo se guardan las decisiones. Quien no puede aprobar (RH) queda
+ * en modo solo lectura: el servidor además le devuelve únicamente lo aprobado.
  */
-export const useOvertimeApproval = () => {
+export const useOvertimeApproval = ({
+  canApprove,
+  downloadPdf,
+}: UseOvertimeApprovalOptions) => {
   const { t } = useTranslation("overtime");
   const [period, setPeriod] = useState<Period>("WEEK");
   const [date, setDate] = useState<Date>(new Date());
@@ -53,6 +67,8 @@ export const useOvertimeApproval = () => {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
   const [saving, setSaving] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [exportingCsv, setExportingCsv] = useState(false);
   const [confirm, setConfirm] = useState<{ status: "APROBADO" | "RECHAZADO" } | null>(null);
 
   useEffect(() => {
@@ -78,10 +94,11 @@ export const useOvertimeApproval = () => {
     return f;
   }, [period, date, departmentId, q]);
 
-  /** Filtros externos de la tabla (incluyen `status`). */
+  /** Filtros externos de la tabla. Quien no aprueba queda fijo en APROBADO. */
+  const effectiveStatus = canApprove ? status : "APROBADO";
   const externalFilters = useMemo<Record<string, string | number | boolean>>(
-    () => (status ? { ...baseFilters, status } : baseFilters),
-    [baseFilters, status]
+    () => (effectiveStatus ? { ...baseFilters, status: effectiveStatus } : baseFilters),
+    [baseFilters, effectiveStatus]
   );
 
   const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
@@ -111,6 +128,7 @@ export const useOvertimeApproval = () => {
 
   /** Selecciona TODOS los pendientes del filtro (recorre las páginas). */
   const selectPending = useCallback(async () => {
+    if (!canApprove) return;
     setError(null);
     try {
       const next = new Map<string, SelectedDay>();
@@ -131,18 +149,18 @@ export const useOvertimeApproval = () => {
     } catch (e) {
       setError((e as Error).message);
     }
-  }, [baseFilters]);
+  }, [baseFilters, canApprove]);
 
   const requestDecision = useCallback(
     (next: "APROBADO" | "RECHAZADO") => {
-      if (selected.size === 0) return;
+      if (!canApprove || selected.size === 0) return;
       setConfirm({ status: next });
     },
-    [selected]
+    [canApprove, selected]
   );
 
   const confirmDecision = useCallback(async () => {
-    if (!confirm) return;
+    if (!canApprove || !confirm) return;
     setSaving(true);
     setError(null);
     try {
@@ -168,14 +186,77 @@ export const useOvertimeApproval = () => {
       setSaving(false);
       setConfirm(null);
     }
-  }, [confirm, selected, baseFilters, t]);
+  }, [canApprove, confirm, selected, baseFilters, t]);
 
   const selectedMinutes = useMemo(
     () => [...selected.values()].reduce((acc, s) => acc + s.extraMin, 0),
     [selected]
   );
 
+  /** Exporta a PDF SOLO lo aprobado (el endpoint ya filtra en el servidor). */
+  const exportPdf = useCallback(async () => {
+    setExportingPdf(true);
+    setError(null);
+    try {
+      const res = await scheduleApi.horasExtraExport({ page: 1, limit: 1, filters: baseFilters });
+      if (res.data.length === 0) {
+        setToast({ message: t("exportEmpty"), type: "error" });
+        return;
+      }
+      await downloadPdf(res.data, res.summary, {
+        period,
+        date: toDateInput(date),
+        timezone: BROWSER_TIMEZONE,
+      });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setExportingPdf(false);
+    }
+  }, [baseFilters, period, date, downloadPdf, t]);
+
+  /** Exporta a CSV SOLO lo aprobado (mismas filas que el PDF). */
+  const exportCsv = useCallback(async () => {
+    setExportingCsv(true);
+    setError(null);
+    try {
+      const res = await scheduleApi.horasExtraExport({ page: 1, limit: 1, filters: baseFilters });
+      if (res.data.length === 0) {
+        setToast({ message: t("exportEmpty"), type: "error" });
+        return;
+      }
+      const header = [
+        t("columns.employee"),
+        t("columns.department"),
+        t("columns.schedule"),
+        t("statusApproved"),
+        t("kpis.approvedDays"),
+      ];
+      const lines = res.data.map((r) => [
+        r.employeeName,
+        r.departmentName ?? "",
+        r.horarioNombre ?? t("columns.noSchedule"),
+        formatMinutesAsHhMm(r.aprobadoMin),
+        r.diasAprobados,
+      ]);
+      const escape = (c: unknown) => `"${String(c ?? "").replace(/"/g, '""')}"`;
+      const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `horas-extra-aprobadas-${period.toLowerCase()}-${toDateInput(date)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setExportingCsv(false);
+    }
+  }, [baseFilters, period, date, t]);
+
   return {
+    canApprove,
     period,
     setPeriod,
     date,
@@ -202,6 +283,10 @@ export const useOvertimeApproval = () => {
     setConfirm,
     confirmDecision,
     saving,
+    exportPdf,
+    exportCsv,
+    exportingPdf,
+    exportingCsv,
     reloadKey,
     error,
     setError,
