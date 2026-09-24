@@ -18,6 +18,15 @@ const STATUS_POLL_MS = 5_000;
 /** Máximo de filas por página que acepta el contrato de tablas de la API. */
 const EXPORT_PAGE_SIZE = 100;
 
+/** Llave de orden de la tabla de checadas. */
+type ChecadasSort = NonNullable<ITDataTableFetchParams["sort"]>;
+
+/**
+ * Orden por defecto: checada más reciente primero. Un solo lugar para la tabla
+ * y el CSV, que así respeta el orden que ve el usuario.
+ */
+const DEFAULT_CHECADAS_SORT: ChecadasSort = { key: "occurredAt", direction: "desc" };
+
 export type ChecadorRangePreset = "today" | "yesterday" | "last7";
 
 const pad = (n: number): string => String(n).padStart(2, "0");
@@ -152,12 +161,22 @@ export const useChecador = () => {
     return filters;
   }, [dateRange, q, metodo]);
 
+  // Sort vigente de la tabla, compartido con el export. Al cambiar los filtros
+  // la tabla se remonta y pierde su orden: el ref vuelve al default.
+  const sortRef = useRef<ChecadasSort>(DEFAULT_CHECADAS_SORT);
+
+  useEffect(() => {
+    sortRef.current = DEFAULT_CHECADAS_SORT;
+  }, [externalFilters]);
+
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
+    const sort = params.sort ?? DEFAULT_CHECADAS_SORT;
+    sortRef.current = sort;
     const res = await checadorApi.table({
       page: params.page,
       limit: params.limit,
       filters: params.filters as Record<string, string | number | boolean>,
-      sort: params.sort,
+      sort,
     });
     return {
       data: res.data as unknown as Record<string, unknown>[],
@@ -240,7 +259,7 @@ export const useChecador = () => {
           page,
           limit: EXPORT_PAGE_SIZE,
           filters: externalFilters,
-          sort: { key: "occurredAt", direction: "asc" },
+          sort: sortRef.current,
         });
         rows.push(...res.data);
         if (res.data.length < EXPORT_PAGE_SIZE || rows.length >= res.total) break;
