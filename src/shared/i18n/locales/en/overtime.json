@@ -1,6 +1,10 @@
 {
   "title": "Overtime",
   "description": "View and approve staff overtime.",
+  "help": {
+    "extra": "Time worked after the scheduled exit, minus the exit tolerance. It only counts if it reaches the minimum configured in the schedule (60 min by default); above the minimum, exact minutes are counted.",
+    "restDay": "If they clock in on a rest day, all time worked counts as overtime, as long as it reaches the schedule's minimum."
+  },
   "filters": "Filters",
   "date": "Date",
   "clear": "Clear",

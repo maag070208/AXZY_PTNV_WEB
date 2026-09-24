@@ -10,7 +10,25 @@
   "tolEntrada": "Entry tolerance (min)",
   "tolSalida": "Exit tolerance (min)",
   "comida": "Break (min)",
+  "minExtra": "Overtime minimum (min)",
+  "minExtraHint": "Minimum extra time worked to count as overtime. 0 = no minimum.",
   "crossesMidnight": "Crosses midnight",
+  "crossesMidnightHint": "Enable if the exit is on the next day (night shifts).",
+  "sections": {
+    "general": "Schedule details",
+    "rules": "Workday rules",
+    "tolerances": "Tolerances",
+    "workday": "Workday",
+    "overtime": "Overtime",
+    "weekly": "Weekly grid"
+  },
+  "colDay": "Day",
+  "colHours": "Hours",
+  "summary": {
+    "days": "Working days",
+    "weeklyHours": "Weekly hours",
+    "restDays": "Rest days"
+  },
   "days": "Days",
   "day1": "Monday",
   "day2": "Tuesday",
@@ -83,13 +101,13 @@
     "help": {
       "title": "How to read this report?",
       "intro": "Each row is one person in the period. The totals above sum everyone matching the filter, not just this page.",
-      "extra": "Time worked after the scheduled exit, minus the exit tolerance. Clocking in early does not generate overtime.",
+      "extra": "Time worked after the scheduled exit, minus the exit tolerance. It only counts if it reaches the minimum configured in the schedule (60 min by default); above the minimum, exact minutes are counted. Clocking in early does not generate overtime.",
       "worked": "Total time on site (entry to exit). Includes meals and breaks.",
       "scheduled": "Hours set by the schedule on days the person did clock in. That's why it can be less than hours worked.",
       "daysWithExtra": "Number of days in the period with overtime. Not the number of clock-ins.",
       "noSchedule": "The person has no schedule assigned in the period, so no overtime is calculated.",
       "missing": "Difference when the person worked less than scheduled. Included in the CSV, not in the table.",
-      "restDay": "If they clock in on a rest day, all time worked counts as overtime.",
+      "restDay": "If they clock in on a rest day, all time worked counts as overtime, as long as it reaches the schedule's minimum.",
       "scope": "The report only includes people with at least one clock-in in the period.",
       "dash": "“—” means there was no overtime in the period."
     },

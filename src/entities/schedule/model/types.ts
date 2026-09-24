@@ -14,6 +14,7 @@ export interface Horario {
   toleranciaEntradaMin: number;
   toleranciaSalidaMin: number;
   comidaMin: number;
+  minimoExtraMin: number;
   cruzaMedianoche: boolean;
   dias: HorarioDia[];
   asignados?: number;
@@ -35,6 +36,7 @@ export interface HorarioInput {
   toleranciaEntradaMin?: number;
   toleranciaSalidaMin?: number;
   comidaMin?: number;
+  minimoExtraMin?: number;
   cruzaMedianoche?: boolean;
   dias: HorarioDiaInput[];
 }

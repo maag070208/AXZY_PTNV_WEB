@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
+  ITBadget,
   ITButton,
   ITCard,
   ITCheckbox,
@@ -13,10 +14,13 @@ import {
   ITTimePicker,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaSave } from "react-icons/fa";
+import { FaBed, FaCalendarCheck, FaClock, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { scheduleApi, type HorarioDiaInput, type HorarioInput } from "@entities/schedule";
 import { dyn } from "@shared/i18n/dyn";
+import { useIsMobile } from "@shared/lib/useIsMobile";
+import { formatMinutesAsHhMm } from "@shared/utils/dates";
+import { dayMinutes, daysWorked, restDays, weeklyMinutes } from "../model/summary";
 
 const emptyDays = (): HorarioDiaInput[] =>
   [1, 2, 3, 4, 5, 6, 7].map((diaSemana) => ({
@@ -33,14 +37,44 @@ const emptyForm = (): HorarioInput => ({
   toleranciaEntradaMin: 10,
   toleranciaSalidaMin: 10,
   comidaMin: 0,
+  minimoExtraMin: 60,
   cruzaMedianoche: false,
   dias: emptyDays(),
 });
+
+function ActionBar({
+  saving,
+  cancelLabel,
+  saveLabel,
+  onCancel,
+  onSave,
+}: {
+  saving: boolean;
+  cancelLabel: string;
+  saveLabel: string;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <ITFlex justify="end" gap={2}>
+      <ITButton variant="outlined" color="secondary" onClick={onCancel}>
+        {cancelLabel}
+      </ITButton>
+      <ITButton variant="filled" color="primary" onClick={onSave} disabled={saving}>
+        <ITFlex align="center" gap={1}>
+          <FaSave size={12} />
+          <ITText className="font-bold text-[11px]">{saveLabel}</ITText>
+        </ITFlex>
+      </ITButton>
+    </ITFlex>
+  );
+}
 
 export default function ScheduleForm({ id }: { id?: string }) {
   const { t } = useTranslation("schedules");
   const navigate = useNavigate();
   const isEdit = Boolean(id);
+  const isMobile = useIsMobile();
 
   const [form, setForm] = useState<HorarioInput>(emptyForm());
   const [loading, setLoading] = useState(isEdit);
@@ -63,6 +97,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
           toleranciaEntradaMin: h.toleranciaEntradaMin,
           toleranciaSalidaMin: h.toleranciaSalidaMin,
           comidaMin: h.comidaMin,
+          minimoExtraMin: h.minimoExtraMin,
           cruzaMedianoche: h.cruzaMedianoche,
           dias: h.dias.map((d) => ({
             diaSemana: d.diaSemana,
@@ -104,6 +139,15 @@ export default function ScheduleForm({ id }: { id?: string }) {
     }
   };
 
+  const summary = useMemo(
+    () => ({
+      days: daysWorked(form.dias),
+      rest: restDays(form.dias),
+      weekly: weeklyMinutes(form.dias, form.comidaMin ?? 0),
+    }),
+    [form.dias, form.comidaMin]
+  );
+
   if (loading) {
     return (
       <ITFlex justify="center" className="py-10">
@@ -115,20 +159,39 @@ export default function ScheduleForm({ id }: { id?: string }) {
   const dayLabel = (n: number) => dyn(t)(`day${n}`);
   const hasSecond = (d: HorarioDiaInput) => Boolean(d.entrada2 || d.salida2);
 
+  const summaryKpis = [
+    {
+      key: "days",
+      value: `${summary.days}/7`,
+      tint: "bg-sky-50 text-sky-600",
+      icon: <FaCalendarCheck size={15} />,
+    },
+    {
+      key: "weeklyHours",
+      value: formatMinutesAsHhMm(summary.weekly),
+      tint: "bg-emerald-50 text-emerald-600",
+      icon: <FaClock size={15} />,
+    },
+    {
+      key: "restDays",
+      value: String(summary.rest),
+      tint: "bg-slate-100 text-slate-500",
+      icon: <FaBed size={15} />,
+    },
+  ];
+
+  const sectionLabel = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+
   return (
     <ITFlex direction="column" gap={4}>
       {/* Acciones arriba */}
-      <ITFlex justify="end" gap={2}>
-        <ITButton variant="outlined" color="secondary" onClick={() => navigate("/horarios")}>
-          {t("cancel")}
-        </ITButton>
-        <ITButton variant="filled" color="primary" onClick={save} disabled={saving}>
-          <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{t("save")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
+      <ActionBar
+        saving={saving}
+        cancelLabel={t("cancel")}
+        saveLabel={t("save")}
+        onCancel={() => navigate("/horarios")}
+        onSave={save}
+      />
 
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -136,8 +199,11 @@ export default function ScheduleForm({ id }: { id?: string }) {
         </ITAlert>
       )}
 
+      {/* Datos + resumen */}
       <ITCard className="!p-5 border border-slate-200">
         <ITFlex direction="column" gap={4}>
+          <ITText className={sectionLabel}>{t("sections.general")}</ITText>
+
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={6}>
               <ITInput
@@ -147,7 +213,43 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
               />
             </ITGrid>
-            <ITGrid item xs={4} md={2}>
+          </ITGrid>
+
+          <ITFlex wrap="wrap" gap={3}>
+            {summaryKpis.map((k) => (
+              <ITFlex
+                key={k.key}
+                grow={1}
+                basis="180px"
+                align="center"
+                gap={3}
+                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+              >
+                <ITFlex
+                  align="center"
+                  justify="center"
+                  className={`h-10 w-10 shrink-0 rounded-xl ${k.tint}`}
+                >
+                  {k.icon}
+                </ITFlex>
+                <ITFlex direction="column" gap={0} className="min-w-0">
+                  <ITText className="text-xl font-black leading-none text-slate-800">{k.value}</ITText>
+                  <ITText className="truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    {dyn(t)(`summary.${k.key}`)}
+                  </ITText>
+                </ITFlex>
+              </ITFlex>
+            ))}
+          </ITFlex>
+        </ITFlex>
+      </ITCard>
+
+      {/* Reglas de jornada */}
+      <ITCard title={t("sections.rules")} className="!p-5 border border-slate-200">
+        <ITGrid container columns={12} spacing={5}>
+          <ITGrid item xs={12} md={4}>
+            <ITFlex direction="column" gap={3}>
+              <ITText className={sectionLabel}>{t("sections.tolerances")}</ITText>
               <ITInput
                 name="tolEntrada"
                 type="number"
@@ -155,8 +257,6 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 value={String(form.toleranciaEntradaMin ?? 0)}
                 onChange={(e) => setForm((f) => ({ ...f, toleranciaEntradaMin: Number(e.target.value) }))}
               />
-            </ITGrid>
-            <ITGrid item xs={4} md={2}>
               <ITInput
                 name="tolSalida"
                 type="number"
@@ -164,8 +264,12 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 value={String(form.toleranciaSalidaMin ?? 0)}
                 onChange={(e) => setForm((f) => ({ ...f, toleranciaSalidaMin: Number(e.target.value) }))}
               />
-            </ITGrid>
-            <ITGrid item xs={4} md={2}>
+            </ITFlex>
+          </ITGrid>
+
+          <ITGrid item xs={12} md={4} className="md:border-l md:border-slate-100 md:pl-5">
+            <ITFlex direction="column" gap={3}>
+              <ITText className={sectionLabel}>{t("sections.workday")}</ITText>
               <ITInput
                 name="comida"
                 type="number"
@@ -173,50 +277,97 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 value={String(form.comidaMin ?? 0)}
                 onChange={(e) => setForm((f) => ({ ...f, comidaMin: Number(e.target.value) }))}
               />
-            </ITGrid>
+              <ITCheckbox
+                name="cruzaMedianoche"
+                label={t("crossesMidnight")}
+                checked={!!form.cruzaMedianoche}
+                onChange={(v) => setForm((f) => ({ ...f, cruzaMedianoche: v }))}
+              />
+              <ITText className="text-[11px] text-slate-400">{t("crossesMidnightHint")}</ITText>
+            </ITFlex>
           </ITGrid>
 
-          <ITFlex align="center" gap={4} wrap="wrap">
-            <ITCheckbox
-              name="cruzaMedianoche"
-              label={t("crossesMidnight")}
-              checked={!!form.cruzaMedianoche}
-              onChange={(v) => setForm((f) => ({ ...f, cruzaMedianoche: v }))}
-            />
-          </ITFlex>
-        </ITFlex>
+          <ITGrid item xs={12} md={4} className="md:border-l md:border-slate-100 md:pl-5">
+            <ITFlex direction="column" gap={3}>
+              <ITText className={sectionLabel}>{t("sections.overtime")}</ITText>
+              <ITInput
+                name="minExtra"
+                type="number"
+                label={t("minExtra")}
+                value={String(form.minimoExtraMin ?? 0)}
+                onChange={(e) => setForm((f) => ({ ...f, minimoExtraMin: Number(e.target.value) }))}
+              />
+              <ITText className="text-[11px] text-slate-500">{t("minExtraHint")}</ITText>
+            </ITFlex>
+          </ITGrid>
+        </ITGrid>
       </ITCard>
 
-      <ITCard title={t("days")} className="!p-5 border border-slate-200">
+      {/* Rejilla semanal */}
+      <ITCard title={t("sections.weekly")} className="!p-5 border border-slate-200">
         <ITFlex direction="column" gap={3}>
           <ITText className="text-[11px] text-slate-400">{t("secondHint")}</ITText>
+
+          <ITGrid
+            container
+            columns={12}
+            spacing={3}
+            className="hidden md:grid px-3 items-end border-b border-slate-100 pb-2"
+          >
+            {["colDay", "entry", "exit", "second", "rest", "colHours"].map((key) => (
+              <ITGrid key={key} item md={2}>
+                <ITText className={sectionLabel}>{dyn(t)(key)}</ITText>
+              </ITGrid>
+            ))}
+          </ITGrid>
 
           {form.dias.map((d) => (
             <ITFlex
               key={d.diaSemana}
               direction="column"
               gap={2}
-              className="border-b border-slate-100 pb-3 last:border-0"
+              className={`rounded-xl px-3 py-3 transition-colors ${
+                d.descanso ? "bg-slate-50/80" : "hover:bg-slate-50/60"
+              }`}
             >
               <ITGrid container columns={12} spacing={3} className="items-end">
                 <ITGrid item xs={12} md={2}>
-                  <ITText className="text-[12px] font-bold text-slate-600">
-                    {dayLabel(d.diaSemana)}
-                  </ITText>
+                  <ITFlex align="center" gap={2}>
+                    <ITText
+                      className={`text-[12px] font-black ${d.descanso ? "text-slate-400" : "text-slate-700"}`}
+                    >
+                      {dayLabel(d.diaSemana)}
+                    </ITText>
+                    {d.descanso && (
+                      <ITBadget color="gray" size="sm">
+                        {t("rest")}
+                      </ITBadget>
+                    )}
+                  </ITFlex>
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
+                  {!isMobile && (
+                    <label htmlFor={`entrada-${d.diaSemana}`} className="sr-only">
+                      {t("entry")}
+                    </label>
+                  )}
                   <ITTimePicker
                     name={`entrada-${d.diaSemana}`}
-                    label={t("entry")}
+                    label={isMobile ? t("entry") : undefined}
                     value={d.entrada ?? ""}
                     onChange={(e: { target: { value: string } }) => setDay(d.diaSemana, { entrada: e.target.value })}
                     disabled={d.descanso}
                   />
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
+                  {!isMobile && (
+                    <label htmlFor={`salida-${d.diaSemana}`} className="sr-only">
+                      {t("exit")}
+                    </label>
+                  )}
                   <ITTimePicker
                     name={`salida-${d.diaSemana}`}
-                    label={t("exit")}
+                    label={isMobile ? t("exit") : undefined}
                     value={d.salida ?? ""}
                     onChange={(e: { target: { value: string } }) => setDay(d.diaSemana, { salida: e.target.value })}
                     disabled={d.descanso}
@@ -253,28 +404,54 @@ export default function ScheduleForm({ id }: { id?: string }) {
                     />
                   </ITFlex>
                 </ITGrid>
+                <ITGrid item xs={12} md={2}>
+                  <ITText className="text-[11px] font-bold text-slate-500">
+                    {d.descanso ? "—" : formatMinutesAsHhMm(dayMinutes(d, form.comidaMin ?? 0))}
+                  </ITText>
+                </ITGrid>
               </ITGrid>
 
               {hasSecond(d) && !d.descanso && (
-                <ITGrid container columns={12} spacing={3} className="items-end">
-                  <ITGrid item xs={12} md={2} />
-                  <ITGrid item xs={6} md={2}>
-                    <ITTimePicker
-                      name={`entrada2-${d.diaSemana}`}
-                      label={t("entry")}
-                      value={d.entrada2 ?? ""}
-                      onChange={(e: { target: { value: string } }) => setDay(d.diaSemana, { entrada2: e.target.value || null })}
-                    />
+                <div className="md:ml-3 md:border-l-2 md:border-[#0D5777]/30 md:pl-3">
+                  <ITGrid container columns={12} spacing={3} className="items-end mt-2">
+                    <ITGrid item xs={12} md={2}>
+                      <ITFlex align="center" gap={2} className="md:justify-end">
+                        <FaClock size={10} className="text-[#0D5777]" />
+                        <ITText className={sectionLabel}>{t("second")}</ITText>
+                      </ITFlex>
+                    </ITGrid>
+                    <ITGrid item xs={6} md={2}>
+                      {!isMobile && (
+                        <label htmlFor={`entrada2-${d.diaSemana}`} className="sr-only">
+                          {t("entry")}
+                        </label>
+                      )}
+                      <ITTimePicker
+                        name={`entrada2-${d.diaSemana}`}
+                        label={isMobile ? t("entry") : undefined}
+                        value={d.entrada2 ?? ""}
+                        onChange={(e: { target: { value: string } }) =>
+                          setDay(d.diaSemana, { entrada2: e.target.value || null })
+                        }
+                      />
+                    </ITGrid>
+                    <ITGrid item xs={6} md={2}>
+                      {!isMobile && (
+                        <label htmlFor={`salida2-${d.diaSemana}`} className="sr-only">
+                          {t("exit")}
+                        </label>
+                      )}
+                      <ITTimePicker
+                        name={`salida2-${d.diaSemana}`}
+                        label={isMobile ? t("exit") : undefined}
+                        value={d.salida2 ?? ""}
+                        onChange={(e: { target: { value: string } }) =>
+                          setDay(d.diaSemana, { salida2: e.target.value || null })
+                        }
+                      />
+                    </ITGrid>
                   </ITGrid>
-                  <ITGrid item xs={6} md={2}>
-                    <ITTimePicker
-                      name={`salida2-${d.diaSemana}`}
-                      label={t("exit")}
-                      value={d.salida2 ?? ""}
-                      onChange={(e: { target: { value: string } }) => setDay(d.diaSemana, { salida2: e.target.value || null })}
-                    />
-                  </ITGrid>
-                </ITGrid>
+                </div>
               )}
             </ITFlex>
           ))}

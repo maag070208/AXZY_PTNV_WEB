@@ -10,7 +10,25 @@
   "tolEntrada": "Tolerancia entrada (min)",
   "tolSalida": "Tolerancia salida (min)",
   "comida": "Comida (min)",
+  "minExtra": "Mínimo para horas extra (min)",
+  "minExtraHint": "Tiempo mínimo trabajado de más para que cuente como hora extra. 0 = sin mínimo.",
   "crossesMidnight": "Cruza medianoche",
+  "crossesMidnightHint": "Actívalo si la salida es al día siguiente (turnos nocturnos).",
+  "sections": {
+    "general": "Datos del horario",
+    "rules": "Reglas de jornada",
+    "tolerances": "Tolerancias",
+    "workday": "Jornada",
+    "overtime": "Horas extra",
+    "weekly": "Rejilla semanal"
+  },
+  "colDay": "Día",
+  "colHours": "Horas",
+  "summary": {
+    "days": "Días de trabajo",
+    "weeklyHours": "Horas por semana",
+    "restDays": "Días de descanso"
+  },
   "days": "Días",
   "day1": "Lunes",
   "day2": "Martes",
@@ -83,13 +101,13 @@
     "help": {
       "title": "¿Cómo leer este reporte?",
       "intro": "Cada fila es una persona del periodo. Los totales de arriba suman a todas las personas del filtro, no solo a las de la página.",
-      "extra": "Tiempo trabajado después de la hora de salida de su horario, menos la tolerancia de salida. Entrar antes de la hora no genera horas extra.",
+      "extra": "Tiempo trabajado después de la hora de salida de su horario, menos la tolerancia de salida. Solo cuenta si alcanza el mínimo configurado en el horario (por defecto 60 min); por encima del mínimo se cuentan los minutos exactos. Entrar antes de la hora no genera horas extra.",
       "worked": "Tiempo total dentro de las instalaciones (de la entrada a la salida). Incluye comidas y descansos.",
       "scheduled": "Horas que marca su horario en los días en que sí checó. Por eso puede ser menor que las horas trabajadas.",
       "daysWithExtra": "Número de días del periodo en que acumuló horas extra. No es el número de checadas.",
       "noSchedule": "La persona no tiene horario asignado en el periodo; por eso no se le calculan horas extra.",
       "missing": "Diferencia cuando trabajó menos de lo programado. Se incluye en el CSV, no en la tabla.",
-      "restDay": "Si checa en un día de descanso, todo lo trabajado cuenta como horas extra.",
+      "restDay": "Si checa en un día de descanso, todo lo trabajado cuenta como horas extra, siempre que alcance el mínimo del horario.",
       "scope": "El reporte solo incluye a quien tiene al menos una checada en el periodo.",
       "dash": "“—” significa que no hubo horas extra en el periodo."
     },

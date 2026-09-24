@@ -106,7 +106,7 @@ export default function SchedulesTable() {
       sortable: false,
       render: (h) => (
         <ITText className="text-[11px] text-slate-500 whitespace-nowrap">
-          E{h.toleranciaEntradaMin} / S{h.toleranciaSalidaMin} · {t("comida")} {h.comidaMin}
+          E{h.toleranciaEntradaMin} / S{h.toleranciaSalidaMin} · {t("comida")} {h.comidaMin} · {t("minExtra")} {h.minimoExtraMin}
         </ITText>
       ),
     },

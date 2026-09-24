@@ -1,6 +1,10 @@
 {
   "title": "Tiempo extra",
   "description": "Consulta y aprobación de horas extra del personal.",
+  "help": {
+    "extra": "Tiempo trabajado después de la hora de salida de su horario, menos la tolerancia de salida. Solo cuenta si alcanza el mínimo configurado en el horario (por defecto 60 min); por encima del mínimo se cuentan los minutos exactos.",
+    "restDay": "Si checa en un día de descanso, todo lo trabajado cuenta como horas extra, siempre que alcance el mínimo del horario."
+  },
   "filters": "Filtros",
   "date": "Fecha",
   "clear": "Limpiar",
