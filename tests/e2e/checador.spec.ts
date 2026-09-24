@@ -9,7 +9,7 @@ import { irARuta } from "./support/pages/componentes";
  * Las checadas solo entran por la sincronización con el reloj, así que aquí no
  * se siembran: se prueba la pantalla (estado de la sincronización, filtros y la
  * petición server-side a `POST /checador/query`) sin depender del volumen real.
- * No se pulsan "Sincronizar ahora" ni "Importar del reloj": leerían del reloj
+ * No se pulsan "Sincronizar todo" ni "Importar del reloj": leerían del reloj
  * de verdad.
  */
 test.describe("Reloj checador", () => {
@@ -26,7 +26,7 @@ test.describe("Reloj checador", () => {
     await expect(
       page.getByText("Solo lectura: la API nunca modifica la configuración del reloj.")
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Sincronizar ahora" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sincronizar todo" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Importar del reloj" })).toBeVisible();
 
     // El día se corta en la zona del navegador (`timezoneId` de la suite).

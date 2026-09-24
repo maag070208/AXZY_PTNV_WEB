@@ -39,8 +39,13 @@ export interface ChecadorProgreso {
   startedAt: string;
   leidos: number;
   nuevas: number;
-  /** Eventos que faltaban al abrir la última búsqueda en el reloj. */
+  /**
+   * Eventos que reportó la última búsqueda. Baja a medida que se avanza, así que
+   * no promete cuánto queda.
+   */
   restantes: number | null;
+  /** Eventos totales de la corrida; se fija con la primera búsqueda del reloj. */
+  total: number | null;
 }
 
 /**

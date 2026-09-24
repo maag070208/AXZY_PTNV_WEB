@@ -15,8 +15,8 @@
     "messages": {
       "notConfigured": "La API no tiene CHECADOR_URL configurado: no se sincroniza.",
       "paused": "El reloj rechazó la contraseña. Actualiza CHECADOR_PASS en la API y reiníciala.",
-      "running": "Sincronización automática: {{leidos}} eventos leídos · {{nuevas}} checadas nuevas · faltan {{restantes}} eventos",
-      "runningNoTotal": "Sincronización automática: {{leidos}} eventos leídos · {{nuevas}} checadas nuevas",
+      "running": "Sincronizando: {{leidos}} de {{total}} eventos · {{nuevas}} checadas nuevas · faltan {{restantes}}",
+      "runningNoTotal": "Sincronizando: {{leidos}} eventos leídos · {{nuevas}} checadas nuevas",
       "pending": "La primera sincronización aún no termina."
     },
     "device": "Equipo",
@@ -26,8 +26,13 @@
     "empty": "—"
   },
   "sync": {
-    "button": "Sincronizar ahora",
-    "hint": "Trae del reloj las checadas de hoy, sin esperar a la sincronización automática."
+    "button": "Sincronizar todo",
+    "hint": "Trae del reloj todo lo que falte (el rezago completo). Corre en segundo plano; puedes seguir usando el sistema.",
+    "alreadyRunning": "Ya hay una sincronización en curso; espera a que termine.",
+    "percent": "{{percent}}%",
+    "speed": "{{rate}} eventos/s",
+    "eta": "≈ {{eta}} restantes",
+    "toast": "Sincronización terminada: {{count}} checadas nuevas"
   },
   "import": {
     "button": "Importar del reloj",
@@ -86,6 +91,7 @@
   "errors": {
     "status": "No se pudo consultar el estado del reloj",
     "import": "No se pudo iniciar la importación",
+    "sync": "No se pudo iniciar la sincronización",
     "export": "No se pudo generar el CSV"
   },
   "reporte": {

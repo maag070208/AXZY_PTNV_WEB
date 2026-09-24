@@ -40,31 +40,49 @@ const numero = (n: number): string => n.toLocaleString("es-MX");
 /** Día `YYYY-MM-DD` → `DD/MM/AAAA` (es una clave, no un instante). */
 const dia = (key: string): string => key.split("-").reverse().join("/");
 
+/** Segundos → texto corto para el ETA ("2 h 5 min", "3 min", "45 s"). */
+const duracion = (segundos: number): string => {
+  if (segundos < 60) return `${segundos} s`;
+  const min = Math.round(segundos / 60);
+  if (min < 60) return `${min} min`;
+  return `${Math.floor(min / 60)} h ${min % 60} min`;
+};
+
 export default function ChecadorStatusCard({ fx }: { fx: UseChecador }) {
-  const { t, status, importando, starting, handleSyncToday } = fx;
+  const { t, status, enCurso, progreso, importando, starting, handleSyncAll } = fx;
   if (!status) return null;
 
   const estado = estadoDe(status);
 
   const mensaje = ((): string | null => {
-    const progreso = status.enCurso;
     switch (estado) {
       case "notConfigured":
         return t("status.messages.notConfigured");
       case "paused":
         return t("status.messages.paused");
-      case "running":
+      case "running": {
         if (!progreso) return null;
-        return progreso.restantes != null
-          ? t("status.messages.running", {
-              leidos: numero(progreso.leidos),
-              nuevas: numero(progreso.nuevas),
-              restantes: numero(progreso.restantes),
-            })
-          : t("status.messages.runningNoTotal", {
-              leidos: numero(progreso.leidos),
-              nuevas: numero(progreso.nuevas),
-            });
+        if (progreso.total == null || progreso.faltan == null) {
+          return t("status.messages.runningNoTotal", {
+            leidos: numero(progreso.leidos),
+            nuevas: numero(progreso.nuevas),
+          });
+        }
+        const base = t("status.messages.running", {
+          leidos: numero(progreso.leidos),
+          total: numero(progreso.total),
+          nuevas: numero(progreso.nuevas),
+          restantes: numero(progreso.faltan),
+        });
+        const detalle = [
+          progreso.percent != null ? t("sync.percent", { percent: numero(progreso.percent) }) : null,
+          progreso.rate != null ? t("sync.speed", { rate: numero(Math.round(progreso.rate)) }) : null,
+          progreso.eta != null ? t("sync.eta", { eta: duracion(progreso.eta) }) : null,
+        ]
+          .filter((s): s is string => s !== null)
+          .join(" · ");
+        return detalle ? `${base} · ${detalle}` : base;
+      }
       case "error":
         return status.ultimaCorrida?.error ?? null;
       case "pending":
@@ -110,11 +128,11 @@ export default function ChecadorStatusCard({ fx }: { fx: UseChecador }) {
               variant="filled"
               color="primary"
               size="sm"
-              disabled={importando || starting || !status.configurado}
-              onClick={handleSyncToday}
+              disabled={enCurso || importando || starting || !status.configurado}
+              onClick={handleSyncAll}
             >
               <ITFlex align="center" gap={1}>
-                <FaSyncAlt size={11} className={importando ? "animate-spin" : undefined} />
+                <FaSyncAlt size={11} className={enCurso || importando ? "animate-spin" : undefined} />
                 <ITText className="font-bold text-[11px]">{t("sync.button")}</ITText>
               </ITFlex>
             </ITButton>

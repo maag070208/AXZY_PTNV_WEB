@@ -6,6 +6,7 @@ import type {
   ChecadorEmpleado,
   ChecadorEmpleadosResponse,
   ChecadorImportacion,
+  ChecadorProgreso,
   ChecadorStatus,
 } from "../model/types";
 
@@ -23,6 +24,14 @@ export const checadorApi = {
    */
   importar: (input: { desde: string; hasta: string; tz?: string }) =>
     api.post<ChecadorImportacion>(`/checador/import`, input),
+
+  /**
+   * Drena del reloj todo lo que falte desde el cursor (el rezago completo; solo
+   * LEE del reloj). Responde 202 con el avance inicial; la corrida sigue en
+   * segundo plano y su avance sale en `status().enCurso`. 409 si ya hay una
+   * sincronización en curso, 503 si el checador no está configurado.
+   */
+  sync: () => api.post<ChecadorProgreso>(`/checador/sync`),
 
   /** Entradas/salidas del reloj: mismo contrato que `/access/report`. */
   report: (params: ITDataTableFetchParamsPost) =>

@@ -15,8 +15,8 @@
     "messages": {
       "notConfigured": "The API has no CHECADOR_URL configured: nothing is synced.",
       "paused": "The time clock rejected the password. Update CHECADOR_PASS in the API and restart it.",
-      "running": "Automatic sync: {{leidos}} events read · {{nuevas}} new punches · {{restantes}} events left",
-      "runningNoTotal": "Automatic sync: {{leidos}} events read · {{nuevas}} new punches",
+      "running": "Syncing: {{leidos}} of {{total}} events · {{nuevas}} new punches · {{restantes}} left",
+      "runningNoTotal": "Syncing: {{leidos}} events read · {{nuevas}} new punches",
       "pending": "The first sync has not finished yet."
     },
     "device": "Device",
@@ -26,8 +26,13 @@
     "empty": "—"
   },
   "sync": {
-    "button": "Sync now",
-    "hint": "Pulls today's punches from the time clock without waiting for the automatic sync."
+    "button": "Sync all",
+    "hint": "Pulls everything still missing from the clock (the full backlog). Runs in the background; you can keep using the system.",
+    "alreadyRunning": "A sync is already running; wait for it to finish.",
+    "percent": "{{percent}}%",
+    "speed": "{{rate}} events/s",
+    "eta": "≈ {{eta}} left",
+    "toast": "Sync finished: {{count}} new punches"
   },
   "import": {
     "button": "Import from clock",
@@ -86,6 +91,7 @@
   "errors": {
     "status": "Could not load the time clock status",
     "import": "Could not start the import",
+    "sync": "Could not start the sync",
     "export": "Could not generate the CSV"
   },
   "reporte": {

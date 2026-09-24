@@ -73,7 +73,7 @@ export const useChecador = () => {
   const importando = status?.importacion != null && status.importacion.finishedAt == null;
 
   // Mientras algo corre se refresca el estado. Cuando termina, se recarga la
-  // tabla y, si era una importación, se avisa el resultado.
+  // tabla y se avisa el resultado (drenado del reloj o importación por rango).
   const previo = useRef({ enCurso: false, importando: false });
   useEffect(() => {
     const antes = previo.current;
@@ -85,11 +85,62 @@ export const useChecador = () => {
       if (importacion.error) setError(importacion.error);
       else setToast(t("import.toast", { count: importacion.nuevas }));
     }
+    if (antes.enCurso && !enCurso) {
+      const corrida = status?.ultimaCorrida;
+      if (corrida && !corrida.ok) setError(corrida.error ?? t("errors.sync"));
+      else if (corrida) setToast(t("sync.toast", { count: corrida.nuevas }));
+    }
     previo.current = { enCurso, importando };
     if (!enCurso && !importando) return undefined;
     const timer = window.setTimeout(() => void loadStatus(), STATUS_POLL_MS);
     return () => window.clearTimeout(timer);
   }, [enCurso, importando, status, loadStatus, t]);
+
+  // Velocidad y ETA del drenado: se muestrean en cada refresco del estado.
+  const [metrics, setMetrics] = useState<{ rate: number | null; eta: number | null }>({
+    rate: null,
+    eta: null,
+  });
+  const muestra = useRef<{ leidos: number; at: number } | null>(null);
+  const enCursoStatus = status?.enCurso ?? null;
+  useEffect(() => {
+    if (!enCursoStatus) {
+      muestra.current = null;
+      setMetrics({ rate: null, eta: null });
+      return;
+    }
+    const at = Date.now();
+    const anterior = muestra.current;
+    if (anterior && at > anterior.at) {
+      const dt = (at - anterior.at) / 1000;
+      const delta = enCursoStatus.leidos - anterior.leidos;
+      if (dt > 0 && delta > 0) {
+        const rate = delta / dt;
+        const eta =
+          enCursoStatus.total != null
+            ? Math.max(0, Math.round((enCursoStatus.total - enCursoStatus.leidos) / rate))
+            : null;
+        setMetrics({ rate, eta });
+      }
+    }
+    muestra.current = { leidos: enCursoStatus.leidos, at };
+  }, [enCursoStatus]);
+
+  /** Avance del drenado con métricas derivadas (para la tarjeta). */
+  const progreso = useMemo(() => {
+    const p = status?.enCurso;
+    if (!p) return null;
+    const { total } = p;
+    return {
+      ...p,
+      /** Eventos que faltan según el total de la corrida. */
+      faltan: total != null ? Math.max(0, total - p.leidos) : null,
+      /** % de eventos leídos (no de checadas). */
+      percent: total != null && total > 0 ? Math.min(100, Math.round((p.leidos / total) * 100)) : null,
+      rate: metrics.rate,
+      eta: metrics.eta,
+    };
+  }, [status?.enCurso, metrics]);
 
   const externalFilters = useMemo(() => {
     const filters: Record<string, string | number | boolean> = { tz: BROWSER_TIMEZONE };
@@ -152,11 +203,25 @@ export const useChecador = () => {
     }
   }, [t]);
 
-  /** "Sincronizar ahora": trae las checadas de hoy, sin esperar a la carga automática. */
-  const handleSyncToday = () => {
-    const hoy = toDateInput(new Date());
-    void importar(hoy, hoy);
-  };
+  /**
+   * "Sincronizar todo": drena del reloj lo que falte desde el cursor (el rezago
+   * completo), sin esperar a la sincronización automática. Su avance llega por
+   * el sondeo de `status`.
+   */
+  const handleSyncAll = useCallback(async () => {
+    setStarting(true);
+    setError(null);
+    try {
+      const inicial = await checadorApi.sync();
+      setStatus((s) => (s ? { ...s, enCurso: inicial } : s));
+    } catch (e) {
+      const httpStatus =
+        typeof e === "object" && e !== null ? (e as { status?: number }).status : undefined;
+      setError(httpStatus === 409 ? t("sync.alreadyRunning") : t("errors.sync"));
+    } finally {
+      setStarting(false);
+    }
+  }, [t]);
 
   /** Importa del reloj todo el rango de fechas seleccionado en los filtros. */
   const handleImportRange = () => {
@@ -225,9 +290,11 @@ export const useChecador = () => {
     fetchTableData,
     reloadKey,
     status,
+    enCurso,
+    progreso,
     importando,
     starting,
-    handleSyncToday,
+    handleSyncAll,
     handleImportRange,
     exporting,
     handleExportCsv,
