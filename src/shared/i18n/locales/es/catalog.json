@@ -48,6 +48,12 @@
     "newRecipientPlaceholder": "correo@dominio.com",
     "invalidEmail": "Correo inválido",
     "duplicateEmail": "Ese correo ya está en la lista",
-    "removeRecipient": "Quitar"
+    "removeRecipient": "Quitar",
+    "sendEmailLabel": "Enviar correos del sistema",
+    "sendEmailHelp": "Si se desactiva, el sistema deja de enviar TODOS los correos (altas, bajas, documentos y avisos a tickets). Los correos ya en cola se enviarán; los nuevos no se generarán.",
+    "sendEmailOn": "Activado",
+    "sendEmailOff": "Desactivado",
+    "sendEmailSaved": "Preferencia de correo guardada",
+    "sendEmailSaveError": "No se pudo guardar la preferencia de correo"
   }
 }

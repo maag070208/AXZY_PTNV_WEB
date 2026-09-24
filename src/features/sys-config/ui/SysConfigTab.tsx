@@ -4,6 +4,7 @@ import {
   ITAlert,
   ITButton,
   ITCard,
+  ITCheckbox,
   ITFlex,
   ITInput,
   ITText,
@@ -17,6 +18,10 @@ import {
 } from "@features/sys-config";
 
 const KEY = "EMAIL_NOTIFICATION_RECIPIENTS";
+const SEND_EMAIL_KEY = "ENABLE_SEND_EMAIL";
+
+const parseEnabled = (raw: string | null | undefined): boolean =>
+  (raw ?? "true").trim().toLowerCase() !== "false";
 
 const splitRecipients = (raw: string): string[] =>
   raw
@@ -34,16 +39,37 @@ export default function SysConfigTab() {
   const { data, loading, error, reload } = useGetSysConfig(KEY);
   const { mutate, loading: saving, error: saveError } = useUpdateSysConfig(KEY);
 
+  const {
+    data: sendEmailData,
+    loading: sendEmailLoading,
+    error: sendEmailLoadError,
+    reload: reloadSendEmail,
+  } = useGetSysConfig(SEND_EMAIL_KEY);
+  const {
+    mutate: mutateSendEmail,
+    loading: sendEmailSaving,
+    error: sendEmailSaveError,
+  } = useUpdateSysConfig(SEND_EMAIL_KEY);
+
   const [recipients, setRecipients] = useState<string[]>([]);
   const [draftEmail, setDraftEmail] = useState("");
   const [addError, setAddError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [sendEmailEnabled, setSendEmailEnabled] = useState(true);
+  const [sendEmailDirty, setSendEmailDirty] = useState(false);
 
   // Hidratar la lista cuando llega el valor remoto (solo si no está editando).
   useEffect(() => {
     if (data && !dirty) setRecipients(splitRecipients(data.value));
   }, [data, dirty]);
+
+  // Hidratar el interruptor de correo (solo si no está editando).
+  useEffect(() => {
+    if (sendEmailData && !sendEmailDirty) {
+      setSendEmailEnabled(parseEnabled(sendEmailData.value));
+    }
+  }, [sendEmailData, sendEmailDirty]);
 
   const addRecipient = () => {
     const email = draftEmail.trim();
@@ -84,6 +110,23 @@ export default function SysConfigTab() {
     setDraftEmail("");
     setAddError(null);
     setDirty(false);
+  };
+
+  const handleSaveSendEmail = async () => {
+    if (!sendEmailDirty || sendEmailSaving) return;
+    try {
+      await mutateSendEmail(sendEmailEnabled ? "true" : "false");
+      setSendEmailDirty(false);
+      setToast({ message: t("sysConfig.sendEmailSaved"), type: "success" });
+      await reloadSendEmail();
+    } catch {
+      setToast({ message: t("sysConfig.sendEmailSaveError"), type: "error" });
+    }
+  };
+
+  const handleResetSendEmail = () => {
+    setSendEmailEnabled(parseEnabled(sendEmailData?.value));
+    setSendEmailDirty(false);
   };
 
   return (
@@ -216,6 +259,70 @@ export default function SysConfigTab() {
           <ITText className="mt-3 block text-[10px] text-slate-400">
             {data.updatedBy.name} ·{" "}
             {new Date(data.updatedAt).toLocaleString("es-MX")}
+          </ITText>
+        )}
+      </ITCard>
+
+      <ITCard
+        title={t("sysConfig.sendEmailLabel")}
+        className="!p-5 border border-slate-200"
+        actions={
+          <ITFlex justify="end" gap={2}>
+            <ITButton
+              variant="outlined"
+              color="secondary"
+              onClick={handleResetSendEmail}
+              disabled={!sendEmailDirty || sendEmailSaving}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaUndo size={12} />
+                <ITText className="font-bold text-[11px]">
+                  {t("common:actions.cancel")}
+                </ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={handleSaveSendEmail}
+              disabled={!sendEmailDirty || sendEmailSaving}
+            >
+              <ITText className="font-bold text-[11px]">
+                {sendEmailSaving ? t("sysConfig.saving") : t("sysConfig.save")}
+              </ITText>
+            </ITButton>
+          </ITFlex>
+        }
+      >
+        {(sendEmailLoadError || sendEmailSaveError) && (
+          <ITAlert variant="error" dismissible onDismiss={() => undefined}>
+            {sendEmailLoadError ?? sendEmailSaveError}
+          </ITAlert>
+        )}
+
+        <ITCheckbox
+          name="enableSendEmail"
+          checked={sendEmailEnabled}
+          disabled={sendEmailLoading || sendEmailSaving}
+          onChange={(v) => {
+            setSendEmailEnabled(v);
+            setSendEmailDirty(true);
+          }}
+          label={t("sysConfig.sendEmailLabel")}
+        />
+
+        <ITText className="mt-1 block text-[11px] font-medium text-slate-600">
+          {sendEmailEnabled ? t("sysConfig.sendEmailOn") : t("sysConfig.sendEmailOff")}
+        </ITText>
+
+        <ITText className="mt-2 block text-[11px] text-slate-500">
+          {t("sysConfig.sendEmailHelp")}
+        </ITText>
+
+        {sendEmailData?.updatedBy && (
+          <ITText className="mt-3 block text-[10px] text-slate-400">
+            {sendEmailData.updatedBy.name} ·{" "}
+            {new Date(sendEmailData.updatedAt).toLocaleString("es-MX")}
           </ITText>
         )}
       </ITCard>

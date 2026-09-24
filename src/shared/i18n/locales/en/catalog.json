@@ -48,6 +48,12 @@
     "newRecipientPlaceholder": "email@domain.com",
     "invalidEmail": "Invalid email",
     "duplicateEmail": "That email is already in the list",
-    "removeRecipient": "Remove"
+    "removeRecipient": "Remove",
+    "sendEmailLabel": "Send system emails",
+    "sendEmailHelp": "If disabled, the system stops sending ALL emails (new hires, deactivations, documents and ticket notices). Emails already queued will be sent; new ones will not be generated.",
+    "sendEmailOn": "Enabled",
+    "sendEmailOff": "Disabled",
+    "sendEmailSaved": "Email preference saved",
+    "sendEmailSaveError": "Could not save the email preference"
   }
 }

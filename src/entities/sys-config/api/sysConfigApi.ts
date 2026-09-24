@@ -11,6 +11,7 @@ export interface SysConfig {
 }
 
 const EMAIL_KEY = "EMAIL_NOTIFICATION_RECIPIENTS";
+const SEND_EMAIL_KEY = "ENABLE_SEND_EMAIL";
 
 export const sysConfigApi = {
   list: () => api.get<SysConfig[]>("/sys-config"),
@@ -30,5 +31,13 @@ export const sysConfigApi = {
       EMAIL_KEY,
       value,
       "Destinatarios copias en notificaciones de sistema (separados por coma)"
+    ),
+  /** Interruptor global de correo transaccional (`ENABLE_SEND_EMAIL`). */
+  getSendEmail: () => sysConfigApi.get(SEND_EMAIL_KEY),
+  setSendEmail: (enabled: boolean) =>
+    sysConfigApi.update(
+      SEND_EMAIL_KEY,
+      enabled ? "true" : "false",
+      "Interruptor global de correo transaccional"
     ),
 };
