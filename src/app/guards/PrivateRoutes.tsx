@@ -270,7 +270,7 @@ export default function PrivateRoutes() {
           id: "configuracion",
           label: "Configuración",
           icon: <FaCog size={14} />,
-          isActive: active("/catalogos") || active("/usuarios"),
+          isActive: active("/catalogos") || active("/usuarios") || active("/relojes"),
           subitems: [
             {
               id: "catalogos",
@@ -284,6 +284,18 @@ export default function PrivateRoutes() {
               action: () => navigate("/usuarios"),
               isActive: active("/usuarios"),
             },
+            // Alta/baja de relojes checadores: solo ADMIN (GERENTE no, a
+            // diferencia del resto de Configuración).
+            ...(user?.role === "ADMIN"
+              ? [
+                {
+                  id: "relojes",
+                  label: tt("nav.relojes"),
+                  action: () => navigate("/relojes"),
+                  isActive: active("/relojes"),
+                },
+              ]
+              : []),
           ],
         },
       ]

@@ -1,11 +1,12 @@
 {
   "title": "Reloj checador",
-  "description": "Checadas del reloj Hikvision. Se copian solas cada 5 minutos; la API solo lee del reloj.",
+  "description": "Checadas de los relojes Hikvision. Se copian solas cada 5 minutos; la API solo lee de los relojes.",
   "status": {
-    "title": "Sincronización con el reloj",
-    "readOnly": "Solo lectura: la API nunca modifica la configuración del reloj.",
+    "title": "Sincronización con los relojes",
+    "readOnly": "Solo lectura: la API nunca modifica la configuración de los relojes.",
     "states": {
       "notConfigured": "Sin configurar",
+      "sinRelojes": "Sin relojes",
       "paused": "En pausa",
       "running": "Sincronizando",
       "error": "Con error",
@@ -13,39 +14,49 @@
       "pending": "Sin sincronizar"
     },
     "messages": {
-      "notConfigured": "La API no tiene CHECADOR_URL configurado: no se sincroniza.",
-      "paused": "El reloj rechazó la contraseña. Actualiza CHECADOR_PASS en la API y reiníciala.",
-      "running": "Sincronizando: {{leidos}} de {{total}} eventos · {{nuevas}} checadas nuevas · faltan {{restantes}}",
-      "runningNoTotal": "Sincronizando: {{leidos}} eventos leídos · {{nuevas}} checadas nuevas",
+      "notConfigured": "La API no tiene el usuario de los relojes (CHECADOR_USER): no se sincroniza.",
+      "sinRelojes": "Todavía no hay relojes dados de alta.",
+      "paused": "Un reloj rechazó la contraseña y se pausó su sincronización. Actualiza CHECADOR_PASS en la API y reiníciala.",
+      "running": "Sincronizando: {{leidos}} de {{total}} eventos revisados · {{nuevas}} checadas nuevas · faltan {{restantes}}",
+      "runningNoTotal": "Sincronizando: {{nuevas}} checadas nuevas",
+      "error": "Hubo un error en la última sincronización de un reloj; revisa cuál abajo.",
       "pending": "La primera sincronización aún no termina."
     },
-    "device": "Equipo",
+    "device": "Reloj",
     "checadas": "Checadas guardadas",
     "lastChecada": "Última checada",
     "lastSync": "Última sincronización",
-    "empty": "—"
+    "empty": "—",
+    "reloj": {
+      "running": "{{leidos}} de {{total}} eventos revisados · {{nuevas}} checadas nuevas",
+      "runningNoTotal": "{{nuevas}} checadas nuevas",
+      "paused": "Rechazó la contraseña: sincronización en pausa.",
+      "pending": "Su primera sincronización aún no termina."
+    },
+    "administrar": "Administrar relojes",
+    "soloAcceso": "No cuenta para entradas/salidas"
   },
   "sync": {
     "button": "Sincronizar todo",
-    "hint": "Trae del reloj todo lo que falte (el rezago completo). Corre en segundo plano; puedes seguir usando el sistema.",
-    "alreadyRunning": "Ya hay una sincronización en curso; espera a que termine.",
+    "hint": "Trae de cada reloj todo lo que falte (el rezago completo). Corre en segundo plano; puedes seguir usando el sistema.",
+    "alreadyRunning": "Todos los relojes ya están sincronizando; espera a que terminen.",
     "percent": "{{percent}}%",
     "speed": "{{rate}} eventos/s",
     "eta": "≈ {{eta}} restantes",
     "toast": "Sincronización terminada: {{count}} checadas nuevas"
   },
   "import": {
-    "button": "Importar del reloj",
+    "button": "Importar de los relojes",
     "running": "Importando…",
-    "hint": "Trae del reloj todas las checadas del rango de fechas seleccionado. Puede tardar varios minutos; puedes seguir usando el sistema.",
+    "hint": "Trae de todos los relojes las checadas del rango de fechas seleccionado. Puede tardar varios minutos; puedes seguir usando el sistema.",
     "states": {
       "running": "Importando",
       "ok": "Importación terminada",
       "error": "Importación con error"
     },
-    "progress": "{{desde}} – {{hasta}} · {{leidos}} de {{total}} eventos · {{nuevas}} checadas nuevas",
-    "progressNoTotal": "{{desde}} – {{hasta}} · conectando con el reloj…",
-    "done": "{{desde}} – {{hasta}} · {{nuevas}} checadas nuevas de {{leidos}} eventos leídos",
+    "progress": "{{desde}} – {{hasta}} · {{leidos}} de {{total}} checadas leídas · {{nuevas}} nuevas",
+    "progressNoTotal": "{{desde}} – {{hasta}} · conectando con los relojes…",
+    "done": "{{desde}} – {{hasta}} · {{nuevas}} checadas nuevas de {{leidos}} leídas",
     "toast": "Importación terminada: {{count}} checadas nuevas"
   },
   "presets": {
@@ -61,12 +72,15 @@
     "employeePlaceholder": "Nombre o número de empleado...",
     "metodo": "Método",
     "allMetodos": "Todos",
+    "reloj": "Reloj",
+    "allRelojes": "Todos",
     "clear": "Limpiar filtros"
   },
   "columns": {
     "occurredAt": "Fecha y hora",
     "employee": "Empleado",
     "metodo": "Método",
+    "reloj": "Reloj",
     "serialNo": "Consecutivo"
   },
   "metodos": {
@@ -86,6 +100,7 @@
     "numeroEmpleado": "Número de empleado",
     "nombre": "Nombre",
     "metodo": "Método",
+    "reloj": "Reloj",
     "serialNo": "Consecutivo del reloj"
   },
   "errors": {
@@ -161,6 +176,90 @@
     "errors": {
       "usuarios": "No se pudieron cargar los usuarios",
       "guardar": "No se pudo guardar el vínculo"
+    }
+  },
+  "relojes": {
+    "title": "Relojes checadores",
+    "description": "Da de alta los relojes y revisa su configuración y su sincronización. El sistema solo lee de los relojes.",
+    "readOnly": "Solo lectura: el sistema se conecta a los relojes para leer sus checadas y su configuración; nunca les cambia nada. De cada reloj solo se leen las checadas (rostro, huella o tarjeta), no las aperturas de puerta.",
+    "credenciales": "Se conecta con el usuario y la contraseña configurados en la API (los mismos para todos los relojes).",
+    "notConfigured": "La API no tiene el usuario de los relojes (CHECADOR_USER / CHECADOR_PASS): no se puede conectar a ninguno.",
+    "empty": "Todavía no hay relojes dados de alta.",
+    "uso": {
+      "asistencia": "Cuenta para entradas/salidas",
+      "soloAcceso": "No cuenta para entradas/salidas",
+      "checkbox": "Cuenta para entradas/salidas",
+      "hint": "Si cuenta, sus checadas arman las jornadas junto con las de los demás relojes que cuentan: la primera checada del turno es la entrada y la última, la salida, sin importar en qué reloj (puede entrar por uno y salir por otro). Si no cuenta, sus checadas se guardan y se ven en la tabla, pero no se usan para entradas/salidas ni horas extra."
+    },
+    "actions": {
+      "alta": "Dar de alta un reloj",
+      "baja": "Dar de baja",
+      "editar": "Editar",
+      "actualizar": "Volver a leer",
+      "cancelar": "Cancelar",
+      "confirmarAlta": "Dar de alta",
+      "conectando": "Conectando…",
+      "confirmarBaja": "Dar de baja",
+      "guardar": "Guardar"
+    },
+    "sync": {
+      "title": "Sincronización",
+      "checadas": "Checadas guardadas",
+      "ultimaChecada": "Última checada",
+      "ultimaSync": "Última sincronización",
+      "consecutivo": "Consecutivo leído"
+    },
+    "config": {
+      "title": "Configuración del reloj",
+      "hint": "Leída en vivo del reloj, sin cambiarle nada.",
+      "cargando": "Leyendo del reloj…",
+      "nombre": "Nombre en el reloj",
+      "modelo": "Modelo",
+      "serie": "Número de serie",
+      "firmware": "Firmware",
+      "mac": "MAC",
+      "direccion": "Dirección",
+      "hora": "Hora del reloj",
+      "modo": "Ajuste de hora",
+      "modos": {
+        "manual": "Manual",
+        "NTP": "Automático (NTP)"
+      },
+      "personas": "Personas registradas",
+      "personasDetalle": "{{conRostro}} con rostro · {{conHuella}} con huella · {{conTarjeta}} con tarjeta",
+      "enHora": "En hora",
+      "enHoraDetalle": "{{segundos}} s de diferencia con el servidor",
+      "adelantado": "Va {{tiempo}} adelantado",
+      "atrasado": "Va {{tiempo}} atrasado",
+      "desfaseHint": "Ajusta la hora en el propio reloj (de preferencia con NTP). Si los relojes no tienen la misma hora, una entrada en uno y una salida en otro dan horas trabajadas de más o de menos.",
+      "leidoEn": "Leída a las {{hora}}"
+    },
+    "dialog": {
+      "altaTitle": "Dar de alta un reloj",
+      "url": "Dirección del reloj",
+      "urlPlaceholder": "https://192.168.1.132",
+      "urlHint": "La IP o la dirección que abres en el navegador para entrar al reloj.",
+      "nombre": "Nombre (opcional)",
+      "nombrePlaceholder": "p. ej. Entrada de personal",
+      "nombreHint": "Si lo dejas vacío se usa el nombre configurado en el reloj.",
+      "altaNota": "El sistema se conecta para confirmar la dirección y empieza a traer sus checadas. No modifica el reloj.",
+      "bajaTitle": "Dar de baja {{nombre}}",
+      "bajaTexto": "Se deja de sincronizar. Sus checadas se quedan y, si lo vuelves a dar de alta, sigue desde donde iba. No modifica el reloj.",
+      "editarTitle": "Editar {{nombre}}",
+      "nombreEditar": "Nombre",
+      "editarNota": "Solo cambia cómo el sistema usa las checadas de este reloj. No modifica el reloj."
+    },
+    "toasts": {
+      "alta": "{{nombre}} dado de alta: ya está trayendo sus checadas",
+      "baja": "{{nombre}} dado de baja",
+      "editado": "{{nombre}} actualizado"
+    },
+    "errors": {
+      "status": "No se pudo leer el estado de los relojes",
+      "config": "No se pudo leer la configuración del reloj",
+      "alta": "No se pudo dar de alta el reloj",
+      "baja": "No se pudo dar de baja el reloj",
+      "editar": "No se pudo actualizar el reloj"
     }
   }
 }

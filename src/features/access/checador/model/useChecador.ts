@@ -41,9 +41,9 @@ const fechaYHora = (iso: string): [string, string] => {
 };
 
 /**
- * Checadas del reloj Hikvision: filtros de la tabla server-side, estado de la
- * sincronización automática, importación manual por fechas (se refresca sola
- * mientras corre) y exportación CSV.
+ * Checadas de los relojes Hikvision: filtros de la tabla server-side, estado de
+ * la sincronización de cada reloj, importación manual por fechas (se refresca
+ * sola mientras corre) y exportación CSV.
  */
 export const useChecador = () => {
   const { t } = useTranslation(["checador", "common"]);
@@ -54,6 +54,8 @@ export const useChecador = () => {
   ]);
   const [q, setQ] = useState("");
   const [metodo, setMetodo] = useState<MetodoChecada | "">("");
+  /** Serie del reloj ("" = todos). */
+  const [reloj, setReloj] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
 
   const [status, setStatus] = useState<ChecadorStatus | null>(null);
@@ -78,8 +80,10 @@ export const useChecador = () => {
   const importando = status?.importacion != null && status.importacion.finishedAt == null;
 
   // Mientras algo corre se refresca el estado. Cuando termina, se recarga la
-  // tabla y se avisa el resultado (drenado del reloj o importación por rango).
-  const previo = useRef({ enCurso: false, importando: false });
+  // tabla y se avisa el resultado (drenado de los relojes o importación por
+  // rango). `desde` es cuándo empezó lo que se vio correr: sus corridas son
+  // las que se reportan.
+  const previo = useRef({ enCurso: false, importando: false, desde: 0 });
   useEffect(() => {
     const antes = previo.current;
     if ((antes.enCurso && !enCurso) || (antes.importando && !importando)) {
@@ -91,61 +95,47 @@ export const useChecador = () => {
       else setToast(t("import.toast", { count: importacion.nuevas }));
     }
     if (antes.enCurso && !enCurso) {
-      const corrida = status?.ultimaCorrida;
-      if (corrida && !corrida.ok) setError(corrida.error ?? t("errors.sync"));
-      else if (corrida) setToast(t("sync.toast", { count: corrida.nuevas }));
+      const terminadas = (status?.dispositivos ?? []).filter(
+        (d) => d.ultimaCorrida && Date.parse(d.ultimaCorrida.startedAt) >= antes.desde
+      );
+      const fallidas = terminadas.filter((d) => !d.ultimaCorrida!.ok);
+      if (fallidas.length > 0) {
+        setError(
+          fallidas.map((d) => `${d.nombre}: ${d.ultimaCorrida!.error ?? t("errors.sync")}`).join(" · ")
+        );
+      } else if (terminadas.length > 0) {
+        const nuevas = terminadas.reduce((acc, d) => acc + d.ultimaCorrida!.nuevas, 0);
+        setToast(t("sync.toast", { count: nuevas }));
+      }
     }
-    previo.current = { enCurso, importando };
+    const desde = !enCurso ? 0 : antes.enCurso ? antes.desde : Date.parse(status!.enCurso!.startedAt);
+    previo.current = { enCurso, importando, desde };
     if (!enCurso && !importando) return undefined;
     const timer = window.setTimeout(() => void loadStatus(), STATUS_POLL_MS);
     return () => window.clearTimeout(timer);
   }, [enCurso, importando, status, loadStatus, t]);
 
-  // Velocidad y ETA del drenado: se muestrean en cada refresco del estado.
-  const [metrics, setMetrics] = useState<{ rate: number | null; eta: number | null }>({
-    rate: null,
-    eta: null,
-  });
-  const muestra = useRef<{ leidos: number; at: number } | null>(null);
-  const enCursoStatus = status?.enCurso ?? null;
-  useEffect(() => {
-    if (!enCursoStatus) {
-      muestra.current = null;
-      setMetrics({ rate: null, eta: null });
-      return;
-    }
-    const at = Date.now();
-    const anterior = muestra.current;
-    if (anterior && at > anterior.at) {
-      const dt = (at - anterior.at) / 1000;
-      const delta = enCursoStatus.leidos - anterior.leidos;
-      if (dt > 0 && delta > 0) {
-        const rate = delta / dt;
-        const eta =
-          enCursoStatus.total != null
-            ? Math.max(0, Math.round((enCursoStatus.total - enCursoStatus.leidos) / rate))
-            : null;
-        setMetrics({ rate, eta });
-      }
-    }
-    muestra.current = { leidos: enCursoStatus.leidos, at };
-  }, [enCursoStatus]);
-
-  /** Avance del drenado con métricas derivadas (para la tarjeta). */
+  /**
+   * Avance del drenado con métricas derivadas (para la tarjeta). La velocidad
+   * es la de toda la corrida: el avance llega por ventanas, a saltos, y una
+   * muestra entre dos refrescos exageraría.
+   */
   const progreso = useMemo(() => {
     const p = status?.enCurso;
     if (!p) return null;
     const { total } = p;
+    const segundos = (Date.now() - Date.parse(p.startedAt)) / 1000;
+    const rate = p.leidos > 0 && segundos > 0 ? p.leidos / segundos : null;
     return {
       ...p,
       /** Eventos que faltan según el total de la corrida. */
       faltan: total != null ? Math.max(0, total - p.leidos) : null,
-      /** % de eventos leídos (no de checadas). */
+      /** % de eventos del reloj revisados (no de checadas). */
       percent: total != null && total > 0 ? Math.min(100, Math.round((p.leidos / total) * 100)) : null,
-      rate: metrics.rate,
-      eta: metrics.eta,
+      rate,
+      eta: rate != null && total != null ? Math.max(0, Math.round((total - p.leidos) / rate)) : null,
     };
-  }, [status?.enCurso, metrics]);
+  }, [status?.enCurso]);
 
   const externalFilters = useMemo(() => {
     const filters: Record<string, string | number | boolean> = {};
@@ -154,8 +144,9 @@ export const useChecador = () => {
     const query = q.trim();
     if (query) filters.q = query;
     if (metodo) filters.metodo = metodo;
+    if (reloj) filters.dispositivoSerie = reloj;
     return filters;
-  }, [dateRange, q, metodo]);
+  }, [dateRange, q, metodo, reloj]);
 
   // Sort vigente de la tabla, compartido con el export. Al cambiar los filtros
   // la tabla se remonta y pierde su orden: el ref vuelve al default.
@@ -202,6 +193,7 @@ export const useChecador = () => {
     setDateRange([new Date(), new Date()]);
     setQ("");
     setMetodo("");
+    setReloj("");
   };
 
   /** Arranca la importación; su avance llega por el sondeo de `status`. */
@@ -219,9 +211,9 @@ export const useChecador = () => {
   }, [t]);
 
   /**
-   * "Sincronizar todo": drena del reloj lo que falte desde el cursor (el rezago
-   * completo), sin esperar a la sincronización automática. Su avance llega por
-   * el sondeo de `status`.
+   * "Sincronizar todo": drena de cada reloj lo que falte desde su cursor (el
+   * rezago completo), sin esperar a la sincronización automática. Su avance
+   * llega por el sondeo de `status`.
    */
   const handleSyncAll = useCallback(async () => {
     setStarting(true);
@@ -266,6 +258,7 @@ export const useChecador = () => {
         t("csv.numeroEmpleado"),
         t("csv.nombre"),
         t("csv.metodo"),
+        t("csv.reloj"),
         t("csv.serialNo"),
       ];
       const lines = rows.map((c) => [
@@ -273,6 +266,7 @@ export const useChecador = () => {
         c.numeroEmpleado,
         c.nombre,
         t(`metodos.${c.metodo}`),
+        c.reloj ?? c.dispositivoSerie,
         c.serialNo,
       ]);
       const escape = (cell: unknown) => `"${String(cell ?? "").replace(/"/g, '""')}"`;
@@ -299,6 +293,8 @@ export const useChecador = () => {
     setQ,
     metodo,
     setMetodo,
+    reloj,
+    setReloj,
     applyRange,
     clearFilters,
     externalFilters,

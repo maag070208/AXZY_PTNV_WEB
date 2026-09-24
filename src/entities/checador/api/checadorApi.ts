@@ -6,11 +6,14 @@ import type {
   ChecadorEmpleado,
   ChecadorEmpleadosResponse,
   ChecadorImportacion,
+  ChecadorDispositivo,
   ChecadorProgreso,
+  ChecadorRelojConfig,
   ChecadorStatus,
 } from "../model/types";
 
 const empleadoPath = (numero: string) => `/checador/empleados/${encodeURIComponent(numero)}`;
+const relojPath = (serie: string) => `/checador/relojes/${encodeURIComponent(serie)}`;
 
 export const checadorApi = {
   /** Tabla server-side (`{ page, limit, filters, sort }` → `{ data, total }`). */
@@ -32,6 +35,22 @@ export const checadorApi = {
    * sincronización en curso, 503 si el checador no está configurado.
    */
   sync: () => api.post<ChecadorProgreso>(`/checador/sync`),
+
+  /**
+   * Da de alta un reloj (solo ADMIN): la API se conecta, lee su identidad y
+   * arranca su sincronización. Nunca le escribe al reloj. `url` acepta la IP o
+   * la URL copiada del navegador; sin `nombre` se usa el configurado en el reloj.
+   */
+  registrarReloj: (input: { url: string; nombre?: string; asistencia?: boolean }) =>
+    api.post<ChecadorDispositivo>(`/checador/relojes`, input),
+  /** Cambia cómo lo usa el sistema (nombre, si cuenta para entradas/salidas); no toca el reloj. */
+  actualizarReloj: (serie: string, cambios: { nombre?: string; asistencia?: boolean }) =>
+    api.patch<ChecadorDispositivo>(relojPath(serie), cambios),
+  /** Deja de sincronizar el reloj; sus checadas se quedan. */
+  darDeBajaReloj: (serie: string) => api.delete<{ dispositivoSerie: string }>(relojPath(serie)),
+  /** Configuración leída en vivo del reloj (solo lectura). */
+  configuracionReloj: (serie: string) =>
+    api.get<ChecadorRelojConfig>(`${relojPath(serie)}/configuracion`),
 
   /** Entradas/salidas del reloj: mismo contrato que `/access/report`. */
   report: (params: ITDataTableFetchParamsPost) =>

@@ -8,6 +8,7 @@ import AccessReportPage from "@pages/access/AccessReportPage";
 import ChecadorPage from "@pages/access/ChecadorPage";
 import ChecadorReportPage from "@pages/access/ChecadorReportPage";
 import ChecadorEmpleadosPage from "@pages/access/ChecadorEmpleadosPage";
+import ChecadorRelojesPage from "@pages/access/ChecadorRelojesPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
 import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
 import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
@@ -53,6 +54,8 @@ import CatalogPage from "@pages/catalog/CatalogPage";
 
 /** Roles con acceso a la bitácora de accesos (ver ENTRADAS_SALIDAS.md §4). */
 const ACCESS_READ_ROLES: UserRole[] = ["ADMIN", "GERENTE", "RECURSOS_HUMANOS"];
+/** Alta/baja de relojes checadores: solo ADMIN (igual que en la API). */
+const RELOJES_ROLES: UserRole[] = ["ADMIN"];
 
 export default function App() {
   return (
@@ -141,6 +144,15 @@ export default function App() {
           element={
             <RoleGuard roles={ACCESS_READ_ROLES}>
               <ChecadorEmpleadosPage />
+            </RoleGuard>
+          }
+        />
+        {/* Relojes checadores (Configuración): alta, baja y configuración en vivo. */}
+        <Route
+          path="/relojes"
+          element={
+            <RoleGuard roles={RELOJES_ROLES}>
+              <ChecadorRelojesPage />
             </RoleGuard>
           }
         />

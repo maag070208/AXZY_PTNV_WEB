@@ -2,12 +2,15 @@
 export type MetodoChecada = "ROSTRO" | "HUELLA" | "TARJETA" | "OTRO";
 
 /**
- * Checada copiada del reloj Hikvision (ver CHECADOR.md). La API solo LEE del
- * reloj: estas filas llegan por la sincronización periódica y son inmutables.
+ * Checada copiada de un reloj Hikvision (ver CHECADOR.md). La API solo LEE de
+ * los relojes: estas filas llegan por la sincronización periódica y son
+ * inmutables.
  */
 export interface Checada {
   id: string;
   dispositivoSerie: string;
+  /** Nombre del reloj donde se checó (`null` si el reloj no tiene nombre). */
+  reloj: string | null;
   /** Consecutivo del evento en el reloj. */
   serialNo: number;
   numeroEmpleado: string;
@@ -26,7 +29,7 @@ export interface ChecadorCorrida {
   dispositivoSerie: string | null;
   startedAt: string;
   finishedAt: string;
-  /** Eventos leídos del reloj (de cualquier tipo, no solo checadas). */
+  /** Eventos del reloj revisados (por consecutivo); de ellos solo se leen las checadas. */
   leidos: number;
   /** Checadas nuevas guardadas. */
   nuevas: number;
@@ -34,17 +37,18 @@ export interface ChecadorCorrida {
   error: string | null;
 }
 
-/** Avance de la corrida en curso (p. ej. la carga inicial del historial). */
+/**
+ * Avance de la corrida en curso (p. ej. la carga inicial del historial), en
+ * eventos del reloj (consecutivos); de ellos solo se leen las checadas.
+ */
 export interface ChecadorProgreso {
   startedAt: string;
+  /** Eventos del reloj ya revisados. */
   leidos: number;
   nuevas: number;
-  /**
-   * Eventos que reportó la última búsqueda. Baja a medida que se avanza, así que
-   * no promete cuánto queda.
-   */
+  /** Eventos del reloj que faltan; `null` hasta que el reloj da la cota. */
   restantes: number | null;
-  /** Eventos totales de la corrida; se fija con la primera búsqueda del reloj. */
+  /** Eventos del reloj a revisar en la corrida. */
   total: number | null;
 }
 
@@ -59,33 +63,80 @@ export interface ChecadorImportacion {
   hasta: string;
   startedAt: string;
   finishedAt: string | null;
-  /** Eventos del rango en el reloj (se conoce con la primera página). */
+  /** Checadas del rango en los relojes (se conoce al empezar a leer cada uno). */
   total: number | null;
+  /** Checadas leídas del rango. */
   leidos: number;
   nuevas: number;
   error: string | null;
 }
 
+/** Un reloj dado de alta y el estado de su sincronización. */
 export interface ChecadorDispositivo {
   dispositivoSerie: string;
+  nombre: string;
+  /** Dirección con la que la API se conecta (`https://192.168.1.132`). */
+  url: string;
+  /**
+   * Si sus checadas arman las entradas/salidas (y las horas extra). Los relojes
+   * de puertas de oficina, que se checan varias veces por turno, no.
+   */
+  asistencia: boolean;
   modelo: string | null;
   ultimoSerialNo: number;
   sincronizadoEn: string | null;
   checadas: number;
   ultimaChecada: string | null;
+  /** Corrida en curso de este reloj (p. ej. la carga inicial de su historial). */
+  enCurso: ChecadorProgreso | null;
+  ultimaCorrida: ChecadorCorrida | null;
+  /** El reloj rechazó la contraseña: su sincronización automática se detuvo. */
+  pausadoPorCredenciales: boolean;
 }
 
-/** Estado de la sincronización con el reloj (`GET /checador/status`). */
+/** Estado de la sincronización con los relojes (`GET /checador/status`). */
 export interface ChecadorStatus {
-  /** `false` si la API no tiene `CHECADOR_URL`: no se sincroniza. */
+  /** `false` si la API no tiene `CHECADOR_USER`: no se conecta a los relojes. */
   configurado: boolean;
+  /** Suma de las corridas en curso de todos los relojes. */
   enCurso: ChecadorProgreso | null;
-  /** El reloj rechazó la contraseña: la sincronización automática se detuvo. */
-  pausadoPorCredenciales: boolean;
-  ultimaCorrida: ChecadorCorrida | null;
-  /** Importación manual en curso o la última. */
+  /** Importación manual en curso o la última (de todos los relojes). */
   importacion: ChecadorImportacion | null;
+  /** Relojes dados de alta. */
   dispositivos: ChecadorDispositivo[];
+}
+
+/**
+ * Configuración de un reloj leída en vivo del equipo
+ * (`GET /checador/relojes/:serie/configuracion`). Solo lectura. `hora` y
+ * `personas` quedan en `null` si el reloj no las pudo dar.
+ */
+export interface ChecadorRelojConfig {
+  dispositivoSerie: string;
+  leidoEn: string;
+  dispositivo: {
+    /** Nombre configurado en el propio reloj. */
+    nombre: string | null;
+    modelo: string | null;
+    firmware: string | null;
+    mac: string | null;
+  };
+  hora: {
+    /** Hora del reloj con su offset, como la reporta (`2026-09-24T13:39:19-07:00`). */
+    horaLocal: string;
+    /** `manual` o `NTP`. */
+    modo: string | null;
+    /** Zona POSIX del reloj (`CST+7:00:00` = UTC−7). */
+    zona: string | null;
+    /** Reloj − servidor, en segundos (positivo = el reloj va adelantado). */
+    desfaseSegundos: number;
+  } | null;
+  personas: {
+    total: number;
+    conRostro: number;
+    conHuella: number;
+    conTarjeta: number;
+  } | null;
 }
 
 // ---------------------------------------------------------------------------

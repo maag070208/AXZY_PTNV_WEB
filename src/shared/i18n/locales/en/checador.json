@@ -1,11 +1,12 @@
 {
   "title": "Time clock",
-  "description": "Punches from the Hikvision time clock. They are copied every 5 minutes; the API only reads from the device.",
+  "description": "Punches from the Hikvision time clocks. They are copied every 5 minutes; the API only reads from the clocks.",
   "status": {
-    "title": "Time clock sync",
-    "readOnly": "Read-only: the API never changes the device configuration.",
+    "title": "Time clocks sync",
+    "readOnly": "Read-only: the API never changes the clocks' configuration.",
     "states": {
       "notConfigured": "Not configured",
+      "sinRelojes": "No clocks",
       "paused": "Paused",
       "running": "Syncing",
       "error": "Error",
@@ -13,39 +14,49 @@
       "pending": "Not synced"
     },
     "messages": {
-      "notConfigured": "The API has no CHECADOR_URL configured: nothing is synced.",
-      "paused": "The time clock rejected the password. Update CHECADOR_PASS in the API and restart it.",
-      "running": "Syncing: {{leidos}} of {{total}} events · {{nuevas}} new punches · {{restantes}} left",
-      "runningNoTotal": "Syncing: {{leidos}} events read · {{nuevas}} new punches",
+      "notConfigured": "The API has no clock user (CHECADOR_USER): nothing is synced.",
+      "sinRelojes": "No time clocks have been added yet.",
+      "paused": "A clock rejected the password and its sync was paused. Update CHECADOR_PASS in the API and restart it.",
+      "running": "Syncing: {{leidos}} of {{total}} events reviewed · {{nuevas}} new punches · {{restantes}} left",
+      "runningNoTotal": "Syncing: {{nuevas}} new punches",
+      "error": "A clock failed on its last sync; see which one below.",
       "pending": "The first sync has not finished yet."
     },
-    "device": "Device",
+    "device": "Clock",
     "checadas": "Stored punches",
     "lastChecada": "Last punch",
     "lastSync": "Last sync",
-    "empty": "—"
+    "empty": "—",
+    "reloj": {
+      "running": "{{leidos}} of {{total}} events reviewed · {{nuevas}} new punches",
+      "runningNoTotal": "{{nuevas}} new punches",
+      "paused": "Rejected the password: sync paused.",
+      "pending": "Its first sync has not finished yet."
+    },
+    "administrar": "Manage clocks",
+    "soloAcceso": "Does not count for entries/exits"
   },
   "sync": {
     "button": "Sync all",
-    "hint": "Pulls everything still missing from the clock (the full backlog). Runs in the background; you can keep using the system.",
-    "alreadyRunning": "A sync is already running; wait for it to finish.",
+    "hint": "Pulls everything still missing from each clock (the full backlog). Runs in the background; you can keep using the system.",
+    "alreadyRunning": "Every clock is already syncing; wait for them to finish.",
     "percent": "{{percent}}%",
     "speed": "{{rate}} events/s",
     "eta": "≈ {{eta}} left",
     "toast": "Sync finished: {{count}} new punches"
   },
   "import": {
-    "button": "Import from clock",
+    "button": "Import from clocks",
     "running": "Importing…",
-    "hint": "Pulls every punch in the selected date range from the time clock. It may take several minutes; you can keep using the system.",
+    "hint": "Pulls every punch in the selected date range from all the clocks. It may take several minutes; you can keep using the system.",
     "states": {
       "running": "Importing",
       "ok": "Import finished",
       "error": "Import failed"
     },
-    "progress": "{{desde}} – {{hasta}} · {{leidos}} of {{total}} events · {{nuevas}} new punches",
-    "progressNoTotal": "{{desde}} – {{hasta}} · connecting to the time clock…",
-    "done": "{{desde}} – {{hasta}} · {{nuevas}} new punches from {{leidos}} events read",
+    "progress": "{{desde}} – {{hasta}} · {{leidos}} of {{total}} punches read · {{nuevas}} new",
+    "progressNoTotal": "{{desde}} – {{hasta}} · connecting to the clocks…",
+    "done": "{{desde}} – {{hasta}} · {{nuevas}} new punches out of {{leidos}} read",
     "toast": "Import finished: {{count}} new punches"
   },
   "presets": {
@@ -61,12 +72,15 @@
     "employeePlaceholder": "Name or employee number...",
     "metodo": "Method",
     "allMetodos": "All",
+    "reloj": "Clock",
+    "allRelojes": "All",
     "clear": "Clear filters"
   },
   "columns": {
     "occurredAt": "Date and time",
     "employee": "Employee",
     "metodo": "Method",
+    "reloj": "Clock",
     "serialNo": "Serial"
   },
   "metodos": {
@@ -86,6 +100,7 @@
     "numeroEmpleado": "Employee number",
     "nombre": "Name",
     "metodo": "Method",
+    "reloj": "Clock",
     "serialNo": "Device serial"
   },
   "errors": {
@@ -161,6 +176,90 @@
     "errors": {
       "usuarios": "Could not load the users",
       "guardar": "Could not save the link"
+    }
+  },
+  "relojes": {
+    "title": "Time clocks",
+    "description": "Add the time clocks and check their configuration and sync. The system only reads from the clocks.",
+    "readOnly": "Read-only: the system connects to the clocks to read their punches and configuration; it never changes anything on them. Only punches (face, fingerprint or card) are read, not door openings.",
+    "credenciales": "It connects with the clock user and password configured in the API (the same for every clock).",
+    "notConfigured": "The API has no clock user (CHECADOR_USER / CHECADOR_PASS): it cannot connect to any clock.",
+    "empty": "No time clocks have been added yet.",
+    "uso": {
+      "asistencia": "Counts for entries/exits",
+      "soloAcceso": "Does not count for entries/exits",
+      "checkbox": "Counts for entries/exits",
+      "hint": "If it counts, its punches build the shifts together with the other clocks that count: the first punch of the shift is the entry and the last one the exit, whatever the clock (people may enter through one and leave through another). If it does not count, its punches are stored and shown in the table, but not used for entries/exits or overtime."
+    },
+    "actions": {
+      "alta": "Add a time clock",
+      "baja": "Remove",
+      "editar": "Edit",
+      "actualizar": "Read again",
+      "cancelar": "Cancel",
+      "confirmarAlta": "Add",
+      "conectando": "Connecting…",
+      "confirmarBaja": "Remove",
+      "guardar": "Save"
+    },
+    "sync": {
+      "title": "Sync",
+      "checadas": "Stored punches",
+      "ultimaChecada": "Last punch",
+      "ultimaSync": "Last sync",
+      "consecutivo": "Last event read"
+    },
+    "config": {
+      "title": "Clock configuration",
+      "hint": "Read live from the clock, without changing anything.",
+      "cargando": "Reading from the clock…",
+      "nombre": "Name on the clock",
+      "modelo": "Model",
+      "serie": "Serial number",
+      "firmware": "Firmware",
+      "mac": "MAC",
+      "direccion": "Address",
+      "hora": "Clock time",
+      "modo": "Time setting",
+      "modos": {
+        "manual": "Manual",
+        "NTP": "Automatic (NTP)"
+      },
+      "personas": "Enrolled people",
+      "personasDetalle": "{{conRostro}} with face · {{conHuella}} with fingerprint · {{conTarjeta}} with card",
+      "enHora": "On time",
+      "enHoraDetalle": "{{segundos}} s off the server",
+      "adelantado": "{{tiempo}} fast",
+      "atrasado": "{{tiempo}} slow",
+      "desfaseHint": "Set the time on the clock itself (preferably with NTP). If the clocks disagree, an entry on one and an exit on another add or remove worked time.",
+      "leidoEn": "Read at {{hora}}"
+    },
+    "dialog": {
+      "altaTitle": "Add a time clock",
+      "url": "Clock address",
+      "urlPlaceholder": "https://192.168.1.132",
+      "urlHint": "The IP or the address you open in the browser to log into the clock.",
+      "nombre": "Name (optional)",
+      "nombrePlaceholder": "e.g. Staff entrance",
+      "nombreHint": "Leave it empty to use the name configured on the clock.",
+      "altaNota": "The system connects to confirm the address and starts pulling its punches. It does not change the clock.",
+      "bajaTitle": "Remove {{nombre}}",
+      "bajaTexto": "It stops syncing. Its punches stay and, if you add it again, it resumes where it left off. It does not change the clock.",
+      "editarTitle": "Edit {{nombre}}",
+      "nombreEditar": "Name",
+      "editarNota": "It only changes how the system uses this clock's punches. It does not change the clock."
+    },
+    "toasts": {
+      "alta": "{{nombre}} added: it is already pulling its punches",
+      "baja": "{{nombre}} removed",
+      "editado": "{{nombre}} updated"
+    },
+    "errors": {
+      "status": "Could not read the clocks status",
+      "config": "Could not read the clock configuration",
+      "alta": "Could not add the clock",
+      "baja": "Could not remove the clock",
+      "editar": "Could not update the clock"
     }
   }
 }

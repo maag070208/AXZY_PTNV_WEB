@@ -35,7 +35,13 @@ const METODO_COLOR: Record<MetodoChecada, BadgeColor> = {
   OTRO: "warning",
 };
 
-export default function ChecadorTab({ fx }: { fx: UseChecador }) {
+interface Props {
+  fx: UseChecador;
+  /** Solo para quien puede administrar los relojes (ADMIN). */
+  onAdministrarRelojes?: () => void;
+}
+
+export default function ChecadorTab({ fx, onAdministrarRelojes }: Props) {
   const {
     t,
     dateRange,
@@ -44,6 +50,8 @@ export default function ChecadorTab({ fx }: { fx: UseChecador }) {
     setQ,
     metodo,
     setMetodo,
+    reloj,
+    setReloj,
     applyRange,
     clearFilters,
     externalFilters,
@@ -67,6 +75,14 @@ export default function ChecadorTab({ fx }: { fx: UseChecador }) {
       ...METODOS.map((m) => ({ value: m, label: t(`metodos.${m}`) })),
     ],
     [t]
+  );
+
+  const relojOptions = useMemo(
+    () => [
+      { value: "", label: t("filters.allRelojes") },
+      ...(status?.dispositivos ?? []).map((d) => ({ value: d.dispositivoSerie, label: d.nombre })),
+    ],
+    [status?.dispositivos, t]
   );
 
   const columns = useMemo<Column<Checada>[]>(
@@ -110,6 +126,16 @@ export default function ChecadorTab({ fx }: { fx: UseChecador }) {
         ),
       },
       {
+        key: "reloj",
+        label: t("columns.reloj"),
+        type: "string",
+        render: (c) => (
+          <span title={c.dispositivoSerie}>
+            <ITText className="text-[11px] font-bold text-slate-600">{c.reloj ?? c.dispositivoSerie}</ITText>
+          </span>
+        ),
+      },
+      {
         key: "serialNo",
         label: t("columns.serialNo"),
         type: "number",
@@ -138,7 +164,7 @@ export default function ChecadorTab({ fx }: { fx: UseChecador }) {
         </ITAlert>
       )}
 
-      <ChecadorStatusCard fx={fx} />
+      <ChecadorStatusCard fx={fx} onAdministrarRelojes={onAdministrarRelojes} />
 
       {/* Filtros */}
       <ITCard title={t("filters.title")} className="!p-5 border border-slate-200">
@@ -191,7 +217,7 @@ export default function ChecadorTab({ fx }: { fx: UseChecador }) {
           </ITFlex>
 
           <ITGrid container columns={12} spacing={4}>
-            <ITGrid item xs={12} md={4}>
+            <ITGrid item xs={12} md={3}>
               <ITDatePicker
                 name="checadorDateRange"
                 label={t("filters.dateRange")}
@@ -201,7 +227,7 @@ export default function ChecadorTab({ fx }: { fx: UseChecador }) {
                 className="w-full min-w-0"
               />
             </ITGrid>
-            <ITGrid item xs={12} md={4}>
+            <ITGrid item xs={12} md={3}>
               <ITInput
                 name="checadorEmployee"
                 label={t("filters.employee")}
@@ -211,7 +237,17 @@ export default function ChecadorTab({ fx }: { fx: UseChecador }) {
                 className="w-full min-w-0"
               />
             </ITGrid>
-            <ITGrid item xs={12} md={4}>
+            <ITGrid item xs={12} md={3}>
+              <ITSearchSelect
+                name="checadorReloj"
+                label={t("filters.reloj")}
+                options={relojOptions}
+                value={reloj}
+                onChange={(value) => setReloj(String(value))}
+                className="w-full min-w-0"
+              />
+            </ITGrid>
+            <ITGrid item xs={12} md={3}>
               <ITSearchSelect
                 name="checadorMetodo"
                 label={t("filters.metodo")}
