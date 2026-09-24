@@ -106,7 +106,6 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
     const filters: Record<string, string | number | boolean> = {
       period,
       date: dateKey,
-      tz: BROWSER_TIMEZONE,
       includeInactive,
     };
     if (departmentId) filters.departmentId = departmentId;

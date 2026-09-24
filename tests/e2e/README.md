@@ -58,13 +58,15 @@ del panel viven en `pages/componentes.ts` (`panelBuscador`/`opcionesBuscador`).
 Todo eso vive ahí: si el kit gana testids o cambian los textos, se ajusta en un
 solo lugar y ningún spec se entera.
 
-**Ticket de producto pendiente (bitácora `/access`).** La página arma `start`/
-`end` como `YYYY-MM-DD` en la TZ del **navegador** y **no envía `tz`**; la API
-resuelve el rango con `ACCESS_REPORT_TIMEZONE`/`TZ`/`America/Mexico_City`. Entre
-las 23:00 y las 23:59 locales (navegador detrás de la TZ de la API) el día del
-navegador y el de la API no coinciden y los eventos recién creados caen fuera
-del rango. Mitigado en los tests ampliando el rango; el arreglo real es que la
-pantalla mande su `tz` (o alinee la TZ con la de la API).
+**Ticket de producto pendiente (bitácora `/access`).** La página **no envía
+`tz`**: la API resuelve el rango y el corte del día con la **TZ de la empresa**
+(`ACCESS_REPORT_TIMEZONE`/`TZ`/`America/Mexico_City`), así que el resultado es el
+mismo para cualquier usuario (antes dependía de la TZ del navegador y dos PCs
+veían números distintos). **Residual**: la **fecha** del filtro (`start`/`end`,
+date pickers) se sigue calculando en el **calendario del navegador**, así que
+cerca de medianoche, con un navegador en otra TZ, puede quedar desfasada un día.
+Mitigado en los tests ampliando el rango; el arreglo real es exponer la TZ de la
+empresa al cliente.
 
 **Sesión una sola vez.** El proyecto `setup` entra por la pantalla de acceso
 real, guarda `storageState` y los demás proyectos lo reutilizan. `sesion.spec.ts`

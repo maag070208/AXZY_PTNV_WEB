@@ -8,10 +8,11 @@ import { campo, irARuta } from "./support/pages/componentes";
 /**
  * Reporte de entradas/salidas por persona (`/access/report`).
  *
- * Lo que se prueba es la **pantalla**; el escenario se siembra por API. El
- * reporte se resuelve con la zona horaria del navegador, que Playwright fija en
- * `America/Mazatlan` (ver `playwright.config.ts`), así que las verificaciones
- * cruzadas usan la MISMA zona y el MISMO día de referencia.
+ * Lo que se prueba es la **pantalla**; el escenario se siembra por API. La web
+ * ya NO envía `tz`: la API resuelve el corte del día con su TZ de empresa
+ * (`ACCESS_REPORT_TIMEZONE` → env → `America/Mexico_City`), así que las
+ * verificaciones cruzadas hacen la misma petición sin `tz` y con el MISMO día de
+ * referencia.
  *
  * Los eventos se crean con `clientEventId` prefijado `E2E-` (lo que limpia el
  * teardown del paquete `api/`). El usuario con eventos se crea con rol `GUARD`:
@@ -120,7 +121,7 @@ test.describe("Reporte de entradas/salidas", () => {
     // Verificación cruzada: la UI muestra las MISMAS horas que calcula la API.
     // La tabla lista SESIONES (una fila por entrada/salida), no personas.
     const rep = await access.report({
-      filters: { period: "DAY", date: hoyLocal(), tz: TZ, q: NOMBRE_CON_EVENTOS },
+      filters: { period: "DAY", date: hoyLocal(), q: NOMBRE_CON_EVENTOS },
     });
     const fila = rep.data.find((r) => r.employeeId === conEventosId);
     expect(fila, "la API debe devolver la sesión de la persona sembrada").toBeTruthy();
@@ -168,7 +169,7 @@ test.describe("Reporte de entradas/salidas", () => {
     // Verificación cruzada: la API la incluye en el universo del periodo pero
     // sin registros (la cuenta vive en el resumen, no como fila de la tabla).
     const rep = await access.report({
-      filters: { period: "DAY", date: hoyLocal(), tz: TZ, q: NOMBRE_SIN_EVENTOS },
+      filters: { period: "DAY", date: hoyLocal(), q: NOMBRE_SIN_EVENTOS },
     });
     expect(rep.summary.peopleTotal).toBe(1);
     expect(rep.summary.peopleWithRecords).toBe(0);

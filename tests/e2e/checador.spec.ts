@@ -13,7 +13,7 @@ import { irARuta } from "./support/pages/componentes";
  * de verdad.
  */
 test.describe("Reloj checador", () => {
-  test("ADMIN ve el estado de la sincronización y la tabla pide al servidor con su zona", async ({
+  test("ADMIN ve el estado de la sincronización y la tabla pide al servidor", async ({
     page,
   }) => {
     const consulta = page.waitForResponse(
@@ -29,11 +29,11 @@ test.describe("Reloj checador", () => {
     await expect(page.getByRole("button", { name: "Sincronizar todo" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Importar del reloj" })).toBeVisible();
 
-    // El día se corta en la zona del navegador (`timezoneId` de la suite).
+    // El día lo resuelve la API con su TZ de empresa (la web no manda `tz`).
     const res = await consulta;
     expect(res.status()).toBe(200);
     const { filters } = res.request().postDataJSON() as { filters: Record<string, unknown> };
-    expect(filters.tz).toBe("America/Mazatlan");
+    expect(filters.tz).toBeUndefined();
     expect(filters.desde).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     await expect(page.locator("table thead").getByText("Fecha y hora")).toBeVisible();
   });
@@ -66,7 +66,7 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
     const res = await consulta;
     expect(res.status()).toBe(200);
     const { filters } = res.request().postDataJSON() as { filters: Record<string, unknown> };
-    expect(filters).toMatchObject({ period: "DAY", tz: "America/Mazatlan" });
+    expect(filters).toMatchObject({ period: "DAY" });
 
     await page.getByRole("button", { name: "Vincular empleados" }).click();
     await expect(page).toHaveURL(/#\/access\/checador\/empleados/);

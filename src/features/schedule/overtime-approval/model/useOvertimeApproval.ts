@@ -87,7 +87,6 @@ export const useOvertimeApproval = ({
     const f: Record<string, string | number | boolean> = {
       period,
       date: toDateInput(date),
-      tz: BROWSER_TIMEZONE,
     };
     if (departmentId) f.departmentId = departmentId;
     if (q.trim()) f.q = q.trim();
@@ -206,7 +205,7 @@ export const useOvertimeApproval = ({
       await downloadPdf(res.data, res.summary, {
         period,
         date: toDateInput(date),
-        timezone: BROWSER_TIMEZONE,
+        timezone: res.summary.range.timezone || BROWSER_TIMEZONE,
       });
     } catch (e) {
       setError((e as Error).message);

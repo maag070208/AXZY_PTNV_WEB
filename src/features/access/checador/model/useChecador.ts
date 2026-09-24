@@ -8,10 +8,6 @@ import {
   type MetodoChecada,
 } from "@entities/checador";
 
-/** Zona del navegador: los días del filtro se cortan igual que se muestran las horas. */
-const BROWSER_TIMEZONE =
-  Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Mexico_City";
-
 /** Refresco del estado mientras corre una sincronización o una importación. */
 const STATUS_POLL_MS = 5_000;
 
@@ -152,7 +148,7 @@ export const useChecador = () => {
   }, [status?.enCurso, metrics]);
 
   const externalFilters = useMemo(() => {
-    const filters: Record<string, string | number | boolean> = { tz: BROWSER_TIMEZONE };
+    const filters: Record<string, string | number | boolean> = {};
     if (dateRange[0]) filters.desde = toDateInput(dateRange[0]);
     if (dateRange[1]) filters.hasta = toDateInput(dateRange[1]);
     const query = q.trim();
@@ -213,7 +209,7 @@ export const useChecador = () => {
     setStarting(true);
     setError(null);
     try {
-      const importacion = await checadorApi.importar({ desde, hasta, tz: BROWSER_TIMEZONE });
+      const importacion = await checadorApi.importar({ desde, hasta });
       setStatus((s) => (s ? { ...s, importacion } : s));
     } catch (e) {
       setError(e instanceof Error ? e.message : t("errors.import"));
