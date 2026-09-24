@@ -5,6 +5,10 @@ import RoleGuard from "./guards/RoleGuard";
 import type { UserRole } from "@entities/user";
 import AccessPage from "@pages/access/AccessPage";
 import AccessReportPage from "@pages/access/AccessReportPage";
+import SchedulesPage from "@pages/schedules/SchedulesPage";
+import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
+import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
+import OvertimePage from "@pages/schedules/OvertimePage";
 import HomePage from "@pages/home/HomePage";
 import DashboardPage from "@pages/inventario/DashboardPage";
 import DispositivosPage from "@pages/inventario/DispositivosPage";
@@ -109,6 +113,47 @@ export default function App() {
           element={
             <RoleGuard roles={ACCESS_READ_ROLES}>
               <AccessReportPage />
+            </RoleGuard>
+          }
+        />
+
+        <Route
+          path="/horarios"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <SchedulesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/horarios/nuevo"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <ScheduleFormPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/horarios/:id/editar"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <ScheduleFormPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/horarios/asignar"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <AssignSchedulesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/horarios/horas-extra"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <OvertimePage />
             </RoleGuard>
           }
         />

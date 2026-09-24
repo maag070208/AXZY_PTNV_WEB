@@ -1,7 +1,10 @@
 import { useState } from "react";
 import {
+  FileTypeEnum,
+  ITAlert,
   ITButton,
   ITDialog,
+  ITDropfile,
   ITFlex,
   ITGrid,
   ITInput,
@@ -10,6 +13,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import {
   FaBuilding,
+  FaFileUpload,
   FaIdCard,
   FaLock,
   FaQuestion,
@@ -20,7 +24,7 @@ import type { Department } from "@entities/department";
 import type { UserFormValues } from "../model/useUserForm";
 
 interface Props {
-  step: "personal" | "access" | "org";
+  step: "personal" | "access" | "org" | "docs";
   isEdit: boolean;
   form: UserFormValues;
   errors?: Record<string, string>;
@@ -31,6 +35,11 @@ interface Props {
   selectedDept: Department | undefined;
   roleGuidance: { title: string; summary: string; actions: string[] };
   roleOptions: Array<Record<string, string>>;
+  // Documentación del alta
+  requiredDocs?: Array<{ key: string; label: string; tipoId: string | null }>;
+  docsFiles?: Record<string, File | null>;
+  onPickDoc?: (key: string, file: File) => void;
+  docsError?: string | null;
 }
 
 function SectionHeader({
@@ -69,6 +78,9 @@ export default function UserFormFields({
   selectedDept,
   roleGuidance,
   roleOptions,
+  requiredDocs,
+  onPickDoc,
+  docsError,
 }: Props) {
   const { t: tt } = useTranslation(["users", "common"]);
   const activeDepartments = departments.filter((d) => d.active);
@@ -166,6 +178,44 @@ export default function UserFormFields({
         </section>
       )}
 
+      {step === "docs" && (
+        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            icon={<FaFileUpload size={15} className="text-amber-600" />}
+            iconBg="bg-amber-50"
+            title={tt("form.stepDocs")}
+            hint={tt("form.docsHint")}
+          />
+          {docsError && (
+            <ITFlex className="mb-3">
+              <ITAlert variant="error" dismissible={false}>
+                {docsError}
+              </ITAlert>
+            </ITFlex>
+          )}
+          <ITGrid container columns={12} spacing={4}>
+            {(requiredDocs ?? []).map((doc) => (
+              <ITGrid item xs={12} md={6} key={doc.key}>
+                <ITFlex direction="column" gap={1}>
+                  <ITText className="text-[11px] font-bold text-slate-600">{doc.label}</ITText>
+                  <ITDropfile
+                    onFileSelect={() => undefined}
+                    onSubmit={(file) => onPickDoc?.(doc.key, file)}
+                    acceptedFileTypes={[
+                      FileTypeEnum.PNG,
+                      FileTypeEnum.JPG,
+                      FileTypeEnum.JPEG,
+                      FileTypeEnum.PDF,
+                    ]}
+                    showStatusBadge
+                  />
+                </ITFlex>
+              </ITGrid>
+            ))}
+          </ITGrid>
+        </section>
+      )}
+
       <ITDialog
         isOpen={helpOpen}
         onClose={() => setHelpOpen(false)}
@@ -191,3 +241,4 @@ export default function UserFormFields({
     </>
   );
 }
+

@@ -12,6 +12,7 @@ import {
   FaUserTie,
   FaCog,
   FaClipboardList,
+  FaRegClock,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -182,6 +183,37 @@ export default function PrivateRoutes() {
               label: tt("nav.accessReport"),
               action: () => navigate("/access/report"),
               isActive: active("/access/report"),
+            },
+          ],
+        },
+      ]
+      : []),
+    // HORARIOS (ADMIN, GERENTE, RECURSOS_HUMANOS — administración, asignación y horas extra)
+    ...(canViewAccess
+      ? [
+        {
+          id: "horarios",
+          label: tt("nav.schedules"),
+          icon: <FaRegClock size={14} />,
+          isActive: active("/horarios"),
+          subitems: [
+            {
+              id: "schedulesAdmin",
+              label: tt("nav.schedulesAdmin"),
+              action: () => navigate("/horarios"),
+              isActive: active("/horarios") && location.pathname === "/horarios",
+            },
+            {
+              id: "schedulesAssign",
+              label: tt("nav.schedulesAssign"),
+              action: () => navigate("/horarios/asignar"),
+              isActive: active("/horarios/asignar"),
+            },
+            {
+              id: "overtime",
+              label: tt("nav.overtime"),
+              action: () => navigate("/horarios/horas-extra"),
+              isActive: active("/horarios/horas-extra"),
             },
           ],
         },

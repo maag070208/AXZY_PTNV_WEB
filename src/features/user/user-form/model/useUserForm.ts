@@ -5,6 +5,7 @@ import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
 import { usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
+import { personalApi, type TipoDocumento } from "@entities/personal";
 import { validateEmail } from "@shared/validation";
 import { showToast } from "@app/toast/toast.slice";
 import type { AppDispatch } from "@app/store";
@@ -50,6 +51,13 @@ const ROLE_OPTIONS = [
   { value: "JEFE_DE_AREA", label: "JEFE DE AREA" },
   { value: "EMPLEADO", label: "EMPLEADO" },
   { value: "RECURSOS_HUMANOS", label: "RECURSOS HUMANOS" },
+];
+
+/** Documentación obligatoria del alta de un empleado (se resuelve por nombre). */
+export const REQUIRED_DOCS: Array<{ key: string; test: RegExp; fallback: string }> = [
+  { key: "ineFrente", test: /ine.*frente|frente.*ine/i, fallback: "INE (Frente)" },
+  { key: "ineReverso", test: /ine.*reverso|reverso.*ine/i, fallback: "INE (Reverso)" },
+  { key: "comprobante", test: /domicilio/i, fallback: "Comprobante de Domicilio" },
 ];
 
 export interface UserFormValues {
@@ -145,6 +153,18 @@ export const useUserForm = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Documentación obligatoria del alta (INE frente/reverso + comprobante).
+  const [documentTypes, setDocumentTypes] = useState<TipoDocumento[]>([]);
+  const [docsFiles, setDocsFiles] = useState<Record<string, File | null>>({});
+  const [docsError, setDocsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    personalApi
+      .documentTypes()
+      .then(setDocumentTypes)
+      .catch(() => setDocumentTypes([]));
+  }, []);
+
   useEffect(() => {
     departmentsApi
       .list(true)
@@ -180,6 +200,16 @@ export const useUserForm = () => {
   }, [id]);
 
   const selectedDept = departments.find((d) => d.id === form.departmentId);
+
+  /** En el alta de un empleado se exigen las 3 documentaciones. */
+  const requiresDocs = !isEdit && form.role === "EMPLEADO";
+  const requiredDocs = REQUIRED_DOCS.map((r) => {
+    const tipo = documentTypes.find((d) => r.test.test(d.nombre));
+    return { key: r.key, label: tipo?.nombre ?? r.fallback, tipoId: tipo?.id ?? null };
+  });
+  const setDocFile = (key: string, file: File | null) =>
+    setDocsFiles((prev) => ({ ...prev, [key]: file }));
+  const missingDocs = requiredDocs.filter((d) => !docsFiles[d.key]);
   const roleGuidance = {
     title: dyn(tt)(ROLE_GUIDANCE[form.role].title),
     summary: dyn(tt)(ROLE_GUIDANCE[form.role].summary),
@@ -277,11 +307,17 @@ export const useUserForm = () => {
         if (validateField(field, form[field] ?? "")) return step;
       }
     }
+    if (requiresDocs && missingDocs.length > 0) return 3;
     return -1;
   };
 
   const handleSubmit = async (): Promise<boolean> => {
+    if (requiresDocs && missingDocs.length > 0) {
+      setDocsError(i18n.t("users:form.docsRequired"));
+      return false;
+    }
     if (!validate()) return false;
+    setDocsError(null);
     const fullName = composeFullName(form);
     setSaving(true);
     try {
@@ -300,7 +336,7 @@ export const useUserForm = () => {
           subareaId: form.subareaId || undefined,
         });
       } else {
-        await usersApi.create({
+        const created = await usersApi.create({
           username: form.username,
           email: form.email || undefined,
           password: form.password,
@@ -314,6 +350,17 @@ export const useUserForm = () => {
           departmentId: form.departmentId || undefined,
           subareaId: form.subareaId || undefined,
         });
+        // Documentación obligatoria del alta.
+        if (requiresDocs) {
+          for (const d of requiredDocs) {
+            const file = docsFiles[d.key];
+            if (file && d.tipoId) {
+              await personalApi.uploadDocument(created.id, d.tipoId, file);
+            }
+          }
+          // Correo de alta con los documentos adjuntos (fire-and-forget).
+          void personalApi.notificarAlta(created.id).catch(() => undefined);
+        }
       }
       return true;
     } catch (e: any) {
@@ -354,6 +401,12 @@ export const useUserForm = () => {
     handleSubmit,
     firstInvalidStep,
     canSubmit,
+    // Documentación del alta
+    requiresDocs,
+    requiredDocs,
+    docsFiles,
+    setDocFile,
+    docsError,
     tt,
     ROLE_OPTIONS,
   };

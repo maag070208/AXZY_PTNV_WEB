@@ -42,6 +42,10 @@
     "hrReports": "HR Reports",
     "access": "Access control",
     "accessLog": "Access log",
-    "accessReport": "Entry/exit report"
+    "accessReport": "Entry/exit report",
+    "schedules": "Schedules",
+    "schedulesAdmin": "Schedules",
+    "schedulesAssign": "Assign schedules",
+    "overtime": "Overtime"
   }
 }

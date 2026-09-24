@@ -55,11 +55,11 @@
     "headingHint": "Configura identidad, acceso y ubicación organizacional.",
     "sectionPersonal": "Información personal",
     "sectionPersonalHint": "Datos visibles del usuario",
-"name": "Nombre (primer)",
- "secondName": "Segundo nombre",
- "apellidoPaterno": "Apellido paterno",
- "apellidoMaterno": "Apellido materno",
- "employeeNo": "No. Empleado",
+    "name": "Nombre (primer)",
+    "secondName": "Segundo nombre",
+    "apellidoPaterno": "Apellido paterno",
+    "apellidoMaterno": "Apellido materno",
+    "employeeNo": "No. Empleado",
     "email": "Correo",
     "position": "Puesto",
     "sectionAccess": "Acceso y permisos",
@@ -120,7 +120,15 @@
           "No administra tickets, inventario ni usuarios"
         ]
       }
-    }
+    },
+    "stepDocs": "Documentación",
+    "docsHint": "Sube INE (frente), INE (reverso) y comprobante de domicilio (obligatorios para el alta).",
+    "ine": "INE (foto)",
+    "comprobante": "Comprobante de domicilio",
+    "pickFile": "Elegir archivo",
+    "changeFile": "Cambiar archivo",
+    "docsRequired": "Sube las 3 documentaciones: INE frente, INE reverso y comprobante de domicilio.",
+    "docsUploading": "Subiendo documentos…"
   },
   "history": {
     "title": "Historial",

@@ -42,6 +42,10 @@
     "hrReports": "Reportes de personal",
     "access": "Control de acceso",
     "accessLog": "Bitácora de accesos",
-    "accessReport": "Reporte entradas/salidas"
+    "accessReport": "Reporte entradas/salidas",
+    "schedules": "Horarios",
+    "schedulesAdmin": "Horarios",
+    "schedulesAssign": "Asignar horarios",
+    "overtime": "Horas extra"
   }
 }

@@ -46,6 +46,10 @@ export const personalApi = {
   removeDocument: (id: string, docId: string) =>
     api.delete<{ id: string }>(`/personal/${id}/documentos/${docId}`),
 
+  /** Dispara el correo de "Alta de personal" con los documentos adjuntos. */
+  notificarAlta: (id: string) =>
+    api.post<{ enviado: boolean; adjuntos: number }>(`/personal/${id}/notificar-alta`, {}),
+
   documentTypes: (includeInactive?: boolean) =>
     api.get<TipoDocumento[]>(`/personal/catalogos/tipos-documento${includeInactive ? "?includeInactive=true" : ""}`),
   createDocumentType: (nombre: string) =>

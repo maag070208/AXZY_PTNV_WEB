@@ -6,7 +6,7 @@ import {
   ITPage,
   ITStepper,
 } from "@axzydev/axzy_ui_system";
-import { FaBuilding, FaIdCard, FaShieldAlt, FaUserPlus } from "react-icons/fa";
+import { FaBuilding, FaFileUpload, FaIdCard, FaShieldAlt, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -76,6 +76,10 @@ export default function UserFormPage() {
     selectedDept: userForm.selectedDept,
     roleGuidance: userForm.roleGuidance,
     roleOptions: userForm.ROLE_OPTIONS,
+    requiredDocs: userForm.requiredDocs,
+    docsFiles: userForm.docsFiles,
+    onPickDoc: userForm.setDocFile,
+    docsError: userForm.docsError,
   };
 
   const steps: AppStep[] = [
@@ -94,6 +98,15 @@ export default function UserFormPage() {
       icon: <FaBuilding size={13} />,
       content: <UserFormFields step="org" {...fieldsProps} />,
     },
+    ...(userForm.requiresDocs
+      ? [
+          {
+            label: tt("form.stepDocs"),
+            icon: <FaFileUpload size={13} />,
+            content: <UserFormFields step="docs" {...fieldsProps} />,
+          },
+        ]
+      : []),
   ];
 
   return (

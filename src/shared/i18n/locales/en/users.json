@@ -120,7 +120,15 @@
           "Does not manage tickets, inventory or users"
         ]
       }
-    }
+    },
+    "stepDocs": "Documentation",
+    "docsHint": "Upload INE (front), INE (back) and proof of address (required for registration).",
+    "ine": "INE (photo)",
+    "comprobante": "Proof of address",
+    "pickFile": "Choose file",
+    "changeFile": "Change file",
+    "docsRequired": "Upload all 3 documents: INE front, INE back and proof of address.",
+    "docsUploading": "Uploading documents…"
   },
   "history": {
     "title": "History",
