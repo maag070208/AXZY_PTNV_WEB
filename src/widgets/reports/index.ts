@@ -5,10 +5,12 @@ export { default as DevicePDF } from "./ui/DevicePDF";
 export { default as AsignadosPDF } from "./ui/AsignadosPDF";
 export { default as SalidasPDF } from "./ui/SalidasPDF";
 export { default as AccessReportPDF } from "./ui/AccessReportPDF";
+export { default as OvertimePDF } from "./ui/OvertimePDF";
 export {
   downloadReportPDF,
   downloadAsignadosPDF,
   downloadDevicesPDF,
   downloadSalidasPDF,
   downloadAccessReportPDF,
+  downloadOvertimePDF,
 } from "./model/pdf";

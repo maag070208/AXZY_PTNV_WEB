@@ -102,7 +102,15 @@
       "WEEK": "Weekly",
       "MONTH": "Monthly"
     },
-    "empty": "No data"
+    "empty": "No data",
+    "pdf": {
+      "title": "Overtime Report",
+      "timezone": "Time zone",
+      "totalPeople": "People",
+      "totalExtra": "Overtime",
+      "totalWorked": "Worked",
+      "totalScheduled": "Scheduled"
+    }
   },
   "assignedLabel": "Assigned",
   "secondHint": "Enable it on days with a split shift (e.g. housekeeping or restaurant)."

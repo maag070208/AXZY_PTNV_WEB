@@ -3,6 +3,7 @@ import { FaClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { OvertimeReport } from "@features/schedule";
+import { downloadOvertimePDF } from "@widgets/reports";
 
 export default function OvertimePage() {
   const { t } = useTranslation(["schedules", "common"]);
@@ -20,7 +21,7 @@ export default function OvertimePage() {
       ]}
       backAction={() => navigate("/horarios")}
     >
-      <OvertimeReport />
+      <OvertimeReport downloadPdf={downloadOvertimePDF} />
     </ITPage>
   );
 }

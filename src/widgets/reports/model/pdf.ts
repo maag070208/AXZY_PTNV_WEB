@@ -8,11 +8,13 @@ import type {
   AccessReportSessionRow,
   AccessReportSummary,
 } from "@entities/access";
+import type { HorasExtraPdfMeta, HorasExtraRow, HorasExtraSummary } from "@entities/schedule";
 import ReportPDF from "../ui/ReportPDF";
 import AsignadosPDF from "../ui/AsignadosPDF";
 import DevicePDF from "../ui/DevicePDF";
 import SalidasPDF from "../ui/SalidasPDF";
 import AccessReportPDF from "../ui/AccessReportPDF";
+import OvertimePDF from "../ui/OvertimePDF";
 
 export const downloadReportPDF = async (
   rows: ReportRow[],
@@ -65,4 +67,16 @@ export const downloadAccessReportPDF = async (
   ).toBlob();
   const stamp = meta.date;
   saveAs(blob, `reporte_accessos_${meta.period}_${stamp}.pdf`);
+};
+
+export const downloadOvertimePDF = async (
+  rows: HorasExtraRow[],
+  summary: HorasExtraSummary,
+  meta: HorasExtraPdfMeta
+): Promise<void> => {
+  const blob = await pdf(
+    createElement(OvertimePDF, { rows, summary, meta }) as any
+  ).toBlob();
+  const stamp = meta.date.replace(/-/g, "");
+  saveAs(blob, `reporte_horas_extra_${meta.period.toLowerCase()}_${stamp}.pdf`);
 };

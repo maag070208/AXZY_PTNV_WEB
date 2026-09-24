@@ -4,15 +4,23 @@ import { pdfTheme } from "./theme";
 
 interface Props {
   title: string;
-  pageIndex: number;
-  pageCount: number;
   generatedAt: string;
+  /**
+   * Números de página cuando el documento declara las páginas manualmente
+   * (varios `<Page>` con slices). Si se omiten, el membrete toma los números
+   * reales de `@react-pdf/renderer` (render prop), para documentos que usan su
+   * paginación nativa: así el rótulo siempre coincide con la página física.
+   */
+  pageIndex?: number;
+  pageCount?: number;
 }
 
 // Membrete institucional compartido por los reportes del sistema (Entregas,
 // Asignados, Dispositivos). Se renderiza igual en cada página para que el
 // documento se lea como una sola pieza profesional, no como una tabla suelta.
 export default function PdfLetterhead({ title, pageIndex, pageCount, generatedAt }: Props) {
+  const manual =
+    pageIndex !== undefined && pageCount !== undefined ? { pageIndex, pageCount } : null;
   return (
     <View>
       <View style={pdfTheme.band}>
@@ -29,9 +37,22 @@ export default function PdfLetterhead({ title, pageIndex, pageCount, generatedAt
           <Text style={pdfTheme.bandMeta}>
             Generado: <Text style={pdfTheme.bandMetaStrong}>{generatedAt}</Text>
           </Text>
-          <Text style={pdfTheme.bandMeta}>
-            Página <Text style={pdfTheme.bandMetaStrong}>{pageIndex + 1}</Text> de {pageCount}
-          </Text>
+          {manual ? (
+            <Text style={pdfTheme.bandMeta}>
+              Página <Text style={pdfTheme.bandMetaStrong}>{manual.pageIndex + 1}</Text> de{" "}
+              {manual.pageCount}
+            </Text>
+          ) : (
+            <Text
+              style={pdfTheme.bandMeta}
+              render={({ pageNumber, totalPages }) => (
+                <>
+                  Página{" "}
+                  <Text style={pdfTheme.bandMetaStrong}>{pageNumber}</Text> de {totalPages}
+                </>
+              )}
+            />
+          )}
         </View>
       </View>
       <View style={pdfTheme.bandAccentLine} />

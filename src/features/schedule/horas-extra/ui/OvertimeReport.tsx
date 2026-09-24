@@ -20,6 +20,7 @@ import {
   FaClock,
   FaExclamationTriangle,
   FaFileCsv,
+  FaFilePdf,
   FaInfoCircle,
   FaRegClock,
   FaUndo,
@@ -29,13 +30,14 @@ import { departmentsApi, type Department } from "@entities/department";
 import { scheduleApi, type HorasExtraRow, type HorasExtraSummary } from "@entities/schedule";
 import { formatFecha, formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
+import type { DownloadOvertimePdf } from "../model/types";
 
 type Period = "DAY" | "WEEK" | "MONTH";
 
 const toDateInput = (d: Date): string =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-export default function OvertimeReport() {
+export default function OvertimeReport({ downloadPdf }: { downloadPdf: DownloadOvertimePdf }) {
   const { t } = useTranslation("schedules");
   const [period, setPeriod] = useState<Period>("WEEK");
   const [date, setDate] = useState<Date>(new Date());
@@ -47,6 +49,7 @@ export default function OvertimeReport() {
   const [rows, setRows] = useState<HorasExtraRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   useEffect(() => {
     departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
@@ -207,6 +210,24 @@ export default function OvertimeReport() {
     }
   };
 
+  /** Genera el PDF desde las filas y el resumen ya cargados (sin re-fetch). */
+  const handleExportPdf = async () => {
+    if (!summary) return;
+    setExportingPdf(true);
+    setError(null);
+    try {
+      await downloadPdf(rows, summary, {
+        period,
+        date: toDateInput(date),
+        timezone: tz,
+      });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   const columns: Column<HorasExtraRow>[] = [
     {
       key: "employeeName",
@@ -304,6 +325,18 @@ export default function OvertimeReport() {
               onChange={(v) => handlePeriodChange(v as Period)}
             />
             <ITFlex gap={2} className="ml-auto">
+              <ITButton
+                variant="outlined"
+                color="gray"
+                size="sm"
+                onClick={handleExportPdf}
+                disabled={exportingPdf || rows.length === 0}
+              >
+                <ITFlex align="center" gap={1}>
+                  <FaFilePdf className="text-red-600" size={13} />
+                  <ITText className="font-bold text-[11px]">{t("overtime.exportPdf")}</ITText>
+                </ITFlex>
+              </ITButton>
               <ITButton variant="outlined" color="gray" size="sm" onClick={handleExportCsv} disabled={exporting}>
                 <ITFlex align="center" gap={1}>
                   <FaFileCsv className="text-emerald-600" size={13} />

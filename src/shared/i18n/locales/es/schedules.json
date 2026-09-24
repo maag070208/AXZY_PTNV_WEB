@@ -102,7 +102,15 @@
       "WEEK": "Semanal",
       "MONTH": "Mensual"
     },
-    "empty": "Sin datos"
+    "empty": "Sin datos",
+    "pdf": {
+      "title": "Reporte de Horas Extra",
+      "timezone": "Zona horaria",
+      "totalPeople": "Personas",
+      "totalExtra": "Horas extra",
+      "totalWorked": "Trabajadas",
+      "totalScheduled": "Programadas"
+    }
   },
   "assignedLabel": "Asignados",
   "secondHint": "Actívalo en los días con jornada partida (p. ej. camaristas o restaurante)."

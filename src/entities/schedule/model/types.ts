@@ -88,3 +88,10 @@ export interface HorasExtraResponse {
   total: number;
   summary: HorasExtraSummary;
 }
+
+/** Metadatos de la exportación a PDF (periodo de referencia, fecha y zona horaria). */
+export interface HorasExtraPdfMeta {
+  period: "DAY" | "WEEK" | "MONTH";
+  date: string;
+  timezone: string;
+}
