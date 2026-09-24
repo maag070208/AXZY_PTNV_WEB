@@ -26,8 +26,10 @@ import { campo, irARuta } from "./support/pages/componentes";
 const RUN = nuevoRunId();
 const TZ = "America/Mazatlan";
 const USERNAME_CON_EVENTOS = "e2e_report_con";
+const USERNAME_CON_EVENTOS_2 = "e2e_report_con2";
 const USERNAME_SIN_EVENTOS = "e2e_report_sin";
 const NOMBRE_CON_EVENTOS = "E2E Reporte Con Eventos";
+const NOMBRE_CON_EVENTOS_2 = "E2E Reporte Con Eventos 2";
 const NOMBRE_SIN_EVENTOS = "E2E Reporte Sin Eventos";
 
 /** Día de referencia local (el mismo que resuelve el navegador por defecto). */
@@ -172,6 +174,86 @@ test.describe("Reporte de entradas/salidas", () => {
     expect(rep.summary.peopleWithRecords).toBe(0);
     expect(rep.summary.peopleWithoutRecords).toBe(1);
     expect(rep.data).toHaveLength(0);
+  });
+
+  test("la tabla ordena por entryAt desc por defecto", async ({ page }) => {
+    const primerReporte = page.waitForRequest(
+      (r) => r.method() === "POST" && r.url().endsWith("/access/report")
+    );
+
+    await irARuta(page, "/access/report");
+
+    const body = (await primerReporte).postDataJSON() as {
+      sort?: { key: string; direction: string };
+    };
+    expect(body.sort).toEqual({ key: "entryAt", direction: "desc" });
+  });
+
+  test("el export respeta el orden de la tabla (paridad al ordenar por Empleado)", async ({
+    page,
+  }) => {
+    await irARuta(page, "/access/report");
+    await expect(page.locator("table tbody")).toBeVisible();
+
+    // Primer click en el encabezado sortable → `asc`. La petición de tabla con
+    // ese sort confirma que el hook ya lo guardó como orden vigente.
+    const reordenado = page.waitForRequest((r) => {
+      if (r.method() !== "POST" || !r.url().endsWith("/access/report")) return false;
+      const data = r.postDataJSON() as { sort?: { key?: string } };
+      return data?.sort?.key === "employeeName";
+    });
+    await page.getByTitle("Ordenar por Empleado").click();
+    expect((await reordenado).postDataJSON()).toMatchObject({
+      sort: { key: "employeeName", direction: "asc" },
+    });
+
+    // El export comparte el sort vigente de la tabla.
+    const exportRequest = page.waitForRequest(
+      (r) => r.method() === "POST" && r.url().endsWith("/access/report/export")
+    );
+    await page.getByRole("button", { name: "CSV" }).click();
+    expect((await exportRequest).postDataJSON()).toMatchObject({
+      sort: { key: "employeeName", direction: "asc" },
+    });
+  });
+
+  test("el export CSV trae las sesiones de la más reciente a la más vieja", async ({ page }) => {
+    // Segunda sesión (usuario aparte): dos `entryAt` distintos en el mismo día.
+    const segundo = await access.asegurarUsuario({
+      username: USERNAME_CON_EVENTOS_2,
+      name: NOMBRE_CON_EVENTOS_2,
+      role: "GUARD",
+    });
+    await access.crearEvento({
+      employeeId: segundo.id,
+      type: "ENTRY",
+      siteId: demoSite.id,
+      clientEventId: `${E2E_PREFIX}-${RUN}-RPT-002`,
+    });
+    await access.crearEvento({
+      employeeId: segundo.id,
+      type: "EXIT",
+      siteId: demoSite.id,
+      clientEventId: `${E2E_PREFIX}-${RUN}-RPT-003`,
+    });
+
+    await irARuta(page, "/access/report");
+    await expect(page.locator("table tbody")).toBeVisible();
+
+    const exportResponse = page.waitForResponse(
+      (r) => r.request().method() === "POST" && r.url().endsWith("/access/report/export")
+    );
+    await page.getByRole("button", { name: "CSV" }).click();
+    const body = (await (await exportResponse).json()) as {
+      data: { entryAt: string | null }[];
+    };
+
+    const entryAts = body.data
+      .map((r) => r.entryAt)
+      .filter((x): x is string => x !== null);
+    expect(entryAts.length).toBeGreaterThanOrEqual(2);
+    // ISO-8601 ordena lexicográficamente = cronológicamente.
+    expect(entryAts).toEqual([...entryAts].sort().reverse());
   });
 
   test("el subitem de menú 'Reporte entradas/salidas' es visible para ADMIN", async ({ page }) => {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
@@ -30,6 +30,17 @@ export interface AccessReportSource {
   /** Prefijo del nombre del CSV. */
   csvPrefix: string;
 }
+
+/** Llave de orden del reporte: la columna ES una sesión; su ancla es `entryAt`. */
+export type AccessReportSort = NonNullable<ITDataTableFetchParams["sort"]>;
+
+/**
+ * Orden por defecto: sesión más reciente primero. Un solo lugar para la tabla,
+ * el PDF y el CSV. `entryAt desc` implica `date desc` + hora desc para las
+ * sesiones normales; las huérfanas (`EXIT_WITHOUT_ENTRY`, `entryAt: null`)
+ * quedan al final (el backend ordena asc con "" y luego invierte).
+ */
+export const DEFAULT_REPORT_SORT: AccessReportSort = { key: "entryAt", direction: "desc" };
 
 const ACCESS_SOURCE: AccessReportSource = {
   report: accessApi.report,
@@ -104,13 +115,22 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
     return filters;
   }, [period, dateKey, departmentId, q, includeInactive]);
 
+  // Sort vigente de la tabla, compartido con los exports. Al cambiar los filtros
+  // la tabla se remonta y pierde su orden: el ref vuelve al default.
+  const sortRef = useRef<AccessReportSort>(DEFAULT_REPORT_SORT);
+
+  useEffect(() => {
+    sortRef.current = DEFAULT_REPORT_SORT;
+  }, [externalFilters]);
+
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
+    const sort = params.sort ?? DEFAULT_REPORT_SORT;
+    sortRef.current = sort;
     const res = await source.report({
       page: params.page,
       limit: params.limit,
       filters: params.filters as Record<string, string | number | boolean>,
-      // Orden por defecto: departamento y luego nombre (el orden es estable).
-      sort: params.sort ?? { key: "departmentName", direction: "asc" },
+      sort,
     });
     setSummary(res.summary);
     return {
@@ -127,7 +147,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
         page: 1,
         limit: 100,
         filters: externalFilters,
-        sort: { key: "departmentName", direction: "asc" },
+        sort: sortRef.current,
       });
       await download(res.data, res.summary, {
         period,
@@ -149,7 +169,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
         page: 1,
         limit: 1000,
         filters: externalFilters,
-        sort: { key: "departmentName", direction: "asc" },
+        sort: sortRef.current,
       });
       const tz = res.summary.range.timezone || BROWSER_TIMEZONE;
       const stamp = (iso: string | null): string => {
