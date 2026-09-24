@@ -137,25 +137,32 @@ Son **inocuos**: el universo del reporte de acceso es el personal activo
 relleno y de reporte son `GUARD`, así que sin eventos (los borra el teardown) no
 aparecen en ningún reporte, y ninguna se reutiliza por nombre en las aserciones.
 
-#### Residuo legado (medido 2026-09-24, **NO barrido**)
+#### Residuo legado (barrido el 2026-09-24, respaldo en `residuo-am-backup-20260924-122509.json`)
 
-Además de las cuentas de arriba, la base arrastra residuo de las corridas
-**previas al arreglo**, que el cleanup no alcanzaba y que **sigue sin barrerse**:
-borrarlo es una operación destructiva que requiere autorización explícita, y
-todavía no la hay. Los volúmenes medidos hoy son:
+El residuo de las corridas **previas al arreglo** (firma `AM…` / `Tipo UI …`, que
+el cleanup por prefijo `E2E` no alcanzaba) **ya se barrió el 2026-09-24**, con
+respaldo completo previo en
+`/var/folders/4m/dfpqtpt17_7blvlg4_6twz9r0000gn/T/opencode/residuo-am-backup-20260924-122509.json`.
+El respaldo contiene todas las filas afectadas (inventario + dependientes) para
+poder revertir el borrado:
 
-| Residuo | Cantidad | Firma |
+| Tabla | Residuo barrido |
+|---|---|
+| `tipos_dispositivo` | **62** |
+| `dispositivos` | **62** |
+| `unidades_fisicas` | **62** |
+| `prestamos` (+ 57 detalles, 57 unidades) | **57** |
+| `movimientos` (+ 119 detalles) | **119** |
+| `audit_logs` (`MOV_PRESTAMO`) | **57** |
+
+Conteos de la base antes → después del barrido:
+
+| Tabla | Antes (real + residuo) | Después (solo real) |
 |---|---|---|
-| Tipos de dispositivo | **62** | `code`/`name` `Tipo UI A…`; `code NOT LIKE 'E2E%'` |
-| Dispositivos | **62** | `nombre` `Equipo A…` |
-| Unidades físicas | **62** | ligadas a esos dispositivos |
-| Préstamos | **57** | con detalle sobre esos dispositivos |
-| Cuentas `e2e_report_<run>_con` | **36** | una por corrida de `access-report.spec` viejo |
-| Cuentas `e2e_horas_extra_<run>` | **13** | una por corrida de `horas-extra.spec` viejo |
-
-Totales de la base: `tipos_dispositivo` 97 (35 reales + 62 residuo),
-`dispositivos` 139 (77 + 62), `unidades_fisicas` 400 (338 + 62) y `prestamos`
-84 (27 + 57).
+| `tipos_dispositivo` | 97 (35 + 62) | **35** |
+| `dispositivos` | 139 (77 + 62) | **77** |
+| `unidades_fisicas` | 400 (338 + 62) | **338** |
+| `prestamos` | 84 (27 + 57) | **27** |
 
 - **Prefijo real, no `AA…`.** El `reportes.spec` buggy generaba el escenario con
   `marca = 'A' + Date.now().toString(36).toUpperCase() + 4 aleatorios`. En 2026 el
@@ -170,12 +177,13 @@ Totales de la base: `tipos_dispositivo` 97 (35 reales + 62 residuo),
   una corrida manual de QA. No crece ni interfiere, pero se lista para que el
   inventario sea completo.
 
-El barrido (una vez autorizado) es un `DELETE` acotado por esos patrones
-—`code LIKE 'A%' AND name LIKE 'Tipo UI %' AND code NOT LIKE 'E2E%'` y sus
-dependientes— y el conteo de la tabla es el que debe cuadrar antes y después.
-**Procedimiento pendiente de autorización: no se ejecutó.** El código ya no
-genera este residuo (el escenario sale del fixture `escenario` con prefijo `E2E`,
-que el teardown borra), así que la deuda no crece entre corridas.
+El barrido fue un `DELETE` acotado por esos patrones y sus dependientes, en orden
+FK-safe (préstamos → movimientos → unidades → dispositivos → tipos), dentro de
+una transacción. **Las cuentas `e2e_*` NO se tocaron** (el alcance fue solo el
+inventario): siguen las 36 `e2e_report_<run>_con`, 13 `e2e_horas_extra_<run>`, 1
+`e2e_qa_mudumn23` y 18 cuentas `e2e_*` más (68 en total). El código ya no genera
+este residuo (el escenario sale del fixture `escenario` con prefijo `E2E`, que el
+teardown borra), así que la deuda no crece entre corridas.
 
 **Serie, no paralelo.** `workers: 1` a propósito: los tests comparten la base
 real y el consecutivo de préstamo del backend se calcula con `count() + 1` bajo
