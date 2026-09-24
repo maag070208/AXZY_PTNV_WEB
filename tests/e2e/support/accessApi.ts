@@ -43,24 +43,30 @@ export interface UsuarioBasico {
   name: string;
 }
 
-export interface AccessReportRow {
+export interface AccessReportSessionRow {
+  id: string;
   employeeId: string;
   employeeName: string;
   numeroEmpleado: string | null;
+  puesto: string | null;
+  departmentId: string | null;
   departmentName: string | null;
   active: boolean;
-  hasRecords: boolean;
+  /** Día local (YYYY-MM-DD) al que se atribuye la sesión. */
+  date: string;
+  entryAt: string | null;
+  exitAt: string | null;
   workedMinutes: number;
-  sessionCount: number;
-  daysWithRecords: number;
-  incidents: string[];
+  incident: "ENTRY_WITHOUT_EXIT" | "EXIT_WITHOUT_ENTRY" | "OPEN_ENTRY" | null;
+  crossesMidnight: boolean;
 }
 
 export interface AccessReportResult {
   page: number;
   limit: number;
   total: number;
-  data: AccessReportRow[];
+  /** Una fila por SESIÓN; una persona con N entradas/salidas genera N filas. */
+  data: AccessReportSessionRow[];
   summary: {
     peopleTotal: number;
     peopleWithRecords: number;
@@ -162,6 +168,32 @@ export class ApiAccess {
       "crearUsuario",
       201
     );
+  }
+
+  /**
+   * Alta **idempotente** de un usuario de prueba: si el username ya existe (de
+   * una corrida anterior, sin eventos tras la limpieza) lo reutiliza en vez de
+   * acumular cuentas nuevas en cada corrida.
+   */
+  async asegurarUsuario(input: {
+    username: string;
+    name: string;
+    role?: string;
+  }): Promise<UsuarioBasico> {
+    const res = await this.api.post("users", {
+      data: {
+        username: input.username,
+        password: E2E.password,
+        name: input.name,
+        role: input.role ?? "EMPLEADO",
+      },
+    });
+    if (res.status() === 201) return (await res.json()) as UsuarioBasico;
+    if (res.status() === 409) {
+      const existente = (await this.usuarios()).find((u) => u.username === input.username);
+      if (existente) return existente;
+    }
+    throw new Error(`asegurarUsuario: HTTP ${res.status()} → ${await res.text()}`);
   }
 
   /** Borra físicamente un usuario de prueba sin historial ligado. */

@@ -11,6 +11,26 @@ import { ruta } from "../env";
  * cambia aquí y ningún test se entera.
  */
 
+/** Resuelve el `Page` dueño del ámbito (acepta `Page` o `Locator`). */
+const paginaDe = (ambito: Page | Locator): Page =>
+  typeof (ambito as Locator).page === "function" ? (ambito as Locator).page() : (ambito as Page);
+
+/**
+ * Panel desplegable de `ITSearchSelect` / `ITMultiSelect`.
+ *
+ * Desde el kit 1.3.0 el panel se monta por **portal** en `document.body` (con
+ * `position: fixed`), no dentro del control. Su scroller es `div.max-h-60`.
+ * El locator se ancla a la raíz del documento para no depender de la
+ * profundidad del input; `.last()` toma el panel más reciente si hubiera más de
+ * uno abierto (p. ej. dos buscadores en la misma pantalla).
+ */
+export const panelBuscador = (ambito: Page | Locator): Locator =>
+  paginaDe(ambito).locator("body > div:has(> div.max-h-60)").last();
+
+/** Opciones clickeables del panel de un buscador (ya sin el `role` que no expone el kit). */
+export const opcionesBuscador = (ambito: Page | Locator): Locator =>
+  panelBuscador(ambito).locator("div.max-h-60 > div[class*='cursor-pointer']");
+
 /**
  * Combobox con búsqueda: enfoca, filtra y elige una opción del desplegable.
  *
@@ -27,21 +47,16 @@ export const elegirEnBuscador = async (
   await input.click();
   await input.fill(busqueda);
 
-  // Estructura del control:
-  //   contenedor > div.relative > div.relative.flex > input
-  //                            \> div.absolute            <- el desplegable
-  // El ícono de lupa también es `.absolute`, pero cuelga del div interno, así
-  // que se toma sólo el hijo directo para no confundirlos.
-  const desplegable = input.locator("xpath=../..").locator("xpath=./div[contains(@class,'absolute')]");
+  const panel = panelBuscador(ambito);
   const candidata = opcion
-    ? desplegable.getByText(opcion)
-    : desplegable.locator("div[class*='cursor-pointer']").first();
+    ? panel.getByText(opcion).first()
+    : opcionesBuscador(ambito).first();
 
   await expect(candidata).toBeVisible();
   await candidata.click();
 
-  // Al elegir, el control desmonta el desplegable y refleja la opción elegida.
-  await expect(desplegable).toHaveCount(0);
+  // Al elegir, el control cierra y DESMONTA el panel portado.
+  await expect(panel).toHaveCount(0);
 };
 
 const escaparRegex = (texto: string): string => texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

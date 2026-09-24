@@ -16,10 +16,15 @@ import { campo, irARuta } from "./support/pages/componentes";
  * El usuario con eventos se crea con rol `GUARD`: un rol ajeno al personal
  * aparece en el universo solo por tener eventos; tras la limpieza de eventos
  * (teardown de `api/`, por el prefijo `E2E-`) no contamina corridas futuras.
+ *
+ * El usuario es **idempotente**: se reutiliza por `username` en vez de crear uno
+ * nuevo por corrida, así que no se acumulan cuentas `e2e_horas_extra_*` (ver el
+ * inventario de residuos en `README.md`).
  */
 
 const RUN = nuevoRunId();
-const NOMBRE = `E2E HorasExtra ${RUN}`;
+const USERNAME = "e2e_horas_extra";
+const NOMBRE = "E2E HorasExtra";
 
 test.describe("Reporte de horas extra — exportación PDF", () => {
   let ctx: APIRequestContext;
@@ -40,14 +45,15 @@ test.describe("Reporte de horas extra — exportación PDF", () => {
     }
     demoSite = demo;
 
-    const usuario = await access.crearUsuario({
-      username: `e2e_horas_extra_${RUN}`.toLowerCase(),
+    const usuario = await access.asegurarUsuario({
+      username: USERNAME,
       name: NOMBRE,
       role: "GUARD",
     });
     usuarioId = usuario.id;
 
-    // ENTRY + EXIT de hoy (usuario nuevo: no hay ventana anti-duplicado previa).
+    // ENTRY + EXIT de hoy (los eventos E2E se limpian en el teardown de `api/`,
+    // así que el usuario arranca sin ventana anti-duplicado previa).
     await access.crearEvento({
       employeeId: usuarioId,
       type: "ENTRY",
@@ -63,8 +69,9 @@ test.describe("Reporte de horas extra — exportación PDF", () => {
   });
 
   test.afterAll(async () => {
-    // El usuario tiene eventos ligados (FK Restrict): no se puede borrar. La
-    // limpieza de los eventos E2E la hace el teardown del paquete `api/`.
+    // El usuario tiene eventos ligados (FK Restrict): no se puede borrar; se
+    // reutiliza por `username` en la próxima corrida. La limpieza de los eventos
+    // E2E la hace el teardown del paquete `api/`.
     await ctx.dispose();
   });
 

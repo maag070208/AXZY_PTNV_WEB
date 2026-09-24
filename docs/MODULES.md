@@ -10,7 +10,7 @@ Mapa de módulos y funcionalidades del frontend web.
 | Build | Vite 6 + TypeScript 5.7 |
 | Estado | Redux Toolkit 2 (`react-redux`) |
 | Rutas | React Router 7 |
-| Design system | `@axzydev/axzy_ui_system` 1.2.16 |
+| Design system | `@axzydev/axzy_ui_system` 1.3.0 |
 | i18n | i18next + react-i18next (es + en) |
 | Realtime | Ably 2.27 |
 | PDF | `@react-pdf/renderer` 4 |

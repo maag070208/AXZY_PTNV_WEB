@@ -1,5 +1,13 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { boton, campo, chip, elegirEnBuscador, irARuta } from "./componentes";
+import {
+  boton,
+  campo,
+  chip,
+  elegirEnBuscador,
+  irARuta,
+  opcionesBuscador,
+  panelBuscador,
+} from "./componentes";
 
 export type TipoMovimientoUI = "Baja" | "A mantenimiento" | "De mantenimiento";
 export type CondicionUI = "BUENO" | "ACEPTABLE" | "MALO" | "ROTO";
@@ -44,17 +52,17 @@ export class NuevoMovimientoPage {
 
   /** Las unidades que la pantalla ofrece para el tipo de movimiento elegido. */
   async unidadesOfrecidas(indice = 1): Promise<string[]> {
-    const input = this.renglon(indice).getByPlaceholder("Buscar unidad...");
+    const renglon = this.renglon(indice);
+    const input = renglon.getByPlaceholder("Buscar unidad...");
     await input.click();
     await input.fill("");
-    const opciones = input
-      .locator("xpath=../..")
-      .locator("xpath=./div[contains(@class,'absolute')]")
-      .locator("div[class*='cursor-pointer']");
+    const opciones = opcionesBuscador(renglon);
     await expect(opciones.first()).toBeVisible();
     const textos = await opciones.allInnerTexts();
-    await this.page.keyboard.press("Escape");
-    await input.blur();
+
+    // Escape y blur NO cierran el panel del kit: sólo el `mousedown` fuera.
+    await this.page.getByRole("heading", { level: 1 }).click();
+    await expect(panelBuscador(renglon)).toHaveCount(0);
     return textos;
   }
 
