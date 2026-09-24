@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ITAccordion,
   ITAlert,
   ITBadget,
   ITButton,
@@ -19,13 +20,14 @@ import {
   FaClock,
   FaExclamationTriangle,
   FaFileCsv,
+  FaInfoCircle,
   FaRegClock,
   FaUndo,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { departmentsApi, type Department } from "@entities/department";
 import { scheduleApi, type HorasExtraRow, type HorasExtraSummary } from "@entities/schedule";
-import { formatMinutesAsHhMm } from "@shared/utils/dates";
+import { formatFecha, formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 
 type Period = "DAY" | "WEEK" | "MONTH";
@@ -61,10 +63,17 @@ export default function OvertimeReport() {
     return f;
   }, [period, date, departmentId, q, includeInactive]);
 
+  /**
+   * Firma de los filtros externos. Se pasa como `key` de ITDataTable: al cambiar
+   * periodo/fecha/departamento/búsqueda, la tabla se remonta y vuelve a la página 1.
+   */
+  const tableKey = useMemo(() => JSON.stringify(filters), [filters]);
+
   const load = useCallback(async () => {
     setError(null);
     try {
-      const res = await scheduleApi.horasExtraExport({ page: 1, limit: 100, filters });
+      // El endpoint de export ignora `limit` y devuelve el universo completo del filtro.
+      const res = await scheduleApi.horasExtraExport({ page: 1, limit: 1, filters });
       setRows(res.data);
       setSummary(res.summary);
     } catch (e) {
@@ -103,6 +112,22 @@ export default function OvertimeReport() {
     start.setHours(0, 0, 0, 0);
     return [start, start];
   }, [period, date]);
+
+  /** Zona horaria resuelta por el servidor en `summary.range`; local antes del 1er fetch. */
+  const tz = summary?.range.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  /** Texto del banner: qué periodo y qué zona horaria se están mostrando. */
+  const rangeLabel = useMemo(() => {
+    const [start, end] = periodRange;
+    if (period === "DAY") {
+      return t("overtime.rangeDay", { date: formatFecha(start.toISOString()), tz });
+    }
+    return t("overtime.rangeRange", {
+      start: formatFecha(start.toISOString()),
+      end: formatFecha(end.toISOString()),
+      tz,
+    });
+  }, [period, periodRange, t, tz]);
 
   const handleRange = (
     e:
@@ -187,6 +212,7 @@ export default function OvertimeReport() {
       key: "employeeName",
       label: t("overtime.employee"),
       type: "string",
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
@@ -200,12 +226,14 @@ export default function OvertimeReport() {
       key: "departmentName",
       label: t("overtime.department"),
       type: "string",
+      sortable: true,
       render: (r) => <ITText className="text-[11px] font-bold text-slate-600">{r.departmentName ?? "—"}</ITText>,
     },
     {
       key: "horarioNombre",
       label: t("overtime.schedule"),
       type: "string",
+      sortable: true,
       render: (r) =>
         r.horarioNombre ? (
           <ITText className="text-[11px] font-bold text-slate-700">{r.horarioNombre}</ITText>
@@ -219,28 +247,35 @@ export default function OvertimeReport() {
       key: "extraMin",
       label: t("overtime.extra"),
       type: "number",
+      sortable: true,
       render: (r) => (
-        <ITText className={`text-[12px] font-black ${r.extraMin > 0 ? "text-rose-600" : "text-slate-400"}`}>
+        <ITText
+          className={`text-[12px] font-black ${r.extraMin > 0 ? "text-rose-600" : "text-slate-400"}`}
+          title={r.extraMin > 0 ? undefined : t("overtime.help.dash")}
+        >
           {r.extraMin > 0 ? formatMinutesAsHhMm(r.extraMin) : "—"}
         </ITText>
       ),
     },
     {
-      key: "workedMin",
+      key: "trabajadasMin",
       label: t("overtime.worked"),
       type: "number",
+      sortable: true,
       render: (r) => <ITText className="text-[11px] font-bold text-slate-700">{formatMinutesAsHhMm(r.trabajadasMin)}</ITText>,
     },
     {
       key: "programadasMin",
       label: t("overtime.scheduled"),
       type: "number",
+      sortable: true,
       render: (r) => <ITText className="text-[11px] text-slate-600">{formatMinutesAsHhMm(r.programadasMin)}</ITText>,
     },
     {
       key: "diasConExtra",
       label: t("overtime.daysWithExtra"),
       type: "number",
+      sortable: true,
       render: (r) => <ITText className="text-[11px] text-slate-600">{r.diasConExtra}</ITText>,
     },
   ];
@@ -251,6 +286,7 @@ export default function OvertimeReport() {
         page: params.page,
         limit: params.limit,
         filters,
+        ...(params.sort ? { sort: params.sort } : {}),
       });
       return { data: res.data as unknown as Record<string, unknown>[], total: res.total };
     },
@@ -340,6 +376,8 @@ export default function OvertimeReport() {
         </ITFlex>
       </ITCard>
 
+      <ITAlert variant="info">{rangeLabel}</ITAlert>
+
       <ITFlex wrap="wrap" gap={3}>
         {kpis.map((k) => (
           <ITFlex
@@ -363,13 +401,51 @@ export default function OvertimeReport() {
         ))}
       </ITFlex>
 
+      <ITText className="text-[11px] text-slate-500">{t("overtime.totalsNote")}</ITText>
+
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
           {error}
         </ITAlert>
       )}
 
+      <ITAccordion
+        variant="bordered"
+        items={[
+          {
+            id: "help",
+            title: t("overtime.help.title"),
+            icon: <FaInfoCircle size={12} />,
+            content: (
+              <ITFlex direction="column" gap={3}>
+                <ITText className="text-[11px] text-slate-600">{t("overtime.help.intro")}</ITText>
+                <ITGrid container columns={12} spacing={4}>
+                  <ITGrid item xs={12} md={6}>
+                    <ITFlex direction="column" gap={2}>
+                      <HelpLine term={t("overtime.extra")} desc={t("overtime.help.extra")} />
+                      <HelpLine term={t("overtime.worked")} desc={t("overtime.help.worked")} />
+                      <HelpLine term={t("overtime.scheduled")} desc={t("overtime.help.scheduled")} />
+                      <HelpLine term={t("overtime.daysWithExtra")} desc={t("overtime.help.daysWithExtra")} />
+                    </ITFlex>
+                  </ITGrid>
+                  <ITGrid item xs={12} md={6}>
+                    <ITFlex direction="column" gap={2}>
+                      <HelpLine term={t("overtime.noSchedule")} desc={t("overtime.help.noSchedule")} />
+                      <HelpLine term={t("overtime.missing")} desc={t("overtime.help.missing")} />
+                      <ITText className="text-[11px] text-slate-500">{t("overtime.help.restDay")}</ITText>
+                      <ITText className="text-[11px] text-slate-500">{t("overtime.help.scope")}</ITText>
+                      <ITText className="text-[11px] text-slate-500">{t("overtime.help.dash")}</ITText>
+                    </ITFlex>
+                  </ITGrid>
+                </ITGrid>
+              </ITFlex>
+            ),
+          },
+        ]}
+      />
+
       <ITDataTable
+        key={tableKey}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchData as never}
         externalFilters={filters}
@@ -377,6 +453,15 @@ export default function OvertimeReport() {
         itemsPerPageOptions={[25, 50, 100]}
         size="lg"
       />
+    </ITFlex>
+  );
+}
+
+function HelpLine({ term, desc }: { term: string; desc: string }) {
+  return (
+    <ITFlex direction="column" gap={0.5}>
+      <ITText className="text-[11px] font-black text-slate-700">{term}</ITText>
+      <ITText className="text-[11px] text-slate-500">{desc}</ITText>
     </ITFlex>
   );
 }
