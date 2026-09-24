@@ -12,5 +12,6 @@ export {
   downloadDevicesPDF,
   downloadSalidasPDF,
   downloadAccessReportPDF,
+  downloadChecadorReportPDF,
   downloadOvertimePDF,
 } from "./model/pdf";

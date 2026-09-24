@@ -5,6 +5,9 @@ import RoleGuard from "./guards/RoleGuard";
 import type { UserRole } from "@entities/user";
 import AccessPage from "@pages/access/AccessPage";
 import AccessReportPage from "@pages/access/AccessReportPage";
+import ChecadorPage from "@pages/access/ChecadorPage";
+import ChecadorReportPage from "@pages/access/ChecadorReportPage";
+import ChecadorEmpleadosPage from "@pages/access/ChecadorEmpleadosPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
 import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
 import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
@@ -113,6 +116,31 @@ export default function App() {
           element={
             <RoleGuard roles={ACCESS_READ_ROLES}>
               <AccessReportPage />
+            </RoleGuard>
+          }
+        />
+        {/* Reloj checador Hikvision (solo lectura; ver CHECADOR.md). */}
+        <Route
+          path="/access/checador"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <ChecadorPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/access/checador/entradas-salidas"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <ChecadorReportPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/access/checador/empleados"
+          element={
+            <RoleGuard roles={ACCESS_READ_ROLES}>
+              <ChecadorEmpleadosPage />
             </RoleGuard>
           }
         />

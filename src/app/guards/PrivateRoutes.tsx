@@ -176,13 +176,32 @@ export default function PrivateRoutes() {
               id: "accessLog",
               label: tt("nav.accessLog"),
               action: () => navigate("/access"),
-              isActive: active("/access") && !active("/access/report"),
+              isActive:
+                active("/access") && !active("/access/report") && !active("/access/checador"),
             },
             {
               id: "accessReport",
               label: tt("nav.accessReport"),
               action: () => navigate("/access/report"),
               isActive: active("/access/report"),
+            },
+            {
+              id: "accessChecador",
+              label: tt("nav.accessChecador"),
+              action: () => navigate("/access/checador"),
+              isActive: location.pathname === "/access/checador",
+            },
+            {
+              id: "accessChecadorReport",
+              label: tt("nav.accessChecadorReport"),
+              action: () => navigate("/access/checador/entradas-salidas"),
+              isActive: active("/access/checador/entradas-salidas"),
+            },
+            {
+              id: "accessChecadorEmpleados",
+              label: tt("nav.accessChecadorEmpleados"),
+              action: () => navigate("/access/checador/empleados"),
+              isActive: active("/access/checador/empleados"),
             },
           ],
         },

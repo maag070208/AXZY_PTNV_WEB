@@ -49,6 +49,7 @@
     "OPEN_ENTRY": "En sitio"
   },
   "noDepartment": "Sin departamento",
+  "unlinked": "Sin vincular",
   "actions": {
     "viewDetail": "Ver detalle",
     "export": "Descargar PDF",

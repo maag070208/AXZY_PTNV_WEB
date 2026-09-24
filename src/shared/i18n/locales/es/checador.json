@@ -1,0 +1,160 @@
+{
+  "title": "Reloj checador",
+  "description": "Checadas del reloj Hikvision. Se copian solas cada 5 minutos; la API solo lee del reloj.",
+  "status": {
+    "title": "Sincronización con el reloj",
+    "readOnly": "Solo lectura: la API nunca modifica la configuración del reloj.",
+    "states": {
+      "notConfigured": "Sin configurar",
+      "paused": "En pausa",
+      "running": "Sincronizando",
+      "error": "Con error",
+      "ok": "Al día",
+      "pending": "Sin sincronizar"
+    },
+    "messages": {
+      "notConfigured": "La API no tiene CHECADOR_URL configurado: no se sincroniza.",
+      "paused": "El reloj rechazó la contraseña. Actualiza CHECADOR_PASS en la API y reiníciala.",
+      "running": "Sincronización automática: {{leidos}} eventos leídos · {{nuevas}} checadas nuevas · faltan {{restantes}} eventos",
+      "runningNoTotal": "Sincronización automática: {{leidos}} eventos leídos · {{nuevas}} checadas nuevas",
+      "pending": "La primera sincronización aún no termina."
+    },
+    "device": "Equipo",
+    "checadas": "Checadas guardadas",
+    "lastChecada": "Última checada",
+    "lastSync": "Última sincronización",
+    "empty": "—"
+  },
+  "sync": {
+    "button": "Sincronizar ahora",
+    "hint": "Trae del reloj las checadas de hoy, sin esperar a la sincronización automática."
+  },
+  "import": {
+    "button": "Importar del reloj",
+    "running": "Importando…",
+    "hint": "Trae del reloj todas las checadas del rango de fechas seleccionado. Puede tardar varios minutos; puedes seguir usando el sistema.",
+    "states": {
+      "running": "Importando",
+      "ok": "Importación terminada",
+      "error": "Importación con error"
+    },
+    "progress": "{{desde}} – {{hasta}} · {{leidos}} de {{total}} eventos · {{nuevas}} checadas nuevas",
+    "progressNoTotal": "{{desde}} – {{hasta}} · conectando con el reloj…",
+    "done": "{{desde}} – {{hasta}} · {{nuevas}} checadas nuevas de {{leidos}} eventos leídos",
+    "toast": "Importación terminada: {{count}} checadas nuevas"
+  },
+  "presets": {
+    "title": "Rango rápido",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "last7": "Últimos 7 días"
+  },
+  "filters": {
+    "title": "Filtros",
+    "dateRange": "Rango de fechas",
+    "employee": "Buscar empleado",
+    "employeePlaceholder": "Nombre o número de empleado...",
+    "metodo": "Método",
+    "allMetodos": "Todos",
+    "clear": "Limpiar filtros"
+  },
+  "columns": {
+    "occurredAt": "Fecha y hora",
+    "employee": "Empleado",
+    "metodo": "Método",
+    "serialNo": "Consecutivo"
+  },
+  "metodos": {
+    "ROSTRO": "Rostro",
+    "HUELLA": "Huella",
+    "TARJETA": "Tarjeta",
+    "OTRO": "Otro"
+  },
+  "otroHint": "No es una checada válida (código {{minor}} del reloj). No cuenta para asistencia.",
+  "actions": {
+    "exportCsv": "CSV",
+    "exporting": "Generando…"
+  },
+  "csv": {
+    "fecha": "Fecha",
+    "hora": "Hora",
+    "numeroEmpleado": "Número de empleado",
+    "nombre": "Nombre",
+    "metodo": "Método",
+    "serialNo": "Consecutivo del reloj"
+  },
+  "errors": {
+    "status": "No se pudo consultar el estado del reloj",
+    "import": "No se pudo iniciar la importación",
+    "export": "No se pudo generar el CSV"
+  },
+  "reporte": {
+    "title": "Entradas/salidas del reloj",
+    "description": "Jornadas armadas con las checadas del reloj y relacionadas con cada empleado por su número en el reloj.",
+    "pdfTitle": "Entradas y salidas — Reloj checador",
+    "vinculos": "{{vinculados}} de {{total}} empleados del reloj vinculados",
+    "sinVincular": "Los {{count}} sin vincular salen con el nombre del reloj y la marca «Sin vincular».",
+    "irAVincular": "Vincular empleados",
+    "regla": "El reloj no distingue entrada de salida: las checadas se alternan, las repetidas en menos de 5 min se ignoran y una jornada dura máximo 13 h."
+  },
+  "empleados": {
+    "title": "Empleados del reloj",
+    "description": "Relaciona cada número del reloj con su usuario del sistema. El reloj antepone el área al número (070562 = nómina 562), por eso el vínculo se confirma aquí.",
+    "kpis": {
+      "total": "En el reloj",
+      "vinculados": "Vinculados",
+      "sinVincular": "Sin vincular",
+      "sugeridosAlta": "Sugerencias seguras"
+    },
+    "filters": {
+      "q": "Buscar",
+      "qPlaceholder": "Número o nombre (reloj o sistema)...",
+      "estado": "Estado",
+      "todos": "Todos"
+    },
+    "estados": {
+      "VINCULADO": "Vinculados",
+      "SIN_VINCULAR": "Sin vincular",
+      "SUGERIDO": "Con sugerencia"
+    },
+    "columns": {
+      "numero": "Número en el reloj",
+      "nombre": "Nombre en el reloj",
+      "checadas": "Checadas",
+      "ultimaChecada": "Última checada",
+      "usuario": "Usuario del sistema",
+      "acciones": ""
+    },
+    "confianza": {
+      "ALTA": "Coincide nombre y número",
+      "MEDIA": "Solo coincide el nombre"
+    },
+    "sinVinculo": "Sin vincular",
+    "sugerencia": "Sugerencia",
+    "baja": "Baja en el sistema",
+    "actions": {
+      "aceptar": "Aceptar",
+      "vincular": "Vincular",
+      "cambiar": "Cambiar",
+      "desvincular": "Desvincular",
+      "vincularSugeridos": "Vincular {{count}} sugerencias seguras",
+      "cancelar": "Cancelar",
+      "guardar": "Vincular"
+    },
+    "dialog": {
+      "title": "Vincular número {{numero}}",
+      "reloj": "En el reloj: {{nombre}}",
+      "usuario": "Usuario del sistema",
+      "usuarioPlaceholder": "Busca por nombre o número..."
+    },
+    "toasts": {
+      "vinculado": "{{numero}} vinculado a {{nombre}}",
+      "desvinculado": "{{numero}} desvinculado",
+      "sugeridos": "{{count}} empleados vinculados"
+    },
+    "errors": {
+      "usuarios": "No se pudieron cargar los usuarios",
+      "guardar": "No se pudo guardar el vínculo"
+    }
+  }
+}

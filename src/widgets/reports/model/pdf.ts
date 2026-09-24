@@ -1,6 +1,7 @@
 import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import { createElement } from "react";
+import { i18n } from "@shared/i18n";
 import type { ReportFilters, ReportRow, AsignadoRow, DeviceReportRow } from "@entities/report";
 import type { MaterialOutput } from "@entities/salida";
 import type {
@@ -67,6 +68,19 @@ export const downloadAccessReportPDF = async (
   ).toBlob();
   const stamp = meta.date;
   saveAs(blob, `reporte_accessos_${meta.period}_${stamp}.pdf`);
+};
+
+/** Entradas/salidas del reloj checador: mismo PDF que el de accesos, con su título. */
+export const downloadChecadorReportPDF = async (
+  rows: AccessReportSessionRow[],
+  summary: AccessReportSummary,
+  meta: AccessReportPdfMeta
+): Promise<void> => {
+  const title = i18n.t("checador:reporte.pdfTitle");
+  const blob = await pdf(
+    createElement(AccessReportPDF, { rows, summary, meta, title }) as any
+  ).toBlob();
+  saveAs(blob, `reporte_checador_${meta.period}_${meta.date}.pdf`);
 };
 
 export const downloadOvertimePDF = async (

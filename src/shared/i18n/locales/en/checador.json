@@ -1,0 +1,160 @@
+{
+  "title": "Time clock",
+  "description": "Punches from the Hikvision time clock. They are copied every 5 minutes; the API only reads from the device.",
+  "status": {
+    "title": "Time clock sync",
+    "readOnly": "Read-only: the API never changes the device configuration.",
+    "states": {
+      "notConfigured": "Not configured",
+      "paused": "Paused",
+      "running": "Syncing",
+      "error": "Error",
+      "ok": "Up to date",
+      "pending": "Not synced"
+    },
+    "messages": {
+      "notConfigured": "The API has no CHECADOR_URL configured: nothing is synced.",
+      "paused": "The time clock rejected the password. Update CHECADOR_PASS in the API and restart it.",
+      "running": "Automatic sync: {{leidos}} events read · {{nuevas}} new punches · {{restantes}} events left",
+      "runningNoTotal": "Automatic sync: {{leidos}} events read · {{nuevas}} new punches",
+      "pending": "The first sync has not finished yet."
+    },
+    "device": "Device",
+    "checadas": "Stored punches",
+    "lastChecada": "Last punch",
+    "lastSync": "Last sync",
+    "empty": "—"
+  },
+  "sync": {
+    "button": "Sync now",
+    "hint": "Pulls today's punches from the time clock without waiting for the automatic sync."
+  },
+  "import": {
+    "button": "Import from clock",
+    "running": "Importing…",
+    "hint": "Pulls every punch in the selected date range from the time clock. It may take several minutes; you can keep using the system.",
+    "states": {
+      "running": "Importing",
+      "ok": "Import finished",
+      "error": "Import failed"
+    },
+    "progress": "{{desde}} – {{hasta}} · {{leidos}} of {{total}} events · {{nuevas}} new punches",
+    "progressNoTotal": "{{desde}} – {{hasta}} · connecting to the time clock…",
+    "done": "{{desde}} – {{hasta}} · {{nuevas}} new punches from {{leidos}} events read",
+    "toast": "Import finished: {{count}} new punches"
+  },
+  "presets": {
+    "title": "Quick range",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7": "Last 7 days"
+  },
+  "filters": {
+    "title": "Filters",
+    "dateRange": "Date range",
+    "employee": "Search employee",
+    "employeePlaceholder": "Name or employee number...",
+    "metodo": "Method",
+    "allMetodos": "All",
+    "clear": "Clear filters"
+  },
+  "columns": {
+    "occurredAt": "Date and time",
+    "employee": "Employee",
+    "metodo": "Method",
+    "serialNo": "Serial"
+  },
+  "metodos": {
+    "ROSTRO": "Face",
+    "HUELLA": "Fingerprint",
+    "TARJETA": "Card",
+    "OTRO": "Other"
+  },
+  "otroHint": "Not a valid punch (device code {{minor}}). It does not count for attendance.",
+  "actions": {
+    "exportCsv": "CSV",
+    "exporting": "Generating…"
+  },
+  "csv": {
+    "fecha": "Date",
+    "hora": "Time",
+    "numeroEmpleado": "Employee number",
+    "nombre": "Name",
+    "metodo": "Method",
+    "serialNo": "Device serial"
+  },
+  "errors": {
+    "status": "Could not load the time clock status",
+    "import": "Could not start the import",
+    "export": "Could not generate the CSV"
+  },
+  "reporte": {
+    "title": "Time clock entries/exits",
+    "description": "Shifts built from the time clock punches and matched to each employee by their time clock number.",
+    "pdfTitle": "Entries and exits — Time clock",
+    "vinculos": "{{vinculados}} of {{total}} time clock employees linked",
+    "sinVincular": "The {{count}} unlinked ones show the time clock name and the “Not linked” mark.",
+    "irAVincular": "Link employees",
+    "regla": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h."
+  },
+  "empleados": {
+    "title": "Time clock employees",
+    "description": "Match each time clock number to its system user. The clock prefixes the area to the number (070562 = payroll 562), so the link is confirmed here.",
+    "kpis": {
+      "total": "In the clock",
+      "vinculados": "Linked",
+      "sinVincular": "Not linked",
+      "sugeridosAlta": "Safe suggestions"
+    },
+    "filters": {
+      "q": "Search",
+      "qPlaceholder": "Number or name (clock or system)...",
+      "estado": "Status",
+      "todos": "All"
+    },
+    "estados": {
+      "VINCULADO": "Linked",
+      "SIN_VINCULAR": "Not linked",
+      "SUGERIDO": "With suggestion"
+    },
+    "columns": {
+      "numero": "Clock number",
+      "nombre": "Name in the clock",
+      "checadas": "Punches",
+      "ultimaChecada": "Last punch",
+      "usuario": "System user",
+      "acciones": ""
+    },
+    "confianza": {
+      "ALTA": "Name and number match",
+      "MEDIA": "Only the name matches"
+    },
+    "sinVinculo": "Not linked",
+    "sugerencia": "Suggestion",
+    "baja": "Inactive in the system",
+    "actions": {
+      "aceptar": "Accept",
+      "vincular": "Link",
+      "cambiar": "Change",
+      "desvincular": "Unlink",
+      "vincularSugeridos": "Link {{count}} safe suggestions",
+      "cancelar": "Cancel",
+      "guardar": "Link"
+    },
+    "dialog": {
+      "title": "Link number {{numero}}",
+      "reloj": "In the clock: {{nombre}}",
+      "usuario": "System user",
+      "usuarioPlaceholder": "Search by name or number..."
+    },
+    "toasts": {
+      "vinculado": "{{numero}} linked to {{nombre}}",
+      "desvinculado": "{{numero}} unlinked",
+      "sugeridos": "{{count}} employees linked"
+    },
+    "errors": {
+      "usuarios": "Could not load the users",
+      "guardar": "Could not save the link"
+    }
+  }
+}

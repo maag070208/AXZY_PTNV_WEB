@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 
 import accessEn from "./locales/en/access.json";
 import accessReportEn from "./locales/en/access-report.json";
+import checadorEn from "./locales/en/checador.json";
 import schedulesEn from "./locales/en/schedules.json";
 import auditEn from "./locales/en/audit.json";
 import authEn from "./locales/en/auth.json";
@@ -26,6 +27,7 @@ import catalogEn from "./locales/en/catalog.json";
 
 import accessEs from "./locales/es/access.json";
 import accessReportEs from "./locales/es/access-report.json";
+import checadorEs from "./locales/es/checador.json";
 import schedulesEs from "./locales/es/schedules.json";
 import auditEs from "./locales/es/audit.json";
 import authEs from "./locales/es/auth.json";
@@ -71,6 +73,7 @@ export const NS_LIST = [
   "actas",
   "access",
   "access-report",
+  "checador",
   "schedules",
 ] as const;
 
@@ -97,6 +100,7 @@ export const resources = {
     catalog: catalogEn,
     access: accessEn,
     "access-report": accessReportEn,
+    checador: checadorEn,
     schedules: schedulesEn,
   },
   es: {
@@ -121,6 +125,7 @@ export const resources = {
     catalog: catalogEs,
     access: accessEs,
     "access-report": accessReportEs,
+    checador: checadorEs,
     schedules: schedulesEs,
   },
 } as const;

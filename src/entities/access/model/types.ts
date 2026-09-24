@@ -132,6 +132,11 @@ export interface AccessReportSessionRow {
   workedMinutes: number;
   incident: AccessIncidentCode | null;
   crossesMidnight: boolean;
+  /**
+   * Solo en el reporte del reloj checador (`/checador/report`): `false` si el
+   * número del reloj aún no está vinculado a un usuario.
+   */
+  vinculado?: boolean;
 }
 
 /** Rango de fechas resuelto por el servidor en la zona horaria efectiva. */

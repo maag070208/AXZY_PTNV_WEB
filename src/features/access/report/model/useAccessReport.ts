@@ -7,8 +7,10 @@ import {
   type AccessReportPeriod,
   type AccessReportSessionRow,
   type AccessReportSummary,
+  type AccessReportTableResponse,
 } from "@entities/access";
 import { departmentsApi, type Department } from "@entities/department";
+import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
@@ -18,8 +20,27 @@ export type DownloadAccessReportPdf = (
   meta: AccessReportPdfMeta
 ) => Promise<void>;
 
+/**
+ * De dónde salen las sesiones. Por defecto, la bitácora de accesos; el reloj
+ * checador inyecta la suya (`/checador/report`), con el mismo contrato.
+ */
+export interface AccessReportSource {
+  report: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
+  reportExport: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
+  /** Prefijo del nombre del CSV. */
+  csvPrefix: string;
+}
+
+const ACCESS_SOURCE: AccessReportSource = {
+  report: accessApi.report,
+  reportExport: accessApi.reportExport,
+  csvPrefix: "accesos",
+};
+
 interface Options {
   download: DownloadAccessReportPdf;
+  /** Debe ser estable (constante de módulo) para no rehacer los callbacks. */
+  source?: AccessReportSource;
 }
 
 /** Zona horaria del navegador; el reporte la usa para resolver los límites del día. */
@@ -38,7 +59,7 @@ const toDateInput = (date: Date): string => {
  * Estado del reporte de entradas/salidas por persona. La fila ES la persona;
  * `period` define la ventana (DÍA/SEMANA/MES), no la dimensión de la fila.
  */
-export const useAccessReport = ({ download }: Options) => {
+export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) => {
   const { t } = useTranslation(["access-report", "common"]);
 
   const [period, setPeriod] = useState<AccessReportPeriod>("DAY");
@@ -84,7 +105,7 @@ export const useAccessReport = ({ download }: Options) => {
   }, [period, dateKey, departmentId, q, includeInactive]);
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
-    const res = await accessApi.report({
+    const res = await source.report({
       page: params.page,
       limit: params.limit,
       filters: params.filters as Record<string, string | number | boolean>,
@@ -96,13 +117,13 @@ export const useAccessReport = ({ download }: Options) => {
       data: res.data as unknown as Record<string, unknown>[],
       total: res.total,
     };
-  }, []);
+  }, [source]);
 
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
     setError(null);
     try {
-      const res = await accessApi.reportExport({
+      const res = await source.reportExport({
         page: 1,
         limit: 100,
         filters: externalFilters,
@@ -118,13 +139,13 @@ export const useAccessReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [download, externalFilters, period, dateKey, t]);
+  }, [download, source, externalFilters, period, dateKey, t]);
 
   const handleDownloadCsv = useCallback(async () => {
     setExporting(true);
     setError(null);
     try {
-      const res = await accessApi.reportExport({
+      const res = await source.reportExport({
         page: 1,
         limit: 1000,
         filters: externalFilters,
@@ -162,7 +183,7 @@ export const useAccessReport = ({ download }: Options) => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `accesos-${period.toLowerCase()}-${dateKey}.csv`;
+      link.download = `${source.csvPrefix}-${period.toLowerCase()}-${dateKey}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -170,7 +191,7 @@ export const useAccessReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [externalFilters, period, dateKey, t]);
+  }, [source, externalFilters, period, dateKey, t]);
 
   return {
     t,

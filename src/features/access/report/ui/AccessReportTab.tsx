@@ -136,6 +136,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
             {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
             {!r.active && ` · ${t("status.inactive")}`}
+            {r.vinculado === false && ` · ${t("unlinked")}`}
           </ITText>
         </ITFlex>
       ),

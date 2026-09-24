@@ -1,11 +1,13 @@
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
 import { E2E_PREFIX, nuevoRunId } from "./env";
 import { ApiInventario, crearContextoApi, type Dispositivo, type TipoDispositivo } from "./api";
+import { ApiTickets, type Ticket, type TicketAssignment } from "./ticketsApi";
 import { AltaDispositivoPage } from "./pages/AltaDispositivoPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NuevaDevolucionPage } from "./pages/NuevaDevolucionPage";
 import { NuevoMovimientoPage } from "./pages/NuevoMovimientoPage";
 import { NuevoPrestamoPage } from "./pages/NuevoPrestamoPage";
+import { TicketsPage } from "./pages/TicketsPage";
 
 const RUN_ID = nuevoRunId();
 let secuencia = 0;
@@ -47,19 +49,43 @@ export class Escenario {
   }
 }
 
+/**
+ * Ticket exclusivo del test, con fábrica de asignaciones encima.
+ *
+ * El título arranca con `E2E ` a propósito: es el criterio con el que la
+ * limpieza del paquete `api/` barre los residuos. Sembrar por API (y no por
+ * pantalla) es lo que permite que cada test se concentre en la pantalla que
+ * prueba.
+ */
+export class TicketEscenario {
+  constructor(
+    readonly tickets: ApiTickets,
+    readonly ticket: Ticket,
+    readonly titulo: string
+  ) {}
+
+  async asignarA(username: string, title = `Tarea ${this.titulo}`): Promise<TicketAssignment> {
+    const userId = await this.tickets.usuarioPorUsername(username);
+    return this.tickets.asignar(this.ticket.id, { userId, title });
+  }
+}
+
 interface Fixtures {
   login: LoginPage;
   altaPage: AltaDispositivoPage;
   prestamoPage: NuevoPrestamoPage;
   movimientoPage: NuevoMovimientoPage;
   devolucionPage: NuevaDevolucionPage;
+  ticketsPage: TicketsPage;
   escenario: Escenario;
   departamento: { id: string; name: string };
+  ticketEscenario: TicketEscenario;
 }
 
 interface WorkerFixtures {
   ctxApi: APIRequestContext;
   api: ApiInventario;
+  tickets: ApiTickets;
 }
 
 export const test = base.extend<Fixtures, WorkerFixtures>({
@@ -78,6 +104,23 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     },
     { scope: "worker" },
   ],
+
+  tickets: [
+    async ({ ctxApi }, use) => {
+      await use(new ApiTickets(ctxApi));
+    },
+    { scope: "worker" },
+  ],
+
+  ticketEscenario: async ({ tickets }, use) => {
+    secuencia += 1;
+    const titulo = `${E2E_PREFIX} ${RUN_ID}-${secuencia} Ticket`;
+    const ticket = await tickets.crear({
+      titulo,
+      descripcion: `Descripción E2E ${RUN_ID}-${secuencia}`,
+    });
+    await use(new TicketEscenario(tickets, ticket, titulo));
+  },
 
   escenario: async ({ api }, use) => {
     secuencia += 1;
@@ -111,6 +154,9 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   },
   devolucionPage: async ({ page }, use) => {
     await use(new NuevaDevolucionPage(page));
+  },
+  ticketsPage: async ({ page }, use) => {
+    await use(new TicketsPage(page));
   },
 });
 

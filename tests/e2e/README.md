@@ -15,6 +15,8 @@ contra la especificación funcional de [`DISPOSITIVOS.md`](../../../DISPOSITIVOS
 | `mantenimiento.spec.ts` | `/inventario/movimientos/nuevo` | MOVIMIENTOS DE MANTENIMIENTO |
 | `baja.spec.ts` | `/inventario/movimientos/nuevo` | BAJA |
 | `ciclo-completo.spec.ts` | todas | El recorrido completo, sólo por pantalla |
+| `tickets.spec.ts` | `/tickets`, `/tickets/nuevo`, `/tickets/:id`, `/catalogos` | Tickets: lista server-side, alta/edición, detalle, borrado y categorías |
+| `tickets-tablero.spec.ts` | `/tickets/kanban`, `/tickets/tareas`, `/tickets/mis-tareas` | Tablero kanban, tareas y administración de tareas |
 
 ## Cómo correrlas
 
@@ -74,11 +76,50 @@ del cliente no se tocan. La limpieza la hace el paquete `api/`, que es el dueño
 de la base: esta suite invoca sus scripts `test:e2e:provision` y
 `test:e2e:clean` en vez de duplicar Prisma y el `.env` en el frontend.
 
+### Tickets (Fase 1 de cobertura)
+
+`tickets.spec.ts` y `tickets-tablero.spec.ts` cubren el módulo de tickets por
+pantalla: lista server-side (filtros de título/estado/prioridad y paginación),
+alta y edición, detalle (comentario, cambio de estado, cierre en cascada),
+ciclo de borrado (papelera → físico), catálogo de categorías y el tablero de
+tareas (alta, cambio de estado, mis tareas y administración), con el gate por
+rol de EMPLEADO.
+
+**Criterio de limpieza.** Todo ticket se crea con título `E2E …` y toda
+categoría con nombre `E2E …`. La limpieza del paquete `api/`
+(`limpiarTicketsE2E`) barre por ese prefijo, en orden FK-safe: notificaciones y
+correos de ticket → tickets (cascadea asignaciones/comentarios/historial) →
+categorías `E2E` sin tickets. Los correos se resuelven por `entityId` y, como
+respaldo, por asunto `E2E ` para tickets ya borrados físicamente.
+
+**Exclusiones justificadas.**
+
+- **Adjuntos / S3.** Fuera de la Fase 1 por completo (ni happy path ni error):
+  los adjuntos van a S3 y sin credenciales la API responde 503, así que la
+  prueba dependería del entorno. No se monta S3.
+- **GERENTE.** No se provisiona `e2e_gerente`; el caso "GERENTE en
+  `/tickets/tareas`" queda como un `test.skip` nombrado (`requiere
+  e2e_gerente`). ADMIN cubre los caminos privilegiados y EMPLEADO las
+  restricciones.
+- **Arrastrar y soltar del tablero.** El DnD HTML5 nativo no es automatizable
+  de forma estable en Chromium headless. El mismo comportamiento de negocio se
+  cubre moviendo el estado de la tarea desde el detalle (`TasksGraph`) y
+  verificando la columna al recargar el tablero.
+
+**Limitación de producto (documentada, no se toca).** El diálogo "Nueva tarea"
+del tablero (`CreateTaskDialog`) usa `ITDialog`, que cierra al detectar un
+`mousedown` fuera de su caja; como el panel de `ITSearchSelect` se monta por
+portal en `document.body`, elegir una opción con un click normal cerraría el
+diálogo. El page object elige las opciones con `dispatchEvent("click")` (sin
+`mousedown`) para mantenerlo abierto. El arreglo real es que el kit no cierre el
+diálogo cuando el click cae dentro del panel portado.
+
 ### Residuos persistentes (inventario real)
 
 La suite **no debe dejar residuos que crezcan entre corridas**. Lo que crea
 (con prefijo `E2E`) lo borra el teardown de `api/`: tipos, dispositivos, unidades,
-préstamos y eventos de acceso. Lo único que **sí** sobrevive, a propósito, son
+préstamos, eventos de acceso y también tickets/categorías de ticket. Lo único que
+**sí** sobrevive, a propósito, son
 las cuentas de usuario de prueba, porque las referencian FKs (`Restrict`) de
 eventos o porque el `provision` las deja fijas (el residuo legado, que **no** es
 intencional, se detalla más abajo). El inventario estable es:
