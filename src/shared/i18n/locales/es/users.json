@@ -106,7 +106,7 @@
         "title": "Empleado",
         "summary": "Ejecuta tareas asignadas y reporta avances.",
         "actions": [
-          "No crea tickets",
+          "Crea tickets para reportar problemas",
           "Solo ve tickets con tareas asignadas",
           "Mueve sus tareas hasta revisión"
         ]
@@ -118,6 +118,15 @@
           "Ve y edita el expediente de Personal",
           "Sube y gestiona documentos del personal",
           "No administra tickets, inventario ni usuarios"
+        ]
+      },
+      "GUARD": {
+        "title": "Guardia",
+        "summary": "Opera la portería desde la app: escanea la credencial del personal y registra su entrada o salida.",
+        "actions": [
+          "Escanea credenciales y registra entradas/salidas en la app",
+          "Ve sus registros del día",
+          "No ve expedientes, inventario ni usuarios"
         ]
       }
     },

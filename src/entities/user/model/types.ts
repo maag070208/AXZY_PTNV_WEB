@@ -1,4 +1,20 @@
-export type UserRole = "ADMIN" | "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO" | "RECURSOS_HUMANOS";
+export type UserRole =
+  | "ADMIN"
+  | "GERENTE"
+  | "JEFE_DE_AREA"
+  | "EMPLEADO"
+  | "RECURSOS_HUMANOS"
+  | "GUARD";
+
+/** Etiqueta visible de cada rol. El guardia se guarda como `GUARD`. */
+export const ROLE_LABELS: Record<UserRole, string> = {
+  ADMIN: "ADMIN",
+  GERENTE: "GERENTE",
+  JEFE_DE_AREA: "JEFE DE AREA",
+  EMPLEADO: "EMPLEADO",
+  RECURSOS_HUMANOS: "RECURSOS HUMANOS",
+  GUARD: "GUARDIA",
+};
 
 export interface AuthUser {
   id: string;

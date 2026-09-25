@@ -106,7 +106,7 @@
         "title": "Employee",
         "summary": "Carries out assigned tasks and reports progress.",
         "actions": [
-          "Does not create tickets",
+          "Creates tickets to report issues",
           "Only sees tickets with assigned tasks",
           "Moves their tasks to review"
         ]
@@ -118,6 +118,15 @@
           "Views and edits the Personnel record",
           "Uploads and manages personnel documents",
           "Does not manage tickets, inventory or users"
+        ]
+      },
+      "GUARD": {
+        "title": "Guard",
+        "summary": "Runs the gatehouse from the app: scans staff credentials and records their entry or exit.",
+        "actions": [
+          "Scans credentials and records entries/exits in the app",
+          "Sees their own records for the day",
+          "Does not see personnel records, inventory or users"
         ]
       }
     },
