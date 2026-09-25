@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
-import { logout, meThunk } from "@entities/user";
+import { logout, meThunk, puede } from "@entities/user";
 import { fetchUnreadCount } from "@entities/notification";
 import { useAblyNotifications } from "./useAblyNotifications";
 
@@ -38,13 +38,25 @@ export default function PrivateRoutes() {
 
   useEffect(() => {
     // Rehidrata la sesión cuando falta el usuario o cuando viene de un storage
-    // viejo sin permisos (rollout de ROLES_Y_PERMISOS). No cambia el menú.
+    // viejo sin permisos (rollout de ROLES_Y_PERMISOS). Al volver a la ventana
+    // se refresca `/auth/me` para que un cambio de permisos aplique sin relogin.
     if (token && (!user || !user.permisos)) {
       dispatch(meThunk());
     }
     if (token) {
       dispatch(fetchUnreadCount());
     }
+    if (!token) return undefined;
+    const refreshSession = () => dispatch(meThunk());
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") dispatch(meThunk());
+    };
+    window.addEventListener("focus", refreshSession);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.removeEventListener("focus", refreshSession);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, [token, user, dispatch]);
 
   useAblyNotifications(user?.id, handleNewNotification);
@@ -53,17 +65,23 @@ export default function PrivateRoutes() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  const isAdmin = user?.role === "ADMIN" || user?.role === "GERENTE";
-  const isJefeArea = user?.role === "JEFE_DE_AREA";
+  // El menú se arma por permisos efectivos (`GET /auth/me`); la web no
+  // reimplementa la matriz de roles.
+  const permisos = user?.permisos;
+  const canViewDevices = puede(permisos, "dispositivos.ver");
+  const canViewLoans = puede(permisos, "prestamos.ver");
+  const canViewInventory = canViewDevices || canViewLoans;
+  const canViewReports = puede(permisos, "reportes.ver");
+  const canViewAccess = puede(permisos, "acceso.bitacora");
+  const canViewChecador = puede(permisos, "checador.ver");
+  const canViewSchedules = puede(permisos, "horarios.ver");
+  const canViewOvertime = puede(permisos, "horas_extra.ver");
+  const canViewHR = puede(permisos, "personal.expediente");
+  const canAdminCatalogs = puede(permisos, "catalogos.administrar");
+  const canViewUsers = puede(permisos, "usuarios.ver");
+  const canAdminRelojes = puede(permisos, "relojes.administrar");
+  const canManageTasks = puede(permisos, "tareas.completar");
   const isEmpleado = user?.role === "EMPLEADO";
-  const canManage = isAdmin || isJefeArea;
-  // Personal/RH: expediente completo (médico, oficial, contacto de emergencia,
-  // documentos) es exclusivo de ADMIN y RECURSOS_HUMANOS — no de GERENTE.
-  const canManageHR = user?.role === "ADMIN" || user?.role === "RECURSOS_HUMANOS";
-  // Bitácora de accesos: ADMIN, GERENTE y RECURSOS_HUMANOS. JEFE_DE_AREA y
-  // EMPLEADO quedan fuera (ver ENTRADAS_SALIDAS.md §4).
-  const canViewAccess =
-    user?.role === "ADMIN" || user?.role === "GERENTE" || user?.role === "RECURSOS_HUMANOS";
 
   const active = (to: string) => location.pathname.startsWith(to);
 
@@ -88,7 +106,7 @@ export default function PrivateRoutes() {
           action: () => navigate("/tickets"),
           isActive: active("/tickets") && !active("/tickets/tareas") && !active("/tickets/mis-tareas"),
         },
-        ...(user?.role === "ADMIN" || user?.role === "GERENTE"
+        ...(canManageTasks
           ? [
             {
               id: "adminTareas",
@@ -98,7 +116,7 @@ export default function PrivateRoutes() {
             },
           ]
           : []),
-        ...(!canManage && isEmpleado
+        ...(isEmpleado
           ? [
             {
               id: "misTareas",
@@ -110,8 +128,8 @@ export default function PrivateRoutes() {
           : []),
       ],
     },
-    // INVENTARIO (solo ADMIN)
-    ...(isAdmin
+    // INVENTARIO (dispositivos.ver / prestamos.ver)
+    ...(canViewInventory
       ? [
         {
           id: "inventario",
@@ -119,42 +137,50 @@ export default function PrivateRoutes() {
           icon: <FaBoxes size={14} />,
           isActive: active("/inventario"),
           subitems: [
-            {
-              id: "dashboard",
-              label: tt("nav.inventory"),
-              action: () => navigate("/inventario"),
-              isActive: active("/inventario") && location.pathname === "/inventario",
-            },
-            {
-              id: "dispositivos",
-              label: tt("nav.devices"),
-              action: () => navigate("/inventario/dispositivos"),
-              isActive: active("/inventario/dispositivos"),
-            },
-            {
-              id: "movimientos",
-              label: tt("nav.movimientos"),
-              action: () => navigate("/inventario/movimientos"),
-              isActive: active("/inventario/movimientos"),
-            },
-            {
-              id: "prestamos",
-              label: tt("nav.prestamos"),
-              action: () => navigate("/inventario/prestamos"),
-              isActive: active("/inventario/prestamos"),
-            },
-            {
-              id: "devoluciones",
-              label: tt("nav.devoluciones"),
-              action: () => navigate("/inventario/devoluciones"),
-              isActive: active("/inventario/devoluciones"),
-            },
+            ...(canViewDevices
+              ? [
+                {
+                  id: "dashboard",
+                  label: tt("nav.inventory"),
+                  action: () => navigate("/inventario"),
+                  isActive: active("/inventario") && location.pathname === "/inventario",
+                },
+                {
+                  id: "dispositivos",
+                  label: tt("nav.devices"),
+                  action: () => navigate("/inventario/dispositivos"),
+                  isActive: active("/inventario/dispositivos"),
+                },
+                {
+                  id: "movimientos",
+                  label: tt("nav.movimientos"),
+                  action: () => navigate("/inventario/movimientos"),
+                  isActive: active("/inventario/movimientos"),
+                },
+              ]
+              : []),
+            ...(canViewLoans
+              ? [
+                {
+                  id: "prestamos",
+                  label: tt("nav.prestamos"),
+                  action: () => navigate("/inventario/prestamos"),
+                  isActive: active("/inventario/prestamos"),
+                },
+                {
+                  id: "devoluciones",
+                  label: tt("nav.devoluciones"),
+                  action: () => navigate("/inventario/devoluciones"),
+                  isActive: active("/inventario/devoluciones"),
+                },
+              ]
+              : []),
           ],
         },
       ]
       : []),
-    // REPORTES (solo ADMIN)
-    ...(isAdmin
+    // REPORTES (reportes.ver)
+    ...(canViewReports
       ? [
         {
           id: "reportes",
@@ -165,8 +191,8 @@ export default function PrivateRoutes() {
         },
       ]
       : []),
-    // CONTROL DE ACCESO (ADMIN, GERENTE y RECURSOS_HUMANOS — bitácora de entradas/salidas)
-    ...(canViewAccess
+    // CONTROL DE ACCESO (acceso.bitacora / checador.ver)
+    ...(canViewAccess || canViewChecador
       ? [
         {
           id: "accesos",
@@ -174,43 +200,51 @@ export default function PrivateRoutes() {
           icon: <FaDoorOpen size={14} />,
           isActive: active("/access"),
           subitems: [
-            {
-              id: "accessLog",
-              label: tt("nav.accessLog"),
-              action: () => navigate("/access"),
-              isActive:
-                active("/access") && !active("/access/report") && !active("/access/checador"),
-            },
-            {
-              id: "accessReport",
-              label: tt("nav.accessReport"),
-              action: () => navigate("/access/report"),
-              isActive: active("/access/report"),
-            },
-            {
-              id: "accessChecador",
-              label: tt("nav.accessChecador"),
-              action: () => navigate("/access/checador"),
-              isActive: location.pathname === "/access/checador",
-            },
-            {
-              id: "accessChecadorReport",
-              label: tt("nav.accessChecadorReport"),
-              action: () => navigate("/access/checador/entradas-salidas"),
-              isActive: active("/access/checador/entradas-salidas"),
-            },
-            {
-              id: "accessChecadorEmpleados",
-              label: tt("nav.accessChecadorEmpleados"),
-              action: () => navigate("/access/checador/empleados"),
-              isActive: active("/access/checador/empleados"),
-            },
+            ...(canViewAccess
+              ? [
+                {
+                  id: "accessLog",
+                  label: tt("nav.accessLog"),
+                  action: () => navigate("/access"),
+                  isActive:
+                    active("/access") && !active("/access/report") && !active("/access/checador"),
+                },
+                {
+                  id: "accessReport",
+                  label: tt("nav.accessReport"),
+                  action: () => navigate("/access/report"),
+                  isActive: active("/access/report"),
+                },
+              ]
+              : []),
+            ...(canViewChecador
+              ? [
+                {
+                  id: "accessChecador",
+                  label: tt("nav.accessChecador"),
+                  action: () => navigate("/access/checador"),
+                  isActive: location.pathname === "/access/checador",
+                },
+                {
+                  id: "accessChecadorReport",
+                  label: tt("nav.accessChecadorReport"),
+                  action: () => navigate("/access/checador/entradas-salidas"),
+                  isActive: active("/access/checador/entradas-salidas"),
+                },
+                {
+                  id: "accessChecadorEmpleados",
+                  label: tt("nav.accessChecadorEmpleados"),
+                  action: () => navigate("/access/checador/empleados"),
+                  isActive: active("/access/checador/empleados"),
+                },
+              ]
+              : []),
           ],
         },
       ]
       : []),
-    // HORARIOS (ADMIN, GERENTE, RECURSOS_HUMANOS — administración, asignación y horas extra)
-    ...(canViewAccess
+    // HORARIOS (horarios.ver; horas extra con horas_extra.ver)
+    ...(canViewSchedules
       ? [
         {
           id: "horarios",
@@ -230,18 +264,22 @@ export default function PrivateRoutes() {
               action: () => navigate("/horarios/asignar"),
               isActive: active("/horarios/asignar"),
             },
-            {
-              id: "overtime",
-              label: tt("nav.overtime"),
-              action: () => navigate("/horarios/horas-extra/aprobacion"),
-              isActive: active("/horarios/horas-extra/aprobacion"),
-            },
+            ...(canViewOvertime
+              ? [
+                {
+                  id: "overtime",
+                  label: tt("nav.overtime"),
+                  action: () => navigate("/horarios/horas-extra/aprobacion"),
+                  isActive: active("/horarios/horas-extra/aprobacion"),
+                },
+              ]
+              : []),
           ],
         },
       ]
       : []),
-    // RECURSOS HUMANOS (ADMIN y RECURSOS_HUMANOS — expediente completo del personal)
-    ...(canManageHR
+    // RECURSOS HUMANOS (personal.expediente — expediente completo del personal)
+    ...(canViewHR
       ? [
         {
           id: "recursosHumanos",
@@ -265,8 +303,8 @@ export default function PrivateRoutes() {
         },
       ]
       : []),
-    // CONFIGURACIÓN (solo ADMIN)
-    ...(isAdmin
+    // CONFIGURACIÓN (catalogos.administrar / usuarios.ver / relojes.administrar)
+    ...(canAdminCatalogs || canViewUsers || canAdminRelojes
       ? [
         {
           id: "configuracion",
@@ -274,21 +312,28 @@ export default function PrivateRoutes() {
           icon: <FaCog size={14} />,
           isActive: active("/catalogos") || active("/usuarios") || active("/relojes"),
           subitems: [
-            {
-              id: "catalogos",
-              label: tt("nav.catalogs"),
-              action: () => navigate("/catalogos"),
-              isActive: active("/catalogos"),
-            },
-            {
-              id: "usuarios",
-              label: tt("nav.users"),
-              action: () => navigate("/usuarios"),
-              isActive: active("/usuarios"),
-            },
-            // Alta/baja de relojes checadores: solo ADMIN (GERENTE no, a
-            // diferencia del resto de Configuración).
-            ...(user?.role === "ADMIN"
+            ...(canAdminCatalogs
+              ? [
+                {
+                  id: "catalogos",
+                  label: tt("nav.catalogs"),
+                  action: () => navigate("/catalogos"),
+                  isActive: active("/catalogos"),
+                },
+              ]
+              : []),
+            ...(canViewUsers
+              ? [
+                {
+                  id: "usuarios",
+                  label: tt("nav.users"),
+                  action: () => navigate("/usuarios"),
+                  isActive: active("/usuarios"),
+                },
+              ]
+              : []),
+            // Alta/baja de relojes checadores: solo ADMIN (relojes.administrar).
+            ...(canAdminRelojes
               ? [
                 {
                   id: "relojes",

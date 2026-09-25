@@ -11,8 +11,7 @@ import {
 import { FaFileExcel, FaPlus, FaUserShield } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import {
   useUsersList,
   UsersTable,
@@ -22,8 +21,7 @@ import { DeactivateDialog } from "@features/personal/employee-detail";
 export default function UsersListPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["users", "common"]);
-  const authUser = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = authUser?.role === "ADMIN";
+  const canManageUsers = usePuede("usuarios.ver");
 
   const fx = useUsersList();
 
@@ -80,7 +78,7 @@ export default function UsersListPage() {
       <ITConfirmDialog
         isOpen={!!fx.userToToggle && !fx.userToToggle.active}
         onClose={() => fx.setUserToToggle(null)}
-        onConfirm={() => fx.handleToggleActive(isAdmin)}
+        onConfirm={() => fx.handleToggleActive(canManageUsers)}
         title={tt("list.confirmDeleteTitle")}
         message={tt("list.confirmDeleteMsg", {
           username: fx.userToToggle?.username ?? "",

@@ -49,7 +49,7 @@ export default function KanbanPage() {
               </ITFlex>
             </ITButton>
           ) : undefined
-        ) : !fx.isEmpleado ? (
+        ) : fx.canCreate ? (
           <ITFlex align="center" gap={2}>
             <ITButton
               variant="outlined"

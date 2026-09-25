@@ -40,7 +40,7 @@ const roleBadge = (role: string, label: string) => (
 
 interface Props {
   departments: Department[];
-  isAdmin: boolean;
+  canEdit: boolean;
   fetchData: (
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
@@ -51,7 +51,7 @@ interface Props {
 
 export default function EmployeesTable({
   departments,
-  isAdmin,
+  canEdit,
   fetchData,
   reloadKey,
   onView,
@@ -177,7 +177,7 @@ export default function EmployeesTable({
           >
             <FaUserTie size={14} />
           </ITButton>
-          {isAdmin && (
+          {canEdit && (
             <ITButton
               onClick={() => onEdit(u)}
               size="lg"

@@ -261,14 +261,14 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                           "PENDIENTE",
                           "EN_PROGRESO",
                           "EN_REVISION",
-                          ...(fx.isAdmin || fx.isGerente ? ["COMPLETADA"] : []),
+                          ...(fx.canCompleteTask ? ["COMPLETADA"] : []),
                         ].map((value) => ({
                           value,
                           label: dyn(tt)(`detail.taskStatusOptions.${value}`),
                         }))}
                         value={a.status}
                         disabled={
-                          !canEditStatus || (a.status === "COMPLETADA" && !fx.isAdmin && !fx.isGerente)
+                          !canEditStatus || (a.status === "COMPLETADA" && !fx.canCompleteTask)
                         }
                         onChange={(e) => fx.handleUpdateAssignment(a.id, { status: e.target.value })}
                       />
@@ -278,11 +278,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       ticketId: ticket.id,
                       assignmentId: a.id,
                       canUpload:
-                        fx.isAdmin ||
-                        fx.isGerente ||
-                        ticket.asignadoAId === fx.currentUser?.id ||
-                        (fx.isJefeArea && ticket.creadoPorId === fx.currentUser?.id) ||
-                        a.userId === fx.currentUser?.id,
+                        fx.canUploadToTicket || a.userId === fx.currentUser?.id,
                     })}
 
                     {/* Comentarios de la tarea */}

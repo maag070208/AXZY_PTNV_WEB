@@ -11,10 +11,9 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaBuilding, FaTrash, FaTrashRestore } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import {
   DepartmentDetailAside,
   DepartmentInfoCard,
@@ -25,8 +24,7 @@ export default function DepartmentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["departments", "common"]);
-  const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "ADMIN";
+  const canManage = usePuede("departamentos.administrar");
 
   const detail = useDepartmentDetail(id, () => navigate("/departamentos"));
 
@@ -67,7 +65,7 @@ export default function DepartmentDetailPage() {
         { label: dept.name },
       ]}
       actions={
-        isAdmin ? (
+        canManage ? (
           <ITButton
             variant="outlined"
             size="lg"
@@ -90,7 +88,7 @@ export default function DepartmentDetailPage() {
         <ITGrid item xs={12} md={8} className="flex flex-col gap-5 min-w-0">
           <DepartmentInfoCard
             dept={dept}
-            isAdmin={isAdmin}
+            canManage={canManage}
             newSubarea={detail.newSubarea}
             onNewSubarea={detail.setNewSubarea}
             onAddSubarea={detail.handleAddSubarea}

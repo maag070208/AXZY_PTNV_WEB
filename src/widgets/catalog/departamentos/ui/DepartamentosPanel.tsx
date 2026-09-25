@@ -42,7 +42,7 @@ export default function DepartamentosPanel({ openCreateSignal }: { openCreateSig
       <DepartmentsTable
         fetchData={crud.fetchTableData}
         reloadKey={crud.reloadKey}
-        isAdmin
+        canManage
         onView={(d) => navigate(`/departamentos/${d.id}`)}
         onEdit={crud.openEditDept}
         onDelete={crud.setDeptToDelete}

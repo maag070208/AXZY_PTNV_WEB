@@ -13,7 +13,7 @@ import type { Department, Subarea } from "@entities/department";
 
 interface Props {
   dept: Department;
-  isAdmin: boolean;
+  canManage: boolean;
   newSubarea: string;
   onNewSubarea: (value: string) => void;
   onAddSubarea: () => void;
@@ -24,7 +24,7 @@ interface Props {
 
 export default function DepartmentInfoCard({
   dept,
-  isAdmin,
+  canManage,
   newSubarea,
   onNewSubarea,
   onAddSubarea,
@@ -102,7 +102,7 @@ export default function DepartmentInfoCard({
                         {tt("detail.subareaInactive")}
                       </ITText>
                     )}
-                    {isAdmin && s.active && (
+                    {canManage && s.active && (
                       <FaEdit
                         size={10}
                         className="text-slate-400 hover:text-emerald-600 cursor-pointer"
@@ -110,7 +110,7 @@ export default function DepartmentInfoCard({
                         title={tt("detail.editSubarea")}
                       />
                     )}
-                    {isAdmin && !s.active && (
+                    {canManage && !s.active && (
                       <FaTrashRestore
                         size={10}
                         className="text-rose-400 hover:text-emerald-600 cursor-pointer"
@@ -118,7 +118,7 @@ export default function DepartmentInfoCard({
                         title={tt("detail.reactivateSubarea")}
                       />
                     )}
-                    {isAdmin && (
+                    {canManage && (
                       <FaTimes
                         size={10}
                         className="text-slate-400 hover:text-rose-500 cursor-pointer"
@@ -133,7 +133,7 @@ export default function DepartmentInfoCard({
           </ITFlex>
         </ITGrid>
 
-        {isAdmin && (
+        {canManage && (
           <ITGrid item xs={12}>
             <ITFlex gap={2}>
               <ITInput

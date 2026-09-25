@@ -23,7 +23,7 @@ import {
 } from "@entities/ticket";
 
 interface Props {
-  isAdmin: boolean;
+  canDelete: boolean;
   fetchData: (
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
@@ -33,7 +33,7 @@ interface Props {
 }
 
 export default function TicketsTable({
-  isAdmin,
+  canDelete,
   fetchData,
   reloadKey,
   onView,
@@ -150,7 +150,7 @@ export default function TicketsTable({
           >
             <FaEye size={12} />
           </ITButton>
-          {isAdmin && (
+          {canDelete && (
             <ITButton
               variant="outlined"
               size="lg"

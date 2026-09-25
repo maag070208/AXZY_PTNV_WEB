@@ -39,7 +39,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
           </ITText>
         </ITFlex>
 
-        {fx.isAdmin && (
+        {fx.canEditTicket && (
           <ITGrid container columns={12} spacing={3}>
             <ITGrid item xs={12} sm={4}>
               <ITSelect
@@ -77,7 +77,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
           </ITGrid>
         )}
 
-        {(fx.isAdmin || fx.isGerente) && (
+        {fx.canEditTicket && (
           <ITSelect
             name="responsable"
             label={tt("detail.responsible")}

@@ -9,10 +9,9 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaBuilding, FaPlus } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import {
   DepartmentsTable,
   useDepartmentsCrud,
@@ -21,8 +20,7 @@ import {
 export default function DepartmentsPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["departments", "common"]);
-  const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "ADMIN";
+  const canManage = usePuede("departamentos.administrar");
 
   const crud = useDepartmentsCrud();
 
@@ -37,7 +35,7 @@ export default function DepartmentsPage() {
         { label: tt("list.breadcrumb") },
       ]}
       actions={
-        isAdmin ? (
+        canManage ? (
           <ITButton
             variant="filled"
             color="primary"
@@ -60,7 +58,7 @@ export default function DepartmentsPage() {
       <DepartmentsTable
         fetchData={crud.fetchTableData}
         reloadKey={crud.reloadKey}
-        isAdmin={isAdmin}
+        canManage={canManage}
         onView={(d) => navigate(`/departamentos/${d.id}`)}
         onEdit={crud.openEditDept}
         onDelete={crud.setDeptToDelete}

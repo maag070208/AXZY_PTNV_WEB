@@ -12,9 +12,9 @@ interface Props {
 
 /**
  * Gate de permiso a nivel de ruta. `PrivateRoutes` ya garantiza que hay sesión;
- * aquí se bloquea el acceso directo por URL a secciones no autorizadas. Aún no
- * reemplaza a `RoleGuard` (eso es Incremento 2+). Mientras el usuario no cargue
- * (`meThunk` en vuelo) no se decide nada para no redirigir en falso.
+ * aquí se bloquea el acceso directo por URL a secciones no autorizadas. Mientras
+ * el usuario no cargue (`meThunk` en vuelo) no se decide nada para no redirigir
+ * en falso.
  */
 export default function RequierePermiso({ permiso, children }: Props) {
   const user = useSelector((s: RootState) => s.auth.user);

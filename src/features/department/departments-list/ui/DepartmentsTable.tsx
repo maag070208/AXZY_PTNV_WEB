@@ -18,7 +18,7 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
-  isAdmin: boolean;
+  canManage: boolean;
   onView: (d: Department) => void;
   onEdit: (d: Department) => void;
   onDelete: (d: Department) => void;
@@ -27,7 +27,7 @@ interface Props {
 export default function DepartmentsTable({
   fetchData,
   reloadKey,
-  isAdmin,
+  canManage,
   onView,
   onEdit,
   onDelete,
@@ -99,7 +99,7 @@ export default function DepartmentsTable({
           >
             <FaEye size={14} />
           </ITButton>
-          {isAdmin && (
+          {canManage && (
             <ITButton
               variant="outlined"
               size="lg"
@@ -110,7 +110,7 @@ export default function DepartmentsTable({
               <FaEdit size={12} />
             </ITButton>
           )}
-          {isAdmin && (
+          {canManage && (
             <ITButton
               variant="outlined"
               size="lg"

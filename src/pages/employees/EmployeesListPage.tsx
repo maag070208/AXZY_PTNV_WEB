@@ -6,10 +6,9 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaPlus, FaUserTie } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import {
   EmployeesTable,
   useEmployeesList,
@@ -18,8 +17,7 @@ import {
 export default function EmployeesListPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
   const navigate = useNavigate();
-  const currentUser = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = currentUser?.role === "ADMIN";
+  const canEditEmployees = usePuede("personal.expediente");
 
   const list = useEmployeesList();
 
@@ -33,7 +31,7 @@ export default function EmployeesListPage() {
         { label: tt("breadcrumb") },
       ]}
       actions={
-        isAdmin ? (
+        canEditEmployees ? (
           <ITButton
             variant="filled"
             color="primary"
@@ -56,7 +54,7 @@ export default function EmployeesListPage() {
 
       <EmployeesTable
         departments={list.departments}
-        isAdmin={isAdmin}
+        canEdit={canEditEmployees}
         fetchData={list.fetchTableData}
         reloadKey={list.reloadKey}
         onView={(u) => navigate(`/empleados/${u.id}`)}

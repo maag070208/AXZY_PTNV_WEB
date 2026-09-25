@@ -7,10 +7,9 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { useEffect } from "react";
 import { FaSave, FaTicketAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import {
   EditTicketForm,
   useEditTicket,
@@ -19,16 +18,15 @@ import {
 export default function EditTicketPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
-  const currentUser = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = currentUser?.role === "ADMIN";
+  const canEditTicket = usePuede("tickets.editar");
 
   const editTicket = useEditTicket();
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!canEditTicket) {
       navigate("/tickets");
     }
-  }, [isAdmin, navigate]);
+  }, [canEditTicket, navigate]);
 
   const handleSave = () => {
     editTicket.handleSave().then((ok) => {

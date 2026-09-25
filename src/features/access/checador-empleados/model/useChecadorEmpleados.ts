@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
-import type { RootState } from "@app/store";
 import {
   checadorApi,
   type ChecadorEmpleado,
   type ChecadorEmpleadoEstado,
   type ChecadorEmpleadosSummary,
 } from "@entities/checador";
-import { usersApi, type User } from "@entities/user";
+import { usersApi, usePuede, type User } from "@entities/user";
 
 /**
  * Empleados del reloj y su vínculo con los usuarios del sistema: tabla
@@ -18,9 +16,8 @@ import { usersApi, type User } from "@entities/user";
  */
 export const useChecadorEmpleados = () => {
   const { t } = useTranslation(["checador", "common"]);
-  const role = useSelector((s: RootState) => s.auth.user?.role);
-  // Mismos roles que PUT/DELETE /checador/empleados en la API.
-  const canLink = role === "ADMIN" || role === "RECURSOS_HUMANOS";
+  // Mismo permiso que PUT/DELETE /checador/empleados en la API.
+  const canLink = usePuede("checador.vincular");
 
   const [q, setQ] = useState("");
   const [estado, setEstado] = useState<ChecadorEmpleadoEstado | "">("");

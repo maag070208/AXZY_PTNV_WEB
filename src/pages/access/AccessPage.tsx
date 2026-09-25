@@ -34,8 +34,7 @@ import {
   FaUndo,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import { formatFechaHora } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { LocationMap } from "@shared/ui/location-map";
@@ -68,8 +67,7 @@ const formatCoords = (lat: number | null, lng: number | null): string =>
 export default function AccessPage() {
   const { t: tt } = useTranslation(["access", "common"]);
   const navigate = useNavigate();
-  const role = useSelector((s: RootState) => s.auth.user?.role);
-  const canVoid = role === "ADMIN" || role === "RECURSOS_HUMANOS";
+  const canVoid = usePuede("acceso.anular");
 
   const [sites, setSites] = useState<Site[]>([]);
   const [sitesError, setSitesError] = useState(false);

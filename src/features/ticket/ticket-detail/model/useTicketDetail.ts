@@ -12,8 +12,8 @@ import {
   type Ticket,
   type TicketCategory,
 } from "@entities/ticket";
-import type { User, UserRole } from "@entities/user";
-import { usersApi } from "@entities/user";
+import type { Alcance, User, UserRole } from "@entities/user";
+import { usersApi, usePermiso } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { useAblyChannel } from "@shared/lib/ably";
 import { todayInput } from "./timeline";
@@ -30,25 +30,42 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
 
   const ticket = useSelector((s: RootState) => s.tickets.current);
   const currentUser = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = currentUser?.role === "ADMIN";
-  const isGerente = currentUser?.role === "GERENTE";
-  const isJefeArea = currentUser?.role === "JEFE_DE_AREA";
-  const canEditTicket =
-    isAdmin || isGerente || (isJefeArea && ticket?.creadoPorId === currentUser?.id);
-  const canCreateTasks = Boolean(
-    ticket &&
-      (isAdmin ||
-        ticket.creadoPorId === currentUser?.id ||
-        ticket.asignadoAId === currentUser?.id)
-  );
+
+  const alcanceEditar = usePermiso("tickets.editar");
+  const alcanceCerrar = usePermiso("tickets.cerrar");
+  const alcanceAsignar = usePermiso("tareas.asignar");
+  const alcanceCompletar = usePermiso("tareas.completar");
+  const alcanceEliminar = usePermiso("tickets.eliminar");
+
+  const isCreator = !!ticket && ticket.creadoPorId === currentUser?.id;
+  const isAssignee = !!ticket && ticket.asignadoAId === currentUser?.id;
+  const isSameDepartment =
+    !!ticket &&
+    !!currentUser?.departmentId &&
+    ticket.departmentId === currentUser.departmentId;
   const isInvolved =
     !!ticket &&
-    (ticket.creadoPorId === currentUser?.id ||
-      ticket.asignadoAId === currentUser?.id ||
+    (isCreator ||
+      isAssignee ||
       ticket.assignments.some((a) => a.userId === currentUser?.id));
   const isClosed = ticket?.status === "CERRADO";
-  const canClose =
-    isAdmin || isGerente || (isJefeArea && ticket?.departmentId === currentUser?.departmentId);
+
+  /**
+   * Alcance sobre el registro: TODO siempre; AREA incluye lo propio y su
+   * departamento; PROPIO solo lo propio (ver ROLES_Y_PERMISOS.md §2).
+   */
+  const alcancePermite = (alcance: Alcance, propio: boolean): boolean =>
+    alcance === "TODO" ||
+    (alcance === "AREA" && (propio || isSameDepartment)) ||
+    (alcance === "PROPIO" && propio);
+
+  const canEditTicket = alcancePermite(alcanceEditar, isCreator);
+  const canClose = alcancePermite(alcanceCerrar, isCreator);
+  const canCreateTasks =
+    Boolean(ticket) && alcancePermite(alcanceAsignar, isCreator || isAssignee);
+  const canCompleteTask = alcancePermite(alcanceCompletar, isCreator || isAssignee);
+  const canDeleteTicket = alcanceEliminar !== "NINGUNO";
+  const canUploadToTicket = canEditTicket || isInvolved;
 
   const [empleados, setEmpleados] = useState<User[]>([]);
   const [responsables, setResponsables] = useState<User[]>([]);
@@ -349,11 +366,11 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
   return {
     ticket,
     currentUser,
-    isAdmin,
-    isGerente,
-    isJefeArea,
     canEditTicket,
     canCreateTasks,
+    canCompleteTask,
+    canDeleteTicket,
+    canUploadToTicket,
     isInvolved,
     isClosed,
     canClose,

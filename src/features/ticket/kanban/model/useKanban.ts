@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "@app/store";
-import { usersApi, type User } from "@entities/user";
+import { usersApi, usePermiso, type Alcance, type User } from "@entities/user";
 import {
   ticketsApi,
   type KanbanAssignment,
@@ -20,10 +20,21 @@ const COLUMNS: Array<{ status: Status }> = [
 export const useKanban = (ticketId?: string) => {
   const { t: tt } = useTranslation("tickets");
   const currentUser = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = currentUser?.role === "ADMIN";
-  const isEmpleado = currentUser?.role === "EMPLEADO";
-  const isGerente = currentUser?.role === "GERENTE";
-  const canCreate = !isEmpleado;
+  const alcanceAsignar = usePermiso("tareas.asignar");
+  const alcanceCompletar = usePermiso("tareas.completar");
+  const canCreate = alcanceAsignar !== "NINGUNO";
+
+  /** Alcance sobre el registro: TODO siempre; AREA incluye su departamento. */
+  const alcancePermite = (
+    alcance: Alcance,
+    departamentoId: string | null | undefined,
+    propio: boolean
+  ): boolean =>
+    alcance === "TODO" ||
+    (alcance === "AREA" &&
+      (propio ||
+        (!!currentUser?.departmentId && departamentoId === currentUser.departmentId))) ||
+    (alcance === "PROPIO" && propio);
 
   const [rows, setRows] = useState<KanbanAssignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -231,10 +242,12 @@ export const useKanban = (ticketId?: string) => {
 
   const canManageModalTicket = Boolean(
     modalTicket &&
-      (isAdmin ||
-        isGerente ||
+      alcancePermite(
+        alcanceAsignar,
+        modalTicket.departmentId,
         modalTicket.creadoPorId === currentUser?.id ||
-        modalTicket.asignadoAId === currentUser?.id)
+          modalTicket.asignadoAId === currentUser?.id
+      )
   );
 
   const handleStatusChange = async (assignment: KanbanAssignment, status: Status) => {
@@ -264,7 +277,7 @@ export const useKanban = (ticketId?: string) => {
       setDraggingId(null);
       return;
     }
-    if (status === "COMPLETADA" && !isAdmin && !isGerente) {
+    if (status === "COMPLETADA" && alcanceCompletar === "NINGUNO") {
       setToast(tt("kanban.completeRestricted"));
       setDraggingId(null);
       return;
@@ -276,9 +289,6 @@ export const useKanban = (ticketId?: string) => {
   return {
     COLUMNS,
     currentUser,
-    isAdmin,
-    isGerente,
-    isEmpleado,
     canCreate,
     rows,
     loading,

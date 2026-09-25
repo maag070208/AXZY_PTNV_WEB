@@ -1,17 +1,15 @@
 import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaClock } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import { OvertimeApprovalTable, useOvertimeApproval } from "@features/schedule";
 import { downloadOvertimePDF } from "@widgets/reports";
 
 export default function OvertimeApprovalPage() {
   const { t } = useTranslation(["overtime", "common"]);
   const navigate = useNavigate();
-  const role = useSelector((s: RootState) => s.auth.user?.role);
-  const canApprove = role === "ADMIN" || role === "GERENTE";
+  const canApprove = usePuede("horas_extra.aprobar");
   const fx = useOvertimeApproval({ canApprove, downloadPdf: downloadOvertimePDF });
 
   return (

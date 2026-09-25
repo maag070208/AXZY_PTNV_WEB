@@ -2,8 +2,7 @@ import { ITBadget, ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_sys
 import { FaSync, FaTasks, FaTrello } from "react-icons/fa";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import {
   useAssignmentList,
   AdminTasksTable,
@@ -12,12 +11,11 @@ import {
 export default function AdminTareasPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
-  const user = useSelector((s: RootState) => s.auth.user);
+  const canCompleteTasks = usePuede("tareas.completar");
 
   const fx = useAssignmentList("admintasks.loadError");
 
-  if (user?.role !== "ADMIN" && user?.role !== "GERENTE")
-    return <Navigate to="/" replace />;
+  if (!canCompleteTasks) return <Navigate to="/" replace />;
 
   return (
     <ITPage

@@ -61,12 +61,7 @@ export default function TicketDetailPage() {
   const renderTicketAttachments = fx.ticket ? (
     <TicketAttachments
       ticketId={fx.ticket.id}
-      canUpload={
-        fx.isAdmin ||
-        fx.isGerente ||
-        fx.isInvolved ||
-        (fx.isJefeArea && fx.ticket.creadoPorId === fx.currentUser?.id)
-      }
+      canUpload={fx.canUploadToTicket}
     />
   ) : null;
 
@@ -105,7 +100,7 @@ export default function TicketDetailPage() {
       ]}
       actions={
         <ITFlex gap={2} wrap="wrap">
-          {(fx.isAdmin || fx.isGerente || fx.canCreateTasks) && (
+          {(fx.canCreateTasks || fx.canEditTicket) && (
             <ITButton
               variant="outlined"
               size="lg"
@@ -146,7 +141,7 @@ export default function TicketDetailPage() {
               </ITFlex>
             </ITButton>
           )}
-          {fx.isAdmin && (
+          {fx.canDeleteTicket && (
             <ITButton
               variant="outlined"
               size="lg"

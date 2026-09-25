@@ -1,17 +1,16 @@
 import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaFingerprint } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import { ChecadorTab, useChecador } from "@features/access/checador";
 
 export default function ChecadorPage() {
   const { t } = useTranslation(["checador", "common"]);
   const navigate = useNavigate();
   const fx = useChecador();
-  // Dar de alta/baja relojes es solo de ADMIN (igual que en la API).
-  const esAdmin = useSelector((s: RootState) => s.auth.user?.role) === "ADMIN";
+  // Dar de alta/baja relojes exige relojes.administrar (igual que en la API).
+  const canManageRelojes = usePuede("relojes.administrar");
 
   return (
     <ITPage
@@ -27,7 +26,7 @@ export default function ChecadorPage() {
     >
       <ChecadorTab
         fx={fx}
-        onAdministrarRelojes={esAdmin ? () => navigate("/relojes") : undefined}
+        onAdministrarRelojes={canManageRelojes ? () => navigate("/relojes") : undefined}
       />
     </ITPage>
   );

@@ -1,8 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "@pages/auth/LoginPage";
 import PrivateRoutes from "./guards/PrivateRoutes";
-import RoleGuard from "./guards/RoleGuard";
-import type { UserRole } from "@entities/user";
+import RequierePermiso from "./guards/RequierePermiso";
 import AccessPage from "@pages/access/AccessPage";
 import AccessReportPage from "@pages/access/AccessReportPage";
 import ChecadorPage from "@pages/access/ChecadorPage";
@@ -52,11 +51,6 @@ import AdminTareasPage from "@pages/tickets/AdminTareasPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
 import CatalogPage from "@pages/catalog/CatalogPage";
 
-/** Roles con acceso a la bitácora de accesos (ver ENTRADAS_SALIDAS.md §4). */
-const ACCESS_READ_ROLES: UserRole[] = ["ADMIN", "GERENTE", "RECURSOS_HUMANOS"];
-/** Alta/baja de relojes checadores: solo ADMIN (igual que en la API). */
-const RELOJES_ROLES: UserRole[] = ["ADMIN"];
-
 export default function App() {
   return (
     <Routes>
@@ -65,136 +59,304 @@ export default function App() {
       <Route element={<PrivateRoutes />}>
         <Route path="/" element={<HomePage />} />
 
-        <Route path="/inventario" element={<DashboardPage />} />
-        <Route path="/inventario/dispositivos" element={<DispositivosPage />} />
-        <Route path="/inventario/dispositivos/nuevo" element={<DispositivoFormPage />} />
-        <Route path="/inventario/dispositivos/:id" element={<DispositivoDetailPage />} />
-        <Route path="/inventario/dispositivos/:id/editar" element={<EditDispositivoPage />} />
-        <Route path="/inventario/tipos" element={<TiposPage />} />
-        <Route path="/inventario/movimientos" element={<MovimientosPage />} />
-        <Route path="/inventario/movimientos/nuevo" element={<NewMovimientoPage />} />
-        <Route path="/inventario/prestamos" element={<PrestamosPage />} />
-        <Route path="/inventario/prestamos/nuevo" element={<NewPrestamoPage />} />
-        <Route path="/inventario/prestamos/:id" element={<PrestamoDetailPage />} />
-        <Route path="/inventario/prestamos/:id/editar" element={<EditPrestamoPage />} />
-        <Route path="/inventario/devoluciones" element={<DevolucionesPage />} />
-        <Route path="/inventario/devoluciones/nueva" element={<NewDevolucionPage />} />
+        <Route
+          path="/inventario"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <DashboardPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/dispositivos"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <DispositivosPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/dispositivos/nuevo"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <DispositivoFormPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/dispositivos/:id"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <DispositivoDetailPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/dispositivos/:id/editar"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <EditDispositivoPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/tipos"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <TiposPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/movimientos"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <MovimientosPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/movimientos/nuevo"
+          element={
+            <RequierePermiso permiso="dispositivos.ver">
+              <NewMovimientoPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/prestamos"
+          element={
+            <RequierePermiso permiso="prestamos.ver">
+              <PrestamosPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/prestamos/nuevo"
+          element={
+            <RequierePermiso permiso="prestamos.ver">
+              <NewPrestamoPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/prestamos/:id"
+          element={
+            <RequierePermiso permiso="prestamos.ver">
+              <PrestamoDetailPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/prestamos/:id/editar"
+          element={
+            <RequierePermiso permiso="prestamos.ver">
+              <EditPrestamoPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/devoluciones"
+          element={
+            <RequierePermiso permiso="prestamos.ver">
+              <DevolucionesPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/inventario/devoluciones/nueva"
+          element={
+            <RequierePermiso permiso="prestamos.ver">
+              <NewDevolucionPage />
+            </RequierePermiso>
+          }
+        />
 
         <Route path="/tickets" element={<TicketsListPage />} />
         <Route path="/tickets/kanban" element={<KanbanPage />} />
         <Route path="/tickets/mis-tareas" element={<MisTareasPage />} />
-        <Route path="/tickets/tareas" element={<AdminTareasPage />} />
+        <Route
+          path="/tickets/tareas"
+          element={
+            <RequierePermiso permiso="tareas.completar">
+              <AdminTareasPage />
+            </RequierePermiso>
+          }
+        />
         <Route path="/tickets/nuevo" element={<NewTicketPage />} />
-        <Route path="/tickets/:id/editar" element={<EditTicketPage />} />
+        <Route
+          path="/tickets/:id/editar"
+          element={
+            <RequierePermiso permiso="tickets.editar">
+              <EditTicketPage />
+            </RequierePermiso>
+          }
+        />
         <Route path="/tickets/:id" element={<TicketDetailPage />} />
 
         <Route path="/departamentos" element={<DepartmentsPage />} />
         <Route path="/departamentos/:id" element={<DepartmentDetailPage />} />
         <Route path="/subareas" element={<SubareasPage />} />
-        <Route path="/empleados" element={<EmployeesListPage />} />
-        <Route path="/empleados/catalogos/documentos" element={<DocumentCatalogPage />} />
-        <Route path="/empleados/:id/editar" element={<EmployeeProfileEditPage />} />
-        <Route path="/empleados/reportes" element={<ReportesPersonalPage />} />
-        <Route path="/empleados/reportes/:id" element={<ActaDetailPage />} />
-        <Route path="/empleados/:id" element={<EmployeeDetailPage />} />
-        <Route path="/reportes" element={<ReportesPage />} />
+        <Route
+          path="/empleados"
+          element={
+            <RequierePermiso permiso="personal.expediente">
+              <EmployeesListPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/empleados/catalogos/documentos"
+          element={
+            <RequierePermiso permiso="personal.expediente">
+              <DocumentCatalogPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/empleados/:id/editar"
+          element={
+            <RequierePermiso permiso="personal.expediente">
+              <EmployeeProfileEditPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/empleados/reportes"
+          element={
+            <RequierePermiso permiso="personal.expediente">
+              <ReportesPersonalPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/empleados/reportes/:id"
+          element={
+            <RequierePermiso permiso="personal.expediente">
+              <ActaDetailPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/empleados/:id"
+          element={
+            <RequierePermiso permiso="personal.expediente">
+              <EmployeeDetailPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/reportes"
+          element={
+            <RequierePermiso permiso="reportes.ver">
+              <ReportesPage />
+            </RequierePermiso>
+          }
+        />
         <Route path="/usuarios" element={<UsersListPage />} />
         <Route path="/usuarios/nuevo" element={<UserFormPage />} />
         <Route path="/usuarios/:id/editar" element={<UserFormPage />} />
         <Route path="/usuarios/:id/historial" element={<UserHistoryPage />} />
         <Route path="/usuarios/importar" element={<UserImportPage />} />
-        <Route path="/catalogos" element={<CatalogPage />} />
+        <Route
+          path="/catalogos"
+          element={
+            <RequierePermiso permiso="catalogos.administrar">
+              <CatalogPage />
+            </RequierePermiso>
+          }
+        />
         <Route path="/notificaciones" element={<NotificationsPage />} />
 
         <Route
           path="/access"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="acceso.bitacora">
               <AccessPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         <Route
           path="/access/report"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="acceso.bitacora">
               <AccessReportPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         {/* Reloj checador Hikvision (solo lectura; ver CHECADOR.md). */}
         <Route
           path="/access/checador"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="checador.ver">
               <ChecadorPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         <Route
           path="/access/checador/entradas-salidas"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="checador.ver">
               <ChecadorReportPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         <Route
           path="/access/checador/empleados"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="checador.ver">
               <ChecadorEmpleadosPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         {/* Relojes checadores (Configuración): alta, baja y configuración en vivo. */}
         <Route
           path="/relojes"
           element={
-            <RoleGuard roles={RELOJES_ROLES}>
+            <RequierePermiso permiso="relojes.administrar">
               <ChecadorRelojesPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
 
         <Route
           path="/horarios"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="horarios.ver">
               <SchedulesPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         <Route
           path="/horarios/nuevo"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="horarios.ver">
               <ScheduleFormPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         <Route
           path="/horarios/:id/editar"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="horarios.ver">
               <ScheduleFormPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         <Route
           path="/horarios/asignar"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="horarios.ver">
               <AssignSchedulesPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
         <Route
           path="/horarios/horas-extra/aprobacion"
           element={
-            <RoleGuard roles={ACCESS_READ_ROLES}>
+            <RequierePermiso permiso="horas_extra.ver">
               <OvertimeApprovalPage />
-            </RoleGuard>
+            </RequierePermiso>
           }
         />
       </Route>

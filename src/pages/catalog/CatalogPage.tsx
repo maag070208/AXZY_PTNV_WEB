@@ -1,23 +1,21 @@
 import { useEffect } from "react";
 import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaSlidersH } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import { CatalogTabs } from "@widgets/catalog/tabs";
 
 export default function CatalogPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["catalog", "common"]);
-  const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "ADMIN";
+  const canAdminCatalogs = usePuede("catalogos.administrar");
 
   useEffect(() => {
-    if (user && !isAdmin) navigate("/", { replace: true });
-  }, [user, isAdmin, navigate]);
+    if (!canAdminCatalogs) navigate("/", { replace: true });
+  }, [canAdminCatalogs, navigate]);
 
-  if (!isAdmin) return null;
+  if (!canAdminCatalogs) return null;
 
   return (
     <ITPage

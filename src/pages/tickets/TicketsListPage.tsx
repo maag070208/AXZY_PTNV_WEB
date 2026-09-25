@@ -7,10 +7,9 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaPlus, FaTicketAlt, FaTrello } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { RootState } from "@app/store";
+import { usePuede } from "@entities/user";
 import {
   TicketsTable,
   useTicketsList,
@@ -19,8 +18,7 @@ import {
 export default function TicketsListPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
-  const currentUser = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = currentUser?.role === "ADMIN";
+  const canDelete = usePuede("tickets.eliminar");
 
   const list = useTicketsList();
 
@@ -60,7 +58,7 @@ export default function TicketsListPage() {
       }
     >
       <TicketsTable
-        isAdmin={isAdmin}
+        canDelete={canDelete}
         fetchData={list.fetchTableData}
         reloadKey={list.reloadKey}
         onView={(t) => navigate(`/tickets/${t.id}`)}
