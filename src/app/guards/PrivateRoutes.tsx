@@ -80,6 +80,7 @@ export default function PrivateRoutes() {
   const canAdminCatalogs = puede(permisos, "catalogos.administrar");
   const canViewUsers = puede(permisos, "usuarios.ver");
   const canAdminRelojes = puede(permisos, "relojes.administrar");
+  const canAdminRoles = puede(permisos, "roles.administrar");
   const canManageTasks = puede(permisos, "tareas.completar");
   const isEmpleado = user?.role === "EMPLEADO";
 
@@ -303,14 +304,18 @@ export default function PrivateRoutes() {
         },
       ]
       : []),
-    // CONFIGURACIÓN (catalogos.administrar / usuarios.ver / relojes.administrar)
-    ...(canAdminCatalogs || canViewUsers || canAdminRelojes
+    // CONFIGURACIÓN (catalogos.administrar / usuarios.ver / relojes.administrar / roles.administrar)
+    ...(canAdminCatalogs || canViewUsers || canAdminRelojes || canAdminRoles
       ? [
         {
           id: "configuracion",
           label: "Configuración",
           icon: <FaCog size={14} />,
-          isActive: active("/catalogos") || active("/usuarios") || active("/relojes"),
+          isActive:
+            active("/catalogos") ||
+            active("/usuarios") ||
+            active("/relojes") ||
+            active("/roles"),
           subitems: [
             ...(canAdminCatalogs
               ? [
@@ -340,6 +345,17 @@ export default function PrivateRoutes() {
                   label: tt("nav.relojes"),
                   action: () => navigate("/relojes"),
                   isActive: active("/relojes"),
+                },
+              ]
+              : []),
+            // Matriz de roles y catálogo de permisos: solo ADMIN (roles.administrar).
+            ...(canAdminRoles
+              ? [
+                {
+                  id: "roles",
+                  label: tt("nav.roles"),
+                  action: () => navigate("/roles"),
+                  isActive: active("/roles"),
                 },
               ]
               : []),

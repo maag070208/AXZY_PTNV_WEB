@@ -40,6 +40,7 @@
     "notifications": "Notifications",
     "logout": "Sign out",
     "catalogs": "Catalogs",
+    "roles": "Roles and permissions",
     "hrReports": "HR Reports",
     "access": "Access control",
     "accessLog": "Access log",

@@ -25,6 +25,7 @@ import salidasEn from "./locales/en/salidas.json";
 import ticketsEn from "./locales/en/tickets.json";
 import usersEn from "./locales/en/users.json";
 import catalogEn from "./locales/en/catalog.json";
+import rolesEn from "./locales/en/roles.json";
 
 import accessEs from "./locales/es/access.json";
 import accessReportEs from "./locales/es/access-report.json";
@@ -50,6 +51,7 @@ import salidasEs from "./locales/es/salidas.json";
 import ticketsEs from "./locales/es/tickets.json";
 import usersEs from "./locales/es/users.json";
 import catalogEs from "./locales/es/catalog.json";
+import rolesEs from "./locales/es/roles.json";
 
 export const defaultNS = "common" as const;
 
@@ -72,6 +74,7 @@ export const NS_LIST = [
   "notifications",
   "audit",
   "catalog",
+  "roles",
   "actas",
   "access",
   "access-report",
@@ -101,6 +104,7 @@ export const resources = {
     notifications: notificationsEn,
     audit: auditEn,
     catalog: catalogEn,
+    roles: rolesEn,
     access: accessEn,
     "access-report": accessReportEn,
     checador: checadorEn,
@@ -127,6 +131,7 @@ export const resources = {
     notifications: notificationsEs,
     audit: auditEs,
     catalog: catalogEs,
+    roles: rolesEs,
     access: accessEs,
     "access-report": accessReportEs,
     checador: checadorEs,

@@ -1,0 +1,82 @@
+{
+  "title": "Roles and permissions",
+  "description": "Manage the role matrix and the system permission catalog (ADMIN only)",
+  "tabs": {
+    "matriz": "Matrix",
+    "catalogo": "Catalog"
+  },
+  "alcance": {
+    "NINGUNO": "None",
+    "PROPIO": "Own",
+    "AREA": "Area",
+    "TODO": "All"
+  },
+  "role": {
+    "ADMIN": "ADMIN",
+    "GERENTE": "MANAGER",
+    "JEFE_DE_AREA": "AREA LEAD",
+    "EMPLEADO": "EMPLOYEE",
+    "RECURSOS_HUMANOS": "HUMAN RESOURCES",
+    "GUARD": "GUARD"
+  },
+  "matrix": {
+    "title": "Role matrix",
+    "subtitle": "Set the scope of each permission per role. Inactive permissions cannot be granted.",
+    "permission": "Permission",
+    "sensitive": "Sensitive",
+    "inactive": "Inactive",
+    "inactiveWarning": "There are inactive permissions: their cells are disabled and cannot be changed.",
+    "changeCount": "{{count}} pending changes",
+    "changeCount_one": "{{count}} pending change",
+    "changeCount_other": "{{count}} pending changes",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Matrix saved successfully",
+    "saveError": "Could not save the matrix",
+    "discard": "Discard",
+    "empty": "There are no permissions in the catalog"
+  },
+  "catalog": {
+    "title": "Permission catalog",
+    "subtitle": "Create, edit and activate the system permissions. They are never deleted, only deactivated.",
+    "new": "New permission",
+    "createTitle": "New permission",
+    "editTitle": "Edit permission",
+    "sensible": "Sensitive",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "activated": "Permission activated",
+    "deactivated": "Permission deactivated",
+    "created": "Permission created successfully",
+    "updated": "Permission updated successfully",
+    "saveError": "Could not save the permission",
+    "saving": "Saving...",
+    "columns": {
+      "clave": "Key",
+      "modulo": "Module",
+      "nombre": "Name",
+      "alcances": "Scopes",
+      "sensible": "Sensitive",
+      "orden": "Order",
+      "activo": "Status"
+    },
+    "fields": {
+      "clave": "Key (module.action)",
+      "modulo": "Module",
+      "nombre": "Name",
+      "descripcion": "Description",
+      "alcances": "Allowed scopes",
+      "sensible": "Sensitive permission (ADMIN only)",
+      "orden": "Order"
+    },
+    "errors": {
+      "clave": "The key must use the module.action format (lowercase, digits and underscore)",
+      "modulo": "Module is required",
+      "nombre": "Name is required",
+      "alcances": "Select at least one scope",
+      "orden": "Order must be an integer greater than or equal to 0"
+    }
+  }
+}

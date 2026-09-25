@@ -50,6 +50,7 @@ import MisTareasPage from "@pages/tickets/MisTareasPage";
 import AdminTareasPage from "@pages/tickets/AdminTareasPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
 import CatalogPage from "@pages/catalog/CatalogPage";
+import RolesPage from "@pages/roles/RolesPage";
 
 export default function App() {
   return (
@@ -263,6 +264,14 @@ export default function App() {
           element={
             <RequierePermiso permiso="catalogos.administrar">
               <CatalogPage />
+            </RequierePermiso>
+          }
+        />
+        <Route
+          path="/roles"
+          element={
+            <RequierePermiso permiso="roles.administrar">
+              <RolesPage />
             </RequierePermiso>
           }
         />
