@@ -37,7 +37,9 @@ export default function PrivateRoutes() {
   }, []);
 
   useEffect(() => {
-    if (token && !user) {
+    // Rehidrata la sesión cuando falta el usuario o cuando viene de un storage
+    // viejo sin permisos (rollout de ROLES_Y_PERMISOS). No cambia el menú.
+    if (token && (!user || !user.permisos)) {
       dispatch(meThunk());
     }
     if (token) {

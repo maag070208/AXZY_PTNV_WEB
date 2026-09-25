@@ -3,12 +3,12 @@ import {
   tableRequest,
   type ITDataTableFetchParamsPost,
 } from "@shared/api/table";
-import type { AuthUser, LoginResponse, User, UserRole } from "../model/types";
+import type { AuthMe, LoginResponse, User, UserRole } from "../model/types";
 
 export const authApi = {
   login: (username: string, password: string) =>
     api.post<LoginResponse>(`/auth/login`, { username, password }),
-  me: () => api.get<AuthUser>(`/auth/me`),
+  me: () => api.get<AuthMe>(`/auth/me`),
 };
 
 export const usersApi = {

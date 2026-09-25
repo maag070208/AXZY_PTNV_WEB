@@ -4,7 +4,7 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import { authApi } from "../api/userApi";
-import type { AuthUser } from "../model/types";
+import type { AuthMe, AuthUser } from "../model/types";
 import i18n from "@shared/i18n";
 
 interface State {
@@ -92,7 +92,7 @@ const slice = createSlice({
         state.loading = false;
         state.error = action.error.message ?? i18n.t("auth:login.errorAuth");
       })
-      .addCase(meThunk.fulfilled, (state, action: PayloadAction<AuthUser>) => {
+      .addCase(meThunk.fulfilled, (state, action: PayloadAction<AuthMe>) => {
         state.user = action.payload;
         persist(state);
       });
