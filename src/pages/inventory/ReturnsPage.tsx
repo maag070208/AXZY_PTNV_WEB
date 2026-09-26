@@ -25,6 +25,7 @@ export default function ReturnsPage() {
       type: "string",
       key: "number",
       label: t("loanReturn.colNumber"),
+      width: 150,
       sortable: false,
       filter: true,
       render: (d: LoanReturn) => <ITText className="text-[11px] font-bold text-slate-800">{d.number}</ITText>,
@@ -33,6 +34,7 @@ export default function ReturnsPage() {
       type: "string",
       key: "loan",
       label: t("loanReturn.colLoan"),
+      width: 160,
       filter: true,
       render: (d: LoanReturn) => (
         <ITButton
@@ -52,6 +54,7 @@ export default function ReturnsPage() {
       type: "string",
       key: "assigned",
       label: t("loanReturn.colAssigned"),
+      width: 200,
       render: (d: LoanReturn) => (
         <ITText className="text-[11px] text-slate-600">
           {d.loan?.custodian?.name ?? d.loan?.department?.name ?? "—"}
@@ -62,6 +65,7 @@ export default function ReturnsPage() {
       type: "date",
       key: "date",
       label: t("loanReturn.colDate"),
+      width: 140,
       sortable: false,
       render: (d: LoanReturn) => <ITText className="text-[11px] text-slate-500 whitespace-nowrap">{formatDate(d.date)}</ITText>,
     },
@@ -69,6 +73,7 @@ export default function ReturnsPage() {
       type: "string",
       key: "item",
       label: t("loanReturn.colItem"),
+      width: 300,
       render: (d: LoanReturn) => (
         <ITFlex direction="column" gap={0.5} className="min-w-0">
           {d.items.map((x) => (
@@ -90,6 +95,7 @@ export default function ReturnsPage() {
       type: "string",
       key: "action",
       label: "",
+      width: 140,
       render: (d: LoanReturn) => (
         <ITButton variant="outlined" color="secondary" size="lg" onClick={() => navigate(`/inventory/loans/${d.loanId}`)}>
           <ITText className="font-bold text-[10px]">{t("common:actions.view")}</ITText>
@@ -120,6 +126,9 @@ export default function ReturnsPage() {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITPage>
   );

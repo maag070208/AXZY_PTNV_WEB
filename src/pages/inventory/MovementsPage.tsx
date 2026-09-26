@@ -156,6 +156,7 @@ export default function MovementsPage() {
       type: "date",
       key: "date",
       label: t("stockLedger.date"),
+      width: 160,
       sortable: false,
       render: (m: MovementRow) => <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">{formatDateTime(m.date)}</ITText>,
     },
@@ -163,6 +164,7 @@ export default function MovementsPage() {
       type: "string",
       key: "type",
       label: t("movements.colType"),
+      width: 160,
       sortable: false,
       filter: true,
       render: (m: MovementRow) => <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">{m.type}</ITBadget>,
@@ -171,6 +173,7 @@ export default function MovementsPage() {
       type: "string",
       key: "name",
       label: t("movements.colItem"),
+      width: 300,
       render: (m: MovementRow) => (
         <ITText className="text-[11px] text-slate-600 truncate">
           {m.name} {m.unit !== "—" && <b className="text-slate-800">· {m.unit}</b>}
@@ -181,18 +184,21 @@ export default function MovementsPage() {
       type: "string",
       key: "reason",
       label: t("movements.colComment"),
+      width: 300,
       render: (m: MovementRow) => <ITText className="text-[11px] text-slate-500">{m.reason || "—"}</ITText>,
     },
     {
       type: "string",
       key: "custodian",
       label: t("movements.colCustodian"),
+      width: 200,
       render: (m: MovementRow) => <ITText className="text-[11px] text-slate-600">{m.custodian?.name ?? m.user?.name ?? "—"}</ITText>,
     },
     {
       type: "string",
       key: "status",
       label: t("movements.colStatus"),
+      width: 130,
       render: (m: MovementRow) =>
         m.status === "CANCELLED" ? <ITBadget color="danger" size="lg">{t("movements.cancelled")}</ITBadget> : <ITBadget color="success" size="lg">{t("movements.activeLabel")}</ITBadget>,
     },
@@ -262,6 +268,9 @@ export default function MovementsPage() {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITPage>
   );

@@ -71,16 +71,18 @@ export default function DeviceTypesPage() {
       type: "string",
       key: "name",
       label: t("types.name"),
+      width: 300,
       filter: true,
       sortable: false,
       render: (tp: DeviceType) => <ITText className="text-[11px] font-bold text-slate-800">{tp.name}</ITText>,
     },
-    { type: "string", key: "code", label: t("types.code"), sortable: false, render: (tp: DeviceType) => <ITText className="text-[11px] text-slate-500">{tp.code}</ITText> },
-    { type: "string", key: "assetTagPrefix", label: t("types.prefix"), sortable: false, render: (tp: DeviceType) => <ITBadget color="gray" size="lg">{tp.assetTagPrefix}</ITBadget> },
+    { type: "string", key: "code", label: t("types.code"), width: 110, sortable: false, render: (tp: DeviceType) => <ITText className="text-[11px] text-slate-500">{tp.code}</ITText> },
+    { type: "string", key: "assetTagPrefix", label: t("types.prefix"), width: 130, sortable: false, render: (tp: DeviceType) => <ITBadget color="gray" size="lg">{tp.assetTagPrefix}</ITBadget> },
     {
       type: "boolean",
       key: "active",
       label: t("types.status"),
+      width: 140,
       sortable: false,
       render: (tp: DeviceType) => (tp.active ? <ITBadget color="success" size="lg">{t("types.active")}</ITBadget> : <ITBadget color="danger" size="lg">{t("types.inactive")}</ITBadget>),
     },
@@ -88,6 +90,7 @@ export default function DeviceTypesPage() {
       type: "string",
       key: "action",
       label: "",
+      width: 100,
       render: (tp: DeviceType) => (
         <ITButton variant="outlined" color="primary" size="lg" onClick={() => openEdit(tp)}>
           <FaEdit size={12} />
@@ -176,6 +179,9 @@ export default function DeviceTypesPage() {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITPage>
   );

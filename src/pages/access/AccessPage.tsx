@@ -285,6 +285,7 @@ export default function AccessPage() {
       key: "occurredAt",
       label: tt("columns.occurredAt"),
       type: "date",
+      width: 160,
       sortable: false,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -296,6 +297,7 @@ export default function AccessPage() {
       key: "employeeNameSnapshot",
       label: tt("columns.employee"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (e) => (
         <ITFlex direction="column" gap={0.5}>
@@ -312,6 +314,7 @@ export default function AccessPage() {
       key: "type",
       label: tt("columns.type"),
       type: "catalog",
+      width: 130,
       sortable: false,
       filter: "catalog",
       catalogOptions: { data: typeOptions, loading: false, error: false },
@@ -325,6 +328,7 @@ export default function AccessPage() {
       key: "siteId",
       label: tt("columns.site"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
       catalogOptions: {
         data: sites.map((s) => ({ id: s.id, name: s.name })),
@@ -341,6 +345,7 @@ export default function AccessPage() {
       key: "guard.name",
       label: tt("columns.guard"),
       type: "string",
+      width: 200,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {e.guard?.name ?? "—"}
@@ -351,6 +356,7 @@ export default function AccessPage() {
       key: "actions",
       label: tt("columns.actions"),
       type: "actions",
+      width: 100,
       actions: (e) => (
         <ITFlex align="center" gap={1}>
           <ITButton
@@ -508,6 +514,9 @@ export default function AccessPage() {
         itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       <ITDialog

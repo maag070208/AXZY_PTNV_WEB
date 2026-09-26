@@ -37,6 +37,7 @@ export default function LoansPage() {
       type: "string",
       key: "number",
       label: t("loans.colNumber"),
+      width: 150,
       sortable: false,
       filter: true,
       render: (p: Loan) => <ITText className="text-[11px] font-bold text-slate-800">{p.number}</ITText>,
@@ -45,6 +46,7 @@ export default function LoansPage() {
       type: "string",
       key: "custodian",
       label: t("loans.colCustodian"),
+      width: 240,
       filter: true,
       render: (p: Loan) => (
         <ITFlex direction="column" gap={0.5} className="min-w-0">
@@ -70,6 +72,7 @@ export default function LoansPage() {
       type: "date",
       key: "date",
       label: t("loans.colDate"),
+      width: 140,
       sortable: false,
       render: (p: Loan) => <ITText className="text-[11px] text-slate-500">{formatDate(p.date)}</ITText>,
     },
@@ -77,6 +80,7 @@ export default function LoansPage() {
       type: "string",
       key: "item",
       label: t("loans.colItem"),
+      width: 300,
       render: (p: Loan) => (
         <ITFlex direction="column" gap={0.5} className="min-w-0">
           {p.items.map((d) => {
@@ -96,12 +100,14 @@ export default function LoansPage() {
       type: "string",
       key: "status",
       label: t("loans.colStatus"),
+      width: 130,
       render: (p: Loan) => <ITBadget color={STATUS_COLOR[p.status]} size="lg">{p.status}</ITBadget>,
     },
     {
       type: "string",
       key: "action",
       label: "",
+      width: 160,
       render: (p: Loan) => (
         <ITFlex gap={1.5}>
           <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/loans/${p.id}`)}>
@@ -137,6 +143,9 @@ export default function LoansPage() {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITPage>
   );

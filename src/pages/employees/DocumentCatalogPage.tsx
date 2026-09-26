@@ -93,6 +93,7 @@ export default function DocumentCatalogPage() {
       type: "string",
       key: "name",
       label: tt("catalog.name"),
+      width: 300,
       filter: true,
       sortable: false,
       render: (type: DocumentType) => <ITText className="text-[11px] font-bold text-slate-800">{type.name}</ITText>,
@@ -101,6 +102,7 @@ export default function DocumentCatalogPage() {
       type: "boolean",
       key: "active",
       label: tt("catalog.status"),
+      width: 140,
       sortable: false,
       render: (type: DocumentType) =>
         type.active ? (
@@ -113,6 +115,7 @@ export default function DocumentCatalogPage() {
       type: "string",
       key: "action",
       label: "",
+      width: 140,
       render: (type: DocumentType) => (
         <ITFlex align="center" gap={2}>
           <ITButton variant="outlined" color="primary" size="lg" onClick={() => openEdit(type)}>
@@ -206,6 +209,9 @@ export default function DocumentCatalogPage() {
         defaultItemsPerPage={20}
         itemsPerPageOptions={[10, 20, 50]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       <ITConfirmDialog

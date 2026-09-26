@@ -26,6 +26,7 @@ export default function DevicesPage() {
       type: "string",
       key: "name",
       label: t("devices.colName"),
+      width: 300,
       sortable: false,
       filter: true,
       render: (d: Device) => (
@@ -39,6 +40,7 @@ export default function DevicesPage() {
       type: "string",
       key: "typeId",
       label: t("devices.colType"),
+      width: 160,
       filter: "catalog" as const,
       catalogOptions: {
         data: activeTypes,
@@ -51,6 +53,7 @@ export default function DevicesPage() {
       type: "number",
       key: "available",
       label: t("devices.colAvail"),
+      width: 110,
       sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-emerald-600">{d.stock?.AVAILABLE ?? 0}</ITText>,
     },
@@ -58,6 +61,7 @@ export default function DevicesPage() {
       type: "number",
       key: "loaned",
       label: t("devices.colLoaned"),
+      width: 110,
       sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-amber-600">{d.stock?.ON_LOAN ?? 0}</ITText>,
     },
@@ -65,6 +69,7 @@ export default function DevicesPage() {
       type: "number",
       key: "retirement",
       label: t("devices.colRetirement"),
+      width: 110,
       sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-red-500">{d.stock?.RETIRED ?? 0}</ITText>,
     },
@@ -72,6 +77,7 @@ export default function DevicesPage() {
       type: "number",
       key: "total",
       label: t("devices.colTotal"),
+      width: 110,
       sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-black text-slate-800">{d.stock?.total ?? 0}</ITText>,
     },
@@ -79,6 +85,7 @@ export default function DevicesPage() {
       type: "string",
       key: "action",
       label: "",
+      width: 140,
       render: (d: Device) => (
         <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/devices/${d.id}`)}>
           <ITText className="font-bold text-[10px]">{t("common:actions.view")}</ITText>
@@ -109,6 +116,9 @@ export default function DevicesPage() {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITPage>
   );
