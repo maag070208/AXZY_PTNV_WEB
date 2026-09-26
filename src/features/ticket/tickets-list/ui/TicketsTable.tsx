@@ -146,6 +146,7 @@ export default function TicketsTable({
       key: "actions",
       label: "",
       type: "string",
+      width: 120,
       render: (t) => (
         <ITFlex gap={1}>
           <ITButton

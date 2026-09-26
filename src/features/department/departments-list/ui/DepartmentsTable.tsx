@@ -39,6 +39,7 @@ export default function DepartmentsTable({
       type: "string",
       key: "name",
       label: tt("list.colDepartment"),
+      width: 240,
       sortable: false,
       filter: true,
       render: (d: Department) => (
@@ -58,6 +59,7 @@ export default function DepartmentsTable({
       type: "string",
       key: "subareas",
       label: tt("list.colAreas"),
+      width: 200,
       render: (d: Department) =>
         d.subareas.length === 0 ? (
           <ITText className="text-[10px] font-bold text-slate-400 uppercase">
@@ -77,6 +79,7 @@ export default function DepartmentsTable({
       type: "number",
       key: "count",
       label: tt("list.colUsers"),
+      width: 100,
       render: (d: Department) => (
         <ITText className="text-[11px] font-black text-slate-600">
           {d._count?.users ?? 0}
@@ -87,6 +90,7 @@ export default function DepartmentsTable({
       type: "actions" as const,
       key: "actions",
       label: "",
+      width: 140,
       align: "right" as const,
       render: (d: Department) => (
         <ITFlex gap={1}>
@@ -138,6 +142,10 @@ export default function DepartmentsTable({
       defaultItemsPerPage={10}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
+      onRowClick={(row) => onView(row as unknown as Department)}
     />
   );
 }

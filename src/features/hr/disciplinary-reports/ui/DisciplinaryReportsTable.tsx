@@ -47,6 +47,7 @@ export default function DisciplinaryReportsTable({
       key: "incidentDate",
       label: tt("table.date"),
       type: "string",
+      width: 140,
       filter: true,
       sortable: false,
       render: (a) => (
@@ -57,6 +58,7 @@ export default function DisciplinaryReportsTable({
       key: "reason",
       label: tt("table.reason"),
       type: "string",
+      width: 140,
       filter: true,
       sortable: false,
       render: (a) => (
@@ -69,6 +71,7 @@ export default function DisciplinaryReportsTable({
       key: "user",
       label: tt("table.employee"),
       type: "string",
+      width: 220,
       filter: true,
       sortable: false,
       render: (a) => (
@@ -84,6 +87,7 @@ export default function DisciplinaryReportsTable({
       key: "jobTitle",
       label: tt("table.jobTitle"),
       type: "string",
+      width: 220,
       filter: false,
       sortable: false,
       render: (a) => (
@@ -96,6 +100,7 @@ export default function DisciplinaryReportsTable({
       key: "description",
       label: tt("table.description"),
       type: "string",
+      width: 300,
       filter: false,
       sortable: false,
       render: (a) => (
@@ -108,6 +113,7 @@ export default function DisciplinaryReportsTable({
       key: "sanction",
       label: tt("table.sanction"),
       type: "string",
+      width: 200,
       filter: false,
       sortable: false,
       render: (a) => (
@@ -120,6 +126,7 @@ export default function DisciplinaryReportsTable({
       key: "createdBy",
       label: tt("table.createdBy"),
       type: "string",
+      width: 200,
       filter: false,
       sortable: false,
       render: (a) => (
@@ -130,6 +137,7 @@ export default function DisciplinaryReportsTable({
       key: "actions",
       label: "",
       type: "string" as const,
+      width: 120,
       sortable: false,
       render: (a: DisciplinaryReport) => (
         <ITFlex align="center" gap={2}>
@@ -166,6 +174,10 @@ export default function DisciplinaryReportsTable({
       defaultItemsPerPage={10}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
+      onRowClick={(row) => onView(row as unknown as DisciplinaryReport)}
     />
   );
 }

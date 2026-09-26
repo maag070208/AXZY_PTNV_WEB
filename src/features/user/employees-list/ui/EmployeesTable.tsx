@@ -68,6 +68,7 @@ export default function EmployeesTable({
       key: "employeeNumber",
       label: tt("table.employeeNoFull"),
       type: "string",
+      width: 110,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -80,6 +81,7 @@ export default function EmployeesTable({
       key: "name",
       label: tt("table.name"),
       type: "string",
+      width: 300,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -100,6 +102,7 @@ export default function EmployeesTable({
       key: "role",
       label: tt("table.role"),
       type: "string",
+      width: 140,
       filter: false,
       sortable: false,
       render: (u) => roleBadge(u.role, roleLabel(u.role)),
@@ -108,6 +111,7 @@ export default function EmployeesTable({
       key: "active",
       label: tt("table.status"),
       type: "boolean" as const,
+      width: 140,
       filter: "catalog",
       catalogOptions: {
         data: [
@@ -127,6 +131,7 @@ export default function EmployeesTable({
       key: "jobTitle",
       label: tt("table.position"),
       type: "string",
+      width: 220,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -137,6 +142,7 @@ export default function EmployeesTable({
       key: "department",
       label: tt("table.departmentFull"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
       catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
@@ -149,6 +155,7 @@ export default function EmployeesTable({
       key: "subarea",
       label: tt("table.subarea"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
       catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
@@ -161,6 +168,7 @@ export default function EmployeesTable({
       key: "actions",
       label: "",
       type: "string" as const,
+      width: 120,
       sortable: false,
       render: (u: PersonalProfile) => (
         <ITFlex align="center" gap={2}>
@@ -199,6 +207,10 @@ export default function EmployeesTable({
       defaultItemsPerPage={10}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
+      onRowClick={(row) => onView(row as unknown as PersonalProfile)}
     />
   );
 }
