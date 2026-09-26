@@ -30,13 +30,25 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
+  /** Opciones del filtro Empleado/Responsable (`userId`). */
+  userOptions: Array<{ id: string; name: string }>;
   onView: (disciplinaryReport: DisciplinaryReport) => void;
   onDelete: (disciplinaryReport: DisciplinaryReport) => void;
 }
 
+const REASONS = [
+  "ABSENCE",
+  "TARDINESS",
+  "INTOXICATION",
+  "MISCONDUCT",
+  "NONCOMPLIANCE",
+  "OTHER",
+] as const;
+
 export default function DisciplinaryReportsTable({
   fetchData,
   reloadKey,
+  userOptions,
   onView,
   onDelete,
 }: Props) {
@@ -57,10 +69,15 @@ export default function DisciplinaryReportsTable({
     {
       key: "reason",
       label: tt("table.reason"),
-      type: "string",
+      type: "catalog",
       width: 140,
-      filter: true,
+      filter: "catalog",
       sortable: false,
+      catalogOptions: {
+        data: REASONS.map((id) => ({ id, name: tt(`reasons.${id}`) })),
+        loading: false,
+        error: false,
+      },
       render: (a) => (
         <ITBadget color={REASON_COLOR[a.reason] ?? "secondary"} size="lg">
           {tt(`reasons.${a.reason}`)}
@@ -68,12 +85,13 @@ export default function DisciplinaryReportsTable({
       ),
     },
     {
-      key: "user",
+      key: "userId",
       label: tt("table.employee"),
-      type: "string",
+      type: "catalog",
       width: 220,
-      filter: true,
+      filter: "catalog",
       sortable: false,
+      catalogOptions: { data: userOptions, loading: false, error: false },
       render: (a) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{a.user.name}</ITText>

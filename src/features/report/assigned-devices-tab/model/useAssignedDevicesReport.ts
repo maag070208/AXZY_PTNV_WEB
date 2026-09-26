@@ -93,14 +93,19 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     setError(null);
     try {
       const { filters, sort } = lastQuery.current;
-      const res = await reportsApi.assignedExport({ page: 1, limit: 100, filters, sort });
+      // El rango manda desde el `externalFilters` VIGENTE: se descarta el
+      // `start`/`end` de la última consulta (podía estar desfasado) y se fusiona
+      // el actual, para que el PDF coincida con el rango que se ve.
+      const { start: _start, end: _end, ...rest } = filters;
+      const exportFilters = { ...rest, ...externalFilters };
+      const res = await reportsApi.assignedExport({ page: 1, limit: 100, filters: exportFilters, sort });
       await download({
         data: res.data,
         stats: res.stats,
         truncated: res.truncated,
         meta: {
           generatedAt: new Date().toISOString(),
-          appliedFilters: appliedFilters(filters, FILTER_LABELS, dyn(t)),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t)),
         },
       });
     } catch (e) {
@@ -108,7 +113,7 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [download, t]);
+  }, [download, t, externalFilters]);
 
   return {
     t,

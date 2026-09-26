@@ -25,6 +25,7 @@
     "loadError": "No se pudo cargar la lista de tickets",
     "columns": {
       "title": "Título",
+      "category": "Categoría",
       "status": "Estado",
       "priority": "Prioridad",
       "createdBy": "Creado por",

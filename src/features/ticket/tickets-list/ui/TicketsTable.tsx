@@ -28,6 +28,10 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
+  /** Opciones del filtro Categoría (`categoryId`). */
+  categoryOptions: Array<{ id: string; name: string }>;
+  /** Opciones de los filtros Creador/Responsable (`createdById` / `assignedToId`). */
+  userOptions: Array<{ id: string; name: string }>;
   onView: (t: Ticket) => void;
   onMarkForDelete: (t: Ticket) => void;
 }
@@ -36,6 +40,8 @@ export default function TicketsTable({
   canDelete,
   fetchData,
   reloadKey,
+  categoryOptions,
+  userOptions,
   onView,
   onMarkForDelete,
 }: Props) {
@@ -60,6 +66,19 @@ export default function TicketsTable({
             {t.category?.name ?? "—"}
           </ITText>
         </ITFlex>
+      ),
+    },
+    {
+      key: "categoryId",
+      label: tt("list.columns.category"),
+      type: "catalog",
+      width: 140,
+      filter: "catalog",
+      catalogOptions: { data: categoryOptions, loading: false, error: false },
+      render: (t) => (
+        <ITText className="text-[11px] font-bold text-slate-600">
+          {t.category?.name ?? "—"}
+        </ITText>
       ),
     },
     {
@@ -121,10 +140,12 @@ export default function TicketsTable({
       },
     },
     {
-      key: "createdBy",
+      key: "createdById",
       label: tt("list.columns.createdBy"),
       width: 100,
-      type: "string",
+      type: "catalog",
+      filter: "catalog",
+      catalogOptions: { data: userOptions, loading: false, error: false },
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {t.createdBy?.name ?? "—"}
@@ -132,10 +153,12 @@ export default function TicketsTable({
       ),
     },
     {
-      key: "assignedTo",
+      key: "assignedToId",
       label: tt("list.columns.assignedTo"),
       width: 100,
-      type: "string",
+      type: "catalog",
+      filter: "catalog",
+      catalogOptions: { data: userOptions, loading: false, error: false },
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {t.assignedTo?.name ?? tt("list.unassigned")}

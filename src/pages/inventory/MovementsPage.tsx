@@ -39,6 +39,9 @@ const ACTION_VISUAL: Record<MovementType, { icon: ReactNode; color: ActionColor 
 };
 const ACTION_DEFAULT: ActionColor = "warning";
 
+/** Tipos de movimiento, para el filtro tipo catálogo. */
+const MOVEMENT_TYPES = Object.keys(ACTION_VISUAL) as MovementType[];
+
 interface MovementRow {
   id: string;
   movementId: string;
@@ -161,12 +164,17 @@ export default function MovementsPage() {
       render: (m: MovementRow) => <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">{formatDateTime(m.date)}</ITText>,
     },
     {
-      type: "string",
+      type: "catalog",
       key: "type",
       label: t("movements.colType"),
       width: 160,
       sortable: false,
-      filter: true,
+      filter: "catalog",
+      catalogOptions: {
+        data: MOVEMENT_TYPES.map((id) => ({ id, name: id })),
+        loading: false,
+        error: false,
+      },
       render: (m: MovementRow) => <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">{m.type}</ITBadget>,
     },
     {

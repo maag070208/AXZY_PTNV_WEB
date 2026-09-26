@@ -25,6 +25,7 @@
     "loadError": "Could not load the ticket list",
     "columns": {
       "title": "Title",
+      "category": "Category",
       "status": "Status",
       "priority": "Priority",
       "createdBy": "Created by",

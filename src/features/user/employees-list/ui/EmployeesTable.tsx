@@ -63,6 +63,12 @@ export default function EmployeesTable({
       d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` }))
     );
 
+  // Roles que admite el API para el personal (PERSONAL_ROLES).
+  const roleOptions = (["MANAGER", "AREA_HEAD", "EMPLOYEE"] as const).map((id) => ({
+    id,
+    name: roleLabel(id),
+  }));
+
   const columns: Column<PersonalProfile>[] = [
     {
       key: "employeeNumber",
@@ -100,10 +106,11 @@ export default function EmployeesTable({
     {
       key: "role",
       label: tt("table.role"),
-      type: "string",
+      type: "catalog",
       width: 140,
-      filter: false,
+      filter: "catalog",
       sortable: false,
+      catalogOptions: { data: roleOptions, loading: false, error: false },
       render: (u) => roleBadge(u.role, roleLabel(u.role)),
     },
     {
@@ -138,7 +145,7 @@ export default function EmployeesTable({
       ),
     },
     {
-      key: "department",
+      key: "departmentId",
       label: tt("table.departmentFull"),
       type: "catalog",
       width: 200,
@@ -151,7 +158,7 @@ export default function EmployeesTable({
       ),
     },
     {
-      key: "subarea",
+      key: "subareaId",
       label: tt("table.subarea"),
       type: "catalog",
       width: 200,

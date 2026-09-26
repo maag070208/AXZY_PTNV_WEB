@@ -1,11 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { usersApi, type User } from "@entities/user";
+import { departmentsApi, type Department } from "@entities/department";
 import { i18n } from "@shared/i18n";
 
 export const useUsersList = () => {
   const { t: tt } = useTranslation("users");
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [total, setTotal] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
   const [userToToggle, setUserToToggle] = useState<User | null>(null);
@@ -17,6 +19,11 @@ export const useUsersList = () => {
     message: string;
     type: "error" | "success";
   } | null>(null);
+
+  // Departamentos y subáreas para los filtros tipo catálogo (Depto / Subárea).
+  useEffect(() => {
+    departmentsApi.list(true).then(setDepartments).catch(() => setDepartments([]));
+  }, []);
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
     const res = await usersApi.table({
@@ -112,6 +119,7 @@ export const useUsersList = () => {
   };
 
   return {
+    departments,
     total,
     reloadKey,
     userToToggle,

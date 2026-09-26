@@ -82,15 +82,19 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
     try {
-      const res = await materialOutputsApi.list(lastFilters);
+      // El rango manda desde el `externalFilters` VIGENTE: se descarta el
+      // `start`/`end` de la última consulta (podía estar desfasado) y se fusiona
+      // el actual, para que el PDF coincida con el rango que se ve.
+      const { start: _start, end: _end, ...rest } = lastFilters as unknown as Record<
+        string,
+        string | number | boolean
+      >;
+      const exportFilters = { ...rest, ...externalFilters };
+      const res = await materialOutputsApi.list(exportFilters as MaterialOutputFilters);
       await download({
         data: res.data,
         meta: {
-          appliedFilters: appliedFilters(
-            lastFilters as unknown as Record<string, string | number | boolean>,
-            FILTER_LABELS,
-            dyn(t)
-          ),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t)),
         },
       });
     } catch (e) {
@@ -98,7 +102,7 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [download, lastFilters, t]);
+  }, [download, lastFilters, t, externalFilters]);
 
   return {
     t,

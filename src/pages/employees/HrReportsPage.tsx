@@ -51,6 +51,10 @@ export default function HrReportsPage() {
       <DisciplinaryReportsTable
         fetchData={fx.fetchTableData}
         reloadKey={fx.reloadKey}
+        userOptions={fx.employees.map((u) => ({
+          id: u.id,
+          name: u.employeeNumber ? `${u.name} #${u.employeeNumber}` : u.name,
+        }))}
         onView={(disciplinaryReport) => navigate(`/employees/disciplinary-reports/${disciplinaryReport.id}`)}
         onDelete={(disciplinaryReport) => setDisciplinaryReportToDelete(disciplinaryReport)}
       />

@@ -8,19 +8,9 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaExclamationTriangle, FaFilePdf, FaSync, FaUndo } from "react-icons/fa";
-import { useMemo } from "react";
 import type { Column } from "@axzydev/axzy_ui_system";
-import type { DeviceReportRow, DeviceReportStatus } from "@entities/report";
+import type { DeviceReportRow } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
-
-/** Estados del catálogo, en el vocabulario que ve el usuario. */
-const STATUS_OPTIONS: DeviceReportStatus[] = [
-  "AVAILABLE",
-  "ASSIGNED",
-  "DAMAGED",
-  "IN_MAINTENANCE",
-  "RETIRED",
-];
 
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const {

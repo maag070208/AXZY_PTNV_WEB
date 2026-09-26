@@ -43,6 +43,15 @@ const roleBadge = (role: string) => (
 
 export default function UsersTable({ fx, onView, onEdit }: Props) {
   const { t: tt } = useTranslation(["users", "common"]);
+
+  const departmentOptions = fx.departments
+    .filter((d) => d.active)
+    .map((d) => ({ id: d.id, name: d.name }));
+
+  const subareaOptions = fx.departments
+    .filter((d) => d.active)
+    .flatMap((d) => d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` })));
+
   const columns: Column<User>[] = [
     {
       key: "username",
@@ -102,7 +111,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       type: "catalog",
       width: 200,
       filter: "catalog",
-      catalogOptions: { data: [], loading: false, error: false },
+      catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] uppercase text-slate-500">
           {(u as any).department?.name ?? "—"}
@@ -110,12 +119,12 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       ),
     },
     {
-      key: "subarea",
+      key: "subareaId",
       label: tt("table.subarea"),
       type: "catalog",
       width: 200,
       filter: "catalog",
-      catalogOptions: { data: [], loading: false, error: false },
+      catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] uppercase text-slate-500">
           {(u as any).subarea?.name ?? "—"}

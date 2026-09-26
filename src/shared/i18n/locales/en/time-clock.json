@@ -196,6 +196,8 @@
       "retirement": "Remove",
       "edit": "Edit",
       "update": "Read again",
+      "details": "View details",
+      "back": "Back to clocks",
       "cancel": "Cancel",
       "confirmRegistration": "Add",
       "connecting": "Connecting…",
