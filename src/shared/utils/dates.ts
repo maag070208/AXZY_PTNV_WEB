@@ -1,5 +1,5 @@
 /** Formatea una fecha ISO a `DD/MM/AAAA`. */
-export const formatFecha = (iso: string): string => {
+export const formatDate = (iso: string): string => {
   if (!iso) return "";
   const d = new Date(iso);
   const dd = String(d.getDate()).padStart(2, "0");
@@ -9,7 +9,7 @@ export const formatFecha = (iso: string): string => {
 };
 
 /** Formatea una fecha ISO a `DD/MM/AAAA HH:mm`. */
-export const formatFechaHora = (iso: string): string => {
+export const formatDateTime = (iso: string): string => {
   if (!iso) return "";
   const d = new Date(iso);
   const dd = String(d.getDate()).padStart(2, "0");

@@ -16,9 +16,9 @@ import { dyn } from "@shared/i18n/dyn";
 import {
   STATUS_BADGE,
   PRIORITY_BADGE,
-  RATING_ESPERA_COLOR,
-  diasEnEspera,
-  ratingEspera,
+  WAIT_RATING_COLOR,
+  daysOnHold,
+  waitRating,
   type Ticket,
 } from "@entities/ticket";
 
@@ -28,6 +28,10 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
+  /** Opciones del filtro Categoría (`categoryId`). */
+  categoryOptions: Array<{ id: string; name: string }>;
+  /** Opciones de los filtros Creador/Responsable (`createdById` / `assignedToId`). */
+  userOptions: Array<{ id: string; name: string }>;
   onView: (t: Ticket) => void;
   onMarkForDelete: (t: Ticket) => void;
 }
@@ -36,6 +40,8 @@ export default function TicketsTable({
   canDelete,
   fetchData,
   reloadKey,
+  categoryOptions,
+  userOptions,
   onView,
   onMarkForDelete,
 }: Props) {
@@ -43,28 +49,43 @@ export default function TicketsTable({
 
   const columns: Column<Ticket>[] = [
     {
-      key: "titulo",
+      key: "title",
       label: tt("list.columns.title"),
       type: "string",
+      width: 300,
       filter: true,
       render: (t) => (
         <ITFlex direction="column" gap={0.5}>
           <ITFlex align="center" gap={1}>
-            <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
+            <ITText className="text-[12px] font-black text-slate-800">{t.title}</ITText>
             {t.deletedAt && (
               <ITBadget color="gray" size="lg">{tt("list.deleted")}</ITBadget>
             )}
           </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
-            {t.category?.nombre ?? "—"}
+            {t.category?.name ?? "—"}
           </ITText>
         </ITFlex>
+      ),
+    },
+    {
+      key: "categoryId",
+      label: tt("list.columns.category"),
+      type: "catalog",
+      width: 140,
+      filter: "catalog",
+      catalogOptions: { data: categoryOptions, loading: false, error: false },
+      render: (t) => (
+        <ITText className="text-[11px] font-bold text-slate-600">
+          {t.category?.name ?? "—"}
+        </ITText>
       ),
     },
     {
       key: "status",
       label: tt("list.columns.status"),
       type: "catalog",
+      width: 100,
       filter: "catalog",
       catalogOptions: {
         data: Object.keys(STATUS_BADGE).map((id) => ({
@@ -84,6 +105,7 @@ export default function TicketsTable({
       key: "priority",
       label: tt("list.columns.priority"),
       type: "catalog",
+      width: 80,
       filter: "catalog",
       catalogOptions: {
         data: Object.keys(PRIORITY_BADGE).map((id) => ({
@@ -100,46 +122,54 @@ export default function TicketsTable({
       ),
     },
     {
-      key: "espera",
-      label: tt("list.columns.espera"),
+      key: "wait",
+      label: tt("list.columns.wait"),
       type: "number",
+      width: 100,
       render: (t) => {
-        const dias = diasEnEspera(t.creadoEn, t.closedAt);
-        const rating = ratingEspera(dias);
+        const days = daysOnHold(t.createdAt, t.closedAt);
+        const rating = waitRating(days);
         return (
           <ITFlex align="center" gap={1}>
-            <ITText className="text-[11px] font-bold text-slate-700">{dias} d</ITText>
-            <ITBadget size="lg" color={RATING_ESPERA_COLOR[rating] as any}>
-              {dyn(tt)(`list.esperaLabels.${rating}`)}
+            <ITText className="text-[11px] font-bold text-slate-700">{days} d</ITText>
+            <ITBadget size="lg" color={WAIT_RATING_COLOR[rating] as any}>
+              {dyn(tt)(`list.waitLabels.${rating}`)}
             </ITBadget>
           </ITFlex>
         );
       },
     },
     {
-      key: "creadoPor",
+      key: "createdById",
       label: tt("list.columns.createdBy"),
-      type: "string",
+      width: 100,
+      type: "catalog",
+      filter: "catalog",
+      catalogOptions: { data: userOptions, loading: false, error: false },
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
-          {t.creadoPor?.name ?? "—"}
+          {t.createdBy?.name ?? "—"}
         </ITText>
       ),
     },
     {
-      key: "asignadoA",
+      key: "assignedToId",
       label: tt("list.columns.assignedTo"),
-      type: "string",
+      width: 100,
+      type: "catalog",
+      filter: "catalog",
+      catalogOptions: { data: userOptions, loading: false, error: false },
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
-          {t.asignadoA?.name ?? tt("list.unassigned")}
+          {t.assignedTo?.name ?? tt("list.unassigned")}
         </ITText>
       ),
     },
     {
-      key: "acciones",
+      key: "actions",
       label: "",
       type: "string",
+      width: 120,
       render: (t) => (
         <ITFlex gap={1}>
           <ITButton
@@ -175,11 +205,14 @@ export default function TicketsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={5}
-      itemsPerPageOptions={[5, 10, 50]}
+      defaultItemsPerPage={100}
+      itemsPerPageOptions={[50, 100, 150]}
       debounceMs={350}
       variant="bordered"
-      size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
+      onRowClick={(row)=> onView(row as unknown as Ticket)}
     />
   );
 }

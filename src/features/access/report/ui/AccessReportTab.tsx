@@ -36,6 +36,7 @@ import {
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import type { UseAccessReport } from "../model/useAccessReport";
+import { dateLocale } from "@shared/i18n";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -129,14 +130,15 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "employeeName",
       label: t("columns.employee"),
       type: "string",
+      width: 300,
       sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
+            {r.employeeNumber ? `#${r.employeeNumber}` : "—"}
             {!r.active && ` · ${t("status.inactive")}`}
-            {r.vinculado === false && ` · ${t("unlinked")}`}
+            {r.linked === false && ` · ${t("unlinked")}`}
           </ITText>
         </ITFlex>
       ),
@@ -145,6 +147,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "departmentName",
       label: t("columns.department"),
       type: "string",
+      width: 200,
       sortable: true,
       render: (r) =>
         r.departmentName ? (
@@ -156,18 +159,20 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         ),
     },
     {
-      key: "puesto",
-      label: t("columns.puesto"),
+      key: "jobTitle",
+      label: t("columns.jobTitle"),
       type: "string",
+      width: 200,
       sortable: true,
       render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-700">{r.puesto ?? "—"}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-700">{r.jobTitle ?? "—"}</ITText>
       ),
     },
     {
       key: "date",
       label: t("columns.date"),
       type: "string",
+      width: 130,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -179,6 +184,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "entryAt",
       label: t("columns.entry"),
       type: "string",
+      width: 150,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-emerald-700 whitespace-nowrap">
@@ -190,6 +196,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "exitAt",
       label: t("columns.exit"),
       type: "string",
+      width: 150,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -201,6 +208,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "workedMinutes",
       label: t("columns.hours"),
       type: "number",
+      width: 100,
       sortable: true,
       render: (r) => (
         <ITText className="text-[12px] font-black text-emerald-700">
@@ -212,6 +220,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "incident",
       label: t("columns.incident"),
       type: "string",
+      width: 160,
       sortable: false,
       render: (r) => renderIncident(r.incident),
     },
@@ -267,15 +276,15 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const rangeLabel = useMemo(() => {
     if (period === "WEEK") {
       const [s, en] = periodRange;
-      return `${t("periods.WEEK")} · ${s.toLocaleDateString("es-MX", { day: "2-digit", month: "short" })} — ${en.toLocaleDateString("es-MX", { day: "2-digit", month: "short" })}`;
+      return `${t("periods.WEEK")} · ${s.toLocaleDateString(dateLocale(), { day: "2-digit", month: "short" })} — ${en.toLocaleDateString(dateLocale(), { day: "2-digit", month: "short" })}`;
     }
     if (period === "MONTH") {
-      return (date ?? new Date()).toLocaleDateString("es-MX", {
+      return (date ?? new Date()).toLocaleDateString(dateLocale(), {
         month: "long",
         year: "numeric",
       });
     }
-    return (date ?? new Date()).toLocaleDateString("es-MX", {
+    return (date ?? new Date()).toLocaleDateString(dateLocale(), {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -486,10 +495,13 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           ) => Promise<{ data: Record<string, unknown>[]; total: number }>
         }
         externalFilters={externalFilters}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITFlex>
   );

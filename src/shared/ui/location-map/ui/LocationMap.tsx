@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaExternalLinkAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { i18n } from "@shared/i18n";
 
 const API_KEY = (import.meta.env as Record<string, string | undefined>)
   .VITE_GOOGLE_MAPS_API_KEY;
@@ -47,7 +48,7 @@ export default function LocationMap({
   longitude,
   height = 220,
   caption,
-  linkLabel = "Ver en el mapa",
+  linkLabel = i18n.t("common:map.view"),
 }: LocationMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [useFallback, setUseFallback] = useState(!API_KEY);
@@ -100,7 +101,7 @@ export default function LocationMap({
       >
         {useFallback ? (
           <iframe
-            title={caption ?? "Mapa"}
+            title={caption ?? i18n.t("common:map.title")}
             src={osmSrc}
             loading="lazy"
             style={{ width: "100%", height: "100%", border: 0, display: "block" }}

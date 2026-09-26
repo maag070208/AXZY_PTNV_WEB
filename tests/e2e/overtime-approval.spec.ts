@@ -1,8 +1,8 @@
 import { test, expect } from "./support/fixtures";
 import type { Browser } from "@playwright/test";
-import { E2E, nuevoRunId } from "./support/env";
-import { limpiarOvertime, sembrarOvertime, type OvertimeSeedUser } from "./support/overtimeSeed";
-import { boton, campo, esperarToast, irARuta } from "./support/pages/componentes";
+import { E2E, newRunId } from "./support/env";
+import { clearOvertime, seedOvertime, type OvertimeSeedUser } from "./support/overtimeSeed";
+import { button, field, waitForToast, goToRoute } from "./support/pages/components";
 import { LoginPage } from "./support/pages/LoginPage";
 
 /**
@@ -14,17 +14,17 @@ import { LoginPage } from "./support/pages/LoginPage";
  * devuelve únicamente lo aprobado) y JEFE no accede a la ruta.
  */
 
-const RUN = nuevoRunId();
-let personaA: OvertimeSeedUser;
-let personaB: OvertimeSeedUser;
+const RUN = newRunId();
+let personA: OvertimeSeedUser;
+let personB: OvertimeSeedUser;
 let rh: OvertimeSeedUser;
-let jefe: OvertimeSeedUser;
+let head: OvertimeSeedUser;
 
-const filaDe = (page: Parameters<typeof campo>[0], nombre: string) =>
-  page.locator("table tbody tr").filter({ hasText: nombre });
+const rowOf = (page: Parameters<typeof field>[0], name: string) =>
+  page.locator("table tbody tr").filter({ hasText: name });
 
 /** Contexto aislado (sin la sesión de ADMIN que hereda el proyecto). */
-const contextoDe = async (browser: Browser, usuario: string) => {
+const contextOf = async (browser: Browser, user: string) => {
   const context = await browser.newContext({
     baseURL: E2E.webUrl,
     locale: "es-MX",
@@ -32,120 +32,120 @@ const contextoDe = async (browser: Browser, usuario: string) => {
     storageState: { cookies: [], origins: [] },
   });
   const page = await context.newPage();
-  await new LoginPage(page).entrarComo(usuario);
+  await new LoginPage(page).enterAs(user);
   return { context, page };
 };
 
 test.describe("Tiempo extra", () => {
   test.beforeAll(() => {
-    const users = sembrarOvertime(RUN);
-    personaA = users.find((u) => u.role === "EMPLEADO" && u.name.endsWith(" A"))!;
-    personaB = users.find((u) => u.role === "EMPLEADO" && u.name.endsWith(" B"))!;
-    rh = users.find((u) => u.role === "RECURSOS_HUMANOS")!;
-    jefe = users.find((u) => u.role === "JEFE_DE_AREA")!;
+    const users = seedOvertime(RUN);
+    personA = users.find((u) => u.role === "EMPLOYEE" && u.name.endsWith(" A"))!;
+    personB = users.find((u) => u.role === "EMPLOYEE" && u.name.endsWith(" B"))!;
+    rh = users.find((u) => u.role === "HUMAN_RESOURCES")!;
+    head = users.find((u) => u.role === "AREA_HEAD")!;
   });
 
-  test.afterAll(() => limpiarOvertime(RUN));
+  test.afterAll(() => clearOvertime(RUN));
 
   test("ADMIN aprueba un día pendiente con confirmación", async ({ page }) => {
-    await irARuta(page, "/horarios/horas-extra/aprobacion");
-    await campo(page, "Empleado").fill(personaA.name);
+    await goToRoute(page, "/schedules/overtime/approval");
+    await field(page, "Empleado").fill(personA.name);
 
-    const fila = filaDe(page, personaA.name);
-    await expect(fila.getByText("Pendiente")).toBeVisible();
-    await fila.getByRole("checkbox").check({ force: true });
+    const row = rowOf(page, personA.name);
+    await expect(row.getByText("Pendiente")).toBeVisible();
+    await row.getByRole("checkbox").check({ force: true });
 
-    await boton(page, "Aprobar (1)").click();
+    await button(page, "Aprobar (1)").click();
     // El diálogo de confirmación trae el botón exacto "Aprobar".
     await page.getByRole("button", { name: "Aprobar", exact: true }).click();
 
-    await esperarToast(page, /día\(s\) aprobado\(s\)/);
-    await expect(fila.getByText("Aprobado")).toBeVisible();
+    await waitForToast(page, /día\(s\) aprobado\(s\)/);
+    await expect(row.getByText("Aprobado")).toBeVisible();
   });
 
   test("ADMIN rechaza un día pendiente", async ({ page }) => {
-    await irARuta(page, "/horarios/horas-extra/aprobacion");
-    await campo(page, "Empleado").fill(personaB.name);
+    await goToRoute(page, "/schedules/overtime/approval");
+    await field(page, "Empleado").fill(personB.name);
 
-    const fila = filaDe(page, personaB.name);
-    await expect(fila.getByText("Pendiente")).toBeVisible();
-    await fila.getByRole("checkbox").check({ force: true });
+    const row = rowOf(page, personB.name);
+    await expect(row.getByText("Pendiente")).toBeVisible();
+    await row.getByRole("checkbox").check({ force: true });
 
-    await boton(page, "Rechazar (1)").click();
+    await button(page, "Rechazar (1)").click();
     await page.getByRole("button", { name: "Rechazar", exact: true }).click();
 
-    await esperarToast(page, /día\(s\) rechazado\(s\)/);
-    await expect(fila.getByText("Rechazado")).toBeVisible();
+    await waitForToast(page, /día\(s\) rechazado\(s\)/);
+    await expect(row.getByText("Rechazado")).toBeVisible();
   });
 
   test("RH abre en solo lectura; JEFE no accede a la ruta", async ({ browser }) => {
     // RH: entra, ve lo aprobado y ningún control de decisión.
-    const { context, page } = await contextoDe(browser, rh.username);
-    await irARuta(page, "/horarios/horas-extra/aprobacion");
+    const { context, page } = await contextOf(browser, rh.username);
+    await goToRoute(page, "/schedules/overtime/approval");
     await expect(page).toHaveURL(/aprobacion/);
 
-    await expect(boton(page, /Aprobar/)).toHaveCount(0);
-    await expect(boton(page, /Rechazar/)).toHaveCount(0);
+    await expect(button(page, /Aprobar/)).toHaveCount(0);
+    await expect(button(page, /Rechazar/)).toHaveCount(0);
     await expect(page.getByText("Seleccionar pendientes")).toHaveCount(0);
 
     // Lo aprobado se ve; lo rechazado no aparece aunque se busque.
-    await campo(page, "Empleado").fill(personaA.name);
-    await expect(filaDe(page, personaA.name).getByText("Aprobado")).toBeVisible();
-    await campo(page, "Empleado").fill(personaB.name);
-    await expect(filaDe(page, personaB.name)).toHaveCount(0);
+    await field(page, "Empleado").fill(personA.name);
+    await expect(rowOf(page, personA.name).getByText("Aprobado")).toBeVisible();
+    await field(page, "Empleado").fill(personB.name);
+    await expect(rowOf(page, personB.name)).toHaveCount(0);
     await context.close();
 
     // JEFE: RoleGuard lo redirige a inicio.
-    const jefeCtx = await contextoDe(browser, jefe.username);
-    await jefeCtx.page.goto("/#/horarios/horas-extra/aprobacion");
-    await jefeCtx.page.reload();
-    await expect(jefeCtx.page).not.toHaveURL(/aprobacion/);
-    await jefeCtx.context.close();
+    const headCtx = await contextOf(browser, head.username);
+    await headCtx.page.goto("/#/schedules/overtime/approval");
+    await headCtx.page.reload();
+    await expect(headCtx.page).not.toHaveURL(/aprobacion/);
+    await headCtx.context.close();
   });
 
   test("ADMIN exporta PDF y CSV solo de lo aprobado; sin aprobados quedan deshabilitados", async ({
     page,
   }) => {
-    await irARuta(page, "/horarios/horas-extra/aprobacion");
+    await goToRoute(page, "/schedules/overtime/approval");
 
-    const botonPdf = boton(page, "PDF");
-    const botonCsv = boton(page, "CSV");
+    const pdfButton = button(page, "PDF");
+    const csvButton = button(page, "CSV");
 
-    await campo(page, "Empleado").fill(personaA.name);
-    await expect(filaDe(page, personaA.name).getByText("Aprobado")).toBeVisible();
-    await expect(botonPdf).toBeEnabled();
-    await expect(botonCsv).toBeEnabled();
+    await field(page, "Empleado").fill(personA.name);
+    await expect(rowOf(page, personA.name).getByText("Aprobado")).toBeVisible();
+    await expect(pdfButton).toBeEnabled();
+    await expect(csvButton).toBeEnabled();
 
-    const descargaPdf = page.waitForEvent("download");
-    await botonPdf.click();
-    expect((await descargaPdf).suggestedFilename()).toMatch(
+    const downloadPdf = page.waitForEvent("download");
+    await pdfButton.click();
+    expect((await downloadPdf).suggestedFilename()).toMatch(
       /^reporte_horas_extra_aprobadas_(day|week|month)_\d{8}\.pdf$/
     );
 
-    const descargaCsv = page.waitForEvent("download");
-    await botonCsv.click();
-    expect((await descargaCsv).suggestedFilename()).toMatch(
+    const downloadCsv = page.waitForEvent("download");
+    await csvButton.click();
+    expect((await downloadCsv).suggestedFilename()).toMatch(
       /^horas-extra-aprobadas-(day|week|month)-\d{4}-\d{2}-\d{2}\.csv$/
     );
 
     // Sin aprobados en el filtro, no hay nada que exportar.
-    await campo(page, "Empleado").fill(`E2E Inexistente ${RUN}`);
-    await expect(botonPdf).toBeDisabled();
-    await expect(botonCsv).toBeDisabled();
+    await field(page, "Empleado").fill(`E2E Inexistente ${RUN}`);
+    await expect(pdfButton).toBeDisabled();
+    await expect(csvButton).toBeDisabled();
   });
 
   test("RH también puede exportar el PDF de lo aprobado", async ({ browser }) => {
-    const { context, page } = await contextoDe(browser, rh.username);
-    await irARuta(page, "/horarios/horas-extra/aprobacion");
+    const { context, page } = await contextOf(browser, rh.username);
+    await goToRoute(page, "/schedules/overtime/approval");
 
-    await campo(page, "Empleado").fill(personaA.name);
-    await expect(filaDe(page, personaA.name).getByText("Aprobado")).toBeVisible();
+    await field(page, "Empleado").fill(personA.name);
+    await expect(rowOf(page, personA.name).getByText("Aprobado")).toBeVisible();
 
-    const botonPdf = boton(page, "PDF");
-    await expect(botonPdf).toBeEnabled();
-    const descarga = page.waitForEvent("download");
-    await botonPdf.click();
-    expect((await descarga).suggestedFilename()).toMatch(
+    const pdfButton = button(page, "PDF");
+    await expect(pdfButton).toBeEnabled();
+    const download = page.waitForEvent("download");
+    await pdfButton.click();
+    expect((await download).suggestedFilename()).toMatch(
       /^reporte_horas_extra_aprobadas_(day|week|month)_\d{8}\.pdf$/
     );
     await context.close();

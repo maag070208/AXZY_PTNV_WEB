@@ -16,10 +16,10 @@ export default function ScheduleFormPage() {
       icon={<FaRegClock size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("title"), onClick: () => navigate("/horarios") },
+        { label: t("title"), onClick: () => navigate("/schedules") },
         { label: isEdit ? t("edit") : t("new") },
       ]}
-      backAction={() => navigate("/horarios")}
+      backAction={() => navigate("/schedules")}
     >
       <ScheduleForm id={id} />
     </ITPage>

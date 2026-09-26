@@ -13,21 +13,21 @@ export interface DepartmentPersonRef {
 
 export interface DepartmentTicket {
   id: string;
-  titulo: string;
-  status: "ABIERTO" | "EN_SEGUIMIENTO" | "CERRADO";
-  priority: "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
+  title: string;
+  status: "OPEN" | "IN_PROGRESS" | "CLOSED";
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   category: string;
-  creadoEn: string;
-  asignadoA?: DepartmentPersonRef | null;
+  createdAt: string;
+  assignedTo?: DepartmentPersonRef | null;
 }
 
-export interface DepartmentCarta {
+export interface DepartmentCustodyLetter {
   id: string;
   consecutive: string;
-  fecha: string;
+  date: string;
   returnDate?: string | null;
-  responsable?: DepartmentPersonRef | null;
-  encargado?: DepartmentPersonRef | null;
+  custodian?: DepartmentPersonRef | null;
+  supervisor?: DepartmentPersonRef | null;
   itemsCount: number;
 }
 
@@ -38,7 +38,7 @@ export interface Department {
   subareas: Subarea[];
   tickets?: DepartmentTicket[];
   ticketsTotal?: number;
-  cartas?: DepartmentCarta[];
-  cartasTotal?: number;
+  custodyLetters?: DepartmentCustodyLetter[];
+  custodyLettersTotal?: number;
   _count?: { users: number };
 }

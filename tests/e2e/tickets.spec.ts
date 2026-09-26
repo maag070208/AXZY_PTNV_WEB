@@ -1,6 +1,6 @@
 import { test, expect } from "./support/fixtures";
-import { E2E, E2E_PREFIX, nuevoRunId, ruta } from "./support/env";
-import { campo, esperarToast } from "./support/pages/componentes";
+import { E2E, E2E_PREFIX, newRunId, route } from "./support/env";
+import { field, waitForToast } from "./support/pages/components";
 
 /**
  * Tickets por pantalla: lista server-side (filtros + paginación), alta, edición,
@@ -15,178 +15,178 @@ import { campo, esperarToast } from "./support/pages/componentes";
  * 503 y la prueba dependería del entorno.
  */
 
-const RUN = nuevoRunId();
+const RUN = newRunId();
 let seq = 0;
-const nuevoTitulo = (etiqueta: string): string => `${E2E_PREFIX} ${RUN}-${++seq} ${etiqueta}`;
+const newTitle = (label: string): string => `${E2E_PREFIX} ${RUN}-${++seq} ${label}`;
 
 test.describe("Tickets — lista y filtros", () => {
   test("la lista renderiza las columnas y una fila sembrada", async ({
     page,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(ticketEscenario.titulo);
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(ticketScenario.title);
 
-    const fila = ticketsPage.fila(ticketEscenario.titulo);
-    await expect(fila).toBeVisible();
+    const row = ticketsPage.row(ticketScenario.title);
+    await expect(row).toBeVisible();
 
-    for (const columna of ["Título", "Estado", "Prioridad", "Creado por", "Asignado a"]) {
-      await expect(page.getByText(columna, { exact: true }).first()).toBeVisible();
+    for (const column of ["Título", "Estado", "Prioridad", "Creado por", "Asignado a"]) {
+      await expect(page.getByText(column, { exact: true }).first()).toBeVisible();
     }
 
-    await expect(fila.getByText("Abierto").first()).toBeVisible();
-    await expect(fila.getByText("Media").first()).toBeVisible();
-    await expect(fila.getByText(E2E.admin.name).first()).toBeVisible();
-    await expect(fila.getByText("Sin asignar").first()).toBeVisible();
+    await expect(row.getByText("Abierto").first()).toBeVisible();
+    await expect(row.getByText("Media").first()).toBeVisible();
+    await expect(row.getByText(E2E.admin.name).first()).toBeVisible();
+    await expect(row.getByText("Sin asignar").first()).toBeVisible();
   });
 
-  test("filtra por título en el servidor", async ({ page, ticketsPage, ticketEscenario }) => {
-    await ticketsPage.ir();
+  test("filtra por título en el servidor", async ({ page, ticketsPage, ticketScenario }) => {
+    await ticketsPage.go();
 
-    const peticion = page.waitForRequest(
+    const request = page.waitForRequest(
       (r) =>
         r.url().includes("/tickets/query") &&
         r.method() === "POST" &&
-        (r.postData() ?? "").includes(ticketEscenario.titulo)
+        (r.postData() ?? "").includes(ticketScenario.title)
     );
-    await ticketsPage.filtrarTitulo(ticketEscenario.titulo);
-    await peticion;
+    await ticketsPage.filterTitle(ticketScenario.title);
+    await request;
 
-    await expect(ticketsPage.fila(ticketEscenario.titulo)).toBeVisible();
+    await expect(ticketsPage.row(ticketScenario.title)).toBeVisible();
 
-    const coincidentes = await ticketEscenario.tickets.query({
-      filters: { titulo: ticketEscenario.titulo },
+    const matching = await ticketScenario.tickets.query({
+      filters: { title: ticketScenario.title },
     });
-    expect(coincidentes.data.every((t) => t.titulo.includes(ticketEscenario.titulo))).toBe(true);
+    expect(matching.data.every((t) => t.title.includes(ticketScenario.title))).toBe(true);
   });
 
-  test("filtra por estado en el servidor", async ({ ticketsPage, ticketEscenario }) => {
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(ticketEscenario.titulo);
-    await expect(ticketsPage.fila(ticketEscenario.titulo)).toBeVisible();
+  test("filtra por estado en el servidor", async ({ ticketsPage, ticketScenario }) => {
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(ticketScenario.title);
+    await expect(ticketsPage.row(ticketScenario.title)).toBeVisible();
 
-    await ticketsPage.filtrarEstado("CERRADO");
-    await expect(ticketsPage.sinResultados).toBeVisible();
+    await ticketsPage.filterStatus("CLOSED");
+    await expect(ticketsPage.withoutResults).toBeVisible();
 
-    await ticketsPage.filtrarEstado("ABIERTO");
-    await expect(ticketsPage.fila(ticketEscenario.titulo)).toBeVisible();
+    await ticketsPage.filterStatus("OPEN");
+    await expect(ticketsPage.row(ticketScenario.title)).toBeVisible();
   });
 
   test("filtra por prioridad en el servidor", async ({ tickets, ticketsPage }) => {
-    const titulo = nuevoTitulo("Prioridad");
-    await tickets.crear({ titulo, descripcion: "Ticket con prioridad ALTA", priority: "ALTA" });
+    const title = newTitle("Prioridad");
+    await tickets.create({ title, description: "Ticket con prioridad ALTA", priority: "HIGH" });
 
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(titulo);
-    await expect(ticketsPage.fila(titulo)).toBeVisible();
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(title);
+    await expect(ticketsPage.row(title)).toBeVisible();
 
-    await ticketsPage.filtrarPrioridad("URGENTE");
-    await expect(ticketsPage.sinResultados).toBeVisible();
+    await ticketsPage.filterPriority("URGENT");
+    await expect(ticketsPage.withoutResults).toBeVisible();
 
-    await ticketsPage.filtrarPrioridad("ALTA");
-    await expect(ticketsPage.fila(titulo)).toBeVisible();
+    await ticketsPage.filterPriority("HIGH");
+    await expect(ticketsPage.row(title)).toBeVisible();
   });
 
   test("pagina en el servidor", async ({ page, tickets, ticketsPage }) => {
     const token = `${E2E_PREFIX} ${RUN}-PAG`;
     for (let i = 0; i < 6; i += 1) {
-      await tickets.crear({ titulo: `${token} ${i}`, descripcion: `Relleno de paginación ${i}` });
+      await tickets.create({ title: `${token} ${i}`, description: `Relleno de paginación ${i}` });
     }
 
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(token);
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(token);
 
-    const filas = page.locator("table tbody tr");
-    await expect(filas).toHaveCount(5);
+    const rows = page.locator("table tbody tr");
+    await expect(rows).toHaveCount(5);
 
-    const peticionPagina2 = page.waitForRequest(
+    const requestPage2 = page.waitForRequest(
       (r) =>
         r.url().includes("/tickets/query") &&
         r.method() === "POST" &&
         (r.postData() ?? "").includes('"page":2')
     );
-    await ticketsPage.pagina(2).click();
-    await peticionPagina2;
+    await ticketsPage.pageButton(2).click();
+    await requestPage2;
 
-    await expect(filas).toHaveCount(1);
+    await expect(rows).toHaveCount(1);
   });
 
   test("muestra el vacío cuando no hay coincidencias", async ({ ticketsPage }) => {
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(`SIN-COINCIDENCIA-${RUN}`);
-    await expect(ticketsPage.sinResultados).toBeVisible();
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(`SIN-COINCIDENCIA-${RUN}`);
+    await expect(ticketsPage.withoutResults).toBeVisible();
   });
 });
 
 test.describe("Tickets — alta y edición", () => {
   test("crea un ticket y lo refleja en la API", async ({ page, tickets, ticketsPage }) => {
-    const titulo = nuevoTitulo("Crear");
-    const categoria = await tickets.crearCategoria(nuevoTitulo("Cat"));
+    const title = newTitle("Crear");
+    const category = await tickets.createCategory(newTitle("Cat"));
 
-    await ticketsPage.irNuevo();
-    await ticketsPage.escribirTitulo(titulo);
-    await ticketsPage.escribirDescripcion("Descripción creada desde la pantalla E2E");
-    await ticketsPage.elegirCategoria(categoria.nombre);
-    await ticketsPage.elegirPrioridad("Alta");
-    await ticketsPage.guardar();
+    await ticketsPage.goNew();
+    await ticketsPage.writeTitle(title);
+    await ticketsPage.writeDescription("Descripción creada desde la pantalla E2E");
+    await ticketsPage.selectCategory(category.name);
+    await ticketsPage.selectPriority("Alta");
+    await ticketsPage.save();
 
-    await esperarToast(page, "Ticket creado correctamente");
+    await waitForToast(page, "Ticket creado correctamente");
     await page.waitForURL(/#\/tickets$/, { timeout: 15_000 });
 
-    const creado = await tickets.buscarPorTitulo(titulo);
-    expect(creado, "el ticket debió crearse").toBeTruthy();
-    expect(creado!.status).toBe("ABIERTO");
-    expect(creado!.priority).toBe("ALTA");
-    expect(creado!.categoryId).toBe(categoria.id);
+    const created = await tickets.searchByTitle(title);
+    expect(created, "el ticket debió crearse").toBeTruthy();
+    expect(created!.status).toBe("OPEN");
+    expect(created!.priority).toBe("HIGH");
+    expect(created!.categoryId).toBe(category.id);
   });
 
   test("bloquea el guardado hasta que el título tiene 3 caracteres", async ({ ticketsPage }) => {
-    await ticketsPage.irNuevo();
+    await ticketsPage.goNew();
 
-    const guardar = ticketsPage.botonGuardar;
-    await expect(guardar).toBeDisabled();
+    const save = ticketsPage.saveButton;
+    await expect(save).toBeDisabled();
 
-    await ticketsPage.escribirTitulo("AB");
-    await expect(guardar).toBeDisabled();
+    await ticketsPage.writeTitle("AB");
+    await expect(save).toBeDisabled();
 
-    await ticketsPage.escribirTitulo("ABC");
-    await expect(guardar).toBeEnabled();
+    await ticketsPage.writeTitle("ABC");
+    await expect(save).toBeEnabled();
   });
 
   test("sin descripción la API rechaza y no queda ticket", async ({ page, tickets, ticketsPage }) => {
-    const titulo = nuevoTitulo("SinDesc");
+    const title = newTitle("SinDesc");
 
-    await ticketsPage.irNuevo();
-    await ticketsPage.escribirTitulo(titulo);
-    await ticketsPage.guardar();
+    await ticketsPage.goNew();
+    await ticketsPage.writeTitle(title);
+    await ticketsPage.save();
 
-    await esperarToast(page, "Error al crear ticket");
-    expect(await tickets.buscarPorTitulo(titulo)).toBeNull();
+    await waitForToast(page, "Error al crear ticket");
+    expect(await tickets.searchByTitle(title)).toBeNull();
   });
 
   test("edita la prioridad de un ticket", async ({
     page,
     tickets,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
-    await ticketsPage.irEditar(ticketEscenario.ticket.id);
-    await expect(campo(page, "Título")).toHaveValue(ticketEscenario.titulo);
+    await ticketsPage.goEdit(ticketScenario.ticket.id);
+    await expect(field(page, "Título")).toHaveValue(ticketScenario.title);
 
-    await ticketsPage.elegirPrioridad("Alta");
-    await ticketsPage.guardar();
+    await ticketsPage.selectPriority("Alta");
+    await ticketsPage.save();
 
-    await esperarToast(page, "Ticket actualizado correctamente");
-    await page.waitForURL(new RegExp(`#/tickets/${ticketEscenario.ticket.id}$`), {
+    await waitForToast(page, "Ticket actualizado correctamente");
+    await page.waitForURL(new RegExp(`#/tickets/${ticketScenario.ticket.id}$`), {
       timeout: 15_000,
     });
 
-    const actualizado = await tickets.esperarTicket(
-      ticketEscenario.ticket.id,
-      (t) => t.priority === "ALTA"
+    const updated = await tickets.waitForTicket(
+      ticketScenario.ticket.id,
+      (t) => t.priority === "HIGH"
     );
-    expect(actualizado.priority).toBe("ALTA");
+    expect(updated.priority).toBe("HIGH");
   });
 });
 
@@ -195,23 +195,23 @@ test.describe("Tickets — detalle", () => {
     page,
     tickets,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
     // El botón "ver detalle" es icon-only y va primero en la celda de acciones.
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(ticketEscenario.titulo);
-    await ticketsPage.verDetalleDe(ticketEscenario.titulo).click();
-    await page.waitForURL(new RegExp(`#/tickets/${ticketEscenario.ticket.id}$`), {
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(ticketScenario.title);
+    await ticketsPage.viewDetailOf(ticketScenario.title).click();
+    await page.waitForURL(new RegExp(`#/tickets/${ticketScenario.ticket.id}$`), {
       timeout: 15_000,
     });
 
-    const texto = `Comentario E2E ${RUN}`;
-    await ticketsPage.comentar(texto);
-    await esperarToast(page, "Comentario agregado");
+    const text = `Comentario E2E ${RUN}`;
+    await ticketsPage.comment(text);
+    await waitForToast(page, "Comentario agregado");
 
-    await expect(page.getByText(texto).first()).toBeVisible();
-    const ticket = await tickets.esperarTicket(ticketEscenario.ticket.id, (t) =>
-      t.comments.some((c) => c.texto === texto)
+    await expect(page.getByText(text).first()).toBeVisible();
+    const ticket = await tickets.waitForTicket(ticketScenario.ticket.id, (t) =>
+      t.comments.some((c) => c.text === text)
     );
     expect(ticket.comments.length).toBeGreaterThanOrEqual(1);
   });
@@ -220,45 +220,45 @@ test.describe("Tickets — detalle", () => {
     page,
     tickets,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
-    await ticketsPage.irDetalle(ticketEscenario.ticket.id);
+    await ticketsPage.goItem(ticketScenario.ticket.id);
 
-    await ticketsPage.cambiarEstadoTicket("EN_SEGUIMIENTO");
-    await esperarToast(page, "Estado cambiado a En seguimiento");
+    await ticketsPage.changeStatusTicket("IN_PROGRESS");
+    await waitForToast(page, "Estado cambiado a En seguimiento");
 
-    const ticket = await tickets.esperarTicket(
-      ticketEscenario.ticket.id,
-      (t) => t.status === "EN_SEGUIMIENTO"
+    const ticket = await tickets.waitForTicket(
+      ticketScenario.ticket.id,
+      (t) => t.status === "IN_PROGRESS"
     );
-    expect(ticket.status).toBe("EN_SEGUIMIENTO");
+    expect(ticket.status).toBe("IN_PROGRESS");
   });
 
   test("finaliza el ticket: cierra, fecha y completa sus tareas", async ({
     page,
     tickets,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
-    await ticketEscenario.asignarA(E2E.admin.username);
+    await ticketScenario.assignA(E2E.admin.username);
 
-    await ticketsPage.irDetalle(ticketEscenario.ticket.id);
-    await ticketsPage.finalizar();
-    await esperarToast(page, "Estado cambiado a Cerrado");
+    await ticketsPage.goItem(ticketScenario.ticket.id);
+    await ticketsPage.finish();
+    await waitForToast(page, "Estado cambiado a Cerrado");
 
-    const cerrado = await tickets.esperarTicket(
-      ticketEscenario.ticket.id,
-      (t) => t.status === "CERRADO"
+    const closed = await tickets.waitForTicket(
+      ticketScenario.ticket.id,
+      (t) => t.status === "CLOSED"
     );
-    expect(cerrado.closedAt).toBeTruthy();
-    expect(cerrado.assignments.length).toBe(1);
-    expect(cerrado.assignments[0].status).toBe("COMPLETADA");
+    expect(closed.closedAt).toBeTruthy();
+    expect(closed.assignments.length).toBe(1);
+    expect(closed.assignments[0].status).toBe("COMPLETED");
   });
 
-  test("un ticket cerrado queda en solo lectura", async ({ page, ticketsPage, ticketEscenario }) => {
-    await ticketEscenario.tickets.actualizar(ticketEscenario.ticket.id, { status: "CERRADO" });
+  test("un ticket cerrado queda en solo lectura", async ({ page, ticketsPage, ticketScenario }) => {
+    await ticketScenario.tickets.update(ticketScenario.ticket.id, { status: "CLOSED" });
 
-    await ticketsPage.irDetalle(ticketEscenario.ticket.id);
+    await ticketsPage.goItem(ticketScenario.ticket.id);
     await expect(page.locator('select[name="status"]')).toBeDisabled();
     await expect(page.locator('textarea[name="comment"]')).toBeDisabled();
   });
@@ -268,93 +268,93 @@ test.describe("Tickets — borrado", () => {
   test("mueve a papelera desde la lista y desaparece", async ({
     tickets,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(ticketEscenario.titulo);
-    await expect(ticketsPage.fila(ticketEscenario.titulo)).toBeVisible();
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(ticketScenario.title);
+    await expect(ticketsPage.row(ticketScenario.title)).toBeVisible();
 
-    await ticketsPage.borrarDeFila(ticketEscenario.titulo).click();
-    await ticketsPage.confirmarDialogo("Mover a papelera");
+    await ticketsPage.deleteFromRow(ticketScenario.title).click();
+    await ticketsPage.confirmDialog("Mover a papelera");
 
-    await expect(ticketsPage.sinResultados).toBeVisible();
-    const borrado = await tickets.obtener(ticketEscenario.ticket.id);
-    expect(borrado.deletedAt).toBeTruthy();
+    await expect(ticketsPage.withoutResults).toBeVisible();
+    const deleted = await tickets.get(ticketScenario.ticket.id);
+    expect(deleted.deletedAt).toBeTruthy();
   });
 
   test("elimina definitivamente desde el detalle de un ticket en papelera", async ({
     page,
     tickets,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
     // Primera eliminación por API (soft): deja el ticket en papelera.
-    const soft = await tickets.borrar(ticketEscenario.ticket.id);
+    const soft = await tickets.remove(ticketScenario.ticket.id);
     expect(soft.soft).toBe(true);
 
-    await ticketsPage.irDetalle(ticketEscenario.ticket.id);
+    await ticketsPage.goItem(ticketScenario.ticket.id);
     await page.locator('button[title="Eliminar definitivamente"]').click();
-    await ticketsPage.confirmarDialogo("Eliminar definitivamente");
+    await ticketsPage.confirmDialog("Eliminar definitivamente");
 
     await page.waitForURL(/#\/tickets$/, { timeout: 15_000 });
-    expect(await tickets.obtenerOpcional(ticketEscenario.ticket.id)).toBeNull();
+    expect(await tickets.getOptional(ticketScenario.ticket.id)).toBeNull();
   });
 });
 
 test.describe("Categorías de ticket", () => {
   test("crea, desactiva y elimina definitivamente una categoría", async ({ tickets, ticketsPage }) => {
-    const nombre = nuevoTitulo("Cat");
+    const name = newTitle("Cat");
 
-    await ticketsPage.irCatalogos();
-    await ticketsPage.abrirTabCategorias();
-    await ticketsPage.crearCategoria(nombre);
+    await ticketsPage.goCatalogs();
+    await ticketsPage.openCategoriesTab();
+    await ticketsPage.createCategory(name);
 
-    const fila = ticketsPage.filaCatalogo(nombre);
-    await expect(fila).toBeVisible();
-    await expect(fila.getByText("Activo").first()).toBeVisible();
+    const row = ticketsPage.catalogRow(name);
+    await expect(row).toBeVisible();
+    await expect(row.getByText("Activo").first()).toBeVisible();
 
-    await ticketsPage.desactivarCategoria(nombre);
-    await expect(fila.getByText("Inactivo").first()).toBeVisible();
+    await ticketsPage.deactivateCategory(name);
+    await expect(row.getByText("Inactivo").first()).toBeVisible();
 
-    await ticketsPage.eliminarCategoriaDefinitivo(nombre);
-    await expect(ticketsPage.filaCatalogo(nombre)).toHaveCount(0);
+    await ticketsPage.deleteCategoryPermanently(name);
+    await expect(ticketsPage.catalogRow(name)).toHaveCount(0);
 
-    const categorias = await tickets.categorias(true);
-    expect(categorias.some((c) => c.nombre === nombre)).toBe(false);
+    const categories = await tickets.categories(true);
+    expect(categories.some((c) => c.name === name)).toBe(false);
   });
 });
 
 test.describe("Tickets — gate por rol (EMPLEADO)", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test("un empleado no accede a la edición de tickets", async ({ page, login, ticketEscenario }) => {
-    await login.entrarComo(E2E.empleado.username);
-    await page.goto(ruta(`/tickets/${ticketEscenario.ticket.id}/editar`));
+  test("un empleado no accede a la edición de tickets", async ({ page, login, ticketScenario }) => {
+    await login.enterAs(E2E.employee.username);
+    await page.goto(route(`/tickets/${ticketScenario.ticket.id}/edit`));
 
     await page.waitForURL(/#\/tickets$/, { timeout: 15_000 });
-    await expect(page).not.toHaveURL(new RegExp(`/tickets/${ticketEscenario.ticket.id}/editar`));
+    await expect(page).not.toHaveURL(new RegExp(`/tickets/${ticketScenario.ticket.id}/edit`));
   });
 
   test("un empleado no ve el botón de borrar en la lista", async ({
     login,
     ticketsPage,
-    ticketEscenario,
+    ticketScenario,
   }) => {
-    await ticketEscenario.asignarA(E2E.empleado.username);
+    await ticketScenario.assignA(E2E.employee.username);
 
-    await login.entrarComo(E2E.empleado.username);
-    await ticketsPage.ir();
-    await ticketsPage.filtrarTitulo(ticketEscenario.titulo);
+    await login.enterAs(E2E.employee.username);
+    await ticketsPage.go();
+    await ticketsPage.filterTitle(ticketScenario.title);
 
-    const fila = ticketsPage.fila(ticketEscenario.titulo);
-    await expect(fila).toBeVisible();
-    await expect(fila.locator("button[title]")).toHaveCount(0);
+    const row = ticketsPage.row(ticketScenario.title);
+    await expect(row).toBeVisible();
+    await expect(row.locator("button[title]")).toHaveCount(0);
   });
 
   test("un empleado no accede a los catálogos", async ({ page, login }) => {
-    await login.entrarComo(E2E.empleado.username);
-    await page.goto(ruta("/catalogos"));
+    await login.enterAs(E2E.employee.username);
+    await page.goto(route("/catalogs"));
 
-    await expect(page).not.toHaveURL(/#\/catalogos/);
+    await expect(page).not.toHaveURL(/#\/catalogs/);
   });
 });

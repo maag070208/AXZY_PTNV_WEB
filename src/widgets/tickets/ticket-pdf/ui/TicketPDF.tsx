@@ -13,9 +13,9 @@ interface Props {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  ABIERTO: PDF_COLORS.warning,
-  EN_SEGUIMIENTO: PDF_COLORS.band,
-  CERRADO: PDF_COLORS.success,
+  OPEN: PDF_COLORS.warning,
+  IN_PROGRESS: PDF_COLORS.band,
+  CLOSED: PDF_COLORS.success,
 };
 
 const KANBAN_COLS: Array<{
@@ -23,10 +23,10 @@ const KANBAN_COLS: Array<{
   color: string;
   bg: string;
 }> = [
-  { status: "PENDIENTE", color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
-  { status: "EN_PROGRESO", color: PDF_COLORS.band, bg: "#bfdbfe" },
-  { status: "EN_REVISION", color: "#7c3aed", bg: "#ede9fe" },
-  { status: "COMPLETADA", color: PDF_COLORS.success, bg: PDF_COLORS.successBg },
+  { status: "PENDING", color: PDF_COLORS.gray, bg: PDF_COLORS.grayBg },
+  { status: "IN_PROGRESS", color: PDF_COLORS.band, bg: "#bfdbfe" },
+  { status: "IN_REVIEW", color: "#7c3aed", bg: "#ede9fe" },
+  { status: "COMPLETED", color: PDF_COLORS.success, bg: PDF_COLORS.successBg },
 ];
 
 const styles = StyleSheet.create({
@@ -185,7 +185,7 @@ const formatReportDate = (): string => {
 };
 
 const dotColorFor = (type: string, detail?: string | null) => {
-  if (type === "STATUS" && detail?.includes("CERRADO")) return PDF_COLORS.success;
+  if (type === "STATUS" && detail?.includes("CLOSED")) return PDF_COLORS.success;
   if (type === "CREATED") return PDF_COLORS.success;
   if (type === "ASSIGNED") return "#8b5cf6";
   if (type === "DEPARTMENT") return "#a855f7";
@@ -211,16 +211,16 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
       id: h.id,
       ts: h.createdAt,
       title: h.detail ?? h.type,
-      detail: h.autor?.name ? tt("pdf.byAuthor", { name: h.autor.name }) : undefined,
+      detail: h.author?.name ? tt("pdf.byAuthor", { name: h.author.name }) : undefined,
       dot: dotColorFor(h.type, h.detail),
     });
   });
   ticket.comments.forEach((c) => {
     timeline.push({
       id: c.id,
-      ts: c.creadoEn,
-      title: tt("pdf.commentBy", { author: c.autor?.name ?? tt("pdf.fallbackUser") }),
-      detail: c.texto,
+      ts: c.createdAt,
+      title: tt("pdf.commentBy", { author: c.author?.name ?? tt("pdf.fallbackUser") }),
+      detail: c.text,
       dot: PDF_COLORS.gray,
     });
   });
@@ -230,23 +230,23 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
     ...col,
     items: ticket.assignments.filter((a) => a.status === col.status),
   }));
-  const completedTasks = ticket.assignments.filter((assignment) => assignment.status === "COMPLETADA").length;
+  const completedTasks = ticket.assignments.filter((assignment) => assignment.status === "COMPLETED").length;
 
   return (
-    <Document title={`Ticket - ${ticket.titulo}`} author="Puerto Nuevo Hotel y Villas">
+    <Document title={`Ticket - ${ticket.title}`} author="Puerto Nuevo Hotel y Villas">
       <Page size="A4" style={pdfTheme.page}>
         <PdfLetterhead title={tt("pdf.legend")} pageIndex={0} pageCount={1} generatedAt={today} />
 
         <View style={pdfTheme.content}>
           {/* ── Encabezado ── */}
           <View style={styles.titleRow}>
-            <Text style={styles.ticketTitle}>{ticket.titulo}</Text>
+            <Text style={styles.ticketTitle}>{ticket.title}</Text>
             <Text style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[ticket.status] ?? PDF_COLORS.gray }}>
               {dyn(tt)(`statusLabels.${ticket.status}`) ?? ticket.status}
             </Text>
           </View>
           <Text style={styles.idLine}>
-            Ticket #{ticket.id.slice(0, 8).toUpperCase()} · {tt("pdf.createdPrefix")} {formatShortDate(ticket.creadoEn)}
+            Ticket #{ticket.id.slice(0, 8).toUpperCase()} · {tt("pdf.createdPrefix")} {formatShortDate(ticket.createdAt)}
           </Text>
 
           <View style={styles.metaRow}>
@@ -256,7 +256,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
             </View>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>{tt("pdf.category")}</Text>
-              <Text style={styles.metaValue}>{ticket.category?.nombre ?? "—"}</Text>
+              <Text style={styles.metaValue}>{ticket.category?.name ?? "—"}</Text>
             </View>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>{tt("pdf.department")}</Text>
@@ -267,11 +267,11 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
           <View style={styles.metaRow}>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>{tt("pdf.createdBy")}</Text>
-              <Text style={styles.metaValue}>{ticket.creadoPor?.name ?? "—"}</Text>
+              <Text style={styles.metaValue}>{ticket.createdBy?.name ?? "—"}</Text>
             </View>
             <View style={styles.metaCard}>
               <Text style={styles.metaLabel}>{tt("pdf.assignedTo")}</Text>
-              <Text style={styles.metaValue}>{ticket.asignadoA?.name ?? tt("pdf.unassigned")}</Text>
+              <Text style={styles.metaValue}>{ticket.assignedTo?.name ?? tt("pdf.unassigned")}</Text>
             </View>
             {ticket.closedAt ? (
               <View style={styles.metaCard}>
@@ -284,7 +284,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
               <View style={styles.metaCard}>
                 <Text style={styles.metaLabel}>{tt("pdf.tasks")}</Text>
                 <Text style={styles.metaValue}>
-                  {ticket.assignments.filter((a) => a.status === "COMPLETADA").length}/{ticket.assignments.length}
+                  {ticket.assignments.filter((a) => a.status === "COMPLETED").length}/{ticket.assignments.length}
                 </Text>
               </View>
             )}
@@ -292,7 +292,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{tt("pdf.description")}</Text>
-            <Text style={styles.description}>{ticket.descripcion}</Text>
+            <Text style={styles.description}>{ticket.description}</Text>
           </View>
 
           {attachments.length > 0 && (
@@ -340,13 +340,13 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
                         <View key={a.id} style={styles.taskCard}>
                           <Text style={styles.taskEmployee}>{a.user.name}</Text>
                           <Text style={styles.taskNo}>
-                            {a.user.numeroEmpleado ? tt("pdf.employeeNo", { number: a.user.numeroEmpleado }) : ""}
+                            {a.user.employeeNumber ? tt("pdf.employeeNo", { number: a.user.employeeNumber }) : ""}
                           </Text>
                           <Text style={{ ...styles.taskTitleText }}>{a.title}</Text>
                           {a.description ? (
                             <Text style={styles.taskText}>{a.description}</Text>
                           ) : null}
-                          {a.dueDate && a.status !== "COMPLETADA" && new Date(a.dueDate) < new Date() && (
+                          {a.dueDate && a.status !== "COMPLETED" && new Date(a.dueDate) < new Date() && (
                             <Text style={{ ...styles.taskText, color: PDF_COLORS.danger, fontFamily: "Helvetica-Bold" }}>
                               {tt("pdf.overdue")}
                             </Text>
@@ -390,7 +390,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
           )}
         </View>
 
-        <PdfFooter pageIndex={0} pageCount={1} note="Puerto Nuevo Hotel y Villas — Sistema de Tickets" />
+        <PdfFooter pageIndex={0} pageCount={1} note={tt("pdf.footer")} />
       </Page>
     </Document>
   );

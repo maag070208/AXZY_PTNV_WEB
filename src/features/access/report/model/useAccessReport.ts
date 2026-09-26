@@ -12,6 +12,7 @@ import {
 import { departmentsApi, type Department } from "@entities/department";
 import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
+import { fileName, type FileNameKey, dateLocale } from "@shared/i18n";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
 export type DownloadAccessReportPdf = (
@@ -28,7 +29,7 @@ export interface AccessReportSource {
   report: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
   reportExport: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
   /** Prefijo del nombre del CSV. */
-  csvPrefix: string;
+  csvFile: FileNameKey;
 }
 
 /** Llave de orden del reporte: la columna ES una sesión; su ancla es `entryAt`. */
@@ -45,7 +46,7 @@ export const DEFAULT_REPORT_SORT: AccessReportSort = { key: "entryAt", direction
 const ACCESS_SOURCE: AccessReportSource = {
   report: accessApi.report,
   reportExport: accessApi.reportExport,
-  csvPrefix: "accesos",
+  csvFile: "access",
 };
 
 interface Options {
@@ -174,13 +175,13 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
       const stamp = (iso: string | null): string => {
         if (!iso) return "";
         if (period === "DAY") return formatTimeInTZ(iso, tz);
-        return `${new Date(iso).toLocaleDateString("es-MX")} ${formatTimeInTZ(iso, tz)}`;
+        return `${new Date(iso).toLocaleDateString(dateLocale())} ${formatTimeInTZ(iso, tz)}`;
       };
       const header = [
         t("columns.date"),
         t("columns.employee"),
         t("columns.department"),
-        t("columns.puesto"),
+        t("columns.jobTitle"),
         t("columns.entry"),
         t("columns.exit"),
         t("columns.hours"),
@@ -190,7 +191,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
         r.date,
         r.employeeName,
         r.departmentName ?? t("noDepartment"),
-        r.puesto ?? "",
+        r.jobTitle ?? "",
         stamp(r.entryAt),
         stamp(r.exitAt),
         r.entryAt && r.exitAt ? formatMinutesAsHhMm(r.workedMinutes) : "",
@@ -202,7 +203,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${source.csvPrefix}-${period.toLowerCase()}-${dateKey}.csv`;
+      link.download = `${fileName(source.csvFile)}-${period.toLowerCase()}-${dateKey}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     } catch (e) {

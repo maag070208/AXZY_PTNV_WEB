@@ -1,9 +1,9 @@
 import type { APIRequestContext } from "@playwright/test";
 import { test, expect } from "./support/fixtures";
-import { E2E, E2E_PREFIX, nuevoRunId, ruta } from "./support/env";
-import { crearContextoApi } from "./support/api";
+import { E2E, E2E_PREFIX, newRunId, route } from "./support/env";
+import { createContextApi } from "./support/api";
 import { ApiAccess, DEMO_SITE_CODE, type AccessSite } from "./support/accessApi";
-import { campo, irARuta } from "./support/pages/componentes";
+import { field, goToRoute } from "./support/pages/components";
 
 /**
  * Reporte de entradas/salidas por persona (`/access/report`).
@@ -24,17 +24,17 @@ import { campo, irARuta } from "./support/pages/componentes";
  * (ver el inventario de residuos en `README.md`).
  */
 
-const RUN = nuevoRunId();
+const RUN = newRunId();
 const TZ = "America/Mazatlan";
-const USERNAME_CON_EVENTOS = "e2e_report_con";
-const USERNAME_CON_EVENTOS_2 = "e2e_report_con2";
-const USERNAME_SIN_EVENTOS = "e2e_report_sin";
-const NOMBRE_CON_EVENTOS = "E2E Reporte Con Eventos";
-const NOMBRE_CON_EVENTOS_2 = "E2E Reporte Con Eventos 2";
-const NOMBRE_SIN_EVENTOS = "E2E Reporte Sin Eventos";
+const USERNAME_WITH_EVENTS = "e2e_report_con";
+const USERNAME_WITH_EVENTS_2 = "e2e_report_con2";
+const USERNAME_WITHOUT_EVENTS = "e2e_report_sin";
+const NAME_WITH_EVENTS = "E2E Reporte Con Eventos";
+const NAME_WITH_EVENTS_2 = "E2E Reporte Con Eventos 2";
+const NAME_WITHOUT_EVENTS = "E2E Reporte Sin Eventos";
 
 /** Día de referencia local (el mismo que resuelve el navegador por defecto). */
-const hoyLocal = (): string =>
+const localToday = (): string =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
 
 /** `workedMinutes` → `hh:mm`, igual que la pantalla. */
@@ -47,15 +47,15 @@ test.describe("Reporte de entradas/salidas", () => {
   let ctx: APIRequestContext;
   let access: ApiAccess;
   let demoSite: AccessSite;
-  let conEventosId = "";
-  let sinEventosId = "";
+  let withEventsId = "";
+  let withoutEventsId = "";
 
   test.beforeAll(async () => {
-    ctx = await crearContextoApi();
+    ctx = await createContextApi();
     access = new ApiAccess(ctx);
 
-    const sitios = await access.sitios();
-    const demo = sitios.find((s) => s.code === DEMO_SITE_CODE);
+    const sites = await access.sites();
+    const demo = sites.find((s) => s.code === DEMO_SITE_CODE);
     if (!demo) {
       throw new Error(
         `No existe el sitio demo "${DEMO_SITE_CODE}"; corre "npm run test:e2e:provision" en ../api.`
@@ -63,30 +63,30 @@ test.describe("Reporte de entradas/salidas", () => {
     }
     demoSite = demo;
 
-    const conEventos = await access.asegurarUsuario({
-      username: USERNAME_CON_EVENTOS,
-      name: NOMBRE_CON_EVENTOS,
+    const withEvents = await access.ensureUser({
+      username: USERNAME_WITH_EVENTS,
+      name: NAME_WITH_EVENTS,
       role: "GUARD",
     });
-    conEventosId = conEventos.id;
+    withEventsId = withEvents.id;
 
-    const sinEventos = await access.asegurarUsuario({
-      username: USERNAME_SIN_EVENTOS,
-      name: NOMBRE_SIN_EVENTOS,
-      role: "EMPLEADO",
+    const withoutEvents = await access.ensureUser({
+      username: USERNAME_WITHOUT_EVENTS,
+      name: NAME_WITHOUT_EVENTS,
+      role: "EMPLOYEE",
     });
-    sinEventosId = sinEventos.id;
+    withoutEventsId = withoutEvents.id;
 
     // ENTRY + EXIT de hoy (los eventos E2E se limpian en el teardown de `api/`,
     // así que el usuario arranca sin ventana anti-duplicado previa).
-    await access.crearEvento({
-      employeeId: conEventosId,
+    await access.createEvent({
+      employeeId: withEventsId,
       type: "ENTRY",
       siteId: demoSite.id,
       clientEventId: `${E2E_PREFIX}-${RUN}-RPT-000`,
     });
-    await access.crearEvento({
-      employeeId: conEventosId,
+    await access.createEvent({
+      employeeId: withEventsId,
       type: "EXIT",
       siteId: demoSite.id,
       clientEventId: `${E2E_PREFIX}-${RUN}-RPT-001`,
@@ -98,12 +98,12 @@ test.describe("Reporte de entradas/salidas", () => {
     // corrida lo vuelve a asegurar. El usuario con eventos queda (FK Restrict),
     // pero se reutiliza por `username`; sin eventos tras la limpieza no vuelve a
     // aparecer en el universo del reporte ni se acumula.
-    if (sinEventosId) await access.eliminarUsuario(sinEventosId).catch(() => undefined);
+    if (withoutEventsId) await access.deleteUser(withoutEventsId).catch(() => undefined);
     await ctx.dispose();
   });
 
   test("ADMIN ve KPIs y tabla, y la persona con eventos muestra sus horas", async ({ page }) => {
-    await irARuta(page, "/access/report");
+    await goToRoute(page, "/access/report");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Reporte de entradas y salidas" })
@@ -114,62 +114,62 @@ test.describe("Reporte de entradas/salidas", () => {
     await expect(page.getByText("Personas sin registros", { exact: true })).toBeVisible();
     await expect(page.getByText("Horas totales", { exact: true })).toBeVisible();
 
-    const cuerpo = page.locator("table tbody");
-    await campo(page, "Buscar empleado").fill(NOMBRE_CON_EVENTOS);
-    await expect(cuerpo.getByText(NOMBRE_CON_EVENTOS).first()).toBeVisible();
+    const body = page.locator("table tbody");
+    await field(page, "Buscar empleado").fill(NAME_WITH_EVENTS);
+    await expect(body.getByText(NAME_WITH_EVENTS).first()).toBeVisible();
 
     // Verificación cruzada: la UI muestra las MISMAS horas que calcula la API.
     // La tabla lista SESIONES (una fila por entrada/salida), no personas.
     const rep = await access.report({
-      filters: { period: "DAY", date: hoyLocal(), q: NOMBRE_CON_EVENTOS },
+      filters: { period: "DAY", date: localToday(), q: NAME_WITH_EVENTS },
     });
-    const fila = rep.data.find((r) => r.employeeId === conEventosId);
-    expect(fila, "la API debe devolver la sesión de la persona sembrada").toBeTruthy();
+    const row = rep.data.find((r) => r.employeeId === withEventsId);
+    expect(row, "la API debe devolver la sesión de la persona sembrada").toBeTruthy();
     expect(rep.summary.peopleWithRecords).toBeGreaterThanOrEqual(1);
-    await expect(cuerpo.getByText(formatMinutes(fila!.workedMinutes)).first()).toBeVisible();
+    await expect(body.getByText(formatMinutes(row!.workedMinutes)).first()).toBeVisible();
   });
 
   test("cambiar la granularidad (DÍA→SEMANA→MES) dispara la petición con el period correcto", async ({
     page,
   }) => {
-    await irARuta(page, "/access/report");
+    await goToRoute(page, "/access/report");
     await expect(page.locator("table tbody")).toBeVisible();
 
-    const esperarReporte = () =>
+    const waitForReport = () =>
       page.waitForRequest(
         (r) => r.method() === "POST" && r.url().endsWith("/access/report")
       );
 
-    const pSemana = esperarReporte();
+    const pWeek = waitForReport();
     await page.getByRole("button", { name: "Semanal" }).click();
-    const reqSemana = await pSemana;
-    expect(reqSemana.postDataJSON()).toMatchObject({ filters: { period: "WEEK" } });
+    const reqWeek = await pWeek;
+    expect(reqWeek.postDataJSON()).toMatchObject({ filters: { period: "WEEK" } });
 
-    const pMes = esperarReporte();
+    const pMonth = waitForReport();
     await page.getByRole("button", { name: "Mensual" }).click();
-    const reqMes = await pMes;
-    expect(reqMes.postDataJSON()).toMatchObject({ filters: { period: "MONTH" } });
+    const reqMonth = await pMonth;
+    expect(reqMonth.postDataJSON()).toMatchObject({ filters: { period: "MONTH" } });
 
     // Re-renderizó: la tabla sigue mostrando la persona sembrada.
-    const cuerpo = page.locator("table tbody");
-    await campo(page, "Buscar empleado").fill(NOMBRE_CON_EVENTOS);
-    await expect(cuerpo.getByText(NOMBRE_CON_EVENTOS).first()).toBeVisible();
+    const body = page.locator("table tbody");
+    await field(page, "Buscar empleado").fill(NAME_WITH_EVENTS);
+    await expect(body.getByText(NAME_WITH_EVENTS).first()).toBeVisible();
   });
 
   test("una persona sin eventos no genera fila y el reporte la cuenta sin registros", async ({
     page,
   }) => {
-    await irARuta(page, "/access/report");
+    await goToRoute(page, "/access/report");
 
-    const cuerpo = page.locator("table tbody");
-    await campo(page, "Buscar empleado").fill(NOMBRE_SIN_EVENTOS);
+    const body = page.locator("table tbody");
+    await field(page, "Buscar empleado").fill(NAME_WITHOUT_EVENTS);
     // La tabla lista sesiones: sin eventos, la búsqueda no devuelve filas.
-    await expect(cuerpo.getByText("No se encontraron resultados").first()).toBeVisible();
+    await expect(body.getByText("No se encontraron resultados").first()).toBeVisible();
 
     // Verificación cruzada: la API la incluye en el universo del periodo pero
     // sin registros (la cuenta vive en el resumen, no como fila de la tabla).
     const rep = await access.report({
-      filters: { period: "DAY", date: hoyLocal(), q: NOMBRE_SIN_EVENTOS },
+      filters: { period: "DAY", date: localToday(), q: NAME_WITHOUT_EVENTS },
     });
     expect(rep.summary.peopleTotal).toBe(1);
     expect(rep.summary.peopleWithRecords).toBe(0);
@@ -178,13 +178,13 @@ test.describe("Reporte de entradas/salidas", () => {
   });
 
   test("la tabla ordena por entryAt desc por defecto", async ({ page }) => {
-    const primerReporte = page.waitForRequest(
+    const firstReport = page.waitForRequest(
       (r) => r.method() === "POST" && r.url().endsWith("/access/report")
     );
 
-    await irARuta(page, "/access/report");
+    await goToRoute(page, "/access/report");
 
-    const body = (await primerReporte).postDataJSON() as {
+    const body = (await firstReport).postDataJSON() as {
       sort?: { key: string; direction: string };
     };
     expect(body.sort).toEqual({ key: "entryAt", direction: "desc" });
@@ -193,18 +193,18 @@ test.describe("Reporte de entradas/salidas", () => {
   test("el export respeta el orden de la tabla (paridad al ordenar por Empleado)", async ({
     page,
   }) => {
-    await irARuta(page, "/access/report");
+    await goToRoute(page, "/access/report");
     await expect(page.locator("table tbody")).toBeVisible();
 
     // Primer click en el encabezado sortable → `asc`. La petición de tabla con
     // ese sort confirma que el hook ya lo guardó como orden vigente.
-    const reordenado = page.waitForRequest((r) => {
+    const reordered = page.waitForRequest((r) => {
       if (r.method() !== "POST" || !r.url().endsWith("/access/report")) return false;
       const data = r.postDataJSON() as { sort?: { key?: string } };
       return data?.sort?.key === "employeeName";
     });
     await page.getByTitle("Ordenar por Empleado").click();
-    expect((await reordenado).postDataJSON()).toMatchObject({
+    expect((await reordered).postDataJSON()).toMatchObject({
       sort: { key: "employeeName", direction: "asc" },
     });
 
@@ -220,25 +220,25 @@ test.describe("Reporte de entradas/salidas", () => {
 
   test("el export CSV trae las sesiones de la más reciente a la más vieja", async ({ page }) => {
     // Segunda sesión (usuario aparte): dos `entryAt` distintos en el mismo día.
-    const segundo = await access.asegurarUsuario({
-      username: USERNAME_CON_EVENTOS_2,
-      name: NOMBRE_CON_EVENTOS_2,
+    const second = await access.ensureUser({
+      username: USERNAME_WITH_EVENTS_2,
+      name: NAME_WITH_EVENTS_2,
       role: "GUARD",
     });
-    await access.crearEvento({
-      employeeId: segundo.id,
+    await access.createEvent({
+      employeeId: second.id,
       type: "ENTRY",
       siteId: demoSite.id,
       clientEventId: `${E2E_PREFIX}-${RUN}-RPT-002`,
     });
-    await access.crearEvento({
-      employeeId: segundo.id,
+    await access.createEvent({
+      employeeId: second.id,
       type: "EXIT",
       siteId: demoSite.id,
       clientEventId: `${E2E_PREFIX}-${RUN}-RPT-003`,
     });
 
-    await irARuta(page, "/access/report");
+    await goToRoute(page, "/access/report");
     await expect(page.locator("table tbody")).toBeVisible();
 
     const exportResponse = page.waitForResponse(
@@ -258,7 +258,7 @@ test.describe("Reporte de entradas/salidas", () => {
   });
 
   test("el subitem de menú 'Reporte entradas/salidas' es visible para ADMIN", async ({ page }) => {
-    await irARuta(page, "/access/report");
+    await goToRoute(page, "/access/report");
 
     // La barra lateral arranca colapsada; al pasar el mouse se expande y el
     // padre (auto-expandido por el subitem activo) muestra sus hijos.
@@ -272,11 +272,11 @@ test.describe("Reporte de entradas/salidas", () => {
 test.describe("Reporte de entradas/salidas — gate por rol", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  for (const username of [E2E.empleado.username, E2E.guard.username]) {
+  for (const username of [E2E.employee.username, E2E.guard.username]) {
     test(`un rol no autorizado (${username}) no accede al reporte`, async ({ page, login }) => {
-      await login.entrarComo(username);
+      await login.enterAs(username);
 
-      await page.goto(ruta("/access/report"));
+      await page.goto(route("/access/report"));
 
       await expect(page).not.toHaveURL(/#\/access\/report/);
       await expect(page.getByText("Reporte de entradas y salidas")).toHaveCount(0);

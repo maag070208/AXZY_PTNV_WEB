@@ -29,6 +29,7 @@ import {
   TicketComments,
   TasksGraph,
 } from "@features/ticket/ticket-detail";
+import { i18n } from "@shared/i18n";
 
 export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -87,16 +88,16 @@ export default function TicketDetailPage() {
 
   return (
     <ITPage
-      title={ticket.titulo}
+      title={ticket.title}
       description={tt("detail.description", {
         status: dyn(tt)(`statusLabels.${ticket.status}`) ?? ticket.status,
-        category: ticket.category?.nombre ?? "—",
+        category: ticket.category?.name ?? "—",
       })}
       backAction={() => navigate(-1)}
       icon={<FaTicketAlt size={20} />}
       breadcrumbs={[
         { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets") },
-        { label: ticket.titulo },
+        { label: ticket.title },
       ]}
       actions={
         <ITFlex gap={2} wrap="wrap">
@@ -133,7 +134,7 @@ export default function TicketDetailPage() {
               variant="filled"
               size="lg"
               color="error"
-              onClick={() => fx.handleStatusChange("CERRADO")}
+              onClick={() => fx.handleStatusChange("CLOSED")}
             >
               <ITFlex align="center" gap={1}>
                 <FaTimesCircle size={12} />
@@ -196,8 +197,8 @@ export default function TicketDetailPage() {
         title={ticket.deletedAt ? tt("detail.deleteForever") : tt("detail.moveTrash")}
         message={
           ticket.deletedAt
-            ? `¿Eliminar definitivamente "${ticket.titulo}"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.`
-            : `¿Mover a papelera "${ticket.titulo}"? Quedará en estado eliminado y podrás borrarlo definitivamente después.`
+            ? i18n.t("tickets:detail.confirmHardDelete", { title: ticket.title })
+            : i18n.t("tickets:detail.confirmSoftDelete", { title: ticket.title })
         }
         confirmLabel={ticket.deletedAt ? tt("detail.deleteForever") : tt("detail.moveTrash")}
         cancelLabel={tt("common:actions.cancel")}

@@ -3,13 +3,13 @@ import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaUserShield } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
-import { RolesPermisosTabs } from "@features/roles";
+import { useCan } from "@entities/user";
+import { RolesPermissionsTabs } from "@features/roles";
 
 export default function RolesPage() {
   const navigate = useNavigate();
   const { t } = useTranslation(["roles", "common"]);
-  const canAdminRoles = usePuede("roles.administrar");
+  const canAdminRoles = useCan("roles.manage");
 
   useEffect(() => {
     if (!canAdminRoles) navigate("/", { replace: true });
@@ -28,7 +28,7 @@ export default function RolesPage() {
         { label: t("title") },
       ]}
     >
-      <RolesPermisosTabs />
+      <RolesPermissionsTabs />
     </ITPage>
   );
 }

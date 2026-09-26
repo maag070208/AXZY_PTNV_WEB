@@ -1,4 +1,4 @@
-import type { HorarioDiaInput } from "@entities/schedule";
+import type { ScheduleDayInput } from "@entities/schedule";
 
 const toMinutes = (time: string): number => {
   const [h, m] = time.split(":").map(Number);
@@ -13,21 +13,21 @@ export const minutesBetween = (from: string | null, to: string | null): number =
 };
 
 /** Minutos de la jornada de un día, descontando la comida. `0` si es descanso. */
-export const dayMinutes = (d: HorarioDiaInput, comidaMin: number): number => {
-  if (d.descanso) return 0;
-  const span = minutesBetween(d.entrada ?? null, d.salida ?? null);
-  const second = d.entrada2 && d.salida2 ? minutesBetween(d.entrada2, d.salida2) : 0;
-  return Math.max(0, span + second - comidaMin);
+export const dayMinutes = (d: ScheduleDayInput, mealBreakMin: number): number => {
+  if (d.restDay) return 0;
+  const span = minutesBetween(d.startTime ?? null, d.endTime ?? null);
+  const second = d.splitStartTime && d.splitEndTime ? minutesBetween(d.splitStartTime, d.splitEndTime) : 0;
+  return Math.max(0, span + second - mealBreakMin);
 };
 
 /** Suma de minutos de todos los días de la semana. */
-export const weeklyMinutes = (dias: HorarioDiaInput[], comidaMin: number): number =>
-  dias.reduce((total, d) => total + dayMinutes(d, comidaMin), 0);
+export const weeklyMinutes = (days: ScheduleDayInput[], mealBreakMin: number): number =>
+  days.reduce((total, d) => total + dayMinutes(d, mealBreakMin), 0);
 
 /** Cantidad de días marcados como laborables. */
-export const daysWorked = (dias: HorarioDiaInput[]): number =>
-  dias.filter((d) => !d.descanso).length;
+export const daysWorked = (days: ScheduleDayInput[]): number =>
+  days.filter((d) => !d.restDay).length;
 
 /** Cantidad de días marcados como descanso. */
-export const restDays = (dias: HorarioDiaInput[]): number =>
-  dias.filter((d) => d.descanso).length;
+export const restDays = (days: ScheduleDayInput[]): number =>
+  days.filter((d) => d.restDay).length;

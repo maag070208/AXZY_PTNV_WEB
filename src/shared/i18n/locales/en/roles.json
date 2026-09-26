@@ -1,40 +1,96 @@
 {
   "title": "Roles and permissions",
-  "description": "Manage the role matrix and the system permission catalog (ADMIN only)",
+  "description": "Manage what each role can do and which screens it sees (ADMIN only)",
   "tabs": {
-    "matriz": "Matrix",
-    "catalogo": "Catalog"
+    "access": "Access",
+    "catalog": "Catalog"
   },
-  "alcance": {
-    "NINGUNO": "None",
-    "PROPIO": "Own",
+  "scope": {
+    "NONE": "None",
+    "OWN": "Own",
     "AREA": "Area",
-    "TODO": "All"
+    "ALL": "All"
+  },
+  "scopePlain": {
+    "NONE": "No access",
+    "OWN": "Only their own",
+    "AREA": "Their area",
+    "ALL": "Everything"
+  },
+  "scopeExample": {
+    "NONE": "They do not have the permission.",
+    "OWN": "For example: only their own tickets or their own tasks.",
+    "AREA": "For example: the access log or the time clock of the people in their department.",
+    "ALL": "For example: the access log or the tickets of the whole company."
   },
   "role": {
     "ADMIN": "ADMIN",
-    "GERENTE": "MANAGER",
-    "JEFE_DE_AREA": "AREA LEAD",
-    "EMPLEADO": "EMPLOYEE",
-    "RECURSOS_HUMANOS": "HUMAN RESOURCES",
+    "MANAGER": "MANAGER",
+    "AREA_HEAD": "AREA LEAD",
+    "EMPLOYEE": "EMPLOYEE",
+    "HUMAN_RESOURCES": "HUMAN RESOURCES",
     "GUARD": "GUARD"
   },
   "matrix": {
-    "title": "Role matrix",
-    "subtitle": "Set the scope of each permission per role. Inactive permissions cannot be granted.",
+    "title": "Access by role",
+    "subtitle": "Check the permissions each role has. Scoped permissions show a button to adjust which data they apply to.",
     "permission": "Permission",
+    "permissionCount": "{{count}} permissions",
+    "permissionCount_one": "{{count}} permission",
+    "permissionCount_other": "{{count}} permissions",
     "sensitive": "Sensitive",
+    "scoped": "Scoped",
     "inactive": "Inactive",
-    "inactiveWarning": "There are inactive permissions: their cells are disabled and cannot be changed.",
+    "inactiveWarning": "There are inactive permissions: their checkboxes are disabled and cannot be changed.",
     "changeCount": "{{count}} pending changes",
     "changeCount_one": "{{count}} pending change",
     "changeCount_other": "{{count}} pending changes",
+    "searchPlaceholder": "Search permission by name, key or module…",
+    "noResults": "No permissions match the search",
+    "changeScope": "Change which data it applies to",
+    "adminLocked": "ADMIN cannot lose the ability to manage roles and permissions",
     "save": "Save",
     "saving": "Saving...",
-    "saved": "Matrix saved successfully",
+    "saved": "Changes saved. Users with those roles will see them after reloading or returning to the window.",
     "saveError": "Could not save the matrix",
     "discard": "Discard",
     "empty": "There are no permissions in the catalog"
+  },
+  "scopeDialog": {
+    "title": "Scope of “{{permission}}”",
+    "intro": "Which data does this permission apply to for the {{role}} role?",
+    "hint": "The change is applied when you press Save on the Access tab."
+  },
+  "access": {
+    "title": "System roles",
+    "subtitle": "Pick a role to see and edit what it can do and the screens it sees.",
+    "roleSummary": "{{permissions}} permissions · {{screens}} screens",
+    "edit": "Edit what it sees",
+    "back": "Back to roles",
+    "detailSubtitle": "Check what this role can do. Scoped permissions show a button to choose which data they apply to.",
+    "screensTitle": "Screens it sees",
+    "screensEmpty": "With these permissions, this role would not see any screen.",
+    "permissionsTitle": "Permissions",
+    "preview": "View menu",
+    "previewTitle": "{{role}} menu",
+    "previewEmpty": "This role would not see any menu section."
+  },
+  "help": {
+    "open": "Help",
+    "title": "How roles and permissions work",
+    "intro": "Here you decide what each role can do. Check a permission and that role has it; uncheck it and it no longer does.",
+    "howTitle": "Checkboxes",
+    "howBody": "Each row is an action and each column a role. A checkmark means that role has the permission. Permissions marked as sensitive are worth a second look.",
+    "scopeTitle": "Data scope",
+    "scopeIntro": "Some permissions (the ones showing an adjust button) also define which data they apply to:",
+    "scopeOwnExample": "Only their own: for example, just their own tickets or tasks.",
+    "scopeAreaExample": "Their area: the data of the people in their department.",
+    "scopeAllExample": "Everything: the whole company.",
+    "scopeNote": "Checking one of these permissions applies the most cautious scope; you can adjust it with the adjust button next to the checkbox.",
+    "appliesTitle": "Who it applies to",
+    "appliesBody": "The change is for the whole role: everyone with that role sees it once their session updates (on reload or when returning to the window). Your own session does not change unless you have that role.",
+    "catalogTitle": "Catalog",
+    "catalogBody": "In the Catalog tab you create, edit and activate/deactivate permissions. An inactive permission cannot be granted and does not apply to anyone."
   },
   "catalog": {
     "title": "Permission catalog",
@@ -42,7 +98,7 @@
     "new": "New permission",
     "createTitle": "New permission",
     "editTitle": "Edit permission",
-    "sensible": "Sensitive",
+    "sensitive": "Sensitive",
     "active": "Active",
     "inactive": "Inactive",
     "activate": "Activate",
@@ -54,29 +110,36 @@
     "saveError": "Could not save the permission",
     "saving": "Saving...",
     "columns": {
-      "clave": "Key",
-      "modulo": "Module",
-      "nombre": "Name",
-      "alcances": "Scopes",
-      "sensible": "Sensitive",
-      "orden": "Order",
-      "activo": "Status"
+      "key": "Key",
+      "module": "Module",
+      "name": "Name",
+      "scopes": "Scopes",
+      "sensitive": "Sensitive",
+      "sortOrder": "Order",
+      "active": "Status"
     },
     "fields": {
-      "clave": "Key (module.action)",
-      "modulo": "Module",
-      "nombre": "Name",
-      "descripcion": "Description",
-      "alcances": "Allowed scopes",
-      "sensible": "Sensitive permission (ADMIN only)",
-      "orden": "Order"
+      "key": "Key (module.action)",
+      "module": "Module",
+      "name": "Name",
+      "description": "Description",
+      "scopes": "Allowed scopes",
+      "sensitive": "Sensitive permission (ADMIN only)",
+      "sortOrder": "Order"
     },
     "errors": {
-      "clave": "The key must use the module.action format (lowercase, digits and underscore)",
-      "modulo": "Module is required",
-      "nombre": "Name is required",
-      "alcances": "Select at least one scope",
-      "orden": "Order must be an integer greater than or equal to 0"
+      "key": "The key must use the module.action format (lowercase, digits and underscore)",
+      "module": "Module is required",
+      "name": "Name is required",
+      "scopes": "Select at least one scope",
+      "sortOrder": "Order must be an integer greater than or equal to 0"
     }
+  },
+  "errors": {
+    "load": "Error loading the permissions",
+    "saveMatrix": "Error saving the matrix",
+    "create": "Error creating the permission",
+    "update": "Error updating the permission",
+    "toggle": "Error changing the permission status"
   }
 }

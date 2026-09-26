@@ -11,7 +11,7 @@ import {
 import { FaBuilding, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import {
   DepartmentsTable,
   useDepartmentsCrud,
@@ -20,7 +20,7 @@ import {
 export default function DepartmentsPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["departments", "common"]);
-  const canManage = usePuede("departamentos.administrar");
+  const canManage = useCan("departments.manage");
 
   const crud = useDepartmentsCrud();
 
@@ -59,7 +59,7 @@ export default function DepartmentsPage() {
         fetchData={crud.fetchTableData}
         reloadKey={crud.reloadKey}
         canManage={canManage}
-        onView={(d) => navigate(`/departamentos/${d.id}`)}
+        onView={(d) => navigate(`/departments/${d.id}`)}
         onEdit={crud.openEditDept}
         onDelete={crud.setDeptToDelete}
       />

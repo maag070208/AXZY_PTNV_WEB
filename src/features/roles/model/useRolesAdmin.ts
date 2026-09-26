@@ -1,23 +1,63 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  permisoApi,
-  type CatalogoCreateDto,
-  type CatalogoUpdateDto,
-  type MatrizCambio,
-  type PermisoCatalogo,
+  permissionApi,
+  type CatalogCreateDto,
+  type CatalogUpdateDto,
+  type MatrixChange,
+  type PermissionCatalog,
   type RolesAdminData,
-} from "@entities/permiso";
-import type { Alcance } from "@entities/user";
+} from "@entities/permission";
+import type { PermissionScope } from "@entities/user";
+import { i18n } from "@shared/i18n";
 
 const errorMessage = (err: unknown, fallback: string): string =>
   (err as { message?: string })?.message ?? fallback;
 
-const cellKey = (rol: string, permiso: string): string => `${permiso}|${rol}`;
+const cellKey = (role: string, permission: string): string => `${permission}|${role}`;
 
-const toBaseline = (data: RolesAdminData): Record<string, Alcance> => {
-  const base: Record<string, Alcance> = {};
-  for (const celda of data.matriz) {
-    base[cellKey(celda.rol, celda.permiso)] = celda.alcance;
+/**
+ * Alcance por defecto cuando se marca desde "no" un permiso con alcance de
+ * datos. Se eligió el **mínimo útil** para no ampliar accesos sin querer: los
+ * tickets/tareas arrancan en Propio y la bitácora/checador/horas extra en Área.
+ * El usuario puede cambiarlo desde el modal "cambiar alcance".
+ */
+export const DEFAULT_SCOPE: Record<string, PermissionScope> = {
+  "tickets.view": "OWN",
+  "tickets.edit": "OWN",
+  "tickets.close": "OWN",
+  "tasks.view": "OWN",
+  "tasks.assign": "OWN",
+  "tasks.complete": "OWN",
+  "access.log": "AREA",
+  "time_clock.view": "AREA",
+  "overtime.view": "AREA",
+  "overtime.approve": "AREA",
+  "users.permissions": "AREA",
+};
+
+/** Permiso con alcance de datos (admite Propio/Área además de Todo). */
+export const isScopedPermission = (permission: PermissionCatalog): boolean =>
+  permission.scopes.some((scope) => scope === "OWN" || scope === "AREA");
+
+/** Alcance que se aplica al marcar un permiso desde "no". */
+export const defaultScopeFor = (
+  permission: string,
+  catalog: readonly PermissionCatalog[]
+): PermissionScope => {
+  const definition = catalog.find((item) => item.key === permission);
+  const predefined = DEFAULT_SCOPE[permission];
+  if (predefined && (!definition || definition.scopes.includes(predefined))) {
+    return predefined;
+  }
+  if (!definition) return predefined ?? "ALL";
+  if (definition.scopes.includes("ALL")) return "ALL";
+  return definition.scopes[0] ?? "NONE";
+};
+
+const toBaseline = (data: RolesAdminData): Record<string, PermissionScope> => {
+  const base: Record<string, PermissionScope> = {};
+  for (const cell of data.matrix) {
+    base[cellKey(cell.role, cell.permission)] = cell.scope;
   }
   return base;
 };
@@ -25,15 +65,19 @@ const toBaseline = (data: RolesAdminData): Record<string, Alcance> => {
 export interface RolesAdminState {
   data: RolesAdminData | null;
   /** Alcance en edición por celda (`permiso|rol`). */
-  draft: Record<string, Alcance>;
+  draft: Record<string, PermissionScope>;
+  /** Permisos en edición agrupados por rol (solo los ≠ NONE). */
+  permissionsByRole: Record<string, Partial<Record<string, PermissionScope>>>;
   /** Cambios pendientes respecto a lo persistido. */
-  changes: MatrizCambio[];
+  changes: MatrixChange[];
   dirty: boolean;
   loading: boolean;
   saving: boolean;
   error: string | null;
   saveError: string | null;
-  setAlcance: (rol: string, permiso: string, alcance: Alcance) => void;
+  setScope: (role: string, permission: string, scope: PermissionScope) => void;
+  /** Marca/desmarca una celda (sí/no). Al marcar aplica el alcance por defecto. */
+  toggle: (role: string, permission: string) => void;
   save: () => Promise<boolean>;
   reload: () => Promise<void>;
   discard: () => void;
@@ -46,8 +90,8 @@ export interface RolesAdminState {
  */
 export const useRolesAdmin = (): RolesAdminState => {
   const [data, setData] = useState<RolesAdminData | null>(null);
-  const [baseline, setBaseline] = useState<Record<string, Alcance>>({});
-  const [draft, setDraft] = useState<Record<string, Alcance>>({});
+  const [baseline, setBaseline] = useState<Record<string, PermissionScope>>({});
+  const [draft, setDraft] = useState<Record<string, PermissionScope>>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,13 +101,13 @@ export const useRolesAdmin = (): RolesAdminState => {
     setLoading(true);
     setError(null);
     try {
-      const result = await permisoApi.getAdmin();
+      const result = await permissionApi.getAdmin();
       const base = toBaseline(result);
       setData(result);
       setBaseline(base);
       setDraft({ ...base });
     } catch (err) {
-      setError(errorMessage(err, "Error al cargar los permisos"));
+      setError(errorMessage(err, i18n.t("roles:errors.load")));
       setData(null);
     } finally {
       setLoading(false);
@@ -74,28 +118,59 @@ export const useRolesAdmin = (): RolesAdminState => {
     void reload();
   }, [reload]);
 
-  const setAlcance = useCallback(
-    (rol: string, permiso: string, alcance: Alcance) => {
-      setDraft((prev) => ({ ...prev, [cellKey(rol, permiso)]: alcance }));
+  const setScope = useCallback(
+    (role: string, permission: string, scope: PermissionScope) => {
+      setDraft((prev) => ({ ...prev, [cellKey(role, permission)]: scope }));
     },
     []
   );
+
+  const toggle = useCallback(
+    (role: string, permission: string) => {
+      setDraft((prev) => {
+        const key = cellKey(role, permission);
+        const current = prev[key] ?? "NONE";
+        const next =
+          current === "NONE"
+            ? defaultScopeFor(permission, data?.catalog ?? [])
+            : "NONE";
+        return { ...prev, [key]: next };
+      });
+    },
+    [data]
+  );
+
+  /** Mapa rol → { permiso: alcance } con los permisos ≠ NONE del borrador. */
+  const permissionsByRole = useMemo<
+    Record<string, Partial<Record<string, PermissionScope>>>
+  >(() => {
+    if (!data) return {};
+    const map: Record<string, Partial<Record<string, PermissionScope>>> = {};
+    for (const role of data.roles) map[role] = {};
+    for (const permission of data.catalog) {
+      for (const role of data.roles) {
+        const scope = draft[cellKey(role, permission.key)] ?? "NONE";
+        if (scope !== "NONE") map[role][permission.key] = scope;
+      }
+    }
+    return map;
+  }, [data, draft]);
 
   const discard = useCallback(() => {
     setDraft({ ...baseline });
     setSaveError(null);
   }, [baseline]);
 
-  const changes = useMemo<MatrizCambio[]>(() => {
+  const changes = useMemo<MatrixChange[]>(() => {
     if (!data) return [];
-    const out: MatrizCambio[] = [];
-    for (const permiso of data.catalogo) {
-      for (const rol of data.roles) {
-        const key = cellKey(rol, permiso.clave);
-        const current = draft[key] ?? "NINGUNO";
-        const original = baseline[key] ?? "NINGUNO";
+    const out: MatrixChange[] = [];
+    for (const permission of data.catalog) {
+      for (const role of data.roles) {
+        const key = cellKey(role, permission.key);
+        const current = draft[key] ?? "NONE";
+        const original = baseline[key] ?? "NONE";
         if (current !== original) {
-          out.push({ rol, permiso: permiso.clave, alcance: current });
+          out.push({ role, permission: permission.key, scope: current });
         }
       }
     }
@@ -107,11 +182,11 @@ export const useRolesAdmin = (): RolesAdminState => {
     setSaving(true);
     setSaveError(null);
     try {
-      await permisoApi.saveMatriz(changes);
+      await permissionApi.saveMatrix(changes);
       await reload();
       return true;
     } catch (err) {
-      setSaveError(errorMessage(err, "Error al guardar la matriz"));
+      setSaveError(errorMessage(err, i18n.t("roles:errors.saveMatrix")));
       return false;
     } finally {
       setSaving(false);
@@ -121,26 +196,28 @@ export const useRolesAdmin = (): RolesAdminState => {
   return {
     data,
     draft,
+    permissionsByRole,
     changes,
     dirty: changes.length > 0,
     loading,
     saving,
     error,
     saveError,
-    setAlcance,
+    setScope,
+    toggle,
     save,
     reload,
     discard,
   };
 };
 
-export interface CatalogoAdminState {
-  list: () => Promise<PermisoCatalogo[]>;
+export interface CatalogAdminState {
+  list: () => Promise<PermissionCatalog[]>;
   reloadKey: number;
   reload: () => void;
-  create: (dto: CatalogoCreateDto) => Promise<PermisoCatalogo>;
-  update: (clave: string, dto: CatalogoUpdateDto) => Promise<PermisoCatalogo>;
-  toggleActivo: (permiso: PermisoCatalogo) => Promise<PermisoCatalogo>;
+  create: (dto: CatalogCreateDto) => Promise<PermissionCatalog>;
+  update: (key: string, dto: CatalogUpdateDto) => Promise<PermissionCatalog>;
+  toggleActive: (permission: PermissionCatalog) => Promise<PermissionCatalog>;
   saving: boolean;
   error: string | null;
   setError: (message: string | null) => void;
@@ -150,15 +227,15 @@ export interface CatalogoAdminState {
  * Alta/edición y activación del catálogo de permisos. El listado se lee vía
  * `GET /permisos/admin` (incluye inactivos) y cada mutación recarga la tabla.
  */
-export const useCatalogoPermisos = (): CatalogoAdminState => {
+export const usePermissionCatalog = (): CatalogAdminState => {
   const [reloadKey, setReloadKey] = useState<number>(0);
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const list = useCallback(
-    async (): Promise<PermisoCatalogo[]> => {
-      const result = await permisoApi.getAdmin();
-      return result.catalogo;
+    async (): Promise<PermissionCatalog[]> => {
+      const result = await permissionApi.getAdmin();
+      return result.catalog;
     },
     []
   );
@@ -186,28 +263,28 @@ export const useCatalogoPermisos = (): CatalogoAdminState => {
   );
 
   const create = useCallback(
-    (dto: CatalogoCreateDto) =>
-      run(() => permisoApi.createCatalogo(dto), "Error al crear el permiso"),
+    (dto: CatalogCreateDto) =>
+      run(() => permissionApi.createCatalog(dto), i18n.t("roles:errors.create")),
     [run]
   );
 
   const update = useCallback(
-    (clave: string, dto: CatalogoUpdateDto) =>
+    (key: string, dto: CatalogUpdateDto) =>
       run(
-        () => permisoApi.updateCatalogo(clave, dto),
-        "Error al actualizar el permiso"
+        () => permissionApi.updateCatalog(key, dto),
+        i18n.t("roles:errors.update")
       ),
     [run]
   );
 
-  const toggleActivo = useCallback(
-    (permiso: PermisoCatalogo) =>
+  const toggleActive = useCallback(
+    (permission: PermissionCatalog) =>
       run(
-        () => permisoApi.updateCatalogo(permiso.clave, { activo: !permiso.activo }),
-        "Error al cambiar el estado del permiso"
+        () => permissionApi.updateCatalog(permission.key, { active: !permission.active }),
+        i18n.t("roles:errors.toggle")
       ),
     [run]
   );
 
-  return { list, reloadKey, reload, create, update, toggleActivo, saving, error, setError };
+  return { list, reloadKey, reload, create, update, toggleActive, saving, error, setError };
 };

@@ -1,6 +1,11 @@
-/** Non-empty helper. Returns null when valid, otherwise a Spanish error message. */
-export const validateRequired = (value: string | null | undefined, label = "Este campo"): string | null => {
-  if (value == null || value.trim() === "") return `${label} es obligatorio`;
+import { i18n } from "@shared/i18n";
+
+/** Non-empty helper. Returns null when valid, otherwise a translated error message. */
+export const validateRequired = (
+  value: string | null | undefined,
+  label = i18n.t("common:validation.thisField")
+): string | null => {
+  if (value == null || value.trim() === "") return i18n.t("common:validation.required", { label });
   return null;
 };
 
@@ -8,8 +13,8 @@ export const validateRequired = (value: string | null | undefined, label = "Este
 export const validateMinLength = (
   value: string | null | undefined,
   min: number,
-  label = "Este campo"
+  label = i18n.t("common:validation.thisField")
 ): string | null => {
-  if (value == null || value.trim() === "") return `${label} es obligatorio`;
-  return value.length >= min ? null : `${label} debe tener al menos ${min} caracteres`;
+  if (value == null || value.trim() === "") return i18n.t("common:validation.required", { label });
+  return value.length >= min ? null : i18n.t("common:validation.minLength", { label, min });
 };

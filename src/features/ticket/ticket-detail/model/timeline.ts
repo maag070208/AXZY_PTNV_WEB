@@ -25,9 +25,9 @@ const getHistoryMeta = (h: Ticket["history"][0]) => {
       color: "text-emerald-600",
     };
   if (h.type === "STATUS") {
-    if (h.detail?.includes("CERRADO"))
+    if (h.detail?.includes("CLOSED"))
       return { icon: "closed", bg: "bg-red-500", color: "text-red-600" };
-    if (h.detail?.includes("EN_SEGUIMIENTO"))
+    if (h.detail?.includes("IN_PROGRESS"))
       return { icon: "follow", bg: "bg-blue-500", color: "text-blue-600" };
     return { icon: "status", bg: "bg-sky-500", color: "text-sky-600" };
   }
@@ -50,7 +50,7 @@ export const buildTimeline = (ticket: Ticket): TimelineEvent[] => {
         icon: meta.icon,
         iconBg: meta.bg,
         title: h.detail ?? h.type,
-        author: h.autor?.name ?? "",
+        author: h.author?.name ?? "",
         timestamp: h.createdAt,
       };
     }),
@@ -59,10 +59,10 @@ export const buildTimeline = (ticket: Ticket): TimelineEvent[] => {
       type: "comment",
       icon: "comment",
       iconBg: "bg-slate-400",
-      title: c.autor?.name ?? "",
-      detail: c.texto,
-      author: c.autor?.name ?? "",
-      timestamp: c.creadoEn,
+      title: c.author?.name ?? "",
+      detail: c.text,
+      author: c.author?.name ?? "",
+      timestamp: c.createdAt,
     })),
   ];
   return events.sort(
@@ -72,7 +72,7 @@ export const buildTimeline = (ticket: Ticket): TimelineEvent[] => {
 
 export const calculateEfficacy = (ticket: Ticket) => {
   if (!ticket.closedAt) return null;
-  const created = new Date(ticket.creadoEn).getTime();
+  const created = new Date(ticket.createdAt).getTime();
   const closed = new Date(ticket.closedAt).getTime();
   const hours = (closed - created) / (1000 * 60 * 60);
 
@@ -80,10 +80,10 @@ export const calculateEfficacy = (ticket: Ticket) => {
     string,
     { excellent: number; good: number; fair: number }
   > = {
-    URGENTE: { excellent: 4, good: 8, fair: 24 },
-    ALTA: { excellent: 8, good: 24, fair: 48 },
-    MEDIA: { excellent: 24, good: 72, fair: 120 },
-    BAJA: { excellent: 72, good: 120, fair: 168 },
+    URGENT: { excellent: 4, good: 8, fair: 24 },
+    HIGH: { excellent: 8, good: 24, fair: 48 },
+    MEDIUM: { excellent: 24, good: 72, fair: 120 },
+    LOW: { excellent: 72, good: 120, fair: 168 },
   };
 
   const t = thresholds[ticket.priority] ?? { excellent: 24, good: 72, fair: 120 };

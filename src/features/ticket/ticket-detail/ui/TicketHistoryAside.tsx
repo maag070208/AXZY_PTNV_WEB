@@ -9,7 +9,7 @@ import {
   FaComment,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { formatFechaHora } from "@shared/utils/dates";
+import { formatDateTime } from "@shared/utils/dates";
 import type { TimelineEvent } from "../model/timeline";
 
 interface Props {
@@ -64,13 +64,13 @@ export default function TicketHistoryAside({ events }: Props) {
                     <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 mb-1.5">
                       <span
                         className={`text-xs font-bold leading-snug ${
-                          event.title.includes("CERRADO") ? "text-red-600" : "text-slate-700"
+                          event.title.includes("CLOSED") ? "text-red-600" : "text-slate-700"
                         }`}
                       >
                         {event.title || (isComment ? tt("detail.byUser") : event.type.toUpperCase())}
                       </span>
                       <span className="text-[10px] text-slate-400 tabular-nums whitespace-nowrap bg-white px-1.5 py-0.5 rounded">
-                        {formatFechaHora(event.timestamp)}
+                        {formatDateTime(event.timestamp)}
                       </span>
                     </div>
                     {event.detail && (

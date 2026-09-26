@@ -31,7 +31,7 @@
   "columns": {
     "employee": "Empleado",
     "department": "Departamento",
-    "puesto": "Puesto",
+    "jobTitle": "Puesto",
     "status": "Estado",
     "entry": "Primera entrada",
     "exit": "Última salida",

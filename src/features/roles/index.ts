@@ -1,9 +1,9 @@
-export { default as MatrizRolesPanel } from "./ui/MatrizRolesPanel";
-export { default as CatalogoPermisosPanel } from "./ui/CatalogoPermisosPanel";
-export { default as RolesPermisosTabs } from "./ui/RolesPermisosTabs";
+export { default as RoleAccessPanel } from "./ui/RoleAccessPanel";
+export { default as PermissionCatalogPanel } from "./ui/PermissionCatalogPanel";
+export { default as RolesPermissionsTabs } from "./ui/RolesPermissionsTabs";
 export {
   useRolesAdmin,
-  useCatalogoPermisos,
+  usePermissionCatalog,
   type RolesAdminState,
-  type CatalogoAdminState,
+  type CatalogAdminState,
 } from "./model/useRolesAdmin";

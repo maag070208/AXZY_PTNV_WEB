@@ -47,12 +47,12 @@ export const updateTicketThunk = createAsyncThunk<
   {
     id: string;
     data: Partial<{
-      titulo: string;
-      descripcion: string;
+      title: string;
+      description: string;
       status: string;
       priority: string;
       categoryId: string | null;
-      asignadoAId: string | null;
+      assignedToId: string | null;
       departmentId: string | null;
     }>;
   }
@@ -65,11 +65,11 @@ export const updateTicketThunk = createAsyncThunk<
 
 export const addCommentThunk = createAsyncThunk<
   { ticketId: string; comment: any },
-  { ticketId: string; texto: string }
+  { ticketId: string; text: string }
 >(
   "tickets/addComment",
-  async ({ ticketId, texto }) => {
-    const comment = await ticketsApi.addComment(ticketId, texto);
+  async ({ ticketId, text }) => {
+    const comment = await ticketsApi.addComment(ticketId, text);
     return { ticketId, comment };
   }
 );

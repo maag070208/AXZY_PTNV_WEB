@@ -8,10 +8,11 @@ import {
   fetchTicketById,
   updateTicketThunk,
 } from "@entities/ticket";
+import { i18n } from "@shared/i18n";
 
 export interface TicketEditDraft {
-  titulo: string;
-  descripcion: string;
+  title: string;
+  description: string;
   priority: string;
 }
 
@@ -22,9 +23,9 @@ export const useEditTicket = () => {
   const ticket = useSelector((s: RootState) => s.tickets.current);
 
   const [form, setForm] = useState<TicketEditDraft>({
-    titulo: "",
-    descripcion: "",
-    priority: "MEDIA",
+    title: "",
+    description: "",
+    priority: "MEDIUM",
   });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -43,8 +44,8 @@ export const useEditTicket = () => {
   useEffect(() => {
     if (ticket) {
       setForm({
-        titulo: ticket.titulo,
-        descripcion: ticket.descripcion,
+        title: ticket.title,
+        description: ticket.description,
         priority: ticket.priority,
       });
     }
@@ -62,13 +63,13 @@ export const useEditTicket = () => {
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
-    if (!form.titulo.trim()) e.titulo = "El título es obligatorio";
-    else if (form.titulo.trim().length < 3) e.titulo = "El título debe tener al menos 3 caracteres";
+    if (!form.title.trim()) e.title = i18n.t("tickets:form.validation.titleRequired");
+    else if (form.title.trim().length < 3) e.title = i18n.t("tickets:form.validation.titleMin", { min: 3 });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const isValid = form.titulo.trim().length >= 3;
+  const isValid = form.title.trim().length >= 3;
 
   const handleSave = async (): Promise<boolean> => {
     if (!validate() || !id) {
@@ -82,8 +83,8 @@ export const useEditTicket = () => {
         updateTicketThunk({
           id,
           data: {
-            titulo: form.titulo.trim(),
-            descripcion: form.descripcion.trim(),
+            title: form.title.trim(),
+            description: form.description.trim(),
             priority: form.priority,
           },
         })

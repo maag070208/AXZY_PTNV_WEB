@@ -12,39 +12,39 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { DepartamentosPanel } from "@widgets/catalog/departamentos";
+import { DepartmentsPanel } from "@widgets/catalog/departments";
 import { SubareasPanel } from "@widgets/catalog/subareas";
 import {
-  TiposDispositivoTab,
-  TiposDocumentoTab,
-  GenerosTab,
-  TiposSangreTab,
-  CategoriasTicketTab,
+  DeviceTypesTab,
+  DocumentTypesTab,
+  GendersTab,
+  BloodTypesTab,
+  TicketCategoriesTab,
 } from "@features/catalog";
 import { SysConfigTab } from "@features/sys-config";
 
 export default function CatalogTabs() {
   const { t } = useTranslation("catalog");
   const [createSignal, setCreateSignal] = useState(0);
-  const [active, setActive] = useState("departamentos");
+  const [active, setActive] = useState("departments");
 
   const items = [
-    { id: "departamentos", label: t("tabs.departamentos"), icon: <FaBuilding size={12} />, canCreate: true, content: <DepartamentosPanel openCreateSignal={createSignal} /> },
+    { id: "departments", label: t("tabs.departments"), icon: <FaBuilding size={12} />, canCreate: true, content: <DepartmentsPanel openCreateSignal={createSignal} /> },
     { id: "subareas", label: t("tabs.subareas"), icon: <FaNetworkWired size={12} />, canCreate: true, content: <SubareasPanel openCreateSignal={createSignal} /> },
-    { id: "tiposDispositivo", label: t("tabs.tiposDispositivo"), icon: <FaMicrochip size={12} />, canCreate: true, content: <TiposDispositivoTab openCreateSignal={createSignal} /> },
-    { id: "tiposDocumento", label: t("tabs.tiposDocumento"), icon: <FaFileAlt size={12} />, canCreate: true, content: <TiposDocumentoTab openCreateSignal={createSignal} /> },
-    { id: "generos", label: t("tabs.generos"), icon: <FaVenusMars size={12} />, canCreate: true, content: <GenerosTab openCreateSignal={createSignal} /> },
-    { id: "tiposSangre", label: t("tabs.tiposSangre"), icon: <FaTint size={12} />, canCreate: true, content: <TiposSangreTab openCreateSignal={createSignal} /> },
-    { id: "categoriasTicket", label: t("tabs.categoriasTicket"), icon: <FaTags size={12} />, canCreate: true, content: <CategoriasTicketTab openCreateSignal={createSignal} /> },
-    { id: "notificaciones", label: t("tabs.notificaciones"), icon: <FaEnvelope size={12} />, canCreate: false, content: <SysConfigTab /> },
+    { id: "deviceTypes", label: t("tabs.deviceTypes"), icon: <FaMicrochip size={12} />, canCreate: true, content: <DeviceTypesTab openCreateSignal={createSignal} /> },
+    { id: "documentTypes", label: t("tabs.documentTypes"), icon: <FaFileAlt size={12} />, canCreate: true, content: <DocumentTypesTab openCreateSignal={createSignal} /> },
+    { id: "genders", label: t("tabs.genders"), icon: <FaVenusMars size={12} />, canCreate: true, content: <GendersTab openCreateSignal={createSignal} /> },
+    { id: "bloodTypes", label: t("tabs.bloodTypes"), icon: <FaTint size={12} />, canCreate: true, content: <BloodTypesTab openCreateSignal={createSignal} /> },
+    { id: "ticketCategories", label: t("tabs.categoriesTicket"), icon: <FaTags size={12} />, canCreate: true, content: <TicketCategoriesTab openCreateSignal={createSignal} /> },
+    { id: "notifications", label: t("tabs.notifications"), icon: <FaEnvelope size={12} />, canCreate: false, content: <SysConfigTab /> },
   ];
 
   const groups = [
-    { id: "organizacion", label: t("groups.organizacion"), ids: ["departamentos", "subareas"] },
-    { id: "inventario", label: t("groups.inventario"), ids: ["tiposDispositivo"] },
-    { id: "personal", label: t("groups.personal"), ids: ["tiposDocumento", "generos", "tiposSangre"] },
-    { id: "tickets", label: t("groups.tickets"), ids: ["categoriasTicket"] },
-    { id: "sistema", label: t("groups.sistema"), ids: ["notificaciones"] },
+    { id: "organization", label: t("groups.organization"), ids: ["departments", "subareas"] },
+    { id: "inventory", label: t("groups.inventory"), ids: ["deviceTypes"] },
+    { id: "employees", label: t("groups.personal"), ids: ["documentTypes", "genders", "bloodTypes"] },
+    { id: "tickets", label: t("groups.tickets"), ids: ["ticketCategories"] },
+    { id: "system", label: t("groups.system"), ids: ["notifications"] },
   ];
 
   const current = items.find((item) => item.id === active) ?? items[0];

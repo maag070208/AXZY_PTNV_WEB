@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "@app/store";
-import { usersApi, usePermiso, type Alcance, type User } from "@entities/user";
+import { usersApi, usePermission, type PermissionScope, type User } from "@entities/user";
 import {
   ticketsApi,
   type KanbanAssignment,
@@ -11,30 +11,30 @@ import {
 import type { Status } from "@shared/ui/kanban";
 
 const COLUMNS: Array<{ status: Status }> = [
-  { status: "PENDIENTE" },
-  { status: "EN_PROGRESO" },
-  { status: "EN_REVISION" },
-  { status: "COMPLETADA" },
+  { status: "PENDING" },
+  { status: "IN_PROGRESS" },
+  { status: "IN_REVIEW" },
+  { status: "COMPLETED" },
 ];
 
 export const useKanban = (ticketId?: string) => {
   const { t: tt } = useTranslation("tickets");
   const currentUser = useSelector((s: RootState) => s.auth.user);
-  const alcanceAsignar = usePermiso("tareas.asignar");
-  const alcanceCompletar = usePermiso("tareas.completar");
-  const canCreate = alcanceAsignar !== "NINGUNO";
+  const scopeAssign = usePermission("tasks.assign");
+  const scopeComplete = usePermission("tasks.complete");
+  const canCreate = scopeAssign !== "NONE";
 
   /** Alcance sobre el registro: TODO siempre; AREA incluye su departamento. */
-  const alcancePermite = (
-    alcance: Alcance,
-    departamentoId: string | null | undefined,
-    propio: boolean
+  const scopeAllows = (
+    scope: PermissionScope,
+    departmentId: string | null | undefined,
+    own: boolean
   ): boolean =>
-    alcance === "TODO" ||
-    (alcance === "AREA" &&
-      (propio ||
-        (!!currentUser?.departmentId && departamentoId === currentUser.departmentId))) ||
-    (alcance === "PROPIO" && propio);
+    scope === "ALL" ||
+    (scope === "AREA" &&
+      (own ||
+        (!!currentUser?.departmentId && departmentId === currentUser.departmentId))) ||
+    (scope === "OWN" && own);
 
   const [rows, setRows] = useState<KanbanAssignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +82,7 @@ export const useKanban = (ticketId?: string) => {
   }, [toast]);
 
   useEffect(() => {
-    usersApi.empleados().then(setEmployees).catch(() => setEmployees([]));
+    usersApi.employees().then(setEmployees).catch(() => setEmployees([]));
   }, []);
 
   useEffect(() => {
@@ -115,7 +115,7 @@ export const useKanban = (ticketId?: string) => {
       opts.push({
         value: r.id,
         label: `${r.title} · #${r.ticketId.slice(0, 6).toUpperCase()} · ${r.user.name}`,
-        ticket: r.ticket.titulo,
+        ticket: r.ticket.title,
         assignee: r.user.name,
       });
     });
@@ -170,7 +170,7 @@ export const useKanban = (ticketId?: string) => {
   const handleSearchEmployees = async (query?: string) => {
     setBusyEmployees(true);
     try {
-      setEmployees(await usersApi.empleados(undefined, query || undefined));
+      setEmployees(await usersApi.employees(undefined, query || undefined));
     } catch {
       setEmployees([]);
     } finally {
@@ -229,7 +229,7 @@ export const useKanban = (ticketId?: string) => {
     value: employee.id,
     label: [
       employee.name,
-      employee.numeroEmpleado ? `#${employee.numeroEmpleado}` : null,
+      employee.employeeNumber ? `#${employee.employeeNumber}` : null,
     ]
       .filter(Boolean)
       .join(" "),
@@ -237,16 +237,16 @@ export const useKanban = (ticketId?: string) => {
 
   const ticketSelectOptions = ticketOptions.map((t) => ({
     value: t.id,
-    label: `${t.titulo} · #${t.id.slice(0, 8).toUpperCase()}`,
+    label: `${t.title} · #${t.id.slice(0, 8).toUpperCase()}`,
   }));
 
   const canManageModalTicket = Boolean(
     modalTicket &&
-      alcancePermite(
-        alcanceAsignar,
+      scopeAllows(
+        scopeAssign,
         modalTicket.departmentId,
-        modalTicket.creadoPorId === currentUser?.id ||
-          modalTicket.asignadoAId === currentUser?.id
+        modalTicket.createdById === currentUser?.id ||
+          modalTicket.assignedToId === currentUser?.id
       )
   );
 
@@ -277,7 +277,7 @@ export const useKanban = (ticketId?: string) => {
       setDraggingId(null);
       return;
     }
-    if (status === "COMPLETADA" && alcanceCompletar === "NINGUNO") {
+    if (status === "COMPLETED" && scopeComplete === "NONE") {
       setToast(tt("kanban.completeRestricted"));
       setDraggingId(null);
       return;

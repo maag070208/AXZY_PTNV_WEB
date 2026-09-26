@@ -13,7 +13,7 @@ import {
 import { FaBuilding, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import {
   DepartmentDetailAside,
   DepartmentInfoCard,
@@ -24,9 +24,9 @@ export default function DepartmentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["departments", "common"]);
-  const canManage = usePuede("departamentos.administrar");
+  const canManage = useCan("departments.manage");
 
-  const detail = useDepartmentDetail(id, () => navigate("/departamentos"));
+  const detail = useDepartmentDetail(id, () => navigate("/departments"));
 
   if (!detail.dept) {
     return (
@@ -35,7 +35,7 @@ export default function DepartmentDetailPage() {
         backAction={() => navigate(-1)}
         icon={<FaBuilding size={20} />}
         breadcrumbs={[
-          { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departamentos") },
+          { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departments") },
           { label: tt("detail.breadcrumbDetail") },
         ]}
       >
@@ -61,7 +61,7 @@ export default function DepartmentDetailPage() {
       backAction={() => navigate(-1)}
       icon={<FaBuilding size={20} />}
       breadcrumbs={[
-        { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departamentos") },
+        { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departments") },
         { label: dept.name },
       ]}
       actions={

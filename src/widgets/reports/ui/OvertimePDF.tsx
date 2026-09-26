@@ -1,9 +1,9 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { useTranslation } from "react-i18next";
 import type {
-  HorasExtraPdfMeta,
-  HorasExtraRow,
-  HorasExtraSummary,
+  OvertimePdfMeta,
+  OvertimeRow,
+  OvertimeSummary,
 } from "@entities/schedule";
 import { PDF_COLORS, pdfTheme } from "@shared/pdf/theme";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
@@ -12,9 +12,9 @@ import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
 
 interface Props {
-  rows: HorasExtraRow[];
-  summary: HorasExtraSummary;
-  meta: HorasExtraPdfMeta;
+  rows: OvertimeRow[];
+  summary: OvertimeSummary;
+  meta: OvertimePdfMeta;
   title?: string;
 }
 
@@ -137,7 +137,7 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
       ? fmtDateInTZ(summary.range.start, tz)
       : `${fmtDateInTZ(summary.range.start, tz)} — ${prevCivilDay(summary.range.end, tz)}`;
 
-  const approvedDays = rows.reduce((acc, r) => acc + r.diasAprobados, 0);
+  const approvedDays = rows.reduce((acc, r) => acc + r.approvedDays, 0);
 
   const cards: Array<{ label: string; value: string | number; color: string; bg: string }> = [
     { label: t("overtime.pdf.totalPeople"), value: summary.peopleWithExtra, color: PDF_COLORS.band, bg: PDF_COLORS.light },
@@ -205,24 +205,24 @@ export default function OvertimePDF({ rows, summary, meta, title }: Props) {
               <View style={{ width: COL.employee }}>
                 <Text style={pdfTheme.cellDescTitle}>{r.employeeName}</Text>
                 <Text style={pdfTheme.cellDescSub}>
-                  {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
+                  {r.employeeNumber ? `#${r.employeeNumber}` : "—"}
                 </Text>
               </View>
               <View style={{ width: COL.department }}>
                 <Text style={pdfTheme.cellMuted}>{r.departmentName ?? "—"}</Text>
               </View>
               <View style={{ width: COL.schedule }}>
-                <Text style={r.horarioNombre ? pdfTheme.cell : pdfTheme.cellMuted}>
-                  {r.horarioNombre ?? t("overtime.noSchedule")}
+                <Text style={r.scheduleName ? pdfTheme.cell : pdfTheme.cellMuted}>
+                  {r.scheduleName ?? t("overtime.noSchedule")}
                 </Text>
               </View>
               <View style={{ width: COL.approved }}>
-                <Text style={r.aprobadoMin > 0 ? pdfTheme.cellBold : pdfTheme.cellMuted}>
-                  {fmtMinutes(r.aprobadoMin)}
+                <Text style={r.approvedMin > 0 ? pdfTheme.cellBold : pdfTheme.cellMuted}>
+                  {fmtMinutes(r.approvedMin)}
                 </Text>
               </View>
               <View style={{ width: COL.days }}>
-                <Text style={pdfTheme.cell}>{r.diasAprobados}</Text>
+                <Text style={pdfTheme.cell}>{r.approvedDays}</Text>
               </View>
             </View>
           ))}

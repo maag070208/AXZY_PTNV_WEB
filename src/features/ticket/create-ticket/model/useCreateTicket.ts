@@ -3,10 +3,11 @@ import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch } from "@app/store";
 import { createTicketThunk, ticketsApi, type TicketCategory } from "@entities/ticket";
+import { i18n } from "@shared/i18n";
 
 export interface TicketDraft {
-  titulo: string;
-  descripcion: string;
+  title: string;
+  description: string;
   priority: string;
   categoryId: string;
 }
@@ -16,9 +17,9 @@ export const useCreateTicket = () => {
   const { t } = useTranslation(["tickets", "common"]);
 
   const [form, setForm] = useState<TicketDraft>({
-    titulo: "",
-    descripcion: "",
-    priority: "MEDIA",
+    title: "",
+    description: "",
+    priority: "MEDIUM",
     categoryId: "",
   });
   const [categories, setCategories] = useState<TicketCategory[]>([]);
@@ -55,13 +56,13 @@ export const useCreateTicket = () => {
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
-    if (!form.titulo.trim()) e.titulo = "El título es obligatorio";
-    else if (form.titulo.trim().length < 3) e.titulo = "El título debe tener al menos 3 caracteres";
+    if (!form.title.trim()) e.title = i18n.t("tickets:form.validation.titleRequired");
+    else if (form.title.trim().length < 3) e.title = i18n.t("tickets:form.validation.titleMin", { min: 3 });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const isValid = form.titulo.trim().length >= 3;
+  const isValid = form.title.trim().length >= 3;
 
   const handleSave = async (): Promise<boolean> => {
     if (!validate()) {
@@ -73,8 +74,8 @@ export const useCreateTicket = () => {
     try {
       const action = await dispatch(
         createTicketThunk({
-          titulo: form.titulo.trim(),
-          descripcion: form.descripcion.trim(),
+          title: form.title.trim(),
+          description: form.description.trim(),
           priority: form.priority,
           categoryId: form.categoryId || undefined,
         })
@@ -82,7 +83,7 @@ export const useCreateTicket = () => {
       if (createTicketThunk.fulfilled.match(action)) {
         const ticket = action.payload;
         for (const file of files) {
-          await ticketsApi.uploadAttachment(ticket.id, file, "FOTO");
+          await ticketsApi.uploadAttachment(ticket.id, file, "PHOTO");
         }
         setToastType("success");
         setToast(t("new.created"));

@@ -1,41 +1,41 @@
 import { api, post } from "@shared/api/client";
 import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
 import type {
-  AsignacionRow,
-  AsignadoPersona,
-  HorasExtraResponse,
-  Horario,
-  HorarioInput,
+  AssignmentRow,
+  AssignedPerson,
+  OvertimeResponse,
+  Schedule,
+  ScheduleInput,
 } from "../model/types";
 
 export const scheduleApi = {
   list: (includeInactive?: boolean) =>
-    api.get<Horario[]>(`/horarios${includeInactive ? "?includeInactive=true" : ""}`),
-  create: (input: HorarioInput) => api.post<Horario>(`/horarios`, input),
-  update: (id: string, input: Partial<HorarioInput> & { activo?: boolean }) =>
-    api.patch<Horario>(`/horarios/${id}`, input),
+    api.get<Schedule[]>(`/schedules${includeInactive ? "?includeInactive=true" : ""}`),
+  create: (input: ScheduleInput) => api.post<Schedule>(`/schedules`, input),
+  update: (id: string, input: Partial<ScheduleInput> & { active?: boolean }) =>
+    api.patch<Schedule>(`/schedules/${id}`, input),
   remove: (id: string) =>
-    api.delete<{ soft: boolean; data: Horario }>(`/horarios/${id}`),
+    api.delete<{ soft: boolean; data: Schedule }>(`/schedules/${id}`),
 
   /** Asignación masiva: un horario → N personas desde una fecha. */
-  asignar: (data: { horarioId: string; userIds: string[]; desde: string }) =>
-    api.post<{ asignados: number; horario: string; desde: string }>(
-      `/horarios/asignaciones`,
+  assign: (data: { scheduleId: string; userIds: string[]; from: string }) =>
+    api.post<{ assigned: number; schedule: string; from: string }>(
+      `/schedules/assignments`,
       data
     ),
 
-  asignacionesTable: (params: ITDataTableFetchParamsPost) =>
-    tableRequest<AsignacionRow>(`/horarios/asignaciones/query`, params),
+  assignmentsTable: (params: ITDataTableFetchParamsPost) =>
+    tableRequest<AssignmentRow>(`/schedules/assignments/query`, params),
 
   /** Personas con asignación vigente de un horario. */
-  asignadosDeHorario: (id: string) =>
-    api.get<AsignadoPersona[]>(`/horarios/${id}/asignados`),
+  scheduleAssignees: (id: string) =>
+    api.get<AssignedPerson[]>(`/schedules/${id}/assignees`),
 
   /** Quita (cierra la vigencia) la asignación de varias personas. */
-  quitarAsignaciones: (data: { horarioId: string; userIds: string[] }) =>
-    api.post<{ quitados: number }>(`/horarios/asignaciones/quitar`, data),
+  removeAssignments: (data: { scheduleId: string; userIds: string[] }) =>
+    api.post<{ removed: number }>(`/schedules/assignments/remove`, data),
 
   /** Universo completo sin paginar, SOLO aprobado (para CSV/KPIs/PDF). */
-  horasExtraExport: (params: ITDataTableFetchParamsPost) =>
-    post<HorasExtraResponse>(`/horarios/horas-extra/export`, params),
+  overtimeExport: (params: ITDataTableFetchParamsPost) =>
+    post<OvertimeResponse>(`/schedules/overtime/export`, params),
 };

@@ -3,10 +3,11 @@ import {
   ITButton,
   ITCard,
   ITDataTable,
+  ITDatePicker,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaExclamationTriangle, FaFilePdf, FaSync } from "react-icons/fa";
+import { FaExclamationTriangle, FaFilePdf, FaSync, FaUndo } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { DeviceReportRow } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
@@ -14,102 +15,117 @@ import type { UseDevicesReport } from "../model/useDevicesReport";
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const {
     t,
-    rows,
-    loading,
     error,
     exporting,
     reloadKey,
     setReloadKey,
     stats,
+    dateRange,
+    setDateRange,
+    externalFilters,
     handleDownloadPdf,
     fetchTableData,
   } = fx;
 
-  const estadoLabel = (estado: string) =>
-    estado === "ASIGNADO"
-      ? t("devices.estadoAsignado")
-      : estado === "DISPONIBLE"
-        ? t("devices.estadoDisponible")
-        : estado === "BAJA"
-          ? t("devices.estadoBaja")
-          : t("devices.estadoOtro");
+  const handleDateRange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: Date | [Date | null, Date | null] } }
+  ) => {
+    const value = e.target.value;
+    if (Array.isArray(value)) setDateRange(value);
+  };
 
-  const estadoBadge = (estado: string) => (
+  const statusLabel = (status: string) =>
+    status === "ASSIGNED"
+      ? t("devices.assignedStatus")
+      : status === "AVAILABLE"
+        ? t("devices.availableStatus")
+        : status === "RETIRED"
+          ? t("devices.retirementStatus")
+          : t("devices.otherStatus");
+
+  const statusBadge = (status: string) => (
     <ITBadget
-      color={estado === "DISPONIBLE" ? "success" : estado === "ASIGNADO" ? "warning" : "gray"}
+      color={status === "AVAILABLE" ? "success" : status === "ASSIGNED" ? "warning" : "gray"}
       size="lg"
     >
-      {estadoLabel(estado)}
+      {statusLabel(status)}
     </ITBadget>
   );
 
   const columns: Column<DeviceReportRow>[] = [
     {
-      key: "controlActivos",
-      label: t("devices.colActivo"),
+      key: "assetTag",
+      label: t("devices.activeCol"),
       type: "string",
+      width: 160,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-black text-slate-800">
-            {r.controlActivos}
+            {r.assetTag}
           </ITText>
-          {r.cantidad > 1 && (
+          {r.quantity > 1 && (
             <ITText className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
-              {t("devices.loteTag", { count: r.cantidad })}
+              {t("devices.batchTag", { count: r.quantity })}
             </ITText>
           )}
         </ITFlex>
       ),
     },
     {
-      key: "descripcion",
-      label: t("devices.colDescripcion"),
+      key: "description",
+      label: t("devices.colDescription"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
-            {r.descripcion}
+            {r.description}
           </ITText>
           <ITText className="text-[9px] uppercase tracking-widest text-slate-400">
-            {r.tipo} · {r.marca} {r.modelo}
+            {r.type} · {r.brand} {r.model}
           </ITText>
         </ITFlex>
       ),
     },
     {
-      key: "cantidad",
-      label: t("devices.colCant"),
+      key: "quantity",
+      label: t("devices.colQty"),
       type: "number",
+      width: 90,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-700">
-          {r.cantidad}
+          {r.quantity}
         </ITText>
       ),
     },
     {
-      key: "estado",
-      label: t("devices.colEstado"),
+      key: "status",
+      label: t("devices.colStatus"),
       type: "string",
+      width: 140,
       sortable: false,
-      render: (r) => estadoBadge(r.estado),
+      render: (r) => statusBadge(r.status),
     },
     {
-      key: "responsable",
-      label: t("devices.colResponsable"),
+      key: "custodian",
+      label: t("devices.colCustodian"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (r) =>
-        r.estado === "ASIGNADO" ? (
+        r.status === "ASSIGNED" ? (
           <ITFlex direction="column" gap={0.5}>
             <ITText className="text-[11px] text-slate-700">
-              {r.responsable ?? "—"}
+              {r.custodian ?? "—"}
             </ITText>
-            {r.numeroEmpleado && (
+            {r.employeeNumber && (
               <ITText className="text-[9px] text-slate-400">
-                No. {r.numeroEmpleado}
+                No. {r.employeeNumber}
               </ITText>
             )}
           </ITFlex>
@@ -118,31 +134,33 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         ),
     },
     {
-      key: "departamento",
-      label: t("devices.colDepto"),
+      key: "department",
+      label: t("devices.colDept"),
       type: "string",
+      width: 200,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">
-          {r.estado === "ASIGNADO" ? r.departamento ?? "—" : "—"}
+          {r.status === "ASSIGNED" ? r.department ?? "—" : "—"}
         </ITText>
       ),
     },
     {
-      key: "diasAsignado",
-      label: t("devices.colDias"),
+      key: "daysAssigned",
+      label: t("devices.colDays"),
       type: "number",
+      width: 110,
       sortable: false,
       render: (r) => (
         <ITText
-          className={`text-[11px] font-black ${r.estado === "ASIGNADO" && (r.diasAsignado ?? 0) > 30
+          className={`text-[11px] font-black ${r.status === "ASSIGNED" && (r.daysAssigned ?? 0) > 30
               ? "text-red-600"
-              : r.estado === "ASIGNADO"
+              : r.status === "ASSIGNED"
                 ? "text-slate-700"
                 : "text-slate-300"
             }`}
         >
-          {r.estado === "ASIGNADO" ? r.diasAsignado ?? "—" : "—"}
+          {r.status === "ASSIGNED" ? r.daysAssigned ?? "—" : "—"}
         </ITText>
       ),
     },
@@ -150,10 +168,11 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "folio",
       label: t("devices.colFolio"),
       type: "string",
+      width: 150,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-emerald-700">
-          {r.estado === "ASIGNADO" ? r.folio ?? "—" : "—"}
+          {r.status === "ASSIGNED" ? r.folio ?? "—" : "—"}
         </ITText>
       ),
     },
@@ -161,6 +180,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "area",
       label: t("devices.colArea"),
       type: "string",
+      width: 160,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">{r.area}</ITText>
@@ -170,54 +190,79 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
 
   return (
     <ITFlex direction="column" gap={4}>
+      <ITFlex align="end" wrap="wrap" gap={3}>
+        <div className="min-w-[240px] max-w-[340px] flex-1">
+          <ITDatePicker
+            name="devicesDateRange"
+            label={t("filters.dateRange")}
+            range
+            value={dateRange}
+            onChange={handleDateRange}
+            className="w-full min-w-0"
+          />
+        </div>
+        <ITButton
+          variant="text"
+          color="gray"
+          size="sm"
+          onClick={() => setDateRange([null, null])}
+          disabled={!dateRange[0] && !dateRange[1]}
+        >
+          <ITFlex align="center" gap={1}>
+            <FaUndo size={11} />
+            <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
+          </ITFlex>
+        </ITButton>
+      </ITFlex>
+
       <ITFlex gap={3} wrap="wrap">
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-slate-800 leading-none">
-              {rows.length}
+              {stats?.total ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statDispositivos")}
+              {t("devices.statDevices")}
             </ITText>
           </ITFlex>
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-emerald-700 leading-none">
-              {stats.disponibles}
+              {stats?.available ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statDisponibles")}
+              {t("devices.availableStat")}
             </ITText>
           </ITFlex>
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-amber-700 leading-none">
-              {stats.asignados}
+              {stats?.assigned ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statAsignados")}
+              {t("devices.statAssigned")}
             </ITText>
           </ITFlex>
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-red-600 leading-none">
-              {stats.masDe30}
+              {stats?.over30 ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statMas30")}
+              {t("devices.statOver30")}
             </ITText>
           </ITFlex>
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-slate-600 leading-none">
-              {stats.bajas}
+              {stats?.retired ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statBajas")}
+              {t("devices.statRetirements")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -231,11 +276,6 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       )}
 
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
-        {loading && (
-          <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {t("devices.loading")}
-          </ITText>
-        )}
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
             <FaSync size={11} />
@@ -248,7 +288,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           variant="outlined"
           color="primary"
           onClick={handleDownloadPdf}
-          disabled={exporting || rows.length === 0}
+          disabled={exporting || (stats?.total ?? 0) === 0}
         >
           <ITFlex align="center" gap={1}>
             <FaFilePdf className="text-red-600" size={13} />
@@ -269,10 +309,14 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
             total: number;
           }>
         }
+        externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={10}
-        itemsPerPageOptions={[5, 10, 50]}
+        defaultItemsPerPage={100}
+        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITFlex>
   );

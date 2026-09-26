@@ -1,20 +1,19 @@
+import i18n from "@shared/i18n";
+import type { AppLanguage } from "@shared/i18n/config";
+
 export type UserRole =
   | "ADMIN"
-  | "GERENTE"
-  | "JEFE_DE_AREA"
-  | "EMPLEADO"
-  | "RECURSOS_HUMANOS"
+  | "MANAGER"
+  | "AREA_HEAD"
+  | "EMPLOYEE"
+  | "HUMAN_RESOURCES"
   | "GUARD";
 
-/** Etiqueta visible de cada rol. El guardia se guarda como `GUARD`. */
-export const ROLE_LABELS: Record<UserRole, string> = {
-  ADMIN: "ADMIN",
-  GERENTE: "GERENTE",
-  JEFE_DE_AREA: "JEFE DE AREA",
-  EMPLEADO: "EMPLEADO",
-  RECURSOS_HUMANOS: "RECURSOS HUMANOS",
-  GUARD: "GUARDIA",
-};
+export const USER_ROLES: UserRole[] = ["ADMIN", "MANAGER", "AREA_HEAD", "EMPLOYEE", "HUMAN_RESOURCES", "GUARD"];
+
+/** Etiqueta visible de un rol, en el idioma de la interfaz (`roles:role.*`). */
+export const roleLabel = (role: string): string =>
+  i18n.t(`roles:role.${role as UserRole}`, { defaultValue: role });
 
 export interface AuthUser {
   id: string;
@@ -25,29 +24,33 @@ export interface AuthUser {
   departmentId?: string | null;
   /**
    * Permisos efectivos del usuario (`GET /auth/me`): clave → alcance, solo los
-   * distintos de NINGUNO. Opcional porque las sesiones persistidas antes del
+   * distintos de NONE. Opcional porque las sesiones persistidas antes del
    * rollout de permisos no lo traen y `PrivateRoutes` las rehidrata.
    */
-  permisos?: Partial<Record<Permiso, Alcance>>;
+  permissions?: Partial<Record<Permission, PermissionScope>>;
+  /** Idioma del sistema (`GET /auth/me`); opcional por la misma razón. */
+  language?: AppLanguage;
 }
 
 /** Alcance efectivo de un permiso (ver ROLES_Y_PERMISOS.md §2). */
-export type Alcance = "NINGUNO" | "PROPIO" | "AREA" | "TODO";
+export type PermissionScope = "NONE" | "OWN" | "AREA" | "ALL";
 
 /**
- * Clave del catálogo dinámico de permisos del API (`GET /permisos/catalogo`).
+ * Clave del catálogo dinámico de permisos del API (`GET /permissions/catalog`).
  * Antes era un union hardcodeado; ahora el catálogo vive en la BD y puede
  * crecer sin recompilar la web, así que la clave se tipa como string libre.
  */
-export type Permiso = string;
+export type Permission = string;
 
 /** `GET /auth/me`: el usuario de la sesión con los datos de su credencial. */
 export interface AuthMe extends AuthUser {
-  numeroEmpleado: string | null;
-  puesto: string | null;
+  employeeNumber: string | null;
+  jobTitle: string | null;
   department: { id: string; name: string } | null;
-  fotoUrl: string | null;
-  permisos: Partial<Record<Permiso, Alcance>>;
+  photoUrl: string | null;
+  permissions: Partial<Record<Permission, PermissionScope>>;
+  /** Idioma del sistema (`sys_config.LANGUAGE`): la interfaz lo adopta. */
+  language: AppLanguage;
 }
 
 export interface LoginResponse {
@@ -57,13 +60,13 @@ export interface LoginResponse {
 
 export interface User extends AuthUser {
   active: boolean;
-  segundoNombre?: string | null;
-  apellidoPaterno?: string | null;
-  apellidoMaterno?: string | null;
-  puesto?: string;
+  middleName?: string | null;
+  paternalSurname?: string | null;
+  maternalSurname?: string | null;
+  jobTitle?: string;
   area?: string;
-  numeroEmpleado?: string;
-  empresa?: string | null;
+  employeeNumber?: string;
+  company?: string | null;
   departmentId?: string | null;
   department?: { id: string; name: string } | null;
   subareaId?: string | null;

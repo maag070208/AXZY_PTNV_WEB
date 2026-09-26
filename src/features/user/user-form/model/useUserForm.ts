@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
-import { ROLE_LABELS, usersApi, type User, type UserRole } from "@entities/user";
+import { USER_ROLES, roleLabel, usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
-import { personalApi, type TipoDocumento } from "@entities/personal";
+import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
 import { showToast } from "@app/toast/toast.slice";
 import type { AppDispatch } from "@app/store";
@@ -19,28 +19,28 @@ export const ROLE_GUIDANCE: Record<
     summary: "form.roles.ADMIN.summary",
     actions: ["form.roles.ADMIN.actions.0", "form.roles.ADMIN.actions.1", "form.roles.ADMIN.actions.2"],
   },
-  GERENTE: {
-    title: "form.roles.GERENTE.title",
-    summary: "form.roles.GERENTE.summary",
-    actions: ["form.roles.GERENTE.actions.0", "form.roles.GERENTE.actions.1", "form.roles.GERENTE.actions.2"],
+  MANAGER: {
+    title: "form.roles.MANAGER.title",
+    summary: "form.roles.MANAGER.summary",
+    actions: ["form.roles.MANAGER.actions.0", "form.roles.MANAGER.actions.1", "form.roles.MANAGER.actions.2"],
   },
-  JEFE_DE_AREA: {
-    title: "form.roles.JEFE_DE_AREA.title",
-    summary: "form.roles.JEFE_DE_AREA.summary",
-    actions: ["form.roles.JEFE_DE_AREA.actions.0", "form.roles.JEFE_DE_AREA.actions.1", "form.roles.JEFE_DE_AREA.actions.2"],
+  AREA_HEAD: {
+    title: "form.roles.AREA_HEAD.title",
+    summary: "form.roles.AREA_HEAD.summary",
+    actions: ["form.roles.AREA_HEAD.actions.0", "form.roles.AREA_HEAD.actions.1", "form.roles.AREA_HEAD.actions.2"],
   },
-  EMPLEADO: {
-    title: "form.roles.EMPLEADO.title",
-    summary: "form.roles.EMPLEADO.summary",
-    actions: ["form.roles.EMPLEADO.actions.0", "form.roles.EMPLEADO.actions.1", "form.roles.EMPLEADO.actions.2"],
+  EMPLOYEE: {
+    title: "form.roles.EMPLOYEE.title",
+    summary: "form.roles.EMPLOYEE.summary",
+    actions: ["form.roles.EMPLOYEE.actions.0", "form.roles.EMPLOYEE.actions.1", "form.roles.EMPLOYEE.actions.2"],
   },
-  RECURSOS_HUMANOS: {
-    title: "form.roles.RECURSOS_HUMANOS.title",
-    summary: "form.roles.RECURSOS_HUMANOS.summary",
+  HUMAN_RESOURCES: {
+    title: "form.roles.HUMAN_RESOURCES.title",
+    summary: "form.roles.HUMAN_RESOURCES.summary",
     actions: [
-      "form.roles.RECURSOS_HUMANOS.actions.0",
-      "form.roles.RECURSOS_HUMANOS.actions.1",
-      "form.roles.RECURSOS_HUMANOS.actions.2",
+      "form.roles.HUMAN_RESOURCES.actions.0",
+      "form.roles.HUMAN_RESOURCES.actions.1",
+      "form.roles.HUMAN_RESOURCES.actions.2",
     ],
   },
   GUARD: {
@@ -50,16 +50,15 @@ export const ROLE_GUIDANCE: Record<
   },
 };
 
-const ROLE_OPTIONS = (Object.keys(ROLE_LABELS) as UserRole[]).map((value) => ({
-  value,
-  label: ROLE_LABELS[value],
-}));
-
-/** Documentación obligatoria del alta de un empleado (se resuelve por nombre). */
-export const REQUIRED_DOCS: Array<{ key: string; test: RegExp; fallback: string }> = [
-  { key: "ineFrente", test: /ine.*frente|frente.*ine/i, fallback: "INE (Frente)" },
-  { key: "ineReverso", test: /ine.*reverso|reverso.*ine/i, fallback: "INE (Reverso)" },
-  { key: "comprobante", test: /domicilio/i, fallback: "Comprobante de Domicilio" },
+/**
+ * Documentación obligatoria del alta de un empleado. Se resuelve contra el
+ * catálogo de tipos de documento por nombre (datos del cliente, en español);
+ * si no existe, la etiqueta sale de `users:form.docs`.
+ */
+export const REQUIRED_DOCS: Array<{ key: "ineFront" | "ineBack" | "proofOfAddress"; test: RegExp }> = [
+  { key: "ineFront", test: /ine.*frente|frente.*ine/i },
+  { key: "ineBack", test: /ine.*reverso|reverso.*ine/i },
+  { key: "proofOfAddress", test: /domicilio/i },
 ];
 
 export interface UserFormValues {
@@ -67,12 +66,12 @@ export interface UserFormValues {
   email: string;
   password: string;
   name: string;
-  segundoNombre: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string;
+  middleName: string;
+  paternalSurname: string;
+  maternalSurname: string;
   role: UserRole;
-  numeroEmpleado: string;
-  puesto: string;
+  employeeNumber: string;
+  jobTitle: string;
   departmentId: string;
   subareaId: string;
 }
@@ -82,8 +81,8 @@ const LIMITS = {
   username: { min: 3, max: 30 },
   password: { min: 6, max: 72 },
   name: { max: 100 },
-  numeroEmpleado: { max: 30 },
-  puesto: { max: 100 },
+  employeeNumber: { max: 30 },
+  jobTitle: { max: 100 },
 } as const;
 
 const VALIDATED_FIELDS: (keyof UserFormValues)[] = [
@@ -91,8 +90,8 @@ const VALIDATED_FIELDS: (keyof UserFormValues)[] = [
   "password",
   "email",
   "name",
-  "numeroEmpleado",
-  "puesto",
+  "employeeNumber",
+  "jobTitle",
 ];
 
 /** Paso del stepper al que pertenece cada campo validado (0=datos personales, 1=acceso). */
@@ -101,31 +100,31 @@ const FIELD_STEP: Record<string, number> = {
   password: 1,
   email: 0,
   name: 0,
-  numeroEmpleado: 0,
-  puesto: 0,
+  employeeNumber: 0,
+  jobTitle: 0,
 };
 
 /** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
 export const composeFullName = (v: {
   name?: string;
-  segundoNombre?: string;
-  apellidoPaterno?: string;
-  apellidoMaterno?: string;
+  middleName?: string;
+  paternalSurname?: string;
+  maternalSurname?: string;
 }): string =>
-  [v.name, v.segundoNombre, v.apellidoPaterno, v.apellidoMaterno]
+  [v.name, v.middleName, v.paternalSurname, v.maternalSurname]
     .filter(Boolean)
     .join(" ")
     .trim();
 
 /** Divide un nombre completo almacenado en "name" a sus campos separados (fallback para datos viejos). */
-const splitStoredName = (full: string): Pick<UserFormValues, "name" | "segundoNombre" | "apellidoPaterno" | "apellidoMaterno"> => {
+const splitStoredName = (full: string): Pick<UserFormValues, "name" | "middleName" | "paternalSurname" | "maternalSurname"> => {
   const parts = full.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 1) return { name: parts[0], segundoNombre: "", apellidoPaterno: "", apellidoMaterno: "" };
+  if (parts.length === 1) return { name: parts[0], middleName: "", paternalSurname: "", maternalSurname: "" };
   return {
     name: parts[0],
-    segundoNombre: "",
-    apellidoPaterno: parts.slice(1).join(" "),
-    apellidoMaterno: "",
+    middleName: "",
+    paternalSurname: parts.slice(1).join(" "),
+    maternalSurname: "",
   };
 };
 
@@ -141,12 +140,12 @@ export const useUserForm = () => {
     email: "",
     password: "",
     name: "",
-    segundoNombre: "",
-    apellidoPaterno: "",
-    apellidoMaterno: "",
-    role: "EMPLEADO",
-    numeroEmpleado: "",
-    puesto: "",
+    middleName: "",
+    paternalSurname: "",
+    maternalSurname: "",
+    role: "EMPLOYEE",
+    employeeNumber: "",
+    jobTitle: "",
     departmentId: "",
     subareaId: "",
   });
@@ -156,7 +155,7 @@ export const useUserForm = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Documentación obligatoria del alta (INE frente/reverso + comprobante).
-  const [documentTypes, setDocumentTypes] = useState<TipoDocumento[]>([]);
+  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [docsFiles, setDocsFiles] = useState<Record<string, File | null>>({});
   const [docsError, setDocsError] = useState<string | null>(null);
 
@@ -184,12 +183,12 @@ export const useUserForm = () => {
             email: u.email ?? "",
             password: "",
             name: nameParts.name,
-            segundoNombre: u.segundoNombre ?? nameParts.segundoNombre ?? "",
-            apellidoPaterno: u.apellidoPaterno ?? nameParts.apellidoPaterno ?? "",
-            apellidoMaterno: u.apellidoMaterno ?? nameParts.apellidoMaterno ?? "",
+            middleName: u.middleName ?? nameParts.middleName ?? "",
+            paternalSurname: u.paternalSurname ?? nameParts.paternalSurname ?? "",
+            maternalSurname: u.maternalSurname ?? nameParts.maternalSurname ?? "",
             role: u.role,
-            numeroEmpleado: u.numeroEmpleado ?? "",
-            puesto: u.puesto ?? "",
+            employeeNumber: u.employeeNumber ?? "",
+            jobTitle: u.jobTitle ?? "",
             departmentId: u.departmentId ?? "",
             subareaId: u.subareaId ?? "",
           });
@@ -204,10 +203,10 @@ export const useUserForm = () => {
   const selectedDept = departments.find((d) => d.id === form.departmentId);
 
   /** En el alta de un empleado se exigen las 3 documentaciones. */
-  const requiresDocs = !isEdit && form.role === "EMPLEADO";
+  const requiresDocs = !isEdit && form.role === "EMPLOYEE";
   const requiredDocs = REQUIRED_DOCS.map((r) => {
-    const tipo = documentTypes.find((d) => r.test.test(d.nombre));
-    return { key: r.key, label: tipo?.nombre ?? r.fallback, tipoId: tipo?.id ?? null };
+    const type = documentTypes.find((d) => r.test.test(d.name));
+    return { key: r.key, label: type?.name ?? i18n.t(`users:form.docs.${r.key}`), typeId: type?.id ?? null };
   });
   const setDocFile = (key: string, file: File | null) =>
     setDocsFiles((prev) => ({ ...prev, [key]: file }));
@@ -246,35 +245,35 @@ export const useUserForm = () => {
     const trimmed = value.trim();
     switch (field) {
       case "username":
-        if (!trimmed) return "El usuario es obligatorio";
+        if (!trimmed) return i18n.t("users:form.validation.usernameRequired");
         if (trimmed.length < LIMITS.username.min)
-          return `El usuario debe tener al menos ${LIMITS.username.min} caracteres`;
+          return i18n.t("users:form.validation.usernameMin", { min: LIMITS.username.min });
         if (trimmed.length > LIMITS.username.max)
-          return `El usuario debe tener máximo ${LIMITS.username.max} caracteres`;
+          return i18n.t("users:form.validation.usernameMax", { max: LIMITS.username.max });
         return null;
       case "password":
-        if (!isEdit && !value) return "La contraseña es obligatoria";
+        if (!isEdit && !value) return i18n.t("users:form.validation.passwordRequired");
         if (value && value.length < LIMITS.password.min)
-          return `La contraseña debe tener al menos ${LIMITS.password.min} caracteres`;
+          return i18n.t("users:form.validation.passwordMin", { min: LIMITS.password.min });
         if (value.length > LIMITS.password.max)
-          return `La contraseña debe tener máximo ${LIMITS.password.max} caracteres`;
+          return i18n.t("users:form.validation.passwordMax", { max: LIMITS.password.max });
         return null;
       case "name":
-        if (!trimmed) return "El nombre es obligatorio";
+        if (!trimmed) return i18n.t("users:form.validation.nameRequired");
         if (trimmed.length > LIMITS.name.max)
-          return `El nombre debe tener máximo ${LIMITS.name.max} caracteres`;
+          return i18n.t("users:form.validation.nameMax", { max: LIMITS.name.max });
         return null;
       case "email":
         if (!trimmed) return null;
-        if (trimmed.length > 254) return "El correo debe tener máximo 254 caracteres";
+        if (trimmed.length > 254) return i18n.t("users:form.validation.emailMax", { max: 254 });
         return validateEmail(trimmed);
-      case "numeroEmpleado":
-        if (trimmed.length > LIMITS.numeroEmpleado.max)
-          return `El número de empleado debe tener máximo ${LIMITS.numeroEmpleado.max} caracteres`;
+      case "employeeNumber":
+        if (trimmed.length > LIMITS.employeeNumber.max)
+          return i18n.t("users:form.validation.employeeNumberMax", { max: LIMITS.employeeNumber.max });
         return null;
-      case "puesto":
-        if (trimmed.length > LIMITS.puesto.max)
-          return `El puesto debe tener máximo ${LIMITS.puesto.max} caracteres`;
+      case "jobTitle":
+        if (trimmed.length > LIMITS.jobTitle.max)
+          return i18n.t("users:form.validation.jobTitleMax", { max: LIMITS.jobTitle.max });
         return null;
       default:
         return null;
@@ -328,12 +327,12 @@ export const useUserForm = () => {
           username: form.username,
           email: form.email || null,
           name: fullName,
-          segundoNombre: form.segundoNombre || null,
-          apellidoPaterno: form.apellidoPaterno || null,
-          apellidoMaterno: form.apellidoMaterno || null,
+          middleName: form.middleName || null,
+          paternalSurname: form.paternalSurname || null,
+          maternalSurname: form.maternalSurname || null,
           role: form.role,
-          numeroEmpleado: form.numeroEmpleado || undefined,
-          puesto: form.puesto || undefined,
+          employeeNumber: form.employeeNumber || undefined,
+          jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
           subareaId: form.subareaId || undefined,
         });
@@ -343,12 +342,12 @@ export const useUserForm = () => {
           email: form.email || undefined,
           password: form.password,
           name: fullName,
-          segundoNombre: form.segundoNombre || undefined,
-          apellidoPaterno: form.apellidoPaterno || undefined,
-          apellidoMaterno: form.apellidoMaterno || undefined,
+          middleName: form.middleName || undefined,
+          paternalSurname: form.paternalSurname || undefined,
+          maternalSurname: form.maternalSurname || undefined,
           role: form.role,
-          numeroEmpleado: form.numeroEmpleado || undefined,
-          puesto: form.puesto || undefined,
+          employeeNumber: form.employeeNumber || undefined,
+          jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
           subareaId: form.subareaId || undefined,
         });
@@ -356,22 +355,22 @@ export const useUserForm = () => {
         if (requiresDocs) {
           for (const d of requiredDocs) {
             const file = docsFiles[d.key];
-            if (file && d.tipoId) {
-              await personalApi.uploadDocument(created.id, d.tipoId, file);
+            if (file && d.typeId) {
+              await personalApi.uploadDocument(created.id, d.typeId, file);
             }
           }
           // Correo de alta con los documentos adjuntos (fire-and-forget).
-          void personalApi.notificarAlta(created.id).catch(() => undefined);
+          void personalApi.notifyRegistration(created.id).catch(() => undefined);
         }
       }
       return true;
     } catch (e: any) {
       const code: unknown = e?.code;
-      const msg: string = e?.message ?? "Error al guardar";
+      const msg: string = e?.message ?? i18n.t("common:errors.save");
       // Duplicados que manda la API → error inline en el campo + toast global.
-      if (code === "EMAIL_TAKEN" || code === "USERNAME_TAKEN" || code === "NUMERO_EMPLEADO_TAKEN") {
+      if (code === "EMAIL_TAKEN" || code === "USERNAME_TAKEN" || code === "EMPLOYEE_NUMBER_TAKEN") {
         const field =
-          code === "EMAIL_TAKEN" ? "email" : code === "USERNAME_TAKEN" ? "username" : "numeroEmpleado";
+          code === "EMAIL_TAKEN" ? "email" : code === "USERNAME_TAKEN" ? "username" : "employeeNumber";
         setFieldError(field, msg);
         dispatch(showToast({ message: msg, type: "error" }));
       } else {
@@ -410,6 +409,6 @@ export const useUserForm = () => {
     setDocFile,
     docsError,
     tt,
-    ROLE_OPTIONS,
+    ROLE_OPTIONS: USER_ROLES.map((value) => ({ value, label: roleLabel(value) })),
   };
 };

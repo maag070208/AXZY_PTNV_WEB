@@ -7,9 +7,9 @@
   "active": "Activo",
   "inactive": "Inactivo",
   "assigned": "{{count}} asignados",
-  "tolEntrada": "Tolerancia entrada (min)",
-  "tolSalida": "Tolerancia salida (min)",
-  "comida": "Comida (min)",
+  "tolEntry": "Tolerancia entrada (min)",
+  "tolExit": "Tolerancia salida (min)",
+  "meal": "Comida (min)",
   "minExtra": "Mínimo para horas extra (min)",
   "minExtraHint": "Tiempo mínimo trabajado de más para que cuente como hora extra. 0 = sin mínimo.",
   "crossesMidnight": "Cruza medianoche",
@@ -137,5 +137,8 @@
     }
   },
   "assignedLabel": "Asignados",
-  "secondHint": "Actívalo en los días con jornada partida (p. ej. camaristas o restaurante)."
+  "secondHint": "Actívalo en los días con jornada partida (p. ej. camaristas o restaurante).",
+  "form": {
+    "notFound": "Horario no encontrado"
+  }
 }

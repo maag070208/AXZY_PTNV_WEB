@@ -1,29 +1,38 @@
-import { ITLayout, ITSidebarProps, ITToast } from "@axzydev/axzy_ui_system";
-import { useEffect, useState, useCallback } from "react";
+import { ITLayout, ITSidebarProps, ITToast, type ITNavigationItem } from "@axzydev/axzy_ui_system";
+import { useEffect, useState, useCallback, type ReactNode } from "react";
 import {
   FaBoxes,
   FaChartBar,
   FaDoorOpen,
   FaHouseUser,
-  FaMapMarkerAlt,
-  FaTasks,
   FaTicketAlt,
-  FaUserShield,
   FaUserTie,
   FaCog,
-  FaClipboardList,
   FaRegClock,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
-import { logout, meThunk, puede } from "@entities/user";
+import { logout, meThunk } from "@entities/user";
+import { APP_SCREENS, isScreenVisible, type AppScreen } from "@entities/permission";
 import { fetchUnreadCount } from "@entities/notification";
 import { useAblyNotifications } from "./useAblyNotifications";
 
+/** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
+const NAV_ICONS: Record<string, ReactNode> = {
+  start: <FaHouseUser size={14} />,
+  tasks: <FaTicketAlt size={14} />,
+  inventory: <FaBoxes size={14} />,
+  reports: <FaChartBar size={14} />,
+  access: <FaDoorOpen size={14} />,
+  schedules: <FaRegClock size={14} />,
+  hr: <FaUserTie size={14} />,
+  settings: <FaCog size={14} />,
+};
+
 export default function PrivateRoutes() {
-  const { t: tt } = useTranslation(["common"]);
+  const { t: tt, i18n } = useTranslation(["common"]);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -36,13 +45,21 @@ export default function PrivateRoutes() {
     setTimeout(() => setToast(null), 3000);
   }, []);
 
+  // Al abrir la app (o iniciar sesión) se refresca `/auth/me`: el usuario
+  // guardado puede traer permisos o idioma viejos. Al volver a la ventana se
+  // refresca otra vez para que un cambio aplique sin relogin.
   useEffect(() => {
-    // Rehidrata la sesión cuando falta el usuario o cuando viene de un storage
-    // viejo sin permisos (rollout de ROLES_Y_PERMISOS). Al volver a la ventana
-    // se refresca `/auth/me` para que un cambio de permisos aplique sin relogin.
-    if (token && (!user || !user.permisos)) {
-      dispatch(meThunk());
+    if (token) dispatch(meThunk());
+  }, [token, dispatch]);
+
+  // La interfaz sigue el idioma del sistema que trae la sesión.
+  useEffect(() => {
+    if (user?.language && user.language !== i18n.language) {
+      void i18n.changeLanguage(user.language);
     }
+  }, [user, i18n]);
+
+  useEffect(() => {
     if (token) {
       dispatch(fetchUnreadCount());
     }
@@ -65,314 +82,70 @@ export default function PrivateRoutes() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // El menú se arma por permisos efectivos (`GET /auth/me`); la web no
-  // reimplementa la matriz de roles.
-  const permisos = user?.permisos;
-  const canViewDevices = puede(permisos, "dispositivos.ver");
-  const canViewLoans = puede(permisos, "prestamos.ver");
-  const canViewInventory = canViewDevices || canViewLoans;
-  const canViewReports = puede(permisos, "reportes.ver");
-  const canViewAccess = puede(permisos, "acceso.bitacora");
-  const canViewChecador = puede(permisos, "checador.ver");
-  const canViewSchedules = puede(permisos, "horarios.ver");
-  const canViewOvertime = puede(permisos, "horas_extra.ver");
-  const canViewHR = puede(permisos, "personal.expediente");
-  const canAdminCatalogs = puede(permisos, "catalogos.administrar");
-  const canViewUsers = puede(permisos, "usuarios.ver");
-  const canAdminRelojes = puede(permisos, "relojes.administrar");
-  const canAdminRoles = puede(permisos, "roles.administrar");
-  const canManageTasks = puede(permisos, "tareas.completar");
-  const isEmpleado = user?.role === "EMPLEADO";
+  // El menú se arma desde el catálogo de pantallas (`APP_SCREENS`) y los
+  // permisos efectivos (`GET /auth/me`); la web no reimplementa la matriz.
+  const permissions = user?.permissions;
 
-  const active = (to: string) => location.pathname.startsWith(to);
+  const matchesPath = (
+    path: string,
+    match: "exact" | "prefix" | undefined,
+    excludes: readonly string[] | undefined
+  ): boolean => {
+    const hit =
+      match === "exact"
+        ? location.pathname === path
+        : location.pathname === path || location.pathname.startsWith(`${path}/`);
+    if (!hit) return false;
+    return !(excludes ?? []).some(
+      (excluded) =>
+        location.pathname === excluded || location.pathname.startsWith(`${excluded}/`)
+    );
+  };
 
-  const navigationItems = [
-    {
-      id: "inicio",
-      label: tt("nav.home"),
-      icon: <FaHouseUser size={14} />,
-      action: () => navigate("/"),
-      isActive: active("/") && location.pathname === "/",
-    },
-    // TAREAS (Tickets, Admin Tareas, Mis Tareas)
-    {
-      id: "tareas",
-      label: "Tareas",
-      icon: <FaTicketAlt size={14} />,
-      isActive: active("/tickets"),
-      subitems: [
-        {
-          id: "tickets",
-          label: tt("nav.tickets"),
-          action: () => navigate("/tickets"),
-          isActive: active("/tickets") && !active("/tickets/tareas") && !active("/tickets/mis-tareas"),
-        },
-        ...(canManageTasks
-          ? [
-            {
-              id: "adminTareas",
-              label: tt("nav.adminTasks"),
-              action: () => navigate("/tickets/tareas"),
-              isActive: active("/tickets/tareas"),
-            },
-          ]
-          : []),
-        ...(isEmpleado
-          ? [
-            {
-              id: "misTareas",
-              label: tt("nav.myTasks"),
-              action: () => navigate("/tickets/mis-tareas"),
-              isActive: active("/tickets/mis-tareas"),
-            },
-          ]
-          : []),
-      ],
-    },
-    // INVENTARIO (dispositivos.ver / prestamos.ver)
-    ...(canViewInventory
-      ? [
-        {
-          id: "inventario",
-          label: tt("nav.inventory"),
-          icon: <FaBoxes size={14} />,
-          isActive: active("/inventario"),
-          subitems: [
-            ...(canViewDevices
-              ? [
-                {
-                  id: "dashboard",
-                  label: tt("nav.inventory"),
-                  action: () => navigate("/inventario"),
-                  isActive: active("/inventario") && location.pathname === "/inventario",
-                },
-                {
-                  id: "dispositivos",
-                  label: tt("nav.devices"),
-                  action: () => navigate("/inventario/dispositivos"),
-                  isActive: active("/inventario/dispositivos"),
-                },
-                {
-                  id: "movimientos",
-                  label: tt("nav.movimientos"),
-                  action: () => navigate("/inventario/movimientos"),
-                  isActive: active("/inventario/movimientos"),
-                },
-              ]
-              : []),
-            ...(canViewLoans
-              ? [
-                {
-                  id: "prestamos",
-                  label: tt("nav.prestamos"),
-                  action: () => navigate("/inventario/prestamos"),
-                  isActive: active("/inventario/prestamos"),
-                },
-                {
-                  id: "devoluciones",
-                  label: tt("nav.devoluciones"),
-                  action: () => navigate("/inventario/devoluciones"),
-                  isActive: active("/inventario/devoluciones"),
-                },
-              ]
-              : []),
-          ],
-        },
-      ]
-      : []),
-    // REPORTES (reportes.ver)
-    ...(canViewReports
-      ? [
-        {
-          id: "reportes",
-          label: tt("nav.reports"),
-          icon: <FaChartBar size={14} />,
-          action: () => navigate("/reportes"),
-          isActive: active("/reportes"),
-        },
-      ]
-      : []),
-    // CONTROL DE ACCESO (acceso.bitacora / checador.ver)
-    ...(canViewAccess || canViewChecador
-      ? [
-        {
-          id: "accesos",
-          label: tt("nav.access"),
-          icon: <FaDoorOpen size={14} />,
-          isActive: active("/access"),
-          subitems: [
-            ...(canViewAccess
-              ? [
-                {
-                  id: "accessLog",
-                  label: tt("nav.accessLog"),
-                  action: () => navigate("/access"),
-                  isActive:
-                    active("/access") && !active("/access/report") && !active("/access/checador"),
-                },
-                {
-                  id: "accessReport",
-                  label: tt("nav.accessReport"),
-                  action: () => navigate("/access/report"),
-                  isActive: active("/access/report"),
-                },
-              ]
-              : []),
-            ...(canViewChecador
-              ? [
-                {
-                  id: "accessChecador",
-                  label: tt("nav.accessChecador"),
-                  action: () => navigate("/access/checador"),
-                  isActive: location.pathname === "/access/checador",
-                },
-                {
-                  id: "accessChecadorReport",
-                  label: tt("nav.accessChecadorReport"),
-                  action: () => navigate("/access/checador/entradas-salidas"),
-                  isActive: active("/access/checador/entradas-salidas"),
-                },
-                {
-                  id: "accessChecadorEmpleados",
-                  label: tt("nav.accessChecadorEmpleados"),
-                  action: () => navigate("/access/checador/empleados"),
-                  isActive: active("/access/checador/empleados"),
-                },
-              ]
-              : []),
-          ],
-        },
-      ]
-      : []),
-    // HORARIOS (horarios.ver; horas extra con horas_extra.ver)
-    ...(canViewSchedules
-      ? [
-        {
-          id: "horarios",
-          label: tt("nav.schedules"),
-          icon: <FaRegClock size={14} />,
-          isActive: active("/horarios"),
-          subitems: [
-            {
-              id: "schedulesAdmin",
-              label: tt("nav.schedulesAdmin"),
-              action: () => navigate("/horarios"),
-              isActive: active("/horarios") && location.pathname === "/horarios",
-            },
-            {
-              id: "schedulesAssign",
-              label: tt("nav.schedulesAssign"),
-              action: () => navigate("/horarios/asignar"),
-              isActive: active("/horarios/asignar"),
-            },
-            ...(canViewOvertime
-              ? [
-                {
-                  id: "overtime",
-                  label: tt("nav.overtime"),
-                  action: () => navigate("/horarios/horas-extra/aprobacion"),
-                  isActive: active("/horarios/horas-extra/aprobacion"),
-                },
-              ]
-              : []),
-          ],
-        },
-      ]
-      : []),
-    // RECURSOS HUMANOS (personal.expediente — expediente completo del personal)
-    ...(canViewHR
-      ? [
-        {
-          id: "recursosHumanos",
-          label: tt("nav.hr"),
-          icon: <FaUserTie size={14} />,
-          isActive: active("/empleados"),
-          subitems: [
-            {
-              id: "personal",
-              label: tt("nav.employees"),
-              action: () => navigate("/empleados"),
-              isActive: active("/empleados") && !active("/empleados/reportes"),
-            },
-            {
-              id: "reportesPersonal",
-              label: tt("nav.hrReports"),
-              action: () => navigate("/empleados/reportes"),
-              isActive: active("/empleados/reportes"),
-            },
-          ],
-        },
-      ]
-      : []),
-    // CONFIGURACIÓN (catalogos.administrar / usuarios.ver / relojes.administrar / roles.administrar)
-    ...(canAdminCatalogs || canViewUsers || canAdminRelojes || canAdminRoles
-      ? [
-        {
-          id: "configuracion",
-          label: "Configuración",
-          icon: <FaCog size={14} />,
-          isActive:
-            active("/catalogos") ||
-            active("/usuarios") ||
-            active("/relojes") ||
-            active("/roles"),
-          subitems: [
-            ...(canAdminCatalogs
-              ? [
-                {
-                  id: "catalogos",
-                  label: tt("nav.catalogs"),
-                  action: () => navigate("/catalogos"),
-                  isActive: active("/catalogos"),
-                },
-              ]
-              : []),
-            ...(canViewUsers
-              ? [
-                {
-                  id: "usuarios",
-                  label: tt("nav.users"),
-                  action: () => navigate("/usuarios"),
-                  isActive: active("/usuarios"),
-                },
-              ]
-              : []),
-            // Alta/baja de relojes checadores: solo ADMIN (relojes.administrar).
-            ...(canAdminRelojes
-              ? [
-                {
-                  id: "relojes",
-                  label: tt("nav.relojes"),
-                  action: () => navigate("/relojes"),
-                  isActive: active("/relojes"),
-                },
-              ]
-              : []),
-            // Matriz de roles y catálogo de permisos: solo ADMIN (roles.administrar).
-            ...(canAdminRoles
-              ? [
-                {
-                  id: "roles",
-                  label: tt("nav.roles"),
-                  action: () => navigate("/roles"),
-                  isActive: active("/roles"),
-                },
-              ]
-              : []),
-          ],
-        },
-      ]
-      : []),
-  ];
+  const isScreenActive = (screen: AppScreen): boolean => {
+    if (screen.path && matchesPath(screen.path, screen.match, screen.excludes)) return true;
+    return screen.children?.some((child) => isScreenActive(child)) ?? false;
+  };
+
+  const canView = (screen: AppScreen): boolean =>
+    isScreenVisible(permissions, screen, user?.role);
+
+  const toNavigationItem = (screen: AppScreen): ITNavigationItem | null => {
+    if (!canView(screen)) return null;
+    const children = (screen.children ?? []).filter((child) => canView(child));
+    return {
+      id: screen.id,
+      label: tt(screen.labelKey),
+      icon: NAV_ICONS[screen.id],
+      ...(screen.path ? { action: () => navigate(screen.path!) } : {}),
+      isActive: isScreenActive(screen),
+      ...(children.length > 0
+        ? {
+            subitems: children.map((child) => ({
+              id: child.id,
+              label: tt(child.labelKey),
+              action: () => {
+                if (child.path) navigate(child.path);
+              },
+              isActive: isScreenActive(child),
+            })),
+          }
+        : {}),
+    };
+  };
+
+  const navigationItems = APP_SCREENS.map(toNavigationItem).filter(
+    (item): item is ITNavigationItem => item !== null
+  );
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
   };
 
-  const sidebar:ITSidebarProps = {
+  const sidebar: ITSidebarProps = {
     navigationItems,
-    isCollapsed:true,
+    isCollapsed: true,
   };
 
   const topBar = {
@@ -386,16 +159,19 @@ export default function PrivateRoutes() {
     logoText: "Puerto Nuevo",
     userMenu: user
       ? {
-        userName: user.name ?? "—",
-        userEmail: user.username,
-        menuItems: [
-          {
-            label: unreadCount > 0 ? tt('nav.notifications', { count: unreadCount }) : tt('nav.notifications'),
-            onClick: () => navigate("/notificaciones"),
-          },
-          { label: tt("nav.logout"), onClick: handleLogout },
-        ],
-      }
+          userName: user.name ?? "—",
+          userEmail: user.username,
+          menuItems: [
+            {
+              label:
+                unreadCount > 0
+                  ? tt("nav.notifications", { count: unreadCount })
+                  : tt("nav.notifications"),
+              onClick: () => navigate("/notifications"),
+            },
+            { label: tt("nav.logout"), onClick: handleLogout },
+          ],
+        }
       : undefined,
   };
 

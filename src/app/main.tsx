@@ -1,4 +1,4 @@
-import { ITThemeProvider } from "@axzydev/axzy_ui_system";
+import { ITThemePalette, ITThemeProvider } from "@axzydev/axzy_ui_system";
 import "@axzydev/axzy_ui_system/dist/index.css";
 import "@shared/i18n/config";
 import { store } from "@app/store";
@@ -14,25 +14,30 @@ if (!localStorage.getItem("it-theme-dark-mode")) {
   localStorage.setItem("it-theme-dark-mode", "light");
 }
 
-const customTheme = {
-  primary: "#0D5777",    // Azul oscuro principal del logo (texto y contorno superior)
-  secondary: "#1A7499",  // Azul medio del logo (agua)
-  danger: "#BA1A1A",     // Se mantiene el color de peligro original
-  info: "#512bbb",       // Se mantiene el color de información original
-  success: "#4ADE80",    // Se mantiene el color de éxito original
+const customTheme: ITThemePalette = {
+  primary: "#0D5777",
+  secondary: "#1A7499",
+  ternary: "#F0F4F7",
+  alert: "#F9C74F",
+  warning: "#F9C74F",
+  danger: "#BA1A1A",
+  info: "#512bbb",
+  success: "#4ADE80",
   layout: {
-    sidebarBg: "#ffffff",  // Fondo blanco para la barra lateral
-    sidebarText: "#54634d", // Texto oscuro para la barra lateral (mantenido)
-    navbarBg: "#0D5777",   // Azul oscuro del logo como fondo de la barra de navegación
-    navbarText: "#ffffff", // Texto blanco sobre fondo azul oscuro
+    sidebarBg: "#ffffff",
+    sidebarText: "#54634d",
+    navbarBg: "#0D5777",
+    navbarText: "#ffffff",
   },
   table: {
-    headerBg: "#F0F4F7",   // Tono muy claro derivado del azul claro para cabeceras
-    headerText: "#0D5777", // Texto de cabecera en el azul oscuro principal
-    rowBg: "#ffffff",     // Fondo de fila blanco
-    rowText: "#1B1B1F",    // Texto de fila oscuro (mantenido)
+    headerBg: "#8ab1cf9d",
+    headerText: "#0D5777",
+    rowBg: "#ffffff",
+    rowText: "#1B1B1F",
+    rowHover: "#0d5777c4",
   },
 };
+
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>

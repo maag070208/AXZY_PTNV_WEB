@@ -31,6 +31,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "title",
       label: tt("tasksTable.task"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -45,15 +46,17 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "ticket",
       label: tt("tasksTable.ticket"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.titulo}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.title}</ITText>
       ),
     },
     {
       key: "status",
       label: tt("tasksTable.status"),
       type: "string",
+      width: 150,
       sortable: false,
       render: (r) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="lg">
@@ -65,6 +68,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "dates",
       label: tt("tasksTable.dates"),
       type: "string",
+      width: 220,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -79,7 +83,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
             </ITText>
           )}
           {r.dueDate &&
-            r.status !== "COMPLETADA" &&
+            r.status !== "COMPLETED" &&
             new Date(r.dueDate) < new Date() && (
               <ITBadget color="danger" size="lg">{tt("tasksTable.overdue")}</ITBadget>
             )}
@@ -87,9 +91,10 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       ),
     },
     {
-      key: "acciones",
+      key: "actions",
       label: "",
       type: "string",
+      width: 100,
       sortable: false,
       render: () => (
         <ITFlex justify="end">
@@ -116,9 +121,12 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={10}
-      itemsPerPageOptions={[5, 10, 50]}
+      defaultItemsPerPage={100}
+      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
     />
   );
 }

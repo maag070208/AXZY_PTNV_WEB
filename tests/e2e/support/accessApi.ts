@@ -37,7 +37,7 @@ export interface AccessQueryResult {
   data: AccessEvent[];
 }
 
-export interface UsuarioBasico {
+export interface UserBasic {
   id: string;
   username: string;
   name: string;
@@ -47,8 +47,8 @@ export interface AccessReportSessionRow {
   id: string;
   employeeId: string;
   employeeName: string;
-  numeroEmpleado: string | null;
-  puesto: string | null;
+  employeeNumber: string | null;
+  jobTitle: string | null;
   departmentId: string | null;
   departmentName: string | null;
   active: boolean;
@@ -86,24 +86,24 @@ export class ApiAccess {
 
   private async json<T>(
     res: Awaited<ReturnType<APIRequestContext["get"]>>,
-    accion: string,
-    esperado: number
+    action: string,
+    expected: number
   ): Promise<T> {
-    if (res.status() !== esperado) {
-      throw new Error(`${accion}: HTTP ${res.status()} → ${await res.text()}`);
+    if (res.status() !== expected) {
+      throw new Error(`${action}: HTTP ${res.status()} → ${await res.text()}`);
     }
     return (await res.json()) as T;
   }
 
-  async sitios(): Promise<AccessSite[]> {
-    return this.json(await this.api.get("access/sites"), "sitios", 200);
+  async sites(): Promise<AccessSite[]> {
+    return this.json(await this.api.get("access/sites"), "sites", 200);
   }
 
-  async crearSitio(input: { name: string; code: string }): Promise<AccessSite> {
-    return this.json(await this.api.post("access/sites", { data: input }), "crearSitio", 201);
+  async createSite(input: { name: string; code: string }): Promise<AccessSite> {
+    return this.json(await this.api.post("access/sites", { data: input }), "createSite", 201);
   }
 
-  async crearEvento(input: {
+  async createEvent(input: {
     employeeId?: string;
     qr?: string;
     type: "ENTRY" | "EXIT";
@@ -115,18 +115,18 @@ export class ApiAccess {
   }): Promise<AccessEvent> {
     return this.json(
       await this.api.post("access/events", { data: input }),
-      "crearEvento",
+      "createEvent",
       201
     );
   }
 
-  async estado(employeeId: string): Promise<{
+  async status(employeeId: string): Promise<{
     hasOpenEntry: boolean;
     lastEvent: { type: "ENTRY" | "EXIT" } | null;
   }> {
     return this.json(
       await this.api.get(`access/status/${employeeId}`),
-      "estado",
+      "status",
       200
     );
   }
@@ -144,28 +144,28 @@ export class ApiAccess {
     );
   }
 
-  async usuarios(): Promise<UsuarioBasico[]> {
-    return this.json(await this.api.get("users"), "usuarios", 200);
+  async users(): Promise<UserBasic[]> {
+    return this.json(await this.api.get("users"), "users", 200);
   }
 
   /** Alta de un usuario de prueba (ADMIN) para sembrar el reporte. */
-  async crearUsuario(input: {
+  async createUser(input: {
     username: string;
     name: string;
     role?: string;
     departmentId?: string;
-  }): Promise<UsuarioBasico> {
+  }): Promise<UserBasic> {
     return this.json(
       await this.api.post("users", {
         data: {
           username: input.username,
           password: E2E.password,
           name: input.name,
-          role: input.role ?? "EMPLEADO",
+          role: input.role ?? "EMPLOYEE",
           ...(input.departmentId ? { departmentId: input.departmentId } : {}),
         },
       }),
-      "crearUsuario",
+      "createUser",
       201
     );
   }
@@ -175,29 +175,29 @@ export class ApiAccess {
    * una corrida anterior, sin eventos tras la limpieza) lo reutiliza en vez de
    * acumular cuentas nuevas en cada corrida.
    */
-  async asegurarUsuario(input: {
+  async ensureUser(input: {
     username: string;
     name: string;
     role?: string;
-  }): Promise<UsuarioBasico> {
+  }): Promise<UserBasic> {
     const res = await this.api.post("users", {
       data: {
         username: input.username,
         password: E2E.password,
         name: input.name,
-        role: input.role ?? "EMPLEADO",
+        role: input.role ?? "EMPLOYEE",
       },
     });
-    if (res.status() === 201) return (await res.json()) as UsuarioBasico;
+    if (res.status() === 201) return (await res.json()) as UserBasic;
     if (res.status() === 409) {
-      const existente = (await this.usuarios()).find((u) => u.username === input.username);
-      if (existente) return existente;
+      const existing = (await this.users()).find((u) => u.username === input.username);
+      if (existing) return existing;
     }
     throw new Error(`asegurarUsuario: HTTP ${res.status()} → ${await res.text()}`);
   }
 
   /** Borra físicamente un usuario de prueba sin historial ligado. */
-  async eliminarUsuario(id: string): Promise<void> {
+  async deleteUser(id: string): Promise<void> {
     const res = await this.api.delete(`users/${id}?force=true`);
     if (res.status() !== 200) {
       throw new Error(`eliminarUsuario: HTTP ${res.status()} → ${await res.text()}`);
@@ -218,14 +218,14 @@ export class ApiAccess {
     );
   }
 
-  async usuarioPorUsername(username: string): Promise<string> {
-    const usuario = (await this.usuarios()).find((u) => u.username === username);
-    if (!usuario) {
+  async userByUsername(username: string): Promise<string> {
+    const user = (await this.users()).find((u) => u.username === username);
+    if (!user) {
       throw new Error(
         `"${username}" no está provisionado. Corre "npm run test:e2e:provision" en ../api.`
       );
     }
-    return usuario.id;
+    return user.id;
   }
 }
 

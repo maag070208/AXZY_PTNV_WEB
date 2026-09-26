@@ -11,17 +11,17 @@ import {
 import { FaFileExcel, FaPlus, FaUserShield } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import {
   useUsersList,
   UsersTable,
 } from "@features/user/users-list";
-import { DeactivateDialog } from "@features/personal/employee-detail";
+import { DeactivateDialog } from "@features/hr/employee-detail";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["users", "common"]);
-  const canManageUsers = usePuede("usuarios.ver");
+  const canManageUsers = useCan("users.view");
 
   const fx = useUsersList();
 
@@ -39,7 +39,7 @@ export default function UsersListPage() {
           <ITButton
             variant="outlined"
             color="secondary"
-            onClick={() => navigate("/usuarios/importar")}
+            onClick={() => navigate("/users/import")}
           >
             <ITFlex align="center" gap={1}>
               <FaFileExcel size={12} />
@@ -49,7 +49,7 @@ export default function UsersListPage() {
           <ITButton
             variant="filled"
             color="primary"
-            onClick={() => navigate("/usuarios/nuevo")}
+            onClick={() => navigate("/users/new")}
           >
             <ITFlex align="center" gap={1}>
               <FaPlus size={12} />
@@ -62,8 +62,8 @@ export default function UsersListPage() {
     >
       <UsersTable
         fx={fx}
-        onView={(u) => navigate(`/empleados/${u.id}`)}
-        onEdit={(u) => navigate(`/usuarios/${u.id}/editar`)}
+        onView={(u) => navigate(`/employees/${u.id}`)}
+        onEdit={(u) => navigate(`/users/${u.id}/edit`)}
       />
 
       {/* Para usuarios activos, baja con captura de motivo */}
@@ -93,7 +93,7 @@ export default function UsersListPage() {
         onClose={() => fx.setUserToForceDelete(null)}
         onConfirm={fx.handleForceDelete}
         title={tt("list.forceDeleteTitle")}
-        message={`${fx.userToForceDelete?.username} tiene historial ligado (tickets, cartas, comentarios, movimientos, etc.) que normalmente bloquea el borrado. Como administrador puedes forzar su eliminación: los registros con autor obligatorio se reasignarán a tu usuario y el resto quedará sin autor. Esta acción no se puede deshacer.`}
+        message={tt("list.forceDeleteMessage", { username: fx.userToForceDelete?.username ?? "" })}
         confirmLabel={tt("list.forceDeleteBtn")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"

@@ -1,5 +1,6 @@
 import { Text, View } from "@react-pdf/renderer";
 import { pdfTheme } from "./theme";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   /**
@@ -18,17 +19,17 @@ export default function PdfFooter({ pageIndex, pageCount, note }: Props) {
   return (
     <View style={pdfTheme.footer} fixed>
       <Text style={pdfTheme.footerText}>
-        {note ?? "Puerto Nuevo Hotel y Villas — Sistema de Control de Activos"}
+        {note ?? i18n.t("common:pdf.footer")}
       </Text>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         {manual ? (
           <Text style={pdfTheme.footerPage}>
-            Página {manual.pageIndex + 1} de {manual.pageCount}
+            {i18n.t("common:pdf.pageOf", { current: manual.pageIndex + 1, total: manual.pageCount })}
           </Text>
         ) : (
           <Text
             style={pdfTheme.footerPage}
-            render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`}
+            render={({ pageNumber, totalPages }) => i18n.t("common:pdf.pageOf", { current: pageNumber, total: totalPages })}
           />
         )}
         <Text style={pdfTheme.footerPowered}>powered by axzy.dev</Text>

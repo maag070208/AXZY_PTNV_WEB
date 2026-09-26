@@ -251,7 +251,7 @@ export default function AccessReportPDF({ rows, summary, meta, title }: Props) {
                 <View style={{ width: COL.employee }}>
                   <Text style={pdfTheme.cellDescTitle}>{r.employeeName}</Text>
                   <Text style={pdfTheme.cellDescSub}>
-                    {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
+                    {r.employeeNumber ? `#${r.employeeNumber}` : "—"}
                     {!r.active ? ` · ${tt("status.inactive")}` : ""}
                   </Text>
                 </View>

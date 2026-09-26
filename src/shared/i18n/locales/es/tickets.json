@@ -1,14 +1,14 @@
 {
   "statusLabels": {
-    "ABIERTO": "Abierto",
-    "EN_SEGUIMIENTO": "En seguimiento",
-    "CERRADO": "Cerrado"
+    "OPEN": "Abierto",
+    "IN_PROGRESS": "En seguimiento",
+    "CLOSED": "Cerrado"
   },
   "priorityLabels": {
-    "BAJA": "Baja",
-    "MEDIA": "Media",
-    "ALTA": "Alta",
-    "URGENTE": "Urgente"
+    "LOW": "Baja",
+    "MEDIUM": "Media",
+    "HIGH": "Alta",
+    "URGENT": "Urgente"
   },
   "list": {
     "title": "Tickets",
@@ -25,17 +25,18 @@
     "loadError": "No se pudo cargar la lista de tickets",
     "columns": {
       "title": "Título",
+      "category": "Categoría",
       "status": "Estado",
       "priority": "Prioridad",
       "createdBy": "Creado por",
       "assignedTo": "Asignado a",
-      "espera": "Días en espera"
+      "wait": "Días en espera"
     },
-    "esperaLabels": {
-      "EXCELENTE": "EXCELENTE",
-      "BUENO": "BUENO",
+    "waitLabels": {
+      "EXCELLENT": "EXCELENTE",
+      "GOOD": "BUENO",
       "REGULAR": "REGULAR",
-      "MALO": "MALO"
+      "POOR": "MALO"
     }
   },
   "new": {
@@ -61,7 +62,7 @@
     "evidenceTitle": "Evidencias",
     "evidenceSub": "Imágenes o PDF del problema",
     "removeFile": "Quitar",
-    "resumenTitle": "Resumen de la solicitud"
+    "summaryTitle": "Resumen de la solicitud"
   },
   "edit": {
     "title": "Editar Ticket",
@@ -148,10 +149,10 @@
     "dueDate": "Fecha de fin esperada",
     "taskStatus": "Estado de la tarea",
     "taskStatusOptions": {
-      "PENDIENTE": "Pendiente",
-      "EN_PROGRESO": "En progreso",
-      "EN_REVISION": "En revisión",
-      "COMPLETADA": "Completada"
+      "PENDING": "Pendiente",
+      "IN_PROGRESS": "En progreso",
+      "IN_REVIEW": "En revisión",
+      "COMPLETED": "Completada"
     },
     "employeeNo": "No. {{number}}",
     "employeeLabel": "Empleado",
@@ -177,7 +178,9 @@
     "startShort": "Inicio",
     "dueShort": "Límite",
     "systemUser": "Sistema",
-    "byUser": "Usuario"
+    "byUser": "Usuario",
+    "confirmHardDelete": "¿Eliminar definitivamente \"{{title}}\"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.",
+    "confirmSoftDelete": "¿Mover a papelera \"{{title}}\"? Quedará en estado eliminado y podrás borrarlo definitivamente después."
   },
   "kanban": {
     "byTicket": "Tareas del ticket",
@@ -271,7 +274,8 @@
     "commentBy": "Comentario de {{author}}",
     "fallbackUser": "Usuario",
     "byAuthor": "Por {{name}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "footer": "Puerto Nuevo Hotel y Villas — Sistema de Tickets"
   },
   "attachments": {
     "loadError": "No se pudieron cargar los archivos",
@@ -284,5 +288,11 @@
     "uploadEvidence": "Subir evidencia",
     "uploadTicketFiles": "Subir archivos del ticket",
     "fallbackExt": "ARCHIVO"
+  },
+  "form": {
+    "validation": {
+      "titleRequired": "El título es obligatorio",
+      "titleMin": "El título debe tener al menos {{min}} caracteres"
+    }
   }
 }

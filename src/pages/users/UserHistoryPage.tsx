@@ -7,6 +7,7 @@ import {
   UserHistoryTimeline,
   useUserHistory,
 } from "@features/user/user-history";
+import { i18n } from "@shared/i18n";
 
 export default function UserHistoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ export default function UserHistoryPage() {
         backAction={() => navigate(-1)}
         icon={<FaUserShield size={20} />}
         breadcrumbs={[
-          { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+          { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
           { label: tt("history.breadcrumb") },
         ]}
       >
@@ -41,11 +42,11 @@ export default function UserHistoryPage() {
         backAction={() => navigate(-1)}
         icon={<FaUserShield size={20} />}
         breadcrumbs={[
-          { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+          { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
           { label: tt("history.breadcrumb") },
         ]}
       >
-        <ITText className="text-slate-400">Usuario no encontrado</ITText>
+        <ITText className="text-slate-400">{i18n.t("users:history.notFound")}</ITText>
       </ITPage>
     );
   }
@@ -57,7 +58,7 @@ export default function UserHistoryPage() {
       backAction={() => navigate(-1)}
       icon={<FaUserShield size={20} />}
       breadcrumbs={[
-        { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+        { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
         { label: user.name },
       ]}
     >

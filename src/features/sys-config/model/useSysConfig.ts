@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { sysConfigApi, type SysConfig } from "@entities/sys-config";
+import { i18n } from "@shared/i18n";
 
 // Regex simple: cualquier cosa con forma user@dominio.tld (sin espacios).
 // Es la misma validación que el frontend usa en otros lugares del sistema
@@ -52,7 +53,7 @@ export const useGetSysConfig = (key: string): GetState => {
       setData(result);
     } catch (err) {
       const message =
-        (err as { message?: string })?.message ?? "Error al cargar";
+        (err as { message?: string })?.message ?? i18n.t("common:errors.load");
       setError(message);
       setData(null);
     } finally {
@@ -85,7 +86,7 @@ export const useUpdateSysConfig = (key: string): MutateState => {
         return await sysConfigApi.update(key, value);
       } catch (err) {
         const message =
-          (err as { message?: string })?.message ?? "Error al guardar";
+          (err as { message?: string })?.message ?? i18n.t("common:errors.save");
         setError(message);
         throw err;
       } finally {

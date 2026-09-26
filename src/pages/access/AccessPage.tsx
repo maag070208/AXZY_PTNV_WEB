@@ -34,8 +34,8 @@ import {
   FaUndo,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
-import { formatFechaHora } from "@shared/utils/dates";
+import { useCan } from "@entities/user";
+import { formatDateTime } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { LocationMap } from "@shared/ui/location-map";
 import {
@@ -45,6 +45,7 @@ import {
   type AccessStats,
   type Site,
 } from "@entities/access";
+import { fileName } from "@shared/i18n";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -67,7 +68,7 @@ const formatCoords = (lat: number | null, lng: number | null): string =>
 export default function AccessPage() {
   const { t: tt } = useTranslation(["access", "common"]);
   const navigate = useNavigate();
-  const canVoid = usePuede("acceso.anular");
+  const canVoid = useCan("access.void");
 
   const [sites, setSites] = useState<Site[]>([]);
   const [sitesError, setSitesError] = useState(false);
@@ -201,7 +202,7 @@ export default function AccessPage() {
         tt("columns.status"),
       ];
       const lines = res.data.map((e) => [
-        formatFechaHora(e.occurredAt),
+        formatDateTime(e.occurredAt),
         [e.employeeNameSnapshot, e.employeeNumberSnapshot ? `#${e.employeeNumberSnapshot}` : ""]
           .filter(Boolean)
           .join(" "),
@@ -217,7 +218,7 @@ export default function AccessPage() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `accesos-${toDateInput(dateRange[0] ?? new Date())}.csv`;
+      link.download = `${fileName("access")}-${toDateInput(dateRange[0] ?? new Date())}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -284,10 +285,11 @@ export default function AccessPage() {
       key: "occurredAt",
       label: tt("columns.occurredAt"),
       type: "date",
+      width: 160,
       sortable: false,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
-          {formatFechaHora(e.occurredAt)}
+          {formatDateTime(e.occurredAt)}
         </ITText>
       ),
     },
@@ -295,6 +297,7 @@ export default function AccessPage() {
       key: "employeeNameSnapshot",
       label: tt("columns.employee"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (e) => (
         <ITFlex direction="column" gap={0.5}>
@@ -311,6 +314,7 @@ export default function AccessPage() {
       key: "type",
       label: tt("columns.type"),
       type: "catalog",
+      width: 130,
       sortable: false,
       filter: "catalog",
       catalogOptions: { data: typeOptions, loading: false, error: false },
@@ -324,6 +328,7 @@ export default function AccessPage() {
       key: "siteId",
       label: tt("columns.site"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
       catalogOptions: {
         data: sites.map((s) => ({ id: s.id, name: s.name })),
@@ -340,6 +345,7 @@ export default function AccessPage() {
       key: "guard.name",
       label: tt("columns.guard"),
       type: "string",
+      width: 200,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {e.guard?.name ?? "—"}
@@ -350,6 +356,7 @@ export default function AccessPage() {
       key: "actions",
       label: tt("columns.actions"),
       type: "actions",
+      width: 100,
       actions: (e) => (
         <ITFlex align="center" gap={1}>
           <ITButton
@@ -503,10 +510,13 @@ export default function AccessPage() {
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       <ITDialog
@@ -531,7 +541,7 @@ export default function AccessPage() {
                   {detail.voidedAt ? tt("status.voided") : tt("status.active")}
                 </ITBadget>
                 <span className="text-xs text-slate-400">
-                  · {formatFechaHora(detail.occurredAt)}
+                  · {formatDateTime(detail.occurredAt)}
                 </span>
               </ITFlex>
               <ITText className="text-xl font-bold leading-tight text-slate-900">
@@ -566,7 +576,7 @@ export default function AccessPage() {
                 <ITGrid item xs={12} md={6}>
                   <DetailRow
                     label={tt("detail.deviceTimestamp")}
-                    value={detail.deviceTimestamp ? formatFechaHora(detail.deviceTimestamp) : "—"}
+                    value={detail.deviceTimestamp ? formatDateTime(detail.deviceTimestamp) : "—"}
                   />
                 </ITGrid>
                 <ITGrid item xs={12} md={6}>
@@ -608,7 +618,7 @@ export default function AccessPage() {
                 <ITGrid item xs={12} md={6}>
                   <DetailRow
                     label={tt("detail.createdAt")}
-                    value={formatFechaHora(detail.createdAt)}
+                    value={formatDateTime(detail.createdAt)}
                   />
                 </ITGrid>
                 <ITGrid item xs={12} md={6}>
@@ -622,7 +632,7 @@ export default function AccessPage() {
                     <ITGrid item xs={12} md={6}>
                       <DetailRow
                         label={tt("detail.voidedAt")}
-                        value={formatFechaHora(detail.voidedAt)}
+                        value={formatDateTime(detail.voidedAt)}
                       />
                     </ITGrid>
                   </>

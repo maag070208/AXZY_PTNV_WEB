@@ -2,16 +2,16 @@
 // en @features/report y reciben el download por DI desde la página.
 export { default as ReportPDF } from "./ui/ReportPDF";
 export { default as DevicePDF } from "./ui/DevicePDF";
-export { default as AsignadosPDF } from "./ui/AsignadosPDF";
-export { default as SalidasPDF } from "./ui/SalidasPDF";
+export { default as AssignedDevicesPdf } from "./ui/AssignedDevicesPdf";
+export { default as MaterialOutputsPdf } from "./ui/MaterialOutputsPdf";
 export { default as AccessReportPDF } from "./ui/AccessReportPDF";
 export { default as OvertimePDF } from "./ui/OvertimePDF";
 export {
   downloadReportPDF,
-  downloadAsignadosPDF,
+  downloadAssignedDevicesPdf,
   downloadDevicesPDF,
-  downloadSalidasPDF,
+  downloadMaterialOutputsPdf,
   downloadAccessReportPDF,
-  downloadChecadorReportPDF,
+  downloadTimeClockReportPdf,
   downloadOvertimePDF,
 } from "./model/pdf";

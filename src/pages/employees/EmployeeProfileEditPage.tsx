@@ -15,8 +15,8 @@ import {
 import { FaCamera, FaIdCard, FaMapMarkerAlt, FaPhoneAlt, FaUserTie } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEmployeeDetail } from "@features/personal/employee-detail";
-import type { PersonalProfile, PersonalProfileUpdateInput } from "@entities/personal";
+import { useEmployeeDetail } from "@features/hr/employee-detail";
+import type { PersonalProfile, PersonalProfileUpdateInput } from "@entities/hr";
 import { DatePickerPortal } from "@shared/ui/date-picker-portal";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import {
@@ -27,6 +27,7 @@ import {
   validatePostal,
   validateRfc,
 } from "@shared/validation";
+import { i18n } from "@shared/i18n";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
 const dateStrToLocal = (value?: string | null): Date | undefined => {
@@ -53,30 +54,30 @@ type FormState = PersonalProfileUpdateInput;
 const emptyForm = (): FormState => ({});
 
 const formFromProfile = (p: PersonalProfile): FormState => ({
-  segundoNombre: p.segundoNombre ?? "",
-  apellidoPaterno: p.apellidoPaterno ?? "",
-  apellidoMaterno: p.apellidoMaterno ?? "",
+  middleName: p.middleName ?? "",
+  paternalSurname: p.paternalSurname ?? "",
+  maternalSurname: p.maternalSurname ?? "",
   email: p.email ?? "",
-  generoId: p.genero?.id ?? "",
-  tipoSangreId: p.tipoSangre?.id ?? "",
-  padecimiento: p.padecimiento ?? "",
-  alergias: p.alergias ?? "",
-  fechaNacimiento: p.fechaNacimiento ?? "",
-  fechaIngreso: p.fechaIngreso ?? "",
+  genderId: p.gender?.id ?? "",
+  bloodTypeId: p.bloodType?.id ?? "",
+  medicalConditions: p.medicalConditions ?? "",
+  allergies: p.allergies ?? "",
+  birthDate: p.birthDate ?? "",
+  hireDate: p.hireDate ?? "",
   rfc: p.rfc ?? "",
   curp: p.curp ?? "",
   nss: p.nss ?? "",
-  calleNumero: p.calleNumero ?? "",
-  colonia: p.colonia ?? "",
-  codigoPostal: p.codigoPostal ?? "",
-  ciudad: p.ciudad ?? "",
-  estadoDireccion: p.estadoDireccion ?? "",
-  pais: p.pais ?? "México",
-  celularPersonal: p.celularPersonal ?? "",
-  celularEmpresa: p.celularEmpresa ?? "",
-  contactoEmergenciaNombre: p.contactoEmergenciaNombre ?? "",
-  contactoEmergenciaTelefono: p.contactoEmergenciaTelefono ?? "",
-  contactoEmergenciaParentesco: p.contactoEmergenciaParentesco ?? "",
+  streetAddress: p.streetAddress ?? "",
+  neighborhood: p.neighborhood ?? "",
+  postalCode: p.postalCode ?? "",
+  city: p.city ?? "",
+  addressState: p.addressState ?? "",
+  country: p.country ?? "México",
+  personalPhone: p.personalPhone ?? "",
+  workPhone: p.workPhone ?? "",
+  emergencyContactName: p.emergencyContactName ?? "",
+  emergencyContactPhone: p.emergencyContactPhone ?? "",
+  emergencyContactRelationship: p.emergencyContactRelationship ?? "",
 });
 
 function Row({ children }: { children: React.ReactNode }) {
@@ -112,7 +113,7 @@ export default function EmployeeProfileEditPage() {
       setForm((f) => ({ ...f, [name]: e.target.value }));
 
   const dateField =
-    (name: "fechaNacimiento" | "fechaIngreso") =>
+    (name: "birthDate" | "hireDate") =>
     (
       e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: Date | [Date | null, Date | null] } }
     ) => {
@@ -128,14 +129,14 @@ export default function EmployeeProfileEditPage() {
     if (curpErr) e.curp = curpErr;
     const nssErr = validateNss(form.nss);
     if (nssErr) e.nss = nssErr;
-    const postalErr = validatePostal(form.codigoPostal);
-    if (postalErr) e.codigoPostal = postalErr;
-    const personalPhoneErr = validatePhone(form.celularPersonal);
-    if (personalPhoneErr) e.celularPersonal = personalPhoneErr;
-    const companyPhoneErr = validatePhone(form.celularEmpresa);
-    if (companyPhoneErr) e.celularEmpresa = companyPhoneErr;
-    const emergencyPhoneErr = validatePhone(form.contactoEmergenciaTelefono);
-    if (emergencyPhoneErr) e.contactoEmergenciaTelefono = emergencyPhoneErr;
+    const postalErr = validatePostal(form.postalCode);
+    if (postalErr) e.postalCode = postalErr;
+    const personalPhoneErr = validatePhone(form.personalPhone);
+    if (personalPhoneErr) e.personalPhone = personalPhoneErr;
+    const companyPhoneErr = validatePhone(form.workPhone);
+    if (companyPhoneErr) e.workPhone = companyPhoneErr;
+    const emergencyPhoneErr = validatePhone(form.emergencyContactPhone);
+    if (emergencyPhoneErr) e.emergencyContactPhone = emergencyPhoneErr;
     const emailErr = validateEmail(form.email);
     if (emailErr) e.email = emailErr;
     setErrors(e);
@@ -145,14 +146,14 @@ export default function EmployeeProfileEditPage() {
   const handleFinish = async () => {
     if (!validate()) {
       // Surface a generic alert; per-field messages are inline.
-      detail.setError("Por favor revisa los campos marcados");
+      detail.setError(i18n.t("common:validation.reviewFields"));
       return;
     }
     const normalized: FormState = Object.fromEntries(
       Object.entries(form).map(([key, value]) => [key, typeof value === "string" && value.trim() === "" ? null : value])
     ) as FormState;
     const ok = await detail.saveProfile(normalized, detail.profile?.discounts ?? []);
-    if (ok) navigate(`/empleados/${id}`);
+    if (ok) navigate(`/employees/${id}`);
   };
 
   if (detail.loading || !detail.profile) {
@@ -162,7 +163,7 @@ export default function EmployeeProfileEditPage() {
         backAction={() => navigate(-1)}
         icon={<FaUserTie size={20} />}
         breadcrumbs={[
-          { label: tt("breadcrumb"), onClick: () => navigate("/empleados") },
+          { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
           { label: tt("detail.title") },
           { label: tt("detail.editInfo") },
         ]}
@@ -197,7 +198,7 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={5}>
           <ITFlex align="center" gap={4}>
             <div className="relative inline-block shrink-0">
-              <ProfileAvatar fotoUrl={profile.fotoUrl} initials={initials} alt={profile.name} size="xl" />
+              <ProfileAvatar photoUrl={profile.photoUrl} initials={initials} alt={profile.name} size="xl" />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -230,72 +231,72 @@ export default function EmployeeProfileEditPage() {
 
           <Row>
             <Cell>
-              <ITInput name="segundoNombre" label={tt("detail.fields.secondName")} value={form.segundoNombre ?? ""} onChange={field("segundoNombre")} />
+              <ITInput name="middleName" label={tt("detail.fields.secondName")} value={form.middleName ?? ""} onChange={field("middleName")} />
             </Cell>
             <Cell>
-              <ITInput name="apellidoPaterno" label={tt("detail.fields.apellidoPaterno")} value={form.apellidoPaterno ?? ""} onChange={field("apellidoPaterno")} />
+              <ITInput name="paternalSurname" label={tt("detail.fields.paternalSurname")} value={form.paternalSurname ?? ""} onChange={field("paternalSurname")} />
             </Cell>
             <Cell>
-              <ITInput name="apellidoMaterno" label={tt("detail.fields.apellidoMaterno")} value={form.apellidoMaterno ?? ""} onChange={field("apellidoMaterno")} />
+              <ITInput name="maternalSurname" label={tt("detail.fields.maternalSurname")} value={form.maternalSurname ?? ""} onChange={field("maternalSurname")} />
             </Cell>
           </Row>
           <Row>
             <Cell>
               <ITSelect
-                name="generoId"
+                name="genderId"
                 label={tt("detail.fields.gender")}
-                value={form.generoId ?? ""}
-                onChange={(e) => setForm((f) => ({ ...f, generoId: e.target.value }))}
-                options={[{ value: "", label: "—" }, ...detail.generos.map((g) => ({ value: g.id, label: g.nombre }))]}
+                value={form.genderId ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, genderId: e.target.value }))}
+                options={[{ value: "", label: "—" }, ...detail.genders.map((g) => ({ value: g.id, label: g.name }))]}
               />
             </Cell>
             <Cell>
               <DatePickerPortal
-                name="fechaNacimiento"
+                name="birthDate"
                 label={tt("detail.fields.birthDate")}
-                value={dateStrToLocal(form.fechaNacimiento)}
-                onChange={dateField("fechaNacimiento")}
+                value={dateStrToLocal(form.birthDate)}
+                onChange={dateField("birthDate")}
               />
             </Cell>
             <Cell>
               <ITSelect
-                name="tipoSangreId"
+                name="bloodTypeId"
                 label={tt("detail.fields.bloodType")}
-                value={form.tipoSangreId ?? ""}
-                onChange={(e) => setForm((f) => ({ ...f, tipoSangreId: e.target.value }))}
-                options={[{ value: "", label: "—" }, ...detail.tiposSangre.map((b) => ({ value: b.id, label: b.nombre }))]}
+                value={form.bloodTypeId ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, bloodTypeId: e.target.value }))}
+                options={[{ value: "", label: "—" }, ...detail.bloodTypes.map((b) => ({ value: b.id, label: b.name }))]}
               />
             </Cell>
           </Row>
           <ITTextarea
-            name="padecimiento"
+            name="medicalConditions"
             label={tt("detail.fields.condition")}
-            value={form.padecimiento ?? ""}
-            onChange={(value) => setForm((f) => ({ ...f, padecimiento: value }))}
+            value={form.medicalConditions ?? ""}
+            onChange={(value) => setForm((f) => ({ ...f, medicalConditions: value }))}
             rows={2}
           />
           <ITTextarea
-            name="alergias"
+            name="allergies"
             label={tt("detail.fields.allergies")}
-            value={form.alergias ?? ""}
-            onChange={(value) => setForm((f) => ({ ...f, alergias: value }))}
+            value={form.allergies ?? ""}
+            onChange={(value) => setForm((f) => ({ ...f, allergies: value }))}
             rows={2}
           />
         </ITFlex>
       ),
     },
     {
-      label: tt("detail.stepper.laboral"),
+      label: tt("detail.stepper.employment"),
       icon: <FaIdCard size={13} />,
       content: (
         <ITFlex direction="column" gap={4}>
           <Row>
             <Cell>
               <ITDatePicker
-                name="fechaIngreso"
+                name="hireDate"
                 label={tt("detail.fields.hireDate")}
-                value={dateStrToLocal(form.fechaIngreso)}
-                onChange={dateField("fechaIngreso")}
+                value={dateStrToLocal(form.hireDate)}
+                onChange={dateField("hireDate")}
               />
             </Cell>
             <Cell>
@@ -323,12 +324,12 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={4}>
           <Row>
             <Cell>
-              <ITInput name="celularPersonal" label={tt("detail.fields.personalCell")} value={form.celularPersonal ?? ""} onChange={field("celularPersonal")} aria-invalid={!!errors.celularPersonal} />
-              {errors.celularPersonal && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.celularPersonal}</span>}
+              <ITInput name="personalPhone" label={tt("detail.fields.personalCell")} value={form.personalPhone ?? ""} onChange={field("personalPhone")} aria-invalid={!!errors.personalPhone} />
+              {errors.personalPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</span>}
             </Cell>
             <Cell>
-              <ITInput name="celularEmpresa" label={tt("detail.fields.companyCell")} value={form.celularEmpresa ?? ""} onChange={field("celularEmpresa")} aria-invalid={!!errors.celularEmpresa} />
-              {errors.celularEmpresa && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.celularEmpresa}</span>}
+              <ITInput name="workPhone" label={tt("detail.fields.companyCell")} value={form.workPhone ?? ""} onChange={field("workPhone")} aria-invalid={!!errors.workPhone} />
+              {errors.workPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</span>}
             </Cell>
             <Cell>
               <ITInput name="email" type="email" label={tt("detail.fields.email")} value={form.email ?? ""} onChange={field("email")} aria-invalid={!!errors.email} />
@@ -345,25 +346,25 @@ export default function EmployeeProfileEditPage() {
           </ITFlex>
           <Row>
             <Cell>
-              <ITInput name="calleNumero" label={tt("detail.fields.street")} value={form.calleNumero ?? ""} onChange={field("calleNumero")} />
+              <ITInput name="streetAddress" label={tt("detail.fields.street")} value={form.streetAddress ?? ""} onChange={field("streetAddress")} />
             </Cell>
             <Cell min={160}>
-              <ITInput name="colonia" label={tt("detail.fields.colony")} value={form.colonia ?? ""} onChange={field("colonia")} />
+              <ITInput name="neighborhood" label={tt("detail.fields.colony")} value={form.neighborhood ?? ""} onChange={field("neighborhood")} />
             </Cell>
             <Cell min={120}>
-              <ITInput name="codigoPostal" label={tt("detail.fields.zip")} value={form.codigoPostal ?? ""} onChange={field("codigoPostal")} aria-invalid={!!errors.codigoPostal} />
-              {errors.codigoPostal && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.codigoPostal}</span>}
+              <ITInput name="postalCode" label={tt("detail.fields.zip")} value={form.postalCode ?? ""} onChange={field("postalCode")} aria-invalid={!!errors.postalCode} />
+              {errors.postalCode && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</span>}
             </Cell>
           </Row>
           <Row>
             <Cell min={160}>
-              <ITInput name="ciudad" label={tt("detail.fields.city")} value={form.ciudad ?? ""} onChange={field("ciudad")} />
+              <ITInput name="city" label={tt("detail.fields.city")} value={form.city ?? ""} onChange={field("city")} />
             </Cell>
             <Cell min={160}>
-              <ITInput name="estadoDireccion" label={tt("detail.fields.state")} value={form.estadoDireccion ?? ""} onChange={field("estadoDireccion")} />
+              <ITInput name="addressState" label={tt("detail.fields.state")} value={form.addressState ?? ""} onChange={field("addressState")} />
             </Cell>
             <Cell min={160}>
-              <ITInput name="pais" label={tt("detail.fields.country")} value={form.pais ?? ""} onChange={field("pais")} />
+              <ITInput name="country" label={tt("detail.fields.country")} value={form.country ?? ""} onChange={field("country")} />
             </Cell>
           </Row>
 
@@ -372,14 +373,14 @@ export default function EmployeeProfileEditPage() {
           </ITText>
           <Row>
             <Cell>
-              <ITInput name="contactoEmergenciaNombre" label={tt("detail.fields.emergencyContact")} value={form.contactoEmergenciaNombre ?? ""} onChange={field("contactoEmergenciaNombre")} />
+              <ITInput name="emergencyContactName" label={tt("detail.fields.emergencyContact")} value={form.emergencyContactName ?? ""} onChange={field("emergencyContactName")} />
             </Cell>
             <Cell>
-              <ITInput name="contactoEmergenciaTelefono" label={tt("detail.fields.emergencyPhone")} value={form.contactoEmergenciaTelefono ?? ""} onChange={field("contactoEmergenciaTelefono")} aria-invalid={!!errors.contactoEmergenciaTelefono} />
-              {errors.contactoEmergenciaTelefono && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.contactoEmergenciaTelefono}</span>}
+              <ITInput name="emergencyContactPhone" label={tt("detail.fields.emergencyPhone")} value={form.emergencyContactPhone ?? ""} onChange={field("emergencyContactPhone")} aria-invalid={!!errors.emergencyContactPhone} />
+              {errors.emergencyContactPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</span>}
             </Cell>
             <Cell>
-              <ITInput name="contactoEmergenciaParentesco" label={tt("detail.fields.emergencyRelation")} value={form.contactoEmergenciaParentesco ?? ""} onChange={field("contactoEmergenciaParentesco")} />
+              <ITInput name="emergencyContactRelationship" label={tt("detail.fields.emergencyRelation")} value={form.emergencyContactRelationship ?? ""} onChange={field("emergencyContactRelationship")} />
             </Cell>
           </Row>
         </ITFlex>
@@ -394,7 +395,7 @@ export default function EmployeeProfileEditPage() {
       backAction={() => navigate(-1)}
       icon={<FaUserTie size={20} />}
       breadcrumbs={[
-        { label: tt("breadcrumb"), onClick: () => navigate("/empleados") },
+        { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
         { label: tt("detail.title") },
         { label: tt("detail.editInfo") },
       ]}

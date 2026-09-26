@@ -36,6 +36,7 @@ export default function SubareasTable({
       type: "string",
       key: "name",
       label: tt("list.colName"),
+      width: 240,
       sortable: false,
       filter: true,
       render: (s: Subarea) => (
@@ -55,6 +56,7 @@ export default function SubareasTable({
       type: "string",
       key: "department",
       label: tt("list.colDepartment"),
+      width: 200,
       sortable: false,
       render: (s: Subarea) => (
         <ITText className="text-[11px] font-black uppercase tracking-wide text-slate-600">
@@ -66,6 +68,7 @@ export default function SubareasTable({
       type: "actions" as const,
       key: "actions",
       label: "",
+      width: 120,
       align: "right" as const,
       render: (s: Subarea) => (
         <ITFlex gap={1}>
@@ -113,9 +116,13 @@ export default function SubareasTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={10}
-      itemsPerPageOptions={[5, 10, 50]}
+      defaultItemsPerPage={100}
+      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
+      onRowClick={(row) => onEdit(row as unknown as Subarea)}
     />
   );
 }

@@ -1,14 +1,14 @@
 {
   "statusLabels": {
-    "ABIERTO": "Open",
-    "EN_SEGUIMIENTO": "Following up",
-    "CERRADO": "Closed"
+    "OPEN": "Open",
+    "IN_PROGRESS": "Following up",
+    "CLOSED": "Closed"
   },
   "priorityLabels": {
-    "BAJA": "Low",
-    "MEDIA": "Medium",
-    "ALTA": "High",
-    "URGENTE": "Urgent"
+    "LOW": "Low",
+    "MEDIUM": "Medium",
+    "HIGH": "High",
+    "URGENT": "Urgent"
   },
   "list": {
     "title": "Tickets",
@@ -25,17 +25,18 @@
     "loadError": "Could not load the ticket list",
     "columns": {
       "title": "Title",
+      "category": "Category",
       "status": "Status",
       "priority": "Priority",
       "createdBy": "Created by",
       "assignedTo": "Assigned to",
-      "espera": "Days waiting"
+      "wait": "Days waiting"
     },
-    "esperaLabels": {
-      "EXCELENTE": "EXCELLENT",
-      "BUENO": "GOOD",
+    "waitLabels": {
+      "EXCELLENT": "EXCELLENT",
+      "GOOD": "GOOD",
       "REGULAR": "FAIR",
-      "MALO": "BAD"
+      "POOR": "BAD"
     }
   },
   "new": {
@@ -61,7 +62,7 @@
     "evidenceTitle": "Evidence",
     "evidenceSub": "Images or PDF of the issue",
     "removeFile": "Remove",
-    "resumenTitle": "Request summary"
+    "summaryTitle": "Request summary"
   },
   "edit": {
     "title": "Edit Ticket",
@@ -148,10 +149,10 @@
     "dueDate": "Expected end date",
     "taskStatus": "Task status",
     "taskStatusOptions": {
-      "PENDIENTE": "Pending",
-      "EN_PROGRESO": "In progress",
-      "EN_REVISION": "In review",
-      "COMPLETADA": "Completed"
+      "PENDING": "Pending",
+      "IN_PROGRESS": "In progress",
+      "IN_REVIEW": "In review",
+      "COMPLETED": "Completed"
     },
     "employeeNo": "No. {{number}}",
     "employeeLabel": "Employee",
@@ -177,7 +178,9 @@
     "startShort": "Start",
     "dueShort": "Due",
     "systemUser": "System",
-    "byUser": "User"
+    "byUser": "User",
+    "confirmHardDelete": "Permanently delete \"{{title}}\"? Its comments and history will be erased. This action cannot be undone.",
+    "confirmSoftDelete": "Move \"{{title}}\" to the trash? It will be marked as deleted and you can permanently delete it later."
   },
   "kanban": {
     "byTicket": "Ticket tasks",
@@ -271,7 +274,8 @@
     "commentBy": "Comment by {{author}}",
     "fallbackUser": "User",
     "byAuthor": "By {{name}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "footer": "Puerto Nuevo Hotel y Villas — Ticket System"
   },
   "attachments": {
     "loadError": "Could not load the files",
@@ -284,5 +288,11 @@
     "uploadEvidence": "Upload evidence",
     "uploadTicketFiles": "Upload ticket files",
     "fallbackExt": "FILE"
+  },
+  "form": {
+    "validation": {
+      "titleRequired": "Title is required",
+      "titleMin": "Title must have at least {{min}} characters"
+    }
   }
 }

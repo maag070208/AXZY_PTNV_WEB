@@ -2,7 +2,7 @@ import { ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaFileSignature, FaTicketAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { formatFecha } from "@shared/utils/dates";
+import { formatDate } from "@shared/utils/dates";
 import { STATUS_BADGE, PRIORITY_BADGE } from "@entities/ticket";
 import type { Department } from "@entities/department";
 
@@ -48,7 +48,7 @@ export default function DepartmentDetailAside({ dept }: Props) {
   const navigate = useNavigate();
 
   const tickets = dept.tickets ?? [];
-  const cartas = dept.cartas ?? [];
+  const custodyLetters = dept.custodyLetters ?? [];
 
   return (
     <div className="w-full min-w-0 flex flex-col gap-5 md:sticky md:top-24">
@@ -72,7 +72,7 @@ export default function DepartmentDetailAside({ dept }: Props) {
               >
                 <ITFlex justify="between" align="start" gap={2}>
                   <ITText className="text-[11px] font-bold text-slate-700 leading-snug line-clamp-2 flex-1">
-                    {t.titulo}
+                    {t.title}
                   </ITText>
                   <ITBadget color={STATUS_BADGE[t.status]?.color as any} size="lg">
                     {tt(`tickets:statusLabels.${t.status}`)}
@@ -83,7 +83,7 @@ export default function DepartmentDetailAside({ dept }: Props) {
                     {tt(`tickets:priorityLabels.${t.priority}`)}
                   </ITBadget>
                   <ITText className="text-[10px] text-slate-400 whitespace-nowrap">
-                    {formatFecha(t.creadoEn)}
+                    {formatDate(t.createdAt)}
                   </ITText>
                 </ITFlex>
               </div>
@@ -95,38 +95,38 @@ export default function DepartmentDetailAside({ dept }: Props) {
       <AsideSection
         icon={<FaFileSignature size={12} className="text-white" />}
         iconBg="bg-gradient-to-br from-emerald-500 to-teal-600"
-        title={tt("detail.cartasTitle")}
-        count={dept.cartasTotal ?? cartas.length}
+        title={tt("detail.custodyLettersTitle")}
+        count={dept.custodyLettersTotal ?? custodyLetters.length}
       >
-        {cartas.length === 0 ? (
+        {custodyLetters.length === 0 ? (
           <ITText className="text-[12px] font-bold text-slate-400">
-            {tt("detail.noCartas")}
+            {tt("detail.noCustodyLetters")}
           </ITText>
         ) : (
           <ITFlex direction="column" gap={2}>
-            {cartas.map((c) => {
-              const devuelta = !!c.returnDate;
-              const responsable = c.responsable?.name ?? c.encargado?.name;
+            {custodyLetters.map((c) => {
+              const returned = !!c.returnDate;
+              const custodian = c.custodian?.name ?? c.supervisor?.name;
               return (
                 <div
                   key={c.id}
-                  onClick={() => navigate(`/cartas/${c.id}`)}
+                  onClick={() => navigate(`/inventory/loans/${c.id}`)}
                   className="cursor-pointer rounded-lg border border-slate-100 bg-slate-50/60 hover:bg-slate-100/80 p-2.5 transition-colors"
                 >
                   <ITFlex justify="between" align="center" gap={2}>
                     <ITText className="font-mono font-bold text-[11px] text-blue-600">
                       {c.consecutive}
                     </ITText>
-                    <ITBadget color={devuelta ? "gray" : "success"} size="lg">
-                      {devuelta ? tt("detail.cartaReturned") : tt("detail.cartaActive")}
+                    <ITBadget color={returned ? "gray" : "success"} size="lg">
+                      {returned ? tt("detail.custodyLetterReturned") : tt("detail.custodyLetterActive")}
                     </ITBadget>
                   </ITFlex>
                   <ITFlex justify="between" align="center" gap={2} className="mt-1.5">
                     <ITText className="text-[10px] text-slate-500 truncate">
-                      {responsable ?? "—"}
+                      {custodian ?? "—"}
                     </ITText>
                     <ITText className="text-[10px] text-slate-400 whitespace-nowrap">
-                      {formatFecha(c.fecha)}
+                      {formatDate(c.date)}
                     </ITText>
                   </ITFlex>
                 </div>

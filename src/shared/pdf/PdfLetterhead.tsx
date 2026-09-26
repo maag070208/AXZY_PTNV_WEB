@@ -1,6 +1,7 @@
 import { Image, Text, View } from "@react-pdf/renderer";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
 import { pdfTheme } from "./theme";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   title: string;
@@ -35,11 +36,11 @@ export default function PdfLetterhead({ title, pageIndex, pageCount, generatedAt
         </View>
         <View style={pdfTheme.bandMetaWrap}>
           <Text style={pdfTheme.bandMeta}>
-            Generado: <Text style={pdfTheme.bandMetaStrong}>{generatedAt}</Text>
+            {i18n.t("common:pdf.generated")} <Text style={pdfTheme.bandMetaStrong}>{generatedAt}</Text>
           </Text>
           {manual ? (
             <Text style={pdfTheme.bandMeta}>
-              Página <Text style={pdfTheme.bandMetaStrong}>{manual.pageIndex + 1}</Text> de{" "}
+              {i18n.t("common:pdf.page")} <Text style={pdfTheme.bandMetaStrong}>{manual.pageIndex + 1}</Text> {i18n.t("common:pdf.of")}{" "}
               {manual.pageCount}
             </Text>
           ) : (
@@ -47,8 +48,8 @@ export default function PdfLetterhead({ title, pageIndex, pageCount, generatedAt
               style={pdfTheme.bandMeta}
               render={({ pageNumber, totalPages }) => (
                 <>
-                  Página{" "}
-                  <Text style={pdfTheme.bandMetaStrong}>{pageNumber}</Text> de {totalPages}
+                  {i18n.t("common:pdf.page")}{" "}
+                  <Text style={pdfTheme.bandMetaStrong}>{pageNumber}</Text> {i18n.t("common:pdf.of")} {totalPages}
                 </>
               )}
             />

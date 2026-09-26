@@ -12,8 +12,9 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaEye, FaKey, FaTrash, FaUndo } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { ROLE_LABELS, type User, type UserRole } from "@entities/user";
+import { USER_ROLES, roleLabel, type User } from "@entities/user";
 import type { UseUsersList } from "../model/useUsersList";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   fx: UseUsersList;
@@ -26,9 +27,9 @@ const roleBadge = (role: string) => (
     color={
       role === "ADMIN"
         ? "danger"
-        : role === "GERENTE"
+        : role === "MANAGER"
         ? "info"
-        : role === "JEFE_DE_AREA"
+        : role === "AREA_HEAD"
         ? "warning"
         : role === "GUARD"
         ? "gray"
@@ -36,17 +37,27 @@ const roleBadge = (role: string) => (
     }
     size="lg"
   >
-    {ROLE_LABELS[role as UserRole] ?? role}
+    {roleLabel(role)}
   </ITBadget>
 );
 
 export default function UsersTable({ fx, onView, onEdit }: Props) {
   const { t: tt } = useTranslation(["users", "common"]);
+
+  const departmentOptions = fx.departments
+    .filter((d) => d.active)
+    .map((d) => ({ id: d.id, name: d.name }));
+
+  const subareaOptions = fx.departments
+    .filter((d) => d.active)
+    .flatMap((d) => d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` })));
+
   const columns: Column<User>[] = [
     {
       key: "username",
       label: tt("table.username"),
       type: "string",
+      width: 110,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -57,13 +68,14 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "name",
       label: tt("table.name"),
       type: "string",
+      width: 300,
       filter: true,
       sortable: false,
       render: (u) => (
         <ITFlex align="center" gap={1}>
           <ITText className="text-[12px] text-slate-800">{u.name}</ITText>
           {!u.active && (
-            <ITBadget color="danger" size="lg">inactivo</ITBadget>
+            <ITBadget color="danger" size="lg">{i18n.t("common:labels.inactive")}</ITBadget>
           )}
         </ITFlex>
       ),
@@ -72,31 +84,34 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "role",
       label: tt("table.role"),
       type: "catalog",
+      width: 140,
       filter: "catalog",
       sortable: false,
       catalogOptions: {
-        data: (Object.keys(ROLE_LABELS) as UserRole[]).map((id) => ({ id, name: ROLE_LABELS[id] })),
+        data: USER_ROLES.map((id) => ({ id, name: roleLabel(id) })),
         loading: false,
         error: false,
       },
       render: (u) => roleBadge(u.role),
     },
     {
-      key: "numeroEmpleado",
+      key: "employeeNumber",
       label: tt("table.employeeNo"),
       type: "string",
+      width: 110,
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[11px] text-slate-600">{u.numeroEmpleado ?? "—"}</ITText>
+        <ITText className="text-[11px] text-slate-600">{u.employeeNumber ?? "—"}</ITText>
       ),
     },
     {
       key: "department",
       label: tt("table.department"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
-      catalogOptions: { data: [], loading: false, error: false },
+      catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] uppercase text-slate-500">
           {(u as any).department?.name ?? "—"}
@@ -104,11 +119,12 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       ),
     },
     {
-      key: "subarea",
+      key: "subareaId",
       label: tt("table.subarea"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
-      catalogOptions: { data: [], loading: false, error: false },
+      catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] uppercase text-slate-500">
           {(u as any).subarea?.name ?? "—"}
@@ -119,6 +135,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "actions",
       label: "",
       type: "string",
+      width: 200,
       sortable: false,
       render: (u) => (
         <ITFlex align="center" gap={2}>
@@ -174,9 +191,13 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={10}
-      itemsPerPageOptions={[5, 10, 50]}
+      defaultItemsPerPage={100}
+      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
+      onRowClick={(row) => onView(row as unknown as User)}
     />
   );
 }

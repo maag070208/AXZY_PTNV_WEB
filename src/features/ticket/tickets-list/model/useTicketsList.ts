@@ -1,11 +1,33 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { ticketsApi, type Ticket } from "@entities/ticket";
+import { usersApi } from "@entities/user";
 
 export const useTicketsList = () => {
+  const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [userOptions, setUserOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [reloadKey, setReloadKey] = useState(0);
   const [ticketToDelete, setTicketToDelete] = useState<Ticket | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Catálogos para los filtros de Categoría, Creador y Responsable.
+  useEffect(() => {
+    ticketsApi
+      .categories()
+      .then((list) => setCategoryOptions(list.map((c) => ({ id: c.id, name: c.name }))))
+      .catch(() => setCategoryOptions([]));
+    usersApi
+      .employees()
+      .then((list) =>
+        setUserOptions(
+          list.map((u) => ({
+            id: u.id,
+            name: u.employeeNumber ? `${u.name} #${u.employeeNumber}` : u.name,
+          }))
+        )
+      )
+      .catch(() => setUserOptions([]));
+  }, []);
 
   const confirmDeleteTicket = async () => {
     if (!ticketToDelete) return;
@@ -35,6 +57,8 @@ export const useTicketsList = () => {
   );
 
   return {
+    categoryOptions,
+    userOptions,
     reloadKey,
     fetchTableData,
     ticketToDelete,

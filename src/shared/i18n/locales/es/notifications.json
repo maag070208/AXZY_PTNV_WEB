@@ -4,5 +4,6 @@
   "description": "Centro de notificaciones y alertas",
   "markAllRead": "Marcar todo como leído",
   "loading": "Cargando…",
-  "empty": "Sin notificaciones"
+  "empty": "Sin notificaciones",
+  "newNotification": "Nueva notificación"
 }

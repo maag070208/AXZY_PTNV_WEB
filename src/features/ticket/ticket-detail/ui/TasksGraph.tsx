@@ -13,7 +13,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaComment, FaPaperPlane, FaPlus, FaProjectDiagram, FaTicketAlt, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { formatFechaHora } from "@shared/utils/dates";
+import { formatDateTime } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { STATUS_BADGE } from "@entities/ticket";
 import type { UseTicketDetail } from "../model/useTicketDetail";
@@ -29,10 +29,10 @@ interface Props {
 }
 
 const statusMeta: Record<string, { dot: string; bar: string }> = {
-  PENDIENTE: { dot: "bg-slate-400", bar: "border-slate-300" },
-  EN_PROGRESO: { dot: "bg-blue-500", bar: "border-blue-400" },
-  EN_REVISION: { dot: "bg-purple-500", bar: "border-purple-400" },
-  COMPLETADA: { dot: "bg-emerald-500", bar: "border-emerald-400" },
+  PENDING: { dot: "bg-slate-400", bar: "border-slate-300" },
+  IN_PROGRESS: { dot: "bg-blue-500", bar: "border-blue-400" },
+  IN_REVIEW: { dot: "bg-purple-500", bar: "border-purple-400" },
+  COMPLETED: { dot: "bg-emerald-500", bar: "border-emerald-400" },
 };
 
 export default function TasksGraph({ fx, canManage, renderAssignmentAttachments }: Props) {
@@ -99,7 +99,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
             <ITFlex align="center" gap={2} className="min-w-0">
               <FaTicketAlt size={13} className="text-slate-400 shrink-0" />
               <ITText className="text-[13px] font-black text-white leading-tight truncate">
-                {ticket.titulo}
+                {ticket.title}
               </ITText>
             </ITFlex>
             <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="lg">
@@ -123,7 +123,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
         </div>
       ) : (
         ticket.assignments.map((a) => {
-          const meta = statusMeta[a.status] ?? statusMeta.PENDIENTE;
+          const meta = statusMeta[a.status] ?? statusMeta.PENDING;
           const assignmentOpen = fx.expandedAssignments[a.id] ?? false;
           const canEditTask = canManage && !isClosed;
           const canEditStatus =
@@ -153,9 +153,9 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       <ITText className="text-[12px] font-black text-slate-800 leading-tight truncate">
                         {a.user.name}
                       </ITText>
-                      {a.user.numeroEmpleado && (
+                      {a.user.employeeNumber && (
                         <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                          {tt("detail.employeeNo", { number: a.user.numeroEmpleado })}
+                          {tt("detail.employeeNo", { number: a.user.employeeNumber })}
                         </ITText>
                       )}
                     </ITStack>
@@ -175,11 +175,11 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                     )}
                     <ITBadget
                       color={
-                        a.status === "COMPLETADA"
+                        a.status === "COMPLETED"
                           ? "success"
-                          : a.status === "EN_PROGRESO"
+                          : a.status === "IN_PROGRESS"
                           ? "info"
-                          : a.status === "EN_REVISION"
+                          : a.status === "IN_REVIEW"
                           ? "purple"
                           : "gray"
                       }
@@ -258,17 +258,17 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                         name={`status-${a.id}`}
                         label={tt("detail.taskStatus")}
                         options={[
-                          "PENDIENTE",
-                          "EN_PROGRESO",
-                          "EN_REVISION",
-                          ...(fx.canCompleteTask ? ["COMPLETADA"] : []),
+                          "PENDING",
+                          "IN_PROGRESS",
+                          "IN_REVIEW",
+                          ...(fx.canCompleteTask ? ["COMPLETED"] : []),
                         ].map((value) => ({
                           value,
                           label: dyn(tt)(`detail.taskStatusOptions.${value}`),
                         }))}
                         value={a.status}
                         disabled={
-                          !canEditStatus || (a.status === "COMPLETADA" && !fx.canCompleteTask)
+                          !canEditStatus || (a.status === "COMPLETED" && !fx.canCompleteTask)
                         }
                         onChange={(e) => fx.handleUpdateAssignment(a.id, { status: e.target.value })}
                       />
@@ -313,14 +313,14 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                               >
                                 <ITFlex justify="between" align="center" className="mb-0.5">
                                   <ITText className="text-[9px] font-black text-slate-600">
-                                    {c.autor?.name ?? tt("detail.systemUser")}
+                                    {c.author?.name ?? tt("detail.systemUser")}
                                   </ITText>
                                   <ITText className="text-[8px] text-slate-400">
-                                    {formatFechaHora(c.createdAt)}
+                                    {formatDateTime(c.createdAt)}
                                   </ITText>
                                 </ITFlex>
                                 <ITText className="text-[10px] text-slate-600 whitespace-pre-wrap">
-                                  {c.texto}
+                                  {c.text}
                                 </ITText>
                               </div>
                             ))
@@ -401,11 +401,11 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                     name="newUserId"
                     label={tt("detail.employeeLabel")}
                     placeholder={tt("detail.searchEmployee")}
-                    options={fx.empleadoOptions}
+                    options={fx.employeeOptions}
                     value={fx.selectedUserId}
                     onChange={fx.handleAssign}
-                    onSearch={fx.buscarEmpleados}
-                    isLoading={fx.busyEmpleados}
+                    onSearch={fx.searchEmployees}
+                    isLoading={fx.busyEmployees}
                   />
                 </ITGrid>
                 <ITGrid item xs={12} md={5}>

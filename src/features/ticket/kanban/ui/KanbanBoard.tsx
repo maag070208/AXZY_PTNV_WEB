@@ -150,7 +150,7 @@ export default function KanbanBoard({ fx }: Props) {
             >
               <ITFlex justify="between" align="center" className="mb-3 px-1">
                 <ITFlex align="center" gap={1.5}>
-                  {col.status === "COMPLETADA" && (
+                  {col.status === "COMPLETED" && (
                     <FaCheckCircle size={12} className="text-emerald-500" />
                   )}
                   <ITText className="text-[13px] font-semibold text-slate-700">
@@ -182,7 +182,7 @@ export default function KanbanBoard({ fx }: Props) {
                     const ticketStatusMeta = metaFor(STATUS_META, a.ticket.status);
                     const overdue = Boolean(
                       a.dueDate &&
-                        a.status !== "COMPLETADA" &&
+                        a.status !== "COMPLETED" &&
                         new Date(a.dueDate) < new Date()
                     );
                     return (
@@ -202,7 +202,7 @@ export default function KanbanBoard({ fx }: Props) {
                         <ITFlex justify="between" align="center" gap={2} className="mb-1.5">
                           <Tag label={deptLabel} tone={deptTone} />
                           {overdue && (
-                           <Tag label={tt("kanban.overdue")} tone={PRIORITY_META.URGENTE.tone} />
+                           <Tag label={tt("kanban.overdue")} tone={PRIORITY_META.URGENT.tone} />
                           )}
                         </ITFlex>
 
@@ -210,7 +210,7 @@ export default function KanbanBoard({ fx }: Props) {
                           <ITFlex align="center" gap={1} className="min-w-0">
                             <FaTicketAlt size={8} className="text-slate-300 shrink-0" />
                             <ITText className="text-[10px] text-slate-400 truncate">
-                              {a.ticket.titulo}
+                              {a.ticket.title}
                             </ITText>
                           </ITFlex>
                           <Tag

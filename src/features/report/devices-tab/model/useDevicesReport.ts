@@ -1,78 +1,126 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { reportsApi, type DeviceReportRow } from "@entities/report";
-import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
+import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
+import {
+  reportsApi,
+  type DevicesPdfPayload,
+  type DevicesStats,
+} from "@entities/report";
+import { appliedFilters, type TableQuery } from "@shared/utils/tableFilters";
+import { dyn } from "@shared/i18n/dyn";
 
-export type DownloadDevicesPdf = (rows: DeviceReportRow[]) => Promise<void>;
+/** Orden vigente de la tabla; la columna ES una unidad física. */
+export type DevicesSort = NonNullable<ITDataTableFetchParams["sort"]>;
+
+/** Orden estable: el mismo al que cae el API cuando el `sort` no está en su allowlist. */
+export const DEFAULT_DEVICES_SORT: DevicesSort = { key: "assetTag", direction: "asc" };
+
+/** Columnas filtrables → llave i18n de su encabezado. */
+const FILTER_LABELS: Record<string, string> = {
+  assetTag: "devices.activeCol",
+  description: "devices.colDescription",
+  status: "devices.colStatus",
+  custodian: "devices.colCustodian",
+  department: "devices.colDept",
+  area: "devices.colArea",
+  start: "pdf.filterFrom",
+  end: "pdf.filterTo",
+};
+
+/** Fecha local `YYYY-MM-DD`, la clave de día que el API resuelve en su zona. */
+const toDateInput = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+export type { DevicesPdfPayload } from "@entities/report";
+
+export type DownloadDevicesPdf = (payload: DevicesPdfPayload) => Promise<void>;
 
 interface Options {
   download: DownloadDevicesPdf;
 }
 
+/**
+ * Estado de la pestaña "Dispositivos": tabla server-side del catálogo de
+ * unidades con su estado actual, y los KPIs del conjunto filtrado que devuelve
+ * el servidor.
+ */
 export const useDevicesReport = ({ download }: Options) => {
   const { t } = useTranslation(["reports", "common"]);
-  const [rows, setRows] = useState<DeviceReportRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<DevicesStats | null>(null);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [exporting, setExporting] = useState(false);
+  // Rango vacío = sin recorte (comportamiento previo). Con rango, el API filtra
+  // por la fecha del préstamo VIGENTE: las unidades no prestadas quedan fuera y
+  // tabla, KPIs y PDF comparten el mismo recorte.
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    reportsApi
-      .devices()
-      .then((res) => setRows(res.data))
-      .catch((e: any) => setError(e.message ?? t("devices.errorLoad")))
-      .finally(() => setLoading(false));
-  }, [t]);
+  /** Rango de fechas expuesto a la tabla como filtros externos (clave de día). */
+  const externalFilters = useMemo(() => {
+    const filters: Record<string, string | number | boolean> = {};
+    if (dateRange[0]) filters.start = toDateInput(dateRange[0]);
+    if (dateRange[1]) filters.end = toDateInput(dateRange[1]);
+    return filters;
+  }, [dateRange]);
 
-  useEffect(() => {
-    load();
-  }, [load, reloadKey]);
+  /** Última consulta de la tabla; el export reutiliza su recorte y su orden. */
+  const lastQuery = useRef<TableQuery>({ filters: {}, sort: DEFAULT_DEVICES_SORT });
+
+  const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
+    const filters = params.filters as Record<string, string | number | boolean>;
+    const sort = params.sort ?? DEFAULT_DEVICES_SORT;
+    lastQuery.current = { filters, sort };
+
+    const res = await reportsApi.devices({ page: params.page, limit: params.limit, filters, sort });
+    setStats(res.stats);
+    return {
+      data: res.data as unknown as Record<string, unknown>[],
+      total: res.total,
+    };
+  }, []);
 
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
+    setError(null);
     try {
-      await download(rows);
+      const { filters, sort } = lastQuery.current;
+      // El rango manda desde el `externalFilters` VIGENTE: se descarta el
+      // `start`/`end` de la última consulta (podía estar desfasado) y se fusiona
+      // el actual, para que el PDF coincida con el rango que se ve.
+      const { start: _start, end: _end, ...rest } = filters;
+      const exportFilters = { ...rest, ...externalFilters };
+      const res = await reportsApi.devicesExport({ page: 1, limit: 100, filters: exportFilters, sort });
+      await download({
+        data: res.data,
+        stats: res.stats,
+        truncated: res.truncated,
+        meta: {
+          generatedAt: new Date().toISOString(),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t)),
+        },
+      });
     } catch (e) {
-      console.error("Error al exportar PDF de dispositivos", e);
+      setError(e instanceof Error ? e.message : t("devices.errorLoad"));
     } finally {
       setExporting(false);
     }
-  }, [download, rows]);
-
-  const stats = useMemo(() => {
-    const asignados = rows.filter((r) => r.estado === "ASIGNADO").length;
-    const disponibles = rows.filter((r) => r.estado === "DISPONIBLE").length;
-    const bajas = rows.filter((r) => r.estado === "BAJA").length;
-    const masDe30 = rows.filter((r) => (r.diasAsignado ?? 0) > 30).length;
-    return { asignados, disponibles, bajas, masDe30 };
-  }, [rows]);
-
-  // ITDataTable exige fetchData asíncrono (page/limit); el universo de
-  // dispositivos es acotado, así que paginamos en el cliente sobre `rows`.
-  const fetchTableData = useCallback(
-    async (params: ITDataTableFetchParams): Promise<ITDataTableResponse<DeviceReportRow>> => {
-      const start = (params.page - 1) * params.limit;
-      return {
-        data: rows.slice(start, start + params.limit),
-        total: rows.length,
-      };
-    },
-    [rows]
-  );
+  }, [download, t, externalFilters]);
 
   return {
     t,
-    rows,
-    loading,
+    stats,
     error,
     setError,
     exporting,
     reloadKey,
     setReloadKey,
-    stats,
+    dateRange,
+    setDateRange,
+    externalFilters,
     handleDownloadPdf,
     fetchTableData,
   };

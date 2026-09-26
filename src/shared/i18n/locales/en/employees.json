@@ -16,7 +16,7 @@
     "credentialError": "Could not generate the ID card",
     "stepper": {
       "photoPersonal": "Photo and Personal Data",
-      "laboral": "Work",
+      "employment": "Work",
       "contact": "Contact"
     },
     "deactivate": "Deactivate",
@@ -31,7 +31,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "employeeNo": "Employee No.",
-    "laboralTitle": "Work Information",
+    "employmentTitle": "Work Information",
     "medicalTitle": "Medical Information",
     "personalInfoTitle": "Personal Information",
     "officialDocsTitle": "Official Documents",
@@ -46,14 +46,14 @@
     "noDocumentTypes": "No document types configured",
     "uploaded": "Uploaded",
     "pendingOne": "Pending",
-    "uploadFor": "Upload {{tipo}}",
+    "uploadFor": "Upload {{type}}",
     "documentUploadError": "Could not upload the document",
     "documentDeleteError": "Could not delete the document",
     "discountNote": "Note (credit number, amount, case number, etc.)",
     "discountTypes": {
       "INFONAVIT": "INFONAVIT",
       "IMSS": "IMSS",
-      "DEUDOR_ALIMENTICIO": "Alimony Debtor"
+      "CHILD_SUPPORT": "Alimony Debtor"
     },
     "tabs": {
       "personal": "Personal",
@@ -68,8 +68,8 @@
       "employeeNo": "Employee Number",
       "firstName": "First Name",
       "secondName": "Middle Name",
-      "apellidoPaterno": "Last Name",
-      "apellidoMaterno": "Second Last Name",
+      "paternalSurname": "Last Name",
+      "maternalSurname": "Second Last Name",
       "gender": "Gender",
       "birthDate": "Date of Birth",
       "hireDate": "Hire Date",
@@ -118,5 +118,28 @@
     "deleteForeverConfirm": "This will permanently delete \"{{name}}\". This action cannot be undone.",
     "saveError": "Could not save the document type",
     "deleteError": "Could not delete the document type"
+  },
+  "disciplinary": {
+    "saveError": "Could not save the disciplinary report",
+    "deleteError": "Could not delete the disciplinary report",
+    "loadError": "Could not load the disciplinary report",
+    "notFound": "Disciplinary report not found"
+  },
+  "deactivate": {
+    "reasonMin": "The reason must have at least {{min}} characters",
+    "reasonLabel": "Deactivation reason",
+    "reasonPlaceholder": "Briefly describe the reason..."
+  },
+  "credential": {
+    "title": "EMPLOYEE BADGE",
+    "subtitle": "Puerto Nuevo Hotel y Villas · Authorized Staff",
+    "employeeNumber": "Employee number",
+    "fullName": "Full name",
+    "jobTitle": "Job title",
+    "department": "Department",
+    "scanToVerify": "Scan to verify this badge",
+    "footer": "employee-badge · {{year}}",
+    "renderError": "Could not get the 2D context to draw the badge",
+    "generateError": "Could not generate the badge"
   }
 }

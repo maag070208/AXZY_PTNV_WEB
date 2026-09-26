@@ -8,12 +8,6 @@ export const isITDeviceCode = (
 ): code is ITDeviceCode =>
   !!code && (IT_DEVICE_CODES as readonly string[]).includes(code);
 
-export const IT_DEVICE_CODE_LABELS: Record<ITDeviceCode, string> = {
-  PC: "PC de escritorio",
-  TABLET: "Tablet",
-  LAPTOP: "Laptop",
-};
-
 // Validadores ────────────────────────────────────────────────────────
 const MAC_REGEX = /^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$/;
 const IPV4_REGEX =

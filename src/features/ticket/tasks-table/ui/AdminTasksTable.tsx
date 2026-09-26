@@ -27,6 +27,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "title",
       label: tt("tasksTable.task"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
@@ -41,12 +42,13 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "employee",
       label: tt("tasksTable.employee"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
-          {row.user.numeroEmpleado && (
-            <ITText className="text-[9px] text-slate-400">{tt("tasksTable.employeeNo", { number: row.user.numeroEmpleado })}</ITText>
+          {row.user.employeeNumber && (
+            <ITText className="text-[9px] text-slate-400">{tt("tasksTable.employeeNo", { number: row.user.employeeNumber })}</ITText>
           )}
         </ITFlex>
       ),
@@ -55,15 +57,17 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "ticket",
       label: tt("tasksTable.ticket"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (row) => (
-        <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.titulo}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.title}</ITText>
       ),
     },
     {
       key: "status",
       label: tt("tasksTable.status"),
       type: "string",
+      width: 150,
       sortable: false,
       render: (row) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="lg">
@@ -75,6 +79,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "dates",
       label: tt("tasksTable.dates"),
       type: "string",
+      width: 220,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
@@ -89,7 +94,7 @@ export default function AdminTasksTable({ fx }: Props) {
             </ITText>
           )}
           {row.dueDate &&
-            row.status !== "COMPLETADA" &&
+            row.status !== "COMPLETED" &&
             new Date(row.dueDate) < new Date() && (
               <ITBadget color="danger" size="lg">{tt("tasksTable.overdue")}</ITBadget>
             )}
@@ -107,9 +112,12 @@ export default function AdminTasksTable({ fx }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={10}
-      itemsPerPageOptions={[5, 10, 50]}
+      defaultItemsPerPage={100}
+      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
     />
   );
 }

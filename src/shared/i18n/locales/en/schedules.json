@@ -7,9 +7,9 @@
   "active": "Active",
   "inactive": "Inactive",
   "assigned": "{{count}} assigned",
-  "tolEntrada": "Entry tolerance (min)",
-  "tolSalida": "Exit tolerance (min)",
-  "comida": "Break (min)",
+  "tolEntry": "Entry tolerance (min)",
+  "tolExit": "Exit tolerance (min)",
+  "meal": "Break (min)",
   "minExtra": "Overtime minimum (min)",
   "minExtraHint": "Minimum extra time worked to count as overtime. 0 = no minimum.",
   "crossesMidnight": "Crosses midnight",
@@ -137,5 +137,8 @@
     }
   },
   "assignedLabel": "Assigned",
-  "secondHint": "Enable it on days with a split shift (e.g. housekeeping or restaurant)."
+  "secondHint": "Enable it on days with a split shift (e.g. housekeeping or restaurant).",
+  "form": {
+    "notFound": "Schedule not found"
+  }
 }

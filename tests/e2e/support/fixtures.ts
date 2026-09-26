@@ -1,16 +1,16 @@
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
-import { E2E_PREFIX, nuevoRunId } from "./env";
-import { ApiInventario, crearContextoApi, type Dispositivo, type TipoDispositivo } from "./api";
+import { E2E_PREFIX, newRunId } from "./env";
+import { ApiInventory, createContextApi, type Device, type DeviceType } from "./api";
 import { ApiTickets, type Ticket, type TicketAssignment } from "./ticketsApi";
-import { AltaDispositivoPage } from "./pages/AltaDispositivoPage";
+import { DeviceRegistrationPage } from "./pages/DeviceRegistrationPage";
 import { LoginPage } from "./pages/LoginPage";
-import { NuevaDevolucionPage } from "./pages/NuevaDevolucionPage";
-import { NuevoMovimientoPage } from "./pages/NuevoMovimientoPage";
-import { NuevoPrestamoPage } from "./pages/NuevoPrestamoPage";
+import { NewLoanReturnPage } from "./pages/NewLoanReturnPage";
+import { NewMovementPage } from "./pages/NewMovementPage";
+import { NewLoanPage } from "./pages/NewLoanPage";
 import { TicketsPage } from "./pages/TicketsPage";
 
-const RUN_ID = nuevoRunId();
-let secuencia = 0;
+const RUN_ID = newRunId();
+let sequence = 0;
 
 /**
  * Tipo de dispositivo exclusivo del test, con fábrica de dispositivos encima.
@@ -20,32 +20,32 @@ let secuencia = 0;
  * siembran por API porque lo que se prueba es la pantalla del flujo, no la
  * preparación.
  */
-export class Escenario {
+export class Scenario {
   constructor(
-    readonly api: ApiInventario,
-    readonly tipo: TipoDispositivo
+    readonly api: ApiInventory,
+    readonly type: DeviceType
   ) {}
 
-  async dispositivo(
-    cantidad: number,
-    nombre?: string
-  ): Promise<Dispositivo & { nombreVisible: string }> {
-    secuencia += 1;
-    const nombreFinal = nombre ?? `Equipo ${RUN_ID}-${secuencia}`;
-    const dispositivo = await this.api.crearDispositivo({
-      tipoId: this.tipo.id,
-      nombre: nombreFinal,
-      marca: "MarcaPrueba",
-      modelo: "ModeloPrueba",
-      cantidadInicial: cantidad,
+  async device(
+    quantity: number,
+    name?: string
+  ): Promise<Device & { nameVisible: string }> {
+    sequence += 1;
+    const finalName = name ?? `Equipo ${RUN_ID}-${sequence}`;
+    const device = await this.api.createDevice({
+      typeId: this.type.id,
+      name: finalName,
+      brand: "TestBrand",
+      model: "TestModel",
+      initialQuantity: quantity,
     });
-    return { ...dispositivo, nombreVisible: nombreFinal };
+    return { ...device, nameVisible: finalName };
   }
 
   /** Nombre único para dar de alta desde la pantalla. */
-  nombreNuevo(prefijo = "Alta UI"): string {
-    secuencia += 1;
-    return `${prefijo} ${RUN_ID}-${secuencia}`;
+  newName(prefix = "Alta UI"): string {
+    sequence += 1;
+    return `${prefix} ${RUN_ID}-${sequence}`;
   }
 }
 
@@ -57,41 +57,41 @@ export class Escenario {
  * pantalla) es lo que permite que cada test se concentre en la pantalla que
  * prueba.
  */
-export class TicketEscenario {
+export class TicketScenario {
   constructor(
     readonly tickets: ApiTickets,
     readonly ticket: Ticket,
-    readonly titulo: string
+    readonly title: string
   ) {}
 
-  async asignarA(username: string, title = `Tarea ${this.titulo}`): Promise<TicketAssignment> {
-    const userId = await this.tickets.usuarioPorUsername(username);
-    return this.tickets.asignar(this.ticket.id, { userId, title });
+  async assignA(username: string, title = `Tarea ${this.title}`): Promise<TicketAssignment> {
+    const userId = await this.tickets.userByUsername(username);
+    return this.tickets.assign(this.ticket.id, { userId, title });
   }
 }
 
 interface Fixtures {
   login: LoginPage;
-  altaPage: AltaDispositivoPage;
-  prestamoPage: NuevoPrestamoPage;
-  movimientoPage: NuevoMovimientoPage;
-  devolucionPage: NuevaDevolucionPage;
+  registrationPage: DeviceRegistrationPage;
+  loanPage: NewLoanPage;
+  movementPage: NewMovementPage;
+  loanReturnPage: NewLoanReturnPage;
   ticketsPage: TicketsPage;
-  escenario: Escenario;
-  departamento: { id: string; name: string };
-  ticketEscenario: TicketEscenario;
+  scenario: Scenario;
+  department: { id: string; name: string };
+  ticketScenario: TicketScenario;
 }
 
 interface WorkerFixtures {
   ctxApi: APIRequestContext;
-  api: ApiInventario;
+  api: ApiInventory;
   tickets: ApiTickets;
 }
 
 export const test = base.extend<Fixtures, WorkerFixtures>({
   ctxApi: [
     async ({}, use) => {
-      const ctx = await crearContextoApi();
+      const ctx = await createContextApi();
       await use(ctx);
       await ctx.dispose();
     },
@@ -100,7 +100,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
 
   api: [
     async ({ ctxApi }, use) => {
-      await use(new ApiInventario(ctxApi));
+      await use(new ApiInventory(ctxApi));
     },
     { scope: "worker" },
   ],
@@ -112,48 +112,48 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     { scope: "worker" },
   ],
 
-  ticketEscenario: async ({ tickets }, use) => {
-    secuencia += 1;
-    const titulo = `${E2E_PREFIX} ${RUN_ID}-${secuencia} Ticket`;
-    const ticket = await tickets.crear({
-      titulo,
-      descripcion: `Descripción E2E ${RUN_ID}-${secuencia}`,
+  ticketScenario: async ({ tickets }, use) => {
+    sequence += 1;
+    const title = `${E2E_PREFIX} ${RUN_ID}-${sequence} Ticket`;
+    const ticket = await tickets.create({
+      title,
+      description: `Descripción E2E ${RUN_ID}-${sequence}`,
     });
-    await use(new TicketEscenario(tickets, ticket, titulo));
+    await use(new TicketScenario(tickets, ticket, title));
   },
 
-  escenario: async ({ api }, use) => {
-    secuencia += 1;
-    const marca = `${E2E_PREFIX}${RUN_ID}${String(secuencia).padStart(3, "0")}`;
-    const tipo = await api.crearTipo({
-      code: marca,
-      name: `Tipo UI ${marca}`,
-      folioPrefix: marca,
-      useSerie: true,
+  scenario: async ({ api }, use) => {
+    sequence += 1;
+    const brand = `${E2E_PREFIX}${RUN_ID}${String(sequence).padStart(3, "0")}`;
+    const type = await api.createType({
+      code: brand,
+      name: `Tipo UI ${brand}`,
+      assetTagPrefix: brand,
+      useSerialNumber: true,
     });
-    await use(new Escenario(api, tipo));
+    await use(new Scenario(api, type));
   },
 
-  departamento: async ({ api }, use) => {
-    const [primero] = await api.departamentos();
-    if (!primero) throw new Error("No hay departamentos en la base; el seed no corrió");
-    await use(primero);
+  department: async ({ api }, use) => {
+    const [first] = await api.departments();
+    if (!first) throw new Error("No hay departamentos en la base; el seed no corrió");
+    await use(first);
   },
 
   login: async ({ page }, use) => {
     await use(new LoginPage(page));
   },
-  altaPage: async ({ page }, use) => {
-    await use(new AltaDispositivoPage(page));
+  registrationPage: async ({ page }, use) => {
+    await use(new DeviceRegistrationPage(page));
   },
-  prestamoPage: async ({ page }, use) => {
-    await use(new NuevoPrestamoPage(page));
+  loanPage: async ({ page }, use) => {
+    await use(new NewLoanPage(page));
   },
-  movimientoPage: async ({ page }, use) => {
-    await use(new NuevoMovimientoPage(page));
+  movementPage: async ({ page }, use) => {
+    await use(new NewMovementPage(page));
   },
-  devolucionPage: async ({ page }, use) => {
-    await use(new NuevaDevolucionPage(page));
+  loanReturnPage: async ({ page }, use) => {
+    await use(new NewLoanReturnPage(page));
   },
   ticketsPage: async ({ page }, use) => {
     await use(new TicketsPage(page));

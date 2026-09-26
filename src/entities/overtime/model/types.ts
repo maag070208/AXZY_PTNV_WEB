@@ -1,11 +1,11 @@
 /** Estado de aprobación de un día de tiempo extra. La ausencia de decisión = PENDIENTE. */
-export type OvertimeDayStatus = "PENDIENTE" | "APROBADO" | "RECHAZADO";
+export type OvertimeDayStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 /** Un día de tiempo extra (persona + día) con su estado de aprobación. */
 export interface OvertimeDayRow {
   userId: string;
   employeeName: string;
-  numeroEmpleado: string | null;
+  employeeNumber: string | null;
   departmentId: string | null;
   departmentName: string | null;
   active: boolean;
@@ -13,10 +13,10 @@ export interface OvertimeDayRow {
   date: string;
   extraMin: number;
   workedMin: number;
-  programadasMin: number;
-  horarioNombre: string | null;
-  descanso: boolean;
-  sinHorario: boolean;
+  scheduledMin: number;
+  scheduleName: string | null;
+  restDay: boolean;
+  withoutSchedule: boolean;
   status: OvertimeDayStatus;
   /** Minutos contabilizados (snapshot aprobado). */
   approvedExtraMin: number;

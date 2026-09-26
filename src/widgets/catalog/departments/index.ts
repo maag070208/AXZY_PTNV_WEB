@@ -1,0 +1,1 @@
+export { default as DepartmentsPanel } from "./ui/DepartmentsPanel";
