@@ -1,83 +1,101 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { reportsApi, type AssignedDeviceRow } from "@entities/report";
-import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
+import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
+import {
+  reportsApi,
+  type AssignedDevicesPdfPayload,
+  type AssignedDevicesStats,
+} from "@entities/report";
+import { appliedFilters, type TableQuery } from "@shared/utils/tableFilters";
+import { dyn } from "@shared/i18n/dyn";
 
-export type DownloadAssignedDevicesPdf = (rows: AssignedDeviceRow[]) => Promise<void>;
+/** Orden vigente de la tabla; la columna ES una unidad física. */
+export type AssignedDevicesSort = NonNullable<ITDataTableFetchParams["sort"]>;
+
+/** Orden estable: el mismo al que cae el API cuando el `sort` no está en su allowlist. */
+export const DEFAULT_ASSIGNED_SORT: AssignedDevicesSort = { key: "assetTag", direction: "asc" };
+
+/** Columnas filtrables → llave i18n de su encabezado. */
+const FILTER_LABELS: Record<string, string> = {
+  assetTag: "assigned.activeCol",
+  description: "assigned.colDescription",
+  custodian: "assigned.colCustodian",
+  department: "assigned.colDept",
+  folio: "assigned.colFolioSource",
+  date: "assigned.colDate",
+  daysAssigned: "assigned.colDays",
+};
+
+export type { AssignedDevicesPdfPayload } from "@entities/report";
+
+export type DownloadAssignedDevicesPdf = (payload: AssignedDevicesPdfPayload) => Promise<void>;
 
 interface Options {
   download: DownloadAssignedDevicesPdf;
 }
 
+/**
+ * Estado de la pestaña "Asignados". La fila ES la unidad prestada: filtros,
+ * orden y paginación se resuelven en el servidor, y los KPIs se leen de `stats`
+ * del conjunto filtrado completo (no de la página visible).
+ */
 export const useAssignedDevicesReport = ({ download }: Options) => {
   const { t } = useTranslation(["reports", "common"]);
-  const [rows, setRows] = useState<AssignedDeviceRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<AssignedDevicesStats | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    reportsApi
-      .assigned()
-      .then((res) => setRows(res.data))
-      .catch((e: any) => setError(e.message ?? t("assigned.errorLoad")))
-      .finally(() => setLoading(false));
-  }, [t]);
+  /**
+   * Última consulta que la tabla encontró. Los filtros de columna viven dentro
+   * de `ITDataTable`, así que se_guardan aquí para que el PDF salga con el mismo
+   * recorte que el usuario está viendo.
+   */
+  const lastQuery = useRef<TableQuery>({ filters: {}, sort: DEFAULT_ASSIGNED_SORT });
 
-  useEffect(() => {
-    load();
-  }, [load, reloadKey]);
+  const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
+    const filters = params.filters as Record<string, string | number | boolean>;
+    const sort = params.sort ?? DEFAULT_ASSIGNED_SORT;
+    lastQuery.current = { filters, sort };
 
-  const averageDays = useMemo(() => {
-    if (rows.length === 0) return 0;
-    return Math.round(
-      rows.reduce((acc, r) => acc + (r.daysAssigned ?? 0), 0) / rows.length
-    );
-  }, [rows]);
-
-  const moreDe30 = useMemo(
-    () => rows.filter((r) => (r.daysAssigned ?? 0) > 30).length,
-    [rows]
-  );
+    const res = await reportsApi.assigned({ page: params.page, limit: params.limit, filters, sort });
+    setStats(res.stats);
+    return {
+      data: res.data as unknown as Record<string, unknown>[],
+      total: res.total,
+    };
+  }, []);
 
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
+    setError(null);
     try {
-      await download(rows);
+      const { filters, sort } = lastQuery.current;
+      const res = await reportsApi.assignedExport({ page: 1, limit: 100, filters, sort });
+      await download({
+        data: res.data,
+        stats: res.stats,
+        truncated: res.truncated,
+        meta: {
+          generatedAt: new Date().toISOString(),
+          appliedFilters: appliedFilters(filters, FILTER_LABELS, dyn(t)),
+        },
+      });
     } catch (e) {
-      console.error("Error exporting the assigned devices PDF", e);
+      setError(e instanceof Error ? e.message : t("assigned.errorLoad"));
     } finally {
       setExporting(false);
     }
-  }, [download, rows]);
-
-  // ITDataTable exige un fetchData asíncrono (page/limit); como el universo
-  // de asignados activos es acotado, paginamos en el cliente sobre `rows`.
-  const fetchTableData = useCallback(
-    async (params: ITDataTableFetchParams): Promise<ITDataTableResponse<AssignedDeviceRow>> => {
-      const start = (params.page - 1) * params.limit;
-      return {
-        data: rows.slice(start, start + params.limit),
-        total: rows.length,
-      };
-    },
-    [rows]
-  );
+  }, [download, t]);
 
   return {
     t,
-    rows,
-    loading,
+    stats,
     error,
     setError,
     exporting,
     reloadKey,
     setReloadKey,
-    averageDays,
-    moreDe30,
     handleDownloadPdf,
     fetchTableData,
   };

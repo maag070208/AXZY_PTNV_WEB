@@ -5,6 +5,31 @@ export interface ReportFilters {
   employee?: string;
 }
 
+/**
+ * Pie de los PDF de instantánea (asignados / dispositivos): sólo.filters
+ * aplicados, porque la pestaña no tiene periodo.
+ */
+export interface SnapshotReportPdfMeta {
+  generatedAt: string;
+  appliedFilters: Array<{ label: string; value: string }>;
+}
+
+/** Payload del PDF de asignados: universo filtrado + KPIs del conjunto completo. */
+export interface AssignedDevicesPdfPayload {
+  data: AssignedDeviceRow[];
+  stats: AssignedDevicesStats;
+  truncated: boolean;
+  meta: SnapshotReportPdfMeta;
+}
+
+/** Payload del PDF de dispositivos: universo filtrado + KPIs del conjunto completo. */
+export interface DevicesPdfPayload {
+  data: DeviceReportRow[];
+  stats: DevicesStats;
+  truncated: boolean;
+  meta: SnapshotReportPdfMeta;
+}
+
 export interface ReportRow {
   id: string;
   date: string;
@@ -44,6 +69,30 @@ export interface AssignedDeviceRow {
   folio: string | null;
 }
 
+/** KPIs del conjunto filtrado, calculados en el servidor. */
+export interface AssignedDevicesStats {
+  assigned: number;
+  averageDays: number;
+  over30: number;
+}
+
+export interface AssignedDevicesTableResponse {
+  data: AssignedDeviceRow[];
+  total: number;
+  stats: AssignedDevicesStats;
+}
+
+export interface AssignedDevicesExportResponse extends AssignedDevicesTableResponse {
+  truncated: boolean;
+}
+
+export type DeviceReportStatus =
+  | "AVAILABLE"
+  | "ASSIGNED"
+  | "DAMAGED"
+  | "IN_MAINTENANCE"
+  | "RETIRED";
+
 export interface DeviceReportRow {
   deviceId: string;
   assetTag: string;
@@ -57,7 +106,7 @@ export interface DeviceReportRow {
   macAddress: string | null;
   area: string;
   departmentName: string | null;
-  status: string;
+  status: DeviceReportStatus;
   batchId: string | null;
   quantity: number;
   custodian: string | null;
@@ -67,4 +116,23 @@ export interface DeviceReportRow {
   daysAssigned: number | null;
   source: "CUSTODY_LETTER" | "MOVEMENT" | "UNKNOWN" | null;
   folio: string | null;
+}
+
+export interface DevicesStats {
+  total: number;
+  available: number;
+  assigned: number;
+  retired: number;
+  over30: number;
+  averageDays: number;
+}
+
+export interface DevicesTableResponse {
+  data: DeviceReportRow[];
+  total: number;
+  stats: DevicesStats;
+}
+
+export interface DevicesExportResponse extends DevicesTableResponse {
+  truncated: boolean;
 }

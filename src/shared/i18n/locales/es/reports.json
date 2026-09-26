@@ -1,6 +1,6 @@
 {
   "title": "Reportes",
-  "description": "Consulta asignaciones e inventario de dispositivos",
+  "description": "Asignaciones e inventario de dispositivos",
   "tabs": {
     "assigned": "Asignados",
     "devices": "Dispositivos",
@@ -94,6 +94,7 @@
     "availableStatus": "Disponible",
     "retirementStatus": "Baja",
     "appliedFilters": "Filtros aplicados",
+    "truncatedRows": "Se muestran sólo los primeros {{shown}} registros",
     "filterPeriod": "Periodo: {{from}} — {{to}}",
     "filterDepartment": "Departamento: {{name}}",
     "filterEmployee": "Empleado: {{name}}",

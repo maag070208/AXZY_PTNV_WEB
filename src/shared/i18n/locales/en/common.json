@@ -69,6 +69,7 @@
     "deliveryReport": "delivery_report",
     "assignedDevicesReport": "assigned_devices_report",
     "devicesReport": "devices_report",
+    "periodSummaryReport": "period_report",
     "materialOutputsReport": "material_outputs_report"
   },
   "errors": {

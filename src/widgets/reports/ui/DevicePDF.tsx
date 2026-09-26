@@ -8,6 +8,10 @@ import PdfFooter from "@shared/pdf/PdfFooter";
 interface Props {
   rows: DeviceReportRow[];
   title?: string;
+  /** El universo filtrado no cupo: se marca en el pie. */
+  truncated?: boolean;
+  /** Filtros de columna que el servidor aplicó (etiqueta ya traducida). */
+  appliedFilters?: Array<{ label: string; value: string }>;
 }
 
 const styles = StyleSheet.create({
@@ -18,6 +22,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   cellNumber: { textAlign: "right" },
+  truncationNote: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: PDF_COLORS.warning,
+    marginBottom: 3,
+  },
 });
 
 const fmtDate = (d: string | null): string => {
@@ -44,7 +54,7 @@ const COL = {
   days: 24,
 };
 
-export default function DevicePDF({ rows, title }: Props) {
+export default function DevicePDF({ rows, title, truncated, appliedFilters }: Props) {
   const { t: tt } = useTranslation(["reports"]);
   const reportTitle = title ?? tt("pdf.devicesTitle");
   const today = fmtDate(new Date().toISOString());
@@ -132,6 +142,22 @@ export default function DevicePDF({ rows, title }: Props) {
                 </View>
               </View>
             ))}
+
+            {pageIdx === pages.length - 1 && (truncated || (appliedFilters?.length ?? 0) > 0) && (
+              <View style={pdfTheme.filterBox} wrap={false}>
+                <Text style={pdfTheme.filterTitle}>{tt("pdf.appliedFilters")}</Text>
+                {truncated && (
+                  <Text style={styles.truncationNote}>
+                    {tt("pdf.truncatedRows", { shown: rows.length })}
+                  </Text>
+                )}
+                {appliedFilters!.map((f) => (
+                  <Text key={f.label} style={pdfTheme.filterText}>
+                    {f.label}: {f.value}
+                  </Text>
+                ))}
+              </View>
+            )}
           </View>
 
           <PdfFooter pageIndex={pageIdx} pageCount={pages.length} />

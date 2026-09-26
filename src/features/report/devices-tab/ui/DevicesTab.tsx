@@ -7,15 +7,23 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaExclamationTriangle, FaFilePdf, FaSync } from "react-icons/fa";
+import { useMemo } from "react";
 import type { Column } from "@axzydev/axzy_ui_system";
-import type { DeviceReportRow } from "@entities/report";
+import type { DeviceReportRow, DeviceReportStatus } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
+
+/** Estados del catálogo, en el vocabulario que ve el usuario. */
+const STATUS_OPTIONS: DeviceReportStatus[] = [
+  "AVAILABLE",
+  "ASSIGNED",
+  "DAMAGED",
+  "IN_MAINTENANCE",
+  "RETIRED",
+];
 
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const {
     t,
-    rows,
-    loading,
     error,
     exporting,
     reloadKey,
@@ -183,7 +191,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-slate-800 leading-none">
-              {rows.length}
+              {stats?.total ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("devices.statDevices")}
@@ -193,7 +201,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-emerald-700 leading-none">
-              {stats.available}
+              {stats?.available ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("devices.availableStat")}
@@ -203,7 +211,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-amber-700 leading-none">
-              {stats.assigned}
+              {stats?.assigned ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("devices.statAssigned")}
@@ -213,7 +221,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-red-600 leading-none">
-              {stats.moreDe30}
+              {stats?.over30 ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("devices.statOver30")}
@@ -223,7 +231,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-slate-600 leading-none">
-              {stats.retirements}
+              {stats?.retired ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("devices.statRetirements")}
@@ -240,11 +248,6 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       )}
 
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
-        {loading && (
-          <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {t("devices.loading")}
-          </ITText>
-        )}
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
             <FaSync size={11} />
@@ -257,7 +260,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           variant="outlined"
           color="primary"
           onClick={handleDownloadPdf}
-          disabled={exporting || rows.length === 0}
+          disabled={exporting || (stats?.total ?? 0) === 0}
         >
           <ITFlex align="center" gap={1}>
             <FaFilePdf className="text-red-600" size={13} />

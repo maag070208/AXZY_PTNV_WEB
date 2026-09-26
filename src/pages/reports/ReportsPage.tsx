@@ -1,5 +1,10 @@
 import { ITPage, ITTabs } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaChartBar, FaHandHolding, FaTrashAlt } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaChartBar,
+  FaHandHolding,
+  FaTrashAlt,
+} from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -34,6 +39,7 @@ export default function ReportsPage() {
     >
       <ITTabs
         variant="line"
+        defaultActiveId="assigned"
         items={[
           {
             id: "assigned",

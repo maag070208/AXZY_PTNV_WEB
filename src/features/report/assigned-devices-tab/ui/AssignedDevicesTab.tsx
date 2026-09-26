@@ -15,14 +15,11 @@ import type { UseAssignedDevicesReport } from "../model/useAssignedDevicesReport
 export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesReport }) {
   const {
     t,
-    rows,
-    loading,
+    stats,
     error,
     exporting,
     reloadKey,
     setReloadKey,
-    averageDays,
-    moreDe30,
     handleDownloadPdf,
     fetchTableData,
   } = fx;
@@ -43,7 +40,8 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       label: t("assigned.activeCol"),
       type: "string",
       width: 110,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-800">
           {r.assetTag}
@@ -55,7 +53,8 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       label: t("assigned.colDescription"),
       type: "string",
       width: 300,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
@@ -72,6 +71,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       label: t("assigned.colCustodian"),
       type: "string",
       width: 240,
+      filter: true,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -89,6 +89,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       label: t("assigned.colDept"),
       type: "string",
       width: 200,
+      filter: true,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">
@@ -101,6 +102,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       label: t("assigned.colFolioSource"),
       type: "string",
       width: 180,
+      filter: true,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -130,6 +132,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       label: t("assigned.colDays"),
       type: "number",
       width: 100,
+      filter: true,
       sortable: false,
       render: (r) => (
         <ITText
@@ -149,7 +152,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-slate-800 leading-none">
-              {rows.length}
+              {stats?.assigned ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("assigned.statAssigned")}
@@ -159,7 +162,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-amber-700 leading-none">
-              {averageDays}
+              {stats?.averageDays ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("assigned.statAverage")}
@@ -169,7 +172,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-red-600 leading-none">
-              {moreDe30}
+              {stats?.over30 ?? 0}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
               {t("assigned.statOver30")}
@@ -186,11 +189,6 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       )}
 
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
-        {loading && (
-          <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {t("assigned.loading")}
-          </ITText>
-        )}
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
             <FaSync size={11} />
@@ -203,7 +201,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
           variant="outlined"
           color="gray"
           onClick={handleDownloadPdf}
-          disabled={exporting || rows.length === 0}
+          disabled={exporting || (stats?.assigned ?? 0) === 0}
         >
           <ITFlex align="center" gap={1}>
             <FaFilePdf className="text-red-600" size={13} />
@@ -227,6 +225,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         reloadTrigger={reloadKey}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
+        debounceMs={350}
         size="lg"
         virtualized
         virtualizedMaxHeight={420}

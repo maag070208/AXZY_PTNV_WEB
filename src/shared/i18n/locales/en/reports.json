@@ -1,6 +1,6 @@
 {
   "title": "Reports",
-  "description": "View equipment assignments and inventory",
+  "description": "Assignments and device inventory",
   "tabs": {
     "assigned": "Assigned",
     "devices": "Devices",
@@ -94,6 +94,7 @@
     "availableStatus": "Available",
     "retirementStatus": "Retired",
     "appliedFilters": "Applied filters",
+    "truncatedRows": "Only the first {{shown}} records are shown",
     "filterPeriod": "Period: {{from}} — {{to}}",
     "filterDepartment": "Department: {{name}}",
     "filterEmployee": "Employee: {{name}}",

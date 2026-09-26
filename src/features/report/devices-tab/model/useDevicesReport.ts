@@ -1,78 +1,96 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { reportsApi, type DeviceReportRow } from "@entities/report";
-import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
+import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
+import {
+  reportsApi,
+  type DevicesPdfPayload,
+  type DevicesStats,
+} from "@entities/report";
+import { appliedFilters, type TableQuery } from "@shared/utils/tableFilters";
+import { dyn } from "@shared/i18n/dyn";
 
-export type DownloadDevicesPdf = (rows: DeviceReportRow[]) => Promise<void>;
+/** Orden vigente de la tabla; la columna ES una unidad física. */
+export type DevicesSort = NonNullable<ITDataTableFetchParams["sort"]>;
+
+/** Orden estable: el mismo al que cae el API cuando el `sort` no está en su allowlist. */
+export const DEFAULT_DEVICES_SORT: DevicesSort = { key: "assetTag", direction: "asc" };
+
+/** Columnas filtrables → llave i18n de su encabezado. */
+const FILTER_LABELS: Record<string, string> = {
+  assetTag: "devices.activeCol",
+  description: "devices.colDescription",
+  status: "devices.colStatus",
+  custodian: "devices.colCustodian",
+  department: "devices.colDept",
+  area: "devices.colArea",
+};
+
+export type { DevicesPdfPayload } from "@entities/report";
+
+export type DownloadDevicesPdf = (payload: DevicesPdfPayload) => Promise<void>;
 
 interface Options {
   download: DownloadDevicesPdf;
 }
 
+/**
+ * Estado de la pestaña "Dispositivos": tabla server-side del catálogo de
+ * unidades con su estado actual, y los KPIs del conjunto filtrado que devuelve
+ * el servidor.
+ */
 export const useDevicesReport = ({ download }: Options) => {
   const { t } = useTranslation(["reports", "common"]);
-  const [rows, setRows] = useState<DeviceReportRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<DevicesStats | null>(null);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [exporting, setExporting] = useState(false);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    reportsApi
-      .devices()
-      .then((res) => setRows(res.data))
-      .catch((e: any) => setError(e.message ?? t("devices.errorLoad")))
-      .finally(() => setLoading(false));
-  }, [t]);
+  /** Última consulta de la tabla; el export reutiliza su recorte y su orden. */
+  const lastQuery = useRef<TableQuery>({ filters: {}, sort: DEFAULT_DEVICES_SORT });
 
-  useEffect(() => {
-    load();
-  }, [load, reloadKey]);
+  const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
+    const filters = params.filters as Record<string, string | number | boolean>;
+    const sort = params.sort ?? DEFAULT_DEVICES_SORT;
+    lastQuery.current = { filters, sort };
+
+    const res = await reportsApi.devices({ page: params.page, limit: params.limit, filters, sort });
+    setStats(res.stats);
+    return {
+      data: res.data as unknown as Record<string, unknown>[],
+      total: res.total,
+    };
+  }, []);
 
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
+    setError(null);
     try {
-      await download(rows);
+      const { filters, sort } = lastQuery.current;
+      const res = await reportsApi.devicesExport({ page: 1, limit: 100, filters, sort });
+      await download({
+        data: res.data,
+        stats: res.stats,
+        truncated: res.truncated,
+        meta: {
+          generatedAt: new Date().toISOString(),
+          appliedFilters: appliedFilters(filters, FILTER_LABELS, dyn(t)),
+        },
+      });
     } catch (e) {
-      console.error("Error exporting the devices PDF", e);
+      setError(e instanceof Error ? e.message : t("devices.errorLoad"));
     } finally {
       setExporting(false);
     }
-  }, [download, rows]);
-
-  const stats = useMemo(() => {
-    const assigned = rows.filter((r) => r.status === "ASSIGNED").length;
-    const available = rows.filter((r) => r.status === "AVAILABLE").length;
-    const retirements = rows.filter((r) => r.status === "RETIRED").length;
-    const moreDe30 = rows.filter((r) => (r.daysAssigned ?? 0) > 30).length;
-    return { assigned, available, retirements, moreDe30 };
-  }, [rows]);
-
-  // ITDataTable exige fetchData asíncrono (page/limit); el universo de
-  // dispositivos es acotado, así que paginamos en el cliente sobre `rows`.
-  const fetchTableData = useCallback(
-    async (params: ITDataTableFetchParams): Promise<ITDataTableResponse<DeviceReportRow>> => {
-      const start = (params.page - 1) * params.limit;
-      return {
-        data: rows.slice(start, start + params.limit),
-        total: rows.length,
-      };
-    },
-    [rows]
-  );
+  }, [download, t]);
 
   return {
     t,
-    rows,
-    loading,
+    stats,
     error,
     setError,
     exporting,
     reloadKey,
     setReloadKey,
-    stats,
     handleDownloadPdf,
     fetchTableData,
   };

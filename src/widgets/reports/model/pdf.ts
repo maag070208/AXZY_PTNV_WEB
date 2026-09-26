@@ -2,7 +2,12 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import { createElement } from "react";
 import { fileName, i18n } from "@shared/i18n";
-import type { ReportFilters, ReportRow, AssignedDeviceRow, DeviceReportRow } from "@entities/report";
+import type {
+  ReportFilters,
+  ReportRow,
+  AssignedDevicesPdfPayload,
+  DevicesPdfPayload,
+} from "@entities/report";
 import type { MaterialOutput } from "@entities/material-output";
 import type {
   AccessReportPdfMeta,
@@ -31,8 +36,16 @@ export const downloadReportPDF = async (
   saveAs(blob, `${fileName("deliveryReport")}_${yy}${mm}${dd}.pdf`);
 };
 
-export const downloadAssignedDevicesPdf = async (rows: AssignedDeviceRow[]): Promise<void> => {
-  const blob = await pdf(createElement(AssignedDevicesPdf, { rows }) as any).toBlob();
+export const downloadAssignedDevicesPdf = async (
+  payload: AssignedDevicesPdfPayload
+): Promise<void> => {
+  const blob = await pdf(
+    createElement(AssignedDevicesPdf, {
+      rows: payload.data,
+      truncated: payload.truncated,
+      appliedFilters: payload.meta.appliedFilters,
+    }) as any
+  ).toBlob();
   const now = new Date();
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -40,8 +53,14 @@ export const downloadAssignedDevicesPdf = async (rows: AssignedDeviceRow[]): Pro
   saveAs(blob, `${fileName("assignedDevicesReport")}_${yy}${mm}${dd}.pdf`);
 };
 
-export const downloadDevicesPDF = async (rows: DeviceReportRow[]): Promise<void> => {
-  const blob = await pdf(createElement(DevicePDF, { rows }) as any).toBlob();
+export const downloadDevicesPDF = async (payload: DevicesPdfPayload): Promise<void> => {
+  const blob = await pdf(
+    createElement(DevicePDF, {
+      rows: payload.data,
+      truncated: payload.truncated,
+      appliedFilters: payload.meta.appliedFilters,
+    }) as any
+  ).toBlob();
   const now = new Date();
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");

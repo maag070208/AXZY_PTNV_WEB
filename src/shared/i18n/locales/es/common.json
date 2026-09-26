@@ -69,6 +69,7 @@
     "deliveryReport": "reporte_entregas",
     "assignedDevicesReport": "reporte_asignados",
     "devicesReport": "reporte_dispositivos",
+    "periodSummaryReport": "reporte_periodo",
     "materialOutputsReport": "reporte_salidas"
   },
   "errors": {
