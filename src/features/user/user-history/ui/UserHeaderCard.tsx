@@ -25,13 +25,13 @@ export default function UserHeaderCard({ user }: Props) {
             {ROLE_LABELS[user.role] ?? user.role}
           </ITText>
         </ITStack>
-        {user.numeroEmpleado && (
+        {user.employeeNumber && (
           <ITStack direction="column" spacing={1}>
             <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
               No. Empleado
             </ITText>
             <ITText className="text-[12px] font-bold text-slate-700">
-              {user.numeroEmpleado}
+              {user.employeeNumber}
             </ITText>
           </ITStack>
         )}

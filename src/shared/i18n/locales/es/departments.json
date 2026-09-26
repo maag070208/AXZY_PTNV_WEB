@@ -49,9 +49,9 @@
     "deleteSubareaForever": "¿Eliminar definitivamente la subárea \"{{name}}\"? Esta acción no se puede deshacer.",
     "ticketsTitle": "Tickets",
     "noTickets": "Este departamento no tiene tickets.",
-    "cartasTitle": "Cartas responsivas",
-    "noCartas": "Este departamento no tiene cartas responsivas.",
-    "cartaActive": "Activa",
-    "cartaReturned": "Devuelta"
+    "custodyLettersTitle": "Cartas responsivas",
+    "noCustodyLetters": "Este departamento no tiene cartas responsivas.",
+    "custodyLetterActive": "Activa",
+    "custodyLetterReturned": "Devuelta"
   }
 }

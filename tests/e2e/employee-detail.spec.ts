@@ -1,7 +1,7 @@
 import { test, expect } from "./support/fixtures";
-import { irARuta } from "./support/pages/componentes";
+import { goToRoute } from "./support/pages/components";
 import { E2E } from "./support/env";
-import type { ApiInventario, Usuario } from "./support/api";
+import type { ApiInventory, User } from "./support/api";
 
 /**
  * Duplicación visual en el card "Información Personal" del detalle de empleado.
@@ -16,11 +16,11 @@ import type { ApiInventario, Usuario } from "./support/api";
  *  - hay 4 grupos de campos (`ITGrid` containers).
  */
 
-const empleadoPorUsername = async (api: ApiInventario, username: string): Promise<Usuario> => {
-  const usuarios = await api.usuarios();
-  const usuario = usuarios.find((u) => u.username === username);
-  expect(usuario, `el usuario ${username} debe existir (auth.setup lo provisiona)`).toBeDefined();
-  return usuario!;
+const employeeByUsername = async (api: ApiInventory, username: string): Promise<User> => {
+  const users = await api.users();
+  const user = users.find((u) => u.username === username);
+  expect(user, `el usuario ${username} debe existir (auth.setup lo provisiona)`).toBeDefined();
+  return user!;
 };
 
 test.describe("Detalle de empleado — card de Información Personal", () => {
@@ -28,20 +28,20 @@ test.describe("Detalle de empleado — card de Información Personal", () => {
     page,
     api,
   }) => {
-    const admin = await empleadoPorUsername(api, E2E.admin.username);
+    const admin = await employeeByUsername(api, E2E.admin.username);
 
-    await irARuta(page, `/empleados/${admin.id}`);
+    await goToRoute(page, `/employees/${admin.id}`);
 
     // Localiza el card por el botón-encabezado de "Información Personal".
-    const encabezado = page.getByRole("button", {
+    const header = page.getByRole("button", {
       name: /Información Personal/i,
     });
-    await expect(encabezado).toBeVisible();
+    await expect(header).toBeVisible();
 
     // Sube al card raíz (la `CollapsibleCard` envuelve todo en un <div> con
     // clases de card). El header es el botón clickeable; su padre directo es
     // el contenedor del card completo.
-    const card = encabezado.locator("xpath=..");
+    const card = header.locator("xpath=..");
 
     // El título debe aparecer UNA sola vez dentro del card (solo el encabezado,
     // no debe quedar el duplicado del antiguo `SectionBlock`).
@@ -60,13 +60,13 @@ test.describe("Detalle de empleado — card de Información Personal", () => {
     page,
     api,
   }) => {
-    const admin = await empleadoPorUsername(api, E2E.admin.username);
+    const admin = await employeeByUsername(api, E2E.admin.username);
 
-    await irARuta(page, `/empleados/${admin.id}`);
+    await goToRoute(page, `/employees/${admin.id}`);
 
-    const encabezado = page.getByRole("button", { name: /Información Personal/i });
-    const card = encabezado.locator("xpath=..");
-    await expect(encabezado).toBeVisible();
+    const header = page.getByRole("button", { name: /Información Personal/i });
+    const card = header.locator("xpath=..");
+    await expect(header).toBeVisible();
 
     // Un campo representante de cada grupo debe seguir visible.
     // Las etiquetas salen de i18n (`detail.fields.<key>`); los nombres usados

@@ -2,14 +2,14 @@ import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import { OvertimeApprovalTable, useOvertimeApproval } from "@features/schedule";
 import { downloadOvertimePDF } from "@widgets/reports";
 
 export default function OvertimeApprovalPage() {
   const { t } = useTranslation(["overtime", "common"]);
   const navigate = useNavigate();
-  const canApprove = usePuede("horas_extra.aprobar");
+  const canApprove = useCan("overtime.approve");
   const fx = useOvertimeApproval({ canApprove, downloadPdf: downloadOvertimePDF });
 
   return (
@@ -19,10 +19,10 @@ export default function OvertimeApprovalPage() {
       icon={<FaClock size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("common:nav.schedules"), onClick: () => navigate("/horarios") },
+        { label: t("common:nav.schedules"), onClick: () => navigate("/schedules") },
         { label: t("title") },
       ]}
-      backAction={() => navigate("/horarios")}
+      backAction={() => navigate("/schedules")}
     >
       <OvertimeApprovalTable fx={fx} />
     </ITPage>

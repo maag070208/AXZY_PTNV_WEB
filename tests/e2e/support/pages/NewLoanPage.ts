@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import { boton, campo, elegirEnBuscador, irARuta } from "./componentes";
+import { button, field, selectInSearch, goToRoute } from "./components";
 
 /**
  * PRÉSTAMO (carta responsiva) — `/inventario/prestamos/nuevo`.
@@ -7,39 +7,39 @@ import { boton, campo, elegirEnBuscador, irARuta } from "./componentes";
  * La pantalla filtra los dispositivos por tipo, así que hay que elegir el tipo
  * antes que el dispositivo.
  */
-export class NuevoPrestamoPage {
+export class NewLoanPage {
   constructor(private readonly page: Page) {}
 
-  async ir(): Promise<void> {
-    await irARuta(this.page, "/inventario/prestamos/nuevo");
+  async go(): Promise<void> {
+    await goToRoute(this.page, "/inventory/loans/new");
     await expect(this.page.getByPlaceholder("Seleccionar tipo...")).toBeVisible();
   }
 
-  async asignarADepartamento(nombre: string): Promise<void> {
-    await boton(this.page, /A un departamento/).click();
-    await elegirEnBuscador(this.page, "Seleccionar departamento...", nombre);
+  async assignToDepartment(name: string): Promise<void> {
+    await button(this.page, /A un departamento/).click();
+    await selectInSearch(this.page, "Seleccionar departamento...", name);
   }
 
-  async asignarAEmpleado(nombre: string): Promise<void> {
-    await boton(this.page, /A un empleado/).click();
-    await elegirEnBuscador(this.page, "Buscar responsable...", nombre);
+  async assignToEmployee(name: string): Promise<void> {
+    await button(this.page, /A un empleado/).click();
+    await selectInSearch(this.page, "Buscar responsable...", name);
   }
 
-  async elegirRecurso(tipo: string, dispositivo: string): Promise<void> {
-    await elegirEnBuscador(this.page, "Seleccionar tipo...", tipo);
-    await elegirEnBuscador(this.page, "Seleccionar dispositivo...", dispositivo);
+  async selectResource(type: string, device: string): Promise<void> {
+    await selectInSearch(this.page, "Seleccionar tipo...", type);
+    await selectInSearch(this.page, "Seleccionar dispositivo...", device);
   }
 
-  async fijarCantidad(cantidad: number): Promise<void> {
-    await campo(this.page, "Cantidad de piezas").fill(String(cantidad));
+  async setQuantity(quantity: number): Promise<void> {
+    await field(this.page, "Cantidad de piezas").fill(String(quantity));
   }
 
-  async escribirObservaciones(texto: string): Promise<void> {
-    await campo(this.page, "Observaciones").fill(texto);
+  async writeNotes(text: string): Promise<void> {
+    await field(this.page, "Observaciones").fill(text);
   }
 
   /** El indicador "Disponible: N" que la pantalla consulta a la API. */
-  get disponible() {
+  get available() {
     return this.page.getByText(/Disponible:/).first();
   }
 
@@ -50,18 +50,18 @@ export class NuevoPrestamoPage {
    * positivo.
    */
   get areaPreview() {
-    return this.page.getByTestId("carta-area");
+    return this.page.getByTestId("custody-letter-area");
   }
 
-  get alertaSobreStock() {
+  get overstockAlert() {
     return this.page.getByText("La cantidad no puede superar el disponible");
   }
 
-  get botonGuardar() {
-    return boton(this.page, "Guardar");
+  get saveButton() {
+    return button(this.page, "Guardar");
   }
 
-  async guardar(): Promise<void> {
-    await this.botonGuardar.click();
+  async save(): Promise<void> {
+    await this.saveButton.click();
   }
 }

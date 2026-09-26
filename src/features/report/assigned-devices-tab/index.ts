@@ -1,6 +1,6 @@
 export {
-  useAsignadosReport,
-  type UseAsignadosReport,
-  type DownloadAsignadosPdf,
-} from "./model/useAsignadosReport";
-export { default as AsignadosTab } from "./ui/AsignadosTab";
+  useAssignedDevicesReport,
+  type UseAssignedDevicesReport,
+  type DownloadAssignedDevicesPdf,
+} from "./model/useAssignedDevicesReport";
+export { default as AssignedDevicesTab } from "./ui/AssignedDevicesTab";

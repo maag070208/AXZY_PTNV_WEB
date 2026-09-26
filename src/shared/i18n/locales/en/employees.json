@@ -16,7 +16,7 @@
     "credentialError": "Could not generate the ID card",
     "stepper": {
       "photoPersonal": "Photo and Personal Data",
-      "laboral": "Work",
+      "employment": "Work",
       "contact": "Contact"
     },
     "deactivate": "Deactivate",
@@ -31,7 +31,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "employeeNo": "Employee No.",
-    "laboralTitle": "Work Information",
+    "employmentTitle": "Work Information",
     "medicalTitle": "Medical Information",
     "personalInfoTitle": "Personal Information",
     "officialDocsTitle": "Official Documents",
@@ -53,7 +53,7 @@
     "discountTypes": {
       "INFONAVIT": "INFONAVIT",
       "IMSS": "IMSS",
-      "DEUDOR_ALIMENTICIO": "Alimony Debtor"
+      "CHILD_SUPPORT": "Alimony Debtor"
     },
     "tabs": {
       "personal": "Personal",
@@ -68,8 +68,8 @@
       "employeeNo": "Employee Number",
       "firstName": "First Name",
       "secondName": "Middle Name",
-      "apellidoPaterno": "Last Name",
-      "apellidoMaterno": "Second Last Name",
+      "paternalSurname": "Last Name",
+      "maternalSurname": "Second Last Name",
       "gender": "Gender",
       "birthDate": "Date of Birth",
       "hireDate": "Hire Date",

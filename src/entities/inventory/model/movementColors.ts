@@ -1,29 +1,29 @@
-import type { TipoMovimiento } from "./types";
+import type { MovementType } from "./types";
 
 export type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
-export const TIPO_BADGE_COLOR: Record<TipoMovimiento, BadgeColor> = {
-  ENTRADA: "success",
-  PRESTAMO: "warning",
-  DEVOLUCION: "info",
-  BAJA: "danger",
-  TRASPASO: "info",
-  AJUSTE_ENTRADA: "success",
-  AJUSTE_SALIDA: "warning",
-  MANTENIMIENTO_ENTRADA: "gray",
-  MANTENIMIENTO_SALIDA: "info",
-  REVERSION: "danger",
+export const TYPE_BADGE_COLOR: Record<MovementType, BadgeColor> = {
+  STOCK_IN: "success",
+  LOAN: "warning",
+  RETURN: "info",
+  RETIREMENT: "danger",
+  TRANSFER: "info",
+  ADJUSTMENT_IN: "success",
+  ADJUSTMENT_OUT: "warning",
+  MAINTENANCE_IN: "gray",
+  MAINTENANCE_OUT: "info",
+  REVERSAL: "danger",
 };
 
-export const TIPO_BADGE_HEX: Record<TipoMovimiento, string> = {
-  ENTRADA: "#10b981",
-  PRESTAMO: "#f59e0b",
-  DEVOLUCION: "#0ea5e9",
-  BAJA: "#ef4444",
-  TRASPASO: "#0ea5e9",
-  AJUSTE_ENTRADA: "#10b981",
-  AJUSTE_SALIDA: "#f59e0b",
-  MANTENIMIENTO_ENTRADA: "#64748b",
-  MANTENIMIENTO_SALIDA: "#0ea5e9",
-  REVERSION: "#ef4444",
+export const TYPE_BADGE_HEX: Record<MovementType, string> = {
+  STOCK_IN: "#10b981",
+  LOAN: "#f59e0b",
+  RETURN: "#0ea5e9",
+  RETIREMENT: "#ef4444",
+  TRANSFER: "#0ea5e9",
+  ADJUSTMENT_IN: "#10b981",
+  ADJUSTMENT_OUT: "#f59e0b",
+  MAINTENANCE_IN: "#64748b",
+  MAINTENANCE_OUT: "#0ea5e9",
+  REVERSAL: "#ef4444",
 };

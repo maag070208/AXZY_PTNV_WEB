@@ -64,7 +64,7 @@ export default function KanbanPage() {
             <ITButton
               variant="filled"
               color="primary"
-              onClick={() => navigate("/tickets/nuevo")}
+              onClick={() => navigate("/tickets/new")}
             >
               <ITFlex align="center" gap={1}>
                 <FaPlus size={12} />

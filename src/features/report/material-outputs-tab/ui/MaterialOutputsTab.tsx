@@ -9,88 +9,88 @@ import {
 import { FaExclamationTriangle, FaFilePdf } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
-import { formatFecha } from "@shared/utils/dates";
-import type { MaterialOutput, MaterialOutputMotivo } from "@entities/salida";
-import type { UseSalidasReport } from "../model/useSalidasReport";
+import { formatDate } from "@shared/utils/dates";
+import type { MaterialOutput, MaterialOutputReason } from "@entities/material-output";
+import type { UseMaterialOutputsReport } from "../model/useMaterialOutputsReport";
 
-const MOTIVO_COLORS: Record<MaterialOutputMotivo, "danger" | "warning" | "gray"> = {
-  DANADO: "danger",
-  OBSOLETO: "warning",
-  EXTRAVIO: "danger",
-  OTRO: "gray",
+const REASON_COLORS: Record<MaterialOutputReason, "danger" | "warning" | "gray"> = {
+  DAMAGED: "danger",
+  OBSOLETE: "warning",
+  LOST: "danger",
+  OTHER: "gray",
 };
 
-export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
-  const { t } = useTranslation(["reports", "salidas", "common"]);
+export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsReport }) {
+  const { t } = useTranslation(["reports", "material-outputs", "common"]);
   const { total, error, exporting, reloadKey, handleDownloadPdf, fetchTableData } = fx;
 
   const columns: Column<MaterialOutput>[] = [
     {
-      key: "fecha",
-      label: t("salidas.colFecha"),
+      key: "date",
+      label: t("exits.colDate"),
       type: "date",
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">
-          {formatFecha(r.fecha)}
+          {formatDate(r.date)}
         </ITText>
       ),
     },
     {
       key: "q",
-      label: t("salidas.colDescripcion"),
+      label: t("exits.colDescription"),
       type: "string",
       filter: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
-            {r.descripcion}
+            {r.description}
           </ITText>
-          {(r.marca || r.modelo) && (
+          {(r.brand || r.model) && (
             <ITText className="text-[9px] uppercase tracking-widest text-slate-400">
-              {[r.marca, r.modelo].filter(Boolean).join(" · ")}
+              {[r.brand, r.model].filter(Boolean).join(" · ")}
             </ITText>
           )}
         </ITFlex>
       ),
     },
     {
-      key: "cantidad",
-      label: t("salidas.colCant"),
+      key: "quantity",
+      label: t("exits.colQty"),
       type: "number",
       sortable: false,
       render: (r) => (
-        <ITText className="text-[11px] font-black text-slate-700">{r.cantidad}</ITText>
+        <ITText className="text-[11px] font-black text-slate-700">{r.quantity}</ITText>
       ),
     },
     {
-      key: "departamento",
-      label: t("salidas.colDepto"),
+      key: "departmentName",
+      label: t("exits.colDept"),
       type: "string",
       filter: true,
       sortable: false,
       render: (r) => (
-        <ITText className="text-[10px] uppercase text-slate-500">{r.departamento}</ITText>
+        <ITText className="text-[10px] uppercase text-slate-500">{r.departmentName}</ITText>
       ),
     },
     {
-      key: "usuario",
-      label: t("salidas.colUsuario"),
+      key: "userName",
+      label: t("exits.colUser"),
       type: "string",
       filter: true,
       sortable: false,
       render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-600">{r.usuario}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-600">{r.userName}</ITText>
       ),
     },
     {
-      key: "motivo",
-      label: t("salidas.colMotivo"),
+      key: "reason",
+      label: t("exits.colReason"),
       type: "string",
       render: (r) =>
-        r.motivo ? (
-          <ITBadget color={MOTIVO_COLORS[r.motivo]} size="lg">
-            {t(`salidas:motivo.${r.motivo}`)}
+        r.reason ? (
+          <ITBadget color={REASON_COLORS[r.reason]} size="lg">
+            {t(`material-outputs:reason.${r.reason}`)}
           </ITBadget>
         ) : (
           <ITText className="text-[10px] text-slate-300">—</ITText>
@@ -98,24 +98,24 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
     },
     {
       key: "device",
-      label: t("salidas.colDispositivo"),
+      label: t("exits.colDevice"),
       type: "string",
       render: (r) =>
         r.device ? (
           <ITText className="text-[11px] font-black text-emerald-700">
-            {r.device.controlActivos}
+            {r.device.assetTag}
           </ITText>
         ) : (
           <ITText className="text-[10px] text-slate-300">—</ITText>
         ),
     },
     {
-      key: "observaciones",
-      label: t("salidas.colObservaciones"),
+      key: "notes",
+      label: t("exits.colNotes"),
       type: "string",
       render: (r) => (
         <ITText className="text-[10px] text-slate-500 max-w-[220px] truncate">
-          {r.observaciones ?? "—"}
+          {r.notes ?? "—"}
         </ITText>
       ),
     },
@@ -130,7 +130,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
               {total}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("salidas.statTotal")}
+              {t("exits.statTotal")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -153,7 +153,7 @@ export default function SalidasTab({ fx }: { fx: UseSalidasReport }) {
           <ITFlex align="center" gap={1}>
             <FaFilePdf className="text-red-600" size={13} />
             <ITText className="font-bold text-[11px]">
-              {exporting ? t("salidas.exporting") : t("salidas.export")}
+              {exporting ? t("exits.exporting") : t("exits.export")}
             </ITText>
           </ITFlex>
         </ITButton>

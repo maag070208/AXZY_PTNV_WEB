@@ -1,6 +1,6 @@
 import { test, expect } from "./support/fixtures";
-import { esperarToast } from "./support/pages/componentes";
-import { ruta } from "./support/env";
+import { waitForToast } from "./support/pages/components";
+import { route } from "./support/env";
 
 /**
  * Flujo ALTA por pantalla — `/inventario/dispositivos/nuevo`.
@@ -11,107 +11,107 @@ import { ruta } from "./support/env";
 test.describe("ALTA desde la web", () => {
   test("da de alta un dispositivo con sus unidades y lo confirma en el backend", async ({
     page,
-    altaPage,
-    escenario,
+    registrationPage,
+    scenario,
     api,
   }) => {
-    const nombre = escenario.nombreNuevo("Samsung A9");
+    const name = scenario.newName("Samsung A9");
 
-    await altaPage.ir();
-    await altaPage.elegirTipo(escenario.tipo.name);
-    await altaPage.llenar({ nombre, marca: "Samsung", modelo: "SM-X115", cantidad: 4 });
-    await altaPage.guardar();
+    await registrationPage.go();
+    await registrationPage.selectType(scenario.type.name);
+    await registrationPage.fill({ name, brand: "Samsung", model: "SM-X115", quantity: 4 });
+    await registrationPage.save();
 
-    await esperarToast(page, "Dispositivo dado de alta");
-    await page.waitForURL(`**${ruta("/inventario/dispositivos")}`);
+    await waitForToast(page, "Dispositivo dado de alta");
+    await page.waitForURL(`**${route("/inventory/devices")}`);
 
     // Lo que quedó en la base, no sólo lo que dijo la pantalla.
-    const dispositivo = await api.buscarDispositivo(escenario.tipo.id, nombre);
-    const unidades = await api.unidades(dispositivo.id);
-    expect(unidades).toHaveLength(4);
-    expect(unidades.every((u) => u.estado === "DISPONIBLE")).toBe(true);
-    expect(unidades[0].activoFijo).toBe(`${escenario.tipo.folioPrefix}-0001`);
-    expect(unidades[3].activoFijo).toBe(`${escenario.tipo.folioPrefix}-0004`);
+    const device = await api.searchDevice(scenario.type.id, name);
+    const units = await api.units(device.id);
+    expect(units).toHaveLength(4);
+    expect(units.every((u) => u.status === "AVAILABLE")).toBe(true);
+    expect(units[0].assetTag).toBe(`${scenario.type.assetTagPrefix}-0001`);
+    expect(units[3].assetTag).toBe(`${scenario.type.assetTagPrefix}-0004`);
   });
 
   test("el alta queda respaldada por un movimiento de ENTRADA", async ({
     page,
-    altaPage,
-    escenario,
+    registrationPage,
+    scenario,
     api,
   }) => {
-    const nombre = escenario.nombreNuevo("Con entrada");
+    const name = scenario.newName("Con entrada");
 
-    await altaPage.ir();
-    await altaPage.elegirTipo(escenario.tipo.name);
-    await altaPage.llenar({ nombre, marca: "Dell", modelo: "Latitude", cantidad: 2 });
-    await altaPage.guardar();
-    await esperarToast(page, "Dispositivo dado de alta");
+    await registrationPage.go();
+    await registrationPage.selectType(scenario.type.name);
+    await registrationPage.fill({ name, brand: "Dell", model: "Latitude", quantity: 2 });
+    await registrationPage.save();
+    await waitForToast(page, "Dispositivo dado de alta");
 
-    const { id: dispositivoId } = await api.buscarDispositivo(escenario.tipo.id, nombre);
-    const movimientos = await api.movimientos({ dispositivoId });
-    expect(movimientos).toHaveLength(1);
-    expect(movimientos[0]).toMatchObject({ tipo: "ENTRADA", motivo: "Alta inicial" });
-    expect(movimientos[0].detalles[0].cantidad).toBe(2);
+    const { id: deviceId } = await api.searchDevice(scenario.type.id, name);
+    const movements = await api.movements({ deviceId });
+    expect(movements).toHaveLength(1);
+    expect(movements[0]).toMatchObject({ type: "STOCK_IN", reason: "Alta inicial" });
+    expect(movements[0].items[0].quantity).toBe(2);
   });
 
   test("captura los datos de una unidad y los guarda", async ({
     page,
-    altaPage,
-    escenario,
+    registrationPage,
+    scenario,
     api,
   }) => {
-    const nombre = escenario.nombreNuevo("Con serie");
-    const serie = `SN-${escenario.tipo.code}-1`;
+    const name = scenario.newName("Con serie");
+    const serial = `SN-${scenario.type.code}-1`;
 
-    await altaPage.ir();
-    await altaPage.elegirTipo(escenario.tipo.name);
-    await altaPage.llenar({ nombre, marca: "Lenovo", modelo: "T14", cantidad: 2 });
-    await altaPage.capturarUnidad(1, { numeroSerie: serie });
-    await altaPage.guardar();
-    await esperarToast(page, "Dispositivo dado de alta");
+    await registrationPage.go();
+    await registrationPage.selectType(scenario.type.name);
+    await registrationPage.fill({ name, brand: "Lenovo", model: "T14", quantity: 2 });
+    await registrationPage.captureUnit(1, { serialNumber: serial });
+    await registrationPage.save();
+    await waitForToast(page, "Dispositivo dado de alta");
 
-    const dispositivo = await api.buscarDispositivo(escenario.tipo.id, nombre);
-    const unidades = await api.unidades(dispositivo.id);
-    expect(unidades).toHaveLength(2);
-    expect(unidades.map((u) => u.numeroSerie)).toContain(serie);
+    const device = await api.searchDevice(scenario.type.id, name);
+    const units = await api.units(device.id);
+    expect(units).toHaveLength(2);
+    expect(units.map((u) => u.serialNumber)).toContain(serial);
   });
 
-  test("la cantidad gobierna cuántas unidades se van a crear", async ({ altaPage, escenario }) => {
-    await altaPage.ir();
-    await altaPage.elegirTipo(escenario.tipo.name);
+  test("la cantidad gobierna cuántas unidades se van a crear", async ({ registrationPage, scenario }) => {
+    await registrationPage.go();
+    await registrationPage.selectType(scenario.type.name);
 
-    await altaPage.fijarCantidad(6);
-    await expect(altaPage.renglonesDeUnidad).toHaveCount(6);
+    await registrationPage.setQuantity(6);
+    await expect(registrationPage.unitRows).toHaveCount(6);
 
-    await altaPage.fijarCantidad(2);
-    await expect(altaPage.renglonesDeUnidad).toHaveCount(2);
-    await expect(altaPage.promesaDeUnidades(2)).toBeVisible();
+    await registrationPage.setQuantity(2);
+    await expect(registrationPage.unitRows).toHaveCount(2);
+    await expect(registrationPage.unitsPromise(2)).toBeVisible();
   });
 
   test("no deja guardar hasta que el formulario está completo", async ({
-    altaPage,
-    escenario,
+    registrationPage,
+    scenario,
   }) => {
-    await altaPage.ir();
-    await expect(altaPage.botonGuardar).toBeDisabled();
+    await registrationPage.go();
+    await expect(registrationPage.saveButton).toBeDisabled();
 
-    await altaPage.elegirTipo(escenario.tipo.name);
-    await expect(altaPage.botonGuardar).toBeDisabled();
+    await registrationPage.selectType(scenario.type.name);
+    await expect(registrationPage.saveButton).toBeDisabled();
 
-    await altaPage.llenar({ nombre: escenario.nombreNuevo("Incompleto"), marca: "", modelo: "" });
-    await expect(altaPage.botonGuardar).toBeDisabled();
+    await registrationPage.fill({ name: scenario.newName("Incompleto"), brand: "", model: "" });
+    await expect(registrationPage.saveButton).toBeDisabled();
 
-    await altaPage.llenar({
-      nombre: escenario.nombreNuevo("Completo"),
-      marca: "Acme",
-      modelo: "X1",
+    await registrationPage.fill({
+      name: scenario.newName("Completo"),
+      brand: "Acme",
+      model: "X1",
     });
-    await expect(altaPage.botonGuardar).toBeEnabled();
+    await expect(registrationPage.saveButton).toBeEnabled();
   });
 
-  test("pide elegir el tipo antes de capturar unidades", async ({ page, altaPage }) => {
-    await altaPage.ir();
+  test("pide elegir el tipo antes de capturar unidades", async ({ page, registrationPage }) => {
+    await registrationPage.go();
     await expect(
       page.getByText("Selecciona un tipo de dispositivo para generar las unidades.")
     ).toBeVisible();
@@ -119,23 +119,23 @@ test.describe("ALTA desde la web", () => {
 
   test("avisa cuando el alta choca con un dispositivo ya registrado", async ({
     page,
-    altaPage,
-    escenario,
+    registrationPage,
+    scenario,
   }) => {
-    const repetido = await escenario.dispositivo(1);
+    const repeated = await scenario.device(1);
 
-    await altaPage.ir();
-    await altaPage.elegirTipo(escenario.tipo.name);
-    await altaPage.llenar({
-      nombre: repetido.nombreVisible,
-      marca: repetido.marca,
-      modelo: repetido.modelo,
-      cantidad: 1,
+    await registrationPage.go();
+    await registrationPage.selectType(scenario.type.name);
+    await registrationPage.fill({
+      name: repeated.nameVisible,
+      brand: repeated.brand,
+      model: repeated.model,
+      quantity: 1,
     });
-    await altaPage.guardar();
+    await registrationPage.save();
 
-    await esperarToast(page, /duplicado/i);
+    await waitForToast(page, /duplicado/i);
     // Sigue en el formulario: no navegó como si hubiera guardado.
-    await expect(page).toHaveURL(new RegExp(`${ruta("/inventario/dispositivos/nuevo")}$`));
+    await expect(page).toHaveURL(new RegExp(`${route("/inventory/devices/new")}$`));
   });
 });

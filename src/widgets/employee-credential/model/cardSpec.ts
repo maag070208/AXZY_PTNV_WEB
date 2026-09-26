@@ -6,19 +6,19 @@
  * única fuente de verdad de medidas y coordenadas.
  */
 
-export const CREDENCIAL_DPI = 300;
+export const CREDENTIAL_DPI = 300;
 
 /** Píxeles por centímetro a la resolución de la credencial (300 / 2.54). */
-export const PX_PER_CM = CREDENCIAL_DPI / 2.54;
+export const PX_PER_CM = CREDENTIAL_DPI / 2.54;
 
 /** 8.6 cm × 300 DPI = 1016 px. */
-export const CREDENCIAL_W_PX = Math.round(8.6 * PX_PER_CM);
+export const CREDENTIAL_W_PX = Math.round(8.6 * PX_PER_CM);
 
 /** 5.4 cm × 300 DPI = 638 px. */
-export const CREDENCIAL_H_PX = Math.round(5.4 * PX_PER_CM);
+export const CREDENTIAL_H_PX = Math.round(5.4 * PX_PER_CM);
 
 /** Relación de aspecto ancho/alto, para reservar el espacio del `<img>`. */
-export const CREDENCIAL_ASPECT = CREDENCIAL_W_PX / CREDENCIAL_H_PX;
+export const CREDENTIAL_ASPECT = CREDENTIAL_W_PX / CREDENTIAL_H_PX;
 
 /**
  * Coordenadas del layout, en píxeles del canvas (1016 × 638).
@@ -28,8 +28,8 @@ export const CREDENCIAL_ASPECT = CREDENCIAL_W_PX / CREDENCIAL_H_PX;
  */
 export const LAYOUT = {
   /** Banda superior azul y su línea de acento inferior. */
-  band: { x: 0, y: 0, w: CREDENCIAL_W_PX, h: 120 },
-  accent: { x: 0, y: 120, w: CREDENCIAL_W_PX, h: 6 },
+  band: { x: 0, y: 0, w: CREDENTIAL_W_PX, h: 120 },
+  accent: { x: 0, y: 120, w: CREDENTIAL_W_PX, h: 6 },
 
   /** Badge circular blanco con el logo del hotel. */
   logoBadge: { cx: 68, cy: 60, r: 38 },
@@ -40,11 +40,11 @@ export const LAYOUT = {
   subtitle: { x: 126, baseline: 90, size: 15 },
 
   /** Foto del empleado (cover-crop, esquinas redondeadas). */
-  foto: { x: 44, y: 176, w: 200, h: 248, radius: 16, border: 3 },
+  photo: { x: 44, y: 176, w: 200, h: 248, radius: 16, border: 3 },
 
   /** Bloque de datos: 4 filas con paso uniforme. */
-  datos: { x: 272, w: 470, startY: 176, step: 86 },
-  fila: { labelOffset: 16, valorOffset: 52, separadorOffset: 70 },
+  data: { x: 272, w: 470, startY: 176, step: 86 },
+  row: { labelOffset: 16, valueOffset: 52, separatorOffset: 70 },
 
   /** QR + su etiqueta. La quiet zone es el margen blanco alrededor del módulo. */
   qr: { x: 760, y: 176, size: 232, quiet: 16 },

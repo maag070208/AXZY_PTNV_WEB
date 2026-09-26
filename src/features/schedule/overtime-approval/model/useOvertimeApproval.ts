@@ -69,7 +69,7 @@ export const useOvertimeApproval = ({
   const [saving, setSaving] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingCsv, setExportingCsv] = useState(false);
-  const [confirm, setConfirm] = useState<{ status: "APROBADO" | "RECHAZADO" } | null>(null);
+  const [confirm, setConfirm] = useState<{ status: "APPROVED" | "REJECTED" } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -94,7 +94,7 @@ export const useOvertimeApproval = ({
   }, [period, date, departmentId, q]);
 
   /** Filtros externos de la tabla. Quien no aprueba queda fijo en APROBADO. */
-  const effectiveStatus = canApprove ? status : "APROBADO";
+  const effectiveStatus = canApprove ? status : "APPROVED";
   const externalFilters = useMemo<Record<string, string | number | boolean>>(
     () => (effectiveStatus ? { ...baseFilters, status: effectiveStatus } : baseFilters),
     [baseFilters, effectiveStatus]
@@ -136,7 +136,7 @@ export const useOvertimeApproval = ({
         const res = await overtimeApi.query({
           page,
           limit: 100,
-          filters: { ...baseFilters, status: "PENDIENTE" },
+          filters: { ...baseFilters, status: "PENDING" },
         });
         for (const r of res.data) {
           next.set(dayKeyOf(r), { userId: r.userId, date: r.date, extraMin: r.extraMin });
@@ -151,7 +151,7 @@ export const useOvertimeApproval = ({
   }, [baseFilters, canApprove]);
 
   const requestDecision = useCallback(
-    (next: "APROBADO" | "RECHAZADO") => {
+    (next: "APPROVED" | "REJECTED") => {
       if (!canApprove || selected.size === 0) return;
       setConfirm({ status: next });
     },
@@ -172,7 +172,7 @@ export const useOvertimeApproval = ({
       });
       setToast({
         message:
-          confirm.status === "APROBADO"
+          confirm.status === "APPROVED"
             ? t("toast.approved", { count: res.updated })
             : t("toast.rejected", { count: res.updated }),
         type: "success",
@@ -197,7 +197,7 @@ export const useOvertimeApproval = ({
     setExportingPdf(true);
     setError(null);
     try {
-      const res = await scheduleApi.horasExtraExport({ page: 1, limit: 1, filters: baseFilters });
+      const res = await scheduleApi.overtimeExport({ page: 1, limit: 1, filters: baseFilters });
       if (res.data.length === 0) {
         setToast({ message: t("exportEmpty"), type: "error" });
         return;
@@ -219,7 +219,7 @@ export const useOvertimeApproval = ({
     setExportingCsv(true);
     setError(null);
     try {
-      const res = await scheduleApi.horasExtraExport({ page: 1, limit: 1, filters: baseFilters });
+      const res = await scheduleApi.overtimeExport({ page: 1, limit: 1, filters: baseFilters });
       if (res.data.length === 0) {
         setToast({ message: t("exportEmpty"), type: "error" });
         return;
@@ -234,9 +234,9 @@ export const useOvertimeApproval = ({
       const lines = res.data.map((r) => [
         r.employeeName,
         r.departmentName ?? "",
-        r.horarioNombre ?? t("columns.noSchedule"),
-        formatMinutesAsHhMm(r.aprobadoMin),
-        r.diasAprobados,
+        r.scheduleName ?? t("columns.noSchedule"),
+        formatMinutesAsHhMm(r.approvedMin),
+        r.approvedDays,
       ]);
       const escape = (c: unknown) => `"${String(c ?? "").replace(/"/g, '""')}"`;
       const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");

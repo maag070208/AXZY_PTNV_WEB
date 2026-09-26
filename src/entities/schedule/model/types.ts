@@ -1,91 +1,91 @@
-export interface HorarioDia {
-  diaSemana: number; // 1..7 (1=Lunes)
-  entrada: string | null;
-  salida: string | null;
-  entrada2: string | null;
-  salida2: string | null;
-  descanso: boolean;
+export interface ScheduleDay {
+  weekday: number; // 1..7 (1=Lunes)
+  startTime: string | null;
+  endTime: string | null;
+  splitStartTime: string | null;
+  splitEndTime: string | null;
+  restDay: boolean;
 }
 
-export interface Horario {
+export interface Schedule {
   id: string;
-  nombre: string;
-  activo: boolean;
-  toleranciaEntradaMin: number;
-  toleranciaSalidaMin: number;
-  comidaMin: number;
-  minimoExtraMin: number;
-  cruzaMedianoche: boolean;
-  dias: HorarioDia[];
-  asignados?: number;
+  name: string;
+  active: boolean;
+  entryToleranceMin: number;
+  exitToleranceMin: number;
+  mealBreakMin: number;
+  minOvertimeMin: number;
+  crossesMidnight: boolean;
+  days: ScheduleDay[];
+  assigned?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface HorarioDiaInput {
-  diaSemana: number;
-  entrada?: string | null;
-  salida?: string | null;
-  entrada2?: string | null;
-  salida2?: string | null;
-  descanso?: boolean;
+export interface ScheduleDayInput {
+  weekday: number;
+  startTime?: string | null;
+  endTime?: string | null;
+  splitStartTime?: string | null;
+  splitEndTime?: string | null;
+  restDay?: boolean;
 }
 
-export interface HorarioInput {
-  nombre: string;
-  toleranciaEntradaMin?: number;
-  toleranciaSalidaMin?: number;
-  comidaMin?: number;
-  minimoExtraMin?: number;
-  cruzaMedianoche?: boolean;
-  dias: HorarioDiaInput[];
+export interface ScheduleInput {
+  name: string;
+  entryToleranceMin?: number;
+  exitToleranceMin?: number;
+  mealBreakMin?: number;
+  minOvertimeMin?: number;
+  crossesMidnight?: boolean;
+  days: ScheduleDayInput[];
 }
 
-export interface AsignacionRow {
+export interface AssignmentRow {
   id: string;
   userId: string;
   employeeName: string;
-  numeroEmpleado: string | null;
+  employeeNumber: string | null;
   departmentId: string | null;
   departmentName: string | null;
-  horarioId: string;
-  horarioNombre: string;
-  desde: string;
+  scheduleId: string;
+  scheduleName: string;
+  from: string;
 }
 
 /** Persona con asignación vigente de un horario. */
-export interface AsignadoPersona {
+export interface AssignedPerson {
   userId: string;
   employeeName: string;
-  numeroEmpleado: string | null;
+  employeeNumber: string | null;
 }
 
-export interface HorasExtraRow {
+export interface OvertimeRow {
   userId: string;
   employeeName: string;
-  numeroEmpleado: string | null;
+  employeeNumber: string | null;
   departmentId: string | null;
   departmentName: string | null;
   active: boolean;
-  horarioNombre: string | null;
-  programadasMin: number;
-  trabajadasMin: number;
+  scheduleName: string | null;
+  scheduledMin: number;
+  workedMin: number;
   extraMin: number;
-  faltanteMin: number;
-  diasConExtra: number;
-  sinHorario: boolean;
+  missingMin: number;
+  daysWithExtra: number;
+  withoutSchedule: boolean;
   /** Minutos aprobados (lo contabilizado). */
-  aprobadoMin: number;
+  approvedMin: number;
   /** Minutos calculados aún sin decisión. */
-  pendienteMin: number;
+  pendingMin: number;
   /** Minutos rechazados. */
-  rechazadoMin: number;
-  diasAprobados: number;
-  diasPendientes: number;
-  diasRechazados: number;
+  rejectedMin: number;
+  approvedDays: number;
+  pendingDays: number;
+  rejectedDays: number;
 }
 
-export interface HorasExtraSummary {
+export interface OvertimeSummary {
   peopleTotal: number;
   peopleWithExtra: number;
   totalExtraMinutes: number;
@@ -100,14 +100,14 @@ export interface HorasExtraSummary {
   range: { start: string; end: string; timezone: string; period: string };
 }
 
-export interface HorasExtraResponse {
-  data: HorasExtraRow[];
+export interface OvertimeResponse {
+  data: OvertimeRow[];
   total: number;
-  summary: HorasExtraSummary;
+  summary: OvertimeSummary;
 }
 
 /** Metadatos de la exportación a PDF (periodo de referencia, fecha y zona horaria). */
-export interface HorasExtraPdfMeta {
+export interface OvertimePdfMeta {
   period: "DAY" | "WEEK" | "MONTH";
   date: string;
   timezone: string;

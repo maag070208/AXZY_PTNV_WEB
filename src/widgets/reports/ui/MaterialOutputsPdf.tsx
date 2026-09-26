@@ -1,6 +1,6 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { useTranslation } from "react-i18next";
-import type { MaterialOutput } from "@entities/salida";
+import type { MaterialOutput } from "@entities/material-output";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
@@ -19,10 +19,10 @@ const fmtDate = (d: string | null): string => {
   return `${dd}/${mm}/${yy}`;
 };
 
-const motivoBadge = (motivo: MaterialOutput["motivo"]) =>
-  motivo === "DANADO" || motivo === "EXTRAVIO"
+const reasonBadge = (reason: MaterialOutput["reason"]) =>
+  reason === "DAMAGED" || reason === "LOST"
     ? badgeStyleFor("danger")
-    : motivo === "OBSOLETO"
+    : reason === "OBSOLETE"
     ? badgeStyleFor("warning")
     : badgeStyleFor("gray");
 
@@ -31,29 +31,29 @@ const styles = StyleSheet.create({
 });
 
 const COL = {
-  fecha: 46,
+  date: 46,
   desc: 132,
-  cant: 26,
-  depto: 78,
-  usuario: 78,
-  motivo: 56,
-  dispositivo: 66,
+  qty: 26,
+  dept: 78,
+  userName: 78,
+  reason: 56,
+  device: 66,
 };
 
-export default function SalidasPDF({ rows, title }: Props) {
-  const { t: tt } = useTranslation(["reports", "salidas"]);
-  const reportTitle = title ?? tt("pdf.salidasTitle");
+export default function MaterialOutputsPdf({ rows, title }: Props) {
+  const { t: tt } = useTranslation(["reports", "material-outputs"]);
+  const reportTitle = title ?? tt("pdf.exitsTitle");
   const today = fmtDate(new Date().toISOString());
-  const danados = rows.filter((r) => r.motivo === "DANADO").length;
-  const conDispositivo = rows.filter((r) => r.deviceId).length;
+  const damaged = rows.filter((r) => r.reason === "DAMAGED").length;
+  const withDevice = rows.filter((r) => r.deviceId).length;
 
-  const motivoLabel = (motivo: MaterialOutput["motivo"]) =>
-    motivo ? tt(`salidas:motivo.${motivo}`) : "—";
+  const reasonLabel = (reason: MaterialOutput["reason"]) =>
+    reason ? tt(`material-outputs:reason.${reason}`) : "—";
 
   const summary: Array<{ label: string; value: number; color: string }> = [
-    { label: tt("salidas.statTotal"), value: rows.length, color: PDF_COLORS.band },
-    { label: tt("pdf.summaryDanados"), value: danados, color: PDF_COLORS.danger },
-    { label: tt("pdf.summaryConDispositivo"), value: conDispositivo, color: PDF_COLORS.warning },
+    { label: tt("exits.statTotal"), value: rows.length, color: PDF_COLORS.band },
+    { label: tt("pdf.damagedSummary"), value: damaged, color: PDF_COLORS.danger },
+    { label: tt("pdf.summaryWithDevice"), value: withDevice, color: PDF_COLORS.warning },
   ];
 
   const ROWS_PER_PAGE = 26;
@@ -82,35 +82,35 @@ export default function SalidasPDF({ rows, title }: Props) {
             )}
 
             <View style={pdfTheme.tableHeader}>
-              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>{tt("salidas.colFecha")}</Text></View>
-              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("salidas.colDescripcion")}</Text></View>
-              <View style={{ width: COL.cant }}><Text style={pdfTheme.tableHeaderText}>{tt("salidas.colCant")}</Text></View>
-              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>{tt("salidas.colDepto")}</Text></View>
-              <View style={{ width: COL.usuario }}><Text style={pdfTheme.tableHeaderText}>{tt("salidas.colUsuario")}</Text></View>
-              <View style={{ width: COL.motivo }}><Text style={pdfTheme.tableHeaderText}>{tt("salidas.colMotivo")}</Text></View>
-              <View style={{ width: COL.dispositivo }}><Text style={pdfTheme.tableHeaderText}>{tt("salidas.colDispositivo")}</Text></View>
+              <View style={{ width: COL.date }}><Text style={pdfTheme.tableHeaderText}>{tt("exits.colDate")}</Text></View>
+              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("exits.colDescription")}</Text></View>
+              <View style={{ width: COL.qty }}><Text style={pdfTheme.tableHeaderText}>{tt("exits.colQty")}</Text></View>
+              <View style={{ width: COL.dept }}><Text style={pdfTheme.tableHeaderText}>{tt("exits.colDept")}</Text></View>
+              <View style={{ width: COL.userName }}><Text style={pdfTheme.tableHeaderText}>{tt("exits.colUser")}</Text></View>
+              <View style={{ width: COL.reason }}><Text style={pdfTheme.tableHeaderText}>{tt("exits.colReason")}</Text></View>
+              <View style={{ width: COL.device }}><Text style={pdfTheme.tableHeaderText}>{tt("exits.colDevice")}</Text></View>
             </View>
 
             {pageRows.map((r, i) => (
               <View key={r.id + i} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
-                <View style={{ width: COL.fecha }}><Text style={pdfTheme.cell}>{fmtDate(r.fecha)}</Text></View>
+                <View style={{ width: COL.date }}><Text style={pdfTheme.cell}>{fmtDate(r.date)}</Text></View>
                 <View style={{ width: COL.desc }}>
-                  <Text style={pdfTheme.cellDescTitle}>{r.descripcion}</Text>
-                  {(r.marca || r.modelo) && (
-                    <Text style={pdfTheme.cellDescSub}>{[r.marca, r.modelo].filter(Boolean).join(" · ")}</Text>
+                  <Text style={pdfTheme.cellDescTitle}>{r.description}</Text>
+                  {(r.brand || r.model) && (
+                    <Text style={pdfTheme.cellDescSub}>{[r.brand, r.model].filter(Boolean).join(" · ")}</Text>
                   )}
                 </View>
-                <View style={{ width: COL.cant }}><Text style={pdfTheme.cell}>{r.cantidad}</Text></View>
-                <View style={{ width: COL.depto }}><Text style={pdfTheme.cellMuted}>{r.departamento}</Text></View>
-                <View style={{ width: COL.usuario }}><Text style={pdfTheme.cell}>{r.usuario}</Text></View>
-                <View style={{ width: COL.motivo }}>
-                  {r.motivo ? (
-                    <Text style={motivoBadge(r.motivo)}>{motivoLabel(r.motivo)}</Text>
+                <View style={{ width: COL.qty }}><Text style={pdfTheme.cell}>{r.quantity}</Text></View>
+                <View style={{ width: COL.dept }}><Text style={pdfTheme.cellMuted}>{r.departmentName}</Text></View>
+                <View style={{ width: COL.userName }}><Text style={pdfTheme.cell}>{r.userName}</Text></View>
+                <View style={{ width: COL.reason }}>
+                  {r.reason ? (
+                    <Text style={reasonBadge(r.reason)}>{reasonLabel(r.reason)}</Text>
                   ) : (
                     <Text style={styles.emptyBadge}>—</Text>
                   )}
                 </View>
-                <View style={{ width: COL.dispositivo }}><Text style={pdfTheme.cellMuted}>{r.device?.controlActivos ?? "—"}</Text></View>
+                <View style={{ width: COL.device }}><Text style={pdfTheme.cellMuted}>{r.device?.assetTag ?? "—"}</Text></View>
               </View>
             ))}
           </View>

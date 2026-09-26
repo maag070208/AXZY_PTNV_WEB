@@ -16,9 +16,9 @@ import { dyn } from "@shared/i18n/dyn";
 import {
   STATUS_BADGE,
   PRIORITY_BADGE,
-  RATING_ESPERA_COLOR,
-  diasEnEspera,
-  ratingEspera,
+  WAIT_RATING_COLOR,
+  daysOnHold,
+  waitRating,
   type Ticket,
 } from "@entities/ticket";
 
@@ -43,20 +43,20 @@ export default function TicketsTable({
 
   const columns: Column<Ticket>[] = [
     {
-      key: "titulo",
+      key: "title",
       label: tt("list.columns.title"),
       type: "string",
       filter: true,
       render: (t) => (
         <ITFlex direction="column" gap={0.5}>
           <ITFlex align="center" gap={1}>
-            <ITText className="text-[12px] font-black text-slate-800">{t.titulo}</ITText>
+            <ITText className="text-[12px] font-black text-slate-800">{t.title}</ITText>
             {t.deletedAt && (
               <ITBadget color="gray" size="lg">{tt("list.deleted")}</ITBadget>
             )}
           </ITFlex>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase">
-            {t.category?.nombre ?? "—"}
+            {t.category?.name ?? "—"}
           </ITText>
         </ITFlex>
       ),
@@ -101,43 +101,43 @@ export default function TicketsTable({
     },
     {
       key: "espera",
-      label: tt("list.columns.espera"),
+      label: tt("list.columns.wait"),
       type: "number",
       render: (t) => {
-        const dias = diasEnEspera(t.creadoEn, t.closedAt);
-        const rating = ratingEspera(dias);
+        const days = daysOnHold(t.createdAt, t.closedAt);
+        const rating = waitRating(days);
         return (
           <ITFlex align="center" gap={1}>
-            <ITText className="text-[11px] font-bold text-slate-700">{dias} d</ITText>
-            <ITBadget size="lg" color={RATING_ESPERA_COLOR[rating] as any}>
-              {dyn(tt)(`list.esperaLabels.${rating}`)}
+            <ITText className="text-[11px] font-bold text-slate-700">{days} d</ITText>
+            <ITBadget size="lg" color={WAIT_RATING_COLOR[rating] as any}>
+              {dyn(tt)(`list.waitLabels.${rating}`)}
             </ITBadget>
           </ITFlex>
         );
       },
     },
     {
-      key: "creadoPor",
+      key: "createdBy",
       label: tt("list.columns.createdBy"),
       type: "string",
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
-          {t.creadoPor?.name ?? "—"}
+          {t.createdBy?.name ?? "—"}
         </ITText>
       ),
     },
     {
-      key: "asignadoA",
+      key: "assignedTo",
       label: tt("list.columns.assignedTo"),
       type: "string",
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
-          {t.asignadoA?.name ?? tt("list.unassigned")}
+          {t.assignedTo?.name ?? tt("list.unassigned")}
         </ITText>
       ),
     },
     {
-      key: "acciones",
+      key: "actions",
       label: "",
       type: "string",
       render: (t) => (

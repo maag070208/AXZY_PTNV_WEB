@@ -9,7 +9,7 @@ import {
 import { FaPlus, FaTicketAlt, FaTrello } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import {
   TicketsTable,
   useTicketsList,
@@ -18,7 +18,7 @@ import {
 export default function TicketsListPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
-  const canDelete = usePuede("tickets.eliminar");
+  const canDelete = useCan("tickets.delete");
 
   const list = useTicketsList();
 
@@ -47,7 +47,7 @@ export default function TicketsListPage() {
           <ITButton
               variant="filled"
               color="primary"
-              onClick={() => navigate("/tickets/nuevo")}
+              onClick={() => navigate("/tickets/new")}
             >
               <ITFlex align="center" gap={1}>
                 <FaPlus size={12} />
@@ -82,8 +82,8 @@ export default function TicketsListPage() {
         }
         message={
           list.ticketToDelete?.deletedAt
-            ? tt("list.confirmDeleteForever", { title: list.ticketToDelete?.titulo })
-            : tt("list.confirmMoveTrash", { title: list.ticketToDelete?.titulo })
+            ? tt("list.confirmDeleteForever", { title: list.ticketToDelete?.title })
+            : tt("list.confirmMoveTrash", { title: list.ticketToDelete?.title })
         }
         confirmLabel={
           list.ticketToDelete?.deletedAt

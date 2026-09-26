@@ -2,21 +2,21 @@
   "title": "Catalogs",
   "description": "Configure the system master catalogs (ADMIN only)",
   "tabs": {
-    "departamentos": "Departments",
+    "departments": "Departments",
     "subareas": "Subareas",
-    "tiposDispositivo": "Device types",
-    "tiposDocumento": "Document types",
-    "generos": "Genders",
-    "tiposSangre": "Blood types",
-    "categoriasTicket": "Ticket categories",
-    "notificaciones": "Notifications"
+    "deviceTypes": "Device types",
+    "documentTypes": "Document types",
+    "genders": "Genders",
+    "bloodTypes": "Blood types",
+    "categoriesTicket": "Ticket categories",
+    "notifications": "Notifications"
   },
   "groups": {
-    "organizacion": "Organization",
-    "inventario": "Inventory",
+    "organization": "Organization",
+    "inventory": "Inventory",
     "personal": "Personnel",
     "tickets": "Tickets",
-    "sistema": "System"
+    "system": "System"
   },
   "name": "Name",
   "status": "Status",

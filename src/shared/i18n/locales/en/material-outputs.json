@@ -1,8 +1,8 @@
 {
-  "motivo": {
-    "DANADO": "Damaged",
-    "OBSOLETO": "Obsolete",
-    "EXTRAVIO": "Lost",
-    "OTRO": "Other"
+  "reason": {
+    "DAMAGED": "Damaged",
+    "OBSOLETE": "Obsolete",
+    "LOST": "Lost",
+    "OTHER": "Other"
   }
 }

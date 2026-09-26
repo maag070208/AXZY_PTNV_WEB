@@ -19,33 +19,33 @@ export const usersApi = {
     return api.get<User[]>(`/users${qs}`);
   },
   get: (id: string) => api.get<User>(`/users/${id}`),
-  empleados: (departmentId?: string, q?: string) => {
+  employees: (departmentId?: string, q?: string) => {
     const params = new URLSearchParams();
     if (departmentId) params.set("departmentId", departmentId);
     if (q) params.set("q", q);
     const qs = params.toString();
-    return api.get<User[]>(`/users/empleados${qs ? `?${qs}` : ""}`);
+    return api.get<User[]>(`/users/employees${qs ? `?${qs}` : ""}`);
   },
-  empleadosPorRoles: (roles: UserRole[], departmentId?: string, q?: string) => {
+  employeesByRoles: (roles: UserRole[], departmentId?: string, q?: string) => {
     const params = new URLSearchParams();
     if (roles.length) params.set("roles", roles.join(","));
     if (departmentId) params.set("departmentId", departmentId);
     if (q) params.set("q", q);
     const qs = params.toString();
-    return api.get<User[]>(`/users/empleados${qs ? `?${qs}` : ""}`);
+    return api.get<User[]>(`/users/employees${qs ? `?${qs}` : ""}`);
   },
   create: (data: {
     username: string;
     email?: string;
     password: string;
     name: string;
-    segundoNombre?: string;
-    apellidoPaterno?: string;
-    apellidoMaterno?: string;
+    middleName?: string;
+    paternalSurname?: string;
+    maternalSurname?: string;
     role: UserRole;
-    puesto?: string;
+    jobTitle?: string;
     area?: string;
-    numeroEmpleado?: string;
+    employeeNumber?: string;
     departmentId?: string;
     subareaId?: string;
   }) => api.post<User>(`/users`, data),
@@ -55,14 +55,14 @@ export const usersApi = {
       username?: string;
       email?: string | null;
       name?: string;
-      segundoNombre?: string | null;
-      apellidoPaterno?: string | null;
-      apellidoMaterno?: string | null;
+      middleName?: string | null;
+      paternalSurname?: string | null;
+      maternalSurname?: string | null;
       role?: UserRole;
       active?: boolean;
-      puesto?: string;
+      jobTitle?: string;
       area?: string;
-      numeroEmpleado?: string;
+      employeeNumber?: string;
       departmentId?: string | null;
       subareaId?: string | null;
     }
@@ -73,8 +73,8 @@ export const usersApi = {
     const form = new FormData();
     form.append("file", file);
     return api.post<{
-      creados: number;
-      omitidos: { fila: number; username: string; motivo: string }[];
+      created: number;
+      skipped: { row: number; username: string; reason: string }[];
     }>(`/users/import`, form, {
       headers: { "Content-Type": "multipart/form-data" },
     });

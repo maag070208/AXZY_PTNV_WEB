@@ -23,7 +23,7 @@ export default function UserHistoryPage() {
         backAction={() => navigate(-1)}
         icon={<FaUserShield size={20} />}
         breadcrumbs={[
-          { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+          { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
           { label: tt("history.breadcrumb") },
         ]}
       >
@@ -41,7 +41,7 @@ export default function UserHistoryPage() {
         backAction={() => navigate(-1)}
         icon={<FaUserShield size={20} />}
         breadcrumbs={[
-          { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+          { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
           { label: tt("history.breadcrumb") },
         ]}
       >
@@ -57,7 +57,7 @@ export default function UserHistoryPage() {
       backAction={() => navigate(-1)}
       icon={<FaUserShield size={20} />}
       breadcrumbs={[
-        { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+        { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
         { label: user.name },
       ]}
     >

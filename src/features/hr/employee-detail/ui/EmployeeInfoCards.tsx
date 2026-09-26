@@ -6,7 +6,7 @@ import {
   FaPhoneAlt,
   FaUser,
 } from "react-icons/fa";
-import type { PersonalProfile } from "@entities/personal";
+import type { PersonalProfile } from "@entities/hr";
 
 const formatDateOnly = (iso?: string | null): string => {
   if (!iso) return "—";
@@ -61,14 +61,14 @@ export default function EmployeeInfoCards({ profile }: Props) {
         title={sg.identification}
       />
       <ITGrid container columns={12} spacing={4}>
-        <Field label={f.employeeNo} value={profile.numeroEmpleado} />
-        <Field label={f.apellidoMaterno} value={profile.apellidoMaterno} />
+        <Field label={f.employeeNo} value={profile.employeeNumber} />
+        <Field label={f.maternalSurname} value={profile.maternalSurname} />
         <Field label={f.firstName} value={profile.name} />
-        <Field label={f.birthDate} value={formatDateOnly(profile.fechaNacimiento)} />
-        <Field label={f.secondName} value={profile.segundoNombre} />
-        <Field label={f.hireDate} value={formatDateOnly(profile.fechaIngreso)} />
-        <Field label={f.apellidoPaterno} value={profile.apellidoPaterno} />
-        <Field label={f.gender} value={profile.genero?.nombre} />
+        <Field label={f.birthDate} value={formatDateOnly(profile.birthDate)} />
+        <Field label={f.secondName} value={profile.middleName} />
+        <Field label={f.hireDate} value={formatDateOnly(profile.hireDate)} />
+        <Field label={f.paternalSurname} value={profile.paternalSurname} />
+        <Field label={f.gender} value={profile.gender?.name} />
       </ITGrid>
 
       <ITDivider className="border-slate-100" />
@@ -92,12 +92,12 @@ export default function EmployeeInfoCards({ profile }: Props) {
         title={sg.contact}
       />
       <ITGrid container columns={12} spacing={4}>
-        <Field label={f.personalCell} value={profile.celularPersonal} />
+        <Field label={f.personalCell} value={profile.personalPhone} />
         <Field label={f.email} value={profile.email} />
-        <Field label={f.companyCell} value={profile.celularEmpresa} />
-        <Field label={f.emergencyContact} value={profile.contactoEmergenciaNombre} />
-        <Field label={f.emergencyPhone} value={profile.contactoEmergenciaTelefono} />
-        <Field label={f.emergencyRelation} value={profile.contactoEmergenciaParentesco} />
+        <Field label={f.companyCell} value={profile.workPhone} />
+        <Field label={f.emergencyContact} value={profile.emergencyContactName} />
+        <Field label={f.emergencyPhone} value={profile.emergencyContactPhone} />
+        <Field label={f.emergencyRelation} value={profile.emergencyContactRelationship} />
       </ITGrid>
 
       <ITDivider className="border-slate-100" />
@@ -108,12 +108,12 @@ export default function EmployeeInfoCards({ profile }: Props) {
         title={sg.address}
       />
       <ITGrid container columns={12} spacing={4}>
-        <Field label={f.street} value={profile.calleNumero} />
-        <Field label={f.zip} value={profile.codigoPostal} />
-        <Field label={f.colony} value={profile.colonia} />
-        <Field label={f.state} value={profile.estadoDireccion} />
-        <Field label={f.city} value={profile.ciudad} />
-        <Field label={f.country} value={profile.pais} />
+        <Field label={f.street} value={profile.streetAddress} />
+        <Field label={f.zip} value={profile.postalCode} />
+        <Field label={f.colony} value={profile.neighborhood} />
+        <Field label={f.state} value={profile.addressState} />
+        <Field label={f.city} value={profile.city} />
+        <Field label={f.country} value={profile.country} />
       </ITGrid>
     </ITFlex>
   );

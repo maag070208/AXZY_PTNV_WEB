@@ -12,14 +12,14 @@ import { E2E, apiBase } from "./env";
  * Reutiliza el contrato real de `api/src/modules/tickets`: no inventa campos.
  */
 
-export type TicketStatus = "ABIERTO" | "EN_SEGUIMIENTO" | "CERRADO";
-export type TicketPriority = "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
-export type AssignmentStatus = "PENDIENTE" | "EN_PROGRESO" | "EN_REVISION" | "COMPLETADA";
+export type TicketStatus = "OPEN" | "IN_PROGRESS" | "CLOSED";
+export type TicketPriority = "RETIREMENT" | "MEDIUM" | "HIGH" | "URGENT";
+export type AssignmentStatus = "PENDING" | "IN_PROGRESS" | "IN_REVIEW" | "COMPLETED";
 
 export interface TicketCategory {
   id: string;
-  nombre: string;
-  activo: boolean;
+  name: string;
+  active: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -27,18 +27,18 @@ export interface TicketCategory {
 export interface TicketComment {
   id: string;
   ticketId: string;
-  autorId: string;
-  autor?: { id: string; name: string; username: string } | null;
-  texto: string;
-  creadoEn: string;
+  authorId: string;
+  author?: { id: string; name: string; username: string } | null;
+  text: string;
+  createdAt: string;
 }
 
 export interface TicketAssignmentComment {
   id: string;
   assignmentId: string;
-  autorId: string;
-  autor?: { id: string; name: string; username: string } | null;
-  texto: string;
+  authorId: string;
+  author?: { id: string; name: string; username: string } | null;
+  text: string;
   createdAt: string;
 }
 
@@ -50,8 +50,8 @@ export interface TicketAssignment {
     id: string;
     name: string;
     username: string;
-    numeroEmpleado?: string | null;
-    puesto?: string | null;
+    employeeNumber?: string | null;
+    jobTitle?: string | null;
   };
   title: string;
   description: string;
@@ -65,23 +65,23 @@ export interface TicketAssignment {
 
 export interface Ticket {
   id: string;
-  titulo: string;
-  descripcion: string;
+  title: string;
+  description: string;
   status: TicketStatus;
   priority: TicketPriority;
   categoryId?: string | null;
   category?: TicketCategory | null;
-  creadoPorId: string;
-  creadoPor?: { id: string; name: string; username: string } | null;
-  asignadoAId?: string | null;
-  asignadoA?: { id: string; name: string; username: string } | null;
+  createdById: string;
+  createdBy?: { id: string; name: string; username: string } | null;
+  assignedToId?: string | null;
+  assignedTo?: { id: string; name: string; username: string } | null;
   departmentId?: string | null;
   closedAt?: string | null;
   closedBy?: string | null;
   deletedAt?: string | null;
   assignments: TicketAssignment[];
   comments: TicketComment[];
-  creadoEn: string;
+  createdAt: string;
 }
 
 export interface KanbanAssignment {
@@ -92,8 +92,8 @@ export interface KanbanAssignment {
     id: string;
     name: string;
     username: string;
-    numeroEmpleado?: string | null;
-    puesto?: string | null;
+    employeeNumber?: string | null;
+    jobTitle?: string | null;
   };
   title: string;
   description: string;
@@ -102,7 +102,7 @@ export interface KanbanAssignment {
   status: AssignmentStatus;
   ticket: {
     id: string;
-    titulo: string;
+    title: string;
     status: TicketStatus;
     priority: TicketPriority;
     deletedAt?: string | null;
@@ -110,7 +110,7 @@ export interface KanbanAssignment {
   };
 }
 
-export interface Usuario {
+export interface User {
   id: string;
   username: string;
   name: string;
@@ -128,7 +128,7 @@ export interface TicketDeleteResult {
 }
 
 /** Contexto autenticado como un usuario concreto (para verificar los 403). */
-export const crearContextoApiComo = async (username: string): Promise<APIRequestContext> => {
+export const createContextApiAs = async (username: string): Promise<APIRequestContext> => {
   const anon = await request.newContext({ baseURL: apiBase });
   const res = await anon.post("auth/login", {
     data: { username, password: E2E.password },
@@ -153,18 +153,18 @@ export class ApiTickets {
 
   private async json<T>(
     res: Awaited<ReturnType<APIRequestContext["get"]>>,
-    accion: string,
-    esperado: number
+    action: string,
+    expected: number
   ): Promise<T> {
-    if (res.status() !== esperado) {
-      throw new Error(`${accion}: HTTP ${res.status()} → ${await res.text()}`);
+    if (res.status() !== expected) {
+      throw new Error(`${action}: HTTP ${res.status()} → ${await res.text()}`);
     }
     return (await res.json()) as T;
   }
 
-  async listar(filtros: { q?: string } = {}): Promise<TableResult<Ticket>> {
-    const qs = filtros.q ? `?q=${encodeURIComponent(filtros.q)}` : "";
-    return this.json(await this.api.get(`tickets${qs}`), "listar", 200);
+  async list(filters: { q?: string } = {}): Promise<TableResult<Ticket>> {
+    const qs = filters.q ? `?q=${encodeURIComponent(filters.q)}` : "";
+    return this.json(await this.api.get(`tickets${qs}`), "list", 200);
   }
 
   async query(body: {
@@ -186,12 +186,12 @@ export class ApiTickets {
   }
 
   /** Detalle del ticket; lanza si la API no responde 200. */
-  async obtener(id: string): Promise<Ticket> {
-    return this.json(await this.api.get(`tickets/${id}`), "obtener", 200);
+  async get(id: string): Promise<Ticket> {
+    return this.json(await this.api.get(`tickets/${id}`), "get", 200);
   }
 
   /** Detalle del ticket; 404 → `null` (para verificar el borrado físico). */
-  async obtenerOpcional(id: string): Promise<Ticket | null> {
+  async getOptional(id: string): Promise<Ticket | null> {
     const res = await this.api.get(`tickets/${id}`);
     if (res.status() === 404) return null;
     if (res.status() !== 200) {
@@ -200,76 +200,76 @@ export class ApiTickets {
     return (await res.json()) as Ticket;
   }
 
-  async crear(input: {
-    titulo: string;
-    descripcion: string;
+  async create(input: {
+    title: string;
+    description: string;
     priority?: TicketPriority;
     categoryId?: string;
     departmentId?: string;
-    asignadoAId?: string;
+    assignedToId?: string;
   }): Promise<Ticket> {
-    return this.json(await this.api.post("tickets", { data: input }), "crear", 201);
+    return this.json(await this.api.post("tickets", { data: input }), "create", 201);
   }
 
-  async actualizar(
+  async update(
     id: string,
     data: Partial<{
       status: TicketStatus;
       priority: TicketPriority;
       categoryId: string | null;
-      asignadoAId: string | null;
+      assignedToId: string | null;
       departmentId: string | null;
     }>
   ): Promise<Ticket> {
-    return this.json(await this.api.put(`tickets/${id}`, { data }), "actualizar", 200);
+    return this.json(await this.api.put(`tickets/${id}`, { data }), "update", 200);
   }
 
   /** Primera llamada: soft (papelera). Segunda: físico. */
-  async borrar(id: string): Promise<TicketDeleteResult> {
-    return this.json(await this.api.delete(`tickets/${id}`), "borrar", 200);
+  async remove(id: string): Promise<TicketDeleteResult> {
+    return this.json(await this.api.delete(`tickets/${id}`), "remove", 200);
   }
 
-  async categorias(includeInactive = false): Promise<TicketCategory[]> {
+  async categories(includeInactive = false): Promise<TicketCategory[]> {
     const qs = includeInactive ? "?includeInactive=true" : "";
-    return this.json(await this.api.get(`tickets/categories${qs}`), "categorias", 200);
+    return this.json(await this.api.get(`tickets/categories${qs}`), "categories", 200);
   }
 
-  async crearCategoria(nombre: string): Promise<TicketCategory> {
+  async createCategory(name: string): Promise<TicketCategory> {
     return this.json(
-      await this.api.post("tickets/categories", { data: { nombre } }),
-      "crearCategoria",
+      await this.api.post("tickets/categories", { data: { name } }),
+      "createCategory",
       201
     );
   }
 
-  async actualizarCategoria(
+  async updateCategory(
     id: string,
-    data: { nombre?: string; activo?: boolean }
+    data: { name?: string; active?: boolean }
   ): Promise<TicketCategory> {
     return this.json(
       await this.api.patch(`tickets/categories/${id}`, { data }),
-      "actualizarCategoria",
+      "updateCategory",
       200
     );
   }
 
-  async eliminarCategoria(id: string): Promise<{ soft: boolean; data: TicketCategory }> {
+  async deleteCategory(id: string): Promise<{ soft: boolean; data: TicketCategory }> {
     return this.json(
       await this.api.delete(`tickets/categories/${id}`),
-      "eliminarCategoria",
+      "deleteCategory",
       200
     );
   }
 
-  async comentar(id: string, texto: string): Promise<TicketComment> {
+  async comment(id: string, text: string): Promise<TicketComment> {
     return this.json(
-      await this.api.post(`tickets/${id}/comments`, { data: { texto } }),
-      "comentar",
+      await this.api.post(`tickets/${id}/comments`, { data: { text } }),
+      "comment",
       201
     );
   }
 
-  async asignar(
+  async assign(
     id: string,
     data: {
       userId: string;
@@ -281,12 +281,12 @@ export class ApiTickets {
   ): Promise<TicketAssignment> {
     return this.json(
       await this.api.post(`tickets/${id}/assignments`, { data }),
-      "asignar",
+      "assign",
       201
     );
   }
 
-  async actualizarAsignacion(
+  async updateAssignment(
     id: string,
     assignmentId: string,
     data: {
@@ -299,46 +299,46 @@ export class ApiTickets {
   ): Promise<TicketAssignment> {
     return this.json(
       await this.api.put(`tickets/${id}/assignments/${assignmentId}`, { data }),
-      "actualizarAsignacion",
+      "updateAssignment",
       200
     );
   }
 
-  async usuarios(): Promise<Usuario[]> {
-    return this.json(await this.api.get("users"), "usuarios", 200);
+  async users(): Promise<User[]> {
+    return this.json(await this.api.get("users"), "users", 200);
   }
 
-  async usuarioPorUsername(username: string): Promise<string> {
-    const usuario = (await this.usuarios()).find((u) => u.username === username);
-    if (!usuario) {
+  async userByUsername(username: string): Promise<string> {
+    const user = (await this.users()).find((u) => u.username === username);
+    if (!user) {
       throw new Error(
         `"${username}" no está provisionado. Corre "npm run test:e2e:provision" en ../api.`
       );
     }
-    return usuario.id;
+    return user.id;
   }
 
   /** Busca por título (filtro `contains` del backend) y devuelve la coincidencia exacta. */
-  async buscarPorTitulo(titulo: string): Promise<Ticket | null> {
-    const res = await this.query({ page: 1, limit: 50, filters: { titulo } });
-    return res.data.find((t) => t.titulo === titulo) ?? null;
+  async searchByTitle(title: string): Promise<Ticket | null> {
+    const res = await this.query({ page: 1, limit: 50, filters: { title } });
+    return res.data.find((t) => t.title === title) ?? null;
   }
 
   /** Espera a que el ticket cumpla un predicado (la UI es asíncrona). */
-  async esperarTicket(
+  async waitForTicket(
     id: string,
-    predicado: (ticket: Ticket) => boolean,
+    predicate: (ticket: Ticket) => boolean,
     timeoutMs = 10_000
   ): Promise<Ticket> {
-    const limite = Date.now() + timeoutMs;
-    let ultimo: Ticket | null = null;
-    while (Date.now() < limite) {
-      ultimo = await this.obtener(id);
-      if (predicado(ultimo)) return ultimo;
+    const limit = Date.now() + timeoutMs;
+    let last: Ticket | null = null;
+    while (Date.now() < limit) {
+      last = await this.get(id);
+      if (predicate(last)) return last;
       await new Promise((r) => setTimeout(r, 250));
     }
     throw new Error(
-      `El ticket ${id} nunca cumplió la condición; última lectura: ${JSON.stringify(ultimo)}`
+      `El ticket ${id} nunca cumplió la condición; última lectura: ${JSON.stringify(last)}`
     );
   }
 }

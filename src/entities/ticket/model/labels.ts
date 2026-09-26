@@ -1,14 +1,14 @@
 export const STATUS_BADGE: Record<string, { color: string }> = {
-  ABIERTO: { color: "warning" },
-  EN_SEGUIMIENTO: { color: "info" },
-  CERRADO: { color: "success" },
+  OPEN: { color: "warning" },
+  IN_PROGRESS: { color: "info" },
+  CLOSED: { color: "success" },
 };
 
 export const PRIORITY_BADGE: Record<string, { color: string }> = {
-  BAJA: { color: "default" },
-  MEDIA: { color: "warning" },
-  ALTA: { color: "danger" },
-  URGENTE: { color: "danger" },
+  LOW: { color: "default" },
+  MEDIUM: { color: "warning" },
+  HIGH: { color: "danger" },
+  URGENT: { color: "danger" },
 };
 
 export const STATUS_KEYS = Object.keys(STATUS_BADGE);

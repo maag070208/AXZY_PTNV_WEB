@@ -1,5 +1,5 @@
 import { test, expect } from "./support/fixtures";
-import { E2E, ruta } from "./support/env";
+import { E2E, route } from "./support/env";
 
 /**
  * Acceso al sistema. Corre sin la sesión guardada por el proyecto de
@@ -9,25 +9,25 @@ test.describe("Sesión", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test("entra con credenciales válidas y guarda la sesión", async ({ page, login }) => {
-    await login.entrarComo(E2E.admin.username);
+    await login.enterAs(E2E.admin.username);
 
     await expect(page).not.toHaveURL(/#\/login/);
-    const sesion = await login.sesionGuardada();
-    expect(sesion?.token).toBeTruthy();
-    expect(sesion?.user?.username).toBe(E2E.admin.username);
+    const session = await login.savedSession();
+    expect(session?.token).toBeTruthy();
+    expect(session?.user?.username).toBe(E2E.admin.username);
   });
 
   test("rechaza credenciales inválidas y no deja pasar", async ({ page, login }) => {
-    await login.ir();
-    await login.entrar(E2E.admin.username, "contraseña-que-no-es");
+    await login.go();
+    await login.enter(E2E.admin.username, "contraseña-que-no-es");
 
-    await login.esperarError(/Credenciales inválidas/i);
+    await login.waitForError(/Credenciales inválidas/i);
     await expect(page).toHaveURL(/#\/login/);
-    expect((await login.sesionGuardada())?.token ?? null).toBeNull();
+    expect((await login.savedSession())?.token ?? null).toBeNull();
   });
 
   test("una ruta privada manda al login cuando no hay sesión", async ({ page }) => {
-    await page.goto(ruta("/inventario/dispositivos"));
+    await page.goto(route("/inventory/devices"));
     await expect(page).toHaveURL(/#\/login/);
   });
 
@@ -35,14 +35,14 @@ test.describe("Sesión", () => {
     page,
     login,
   }) => {
-    await login.ir();
-    const entrar = page.getByRole("button", { name: "Entrar" });
-    await expect(entrar).toBeDisabled();
+    await login.go();
+    const enter = page.getByRole("button", { name: "Entrar" });
+    await expect(enter).toBeDisabled();
 
     await page.getByLabel(/^\s*Usuario\s*\*?\s*$/).fill(E2E.admin.username);
-    await expect(entrar).toBeDisabled();
+    await expect(enter).toBeDisabled();
 
     await page.getByLabel(/^\s*Contraseña\s*\*?\s*$/).fill(E2E.password);
-    await expect(entrar).toBeEnabled();
+    await expect(enter).toBeEnabled();
   });
 });

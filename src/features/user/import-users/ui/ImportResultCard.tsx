@@ -24,16 +24,16 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
 
       <ITFlex gap={4} wrap="wrap" className="mb-4">
         <ITBadget color="success" size="lg">
-          {tt("import.imported", { count: result.creados })}
+          {tt("import.imported", { count: result.created })}
         </ITBadget>
-        {result.omitidos.length > 0 && (
+        {result.skipped.length > 0 && (
           <ITBadget color="warning" size="lg">
-            {`${result.omitidos.length} omitido(s)`}
+            {`${result.skipped.length} omitido(s)`}
           </ITBadget>
         )}
       </ITFlex>
 
-      {result.omitidos.length > 0 && (
+      {result.skipped.length > 0 && (
         <div className="mt-2">
           <ITFlex align="center" gap={2} className="mb-2">
             <FaExclamationTriangle size={12} className="text-amber-500" />
@@ -41,9 +41,9 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
               Filas omitidas
             </ITText>
           </ITFlex>
-          {result.omitidos.map((o, i) => (
+          {result.skipped.map((o, i) => (
             <ITText key={i} className="text-[11px] text-slate-500">
-              Fila {o.fila} ({o.username}): {o.motivo}
+              Fila {o.row} ({o.username}): {o.reason}
             </ITText>
           ))}
         </div>

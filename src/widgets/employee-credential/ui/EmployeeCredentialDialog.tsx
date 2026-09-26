@@ -1,10 +1,10 @@
 import { ITAlert, ITButton, ITDialog, ITFlex, ITLoader, ITText } from "@axzydev/axzy_ui_system";
 import { FaDownload } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import type { PersonalProfile } from "@entities/personal";
-import { useCredencialEmpleado } from "../model/useCredencialEmpleado";
-import { descargarCredencialImagen } from "../model/imagen";
-import CredencialEmpleadoPreview from "./CredencialEmpleadoPreview";
+import type { PersonalProfile } from "@entities/hr";
+import { useEmployeeCredential } from "../model/useEmployeeCredential";
+import { downloadCredentialImage } from "../model/image";
+import EmployeeCredentialPreview from "./EmployeeCredentialPreview";
 
 interface Props {
   isOpen: boolean;
@@ -13,13 +13,13 @@ interface Props {
 }
 
 /** Diálogo con la previsualización de la credencial y la descarga de la imagen. */
-export default function CredencialEmpleadoDialog({ isOpen, onClose, profile }: Props) {
+export default function EmployeeCredentialDialog({ isOpen, onClose, profile }: Props) {
   const { t: tt } = useTranslation(["employees"]);
-  const { imagenDataUrl, loading, error } = useCredencialEmpleado(profile);
+  const { imageDataUrl, loading, error } = useEmployeeCredential(profile);
 
-  const descargar = () => {
-    if (!profile || !imagenDataUrl) return;
-    void descargarCredencialImagen({ profile, imagenDataUrl });
+  const download = () => {
+    if (!profile || !imageDataUrl) return;
+    void downloadCredentialImage({ profile, imageDataUrl });
   };
 
   return (
@@ -36,15 +36,15 @@ export default function CredencialEmpleadoDialog({ isOpen, onClose, profile }: P
           </ITFlex>
         ) : error ? (
           <ITAlert variant="error">{error}</ITAlert>
-        ) : profile && imagenDataUrl ? (
+        ) : profile && imageDataUrl ? (
           <ITFlex direction="column" gap={4}>
-            <CredencialEmpleadoPreview imagenDataUrl={imagenDataUrl} />
+            <EmployeeCredentialPreview imageDataUrl={imageDataUrl} />
             <ITFlex justify="end" gap={2}>
               <ITButton
                 variant="filled"
                 color="primary"
-                onClick={descargar}
-                disabled={loading || !imagenDataUrl}
+                onClick={download}
+                disabled={loading || !imageDataUrl}
               >
                 <ITFlex align="center" gap={1}>
                   <FaDownload size={13} />

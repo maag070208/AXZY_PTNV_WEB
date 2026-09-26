@@ -1,6 +1,6 @@
 export const PRIORITIES = [
-  { value: "BAJA", badgeColor: "gray" as const },
-  { value: "MEDIA", badgeColor: "warning" as const },
-  { value: "ALTA", badgeColor: "danger" as const },
-  { value: "URGENTE", badgeColor: "danger" as const },
+  { value: "LOW", badgeColor: "gray" as const },
+  { value: "MEDIUM", badgeColor: "warning" as const },
+  { value: "HIGH", badgeColor: "danger" as const },
+  { value: "URGENT", badgeColor: "danger" as const },
 ];

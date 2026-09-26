@@ -1,42 +1,42 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "@pages/auth/LoginPage";
 import PrivateRoutes from "./guards/PrivateRoutes";
-import RequierePermiso from "./guards/RequierePermiso";
+import RequiresPermission from "./guards/RequirePermission";
 import AccessPage from "@pages/access/AccessPage";
 import AccessReportPage from "@pages/access/AccessReportPage";
-import ChecadorPage from "@pages/access/ChecadorPage";
-import ChecadorReportPage from "@pages/access/ChecadorReportPage";
-import ChecadorEmpleadosPage from "@pages/access/ChecadorEmpleadosPage";
-import ChecadorRelojesPage from "@pages/access/ChecadorRelojesPage";
+import TimeClockPage from "@pages/access/TimeClockPage";
+import TimeClockReportPage from "@pages/access/TimeClockReportPage";
+import TimeClockEmployeesPage from "@pages/access/TimeClockEmployeesPage";
+import TimeClocksPage from "@pages/access/TimeClocksPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
 import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
 import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
 import OvertimeApprovalPage from "@pages/overtime/OvertimeApprovalPage";
 import HomePage from "@pages/home/HomePage";
-import DashboardPage from "@pages/inventario/DashboardPage";
-import DispositivosPage from "@pages/inventario/DispositivosPage";
-import DispositivoFormPage from "@pages/inventario/DispositivoFormPage";
-import EditDispositivoPage from "@pages/inventario/EditDispositivoPage";
-import DispositivoDetailPage from "@pages/inventario/DispositivoDetailPage";
-import TiposPage from "@pages/inventario/TiposPage";
-import MovimientosPage from "@pages/inventario/MovimientosPage";
-import NewMovimientoPage from "@pages/inventario/NewMovimientoPage";
-import PrestamosPage from "@pages/inventario/PrestamosPage";
-import NewPrestamoPage from "@pages/inventario/NewPrestamoPage";
-import EditPrestamoPage from "@pages/inventario/EditPrestamoPage";
-import PrestamoDetailPage from "@pages/inventario/PrestamoDetailPage";
-import DevolucionesPage from "@pages/inventario/DevolucionesPage";
-import NewDevolucionPage from "@pages/inventario/NewDevolucionPage";
+import DashboardPage from "@pages/inventory/DashboardPage";
+import DevicesPage from "@pages/inventory/DevicesPage";
+import DeviceFormPage from "@pages/inventory/DeviceFormPage";
+import EditDevicePage from "@pages/inventory/EditDevicePage";
+import DeviceDetailPage from "@pages/inventory/DeviceDetailPage";
+import DeviceTypesPage from "@pages/inventory/DeviceTypesPage";
+import MovementsPage from "@pages/inventory/MovementsPage";
+import NewMovementPage from "@pages/inventory/NewMovementPage";
+import LoansPage from "@pages/inventory/LoansPage";
+import NewLoanPage from "@pages/inventory/NewLoanPage";
+import EditLoanPage from "@pages/inventory/EditLoanPage";
+import LoanDetailPage from "@pages/inventory/LoanDetailPage";
+import ReturnsPage from "@pages/inventory/ReturnsPage";
+import NewLoanReturnPage from "@pages/inventory/NewLoanReturnPage";
 import DepartmentsPage from "@pages/departments/DepartmentsPage";
 import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
 import SubareasPage from "@pages/subareas/SubareasPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
 import EmployeeDetailPage from "@pages/employees/EmployeeDetailPage";
 import EmployeeProfileEditPage from "@pages/employees/EmployeeProfileEditPage";
-import ReportesPersonalPage from "@pages/employees/ReportesPersonalPage";
-import ActaDetailPage from "@pages/employees/ActaDetailPage";
+import HrReportsPage from "@pages/employees/HrReportsPage";
+import DisciplinaryReportDetailPage from "@pages/employees/DisciplinaryReportDetailPage";
 import DocumentCatalogPage from "@pages/employees/DocumentCatalogPage";
-import ReportesPage from "@pages/reports/ReportesPage";
+import ReportsPage from "@pages/reports/ReportsPage";
 import UsersListPage from "@pages/users/UsersListPage";
 import UserFormPage from "@pages/users/UserFormPage";
 import UserHistoryPage from "@pages/users/UserHistoryPage";
@@ -46,8 +46,8 @@ import NewTicketPage from "@pages/tickets/NewTicketPage";
 import TicketDetailPage from "@pages/tickets/TicketDetailPage";
 import EditTicketPage from "@pages/tickets/EditTicketPage";
 import KanbanPage from "@pages/tickets/KanbanPage";
-import MisTareasPage from "@pages/tickets/MisTareasPage";
-import AdminTareasPage from "@pages/tickets/AdminTareasPage";
+import MyTasksPage from "@pages/tickets/MyTasksPage";
+import AdminTasksPage from "@pages/tickets/AdminTasksPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
 import CatalogPage from "@pages/catalog/CatalogPage";
 import RolesPage from "@pages/roles/RolesPage";
@@ -61,311 +61,311 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
 
         <Route
-          path="/inventario"
+          path="/inventory"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
+            <RequiresPermission permission="devices.view">
               <DashboardPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/dispositivos"
+          path="/inventory/devices"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
-              <DispositivosPage />
-            </RequierePermiso>
+            <RequiresPermission permission="devices.view">
+              <DevicesPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/dispositivos/nuevo"
+          path="/inventory/devices/new"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
-              <DispositivoFormPage />
-            </RequierePermiso>
+            <RequiresPermission permission="devices.view">
+              <DeviceFormPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/dispositivos/:id"
+          path="/inventory/devices/:id"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
-              <DispositivoDetailPage />
-            </RequierePermiso>
+            <RequiresPermission permission="devices.view">
+              <DeviceDetailPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/dispositivos/:id/editar"
+          path="/inventory/devices/:id/edit"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
-              <EditDispositivoPage />
-            </RequierePermiso>
+            <RequiresPermission permission="devices.view">
+              <EditDevicePage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/tipos"
+          path="/inventory/device-types"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
-              <TiposPage />
-            </RequierePermiso>
+            <RequiresPermission permission="devices.view">
+              <DeviceTypesPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/movimientos"
+          path="/inventory/movements"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
-              <MovimientosPage />
-            </RequierePermiso>
+            <RequiresPermission permission="devices.view">
+              <MovementsPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/movimientos/nuevo"
+          path="/inventory/movements/new"
           element={
-            <RequierePermiso permiso="dispositivos.ver">
-              <NewMovimientoPage />
-            </RequierePermiso>
+            <RequiresPermission permission="devices.view">
+              <NewMovementPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/prestamos"
+          path="/inventory/loans"
           element={
-            <RequierePermiso permiso="prestamos.ver">
-              <PrestamosPage />
-            </RequierePermiso>
+            <RequiresPermission permission="loans.view">
+              <LoansPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/prestamos/nuevo"
+          path="/inventory/loans/new"
           element={
-            <RequierePermiso permiso="prestamos.ver">
-              <NewPrestamoPage />
-            </RequierePermiso>
+            <RequiresPermission permission="loans.view">
+              <NewLoanPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/prestamos/:id"
+          path="/inventory/loans/:id"
           element={
-            <RequierePermiso permiso="prestamos.ver">
-              <PrestamoDetailPage />
-            </RequierePermiso>
+            <RequiresPermission permission="loans.view">
+              <LoanDetailPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/prestamos/:id/editar"
+          path="/inventory/loans/:id/edit"
           element={
-            <RequierePermiso permiso="prestamos.ver">
-              <EditPrestamoPage />
-            </RequierePermiso>
+            <RequiresPermission permission="loans.view">
+              <EditLoanPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/devoluciones"
+          path="/inventory/returns"
           element={
-            <RequierePermiso permiso="prestamos.ver">
-              <DevolucionesPage />
-            </RequierePermiso>
+            <RequiresPermission permission="loans.view">
+              <ReturnsPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/inventario/devoluciones/nueva"
+          path="/inventory/returns/new"
           element={
-            <RequierePermiso permiso="prestamos.ver">
-              <NewDevolucionPage />
-            </RequierePermiso>
+            <RequiresPermission permission="loans.view">
+              <NewLoanReturnPage />
+            </RequiresPermission>
           }
         />
 
         <Route path="/tickets" element={<TicketsListPage />} />
         <Route path="/tickets/kanban" element={<KanbanPage />} />
-        <Route path="/tickets/mis-tareas" element={<MisTareasPage />} />
+        <Route path="/tickets/my-tasks" element={<MyTasksPage />} />
         <Route
-          path="/tickets/tareas"
+          path="/tickets/tasks"
           element={
-            <RequierePermiso permiso="tareas.completar">
-              <AdminTareasPage />
-            </RequierePermiso>
+            <RequiresPermission permission="tasks.complete">
+              <AdminTasksPage />
+            </RequiresPermission>
           }
         />
-        <Route path="/tickets/nuevo" element={<NewTicketPage />} />
+        <Route path="/tickets/new" element={<NewTicketPage />} />
         <Route
-          path="/tickets/:id/editar"
+          path="/tickets/:id/edit"
           element={
-            <RequierePermiso permiso="tickets.editar">
+            <RequiresPermission permission="tickets.edit">
               <EditTicketPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route path="/tickets/:id" element={<TicketDetailPage />} />
 
-        <Route path="/departamentos" element={<DepartmentsPage />} />
-        <Route path="/departamentos/:id" element={<DepartmentDetailPage />} />
+        <Route path="/departments" element={<DepartmentsPage />} />
+        <Route path="/departments/:id" element={<DepartmentDetailPage />} />
         <Route path="/subareas" element={<SubareasPage />} />
         <Route
-          path="/empleados"
+          path="/employees"
           element={
-            <RequierePermiso permiso="personal.expediente">
+            <RequiresPermission permission="hr.records">
               <EmployeesListPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/empleados/catalogos/documentos"
+          path="/employees/catalogs/documents"
           element={
-            <RequierePermiso permiso="personal.expediente">
+            <RequiresPermission permission="hr.records">
               <DocumentCatalogPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/empleados/:id/editar"
+          path="/employees/:id/edit"
           element={
-            <RequierePermiso permiso="personal.expediente">
+            <RequiresPermission permission="hr.records">
               <EmployeeProfileEditPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/empleados/reportes"
+          path="/employees/disciplinary-reports"
           element={
-            <RequierePermiso permiso="personal.expediente">
-              <ReportesPersonalPage />
-            </RequierePermiso>
+            <RequiresPermission permission="hr.records">
+              <HrReportsPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/empleados/reportes/:id"
+          path="/employees/disciplinary-reports/:id"
           element={
-            <RequierePermiso permiso="personal.expediente">
-              <ActaDetailPage />
-            </RequierePermiso>
+            <RequiresPermission permission="hr.records">
+              <DisciplinaryReportDetailPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/empleados/:id"
+          path="/employees/:id"
           element={
-            <RequierePermiso permiso="personal.expediente">
+            <RequiresPermission permission="hr.records">
               <EmployeeDetailPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/reportes"
+          path="/reports"
           element={
-            <RequierePermiso permiso="reportes.ver">
-              <ReportesPage />
-            </RequierePermiso>
+            <RequiresPermission permission="reports.view">
+              <ReportsPage />
+            </RequiresPermission>
           }
         />
-        <Route path="/usuarios" element={<UsersListPage />} />
-        <Route path="/usuarios/nuevo" element={<UserFormPage />} />
-        <Route path="/usuarios/:id/editar" element={<UserFormPage />} />
-        <Route path="/usuarios/:id/historial" element={<UserHistoryPage />} />
-        <Route path="/usuarios/importar" element={<UserImportPage />} />
+        <Route path="/users" element={<UsersListPage />} />
+        <Route path="/users/new" element={<UserFormPage />} />
+        <Route path="/users/:id/edit" element={<UserFormPage />} />
+        <Route path="/users/:id/history" element={<UserHistoryPage />} />
+        <Route path="/users/import" element={<UserImportPage />} />
         <Route
-          path="/catalogos"
+          path="/catalogs"
           element={
-            <RequierePermiso permiso="catalogos.administrar">
+            <RequiresPermission permission="catalogs.manage">
               <CatalogPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
           path="/roles"
           element={
-            <RequierePermiso permiso="roles.administrar">
+            <RequiresPermission permission="roles.manage">
               <RolesPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
-        <Route path="/notificaciones" element={<NotificationsPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
 
         <Route
           path="/access"
           element={
-            <RequierePermiso permiso="acceso.bitacora">
+            <RequiresPermission permission="access.log">
               <AccessPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
           path="/access/report"
           element={
-            <RequierePermiso permiso="acceso.bitacora">
+            <RequiresPermission permission="access.log">
               <AccessReportPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         {/* Reloj checador Hikvision (solo lectura; ver CHECADOR.md). */}
         <Route
-          path="/access/checador"
+          path="/access/time-clock"
           element={
-            <RequierePermiso permiso="checador.ver">
-              <ChecadorPage />
-            </RequierePermiso>
+            <RequiresPermission permission="time_clock.view">
+              <TimeClockPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/access/checador/entradas-salidas"
+          path="/access/time-clock/entries-exits"
           element={
-            <RequierePermiso permiso="checador.ver">
-              <ChecadorReportPage />
-            </RequierePermiso>
+            <RequiresPermission permission="time_clock.view">
+              <TimeClockReportPage />
+            </RequiresPermission>
           }
         />
         <Route
-          path="/access/checador/empleados"
+          path="/access/time-clock/employees"
           element={
-            <RequierePermiso permiso="checador.ver">
-              <ChecadorEmpleadosPage />
-            </RequierePermiso>
+            <RequiresPermission permission="time_clock.view">
+              <TimeClockEmployeesPage />
+            </RequiresPermission>
           }
         />
         {/* Relojes checadores (Configuración): alta, baja y configuración en vivo. */}
         <Route
-          path="/relojes"
+          path="/time-clocks"
           element={
-            <RequierePermiso permiso="relojes.administrar">
-              <ChecadorRelojesPage />
-            </RequierePermiso>
+            <RequiresPermission permission="time_clocks.manage">
+              <TimeClocksPage />
+            </RequiresPermission>
           }
         />
 
         <Route
-          path="/horarios"
+          path="/schedules"
           element={
-            <RequierePermiso permiso="horarios.ver">
+            <RequiresPermission permission="schedules.view">
               <SchedulesPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/horarios/nuevo"
+          path="/schedules/new"
           element={
-            <RequierePermiso permiso="horarios.ver">
+            <RequiresPermission permission="schedules.view">
               <ScheduleFormPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/horarios/:id/editar"
+          path="/schedules/:id/edit"
           element={
-            <RequierePermiso permiso="horarios.ver">
+            <RequiresPermission permission="schedules.view">
               <ScheduleFormPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/horarios/asignar"
+          path="/schedules/assign"
           element={
-            <RequierePermiso permiso="horarios.ver">
+            <RequiresPermission permission="schedules.view">
               <AssignSchedulesPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
         <Route
-          path="/horarios/horas-extra/aprobacion"
+          path="/schedules/overtime/approval"
           element={
-            <RequierePermiso permiso="horas_extra.ver">
+            <RequiresPermission permission="overtime.view">
               <OvertimeApprovalPage />
-            </RequierePermiso>
+            </RequiresPermission>
           }
         />
       </Route>

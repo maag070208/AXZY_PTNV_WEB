@@ -1,133 +1,133 @@
 import { api } from "@shared/api/client";
 import type {
-  Condicion,
+  Condition,
   Dashboard,
-  Devolucion,
-  Dispositivo,
-  EstadoInventario,
-  Existencias,
-  KardexRow,
-  Movimiento,
-  Prestamo,
-  TipoDispositivo,
-  TipoMovimiento,
-  UnidadFisica,
+  LoanReturn,
+  Device,
+  DeviceUnitStatus,
+  Stock,
+  StockLedgerRow,
+  Movement,
+  Loan,
+  DeviceType,
+  MovementType,
+  DeviceUnit,
 } from "../model/types";
 
-export interface MovimientoDetalleInput {
-  dispositivoId: string;
-  cantidad: number;
-  condicion?: Condicion;
-  prestamoDetalleId?: string;
-  unidadId?: string;
-  observaciones?: string;
+export interface MovementItemInput {
+  deviceId: string;
+  quantity: number;
+  condition?: Condition;
+  loanItemId?: string;
+  unitId?: string;
+  notes?: string;
 }
 
-export const inventarioApi = {
+export const inventoryApi = {
   // Tipos
-  tipos: () => api.get<TipoDispositivo[]>(`/inventario/tipos`),
-  crearTipo: (data: { code: string; name: string; folioPrefix: string; useSerie?: boolean; useMac?: boolean; useIp?: boolean; useEquipo?: boolean }) =>
-    api.post<TipoDispositivo>(`/inventario/tipos`, data),
-  actualizarTipo: (id: string, data: { name?: string; folioPrefix?: string; active?: boolean; useSerie?: boolean; useMac?: boolean; useIp?: boolean; useEquipo?: boolean }) =>
-    api.put<TipoDispositivo>(`/inventario/tipos/${id}`, data),
-  eliminarTipo: (id: string) => api.delete<TipoDispositivo>(`/inventario/tipos/${id}`),
+  types: () => api.get<DeviceType[]>(`/inventory/device-types`),
+  createType: (data: { code: string; name: string; assetTagPrefix: string; useSerialNumber?: boolean; useMac?: boolean; useIp?: boolean; useHostname?: boolean }) =>
+    api.post<DeviceType>(`/inventory/device-types`, data),
+  updateType: (id: string, data: { name?: string; assetTagPrefix?: string; active?: boolean; useSerialNumber?: boolean; useMac?: boolean; useIp?: boolean; useHostname?: boolean }) =>
+    api.put<DeviceType>(`/inventory/device-types/${id}`, data),
+  deleteType: (id: string) => api.delete<DeviceType>(`/inventory/device-types/${id}`),
 
   // Dispositivos
-  dispositivos: (filters: { tipoId?: string; q?: string; existencias?: boolean } = {}) => {
+  devices: (filters: { typeId?: string; q?: string; stock?: boolean } = {}) => {
     const params = new URLSearchParams();
-    if (filters.tipoId) params.set("tipoId", filters.tipoId);
+    if (filters.typeId) params.set("typeId", filters.typeId);
     if (filters.q) params.set("q", filters.q);
-    if (filters.existencias) params.set("existencias", "true");
+    if (filters.stock) params.set("stock", "true");
     const qs = params.toString();
-    return api.get<Dispositivo[]>(`/inventario/dispositivos${qs ? `?${qs}` : ""}`);
+    return api.get<Device[]>(`/inventory/devices${qs ? `?${qs}` : ""}`);
   },
-  crearDispositivo: (data: {
-    tipoId: string;
-    nombre: string;
-    marca: string;
-    modelo: string;
-    descripcion?: string;
-    observaciones?: string;
-    cantidadInicial?: number;
-    unidades?: { numeroSerie?: string; macAddress?: string; ip?: string; nombreEquipo?: string }[];
-  }) => api.post<Dispositivo>(`/inventario/dispositivos`, data),
-  getDispositivo: (id: string) => api.get<Dispositivo>(`/inventario/dispositivos/${id}`),
-  actualizarDispositivo: (
+  createDevice: (data: {
+    typeId: string;
+    name: string;
+    brand: string;
+    model: string;
+    description?: string;
+    notes?: string;
+    initialQuantity?: number;
+    units?: { serialNumber?: string; macAddress?: string; ip?: string; hostname?: string }[];
+  }) => api.post<Device>(`/inventory/devices`, data),
+  getDevice: (id: string) => api.get<Device>(`/inventory/devices/${id}`),
+  updateDevice: (
     id: string,
-    data: { nombre?: string; marca?: string; modelo?: string; descripcion?: string; observaciones?: string }
-  ) => api.put<Dispositivo>(`/inventario/dispositivos/${id}`, data),
-  eliminarDispositivo: (id: string) => api.delete<Dispositivo>(`/inventario/dispositivos/${id}`),
-  existencias: (id: string) => api.get<Existencias>(`/inventario/dispositivos/${id}/existencias`),
-  unidades: (id: string) => api.get<UnidadFisica[]>(`/inventario/dispositivos/${id}/unidades`),
-  actualizarUnidad: (id: string, data: { numeroSerie?: string; macAddress?: string; ip?: string; nombreEquipo?: string; area?: string; departamentoId?: string }) =>
-    api.put<UnidadFisica>(`/inventario/unidades-fisicas/${id}`, data),
-  kardex: (id: string) =>
-    api.get<{ dispositivo: Dispositivo; existencias: Existencias; rows: KardexRow[] }>(
-      `/inventario/dispositivos/${id}/kardex`
+    data: { name?: string; brand?: string; model?: string; description?: string; notes?: string }
+  ) => api.put<Device>(`/inventory/devices/${id}`, data),
+  deleteDevice: (id: string) => api.delete<Device>(`/inventory/devices/${id}`),
+  stock: (id: string) => api.get<Stock>(`/inventory/devices/${id}/stock`),
+  units: (id: string) => api.get<DeviceUnit[]>(`/inventory/devices/${id}/units`),
+  updateUnit: (id: string, data: { serialNumber?: string; macAddress?: string; ip?: string; hostname?: string; area?: string; departmentId?: string }) =>
+    api.put<DeviceUnit>(`/inventory/units/${id}`, data),
+  stockLedger: (id: string) =>
+    api.get<{ device: Device; stock: Stock; rows: StockLedgerRow[] }>(
+      `/inventory/devices/${id}/ledger`
     ),
 
   // Movimientos
-  movimientos: (filters: { tipo?: string; dispositivoId?: string } = {}) => {
+  movements: (filters: { type?: string; deviceId?: string } = {}) => {
     const params = new URLSearchParams();
-    if (filters.tipo) params.set("tipo", filters.tipo);
-    if (filters.dispositivoId) params.set("dispositivoId", filters.dispositivoId);
+    if (filters.type) params.set("type", filters.type);
+    if (filters.deviceId) params.set("deviceId", filters.deviceId);
     const qs = params.toString();
-    return api.get<Movimiento[]>(`/inventario/movimientos${qs ? `?${qs}` : ""}`);
+    return api.get<Movement[]>(`/inventory/movements${qs ? `?${qs}` : ""}`);
   },
-  getMovimiento: (id: string) => api.get<Movimiento>(`/inventario/movimientos/${id}`),
-  registrarMovimiento: (data: {
-    tipo: TipoMovimiento;
-    responsableId?: string;
-    departamentoId?: string;
-    motivo?: string;
-    observaciones?: string;
-    prestamoId?: string;
-    detalles: MovimientoDetalleInput[];
-  }) => api.post<Movimiento>(`/inventario/movimientos`, data),
-  revertir: (id: string) => api.post<Movimiento>(`/inventario/movimientos/${id}/revertir`),
+  getMovement: (id: string) => api.get<Movement>(`/inventory/movements/${id}`),
+  registerMovement: (data: {
+    type: MovementType;
+    custodianId?: string;
+    departmentId?: string;
+    reason?: string;
+    notes?: string;
+    loanId?: string;
+    items: MovementItemInput[];
+  }) => api.post<Movement>(`/inventory/movements`, data),
+  revert: (id: string) => api.post<Movement>(`/inventory/movements/${id}/revert`),
 
   // Préstamos
-  prestamos: (filters: { status?: string; responsableId?: string } = {}) => {
+  loans: (filters: { status?: string; custodianId?: string } = {}) => {
     const params = new URLSearchParams();
     if (filters.status) params.set("status", filters.status);
-    if (filters.responsableId) params.set("responsableId", filters.responsableId);
+    if (filters.custodianId) params.set("custodianId", filters.custodianId);
     const qs = params.toString();
-    return api.get<Prestamo[]>(`/inventario/prestamos${qs ? `?${qs}` : ""}`);
+    return api.get<Loan[]>(`/inventory/loans${qs ? `?${qs}` : ""}`);
   },
-  getPrestamo: (id: string) => api.get<Prestamo>(`/inventario/prestamos/${id}`),
-  crearPrestamo: (data: {
-    responsableId?: string;
-    departamentoId?: string;
+  getLoan: (id: string) => api.get<Loan>(`/inventory/loans/${id}`),
+  createLoan: (data: {
+    custodianId?: string;
+    departmentId?: string;
     subareaId?: string;
-    observaciones?: string;
-    detalles: { dispositivoId: string; cantidad: number }[];
-  }) => api.post<Movimiento>(`/inventario/prestamos`, data),
-  cancelarPrestamo: (id: string) => api.post<Prestamo>(`/inventario/prestamos/${id}/cancelar`),
-  actualizarPrestamo: (id: string, data: {
-    responsableId?: string;
-    departamentoId?: string;
+    notes?: string;
+    items: { deviceId: string; quantity: number }[];
+  }) => api.post<Movement>(`/inventory/loans`, data),
+  cancelLoan: (id: string) => api.post<Loan>(`/inventory/loans/${id}/cancel`),
+  updateLoan: (id: string, data: {
+    custodianId?: string;
+    departmentId?: string;
     subareaId?: string;
-    observaciones?: string;
-    dispositivoId?: string;
-    cantidad?: number;
-  }) => api.put<Prestamo>(`/inventario/prestamos/${id}`, data),
+    notes?: string;
+    deviceId?: string;
+    quantity?: number;
+  }) => api.put<Loan>(`/inventory/loans/${id}`, data),
 
   // Devoluciones
-  devoluciones: (filters: { prestamoId?: string } = {}) => {
+  returns: (filters: { loanId?: string } = {}) => {
     const params = new URLSearchParams();
-    if (filters.prestamoId) params.set("prestamoId", filters.prestamoId);
+    if (filters.loanId) params.set("loanId", filters.loanId);
     const qs = params.toString();
-    return api.get<Devolucion[]>(`/inventario/devoluciones${qs ? `?${qs}` : ""}`);
+    return api.get<LoanReturn[]>(`/inventory/returns${qs ? `?${qs}` : ""}`);
   },
-  crearDevolucion: (data: {
-    prestamoId: string;
-    responsableId?: string;
-    observaciones?: string;
-    detalles: { prestamoDetalleId: string; cantidad: number; condicion: Condicion }[];
-  }) => api.post<Movimiento>(`/inventario/devoluciones`, data),
+  createLoanReturn: (data: {
+    loanId: string;
+    custodianId?: string;
+    notes?: string;
+    items: { loanItemId: string; quantity: number; condition: Condition }[];
+  }) => api.post<Movement>(`/inventory/returns`, data),
 
   // Dashboard
-  dashboard: () => api.get<Dashboard>(`/inventario/dashboard`),
+  dashboard: () => api.get<Dashboard>(`/inventory/dashboard`),
 };
 
-export type EstadoInventarioType = EstadoInventario;
+export type DeviceUnitStatusType = DeviceUnitStatus;

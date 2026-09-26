@@ -17,9 +17,9 @@ import {
   EmployeeDocumentsCard,
   EmployeeInfoCards,
   DeactivateDialog,
-} from "@features/personal/employee-detail";
+} from "@features/hr/employee-detail";
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
-import { CredencialEmpleadoDialog } from "@widgets/credencial-empleado";
+import { EmployeeCredentialDialog } from "@widgets/employee-credential";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +36,7 @@ export default function EmployeeDetailPage() {
         backAction={() => navigate(-1)}
         icon={<FaUserTie size={20} />}
         breadcrumbs={[
-          { label: tt("breadcrumb"), onClick: () => navigate("/empleados") },
+          { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
           { label: tt("detail.loadingTitle") },
         ]}
       >
@@ -62,7 +62,7 @@ export default function EmployeeDetailPage() {
       backAction={() => navigate(-1)}
       icon={<FaUserTie size={20} />}
       breadcrumbs={[
-        { label: tt("breadcrumb"), onClick: () => navigate("/empleados") },
+        { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
         { label: profile.name },
       ]}
       actions={
@@ -85,7 +85,7 @@ export default function EmployeeDetailPage() {
               <ITText className="font-bold text-[11px]">{tt("detail.reactivate")}</ITText>
             </ITButton>
           )}
-          <ITButton variant="filled" color="primary" size="lg" onClick={() => navigate(`/empleados/${id}/editar`)}>
+          <ITButton variant="filled" color="primary" size="lg" onClick={() => navigate(`/employees/${id}/edit`)}>
             <ITFlex align="center" gap={1}>
               <FaPencilAlt size={11} />
               <ITText className="font-bold text-[11px]">{tt("detail.editInfo")}</ITText>
@@ -138,7 +138,7 @@ export default function EmployeeDetailPage() {
         userName={profile.name}
       />
 
-      <CredencialEmpleadoDialog
+      <EmployeeCredentialDialog
         isOpen={credentialOpen}
         onClose={() => setCredentialOpen(false)}
         profile={profile}

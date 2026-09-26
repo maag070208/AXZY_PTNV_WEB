@@ -4,83 +4,83 @@ import { ITBadget, ITButton, ITDataTable, ITFlex, ITPage, ITText } from "@axzyde
 import { FaBoxOpen, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
-import { inventarioApi, type Dispositivo, type TipoDispositivo } from "@entities/inventario";
+import { inventoryApi, type Device, type DeviceType } from "@entities/inventory";
 
-export default function DispositivosPage() {
-  const { t } = useTranslation(["inventario", "common"]);
+export default function DevicesPage() {
+  const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
-  const [tipos, setTipos] = useState<TipoDispositivo[]>([]);
+  const [types, setTypes] = useState<DeviceType[]>([]);
 
   useEffect(() => {
-    inventarioApi.tipos().then(setTipos);
+    inventoryApi.types().then(setTypes);
   }, []);
 
   const fetchData = useMemo(
-    () => makeClientTableFetch<Dispositivo>(() => inventarioApi.dispositivos({ existencias: true })),
+    () => makeClientTableFetch<Device>(() => inventoryApi.devices({ stock: true })),
     []
   );
-  const tiposActivos = useMemo(() => tipos.filter((x) => x.active), [tipos]);
+  const activeTypes = useMemo(() => types.filter((x) => x.active), [types]);
 
   const columns: any[] = [
     {
       type: "string",
-      key: "nombre",
-      label: t("dispositivos.colNombre"),
+      key: "name",
+      label: t("devices.colName"),
       sortable: false,
       filter: true,
-      render: (d: Dispositivo) => (
+      render: (d: Device) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[11px] font-bold text-slate-800">{d.nombre}</ITText>
-          <ITText className="text-[10px] text-slate-400">{d.marca} {d.modelo}</ITText>
+          <ITText className="text-[11px] font-bold text-slate-800">{d.name}</ITText>
+          <ITText className="text-[10px] text-slate-400">{d.brand} {d.model}</ITText>
         </ITFlex>
       ),
     },
     {
       type: "string",
-      key: "tipoId",
-      label: t("dispositivos.colTipo"),
+      key: "typeId",
+      label: t("devices.colType"),
       filter: "catalog" as const,
       catalogOptions: {
-        data: tiposActivos,
+        data: activeTypes,
         loading: false,
         error: false,
       },
-      render: (d: Dispositivo) => <ITBadget color="gray" size="lg">{d.tipo?.name ?? ""}</ITBadget>,
+      render: (d: Device) => <ITBadget color="gray" size="lg">{d.type?.name ?? ""}</ITBadget>,
     },
     {
       type: "number",
       key: "disp",
-      label: t("dispositivos.colDisp"),
+      label: t("devices.colAvail"),
       sortable: false,
-      render: (d: Dispositivo) => <ITText className="text-[11px] font-bold text-emerald-600">{d.existencias?.DISPONIBLE ?? 0}</ITText>,
+      render: (d: Device) => <ITText className="text-[11px] font-bold text-emerald-600">{d.stock?.AVAILABLE ?? 0}</ITText>,
     },
     {
       type: "number",
       key: "prest",
-      label: t("dispositivos.colPrest"),
+      label: t("devices.colPrest"),
       sortable: false,
-      render: (d: Dispositivo) => <ITText className="text-[11px] font-bold text-amber-600">{d.existencias?.PRESTADO ?? 0}</ITText>,
+      render: (d: Device) => <ITText className="text-[11px] font-bold text-amber-600">{d.stock?.ON_LOAN ?? 0}</ITText>,
     },
     {
       type: "number",
-      key: "baja",
-      label: t("dispositivos.colBaja"),
+      key: "retirement",
+      label: t("devices.colRetirement"),
       sortable: false,
-      render: (d: Dispositivo) => <ITText className="text-[11px] font-bold text-red-500">{d.existencias?.BAJA ?? 0}</ITText>,
+      render: (d: Device) => <ITText className="text-[11px] font-bold text-red-500">{d.stock?.RETIRED ?? 0}</ITText>,
     },
     {
       type: "number",
       key: "total",
-      label: t("dispositivos.colTotal"),
+      label: t("devices.colTotal"),
       sortable: false,
-      render: (d: Dispositivo) => <ITText className="text-[11px] font-black text-slate-800">{d.existencias?.total ?? 0}</ITText>,
+      render: (d: Device) => <ITText className="text-[11px] font-black text-slate-800">{d.stock?.total ?? 0}</ITText>,
     },
     {
       type: "string",
-      key: "accion",
+      key: "action",
       label: "",
-      render: (d: Dispositivo) => (
-        <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventario/dispositivos/${d.id}`)}>
+      render: (d: Device) => (
+        <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/devices/${d.id}`)}>
           <ITText className="font-bold text-[10px]">{t("common:actions.view")}</ITText>
         </ITButton>
       ),
@@ -89,16 +89,16 @@ export default function DispositivosPage() {
 
   return (
     <ITPage
-      title={t("dispositivos.title")}
-      description={t("dispositivos.description")}
+      title={t("devices.title")}
+      description={t("devices.description")}
       icon={<FaBoxOpen size={20} />}
-      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventario") }, { label: t("dispositivos.title") }]}
-      backAction={() => navigate("/inventario")}
+      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title") }]}
+      backAction={() => navigate("/inventory")}
       actions={
-        <ITButton variant="filled" color="primary" onClick={() => navigate("/inventario/dispositivos/nuevo")}>
+        <ITButton variant="filled" color="primary" onClick={() => navigate("/inventory/devices/new")}>
           <ITFlex align="center" gap={1}>
             <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{t("dispositivos.new")}</ITText>
+            <ITText className="font-bold text-[11px]">{t("devices.new")}</ITText>
           </ITFlex>
         </ITButton>
       }

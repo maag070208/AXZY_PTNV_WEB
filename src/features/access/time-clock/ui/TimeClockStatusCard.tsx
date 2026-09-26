@@ -1,150 +1,150 @@
 import { ITBadget, ITButton, ITCard, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
 import { FaCog, FaLock, FaSyncAlt } from "react-icons/fa";
 import {
-  ESTADO_RELOJ_COLOR,
-  estadoDelReloj,
-  type ChecadorDispositivo,
-  type ChecadorImportacion,
-  type ChecadorRelojEstado,
-  type ChecadorStatus,
-} from "@entities/checador";
-import { formatFechaHora } from "@shared/utils/dates";
-import type { UseChecador } from "../model/useChecador";
+  CLOCK_STATUS_COLOR,
+  clockStatus,
+  type TimeClockDevice,
+  type TimeClockImport,
+  type TimeClockState,
+  type TimeClockStatus,
+} from "@entities/time-clock";
+import { formatDateTime } from "@shared/utils/dates";
+import type { UseTimeClock } from "../model/useTimeClock";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
-type Estado = "notConfigured" | "sinRelojes" | ChecadorRelojEstado;
-type EstadoImportacion = "running" | "ok" | "error";
+type OverallState = "notConfigured" | "withoutClocks" | TimeClockState;
+type ImportStatus = "running" | "ok" | "error";
 
-const ESTADO_COLOR: Record<Estado, BadgeColor> = {
+const STATUS_COLOR: Record<OverallState, BadgeColor> = {
   notConfigured: "gray",
-  sinRelojes: "gray",
-  ...ESTADO_RELOJ_COLOR,
+  withoutClocks: "gray",
+  ...CLOCK_STATUS_COLOR,
 };
 
-const IMPORTACION_COLOR: Record<EstadoImportacion, BadgeColor> = {
+const IMPORT_COLOR: Record<ImportStatus, BadgeColor> = {
   running: "info",
   ok: "success",
   error: "warning",
 };
 
 /** El estado general es el del reloj que más atención pide. */
-const PRIORIDAD: ChecadorRelojEstado[] = ["running", "paused", "error", "pending", "ok"];
+const PRIORITY: TimeClockState[] = ["running", "paused", "error", "pending", "ok"];
 
-const estadoDe = (s: ChecadorStatus): Estado => {
-  if (!s.configurado) return "notConfigured";
-  if (s.dispositivos.length === 0) return "sinRelojes";
-  const estados = new Set(s.dispositivos.map(estadoDelReloj));
-  return PRIORIDAD.find((e) => estados.has(e)) ?? "ok";
+const statusOf = (s: TimeClockStatus): OverallState => {
+  if (!s.configured) return "notConfigured";
+  if (s.devices.length === 0) return "withoutClocks";
+  const statuses = new Set(s.devices.map(clockStatus));
+  return PRIORITY.find((e) => statuses.has(e)) ?? "ok";
 };
 
-const estadoImportacionDe = (i: ChecadorImportacion): EstadoImportacion =>
+const importStatusOf = (i: TimeClockImport): ImportStatus =>
   !i.finishedAt ? "running" : i.error ? "error" : "ok";
 
-const numero = (n: number): string => n.toLocaleString("es-MX");
+const number = (n: number): string => n.toLocaleString("es-MX");
 
 /** Día `YYYY-MM-DD` → `DD/MM/AAAA` (es una clave, no un instante). */
-const dia = (key: string): string => key.split("-").reverse().join("/");
+const day = (key: string): string => key.split("-").reverse().join("/");
 
 /** Segundos → texto corto para el ETA ("2 h 5 min", "3 min", "45 s"). */
-const duracion = (segundos: number): string => {
-  if (segundos < 60) return `${segundos} s`;
-  const min = Math.round(segundos / 60);
+const duration = (seconds: number): string => {
+  if (seconds < 60) return `${seconds} s`;
+  const min = Math.round(seconds / 60);
   if (min < 60) return `${min} min`;
   return `${Math.floor(min / 60)} h ${min % 60} min`;
 };
 
 interface Props {
-  fx: UseChecador;
+  fx: UseTimeClock;
   /** Solo para quien puede administrar los relojes (ADMIN). */
-  onAdministrarRelojes?: () => void;
+  onManageClocks?: () => void;
 }
 
-export default function ChecadorStatusCard({ fx, onAdministrarRelojes }: Props) {
-  const { t, status, enCurso, progreso, importando, starting, handleSyncAll } = fx;
+export default function TimeClockStatusCard({ fx, onManageClocks }: Props) {
+  const { t, status, inProgress, progress, importing, starting, handleSyncAll } = fx;
   if (!status) return null;
 
-  const estado = estadoDe(status);
+  const overallState = statusOf(status);
 
-  const mensaje = ((): string | null => {
-    switch (estado) {
+  const message = ((): string | null => {
+    switch (overallState) {
       case "notConfigured":
-      case "sinRelojes":
+      case "withoutClocks":
       case "paused":
       case "error":
       case "pending":
-        return t(`status.messages.${estado}`);
+        return t(`status.messages.${overallState}`);
       case "running": {
-        if (!progreso) return null;
-        if (progreso.total == null || progreso.faltan == null) {
+        if (!progress) return null;
+        if (progress.total == null || progress.missing == null) {
           return t("status.messages.runningNoTotal", {
-            leidos: numero(progreso.leidos),
-            nuevas: numero(progreso.nuevas),
+            readCount: number(progress.readCount),
+            newCount: number(progress.newCount),
           });
         }
         const base = t("status.messages.running", {
-          leidos: numero(progreso.leidos),
-          total: numero(progreso.total),
-          nuevas: numero(progreso.nuevas),
-          restantes: numero(progreso.faltan),
+          readCount: number(progress.readCount),
+          total: number(progress.total),
+          newCount: number(progress.newCount),
+          remaining: number(progress.missing),
         });
-        const detalle = [
-          progreso.percent != null ? t("sync.percent", { percent: numero(progreso.percent) }) : null,
-          progreso.rate != null ? t("sync.speed", { rate: numero(Math.round(progreso.rate)) }) : null,
-          progreso.eta != null ? t("sync.eta", { eta: duracion(progreso.eta) }) : null,
+        const item = [
+          progress.percent != null ? t("sync.percent", { percent: number(progress.percent) }) : null,
+          progress.rate != null ? t("sync.speed", { rate: number(Math.round(progress.rate)) }) : null,
+          progress.eta != null ? t("sync.eta", { eta: duration(progress.eta) }) : null,
         ]
           .filter((s): s is string => s !== null)
           .join(" · ");
-        return detalle ? `${base} · ${detalle}` : base;
+        return item ? `${base} · ${item}` : base;
       }
       default:
         return null;
     }
   })();
 
-  const importacion = status.importacion;
-  const estadoImportacion = importacion ? estadoImportacionDe(importacion) : null;
-  const mensajeImportacion = ((): string | null => {
-    if (!importacion) return null;
-    const rango = { desde: dia(importacion.desde), hasta: dia(importacion.hasta) };
-    if (estadoImportacion === "error") return importacion.error;
-    if (estadoImportacion === "ok") {
+  const importJob = status.importJob;
+  const importStatus = importJob ? importStatusOf(importJob) : null;
+  const importMessage = ((): string | null => {
+    if (!importJob) return null;
+    const range = { from: day(importJob.from), to: day(importJob.to) };
+    if (importStatus === "error") return importJob.error;
+    if (importStatus === "ok") {
       return t("import.done", {
-        ...rango,
-        nuevas: numero(importacion.nuevas),
-        leidos: numero(importacion.leidos),
+        ...range,
+        newCount: number(importJob.newCount),
+        readCount: number(importJob.readCount),
       });
     }
-    return importacion.total != null
+    return importJob.total != null
       ? t("import.progress", {
-          ...rango,
-          leidos: numero(importacion.leidos),
-          total: numero(importacion.total),
-          nuevas: numero(importacion.nuevas),
+          ...range,
+          readCount: number(importJob.readCount),
+          total: number(importJob.total),
+          newCount: number(importJob.newCount),
         })
-      : t("import.progressNoTotal", rango);
+      : t("import.progressNoTotal", range);
   })();
 
   /** Detalle de un reloj: su avance, su error o por qué está en pausa. */
-  const detalleDe = (d: ChecadorDispositivo): string | null => {
-    switch (estadoDelReloj(d)) {
+  const itemOf = (d: TimeClockDevice): string | null => {
+    switch (clockStatus(d)) {
       case "running":
-        if (!d.enCurso) return null;
-        return d.enCurso.total != null
-          ? t("status.reloj.running", {
-              leidos: numero(d.enCurso.leidos),
-              total: numero(d.enCurso.total),
-              nuevas: numero(d.enCurso.nuevas),
+        if (!d.inProgress) return null;
+        return d.inProgress.total != null
+          ? t("status.clock.running", {
+              readCount: number(d.inProgress.readCount),
+              total: number(d.inProgress.total),
+              newCount: number(d.inProgress.newCount),
             })
-          : t("status.reloj.runningNoTotal", {
-              leidos: numero(d.enCurso.leidos),
-              nuevas: numero(d.enCurso.nuevas),
+          : t("status.clock.runningNoTotal", {
+              readCount: number(d.inProgress.readCount),
+              newCount: number(d.inProgress.newCount),
             });
       case "paused":
-        return t("status.reloj.paused");
+        return t("status.clock.paused");
       case "error":
-        return d.ultimaCorrida?.error ?? null;
+        return d.lastRun?.error ?? null;
       case "pending":
-        return t("status.reloj.pending");
+        return t("status.clock.pending");
       default:
         return null;
     }
@@ -154,16 +154,16 @@ export default function ChecadorStatusCard({ fx, onAdministrarRelojes }: Props) 
     <ITCard title={t("status.title")} className="!p-5 border border-slate-200">
       <ITFlex direction="column" gap={3}>
         <ITFlex align="center" wrap="wrap" gap={2}>
-          <ITBadget color={ESTADO_COLOR[estado]} size="lg">
-            {t(`status.states.${estado}`)}
+          <ITBadget color={STATUS_COLOR[overallState]} size="lg">
+            {t(`status.states.${overallState}`)}
           </ITBadget>
-          {mensaje && <ITText className="text-[12px] text-slate-600">{mensaje}</ITText>}
+          {message && <ITText className="text-[12px] text-slate-600">{message}</ITText>}
           <ITFlex align="center" gap={2} className="ml-auto">
-            {onAdministrarRelojes && (
-              <ITButton variant="outlined" color="secondary" size="sm" onClick={onAdministrarRelojes}>
+            {onManageClocks && (
+              <ITButton variant="outlined" color="secondary" size="sm" onClick={onManageClocks}>
                 <ITFlex align="center" gap={1}>
                   <FaCog size={11} />
-                  <ITText className="font-bold text-[11px]">{t("status.administrar")}</ITText>
+                  <ITText className="font-bold text-[11px]">{t("status.manage")}</ITText>
                 </ITFlex>
               </ITButton>
             )}
@@ -173,12 +173,12 @@ export default function ChecadorStatusCard({ fx, onAdministrarRelojes }: Props) 
                 color="primary"
                 size="sm"
                 disabled={
-                  enCurso || importando || starting || !status.configurado || status.dispositivos.length === 0
+                  inProgress || importing || starting || !status.configured || status.devices.length === 0
                 }
                 onClick={handleSyncAll}
               >
                 <ITFlex align="center" gap={1}>
-                  <FaSyncAlt size={11} className={enCurso || importando ? "animate-spin" : undefined} />
+                  <FaSyncAlt size={11} className={inProgress || importing ? "animate-spin" : undefined} />
                   <ITText className="font-bold text-[11px]">{t("sync.button")}</ITText>
                 </ITFlex>
               </ITButton>
@@ -186,23 +186,23 @@ export default function ChecadorStatusCard({ fx, onAdministrarRelojes }: Props) 
           </ITFlex>
         </ITFlex>
 
-        {importacion && estadoImportacion && (
+        {importJob && importStatus && (
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITBadget color={IMPORTACION_COLOR[estadoImportacion]} size="lg">
-              {t(`import.states.${estadoImportacion}`)}
+            <ITBadget color={IMPORT_COLOR[importStatus]} size="lg">
+              {t(`import.states.${importStatus}`)}
             </ITBadget>
-            {mensajeImportacion && (
-              <ITText className="text-[12px] text-slate-600">{mensajeImportacion}</ITText>
+            {importMessage && (
+              <ITText className="text-[12px] text-slate-600">{importMessage}</ITText>
             )}
           </ITFlex>
         )}
 
-        {status.dispositivos.map((d) => {
-          const estadoReloj = estadoDelReloj(d);
-          const detalle = detalleDe(d);
+        {status.devices.map((d) => {
+          const clockState = clockStatus(d);
+          const item = itemOf(d);
           return (
             <ITGrid
-              key={d.dispositivoSerie}
+              key={d.clockSerial}
               container
               columns={12}
               spacing={4}
@@ -214,26 +214,26 @@ export default function ChecadorStatusCard({ fx, onAdministrarRelojes }: Props) 
                     {t("status.device")}
                   </ITText>
                   <ITFlex align="center" wrap="wrap" gap={1}>
-                    <ITText className="text-[12px] font-black text-slate-800">{d.nombre}</ITText>
-                    <ITBadget color={ESTADO_RELOJ_COLOR[estadoReloj]} size="sm">
-                      {t(`status.states.${estadoReloj}`)}
+                    <ITText className="text-[12px] font-black text-slate-800">{d.name}</ITText>
+                    <ITBadget color={CLOCK_STATUS_COLOR[clockState]} size="sm">
+                      {t(`status.states.${clockState}`)}
                     </ITBadget>
                   </ITFlex>
                   <ITText className="text-[10px] font-bold text-slate-400 break-words">{d.url}</ITText>
-                  {!d.asistencia && (
-                    <ITText className="text-[10px] font-bold text-slate-500">{t("status.soloAcceso")}</ITText>
+                  {!d.countsAttendance && (
+                    <ITText className="text-[10px] font-bold text-slate-500">{t("status.onlyAccess")}</ITText>
                   )}
-                  {detalle && <ITText className="text-[11px] text-slate-600 break-words">{detalle}</ITText>}
+                  {item && <ITText className="text-[11px] text-slate-600 break-words">{item}</ITText>}
                 </ITFlex>
               </ITGrid>
-              <Dato label={t("status.checadas")} value={numero(d.checadas)} />
-              <Dato
-                label={t("status.lastChecada")}
-                value={d.ultimaChecada ? formatFechaHora(d.ultimaChecada) : t("status.empty")}
+              <Datum label={t("status.punches")} value={number(d.punches)} />
+              <Datum
+                label={t("status.lastPunch")}
+                value={d.lastPunch ? formatDateTime(d.lastPunch) : t("status.empty")}
               />
-              <Dato
+              <Datum
                 label={t("status.lastSync")}
-                value={d.sincronizadoEn ? formatFechaHora(d.sincronizadoEn) : t("status.empty")}
+                value={d.syncedAt ? formatDateTime(d.syncedAt) : t("status.empty")}
               />
             </ITGrid>
           );
@@ -248,7 +248,7 @@ export default function ChecadorStatusCard({ fx, onAdministrarRelojes }: Props) 
   );
 }
 
-function Dato({ label, value }: { label: string; value: string }) {
+function Datum({ label, value }: { label: string; value: string }) {
   return (
     <ITGrid item xs={12} md={3}>
       <ITFlex direction="column" gap={0.5} className="min-w-0">

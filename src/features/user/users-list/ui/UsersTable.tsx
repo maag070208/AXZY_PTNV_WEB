@@ -26,9 +26,9 @@ const roleBadge = (role: string) => (
     color={
       role === "ADMIN"
         ? "danger"
-        : role === "GERENTE"
+        : role === "MANAGER"
         ? "info"
-        : role === "JEFE_DE_AREA"
+        : role === "AREA_HEAD"
         ? "warning"
         : role === "GUARD"
         ? "gray"
@@ -82,13 +82,13 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       render: (u) => roleBadge(u.role),
     },
     {
-      key: "numeroEmpleado",
+      key: "employeeNumber",
       label: tt("table.employeeNo"),
       type: "string",
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[11px] text-slate-600">{u.numeroEmpleado ?? "—"}</ITText>
+        <ITText className="text-[11px] text-slate-600">{u.employeeNumber ?? "—"}</ITText>
       ),
     },
     {

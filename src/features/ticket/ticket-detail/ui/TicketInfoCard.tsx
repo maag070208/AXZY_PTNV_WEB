@@ -1,5 +1,5 @@
 import { ITBadget, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_system";
-import { formatFechaHora } from "@shared/utils/dates";
+import { formatDateTime } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import { PRIORITY_BADGE, STATUS_BADGE } from "@entities/ticket";
@@ -29,7 +29,7 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
             {dyn(tt)(`priorityLabels.${ticket.priority}`)}
           </ITBadget>
           <ITBadget color="primary" size="lg">
-            {ticket.category?.nombre ?? "—"}
+            {ticket.category?.name ?? "—"}
           </ITBadget>
           {ticket.deletedAt && (
             <ITBadget color="gray" size="lg">
@@ -43,7 +43,7 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
             {tt("detail.description")}
           </ITText>
           <ITText className="text-[13px] text-slate-700 whitespace-pre-wrap break-words leading-relaxed">
-            {ticket.descripcion}
+            {ticket.description}
           </ITText>
         </ITStack>
 
@@ -56,10 +56,10 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
                 {tt("detail.createdBy")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700 truncate">
-                {ticket.creadoPor?.name ?? "—"}
+                {ticket.createdBy?.name ?? "—"}
               </ITText>
               <ITText className="text-[9px] text-slate-400">
-                {formatFechaHora(ticket.creadoEn)}
+                {formatDateTime(ticket.createdAt)}
               </ITText>
             </ITStack>
           </ITGrid>
@@ -69,7 +69,7 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
                 {tt("detail.assignedTo")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700 truncate">
-                {ticket.asignadoA?.name ?? tt("detail.unassigned")}
+                {ticket.assignedTo?.name ?? tt("detail.unassigned")}
               </ITText>
             </ITStack>
           </ITGrid>

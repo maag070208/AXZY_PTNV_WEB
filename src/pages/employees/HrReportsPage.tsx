@@ -10,18 +10,18 @@ import { FaPlus, FaScroll } from "react-icons/fa6";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { ActaAdministrativa } from "@entities/personal";
+import type { DisciplinaryReport } from "@entities/hr";
 import {
-  useActasReporte,
-  ActasTable,
-  ActaAdministrativaForm,
-} from "@features/personal/actas-reporte";
+  useDisciplinaryReports,
+  DisciplinaryReportsTable,
+  DisciplinaryReportForm,
+} from "@features/hr/disciplinary-reports";
 
-export default function ReportesPersonalPage() {
-  const { t: tt } = useTranslation(["actas", "common"]);
+export default function HrReportsPage() {
+  const { t: tt } = useTranslation(["disciplinary-reports", "common"]);
   const navigate = useNavigate();
-  const fx = useActasReporte();
-  const [actaParaBorrar, setActaParaBorrar] = useState<ActaAdministrativa | null>(null);
+  const fx = useDisciplinaryReports();
+  const [disciplinaryReportToDelete, setDisciplinaryReportToDelete] = useState<DisciplinaryReport | null>(null);
 
   return (
     <ITPage
@@ -37,7 +37,7 @@ export default function ReportesPersonalPage() {
         <ITButton variant="filled" color="primary" onClick={() => fx.setShowForm(true)}>
           <ITFlex align="center" gap={1}>
             <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{tt("newActa")}</ITText>
+            <ITText className="font-bold text-[11px]">{tt("newDisciplinaryReport")}</ITText>
           </ITFlex>
         </ITButton>
       }
@@ -48,32 +48,32 @@ export default function ReportesPersonalPage() {
         </ITAlert>
       )}
 
-      <ActasTable
+      <DisciplinaryReportsTable
         fetchData={fx.fetchTableData}
         reloadKey={fx.reloadKey}
-        onView={(acta) => navigate(`/empleados/reportes/${acta.id}`)}
-        onDelete={(acta) => setActaParaBorrar(acta)}
+        onView={(disciplinaryReport) => navigate(`/employees/disciplinary-reports/${disciplinaryReport.id}`)}
+        onDelete={(disciplinaryReport) => setDisciplinaryReportToDelete(disciplinaryReport)}
       />
 
-      <ActaAdministrativaForm
+      <DisciplinaryReportForm
         isOpen={fx.showForm}
         saving={fx.saving}
         onClose={() => fx.setShowForm(false)}
-        onSave={(input) => void fx.createActa(input)}
+        onSave={(input) => void fx.createDisciplinaryReport(input)}
       />
 
       <ITConfirmDialog
-        isOpen={!!actaParaBorrar}
-        onClose={() => setActaParaBorrar(null)}
+        isOpen={!!disciplinaryReportToDelete}
+        onClose={() => setDisciplinaryReportToDelete(null)}
         onConfirm={() => {
-          if (actaParaBorrar) void fx.deleteActa(actaParaBorrar.id);
-          setActaParaBorrar(null);
+          if (disciplinaryReportToDelete) void fx.deleteDisciplinaryReport(disciplinaryReportToDelete.id);
+          setDisciplinaryReportToDelete(null);
         }}
-        title={tt("actions.eliminar")}
-        message={tt("form.eliminarConfirm", {
-          name: actaParaBorrar?.user.name ?? "",
+        title={tt("actions.delete")}
+        message={tt("form.deleteConfirm", {
+          name: disciplinaryReportToDelete?.user.name ?? "",
         })}
-        confirmLabel={tt("actions.eliminar")}
+        confirmLabel={tt("actions.delete")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />

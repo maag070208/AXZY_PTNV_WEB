@@ -19,46 +19,46 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { FaCloudDownloadAlt, FaFileCsv, FaUndo } from "react-icons/fa";
-import type { Checada, MetodoChecada } from "@entities/checador";
-import { formatFechaHora } from "@shared/utils/dates";
-import type { UseChecador } from "../model/useChecador";
-import ChecadorStatusCard from "./ChecadorStatusCard";
+import type { TimeClockPunch, PunchMethod } from "@entities/time-clock";
+import { formatDateTime } from "@shared/utils/dates";
+import type { UseTimeClock } from "../model/useTimeClock";
+import TimeClockStatusCard from "./TimeClockStatusCard";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
-const METODOS: MetodoChecada[] = ["ROSTRO", "HUELLA", "TARJETA", "OTRO"];
+const METHODS: PunchMethod[] = ["FACE", "FINGERPRINT", "CARD", "OTHER"];
 
-const METODO_COLOR: Record<MetodoChecada, BadgeColor> = {
-  ROSTRO: "info",
-  HUELLA: "success",
-  TARJETA: "gray",
-  OTRO: "warning",
+const METHOD_COLOR: Record<PunchMethod, BadgeColor> = {
+  FACE: "info",
+  FINGERPRINT: "success",
+  CARD: "gray",
+  OTHER: "warning",
 };
 
 interface Props {
-  fx: UseChecador;
+  fx: UseTimeClock;
   /** Solo para quien puede administrar los relojes (ADMIN). */
-  onAdministrarRelojes?: () => void;
+  onManageClocks?: () => void;
 }
 
-export default function ChecadorTab({ fx, onAdministrarRelojes }: Props) {
+export default function TimeClockTab({ fx, onManageClocks }: Props) {
   const {
     t,
     dateRange,
     setDateRange,
     q,
     setQ,
-    metodo,
-    setMetodo,
-    reloj,
-    setReloj,
+    method,
+    setMethod,
+    clock,
+    setClock,
     applyRange,
     clearFilters,
     externalFilters,
     fetchTableData,
     reloadKey,
     status,
-    importando,
+    importing,
     starting,
     handleImportRange,
     exporting,
@@ -69,23 +69,23 @@ export default function ChecadorTab({ fx, onAdministrarRelojes }: Props) {
     setToast,
   } = fx;
 
-  const metodoOptions = useMemo(
+  const methodOptions = useMemo(
     () => [
-      { value: "", label: t("filters.allMetodos") },
-      ...METODOS.map((m) => ({ value: m, label: t(`metodos.${m}`) })),
+      { value: "", label: t("filters.allMethods") },
+      ...METHODS.map((m) => ({ value: m, label: t(`methods.${m}`) })),
     ],
     [t]
   );
 
-  const relojOptions = useMemo(
+  const clockOptions = useMemo(
     () => [
-      { value: "", label: t("filters.allRelojes") },
-      ...(status?.dispositivos ?? []).map((d) => ({ value: d.dispositivoSerie, label: d.nombre })),
+      { value: "", label: t("filters.allClocks") },
+      ...(status?.devices ?? []).map((d) => ({ value: d.clockSerial, label: d.name })),
     ],
-    [status?.dispositivos, t]
+    [status?.devices, t]
   );
 
-  const columns = useMemo<Column<Checada>[]>(
+  const columns = useMemo<Column<TimeClockPunch>[]>(
     () => [
       {
         key: "occurredAt",
@@ -94,44 +94,44 @@ export default function ChecadorTab({ fx, onAdministrarRelojes }: Props) {
         sortable: true,
         render: (c) => (
           <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
-            {formatFechaHora(c.occurredAt)}
+            {formatDateTime(c.occurredAt)}
           </ITText>
         ),
       },
       {
-        key: "nombre",
+        key: "name",
         label: t("columns.employee"),
         type: "string",
         sortable: true,
         render: (c) => (
           <ITFlex direction="column" gap={0.5}>
-            <ITText className="text-[12px] font-black text-slate-800">{c.nombre || "—"}</ITText>
+            <ITText className="text-[12px] font-black text-slate-800">{c.name || "—"}</ITText>
             <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-              #{c.numeroEmpleado}
+              #{c.employeeNumber}
             </ITText>
           </ITFlex>
         ),
       },
       {
-        key: "metodo",
-        label: t("columns.metodo"),
+        key: "method",
+        label: t("columns.method"),
         type: "string",
         sortable: true,
         render: (c) => (
-          <span title={c.metodo === "OTRO" ? t("otroHint", { minor: c.minor }) : undefined}>
-            <ITBadget color={METODO_COLOR[c.metodo]} size="lg">
-              {t(`metodos.${c.metodo}`)}
+          <span title={c.method === "OTHER" ? t("otherHint", { minor: c.minor }) : undefined}>
+            <ITBadget color={METHOD_COLOR[c.method]} size="lg">
+              {t(`methods.${c.method}`)}
             </ITBadget>
           </span>
         ),
       },
       {
-        key: "reloj",
-        label: t("columns.reloj"),
+        key: "clock",
+        label: t("columns.clock"),
         type: "string",
         render: (c) => (
-          <span title={c.dispositivoSerie}>
-            <ITText className="text-[11px] font-bold text-slate-600">{c.reloj ?? c.dispositivoSerie}</ITText>
+          <span title={c.clockSerial}>
+            <ITText className="text-[11px] font-bold text-slate-600">{c.clock ?? c.clockSerial}</ITText>
           </span>
         ),
       },
@@ -164,7 +164,7 @@ export default function ChecadorTab({ fx, onAdministrarRelojes }: Props) {
         </ITAlert>
       )}
 
-      <ChecadorStatusCard fx={fx} onAdministrarRelojes={onAdministrarRelojes} />
+      <TimeClockStatusCard fx={fx} onManageClocks={onManageClocks} />
 
       {/* Filtros */}
       <ITCard title={t("filters.title")} className="!p-5 border border-slate-200">
@@ -189,12 +189,12 @@ export default function ChecadorTab({ fx, onAdministrarRelojes }: Props) {
                   color="primary"
                   size="sm"
                   onClick={handleImportRange}
-                  disabled={importando || starting || !dateRange[0] || !status?.configurado}
+                  disabled={importing || starting || !dateRange[0] || !status?.configured}
                 >
                   <ITFlex align="center" gap={1}>
                     <FaCloudDownloadAlt size={13} />
                     <ITText className="font-bold text-[11px]">
-                      {importando ? t("import.running") : t("import.button")}
+                      {importing ? t("import.running") : t("import.button")}
                     </ITText>
                   </ITFlex>
                 </ITButton>
@@ -239,21 +239,21 @@ export default function ChecadorTab({ fx, onAdministrarRelojes }: Props) {
             </ITGrid>
             <ITGrid item xs={12} md={3}>
               <ITSearchSelect
-                name="checadorReloj"
-                label={t("filters.reloj")}
-                options={relojOptions}
-                value={reloj}
-                onChange={(value) => setReloj(String(value))}
+                name="timeClock"
+                label={t("filters.clock")}
+                options={clockOptions}
+                value={clock}
+                onChange={(value) => setClock(String(value))}
                 className="w-full min-w-0"
               />
             </ITGrid>
             <ITGrid item xs={12} md={3}>
               <ITSearchSelect
                 name="checadorMetodo"
-                label={t("filters.metodo")}
-                options={metodoOptions}
-                value={metodo}
-                onChange={(value) => setMetodo(String(value) as MetodoChecada | "")}
+                label={t("filters.method")}
+                options={methodOptions}
+                value={method}
+                onChange={(value) => setMethod(String(value) as PunchMethod | "")}
                 className="w-full min-w-0"
               />
             </ITGrid>

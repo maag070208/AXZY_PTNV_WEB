@@ -7,81 +7,81 @@ import type {
   PersonalStats,
   EmployeeDiscount,
   EmployeeDocument,
-  TipoDocumento,
-  Genero,
-  TipoSangre,
-  ActaAdministrativa,
-  ActaAdministrativaCreateInput,
+  DocumentType,
+  Gender,
+  BloodType,
+  DisciplinaryReport,
+  DisciplinaryReportCreateInput,
 } from "../model/types";
 
 export const personalApi = {
   table: (params: ITDataTableFetchParamsPost) =>
-    tableRequest<PersonalProfile>(`/personal/query`, params),
-  stats: () => api.get<PersonalStats>(`/personal/stats`),
-  get: (id: string) => api.get<PersonalProfile>(`/personal/${id}`),
+    tableRequest<PersonalProfile>(`/hr/query`, params),
+  stats: () => api.get<PersonalStats>(`/hr/stats`),
+  get: (id: string) => api.get<PersonalProfile>(`/hr/${id}`),
   updateProfile: (id: string, data: PersonalProfileUpdateInput) =>
-    api.patch<PersonalProfile>(`/personal/${id}/perfil`, data),
+    api.patch<PersonalProfile>(`/hr/${id}/profile`, data),
   setDiscounts: (id: string, discounts: EmployeeDiscount[]) =>
-    api.put<PersonalProfile>(`/personal/${id}/descuentos`, { discounts }),
+    api.put<PersonalProfile>(`/hr/${id}/discounts`, { discounts }),
 
   uploadPhoto: (id: string, file: File) => {
     const form = new FormData();
     form.append("file", file);
-    return api.post<{ fotoUrl: string }>(`/personal/${id}/foto`, form, {
+    return api.post<{ photoUrl: string }>(`/hr/${id}/photo`, form, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
 
-  fotoRawUrl: (id: string) => `${API_CONSTANTS.BASE_URL}/personal/${id}/foto/raw`,
+  photoRawUrl: (id: string) => `${API_CONSTANTS.BASE_URL}/hr/${id}/photo/raw`,
 
-  documents: (id: string) => api.get<EmployeeDocument[]>(`/personal/${id}/documentos`),
-  uploadDocument: (id: string, tipoDocumentoId: string, file: File) => {
+  documents: (id: string) => api.get<EmployeeDocument[]>(`/hr/${id}/documents`),
+  uploadDocument: (id: string, documentTypeId: string, file: File) => {
     const form = new FormData();
-    form.append("tipoDocumentoId", tipoDocumentoId);
+    form.append("documentTypeId", documentTypeId);
     form.append("file", file);
-    return api.post<EmployeeDocument>(`/personal/${id}/documentos`, form, {
+    return api.post<EmployeeDocument>(`/hr/${id}/documents`, form, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
   removeDocument: (id: string, docId: string) =>
-    api.delete<{ id: string }>(`/personal/${id}/documentos/${docId}`),
+    api.delete<{ id: string }>(`/hr/${id}/documents/${docId}`),
 
   /** Dispara el correo de "Alta de personal" con los documentos adjuntos. */
-  notificarAlta: (id: string) =>
-    api.post<{ enviado: boolean; adjuntos: number }>(`/personal/${id}/notificar-alta`, {}),
+  notifyRegistration: (id: string) =>
+    api.post<{ sent: boolean; attachments: number }>(`/hr/${id}/notify-registration`, {}),
 
   documentTypes: (includeInactive?: boolean) =>
-    api.get<TipoDocumento[]>(`/personal/catalogos/tipos-documento${includeInactive ? "?includeInactive=true" : ""}`),
-  createDocumentType: (nombre: string) =>
-    api.post<TipoDocumento>(`/personal/catalogos/tipos-documento`, { nombre }),
-  updateDocumentType: (id: string, data: { nombre?: string; activo?: boolean }) =>
-    api.patch<TipoDocumento>(`/personal/catalogos/tipos-documento/${id}`, data),
+    api.get<DocumentType[]>(`/hr/catalogs/document-types${includeInactive ? "?includeInactive=true" : ""}`),
+  createDocumentType: (name: string) =>
+    api.post<DocumentType>(`/hr/catalogs/document-types`, { name }),
+  updateDocumentType: (id: string, data: { name?: string; active?: boolean }) =>
+    api.patch<DocumentType>(`/hr/catalogs/document-types/${id}`, data),
   removeDocumentType: (id: string) =>
-    api.delete<{ soft: boolean; data: TipoDocumento }>(`/personal/catalogos/tipos-documento/${id}`),
+    api.delete<{ soft: boolean; data: DocumentType }>(`/hr/catalogs/document-types/${id}`),
 
-  generos: (includeInactive?: boolean) =>
-    api.get<Genero[]>(`/personal/catalogos/generos${includeInactive ? "?includeInactive=true" : ""}`),
-  crearGenero: (nombre: string) =>
-    api.post<Genero>(`/personal/catalogos/generos`, { nombre }),
-  actualizarGenero: (id: string, data: { nombre?: string; activo?: boolean }) =>
-    api.patch<Genero>(`/personal/catalogos/generos/${id}`, data),
-  eliminarGenero: (id: string) =>
-    api.delete<{ soft: boolean; data: Genero }>(`/personal/catalogos/generos/${id}`),
+  genders: (includeInactive?: boolean) =>
+    api.get<Gender[]>(`/hr/catalogs/genders${includeInactive ? "?includeInactive=true" : ""}`),
+  createGender: (name: string) =>
+    api.post<Gender>(`/hr/catalogs/genders`, { name }),
+  updateGender: (id: string, data: { name?: string; active?: boolean }) =>
+    api.patch<Gender>(`/hr/catalogs/genders/${id}`, data),
+  deleteGender: (id: string) =>
+    api.delete<{ soft: boolean; data: Gender }>(`/hr/catalogs/genders/${id}`),
 
-  tiposSangre: (includeInactive?: boolean) =>
-    api.get<TipoSangre[]>(`/personal/catalogos/tipos-sangre${includeInactive ? "?includeInactive=true" : ""}`),
-  crearTipoSangre: (nombre: string) =>
-    api.post<TipoSangre>(`/personal/catalogos/tipos-sangre`, { nombre }),
-  actualizarTipoSangre: (id: string, data: { nombre?: string; activo?: boolean }) =>
-    api.patch<TipoSangre>(`/personal/catalogos/tipos-sangre/${id}`, data),
-  eliminarTipoSangre: (id: string) =>
-    api.delete<{ soft: boolean; data: TipoSangre }>(`/personal/catalogos/tipos-sangre/${id}`),
+  bloodTypes: (includeInactive?: boolean) =>
+    api.get<BloodType[]>(`/hr/catalogs/blood-types${includeInactive ? "?includeInactive=true" : ""}`),
+  createBloodType: (name: string) =>
+    api.post<BloodType>(`/hr/catalogs/blood-types`, { name }),
+  updateBloodType: (id: string, data: { name?: string; active?: boolean }) =>
+    api.patch<BloodType>(`/hr/catalogs/blood-types/${id}`, data),
+  deleteBloodType: (id: string) =>
+    api.delete<{ soft: boolean; data: BloodType }>(`/hr/catalogs/blood-types/${id}`),
 
-  actas: (params: ITDataTableFetchParamsPost) =>
-    tableRequest<ActaAdministrativa>(`/personal/actas/query`, params),
-  actasByEmployee: (id: string) => api.get<ActaAdministrativa[]>(`/personal/actas/empleado/${id}`),
-  acta: (id: string) => api.get<ActaAdministrativa>(`/personal/actas/${id}`),
-  crearActa: (data: ActaAdministrativaCreateInput) =>
-    api.post<ActaAdministrativa>(`/personal/actas`, data),
-  eliminarActa: (id: string) => api.delete<{ id: string }>(`/personal/actas/${id}`),
+  disciplinaryReports: (params: ITDataTableFetchParamsPost) =>
+    tableRequest<DisciplinaryReport>(`/hr/disciplinary-reports/query`, params),
+  disciplinaryReportsByEmployee: (id: string) => api.get<DisciplinaryReport[]>(`/hr/disciplinary-reports/employee/${id}`),
+  disciplinaryReport: (id: string) => api.get<DisciplinaryReport>(`/hr/disciplinary-reports/${id}`),
+  createDisciplinaryReport: (data: DisciplinaryReportCreateInput) =>
+    api.post<DisciplinaryReport>(`/hr/disciplinary-reports`, data),
+  deleteDisciplinaryReport: (id: string) => api.delete<{ id: string }>(`/hr/disciplinary-reports/${id}`),
 };

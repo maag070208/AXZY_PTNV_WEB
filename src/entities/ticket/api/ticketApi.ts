@@ -29,7 +29,7 @@ export const ticketsApi = {
   attachments: (id: string) => api.get<TicketAttachment[]>(`/tickets/${id}/attachments`),
   downloadAttachment: (id: string, attachmentId: string) =>
     api.get<Blob>(`/tickets/${id}/attachments/${attachmentId}/download`, { responseType: "blob" }),
-  uploadAttachment: (id: string, file: File, kind = "FOTO") => {
+  uploadAttachment: (id: string, file: File, kind = "PHOTO") => {
     const form = new FormData();
     form.append("file", file);
     form.append("kind", kind);
@@ -54,7 +54,7 @@ export const ticketsApi = {
     status: string;
     priority: string;
     categoryId: string | null;
-    asignadoAId: string | null;
+    assignedToId: string | null;
     departmentId: string | null;
   }>) => api.put<Ticket>(`/tickets/${id}`, data),
   remove: (id: string) => api.delete<{ soft: boolean; data: Ticket }>(`/tickets/${id}`),
@@ -62,14 +62,14 @@ export const ticketsApi = {
     api.get<TicketCategory[]>(
       `/tickets/categories${includeInactive ? "?includeInactive=true" : ""}`
     ),
-  crearCategoria: (nombre: string) =>
-    api.post<TicketCategory>(`/tickets/categories`, { nombre }),
-  actualizarCategoria: (id: string, data: { nombre?: string; activo?: boolean }) =>
+  createCategory: (name: string) =>
+    api.post<TicketCategory>(`/tickets/categories`, { name }),
+  updateCategory: (id: string, data: { name?: string; active?: boolean }) =>
     api.patch<TicketCategory>(`/tickets/categories/${id}`, data),
-  eliminarCategoria: (id: string) =>
+  deleteCategory: (id: string) =>
     api.delete<{ soft: boolean; data: TicketCategory }>(`/tickets/categories/${id}`),
-  addComment: (id: string, texto: string) =>
-    api.post<TicketComment>(`/tickets/${id}/comments`, { texto }),
+  addComment: (id: string, text: string) =>
+    api.post<TicketComment>(`/tickets/${id}/comments`, { text }),
   addAssignment: (
     id: string,
     data: {
@@ -93,8 +93,8 @@ export const ticketsApi = {
   ) => api.put<TicketAssignment>(`/tickets/${id}/assignments/${assignmentId}`, data),
   removeAssignment: (id: string, assignmentId: string) =>
     api.delete<TicketAssignment>(`/tickets/${id}/assignments/${assignmentId}`),
-  addAssignmentComment: (id: string, assignmentId: string, texto: string) =>
+  addAssignmentComment: (id: string, assignmentId: string, text: string) =>
     api.post<TicketAssignmentComment>(`/tickets/${id}/assignments/${assignmentId}/comments`, {
-      texto,
+      text,
     }),
 };

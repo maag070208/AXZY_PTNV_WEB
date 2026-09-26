@@ -10,43 +10,43 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaLock, FaPlus } from "react-icons/fa";
-import type { UseChecadorRelojes } from "../model/useChecadorRelojes";
-import RelojCard from "./RelojCard";
+import type { UseTimeClocks } from "../model/useTimeClocks";
+import ClockCard from "./ClockCard";
 
 /**
  * Relojes checadores: alta, baja, sincronización y configuración leída en vivo.
  * Del reloj solo se lee; nada de esta pantalla le cambia algo al equipo.
  */
-export default function ChecadorRelojesTab({ fx }: { fx: UseChecadorRelojes }) {
+export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
   const {
     t,
     status,
     configs,
-    altaAbierta,
-    setAltaAbierta,
-    abrirAlta,
+    isRegistrationOpen,
+    setIsRegistrationOpen,
+    openRegistration,
     url,
     setUrl,
-    nombre,
-    setNombre,
-    asistencia,
-    setAsistencia,
-    conectando,
-    altaError,
-    registrar,
+    name,
+    setName,
+    countsAttendance,
+    setAttendance,
+    connecting,
+    registrationError,
+    register,
     editTarget,
     setEditTarget,
-    editNombre,
-    setEditNombre,
-    editAsistencia,
-    setEditAsistencia,
-    guardando,
+    editName,
+    setEditName,
+    editAttendance,
+    setEditAttendance,
+    saving,
     editError,
-    guardarEdicion,
-    bajaTarget,
-    setBajaTarget,
-    dandoDeBaja,
-    confirmarBaja,
+    saveEdit,
+    retirementTarget,
+    setRetirementTarget,
+    retiring,
+    confirmRetirement,
     error,
     setError,
     toast,
@@ -66,92 +66,92 @@ export default function ChecadorRelojesTab({ fx }: { fx: UseChecadorRelojes }) {
           <ITFlex direction="column" gap={1} className="min-w-0">
             <ITFlex align="center" gap={1}>
               <FaLock size={11} className="text-slate-400" />
-              <ITText className="text-[12px] font-bold text-slate-700">{t("relojes.readOnly")}</ITText>
+              <ITText className="text-[12px] font-bold text-slate-700">{t("clocks.readOnly")}</ITText>
             </ITFlex>
-            <ITText className="text-[11px] text-slate-500">{t("relojes.credenciales")}</ITText>
+            <ITText className="text-[11px] text-slate-500">{t("clocks.credentials")}</ITText>
           </ITFlex>
           <ITButton
             variant="filled"
             color="primary"
             size="sm"
             className="ml-auto"
-            disabled={!status?.configurado}
-            onClick={abrirAlta}
+            disabled={!status?.configured}
+            onClick={openRegistration}
           >
             <ITFlex align="center" gap={1}>
               <FaPlus size={10} />
-              <ITText className="font-bold text-[11px]">{t("relojes.actions.alta")}</ITText>
+              <ITText className="font-bold text-[11px]">{t("clocks.actions.registration")}</ITText>
             </ITFlex>
           </ITButton>
         </ITFlex>
       </ITCard>
 
-      {status && !status.configurado && <ITAlert variant="warning">{t("relojes.notConfigured")}</ITAlert>}
+      {status && !status.configured && <ITAlert variant="warning">{t("clocks.notConfigured")}</ITAlert>}
 
-      {status && status.dispositivos.length === 0 && (
+      {status && status.devices.length === 0 && (
         <ITCard className="!p-5 border border-slate-200">
-          <ITText className="text-[12px] text-slate-500">{t("relojes.empty")}</ITText>
+          <ITText className="text-[12px] text-slate-500">{t("clocks.empty")}</ITText>
         </ITCard>
       )}
 
-      {status?.dispositivos.map((reloj) => (
-        <RelojCard
-          key={reloj.dispositivoSerie}
+      {status?.devices.map((clock) => (
+        <ClockCard
+          key={clock.clockSerial}
           fx={fx}
-          reloj={reloj}
-          config={configs[reloj.dispositivoSerie]}
+          clock={clock}
+          config={configs[clock.clockSerial]}
         />
       ))}
 
       <ITDialog
-        isOpen={altaAbierta}
-        onClose={() => !conectando && setAltaAbierta(false)}
-        title={t("relojes.dialog.altaTitle")}
+        isOpen={isRegistrationOpen}
+        onClose={() => !connecting && setIsRegistrationOpen(false)}
+        title={t("clocks.dialog.registrationTitle")}
         className="max-w-md"
       >
         <ITFlex direction="column" gap={3} className="mt-2">
           <ITFlex direction="column" gap={1}>
             <ITInput
               name="checadorRelojUrl"
-              label={t("relojes.dialog.url")}
-              placeholder={t("relojes.dialog.urlPlaceholder")}
+              label={t("clocks.dialog.url")}
+              placeholder={t("clocks.dialog.urlPlaceholder")}
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               className="w-full min-w-0"
             />
-            <ITText className="text-[11px] text-slate-500">{t("relojes.dialog.urlHint")}</ITText>
+            <ITText className="text-[11px] text-slate-500">{t("clocks.dialog.urlHint")}</ITText>
           </ITFlex>
           <ITFlex direction="column" gap={1}>
             <ITInput
               name="checadorRelojNombre"
-              label={t("relojes.dialog.nombre")}
-              placeholder={t("relojes.dialog.nombrePlaceholder")}
-              value={nombre}
+              label={t("clocks.dialog.name")}
+              placeholder={t("clocks.dialog.namePlaceholder")}
+              value={name}
               maxLength={80}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               className="w-full min-w-0"
             />
-            <ITText className="text-[11px] text-slate-500">{t("relojes.dialog.nombreHint")}</ITText>
+            <ITText className="text-[11px] text-slate-500">{t("clocks.dialog.nameHint")}</ITText>
           </ITFlex>
-          <UsoDelReloj fx={fx} checked={asistencia} onChange={setAsistencia} name="checadorRelojAsistencia" />
-          <ITText className="text-[11px] text-slate-600">{t("relojes.dialog.altaNota")}</ITText>
-          {altaError && <ITAlert variant="error">{altaError}</ITAlert>}
+          <ClockUsage fx={fx} checked={countsAttendance} onChange={setAttendance} name="checadorRelojAsistencia" />
+          <ITText className="text-[11px] text-slate-600">{t("clocks.dialog.registrationNote")}</ITText>
+          {registrationError && <ITAlert variant="error">{registrationError}</ITAlert>}
           <ITFlex justify="end" gap={2}>
             <ITButton
               variant="outlined"
               color="secondary"
-              disabled={conectando}
-              onClick={() => setAltaAbierta(false)}
+              disabled={connecting}
+              onClick={() => setIsRegistrationOpen(false)}
             >
-              {t("relojes.actions.cancelar")}
+              {t("clocks.actions.cancel")}
             </ITButton>
             <ITButton
               variant="filled"
               color="primary"
-              disabled={!url.trim() || conectando}
-              onClick={() => void registrar()}
+              disabled={!url.trim() || connecting}
+              onClick={() => void register()}
             >
-              {conectando ? t("relojes.actions.conectando") : t("relojes.actions.confirmarAlta")}
+              {connecting ? t("clocks.actions.connecting") : t("clocks.actions.confirmRegistration")}
             </ITButton>
           </ITFlex>
         </ITFlex>
@@ -159,72 +159,72 @@ export default function ChecadorRelojesTab({ fx }: { fx: UseChecadorRelojes }) {
 
       <ITDialog
         isOpen={!!editTarget}
-        onClose={() => !guardando && setEditTarget(null)}
-        title={t("relojes.dialog.editarTitle", { nombre: editTarget?.nombre ?? "" })}
+        onClose={() => !saving && setEditTarget(null)}
+        title={t("clocks.dialog.editTitle", { name: editTarget?.name ?? "" })}
         className="max-w-md"
       >
         <ITFlex direction="column" gap={3} className="mt-2">
           <ITInput
             name="checadorRelojEditarNombre"
-            label={t("relojes.dialog.nombreEditar")}
-            value={editNombre}
+            label={t("clocks.dialog.nameEdit")}
+            value={editName}
             maxLength={80}
-            onChange={(e) => setEditNombre(e.target.value)}
+            onChange={(e) => setEditName(e.target.value)}
             className="w-full min-w-0"
           />
-          <UsoDelReloj
+          <ClockUsage
             fx={fx}
-            checked={editAsistencia}
-            onChange={setEditAsistencia}
+            checked={editAttendance}
+            onChange={setEditAttendance}
             name="checadorRelojEditarAsistencia"
           />
-          <ITText className="text-[11px] text-slate-600">{t("relojes.dialog.editarNota")}</ITText>
+          <ITText className="text-[11px] text-slate-600">{t("clocks.dialog.editNote")}</ITText>
           {editError && <ITAlert variant="error">{editError}</ITAlert>}
           <ITFlex justify="end" gap={2}>
             <ITButton
               variant="outlined"
               color="secondary"
-              disabled={guardando}
+              disabled={saving}
               onClick={() => setEditTarget(null)}
             >
-              {t("relojes.actions.cancelar")}
+              {t("clocks.actions.cancel")}
             </ITButton>
             <ITButton
               variant="filled"
               color="primary"
-              disabled={!editNombre.trim() || guardando}
-              onClick={() => void guardarEdicion()}
+              disabled={!editName.trim() || saving}
+              onClick={() => void saveEdit()}
             >
-              {t("relojes.actions.guardar")}
+              {t("clocks.actions.save")}
             </ITButton>
           </ITFlex>
         </ITFlex>
       </ITDialog>
 
       <ITDialog
-        isOpen={!!bajaTarget}
-        onClose={() => !dandoDeBaja && setBajaTarget(null)}
-        title={t("relojes.dialog.bajaTitle", { nombre: bajaTarget?.nombre ?? "" })}
+        isOpen={!!retirementTarget}
+        onClose={() => !retiring && setRetirementTarget(null)}
+        title={t("clocks.dialog.retirementTitle", { name: retirementTarget?.name ?? "" })}
         className="max-w-md"
       >
         <ITFlex direction="column" gap={3} className="mt-2">
-          <ITText className="text-[12px] text-slate-600">{t("relojes.dialog.bajaTexto")}</ITText>
+          <ITText className="text-[12px] text-slate-600">{t("clocks.dialog.retirementText")}</ITText>
           <ITFlex justify="end" gap={2}>
             <ITButton
               variant="outlined"
               color="secondary"
-              disabled={dandoDeBaja}
-              onClick={() => setBajaTarget(null)}
+              disabled={retiring}
+              onClick={() => setRetirementTarget(null)}
             >
-              {t("relojes.actions.cancelar")}
+              {t("clocks.actions.cancel")}
             </ITButton>
             <ITButton
               variant="filled"
               color="danger"
-              disabled={dandoDeBaja}
-              onClick={() => void confirmarBaja()}
+              disabled={retiring}
+              onClick={() => void confirmRetirement()}
             >
-              {t("relojes.actions.confirmarBaja")}
+              {t("clocks.actions.confirmRetirement")}
             </ITButton>
           </ITFlex>
         </ITFlex>
@@ -244,13 +244,13 @@ export default function ChecadorRelojesTab({ fx }: { fx: UseChecadorRelojes }) {
 }
 
 /** Si las checadas del reloj cuentan para entradas/salidas (alta y edición). */
-function UsoDelReloj({
+function ClockUsage({
   fx,
   checked,
   onChange,
   name,
 }: {
-  fx: UseChecadorRelojes;
+  fx: UseTimeClocks;
   checked: boolean;
   onChange: (checked: boolean) => void;
   name: string;
@@ -258,8 +258,8 @@ function UsoDelReloj({
   const { t } = fx;
   return (
     <ITFlex direction="column" gap={1}>
-      <ITCheckbox name={name} checked={checked} onChange={onChange} label={t("relojes.uso.checkbox")} />
-      <ITText className="text-[11px] text-slate-500">{t("relojes.uso.hint")}</ITText>
+      <ITCheckbox name={name} checked={checked} onChange={onChange} label={t("clocks.usage.checkbox")} />
+      <ITText className="text-[11px] text-slate-500">{t("clocks.usage.hint")}</ITText>
     </ITFlex>
   );
 }

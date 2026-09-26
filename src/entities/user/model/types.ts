@@ -1,18 +1,18 @@
 export type UserRole =
   | "ADMIN"
-  | "GERENTE"
-  | "JEFE_DE_AREA"
-  | "EMPLEADO"
-  | "RECURSOS_HUMANOS"
+  | "MANAGER"
+  | "AREA_HEAD"
+  | "EMPLOYEE"
+  | "HUMAN_RESOURCES"
   | "GUARD";
 
 /** Etiqueta visible de cada rol. El guardia se guarda como `GUARD`. */
 export const ROLE_LABELS: Record<UserRole, string> = {
   ADMIN: "ADMIN",
-  GERENTE: "GERENTE",
-  JEFE_DE_AREA: "JEFE DE AREA",
-  EMPLEADO: "EMPLEADO",
-  RECURSOS_HUMANOS: "RECURSOS HUMANOS",
+  MANAGER: "MANAGER",
+  AREA_HEAD: "JEFE DE AREA",
+  EMPLOYEE: "EMPLOYEE",
+  HUMAN_RESOURCES: "RECURSOS HUMANOS",
   GUARD: "GUARDIA",
 };
 
@@ -28,26 +28,26 @@ export interface AuthUser {
    * distintos de NINGUNO. Opcional porque las sesiones persistidas antes del
    * rollout de permisos no lo traen y `PrivateRoutes` las rehidrata.
    */
-  permisos?: Partial<Record<Permiso, Alcance>>;
+  permissions?: Partial<Record<Permission, PermissionScope>>;
 }
 
 /** Alcance efectivo de un permiso (ver ROLES_Y_PERMISOS.md §2). */
-export type Alcance = "NINGUNO" | "PROPIO" | "AREA" | "TODO";
+export type PermissionScope = "NONE" | "OWN" | "AREA" | "ALL";
 
 /**
  * Clave del catálogo dinámico de permisos del API (`GET /permisos/catalogo`).
  * Antes era un union hardcodeado; ahora el catálogo vive en la BD y puede
  * crecer sin recompilar la web, así que la clave se tipa como string libre.
  */
-export type Permiso = string;
+export type Permission = string;
 
 /** `GET /auth/me`: el usuario de la sesión con los datos de su credencial. */
 export interface AuthMe extends AuthUser {
-  numeroEmpleado: string | null;
-  puesto: string | null;
+  employeeNumber: string | null;
+  jobTitle: string | null;
   department: { id: string; name: string } | null;
-  fotoUrl: string | null;
-  permisos: Partial<Record<Permiso, Alcance>>;
+  photoUrl: string | null;
+  permissions: Partial<Record<Permission, PermissionScope>>;
 }
 
 export interface LoginResponse {
@@ -57,13 +57,13 @@ export interface LoginResponse {
 
 export interface User extends AuthUser {
   active: boolean;
-  segundoNombre?: string | null;
-  apellidoPaterno?: string | null;
-  apellidoMaterno?: string | null;
-  puesto?: string;
+  middleName?: string | null;
+  paternalSurname?: string | null;
+  maternalSurname?: string | null;
+  jobTitle?: string;
   area?: string;
-  numeroEmpleado?: string;
-  empresa?: string | null;
+  employeeNumber?: string;
+  company?: string | null;
   departmentId?: string | null;
   department?: { id: string; name: string } | null;
   subareaId?: string | null;

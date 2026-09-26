@@ -11,17 +11,17 @@ import {
   FaBoxOpen,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { formatFechaHora } from "@shared/utils/dates";
+import { formatDateTime } from "@shared/utils/dates";
 import type { HistoryEntry } from "../model/types";
 
 const TYPE_CONFIG: Record<string, { icon: React.ReactNode; bg: string }> = {
-  CARTA_CREADA: { icon: <FaFileSignature size={9} />, bg: "bg-emerald-500" },
-  CARTA_RESPONSABLE: { icon: <FaUserCheck size={9} />, bg: "bg-blue-500" },
-  CARTA_ENCARGADO: { icon: <FaUserPlus size={9} />, bg: "bg-cyan-500" },
-  TICKET_CREADO: { icon: <FaFileAlt size={9} />, bg: "bg-amber-500" },
-  TICKET_ASIGNADO: { icon: <FaUserCheck size={9} />, bg: "bg-orange-500" },
-  TICKET_COMENTARIO: { icon: <FaComment size={9} />, bg: "bg-purple-500" },
-  DISPOSITIVO_HISTORIAL: { icon: <FaBoxOpen size={9} />, bg: "bg-slate-400" },
+  CUSTODY_LETTER_CREATED: { icon: <FaFileSignature size={9} />, bg: "bg-emerald-500" },
+  CUSTODY_LETTER_CUSTODIAN: { icon: <FaUserCheck size={9} />, bg: "bg-blue-500" },
+  CUSTODY_LETTER_SUPERVISOR: { icon: <FaUserPlus size={9} />, bg: "bg-cyan-500" },
+  TICKET_CREATED: { icon: <FaFileAlt size={9} />, bg: "bg-amber-500" },
+  TICKET_ASSIGNED: { icon: <FaUserCheck size={9} />, bg: "bg-orange-500" },
+  TICKET_COMMENT: { icon: <FaComment size={9} />, bg: "bg-purple-500" },
+  DEVICE_HISTORY: { icon: <FaBoxOpen size={9} />, bg: "bg-slate-400" },
   USER_DEACTIVATED: { icon: <FaUserSlash size={9} />, bg: "bg-rose-500" },
   USER_REACTIVATED: { icon: <FaUserClock size={9} />, bg: "bg-emerald-500" },
 };
@@ -51,7 +51,7 @@ export default function UserHistoryTimeline({ history }: Props) {
           <div className="relative">
             {history.map((entry, idx) => {
               const isLast = idx === history.length - 1;
-              const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.DISPOSITIVO_HISTORIAL;
+              const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.DEVICE_HISTORY;
 
               return (
                 <div key={entry.id} className="flex gap-3 relative">
@@ -73,7 +73,7 @@ export default function UserHistoryTimeline({ history }: Props) {
                           {entry.title}
                         </span>
                         <span className="text-[9px] text-slate-400 shrink-0 tabular-nums">
-                          {formatFechaHora(entry.timestamp)}
+                          {formatDateTime(entry.timestamp)}
                         </span>
                       </div>
                       <p className="text-[11px] leading-relaxed text-slate-500 whitespace-pre-wrap">

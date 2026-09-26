@@ -1,38 +1,38 @@
 import { useTranslation } from "react-i18next";
-import type { Prestamo } from "@entities/inventario";
-import { formatFecha } from "@shared/utils/dates";
+import type { Loan } from "@entities/inventory";
+import { formatDate } from "@shared/utils/dates";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
-import { resolveAreaName } from "../model/carta";
+import { resolveAreaName } from "../model/custodyLetter";
 
 /**
  * Vista previa HTML de la carta responsiva (sin PDFViewer para evitar
  * re-renderizados/parpadeos al escribir en vivo).
  */
-export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }) {
-  const { t: tt } = useTranslation("cartas");
+export default function CustodyLetterHtml({ loan }: { loan: Loan }) {
+  const { t: tt } = useTranslation("custody-letters");
 
-  const fechaTxt = formatFecha(prestamo.fecha) || tt("doc.dateLetters");
-  const primerDetalle = prestamo.detalles?.[0] ?? null;
-  const areaNombre = resolveAreaName(prestamo);
+  const dateTxt = formatDate(loan.date) || tt("doc.dateLetters");
+  const firstItem = loan.items?.[0] ?? null;
+  const areaName = resolveAreaName(loan);
 
-  const responsableName = prestamo.responsable?.name ?? "";
-  const observableTxt = prestamo.departamento?.name
-    ? `${prestamo.departamento.name}${prestamo.subarea ? ` — ${prestamo.subarea.name}` : ""}`
+  const custodianName = loan.custodian?.name ?? "";
+  const observableTxt = loan.department?.name
+    ? `${loan.department.name}${loan.subarea ? ` — ${loan.subarea.name}` : ""}`
     : "";
-  const responsableTxt = observableTxt || responsableName || "";
+  const custodianTxt = observableTxt || custodianName || "";
 
-  const totalPiezas = prestamo.detalles.length
-    ? prestamo.detalles.reduce((sum, d) => sum + d.cantidad, 0)
+  const totalPieces = loan.items.length
+    ? loan.items.reduce((sum, d) => sum + d.quantity, 0)
     : 0;
-  const piezas = `${totalPiezas} ${totalPiezas === 1 ? "pieza" : "piezas"}`;
-  const descripcionConCantidad =
-    (primerDetalle?.dispositivo?.nombre || "CONTROL DE TV") + (totalPiezas > 0 ? ` (${piezas})` : "");
-  const documentoOficial = "SIS-001";
-  const activoFijo = primerDetalle?.unidades?.[0]?.unidadFisica?.activoFijo ?? "TBE-0001";
-  const numeroSerie = primerDetalle?.unidades?.[0]?.unidadFisica?.numeroSerie;
-  const nombreEquipo = primerDetalle?.unidades?.[0]?.unidadFisica?.nombreEquipo;
+  const pieces = `${totalPieces} ${totalPieces === 1 ? "pieza" : "pieces"}`;
+  const descriptionWithQuantity =
+    (firstItem?.device?.name || "CONTROL DE TV") + (totalPieces > 0 ? ` (${pieces})` : "");
+  const officialDocument = "SIS-001";
+  const assetTag = firstItem?.units?.[0]?.deviceUnit?.assetTag ?? "TBE-0001";
+  const serialNumber = firstItem?.units?.[0]?.deviceUnit?.serialNumber;
+  const hostname = firstItem?.units?.[0]?.deviceUnit?.hostname;
 
-  const compromisos = [
+  const commitments = [
     tt("doc.compromiso1"),
     tt("doc.compromiso2"),
     tt("doc.compromiso3"),
@@ -40,15 +40,15 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
     tt("doc.compromiso5"),
   ];
 
-  const recursoRows: Array<{ label: string; value: string; testId?: string }> = [
-    { label: tt("doc.descripcionGeneral"), value: descripcionConCantidad },
-    { label: tt("doc.marca"), value: primerDetalle?.dispositivo?.marca || "STEREN" },
-    { label: tt("doc.modelo"), value: primerDetalle?.dispositivo?.modelo || "RM-115" },
+  const resourceRows: Array<{ label: string; value: string; testId?: string }> = [
+    { label: tt("doc.descriptionGeneral"), value: descriptionWithQuantity },
+    { label: tt("doc.brand"), value: firstItem?.device?.brand || "STEREN" },
+    { label: tt("doc.model"), value: firstItem?.device?.model || "RM-115" },
   ];
-  if (numeroSerie) recursoRows.push({ label: tt("doc.numeroSerie"), value: numeroSerie });
-  if (nombreEquipo) recursoRows.push({ label: tt("doc.nombreEquipo"), value: nombreEquipo });
-  recursoRows.push({ label: tt("doc.controlActivos"), value: activoFijo });
-  recursoRows.push({ label: tt("doc.area"), value: areaNombre, testId: "carta-area" });
+  if (serialNumber) resourceRows.push({ label: tt("doc.serialNumber"), value: serialNumber });
+  if (hostname) resourceRows.push({ label: tt("doc.hostname"), value: hostname });
+  resourceRows.push({ label: tt("doc.assetTag"), value: assetTag });
+  resourceRows.push({ label: tt("doc.area"), value: areaName, testId: "custody-letter-area" });
 
   return (
     <div className="mx-auto max-w-[210mm] rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
@@ -59,14 +59,14 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
           <div className="w-52 border border-black">
             <div className="flex items-end px-1.5 py-1">
               <span className="w-[74px] font-bold">{tt("doc.date")}</span>
-              <span className="flex-1 border-b border-black text-center">{fechaTxt}</span>
+              <span className="flex-1 border-b border-black text-center">{dateTxt}</span>
             </div>
             <div className="flex items-end px-1.5 py-1">
               <span className="w-[74px] font-bold">
-                {prestamo.departamentoId ? tt("doc.departamento") : tt("doc.employeeNo")}
+                {loan.departmentId ? tt("doc.department") : tt("doc.employeeNo")}
               </span>
               <span className="flex-1 border-b border-black text-center">
-                {prestamo.departamentoId ? responsableTxt : prestamo.responsable?.numeroEmpleado || "N/A"}
+                {loan.departmentId ? custodianTxt : loan.custodian?.employeeNumber || "N/A"}
               </span>
             </div>
             <div className="flex items-end px-1.5 py-1">
@@ -80,25 +80,25 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
 
         {/* Barra de título */}
         <div className="border-b border-slate-300 bg-[#b4c6e7] px-2 py-1.5 text-left font-bold">
-          {tt("doc.barraFolio")}
+          {tt("doc.folioBar")}
         </div>
 
         {/* Cuerpo principal */}
         <div className="p-3">
           <p className="text-justify">
-            {tt("doc.para1a")} <strong>{tt("doc.recursoTic")}</strong> {tt("doc.para1b")}{" "}
+            {tt("doc.para1a")} <strong>{tt("doc.resourceTic")}</strong> {tt("doc.para1b")}{" "}
             <strong>{"Puerto Nuevo Hotel y Villas."}</strong> {tt("doc.para1c")}
           </p>
 
           <ul className="my-1 ml-6 list-disc space-y-0.5">
-            {compromisos.map((c) => (
+            {commitments.map((c) => (
               <li key={c}>{c}</li>
             ))}
           </ul>
 
-          <p className="mt-1 font-bold">{tt("doc.recursoTitulo")}</p>
+          <p className="mt-1 font-bold">{tt("doc.resourceTitle")}</p>
           <div className="mt-0.5">
-            {recursoRows.map((r) => (
+            {resourceRows.map((r) => (
               <div key={r.label} className="flex items-end">
                 <span className="w-[96px] shrink-0">{r.label}</span>
                 <span
@@ -114,35 +114,35 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
           <p className="mt-2 text-justify">
             {tt("doc.para2a")}{" "}
             <strong>
-              {tt("doc.reglamentoDepartamento")} {areaNombre}
+              {tt("doc.departmentRegulations")} {areaName}
             </strong>{" "}
-            {tt("doc.para2b")} <strong>{tt("doc.estrictamenteProhibido")}</strong> {tt("doc.para2c")}{" "}
-            <strong>{tt("doc.reglamentoInterior")}</strong>
+            {tt("doc.para2b")} <strong>{tt("doc.strictlyProhibited")}</strong> {tt("doc.para2c")}{" "}
+            <strong>{tt("doc.interiorRegulations")}</strong>
           </p>
         </div>
 
         {/* Seguimiento */}
         <div className="m-3 border border-slate-300">
           <div className="border-b border-slate-300 bg-[#d9d9d9] px-2 py-1 font-bold">
-            {tt("doc.seguimientoBarra")}
+            {tt("doc.followUpBar")}
           </div>
           <div className="p-3">
             <div className="flex items-end pb-1">
-              <span className="w-32 shrink-0">{tt("doc.fechaDevolucion")}</span>
+              <span className="w-32 shrink-0">{tt("doc.loanReturnDate")}</span>
               <span className="h-2 flex-1 border-b border-black" />
             </div>
             <div className="flex items-end pb-1">
-              <span className="w-32 shrink-0">{tt("doc.nombreResguarda")}</span>
+              <span className="w-32 shrink-0">{tt("doc.nameKeeper")}</span>
               <span className="h-2 flex-1 border-b border-black" />
             </div>
             <div className="flex items-end pb-1">
-              <span className="w-32 shrink-0">{tt("doc.condicionesDevuelve")}</span>
+              <span className="w-32 shrink-0">{tt("doc.conditionsReturns")}</span>
               <span className="h-2 flex-1 border-b border-black" />
             </div>
             <div className="h-2 border-b border-black" />
             <div className="h-2 border-b border-black" />
             <p className="pt-1">
-              <strong>{tt("doc.notaRh1")}</strong> {tt("doc.notaRh2")}
+              <strong>{tt("doc.noteRh1")}</strong> {tt("doc.noteRh2")}
             </p>
           </div>
         </div>
@@ -151,23 +151,23 @@ export default function CartaResponsivaHtml({ prestamo }: { prestamo: Prestamo }
         <div className="mt-auto flex justify-around px-6 pb-6 pt-8 text-center">
           <div className="w-28">
             <div className="border-t border-black" />
-            <p className="font-bold">{responsableTxt || " "}</p>
-            <p>{tt("doc.firmaResponsable")}</p>
+            <p className="font-bold">{custodianTxt || " "}</p>
+            <p>{tt("doc.signatureCustodian")}</p>
           </div>
           <div className="w-28">
             <div className="border-t border-black" />
             <p className="font-bold">{" "}</p>
-            <p>{tt("doc.firmaJefeArea")}</p>
+            <p>{tt("doc.signatureHeadArea")}</p>
           </div>
           <div className="w-28">
             <div className="border-t border-black" />
             <p className="font-bold">{"Departamento de Sistemas"}</p>
-            <p>{tt("doc.firmaEntrega")}</p>
+            <p>{tt("doc.signatureDelivery")}</p>
           </div>
         </div>
       </div>
 
-      <p className="pb-1 pt-2 text-center text-[10px] text-slate-400">{documentoOficial}</p>
+      <p className="pb-1 pt-2 text-center text-[10px] text-slate-400">{officialDocument}</p>
     </div>
   );
 }

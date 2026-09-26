@@ -1,3 +1,3 @@
-export { useActasReporte } from "./model/useActasReporte";
-export { default as ActasTable } from "./ui/ActasTable";
-export { default as ActaAdministrativaForm } from "./ui/ActaAdministrativaForm";
+export { useDisciplinaryReports } from "./model/useDisciplinaryReports";
+export { default as DisciplinaryReportsTable } from "./ui/DisciplinaryReportsTable";
+export { default as DisciplinaryReportForm } from "./ui/DisciplinaryReportForm";

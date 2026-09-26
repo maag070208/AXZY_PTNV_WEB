@@ -3,23 +3,23 @@ import { FaBoxOpen, FaChartBar, FaHandHolding, FaTrashAlt } from "react-icons/fa
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
-  AsignadosTab,
-  useAsignadosReport,
-} from "@features/report/asignados-tab";
+  AssignedDevicesTab,
+  useAssignedDevicesReport,
+} from "@features/report/assigned-devices-tab";
 import { DevicesTab, useDevicesReport } from "@features/report/devices-tab";
-import { SalidasTab, useSalidasReport } from "@features/report/salidas-tab";
+import { MaterialOutputsTab, useMaterialOutputsReport } from "@features/report/material-outputs-tab";
 import {
-  downloadAsignadosPDF,
+  downloadAssignedDevicesPdf,
   downloadDevicesPDF,
-  downloadSalidasPDF,
+  downloadMaterialOutputsPdf,
 } from "@widgets/reports";
 
-export default function ReportesPage() {
+export default function ReportsPage() {
   const { t } = useTranslation(["reports", "common"]);
   const navigate = useNavigate();
-  const asignadosFx = useAsignadosReport({ download: downloadAsignadosPDF });
+  const assignedFx = useAssignedDevicesReport({ download: downloadAssignedDevicesPdf });
   const devicesFx = useDevicesReport({ download: downloadDevicesPDF });
-  const salidasFx = useSalidasReport({ download: downloadSalidasPDF });
+  const materialOutputsFx = useMaterialOutputsReport({ download: downloadMaterialOutputsPdf });
 
   return (
     <ITPage
@@ -36,22 +36,22 @@ export default function ReportesPage() {
         variant="line"
         items={[
           {
-            id: "asignados",
-            label: t("tabs.asignados"),
+            id: "assigned",
+            label: t("tabs.assigned"),
             icon: <FaHandHolding size={13} />,
-            content: <AsignadosTab fx={asignadosFx} />,
+            content: <AssignedDevicesTab fx={assignedFx} />,
           },
           {
-            id: "dispositivos",
-            label: t("tabs.dispositivos"),
+            id: "devices",
+            label: t("tabs.devices"),
             icon: <FaBoxOpen size={13} />,
             content: <DevicesTab fx={devicesFx} />,
           },
           {
-            id: "salidas",
-            label: t("tabs.salidas"),
+            id: "exits",
+            label: t("tabs.exits"),
             icon: <FaTrashAlt size={13} />,
-            content: <SalidasTab fx={salidasFx} />,
+            content: <MaterialOutputsTab fx={materialOutputsFx} />,
           },
         ]}
       />

@@ -1,13 +1,13 @@
 import { test, expect } from "./support/fixtures";
-import { esperarToast } from "./support/pages/componentes";
-import { ruta } from "./support/env";
+import { waitForToast } from "./support/pages/components";
+import { route } from "./support/env";
 
 /** El `Área:` de la carta imprime el departamento sin el prefijo "Departamento de ". */
-const areaEsperada = (nombreDepartamento: string): string =>
-  nombreDepartamento.replace(/^Departamento de /i, "");
+const areaExpected = (departmentName: string): string =>
+  departmentName.replace(/^Departamento de /i, "");
 
-const coincidenciaInsensible = (texto: string): RegExp =>
-  new RegExp(texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+const matchInsensible = (text: string): RegExp =>
+  new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
 
 /**
  * Flujo PRÉSTAMOS por pantalla — `/inventario/prestamos/nuevo` y
@@ -19,263 +19,263 @@ const coincidenciaInsensible = (texto: string): RegExp =>
 test.describe("PRÉSTAMOS desde la web", () => {
   test("presta a un departamento y descuenta las existencias", async ({
     page,
-    prestamoPage,
-    escenario,
-    departamento,
+    loanPage,
+    scenario,
+    department,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(10);
+    const device = await scenario.device(10);
 
-    await prestamoPage.ir();
-    await prestamoPage.asignarADepartamento(departamento.name);
-    await prestamoPage.elegirRecurso(escenario.tipo.name, dispositivo.nombreVisible);
-    await prestamoPage.fijarCantidad(4);
-    await prestamoPage.escribirObservaciones("Entrega para proyecto X");
-    await prestamoPage.guardar();
+    await loanPage.go();
+    await loanPage.assignToDepartment(department.name);
+    await loanPage.selectResource(scenario.type.name, device.nameVisible);
+    await loanPage.setQuantity(4);
+    await loanPage.writeNotes("Entrega para proyecto X");
+    await loanPage.save();
 
-    await esperarToast(page, "Carta responsiva registrada");
-    await page.waitForURL(`**${ruta("/inventario/prestamos")}`);
+    await waitForToast(page, "Carta responsiva registrada");
+    await page.waitForURL(`**${route("/inventory/loans")}`);
 
-    await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 6, PRESTADO: 4 });
+    await api.waitForStock(device.id, { AVAILABLE: 6, ON_LOAN: 4 });
 
-    const prestamos = await api.prestamos();
-    const creado = prestamos.find((p) =>
-      p.detalles.some((d) => d.dispositivoId === dispositivo.id)
+    const loans = await api.loans();
+    const created = loans.find((p) =>
+      p.items.some((d) => d.deviceId === device.id)
     );
-    expect(creado?.status).toBe("ACTIVO");
-    expect(creado?.consecutivo).toMatch(/^CARTA-\d{4}$/);
+    expect(created?.status).toBe("ACTIVE");
+    expect(created?.number).toMatch(/^CARTA-\d{4}$/);
   });
 
   test("muestra el disponible real del dispositivo elegido", async ({
-    prestamoPage,
-    escenario,
-    departamento,
+    loanPage,
+    scenario,
+    department,
   }) => {
-    const dispositivo = await escenario.dispositivo(7);
+    const device = await scenario.device(7);
 
-    await prestamoPage.ir();
-    await prestamoPage.asignarADepartamento(departamento.name);
-    await prestamoPage.elegirRecurso(escenario.tipo.name, dispositivo.nombreVisible);
+    await loanPage.go();
+    await loanPage.assignToDepartment(department.name);
+    await loanPage.selectResource(scenario.type.name, device.nameVisible);
 
-    await expect(prestamoPage.disponible).toContainText("7");
+    await expect(loanPage.available).toContainText("7");
   });
 
   test("no deja prestar más de lo disponible", async ({
-    prestamoPage,
-    escenario,
-    departamento,
+    loanPage,
+    scenario,
+    department,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(3);
+    const device = await scenario.device(3);
 
-    await prestamoPage.ir();
-    await prestamoPage.asignarADepartamento(departamento.name);
-    await prestamoPage.elegirRecurso(escenario.tipo.name, dispositivo.nombreVisible);
-    await prestamoPage.fijarCantidad(5);
+    await loanPage.go();
+    await loanPage.assignToDepartment(department.name);
+    await loanPage.selectResource(scenario.type.name, device.nameVisible);
+    await loanPage.setQuantity(5);
 
-    await expect(prestamoPage.alertaSobreStock).toBeVisible();
-    await expect(prestamoPage.botonGuardar).toBeDisabled();
+    await expect(loanPage.overstockAlert).toBeVisible();
+    await expect(loanPage.saveButton).toBeDisabled();
 
     // Y al corregir, la pantalla vuelve a habilitar el guardado.
-    await prestamoPage.fijarCantidad(3);
-    await expect(prestamoPage.alertaSobreStock).toBeHidden();
-    await expect(prestamoPage.botonGuardar).toBeEnabled();
+    await loanPage.setQuantity(3);
+    await expect(loanPage.overstockAlert).toBeHidden();
+    await expect(loanPage.saveButton).toBeEnabled();
 
     // Nada se movió por haberlo intentado.
-    expect(await api.existencias(dispositivo.id)).toMatchObject({ DISPONIBLE: 3, PRESTADO: 0 });
+    expect(await api.stock(device.id)).toMatchObject({ AVAILABLE: 3, ON_LOAN: 0 });
   });
 
-  test("presta a un empleado", async ({ page, prestamoPage, escenario, api }) => {
-    const dispositivo = await escenario.dispositivo(5);
+  test("presta a un empleado", async ({ page, loanPage, scenario, api }) => {
+    const device = await scenario.device(5);
 
-    await prestamoPage.ir();
-    await prestamoPage.asignarAEmpleado("E2E Empleado");
-    await prestamoPage.elegirRecurso(escenario.tipo.name, dispositivo.nombreVisible);
-    await prestamoPage.fijarCantidad(2);
-    await prestamoPage.guardar();
+    await loanPage.go();
+    await loanPage.assignToEmployee("E2E Empleado");
+    await loanPage.selectResource(scenario.type.name, device.nameVisible);
+    await loanPage.setQuantity(2);
+    await loanPage.save();
 
-    await esperarToast(page, "Carta responsiva registrada");
-    await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 3, PRESTADO: 2 });
+    await waitForToast(page, "Carta responsiva registrada");
+    await api.waitForStock(device.id, { AVAILABLE: 3, ON_LOAN: 2 });
   });
 
   test("la carta recién creada aparece en el listado con su folio y estado", async ({
     page,
-    prestamoPage,
-    escenario,
-    departamento,
+    loanPage,
+    scenario,
+    department,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(4);
+    const device = await scenario.device(4);
 
-    await prestamoPage.ir();
-    await prestamoPage.asignarADepartamento(departamento.name);
-    await prestamoPage.elegirRecurso(escenario.tipo.name, dispositivo.nombreVisible);
-    await prestamoPage.fijarCantidad(1);
-    await prestamoPage.guardar();
-    await esperarToast(page, "Carta responsiva registrada");
+    await loanPage.go();
+    await loanPage.assignToDepartment(department.name);
+    await loanPage.selectResource(scenario.type.name, device.nameVisible);
+    await loanPage.setQuantity(1);
+    await loanPage.save();
+    await waitForToast(page, "Carta responsiva registrada");
 
-    const creado = (await api.prestamos()).find((p) =>
-      p.detalles.some((d) => d.dispositivoId === dispositivo.id)
+    const created = (await api.loans()).find((p) =>
+      p.items.some((d) => d.deviceId === device.id)
     )!;
 
-    await page.goto(ruta("/inventario/prestamos"));
-    await expect(page.getByText(creado.consecutivo)).toBeVisible();
-    await expect(page.getByText("ACTIVO").first()).toBeVisible();
+    await page.goto(route("/inventory/loans"));
+    await expect(page.getByText(created.number)).toBeVisible();
+    await expect(page.getByText("ACTIVE").first()).toBeVisible();
   });
 
   test("el preview de la carta muestra el departamento elegido en Área", async ({
-    prestamoPage,
-    departamento,
+    loanPage,
+    department,
   }) => {
-    await prestamoPage.ir();
-    await prestamoPage.asignarADepartamento(departamento.name);
+    await loanPage.go();
+    await loanPage.assignToDepartment(department.name);
 
-    await expect(prestamoPage.areaPreview).toHaveText(
-      coincidenciaInsensible(areaEsperada(departamento.name))
+    await expect(loanPage.areaPreview).toHaveText(
+      matchInsensible(areaExpected(department.name))
     );
   });
 
   test("Área del preview cambia al cambiar de departamento", async ({
-    prestamoPage,
+    loanPage,
     api,
   }) => {
-    const departamentos = await api.departamentos();
-    test.skip(departamentos.length < 2, "Se necesitan al menos dos departamentos sembrados");
-    const [primero, segundo] = departamentos;
+    const departments = await api.departments();
+    test.skip(departments.length < 2, "Se necesitan al menos dos departamentos sembrados");
+    const [first, second] = departments;
 
-    await prestamoPage.ir();
-    await prestamoPage.asignarADepartamento(primero.name);
-    await expect(prestamoPage.areaPreview).toHaveText(
-      coincidenciaInsensible(areaEsperada(primero.name))
+    await loanPage.go();
+    await loanPage.assignToDepartment(first.name);
+    await expect(loanPage.areaPreview).toHaveText(
+      matchInsensible(areaExpected(first.name))
     );
 
-    await prestamoPage.asignarADepartamento(segundo.name);
-    await expect(prestamoPage.areaPreview).toHaveText(
-      coincidenciaInsensible(areaEsperada(segundo.name))
+    await loanPage.assignToDepartment(second.name);
+    await expect(loanPage.areaPreview).toHaveText(
+      matchInsensible(areaExpected(second.name))
     );
   });
 
-  test.describe("devoluciones", () => {
+  test.describe("returns", () => {
     test("la devolución parcial deja la carta en PARCIAL", async ({
       page,
-      devolucionPage,
-      escenario,
-      departamento,
+      loanReturnPage,
+      scenario,
+      department,
       api,
     }) => {
-      const dispositivo = await escenario.dispositivo(10);
-      const prestamo = await api.prestar({
-        departamentoId: departamento.id,
-        detalles: [{ dispositivoId: dispositivo.id, cantidad: 6 }],
+      const device = await scenario.device(10);
+      const loan = await api.lend({
+        departmentId: department.id,
+        items: [{ deviceId: device.id, quantity: 6 }],
       });
 
-      await devolucionPage.ir();
-      await devolucionPage.elegirPrestamo(prestamo.consecutivo);
-      await expect(devolucionPage.contador(dispositivo.nombreVisible, "Pendiente")).toContainText("6");
+      await loanReturnPage.go();
+      await loanReturnPage.selectLoan(loan.number);
+      await expect(loanReturnPage.counter(device.nameVisible, "Pendiente")).toContainText("6");
 
-      await devolucionPage.devolver(dispositivo.nombreVisible, 2, "BUENO");
-      await devolucionPage.registrar();
-      await esperarToast(page, "Devolución registrada");
+      await loanReturnPage.returnLoan(device.nameVisible, 2, "GOOD");
+      await loanReturnPage.register();
+      await waitForToast(page, "Devolución registrada");
 
-      await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 6, PRESTADO: 4 });
-      const actualizado = await api.prestamo(prestamo.id);
-      expect(actualizado.status).toBe("PARCIAL");
-      expect(actualizado.detalles[0]).toMatchObject({ cantidad: 6, devuelto: 2 });
+      await api.waitForStock(device.id, { AVAILABLE: 6, ON_LOAN: 4 });
+      const updated = await api.loan(loan.id);
+      expect(updated.status).toBe("PARTIAL");
+      expect(updated.items[0]).toMatchObject({ quantity: 6, returnedQuantity: 2 });
     });
 
     test("la devolución total deja la carta en DEVUELTO", async ({
       page,
-      devolucionPage,
-      escenario,
-      departamento,
+      loanReturnPage,
+      scenario,
+      department,
       api,
     }) => {
-      const dispositivo = await escenario.dispositivo(6);
-      const prestamo = await api.prestar({
-        departamentoId: departamento.id,
-        detalles: [{ dispositivoId: dispositivo.id, cantidad: 3 }],
+      const device = await scenario.device(6);
+      const loan = await api.lend({
+        departmentId: department.id,
+        items: [{ deviceId: device.id, quantity: 3 }],
       });
 
-      await devolucionPage.ir();
-      await devolucionPage.elegirPrestamo(prestamo.consecutivo);
-      await devolucionPage.devolver(dispositivo.nombreVisible, 3, "BUENO");
-      await devolucionPage.registrar();
-      await esperarToast(page, "Devolución registrada");
+      await loanReturnPage.go();
+      await loanReturnPage.selectLoan(loan.number);
+      await loanReturnPage.returnLoan(device.nameVisible, 3, "GOOD");
+      await loanReturnPage.register();
+      await waitForToast(page, "Devolución registrada");
 
-      await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 6, PRESTADO: 0 });
-      expect((await api.prestamo(prestamo.id)).status).toBe("DEVUELTO");
+      await api.waitForStock(device.id, { AVAILABLE: 6, ON_LOAN: 0 });
+      expect((await api.loan(loan.id)).status).toBe("RETURNED");
     });
 
     test("devolver en mal estado deja la unidad como dañada", async ({
       page,
-      devolucionPage,
-      escenario,
-      departamento,
+      loanReturnPage,
+      scenario,
+      department,
       api,
     }) => {
-      const dispositivo = await escenario.dispositivo(5);
-      const prestamo = await api.prestar({
-        departamentoId: departamento.id,
-        detalles: [{ dispositivoId: dispositivo.id, cantidad: 3 }],
+      const device = await scenario.device(5);
+      const loan = await api.lend({
+        departmentId: department.id,
+        items: [{ deviceId: device.id, quantity: 3 }],
       });
 
-      await devolucionPage.ir();
-      await devolucionPage.elegirPrestamo(prestamo.consecutivo);
-      await devolucionPage.devolver(dispositivo.nombreVisible, 2, "MALO", "Carcasa rota");
-      await devolucionPage.registrar();
-      await esperarToast(page, "Devolución registrada");
+      await loanReturnPage.go();
+      await loanReturnPage.selectLoan(loan.number);
+      await loanReturnPage.returnLoan(device.nameVisible, 2, "POOR", "Carcasa rota");
+      await loanReturnPage.register();
+      await waitForToast(page, "Devolución registrada");
 
-      await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 2, PRESTADO: 1, DANADO: 2 });
+      await api.waitForStock(device.id, { AVAILABLE: 2, ON_LOAN: 1, DAMAGED: 2 });
     });
 
     test("devolver como ROTO avisa la baja automática y la aplica", async ({
       page,
-      devolucionPage,
-      escenario,
-      departamento,
+      loanReturnPage,
+      scenario,
+      department,
       api,
     }) => {
-      const dispositivo = await escenario.dispositivo(5);
-      const prestamo = await api.prestar({
-        departamentoId: departamento.id,
-        detalles: [{ dispositivoId: dispositivo.id, cantidad: 2 }],
+      const device = await scenario.device(5);
+      const loan = await api.lend({
+        departmentId: department.id,
+        items: [{ deviceId: device.id, quantity: 2 }],
       });
 
-      await devolucionPage.ir();
-      await devolucionPage.elegirPrestamo(prestamo.consecutivo);
-      await devolucionPage.devolver(dispositivo.nombreVisible, 1, "ROTO", "Sin reparación");
+      await loanReturnPage.go();
+      await loanReturnPage.selectLoan(loan.number);
+      await loanReturnPage.returnLoan(device.nameVisible, 1, "BROKEN", "Sin reparación");
 
       // La pantalla advierte antes de guardar.
-      await expect(devolucionPage.avisoBajaAutomatica).toBeVisible();
+      await expect(loanReturnPage.noticeAutomaticRetirement).toBeVisible();
 
-      await devolucionPage.registrar();
-      await esperarToast(page, "Devolución registrada");
+      await loanReturnPage.register();
+      await waitForToast(page, "Devolución registrada");
 
-      await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 3, PRESTADO: 1, BAJA: 1 });
-      const bajas = await api.movimientos({ dispositivoId: dispositivo.id, tipo: "BAJA" });
-      expect(bajas).toHaveLength(1);
-      expect(bajas[0].motivo).toBe("Baja automática por estado ROTO");
+      await api.waitForStock(device.id, { AVAILABLE: 3, ON_LOAN: 1, RETIREMENT: 1 });
+      const retirements = await api.movements({ deviceId: device.id, type: "RETIREMENT" });
+      expect(retirements).toHaveLength(1);
+      expect(retirements[0].reason).toBe("Baja automática por estado ROTO");
     });
 
     test("el tope a devolver es lo que queda pendiente", async ({
-      devolucionPage,
-      escenario,
-      departamento,
+      loanReturnPage,
+      scenario,
+      department,
       api,
     }) => {
-      const dispositivo = await escenario.dispositivo(8);
-      const prestamo = await api.prestar({
-        departamentoId: departamento.id,
-        detalles: [{ dispositivoId: dispositivo.id, cantidad: 5 }],
+      const device = await scenario.device(8);
+      const loan = await api.lend({
+        departmentId: department.id,
+        items: [{ deviceId: device.id, quantity: 5 }],
       });
 
-      await devolucionPage.ir();
-      await devolucionPage.elegirPrestamo(prestamo.consecutivo);
+      await loanReturnPage.go();
+      await loanReturnPage.selectLoan(loan.number);
 
-      const campoDevolver = devolucionPage
-        .bloque(dispositivo.nombreVisible)
+      const fieldReturn = loanReturnPage
+        .block(device.nameVisible)
         .getByLabel(/^\s*Devolver\s*\*?\s*$/);
-      await expect(campoDevolver).toHaveAttribute("max", "5");
+      await expect(fieldReturn).toHaveAttribute("max", "5");
     });
   });
 });

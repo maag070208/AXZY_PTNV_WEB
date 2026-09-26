@@ -46,25 +46,25 @@ const PRIORITY_PRESETS: Record<
   string,
   { icon: ReactNode; ring: string; text: string; dot: string }
 > = {
-  BAJA: {
+  LOW: {
     icon: <FaInfoCircle size={12} />,
     ring: "ring-slate-300",
     text: "text-slate-700",
     dot: "bg-slate-400",
   },
-  MEDIA: {
+  MEDIUM: {
     icon: <FaExclamationTriangle size={12} />,
     ring: "ring-amber-300",
     text: "text-amber-700",
     dot: "bg-amber-500",
   },
-  ALTA: {
+  HIGH: {
     icon: <FaFire size={12} />,
     ring: "ring-orange-300",
     text: "text-orange-700",
     dot: "bg-orange-500",
   },
-  URGENTE: {
+  URGENT: {
     icon: <FaBan size={12} />,
     ring: "ring-red-300",
     text: "text-red-700",
@@ -112,17 +112,17 @@ export default function CreateTicketForm({
             <ITGrid container columns={12} spacing={5}>
               <ITGrid item xs={12} md={7}>
                 <ITInput
-                  name="titulo"
+                  name="title"
                   label={tt("new.titleLabel")}
-                  value={form.titulo}
-                  onChange={(e) => onFieldChange("titulo", e.target.value)}
+                  value={form.title}
+                  onChange={(e) => onFieldChange("title", e.target.value)}
                   placeholder={tt("new.titlePlaceholder")}
                   required
-                  aria-invalid={!!errors?.titulo}
+                  aria-invalid={!!errors?.title}
                 />
-                {errors?.titulo && (
+                {errors?.title && (
                   <span role="alert" className="text-red-500 text-xs mt-1 block">
-                    {errors.titulo}
+                    {errors.title}
                   </span>
                 )}
               </ITGrid>
@@ -132,7 +132,7 @@ export default function CreateTicketForm({
                   label={tt("new.categoryLabel")}
                   options={categories.map((c) => ({
                     value: c.id,
-                    label: c.nombre,
+                    label: c.name,
                   }))}
                   value={form.categoryId}
                   onChange={(e) => onFieldChange("categoryId", e.target.value)}
@@ -142,15 +142,15 @@ export default function CreateTicketForm({
 
             <ITFlex direction="column" gap={1}>
               <ITTextarea
-                name="descripcion"
+                name="description"
                 label={tt("new.descLabel")}
-                value={form.descripcion}
-                onChange={(v) => onFieldChange("descripcion", v)}
+                value={form.description}
+                onChange={(v) => onFieldChange("description", v)}
                 placeholder={tt("new.descPlaceholder")}
                 rows={7}
               />
               <ITText className="text-right text-xs text-slate-400">
-                {form.descripcion.length} / 2000
+                {form.description.length} / 2000
               </ITText>
             </ITFlex>
 
@@ -263,7 +263,7 @@ export default function CreateTicketForm({
                 )}
                 <ITText className="text-xs text-slate-500">
                   {selectedCategory
-                    ? selectedCategory.nombre
+                    ? selectedCategory.name
                     : tt("detail.category")}
                 </ITText>
               </ITFlex>

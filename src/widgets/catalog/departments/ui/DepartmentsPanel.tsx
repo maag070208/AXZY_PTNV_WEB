@@ -16,7 +16,7 @@ import {
   useDepartmentsCrud,
 } from "@features/department/departments-list";
 
-export default function DepartamentosPanel({ openCreateSignal }: { openCreateSignal?: number }) {
+export default function DepartmentsPanel({ openCreateSignal }: { openCreateSignal?: number }) {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["departments", "common"]);
 
@@ -43,7 +43,7 @@ export default function DepartamentosPanel({ openCreateSignal }: { openCreateSig
         fetchData={crud.fetchTableData}
         reloadKey={crud.reloadKey}
         canManage
-        onView={(d) => navigate(`/departamentos/${d.id}`)}
+        onView={(d) => navigate(`/departments/${d.id}`)}
         onEdit={crud.openEditDept}
         onDelete={crud.setDeptToDelete}
       />

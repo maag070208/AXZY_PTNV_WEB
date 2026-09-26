@@ -3,15 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ITAlert, ITButton, ITFlex, ITGrid, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaFilePdf, FaScroll } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
-import { formatFecha } from "@shared/utils/dates";
-import { personalApi, type ActaAdministrativa } from "@entities/personal";
-import { ActaAdministrativaPreview, descargarActaPDF } from "@widgets/acta-administrativa";
+import { formatDate } from "@shared/utils/dates";
+import { personalApi, type DisciplinaryReport } from "@entities/hr";
+import { DisciplinaryReportPreview, downloadDisciplinaryReportPdf } from "@widgets/disciplinary-report";
 
-export default function ActaDetailPage() {
+export default function DisciplinaryReportDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { t: tt } = useTranslation(["actas", "common"]);
+  const { t: tt } = useTranslation(["disciplinary-reports", "common"]);
   const navigate = useNavigate();
-  const [acta, setActa] = useState<ActaAdministrativa | null>(null);
+  const [disciplinaryReport, setDisciplinaryReport] = useState<DisciplinaryReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,8 +20,8 @@ export default function ActaDetailPage() {
     setLoading(true);
     setError(null);
     personalApi
-      .acta(id)
-      .then(setActa)
+      .disciplinaryReport(id)
+      .then(setDisciplinaryReport)
       .catch((err: unknown) =>
         setError(err instanceof Error ? err.message : "No se pudo cargar el acta administrativa")
       )
@@ -30,7 +30,7 @@ export default function ActaDetailPage() {
 
   if (loading) {
     return (
-      <ITPage title={tt("preview.title")} loading backAction={() => navigate("/empleados/reportes")}>
+      <ITPage title={tt("preview.title")} loading backAction={() => navigate("/employees/disciplinary-reports")}>
         <ITFlex justify="center" align="center" className="py-20">
           <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
@@ -38,14 +38,14 @@ export default function ActaDetailPage() {
     );
   }
 
-  if (error || !acta) {
+  if (error || !disciplinaryReport) {
     return (
       <ITPage
         title={tt("preview.title")}
-        backAction={() => navigate("/empleados/reportes")}
+        backAction={() => navigate("/employees/disciplinary-reports")}
         breadcrumbs={[
           { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
-          { label: tt("breadcrumb"), onClick: () => navigate("/empleados/reportes") },
+          { label: tt("breadcrumb"), onClick: () => navigate("/employees/disciplinary-reports") },
           { label: tt("preview.title") },
         ]}
       >
@@ -56,27 +56,27 @@ export default function ActaDetailPage() {
     );
   }
 
-  const area = acta.user.department?.name
-    ? `${acta.user.department.name}${acta.user.subarea ? ` — ${acta.user.subarea.name}` : ""}`
+  const area = disciplinaryReport.user.department?.name
+    ? `${disciplinaryReport.user.department.name}${disciplinaryReport.user.subarea ? ` — ${disciplinaryReport.user.subarea.name}` : ""}`
     : "—";
 
   return (
     <ITPage
       title={tt("preview.title")}
-      description={`${acta.user.name} · ${tt(`motivos.${acta.motivo}`)}`}
+      description={`${disciplinaryReport.user.name} · ${tt(`reasons.${disciplinaryReport.reason}`)}`}
       icon={<FaScroll size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: tt("breadcrumb"), onClick: () => navigate("/empleados/reportes") },
-        { label: acta.user.name },
+        { label: tt("breadcrumb"), onClick: () => navigate("/employees/disciplinary-reports") },
+        { label: disciplinaryReport.user.name },
       ]}
-      backAction={() => navigate("/empleados/reportes")}
+      backAction={() => navigate("/employees/disciplinary-reports")}
       actions={
         <ITFlex gap={2}>
-          <ITButton variant="outlined" color="secondary" onClick={() => void descargarActaPDF(acta)}>
+          <ITButton variant="outlined" color="secondary" onClick={() => void downloadDisciplinaryReportPdf(disciplinaryReport)}>
             <ITFlex align="center" gap={1}>
               <FaFilePdf className="text-red-600" size={13} />
-              <ITText className="font-bold text-[11px]">{tt("preview.descargar")}</ITText>
+              <ITText className="font-bold text-[11px]">{tt("preview.download")}</ITText>
             </ITFlex>
           </ITButton>
         </ITFlex>
@@ -85,46 +85,46 @@ export default function ActaDetailPage() {
       <ITGrid container columns={12} spacing={6}>
         <ITGrid item xs={12} lg={5}>
           <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <ITText className="text-sm font-bold text-slate-800">{tt("doc.tituloDocumento")}</ITText>
+            <ITText className="text-sm font-bold text-slate-800">{tt("doc.documentTitle")}</ITText>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.empleado")}</ITText>
-              <ITText className="text-sm font-bold text-slate-900">{acta.user.name}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.employee")}</ITText>
+              <ITText className="text-sm font-bold text-slate-900">{disciplinaryReport.user.name}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.numeroEmpleado")}</ITText>
-              <ITText className="text-sm text-slate-700">{acta.user.numeroEmpleado ?? "—"}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.employeeNumber")}</ITText>
+              <ITText className="text-sm text-slate-700">{disciplinaryReport.user.employeeNumber ?? "—"}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.puesto")}</ITText>
-              <ITText className="text-sm text-slate-700">{acta.user.puesto ?? "—"}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.jobTitle")}</ITText>
+              <ITText className="text-sm text-slate-700">{disciplinaryReport.user.jobTitle ?? "—"}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.departamento")}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.department")}</ITText>
               <ITText className="text-sm text-slate-700">{area}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.fechaIncidente")}</ITText>
-              <ITText className="text-sm text-slate-700">{formatFecha(acta.fechaIncidente)}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.incidentDate")}</ITText>
+              <ITText className="text-sm text-slate-700">{formatDate(disciplinaryReport.incidentDate)}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.motivo")}</ITText>
-              <ITText className="text-sm text-slate-700">{tt(`motivos.${acta.motivo}`)}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.reason")}</ITText>
+              <ITText className="text-sm text-slate-700">{tt(`reasons.${disciplinaryReport.reason}`)}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.descripcion")}</ITText>
-              <ITText className="text-sm text-slate-600">{acta.descripcion}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.description")}</ITText>
+              <ITText className="text-sm text-slate-600">{disciplinaryReport.description}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.sancion")}</ITText>
-              <ITText className="text-sm text-slate-600">{acta.sancion || "—"}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.sanction")}</ITText>
+              <ITText className="text-sm text-slate-600">{disciplinaryReport.sanction || "—"}</ITText>
             </ITFlex>
           </ITFlex>
         </ITGrid>
@@ -132,7 +132,7 @@ export default function ActaDetailPage() {
         <ITGrid item xs={12} lg={7}>
           <ITFlex as="section" direction="column" gap={2} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <ITText className="text-sm font-bold text-slate-800">{tt("preview.title")}</ITText>
-            <ActaAdministrativaPreview acta={acta} />
+            <DisciplinaryReportPreview disciplinaryReport={disciplinaryReport} />
           </ITFlex>
         </ITGrid>
       </ITGrid>

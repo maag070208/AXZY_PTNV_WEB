@@ -6,7 +6,7 @@
     "readOnly": "Read-only: the API never changes the clocks' configuration.",
     "states": {
       "notConfigured": "Not configured",
-      "sinRelojes": "No clocks",
+      "withoutClocks": "No clocks",
       "paused": "Paused",
       "running": "Syncing",
       "error": "Error",
@@ -15,7 +15,7 @@
     },
     "messages": {
       "notConfigured": "The API has no clock user (CHECADOR_USER): nothing is synced.",
-      "sinRelojes": "No time clocks have been added yet.",
+      "withoutClocks": "No time clocks have been added yet.",
       "paused": "A clock rejected the password and its sync was paused. Update CHECADOR_PASS in the API and restart it.",
       "running": "Syncing: {{leidos}} of {{total}} events reviewed · {{nuevas}} new punches · {{restantes}} left",
       "runningNoTotal": "Syncing: {{nuevas}} new punches",
@@ -23,18 +23,18 @@
       "pending": "The first sync has not finished yet."
     },
     "device": "Clock",
-    "checadas": "Stored punches",
-    "lastChecada": "Last punch",
+    "punches": "Stored punches",
+    "lastPunch": "Last punch",
     "lastSync": "Last sync",
     "empty": "—",
-    "reloj": {
+    "clock": {
       "running": "{{leidos}} of {{total}} events reviewed · {{nuevas}} new punches",
       "runningNoTotal": "{{nuevas}} new punches",
       "paused": "Rejected the password: sync paused.",
       "pending": "Its first sync has not finished yet."
     },
-    "administrar": "Manage clocks",
-    "soloAcceso": "Does not count for entries/exits"
+    "manage": "Manage clocks",
+    "onlyAccess": "Does not count for entries/exits"
   },
   "sync": {
     "button": "Sync all",
@@ -70,37 +70,37 @@
     "dateRange": "Date range",
     "employee": "Search employee",
     "employeePlaceholder": "Name or employee number...",
-    "metodo": "Method",
-    "allMetodos": "All",
-    "reloj": "Clock",
-    "allRelojes": "All",
+    "method": "Method",
+    "allMethods": "All",
+    "clock": "Clock",
+    "allClocks": "All",
     "clear": "Clear filters"
   },
   "columns": {
     "occurredAt": "Date and time",
     "employee": "Employee",
-    "metodo": "Method",
-    "reloj": "Clock",
+    "method": "Method",
+    "clock": "Clock",
     "serialNo": "Serial"
   },
-  "metodos": {
-    "ROSTRO": "Face",
-    "HUELLA": "Fingerprint",
-    "TARJETA": "Card",
-    "OTRO": "Other"
+  "methods": {
+    "FACE": "Face",
+    "FINGERPRINT": "Fingerprint",
+    "CARD": "Card",
+    "OTHER": "Other"
   },
-  "otroHint": "Not a valid punch (device code {{minor}}). It does not count for attendance.",
+  "otherHint": "Not a valid punch (device code {{minor}}). It does not count for attendance.",
   "actions": {
     "exportCsv": "CSV",
     "exporting": "Generating…"
   },
   "csv": {
-    "fecha": "Date",
-    "hora": "Time",
-    "numeroEmpleado": "Employee number",
-    "nombre": "Name",
-    "metodo": "Method",
-    "reloj": "Clock",
+    "date": "Date",
+    "hour": "Time",
+    "employeeNumber": "Employee number",
+    "name": "Name",
+    "method": "Method",
+    "clock": "Clock",
     "serialNo": "Device serial"
   },
   "errors": {
@@ -109,157 +109,157 @@
     "sync": "Could not start the sync",
     "export": "Could not generate the CSV"
   },
-  "reporte": {
+  "report": {
     "title": "Time clock entries/exits",
     "description": "Shifts built from the time clock punches and matched to each employee by their time clock number.",
     "pdfTitle": "Entries and exits — Time clock",
-    "vinculos": "{{vinculados}} of {{total}} time clock employees linked",
-    "sinVincular": "The {{count}} unlinked ones show the time clock name and the “Not linked” mark.",
-    "irAVincular": "Link employees",
-    "regla": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h."
+    "links": "{{vinculados}} of {{total}} time clock employees linked",
+    "withoutLink": "The {{count}} unlinked ones show the time clock name and the “Not linked” mark.",
+    "goToLink": "Link employees",
+    "rule": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h."
   },
-  "empleados": {
+  "employees": {
     "title": "Time clock employees",
     "description": "Match each time clock number to its system user. The clock prefixes the area to the number (070562 = payroll 562), so the link is confirmed here.",
     "kpis": {
       "total": "In the clock",
-      "vinculados": "Linked",
-      "sinVincular": "Not linked",
-      "sugeridosAlta": "Safe suggestions"
+      "linkedCount": "Linked",
+      "withoutLink": "Not linked",
+      "registrationSuggestions": "Safe suggestions"
     },
     "filters": {
       "q": "Search",
       "qPlaceholder": "Number or name (clock or system)...",
-      "estado": "Status",
-      "todos": "All"
+      "status": "Status",
+      "all": "All"
     },
-    "estados": {
-      "VINCULADO": "Linked",
-      "SIN_VINCULAR": "Not linked",
-      "SUGERIDO": "With suggestion"
+    "statuses": {
+      "LINKED": "Linked",
+      "UNLINKED": "Not linked",
+      "SUGGESTED": "With suggestion"
     },
     "columns": {
-      "numero": "Clock number",
-      "nombre": "Name in the clock",
-      "checadas": "Punches",
-      "ultimaChecada": "Last punch",
-      "usuario": "System user",
-      "acciones": ""
+      "number": "Clock number",
+      "name": "Name in the clock",
+      "punches": "Punches",
+      "lastPunch": "Last punch",
+      "user": "System user",
+      "actions": ""
     },
-    "confianza": {
-      "ALTA": "Name and number match",
-      "MEDIA": "Only the name matches"
+    "confidence": {
+      "HIGH": "Name and number match",
+      "MEDIUM": "Only the name matches"
     },
-    "sinVinculo": "Not linked",
-    "sugerencia": "Suggestion",
-    "baja": "Inactive in the system",
+    "withoutLink": "Not linked",
+    "suggestion": "Suggestion",
+    "retirement": "Inactive in the system",
     "actions": {
-      "aceptar": "Accept",
-      "vincular": "Link",
-      "cambiar": "Change",
-      "desvincular": "Unlink",
-      "vincularSugeridos": "Link {{count}} safe suggestions",
-      "cancelar": "Cancel",
-      "guardar": "Link"
+      "accept": "Accept",
+      "linkEmployee": "Link",
+      "change": "Change",
+      "unlinkEmployee": "Unlink",
+      "linkSuggested": "Link {{count}} safe suggestions",
+      "cancel": "Cancel",
+      "save": "Link"
     },
     "dialog": {
       "title": "Link number {{numero}}",
-      "reloj": "In the clock: {{nombre}}",
-      "usuario": "System user",
-      "usuarioPlaceholder": "Search by name or number..."
+      "clock": "In the clock: {{nombre}}",
+      "user": "System user",
+      "userPlaceholder": "Search by name or number..."
     },
     "toasts": {
-      "vinculado": "{{numero}} linked to {{nombre}}",
-      "desvinculado": "{{numero}} unlinked",
-      "sugeridos": "{{count}} employees linked"
+      "linked": "{{numero}} linked to {{nombre}}",
+      "unlinked": "{{numero}} unlinked",
+      "suggested": "{{count}} employees linked"
     },
     "errors": {
-      "usuarios": "Could not load the users",
-      "guardar": "Could not save the link"
+      "users": "Could not load the users",
+      "save": "Could not save the link"
     }
   },
-  "relojes": {
+  "clocks": {
     "title": "Time clocks",
     "description": "Add the time clocks and check their configuration and sync. The system only reads from the clocks.",
     "readOnly": "Read-only: the system connects to the clocks to read their punches and configuration; it never changes anything on them. Only punches (face, fingerprint or card) are read, not door openings.",
-    "credenciales": "It connects with the clock user and password configured in the API (the same for every clock).",
+    "credentials": "It connects with the clock user and password configured in the API (the same for every clock).",
     "notConfigured": "The API has no clock user (CHECADOR_USER / CHECADOR_PASS): it cannot connect to any clock.",
     "empty": "No time clocks have been added yet.",
-    "uso": {
-      "asistencia": "Counts for entries/exits",
-      "soloAcceso": "Does not count for entries/exits",
+    "usage": {
+      "countsAttendance": "Counts for entries/exits",
+      "onlyAccess": "Does not count for entries/exits",
       "checkbox": "Counts for entries/exits",
       "hint": "If it counts, its punches build the shifts together with the other clocks that count: the first punch of the shift is the entry and the last one the exit, whatever the clock (people may enter through one and leave through another). If it does not count, its punches are stored and shown in the table, but not used for entries/exits or overtime."
     },
     "actions": {
-      "alta": "Add a time clock",
-      "baja": "Remove",
-      "editar": "Edit",
-      "actualizar": "Read again",
-      "cancelar": "Cancel",
-      "confirmarAlta": "Add",
-      "conectando": "Connecting…",
-      "confirmarBaja": "Remove",
-      "guardar": "Save"
+      "registration": "Add a time clock",
+      "retirement": "Remove",
+      "edit": "Edit",
+      "update": "Read again",
+      "cancel": "Cancel",
+      "confirmRegistration": "Add",
+      "connecting": "Connecting…",
+      "confirmRetirement": "Remove",
+      "save": "Save"
     },
     "sync": {
       "title": "Sync",
-      "checadas": "Stored punches",
-      "ultimaChecada": "Last punch",
-      "ultimaSync": "Last sync",
-      "consecutivo": "Last event read"
+      "punches": "Stored punches",
+      "lastPunch": "Last punch",
+      "lastSync": "Last sync",
+      "number": "Last event read"
     },
     "config": {
       "title": "Clock configuration",
       "hint": "Read live from the clock, without changing anything.",
-      "cargando": "Reading from the clock…",
-      "nombre": "Name on the clock",
-      "modelo": "Model",
-      "serie": "Serial number",
+      "loading": "Reading from the clock…",
+      "name": "Name on the clock",
+      "model": "Model",
+      "serial": "Serial number",
       "firmware": "Firmware",
       "mac": "MAC",
-      "direccion": "Address",
-      "hora": "Clock time",
-      "modo": "Time setting",
-      "modos": {
+      "address": "Address",
+      "hour": "Clock time",
+      "mode": "Time setting",
+      "modes": {
         "manual": "Manual",
         "NTP": "Automatic (NTP)"
       },
-      "personas": "Enrolled people",
-      "personasDetalle": "{{conRostro}} with face · {{conHuella}} with fingerprint · {{conTarjeta}} with card",
-      "enHora": "On time",
-      "enHoraDetalle": "{{segundos}} s off the server",
-      "adelantado": "{{tiempo}} fast",
-      "atrasado": "{{tiempo}} slow",
-      "desfaseHint": "Set the time on the clock itself (preferably with NTP). If the clocks disagree, an entry on one and an exit on another add or remove worked time.",
-      "leidoEn": "Read at {{hora}}"
+      "people": "Enrolled people",
+      "peopleItem": "{{conRostro}} with face · {{conHuella}} with fingerprint · {{conTarjeta}} with card",
+      "inHour": "On time",
+      "inItemHour": "{{segundos}} s off the server",
+      "ahead": "{{tiempo}} fast",
+      "behind": "{{tiempo}} slow",
+      "driftHint": "Set the time on the clock itself (preferably with NTP). If the clocks disagree, an entry on one and an exit on another add or remove worked time.",
+      "readAt": "Read at {{hora}}"
     },
     "dialog": {
-      "altaTitle": "Add a time clock",
+      "registrationTitle": "Add a time clock",
       "url": "Clock address",
       "urlPlaceholder": "https://192.168.1.132",
       "urlHint": "The IP or the address you open in the browser to log into the clock.",
-      "nombre": "Name (optional)",
-      "nombrePlaceholder": "e.g. Staff entrance",
-      "nombreHint": "Leave it empty to use the name configured on the clock.",
-      "altaNota": "The system connects to confirm the address and starts pulling its punches. It does not change the clock.",
-      "bajaTitle": "Remove {{nombre}}",
-      "bajaTexto": "It stops syncing. Its punches stay and, if you add it again, it resumes where it left off. It does not change the clock.",
-      "editarTitle": "Edit {{nombre}}",
-      "nombreEditar": "Name",
-      "editarNota": "It only changes how the system uses this clock's punches. It does not change the clock."
+      "name": "Name (optional)",
+      "namePlaceholder": "e.g. Staff entrance",
+      "nameHint": "Leave it empty to use the name configured on the clock.",
+      "registrationNote": "The system connects to confirm the address and starts pulling its punches. It does not change the clock.",
+      "retirementTitle": "Remove {{nombre}}",
+      "retirementText": "It stops syncing. Its punches stay and, if you add it again, it resumes where it left off. It does not change the clock.",
+      "editTitle": "Edit {{nombre}}",
+      "nameEdit": "Name",
+      "editNote": "It only changes how the system uses this clock's punches. It does not change the clock."
     },
     "toasts": {
-      "alta": "{{nombre}} added: it is already pulling its punches",
-      "baja": "{{nombre}} removed",
-      "editado": "{{nombre}} updated"
+      "registration": "{{nombre}} added: it is already pulling its punches",
+      "retirement": "{{nombre}} removed",
+      "edited": "{{nombre}} updated"
     },
     "errors": {
       "status": "Could not read the clocks status",
       "config": "Could not read the clock configuration",
-      "alta": "Could not add the clock",
-      "baja": "Could not remove the clock",
-      "editar": "Could not update the clock"
+      "registration": "Could not add the clock",
+      "retirement": "Could not remove the clock",
+      "edit": "Could not update the clock"
     }
   }
 }

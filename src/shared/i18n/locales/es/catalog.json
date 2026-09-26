@@ -2,21 +2,21 @@
   "title": "Catálogos",
   "description": "Configura los catálogos maestros del sistema (solo ADMIN)",
   "tabs": {
-    "departamentos": "Departamentos",
+    "departments": "Departamentos",
     "subareas": "Subáreas",
-    "tiposDispositivo": "Tipos de dispositivo",
-    "tiposDocumento": "Tipos de documento",
-    "generos": "Géneros",
-    "tiposSangre": "Tipos de sangre",
-    "categoriasTicket": "Categorías de ticket",
-    "notificaciones": "Notificaciones"
+    "deviceTypes": "Tipos de dispositivo",
+    "documentTypes": "Tipos de documento",
+    "genders": "Géneros",
+    "bloodTypes": "Tipos de sangre",
+    "categoriesTicket": "Categorías de ticket",
+    "notifications": "Notificaciones"
   },
   "groups": {
-    "organizacion": "Organización",
-    "inventario": "Inventario",
+    "organization": "Organización",
+    "inventory": "Inventario",
     "personal": "Personal",
     "tickets": "Tickets",
-    "sistema": "Sistema"
+    "system": "Sistema"
   },
   "name": "Nombre",
   "status": "Estado",

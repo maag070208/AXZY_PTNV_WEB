@@ -8,7 +8,7 @@ import {
 import { FaPlus, FaUserTie } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import {
   EmployeesTable,
   useEmployeesList,
@@ -17,7 +17,7 @@ import {
 export default function EmployeesListPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
   const navigate = useNavigate();
-  const canEditEmployees = usePuede("personal.expediente");
+  const canEditEmployees = useCan("hr.records");
 
   const list = useEmployeesList();
 
@@ -35,7 +35,7 @@ export default function EmployeesListPage() {
           <ITButton
             variant="filled"
             color="primary"
-            onClick={() => navigate("/usuarios/nuevo")}
+            onClick={() => navigate("/users/new")}
           >
             <ITFlex align="center" gap={1}>
               <FaPlus size={12} />
@@ -57,8 +57,8 @@ export default function EmployeesListPage() {
         canEdit={canEditEmployees}
         fetchData={list.fetchTableData}
         reloadKey={list.reloadKey}
-        onView={(u) => navigate(`/empleados/${u.id}`)}
-        onEdit={(u) => navigate(`/empleados/${u.id}/editar`)}
+        onView={(u) => navigate(`/employees/${u.id}`)}
+        onEdit={(u) => navigate(`/employees/${u.id}/edit`)}
       />
     </ITPage>
   );

@@ -46,10 +46,10 @@ export const useLogin = () => {
     ) {
       const code = (rejected as { code?: string }).code;
       if (code === "ACCOUNT_DEACTIVATED") {
-        const motivo = (rejected as { details?: { motivo?: string } }).details?.motivo;
+        const reason = (rejected as { details?: { reason?: string } }).details?.reason;
         setDeactivatedMsg(
-          motivo
-            ? `Tu cuenta fue dada de baja. Motivo: ${motivo}. Contacta al administrador para reactivarla.`
+          reason
+            ? `Tu cuenta fue dada de baja. Motivo: ${reason}. Contacta al administrador para reactivarla.`
             : "Tu cuenta fue dada de baja. Contacta al administrador para reactivarla."
         );
         return false;

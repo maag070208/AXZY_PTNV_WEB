@@ -3,7 +3,7 @@
 // etiqueta/color, y los componentes Tag/Avatar. Viven aparte para que
 // ambos las importen desde un solo lugar en vez de duplicarlas.
 
-export type Status = "PENDIENTE" | "EN_PROGRESO" | "EN_REVISION" | "COMPLETADA";
+export type Status = "PENDING" | "IN_PROGRESS" | "IN_REVIEW" | "COMPLETED";
 
 export interface Tone {
   bg: string;
@@ -19,23 +19,23 @@ export interface Tone {
 export const FALLBACK_TONE: Tone = { bg: "#94a3b8", text: "#ffffff" };
 
 export const PRIORITY_META: Record<string, { tone: Tone }> = {
-  BAJA: { tone: { bg: "#94a3b8", text: "#ffffff" } },
-  MEDIA: { tone: { bg: "#f59e0b", text: "#ffffff" } },
-  ALTA: { tone: { bg: "#ea580c", text: "#ffffff" } },
-  URGENTE: { tone: { bg: "#e11d48", text: "#ffffff" } },
+  LOW: { tone: { bg: "#94a3b8", text: "#ffffff" } },
+  MEDIUM: { tone: { bg: "#f59e0b", text: "#ffffff" } },
+  HIGH: { tone: { bg: "#ea580c", text: "#ffffff" } },
+  URGENT: { tone: { bg: "#e11d48", text: "#ffffff" } },
 };
 
 export const STATUS_META: Record<string, { tone: Tone }> = {
-  ABIERTO: { tone: { bg: "#f59e0b", text: "#ffffff" } },
-  EN_SEGUIMIENTO: { tone: { bg: "#3b82f6", text: "#ffffff" } },
-  CERRADO: { tone: { bg: "#059669", text: "#ffffff" } },
+  OPEN: { tone: { bg: "#f59e0b", text: "#ffffff" } },
+  IN_PROGRESS: { tone: { bg: "#3b82f6", text: "#ffffff" } },
+  CLOSED: { tone: { bg: "#059669", text: "#ffffff" } },
 };
 
 export const ASSIGNMENT_STATUS_META: Record<Status, { tone: Tone }> = {
-  PENDIENTE: { tone: { bg: "#94a3b8", text: "#ffffff" } },
-  EN_PROGRESO: { tone: { bg: "#3b82f6", text: "#ffffff" } },
-  EN_REVISION: { tone: { bg: "#a855f7", text: "#ffffff" } },
-  COMPLETADA: { tone: { bg: "#059669", text: "#ffffff" } },
+  PENDING: { tone: { bg: "#94a3b8", text: "#ffffff" } },
+  IN_PROGRESS: { tone: { bg: "#3b82f6", text: "#ffffff" } },
+  IN_REVIEW: { tone: { bg: "#a855f7", text: "#ffffff" } },
+  COMPLETED: { tone: { bg: "#059669", text: "#ffffff" } },
 };
 
 // Paleta determinista para etiquetas de departamento y avatares: mismo

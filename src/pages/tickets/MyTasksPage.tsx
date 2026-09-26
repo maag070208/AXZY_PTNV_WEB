@@ -7,7 +7,7 @@ import {
   MyTasksTable,
 } from "@features/ticket/tasks-table";
 
-export default function MisTareasPage() {
+export default function MyTasksPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
 
@@ -41,9 +41,9 @@ export default function MisTareasPage() {
         {fx.error && (
           <ITText className="text-[11px] font-bold text-red-600">{fx.error}</ITText>
         )}
-        {fx.vencidas > 0 && (
+        {fx.overdue > 0 && (
           <ITBadget color="danger" size="lg">
-            {tt("mytasks.overdueTasks", { count: fx.vencidas })}
+            {tt("mytasks.overdueTasks", { count: fx.overdue })}
           </ITBadget>
         )}
         <ITButton variant="outlined" onClick={fx.reload}>

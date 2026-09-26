@@ -15,7 +15,7 @@ import {
 import { FaGripVertical, FaRegCircle, FaRegClock, FaTimes } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { usersApi, type User } from "@entities/user";
-import { scheduleApi, type AsignadoPersona, type Horario } from "@entities/schedule";
+import { scheduleApi, type AssignedPerson, type Schedule } from "@entities/schedule";
 
 const toDateInput = (d: Date): string =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -25,16 +25,16 @@ const PENDING_MIME = "application/x-pending";
 
 export default function AssignSchedules() {
   const { t } = useTranslation("schedules");
-  const [horarios, setHorarios] = useState<Horario[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [employees, setEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  const [horarioId, setHorarioId] = useState("");
-  const [desde, setDesde] = useState<Date>(new Date());
+  const [scheduleId, setScheduleId] = useState("");
+  const [from, setFrom] = useState<Date>(new Date());
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [assigned, setAssigned] = useState<AsignadoPersona[]>([]);
+  const [assigned, setAssigned] = useState<AssignedPerson[]>([]);
   const [q, setQ] = useState("");
   const [mode, setMode] = useState<"list" | "drag">("list");
   const [dragOver, setDragOver] = useState(false);
@@ -42,11 +42,11 @@ export default function AssignSchedules() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    Promise.all([scheduleApi.list(), usersApi.empleados()])
+    Promise.all([scheduleApi.list(), usersApi.employees()])
       .then(([h, u]) => {
-        setHorarios(h);
+        setSchedules(h);
         setEmployees(u);
-        if (h[0]) setHorarioId(h[0].id);
+        if (h[0]) setScheduleId(h[0].id);
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
@@ -55,14 +55,14 @@ export default function AssignSchedules() {
   const loadAssigned = useCallback((id: string) => {
     if (!id) return;
     scheduleApi
-      .asignadosDeHorario(id)
+      .scheduleAssignees(id)
       .then(setAssigned)
       .catch(() => setAssigned([]));
   }, []);
 
   useEffect(() => {
-    loadAssigned(horarioId);
-  }, [horarioId, loadAssigned]);
+    loadAssigned(scheduleId);
+  }, [scheduleId, loadAssigned]);
 
   const employeeById = useMemo(() => new Map(employees.map((e) => [e.id, e])), [employees]);
   const assignedIds = useMemo(() => new Set(assigned.map((a) => a.userId)), [assigned]);
@@ -79,7 +79,7 @@ export default function AssignSchedules() {
       if (!term) return true;
       return (
         e.name.toLowerCase().includes(term) ||
-        (e.numeroEmpleado ?? "").toLowerCase().includes(term)
+        (e.employeeNumber ?? "").toLowerCase().includes(term)
       );
     });
   }, [employees, assignedIds, selected, q]);
@@ -95,22 +95,22 @@ export default function AssignSchedules() {
   const selectAllVisible = () => setSelected(new Set(filtered.map((e) => e.id)));
   const clearSelection = () => setSelected(new Set());
 
-  const horarioOptions = horarios.map((h) => ({ value: h.id, label: h.nombre }));
-  const currentHorario = horarios.find((h) => h.id === horarioId);
+  const scheduleOptions = schedules.map((h) => ({ value: h.id, label: h.name }));
+  const currentSchedule = schedules.find((h) => h.id === scheduleId);
 
   const apply = async () => {
-    if (!horarioId || selected.size === 0) return;
+    if (!scheduleId || selected.size === 0) return;
     setSaving(true);
     setError(null);
     try {
-      const res = await scheduleApi.asignar({
-        horarioId,
+      const res = await scheduleApi.assign({
+        scheduleId,
         userIds: [...selected],
-        desde: toDateInput(desde),
+        from: toDateInput(from),
       });
-      setToast(t("assign.success", { count: res.asignados }));
+      setToast(t("assign.success", { count: res.assigned }));
       setSelected(new Set());
-      loadAssigned(horarioId);
+      loadAssigned(scheduleId);
     } catch (e) {
       setError((e as Error).message ?? t("assign.error"));
     } finally {
@@ -119,10 +119,10 @@ export default function AssignSchedules() {
   };
 
   const removeAssigned = async (userId: string) => {
-    if (!horarioId) return;
+    if (!scheduleId) return;
     try {
-      await scheduleApi.quitarAsignaciones({ horarioId, userIds: [userId] });
-      loadAssigned(horarioId);
+      await scheduleApi.removeAssignments({ scheduleId, userIds: [userId] });
+      loadAssigned(scheduleId);
     } catch (e) {
       setError((e as Error).message);
     }
@@ -147,12 +147,12 @@ export default function AssignSchedules() {
       <ITGrid container columns={12} spacing={4} className="items-end">
         <ITGrid item xs={12} md={4}>
           <ITSearchSelect
-            name="horario"
+            name="schedule"
             label={t("assign.schedule")}
-            options={horarioOptions}
-            value={horarioId}
+            options={scheduleOptions}
+            value={scheduleId}
             onChange={(v) => {
-              setHorarioId(String(v));
+              setScheduleId(String(v));
               setSelected(new Set());
             }}
             className="w-full min-w-0"
@@ -160,12 +160,12 @@ export default function AssignSchedules() {
         </ITGrid>
         <ITGrid item xs={12} md={3}>
           <ITDatePicker
-            name="desde"
+            name="from"
             label={t("assign.since")}
-            value={desde}
+            value={from}
             onChange={(e) => {
               const v = e.target.value;
-              if (v instanceof Date) setDesde(v);
+              if (v instanceof Date) setFrom(v);
             }}
             className="w-full min-w-0"
           />
@@ -185,7 +185,7 @@ export default function AssignSchedules() {
             variant="filled"
             color="primary"
             onClick={apply}
-            disabled={saving || selected.size === 0 || !horarioId}
+            disabled={saving || selected.size === 0 || !scheduleId}
             className="w-full"
           >
             <ITText className="font-bold text-[11px]">
@@ -258,7 +258,7 @@ export default function AssignSchedules() {
                             {e.name}
                           </ITText>
                           <ITText className="text-[10px] text-slate-400">
-                            {e.numeroEmpleado ? `#${e.numeroEmpleado}` : ""}
+                            {e.employeeNumber ? `#${e.employeeNumber}` : ""}
                           </ITText>
                         </ITFlex>
                         <ITButton
@@ -308,10 +308,10 @@ export default function AssignSchedules() {
                 </ITFlex>
                 <ITFlex direction="column" gap={0} className="min-w-0">
                   <ITText className="truncate text-[13px] font-black text-slate-800">
-                    {currentHorario?.nombre ?? "—"}
+                    {currentSchedule?.name ?? "—"}
                   </ITText>
                   <ITText className="text-[10px] text-slate-400">
-                    {t("assign.since")} {toDateInput(desde)}
+                    {t("assign.since")} {toDateInput(from)}
                   </ITText>
                 </ITFlex>
               </ITFlex>
@@ -381,7 +381,7 @@ export default function AssignSchedules() {
                               {a.employeeName}
                             </ITText>
                             <ITText className="text-[10px] text-slate-400">
-                              {a.numeroEmpleado ? `#${a.numeroEmpleado}` : ""}
+                              {a.employeeNumber ? `#${a.employeeNumber}` : ""}
                             </ITText>
                           </ITFlex>
                           <ITButton

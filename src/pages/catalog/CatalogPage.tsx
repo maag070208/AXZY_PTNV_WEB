@@ -3,13 +3,13 @@ import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaSlidersH } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import { CatalogTabs } from "@widgets/catalog/tabs";
 
 export default function CatalogPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["catalog", "common"]);
-  const canAdminCatalogs = usePuede("catalogos.administrar");
+  const canAdminCatalogs = useCan("catalogs.manage");
 
   useEffect(() => {
     if (!canAdminCatalogs) navigate("/", { replace: true });

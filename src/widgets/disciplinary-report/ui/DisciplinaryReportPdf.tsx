@@ -6,13 +6,13 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import { formatFecha } from "@shared/utils/dates";
+import { formatDate } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
-import type { ActaAdministrativa } from "@entities/personal";
+import type { DisciplinaryReport } from "@entities/hr";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
 
 interface Props {
-  acta: ActaAdministrativa;
+  disciplinaryReport: DisciplinaryReport;
 }
 
 const styles = StyleSheet.create({
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     paddingBottom: 1,
     minHeight: 10,
   },
-  barraTitulo: {
+  titleBar: {
     backgroundColor: "#d9d9d9",
     borderWidth: 0.8,
     borderColor: "#000",
@@ -69,27 +69,27 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textAlign: "center",
   },
-  bloquePrincipal: {
+  principalBlock: {
     borderWidth: 0.8,
     borderColor: "#000",
     borderStyle: "solid",
     borderTopWidth: 0,
     padding: 6,
   },
-  parrafo: {
+  paragraph: {
     marginBottom: 4,
     textAlign: "justify",
     lineHeight: 1.3,
   },
   bold: { fontFamily: "Helvetica-Bold" },
-  datos: { marginTop: 3, marginBottom: 4 },
-  datoRow: {
+  data: { marginTop: 3, marginBottom: 4 },
+  datumRow: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginBottom: 2,
   },
-  datoLabel: { width: 95, fontSize: 8.5, fontFamily: "Helvetica-Bold" },
-  datoVal: {
+  datumLabel: { width: 95, fontSize: 8.5, fontFamily: "Helvetica-Bold" },
+  datumVal: {
     flex: 1,
     borderBottomWidth: 0.8,
     borderBottomColor: "#000",
@@ -99,13 +99,13 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     minHeight: 10,
   },
-  seccionTitulo: {
+  sectionTitle: {
     fontFamily: "Helvetica-Bold",
     fontSize: 9,
     marginBottom: 2,
     marginTop: 3,
   },
-  descripcion: {
+  description: {
     borderWidth: 0.6,
     borderColor: "#000",
     borderStyle: "solid",
@@ -115,35 +115,35 @@ const styles = StyleSheet.create({
     textAlign: "justify",
     minHeight: 40,
   },
-  firmaRow: {
+  signatureRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 30,
   },
-  firmaBox: { width: 140, alignItems: "center" },
-  lineaFirma: {
+  signatureBox: { width: 140, alignItems: "center" },
+  signatureLine: {
     width: "100%",
     borderTopWidth: 0.8,
     borderTopColor: "#000",
     borderTopStyle: "solid",
     marginBottom: 1.5,
   },
-  firmaLabel: { fontSize: 8, fontFamily: "Helvetica-Bold" },
-  firmaNombre: { fontSize: 8 },
+  signatureLabel: { fontSize: 8, fontFamily: "Helvetica-Bold" },
+  signatureName: { fontSize: 8 },
 });
 
-export default function ActaAdministrativaPDF({ acta }: Props) {
-  const { t: tt } = useTranslation("actas");
-  const fechaActa = formatFecha(acta.createdAt) || "";
-  const fechaIncidente = formatFecha(acta.fechaIncidente) || "";
-  const empleado = acta.user.name;
-  const area = acta.user.department?.name
-    ? `${acta.user.department.name}${acta.user.subarea ? ` — ${acta.user.subarea.name}` : ""}`
+export default function DisciplinaryReportPdf({ disciplinaryReport }: Props) {
+  const { t: tt } = useTranslation("disciplinary-reports");
+  const disciplinaryReportDate = formatDate(disciplinaryReport.createdAt) || "";
+  const incidentDate = formatDate(disciplinaryReport.incidentDate) || "";
+  const employee = disciplinaryReport.user.name;
+  const area = disciplinaryReport.user.department?.name
+    ? `${disciplinaryReport.user.department.name}${disciplinaryReport.user.subarea ? ` — ${disciplinaryReport.user.subarea.name}` : ""}`
     : "—";
-  const firmaRh = acta.createdBy.name || "—";
+  const signatureRh = disciplinaryReport.createdBy.name || "—";
 
   return (
-    <Document title={tt("doc.tituloDocumento")} author="Puerto Nuevo Hotel y Villas">
+    <Document title={tt("doc.documentTitle")} author="Puerto Nuevo Hotel y Villas">
       <Page size="LETTER" style={styles.page}>
         <View style={styles.topHeader}>
           <View style={styles.logoBox}>
@@ -151,91 +151,91 @@ export default function ActaAdministrativaPDF({ acta }: Props) {
           </View>
           <View style={styles.metaBox}>
             <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>{tt("doc.fecha")}</Text>
-              <Text style={styles.metaVal}>{fechaActa}</Text>
+              <Text style={styles.metaLabel}>{tt("doc.date")}</Text>
+              <Text style={styles.metaVal}>{disciplinaryReportDate}</Text>
             </View>
             <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>{tt("doc.empleado")}</Text>
-              <Text style={styles.metaVal}>{empleado}</Text>
+              <Text style={styles.metaLabel}>{tt("doc.employee")}</Text>
+              <Text style={styles.metaVal}>{employee}</Text>
             </View>
             <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>{tt("doc.motivo")}</Text>
-              <Text style={styles.metaVal}>{tt(`motivos.${acta.motivo}`)}</Text>
+              <Text style={styles.metaLabel}>{tt("doc.reason")}</Text>
+              <Text style={styles.metaVal}>{tt(`reasons.${disciplinaryReport.reason}`)}</Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.barraTitulo}>
-          <Text>{tt("doc.tituloDocumento")}</Text>
+        <View style={styles.titleBar}>
+          <Text>{tt("doc.documentTitle")}</Text>
         </View>
 
-        <View style={styles.bloquePrincipal}>
-          <Text style={styles.parrafo}>
+        <View style={styles.principalBlock}>
+          <Text style={styles.paragraph}>
             {tt("doc.para1a")}{" "}
-            <Text style={styles.bold}>{empleado}</Text>{" "}
+            <Text style={styles.bold}>{employee}</Text>{" "}
             {tt("doc.para1b")}{" "}
-            <Text style={styles.bold}>{tt(`motivos.${acta.motivo}`)}</Text>{" "}
-            {tt("doc.para1c")} <Text style={styles.bold}>{fechaIncidente}</Text>{" "}
+            <Text style={styles.bold}>{tt(`reasons.${disciplinaryReport.reason}`)}</Text>{" "}
+            {tt("doc.para1c")} <Text style={styles.bold}>{incidentDate}</Text>{" "}
             {tt("doc.para1d")}
           </Text>
 
-          <View style={styles.datos}>
-            <View style={styles.datoRow}>
-              <Text style={styles.datoLabel}>{tt("doc.empleado")}</Text>
-              <Text style={styles.datoVal}>{empleado}</Text>
+          <View style={styles.data}>
+            <View style={styles.datumRow}>
+              <Text style={styles.datumLabel}>{tt("doc.employee")}</Text>
+              <Text style={styles.datumVal}>{employee}</Text>
             </View>
-            <View style={styles.datoRow}>
-              <Text style={styles.datoLabel}>{tt("doc.numeroEmpleado")}</Text>
-              <Text style={styles.datoVal}>{acta.user.numeroEmpleado ?? "—"}</Text>
+            <View style={styles.datumRow}>
+              <Text style={styles.datumLabel}>{tt("doc.employeeNumber")}</Text>
+              <Text style={styles.datumVal}>{disciplinaryReport.user.employeeNumber ?? "—"}</Text>
             </View>
-            <View style={styles.datoRow}>
-              <Text style={styles.datoLabel}>{tt("doc.puesto")}</Text>
-              <Text style={styles.datoVal}>{acta.user.puesto ?? "—"}</Text>
+            <View style={styles.datumRow}>
+              <Text style={styles.datumLabel}>{tt("doc.jobTitle")}</Text>
+              <Text style={styles.datumVal}>{disciplinaryReport.user.jobTitle ?? "—"}</Text>
             </View>
-            <View style={styles.datoRow}>
-              <Text style={styles.datoLabel}>{tt("doc.departamento")}</Text>
-              <Text style={styles.datoVal}>{area}</Text>
+            <View style={styles.datumRow}>
+              <Text style={styles.datumLabel}>{tt("doc.department")}</Text>
+              <Text style={styles.datumVal}>{area}</Text>
             </View>
-            <View style={styles.datoRow}>
-              <Text style={styles.datoLabel}>{tt("doc.motivo")}</Text>
-              <Text style={styles.datoVal}>{tt(`motivos.${acta.motivo}`)}</Text>
+            <View style={styles.datumRow}>
+              <Text style={styles.datumLabel}>{tt("doc.reason")}</Text>
+              <Text style={styles.datumVal}>{tt(`reasons.${disciplinaryReport.reason}`)}</Text>
             </View>
-            <View style={styles.datoRow}>
-              <Text style={styles.datoLabel}>{tt("doc.fechaIncidente")}</Text>
-              <Text style={styles.datoVal}>{fechaIncidente}</Text>
+            <View style={styles.datumRow}>
+              <Text style={styles.datumLabel}>{tt("doc.incidentDate")}</Text>
+              <Text style={styles.datumVal}>{incidentDate}</Text>
             </View>
           </View>
 
-          <Text style={styles.seccionTitulo}>{tt("doc.descripcion")}</Text>
-          <Text style={styles.descripcion}>{acta.descripcion}</Text>
+          <Text style={styles.sectionTitle}>{tt("doc.description")}</Text>
+          <Text style={styles.description}>{disciplinaryReport.description}</Text>
 
-          {acta.sancion && (
+          {disciplinaryReport.sanction && (
             <>
-              <Text style={styles.seccionTitulo}>{tt("doc.sancion")}</Text>
-              <Text style={styles.descripcion}>{acta.sancion}</Text>
+              <Text style={styles.sectionTitle}>{tt("doc.sanction")}</Text>
+              <Text style={styles.description}>{disciplinaryReport.sanction}</Text>
             </>
           )}
 
-          <Text style={{ ...styles.parrafo, marginTop: 6, marginBottom: 0 }}>
-            {tt("doc.cierre")}
+          <Text style={{ ...styles.paragraph, marginTop: 6, marginBottom: 0 }}>
+            {tt("doc.closing")}
           </Text>
         </View>
 
-        <View style={styles.firmaRow}>
-          <View style={styles.firmaBox}>
-            <View style={styles.lineaFirma} />
-            <Text style={styles.firmaNombre}>{empleado}</Text>
-            <Text style={styles.firmaLabel}>{tt("doc.firmaEmpleado")}</Text>
+        <View style={styles.signatureRow}>
+          <View style={styles.signatureBox}>
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureName}>{employee}</Text>
+            <Text style={styles.signatureLabel}>{tt("doc.signatureEmployee")}</Text>
           </View>
-          <View style={styles.firmaBox}>
-            <View style={styles.lineaFirma} />
-            <Text style={styles.firmaNombre} />
-            <Text style={styles.firmaLabel}>{tt("doc.firmaJefe")}</Text>
+          <View style={styles.signatureBox}>
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureName} />
+            <Text style={styles.signatureLabel}>{tt("doc.signatureHead")}</Text>
           </View>
-          <View style={styles.firmaBox}>
-            <View style={styles.lineaFirma} />
-            <Text style={styles.firmaNombre}>{firmaRh}</Text>
-            <Text style={styles.firmaLabel}>{tt("doc.firmaRh")}</Text>
+          <View style={styles.signatureBox}>
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureName}>{signatureRh}</Text>
+            <Text style={styles.signatureLabel}>{tt("doc.signatureRh")}</Text>
           </View>
         </View>
       </Page>

@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { FaSave, FaTicketAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import {
   EditTicketForm,
   useEditTicket,
@@ -18,7 +18,7 @@ import {
 export default function EditTicketPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
-  const canEditTicket = usePuede("tickets.editar");
+  const canEditTicket = useCan("tickets.edit");
 
   const editTicket = useEditTicket();
 
@@ -36,7 +36,7 @@ export default function EditTicketPage() {
 
   const breadcrumbs = [
     { label: tt("list.title"), onClick: () => navigate("/tickets") },
-    editTicket.ticket && { label: editTicket.ticket.titulo },
+    editTicket.ticket && { label: editTicket.ticket.title },
     { label: tt("edit.breadcrumb") },
   ].filter(Boolean) as { label: string; onClick?: () => void }[];
 

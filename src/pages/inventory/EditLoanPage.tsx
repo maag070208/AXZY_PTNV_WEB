@@ -3,167 +3,167 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ITAlert, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITSearchSelect, ITSegmentedControl, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaFileSignature, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { inventarioApi, type Dispositivo, type Prestamo, type TipoDispositivo } from "@entities/inventario";
+import { inventoryApi, type Device, type Loan, type DeviceType } from "@entities/inventory";
 import { departmentsApi, type Department } from "@entities/department";
 import { subareaApi, type Subarea } from "@entities/subarea";
 import { usersApi, type User } from "@entities/user";
-import { CartaResponsivaPreview } from "@widgets/carta-responsiva";
+import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 
-export default function EditPrestamoPage() {
+export default function EditLoanPage() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation(["inventario", "common"]);
+  const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
-  const [prestamo, setPrestamo] = useState<Prestamo | null>(null);
-  const [tipos, setTipos] = useState<TipoDispositivo[]>([]);
-  const [dispositivos, setDispositivos] = useState<Dispositivo[]>([]);
-  const [responsables, setResponsables] = useState<User[]>([]);
-  const [departamentos, setDepartamentos] = useState<Department[]>([]);
+  const [loan, setLoan] = useState<Loan | null>(null);
+  const [types, setTypes] = useState<DeviceType[]>([]);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [custodians, setCustodians] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [subareas, setSubareas] = useState<Subarea[]>([]);
 
-  const [asignacion, setAsignacion] = useState<"PERSONAL" | "DEPARTAMENTO">("PERSONAL");
-  const [responsableId, setResponsableId] = useState("");
-  const [departamentoId, setDepartamentoId] = useState("");
+  const [assignment, setAssignment] = useState<"EMPLOYEE" | "DEPARTMENT">("EMPLOYEE");
+  const [custodianId, setCustodianId] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
   const [subareaId, setSubareaId] = useState("");
-  const [tipoId, setTipoId] = useState("");
-  const [dispositivoId, setDispositivoId] = useState("");
-  const [cantidad, setCantidad] = useState("1");
-  const [disponible, setDisponible] = useState<number | null>(null);
-  const [observaciones, setObservaciones] = useState("");
+  const [typeId, setTypeId] = useState("");
+  const [deviceId, setDeviceId] = useState("");
+  const [quantity, setQuantity] = useState("1");
+  const [available, setAvailable] = useState<number | null>(null);
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (!id) return;
     Promise.all([
-      inventarioApi.getPrestamo(id),
-      inventarioApi.tipos(),
-      inventarioApi.dispositivos(),
-      usersApi.empleados(),
+      inventoryApi.getLoan(id),
+      inventoryApi.types(),
+      inventoryApi.devices(),
+      usersApi.employees(),
       departmentsApi.list(),
       subareaApi.list(),
     ])
       .then(([p, ts, ds, us, deps, subs]) => {
-        setPrestamo(p);
-        setTipos(ts.filter((x) => x.active));
-        setDispositivos(ds);
-        setResponsables(us);
-        setDepartamentos(deps);
+        setLoan(p);
+        setTypes(ts.filter((x) => x.active));
+        setDevices(ds);
+        setCustodians(us);
+        setDepartments(deps);
         setSubareas(subs);
 
-        if (p.responsable) setAsignacion("PERSONAL");
-        else if (p.departamento) setAsignacion("DEPARTAMENTO");
-        setResponsableId(p.responsable?.id ?? "");
-        setDepartamentoId(p.departamento?.id ?? "");
+        if (p.custodian) setAssignment("EMPLOYEE");
+        else if (p.department) setAssignment("DEPARTMENT");
+        setCustodianId(p.custodian?.id ?? "");
+        setDepartmentId(p.department?.id ?? "");
         setSubareaId(p.subarea?.id ?? "");
-        setObservaciones(p.observaciones ?? "");
-        const d = p.detalles[0];
+        setNotes(p.notes ?? "");
+        const d = p.items[0];
         if (d) {
-          setTipoId(d.dispositivo?.tipoId ?? "");
-          setDispositivoId(d.dispositivoId);
-          setCantidad(String(d.cantidad));
+          setTypeId(d.device?.typeId ?? "");
+          setDeviceId(d.deviceId);
+          setQuantity(String(d.quantity));
         }
       })
       .finally(() => setLoading(false));
   }, [id]);
 
   const subareasDept = useMemo(
-    () => (departamentoId ? subareas.filter((s) => s.departmentId === departamentoId) : []),
-    [subareas, departamentoId]
+    () => (departmentId ? subareas.filter((s) => s.departmentId === departmentId) : []),
+    [subareas, departmentId]
   );
-  const dispositivosTipo = useMemo(
-    () => (tipoId ? dispositivos.filter((d) => d.tipoId === tipoId) : []),
-    [dispositivos, tipoId]
+  const devicesType = useMemo(
+    () => (typeId ? devices.filter((d) => d.typeId === typeId) : []),
+    [devices, typeId]
   );
 
   // Unidades de este préstamo que siguen prestadas (se liberan al editar).
-  const unidadesEnPrestamo = useMemo(() => {
-    const detalle = prestamo?.detalles?.[0];
-    return (detalle?.unidades ?? []).filter((u) => !u.devuelto).length;
-  }, [prestamo]);
+  const unitsOnLoan = useMemo(() => {
+    const item = loan?.items?.[0];
+    return (item?.units ?? []).filter((u) => !u.returned).length;
+  }, [loan]);
 
-  const seleccionarDispositivo = (did: string) => {
-    setDispositivoId(did);
-    setDisponible(null);
-    setCantidad("1");
+  const selectDevice = (did: string) => {
+    setDeviceId(did);
+    setAvailable(null);
+    setQuantity("1");
     if (did) {
-      inventarioApi.existencias(did).then((ex) => {
-        const bonus = did === prestamo?.detalles?.[0]?.dispositivoId ? unidadesEnPrestamo : 0;
-        setDisponible(ex.DISPONIBLE + bonus);
-      }).catch(() => setDisponible(0));
+      inventoryApi.stock(did).then((ex) => {
+        const bonus = did === loan?.items?.[0]?.deviceId ? unitsOnLoan : 0;
+        setAvailable(ex.AVAILABLE + bonus);
+      }).catch(() => setAvailable(0));
     }
   };
 
-  const cantidadNum = Number(cantidad) || 0;
-  const overStock = disponible !== null && cantidadNum > disponible;
+  const quantityNum = Number(quantity) || 0;
+  const overStock = available !== null && quantityNum > available;
 
   const isValid =
-    (asignacion === "PERSONAL" ? !!responsableId : !!departamentoId) &&
-    !!dispositivoId &&
-    cantidadNum >= 1 &&
-    disponible !== null &&
+    (assignment === "EMPLOYEE" ? !!custodianId : !!departmentId) &&
+    !!deviceId &&
+    quantityNum >= 1 &&
+    available !== null &&
     !overStock;
 
-  const draftPrestamo = useMemo<Prestamo>(
+  const draftLoan = useMemo<Loan>(
     () => ({
       id: "borrador",
-      consecutivo: prestamo?.consecutivo ?? "CARTA-XXXX",
-      fecha: new Date().toISOString(),
-      responsableId: asignacion === "PERSONAL" ? responsableId : null,
-      responsable: asignacion === "PERSONAL"
+      number: loan?.number ?? "CARTA-XXXX",
+      date: new Date().toISOString(),
+      custodianId: assignment === "EMPLOYEE" ? custodianId : null,
+      custodian: assignment === "EMPLOYEE"
         ? (() => {
-            const u = responsables.find((x) => x.id === responsableId);
-            return u ? { id: u.id, name: u.name, username: u.username, numeroEmpleado: u.numeroEmpleado ?? null, department: u.department ?? null } : null;
+            const u = custodians.find((x) => x.id === custodianId);
+            return u ? { id: u.id, name: u.name, username: u.username, employeeNumber: u.employeeNumber ?? null, department: u.department ?? null } : null;
           })()
         : null,
-      departamentoId: asignacion === "DEPARTAMENTO" ? departamentoId : null,
-      departamento: asignacion === "DEPARTAMENTO"
+      departmentId: assignment === "DEPARTMENT" ? departmentId : null,
+      department: assignment === "DEPARTMENT"
         ? (() => {
-            const d = departamentos.find((x) => x.id === departamentoId);
+            const d = departments.find((x) => x.id === departmentId);
             return d ? { id: d.id, name: d.name } : null;
           })()
         : null,
-      subareaId: asignacion === "DEPARTAMENTO" ? subareaId || null : null,
-      subarea: asignacion === "DEPARTAMENTO"
+      subareaId: assignment === "DEPARTMENT" ? subareaId || null : null,
+      subarea: assignment === "DEPARTMENT"
         ? (() => {
             const s = subareasDept.find((x) => x.id === subareaId);
             return s ? { id: s.id, name: s.name } : null;
           })()
         : null,
-      status: "ACTIVO" as const,
-      observaciones: observaciones || null,
-      detalles: dispositivoId
+      status: "ACTIVE" as const,
+      notes: notes || null,
+      items: deviceId
         ? [
             {
-              id: "detalle",
-              dispositivoId,
-              dispositivo: dispositivos.find((d) => d.id === dispositivoId),
-              cantidad: cantidadNum || 1,
-              devuelto: 0,
+              id: "item",
+              deviceId,
+              device: devices.find((d) => d.id === deviceId),
+              quantity: quantityNum || 1,
+              returnedQuantity: 0,
             },
           ]
         : [],
     }),
-    [asignacion, responsableId, departamentoId, subareaId, subareasDept, departamentos, responsables, dispositivoId, dispositivos, cantidadNum, observaciones, prestamo]
+    [assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, notes, loan]
   );
-  const draftPreview = useDebouncedValue(draftPrestamo, 500);
+  const draftPreview = useDebouncedValue(draftLoan, 500);
 
   const handleSubmit = async () => {
     if (!id) return;
     setSaving(true);
     try {
-      await inventarioApi.actualizarPrestamo(id, {
-        responsableId: asignacion === "PERSONAL" ? responsableId : undefined,
-        departamentoId: asignacion === "DEPARTAMENTO" ? departamentoId : undefined,
-        subareaId: asignacion === "DEPARTAMENTO" ? subareaId || undefined : undefined,
-        observaciones: observaciones || undefined,
-        dispositivoId,
-        cantidad: cantidadNum,
+      await inventoryApi.updateLoan(id, {
+        custodianId: assignment === "EMPLOYEE" ? custodianId : undefined,
+        departmentId: assignment === "DEPARTMENT" ? departmentId : undefined,
+        subareaId: assignment === "DEPARTMENT" ? subareaId || undefined : undefined,
+        notes: notes || undefined,
+        deviceId,
+        quantity: quantityNum,
       });
-      setToast({ message: t("prestamos.savedEdit"), type: "success" });
-      setTimeout(() => navigate(`/inventario/prestamos/${id}`), 1000);
+      setToast({ message: t("loans.savedEdit"), type: "success" });
+      setTimeout(() => navigate(`/inventory/loans/${id}`), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -171,9 +171,9 @@ export default function EditPrestamoPage() {
     }
   };
 
-  if (loading || !prestamo) {
+  if (loading || !loan) {
     return (
-      <ITPage title={t("prestamos.edit")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("loans.edit")} loading backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
@@ -181,27 +181,27 @@ export default function EditPrestamoPage() {
     );
   }
 
-  const bloqueadoRecurso = (prestamo.detalles[0]?.devuelto ?? 0) > 0;
+  const lockedResource = (loan.items[0]?.returnedQuantity ?? 0) > 0;
 
   return (
     <ITPage
-      title={t("prestamos.edit")}
-      description={`${prestamo.consecutivo}`}
+      title={t("loans.edit")}
+      description={`${loan.number}`}
       icon={<FaFileSignature size={20} />}
-      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventario") }, { label: t("prestamos.title"), onClick: () => navigate("/inventario/prestamos") }, { label: t("prestamos.edit") }]}
-      backAction={() => navigate(`/inventario/prestamos/${prestamo.id}`)}
+      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.edit") }]}
+      backAction={() => navigate(`/inventory/loans/${loan.id}`)}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>
             <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("prestamos.save")}</ITText>
+            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("loans.save")}</ITText>
           </ITFlex>
         </ITButton>
       }
     >
-      {bloqueadoRecurso && (
+      {lockedResource && (
         <ITAlert variant="warning" dismissible={false}>
-          {t("prestamos.editRecursoBlocked")}
+          {t("loans.editResourceBlocked")}
         </ITAlert>
       )}
 
@@ -209,43 +209,43 @@ export default function EditPrestamoPage() {
         <ITGrid item xs={12} lg={6}>
           <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <ITFlex as="fieldset" direction="column" gap={2}>
-              <ITText as="legend" className="text-sm font-semibold text-slate-700">{t("prestamos.asignacion")}</ITText>
+              <ITText as="legend" className="text-sm font-semibold text-slate-700">{t("loans.assignment")}</ITText>
               <ITSegmentedControl
                 options={[
-                  { value: "PERSONAL", label: t("prestamos.aEmpleado"), icon: <FaFileSignature size={11} /> },
-                  { value: "DEPARTAMENTO", label: t("prestamos.aDepartamento"), icon: <FaFileSignature size={11} /> },
+                  { value: "EMPLOYEE", label: t("loans.toEmployee"), icon: <FaFileSignature size={11} /> },
+                  { value: "DEPARTMENT", label: t("loans.toDepartment"), icon: <FaFileSignature size={11} /> },
                 ]}
-                value={asignacion}
-                onChange={(v) => setAsignacion(v as "PERSONAL" | "DEPARTAMENTO")}
+                value={assignment}
+                onChange={(v) => setAssignment(v as "EMPLOYEE" | "DEPARTMENT")}
                 size="md"
                 className="mt-2"
               />
             </ITFlex>
 
-            {asignacion === "PERSONAL" ? (
+            {assignment === "EMPLOYEE" ? (
               <ITSearchSelect
-                label={t("prestamos.responsable")}
-                placeholder={t("prestamos.responsablePlaceholder")}
-                options={responsables.map((u) => ({ value: u.id, label: u.name }))}
-                value={responsableId}
-                onChange={(v) => setResponsableId(String(v))}
+                label={t("loans.custodian")}
+                placeholder={t("loans.custodianPlaceholder")}
+                options={custodians.map((u) => ({ value: u.id, label: u.name }))}
+                value={custodianId}
+                onChange={(v) => setCustodianId(String(v))}
               />
             ) : (
               <>
                 <ITSearchSelect
-                  label={t("prestamos.departamento")}
-                  placeholder={t("prestamos.departamentoPlaceholder")}
-                  options={departamentos.map((d) => ({ value: d.id, label: d.name }))}
-                  value={departamentoId}
+                  label={t("loans.department")}
+                  placeholder={t("loans.departmentPlaceholder")}
+                  options={departments.map((d) => ({ value: d.id, label: d.name }))}
+                  value={departmentId}
                   onChange={(v) => {
-                    setDepartamentoId(String(v));
+                    setDepartmentId(String(v));
                     setSubareaId("");
                   }}
                 />
                 {subareasDept.length > 0 && (
                   <ITSearchSelect
-                    label={t("prestamos.subarea")}
-                    placeholder={t("prestamos.subareaPlaceholder")}
+                    label={t("loans.subarea")}
+                    placeholder={t("loans.subareaPlaceholder")}
                     options={subareasDept.map((s) => ({ value: s.id, label: s.name }))}
                     value={subareaId}
                     onChange={(v) => setSubareaId(String(v))}
@@ -254,47 +254,47 @@ export default function EditPrestamoPage() {
               </>
             )}
 
-            <ITText className="text-sm font-semibold text-slate-700">{t("prestamos.recurso")}</ITText>
+            <ITText className="text-sm font-semibold text-slate-700">{t("loans.resource")}</ITText>
             <ITGrid container columns={12} spacing={4}>
               <ITGrid item xs={12}>
                 <ITSearchSelect
-                  label={t("prestamos.tipoDispositivo")}
-                  placeholder={t("prestamos.tipoDispositivoPlaceholder")}
-                  options={tipos.map((x) => ({ value: x.id, label: `${x.name} (${x.folioPrefix})` }))}
-                  value={tipoId}
+                  label={t("loans.deviceType")}
+                  placeholder={t("loans.deviceTypePlaceholder")}
+                  options={types.map((x) => ({ value: x.id, label: `${x.name} (${x.assetTagPrefix})` }))}
+                  value={typeId}
                   onChange={(v) => {
-                    setTipoId(String(v));
-                    setDispositivoId("");
-                    setDisponible(null);
+                    setTypeId(String(v));
+                    setDeviceId("");
+                    setAvailable(null);
                   }}
                 />
               </ITGrid>
               <ITGrid item xs={12}>
                 <ITSearchSelect
-                  label={t("prestamos.dispositivo")}
-                  placeholder={t("prestamos.dispositivoPlaceholder")}
-                  options={dispositivosTipo.map((d) => ({ value: d.id, label: `${d.nombre} (${d.marca} ${d.modelo})` }))}
-                  value={dispositivoId}
-                  onChange={(v) => seleccionarDispositivo(String(v))}
+                  label={t("loans.device")}
+                  placeholder={t("loans.devicePlaceholder")}
+                  options={devicesType.map((d) => ({ value: d.id, label: `${d.name} (${d.brand} ${d.model})` }))}
+                  value={deviceId}
+                  onChange={(v) => selectDevice(String(v))}
                 />
               </ITGrid>
               <ITGrid item xs={12} md={5}>
                 <ITInput
-                  name="cantidad"
-                  label={t("prestamos.cantidadLabel")}
+                  name="quantity"
+                  label={t("loans.quantityLabel")}
                   type="number"
                   min={1}
-                  value={cantidad}
-                  onChange={(e) => setCantidad(e.target.value)}
-                  disabled={bloqueadoRecurso}
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  disabled={lockedResource}
                   required
                 />
               </ITGrid>
               <ITGrid item xs={12} md={7}>
                 <ITFlex align="center" gap={2} className="h-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
                   <ITText className="text-xs text-slate-500">
-                    {t("prestamos.disponible")}{" "}
-                    <strong className="text-slate-700">{disponible ?? "—"}</strong>
+                    {t("loans.available")}{" "}
+                    <strong className="text-slate-700">{available ?? "—"}</strong>
                   </ITText>
                 </ITFlex>
               </ITGrid>
@@ -302,14 +302,14 @@ export default function EditPrestamoPage() {
 
             {overStock && <ITAlert variant="error">{t("validation.overStock")}</ITAlert>}
 
-            <ITInput name="observaciones" label={t("prestamos.observaciones")} value={observaciones} onChange={(e) => setObservaciones(e.target.value)} />
+            <ITInput name="notes" label={t("loans.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </ITFlex>
         </ITGrid>
 
         <ITGrid item xs={12} lg={6}>
           <ITFlex as="section" direction="column" gap={2} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <ITText className="text-sm font-bold text-slate-800">{t("prestamos.preview")}</ITText>
-            <CartaResponsivaPreview prestamo={draftPreview as never} />
+            <ITText className="text-sm font-bold text-slate-800">{t("loans.preview")}</ITText>
+            <CustodyLetterPreview loan={draftPreview as never} />
           </ITFlex>
         </ITGrid>
       </ITGrid>

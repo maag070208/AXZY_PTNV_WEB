@@ -3,15 +3,15 @@ import { fileURLToPath } from "node:url";
 import { loadEnv } from "vite";
 
 // El paquete es ESM ("type": "module"), así que no hay __dirname.
-const aqui = path.dirname(fileURLToPath(import.meta.url));
+const here = path.dirname(fileURLToPath(import.meta.url));
 
 /** Raíz del paquete `web/`. */
-export const RAIZ_WEB = path.resolve(aqui, "../../..");
+export const WEB_ROOT = path.resolve(here, "../../..");
 /** Raíz del paquete `api/`, dueño de la base y de su provisión/limpieza. */
-export const RAIZ_API = path.resolve(RAIZ_WEB, "../api");
+export const API_ROOT = path.resolve(WEB_ROOT, "../api");
 
 // Mismo .env que consume la app, para que los tests apunten a donde apunta ella.
-const vars = loadEnv("development", RAIZ_WEB, "");
+const vars = loadEnv("development", WEB_ROOT, "");
 
 /** Prefijo de todo lo que crea la suite; la limpieza corre por aquí. */
 export const E2E_PREFIX = "E2E";
@@ -24,12 +24,12 @@ export const E2E = {
   prefix: E2E_PREFIX,
   password: process.env.E2E_PASSWORD ?? "e2e-Test-2026!",
   admin: { username: "e2e_admin", name: "E2E Admin" },
-  empleado: { username: "e2e_empleado", name: "E2E Empleado" },
+  employee: { username: "e2e_empleado", name: "E2E Empleado" },
   guard: { username: "e2e_guard", name: "E2E Guard" },
   /** Sitio demo persistente del módulo de acceso (mismo que provisiona `api/`). */
   demoSite: { name: "E2E Portería Principal", code: "E2E-SITE" },
   /** Dónde el store de la app persiste la sesión. */
-  storageKey: "cartas_auth_v1",
+  storageKey: "ptnv_auth_v1",
   /** Sesión ya iniciada, reutilizada por todos los tests. */
   storageState: "tests/e2e/.auth/admin.json",
 } as const;
@@ -38,8 +38,8 @@ export const apiBase = `${E2E.apiUrl.replace(/\/+$/, "")}/`;
 export const healthUrl = `${E2E.apiUrl.replace(/\/+$/, "")}/health`;
 
 /** HashRouter: todas las rutas de la app cuelgan de `#`. */
-export const ruta = (path: string): string => `/#${path.startsWith("/") ? path : `/${path}`}`;
+export const route = (path: string): string => `/#${path.startsWith("/") ? path : `/${path}`}`;
 
 /** Sufijo único por corrida, para nombres y folios que no choquen. */
-export const nuevoRunId = (): string =>
+export const newRunId = (): string =>
   `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`.toUpperCase();

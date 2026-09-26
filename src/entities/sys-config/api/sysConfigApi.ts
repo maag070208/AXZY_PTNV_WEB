@@ -4,7 +4,7 @@ export interface SysConfig {
   id: string;
   key: string;
   value: string;
-  descripcion?: string | null;
+  description?: string | null;
   updatedAt: string;
   updatedById?: string | null;
   updatedBy?: { id: string; name: string } | null;
@@ -16,8 +16,8 @@ const SEND_EMAIL_KEY = "ENABLE_SEND_EMAIL";
 export const sysConfigApi = {
   list: () => api.get<SysConfig[]>("/sys-config"),
   get: (key: string) => api.get<SysConfig>(`/sys-config/${key}`),
-  update: (key: string, value: string, descripcion?: string) =>
-    api.put<SysConfig>(`/sys-config/${key}`, { value, descripcion }),
+  update: (key: string, value: string, description?: string) =>
+    api.put<SysConfig>(`/sys-config/${key}`, { value, description }),
   remove: (key: string) => api.delete<void>(`/sys-config/${key}`),
   /**
    * Atajo para la única clave que edita el panel de notificaciones.

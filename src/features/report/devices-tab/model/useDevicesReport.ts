@@ -43,11 +43,11 @@ export const useDevicesReport = ({ download }: Options) => {
   }, [download, rows]);
 
   const stats = useMemo(() => {
-    const asignados = rows.filter((r) => r.estado === "ASIGNADO").length;
-    const disponibles = rows.filter((r) => r.estado === "DISPONIBLE").length;
-    const bajas = rows.filter((r) => r.estado === "BAJA").length;
-    const masDe30 = rows.filter((r) => (r.diasAsignado ?? 0) > 30).length;
-    return { asignados, disponibles, bajas, masDe30 };
+    const assigned = rows.filter((r) => r.status === "ASSIGNED").length;
+    const available = rows.filter((r) => r.status === "AVAILABLE").length;
+    const retirements = rows.filter((r) => r.status === "RETIRED").length;
+    const moreDe30 = rows.filter((r) => (r.daysAssigned ?? 0) > 30).length;
+    return { assigned, available, retirements, moreDe30 };
   }, [rows]);
 
   // ITDataTable exige fetchData asíncrono (page/limit); el universo de

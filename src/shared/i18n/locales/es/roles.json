@@ -2,21 +2,21 @@
   "title": "Roles y permisos",
   "description": "Administra la matriz de roles y el catálogo de permisos del sistema (solo ADMIN)",
   "tabs": {
-    "matriz": "Matriz",
-    "catalogo": "Catálogo"
+    "matrix": "Matriz",
+    "catalog": "Catálogo"
   },
-  "alcance": {
-    "NINGUNO": "Ninguno",
-    "PROPIO": "Propio",
+  "scope": {
+    "NONE": "Ninguno",
+    "OWN": "Propio",
     "AREA": "Área",
-    "TODO": "Todo"
+    "ALL": "Todo"
   },
   "role": {
     "ADMIN": "ADMIN",
-    "GERENTE": "GERENTE",
-    "JEFE_DE_AREA": "JEFE DE ÁREA",
-    "EMPLEADO": "EMPLEADO",
-    "RECURSOS_HUMANOS": "RECURSOS HUMANOS",
+    "MANAGER": "GERENTE",
+    "AREA_HEAD": "JEFE DE ÁREA",
+    "EMPLOYEE": "EMPLEADO",
+    "HUMAN_RESOURCES": "RECURSOS HUMANOS",
     "GUARD": "GUARDIA"
   },
   "matrix": {
@@ -42,7 +42,7 @@
     "new": "Nuevo permiso",
     "createTitle": "Nuevo permiso",
     "editTitle": "Editar permiso",
-    "sensible": "Sensible",
+    "sensitive": "Sensible",
     "active": "Activo",
     "inactive": "Inactivo",
     "activate": "Activar",
@@ -54,29 +54,29 @@
     "saveError": "No se pudo guardar el permiso",
     "saving": "Guardando...",
     "columns": {
-      "clave": "Clave",
-      "modulo": "Módulo",
-      "nombre": "Nombre",
-      "alcances": "Alcances",
-      "sensible": "Sensible",
-      "orden": "Orden",
-      "activo": "Estado"
+      "key": "Clave",
+      "module": "Módulo",
+      "name": "Nombre",
+      "scopes": "Alcances",
+      "sensitive": "Sensible",
+      "sortOrder": "Orden",
+      "active": "Estado"
     },
     "fields": {
-      "clave": "Clave (modulo.accion)",
-      "modulo": "Módulo",
-      "nombre": "Nombre",
-      "descripcion": "Descripción",
-      "alcances": "Alcances permitidos",
-      "sensible": "Permiso sensible (solo ADMIN)",
-      "orden": "Orden"
+      "key": "Clave (modulo.accion)",
+      "module": "Módulo",
+      "name": "Nombre",
+      "description": "Descripción",
+      "scopes": "Alcances permitidos",
+      "sensitive": "Permiso sensible (solo ADMIN)",
+      "sortOrder": "Orden"
     },
     "errors": {
-      "clave": "La clave debe tener el formato modulo.accion (minúsculas, dígitos y guion bajo)",
-      "modulo": "El módulo es obligatorio",
-      "nombre": "El nombre es obligatorio",
-      "alcances": "Selecciona al menos un alcance",
-      "orden": "El orden debe ser un entero mayor o igual a 0"
+      "key": "La clave debe tener el formato modulo.accion (minúsculas, dígitos y guion bajo)",
+      "module": "El módulo es obligatorio",
+      "name": "El nombre es obligatorio",
+      "scopes": "Selecciona al menos un alcance",
+      "sortOrder": "El orden debe ser un entero mayor o igual a 0"
     }
   }
 }

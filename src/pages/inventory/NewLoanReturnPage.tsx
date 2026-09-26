@@ -4,39 +4,39 @@ import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITSearch
 import { FaCheckCircle, FaFileSignature, FaInfoCircle, FaSave, FaTimesCircle, FaUndoAlt, FaUserTie } from "react-icons/fa";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { formatFecha } from "@shared/utils/dates";
-import { inventarioApi, type Condicion, type Prestamo } from "@entities/inventario";
+import { formatDate } from "@shared/utils/dates";
+import { inventoryApi, type Condition, type Loan } from "@entities/inventory";
 
 interface Row {
   key: string;
-  prestamoDetalleId: string;
-  dispositivoNombre: string;
-  prestado: number;
-  devuelto: number;
-  pendiente: number;
-  cantidad: string;
-  condicion: Condicion;
-  observaciones: string;
-  activos: string[];
+  loanItemId: string;
+  deviceName: string;
+  loaned: number;
+  returnedQuantity: number;
+  pending: number;
+  quantity: string;
+  condition: Condition;
+  notes: string;
+  active: string[];
 }
 
 // Presets de condición (estilo "Urgencia" del ticket).
 const CONDITION_PRESETS: Record<string, { icon: ReactNode; ring: string; text: string; dot: string }> = {
-  BUENO: { icon: <FaCheckCircle size={12} />, ring: "ring-emerald-300", text: "text-emerald-700", dot: "bg-emerald-500" },
-  ACEPTABLE: { icon: <FaInfoCircle size={12} />, ring: "ring-amber-300", text: "text-amber-700", dot: "bg-amber-500" },
-  MALO: { icon: <FaTimesCircle size={12} />, ring: "ring-orange-300", text: "text-orange-700", dot: "bg-orange-500" },
-  ROTO: { icon: <FaTimesCircle size={12} />, ring: "ring-red-300", text: "text-red-700", dot: "bg-red-500" },
+  GOOD: { icon: <FaCheckCircle size={12} />, ring: "ring-emerald-300", text: "text-emerald-700", dot: "bg-emerald-500" },
+  FAIR: { icon: <FaInfoCircle size={12} />, ring: "ring-amber-300", text: "text-amber-700", dot: "bg-amber-500" },
+  POOR: { icon: <FaTimesCircle size={12} />, ring: "ring-orange-300", text: "text-orange-700", dot: "bg-orange-500" },
+  BROKEN: { icon: <FaTimesCircle size={12} />, ring: "ring-red-300", text: "text-red-700", dot: "bg-red-500" },
 };
 
-const CONDICIONES: Condicion[] = ["BUENO", "ACEPTABLE", "MALO", "ROTO"];
+const CONDITIONS: Condition[] = ["GOOD", "FAIR", "POOR", "BROKEN"];
 
-export default function NewDevolucionPage() {
-  const { t } = useTranslation(["inventario", "common"]);
+export default function NewLoanReturnPage() {
+  const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const prestamoIdParam = searchParams.get("prestamoId");
-  const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
-  const [prestamo, setPrestamo] = useState<Prestamo | null>(null);
+  const loanIdParam = searchParams.get("loanId");
+  const [loans, setLoans] = useState<Loan[]>([]);
+  const [loan, setLoan] = useState<Loan | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -44,32 +44,32 @@ export default function NewDevolucionPage() {
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
   useEffect(() => {
-    inventarioApi
-      .prestamos()
-      .then((p) => setPrestamos(p.filter((x) => x.status === "ACTIVO" || x.status === "PARCIAL")))
+    inventoryApi
+      .loans()
+      .then((p) => setLoans(p.filter((x) => x.status === "ACTIVE" || x.status === "PARTIAL")))
       .finally(() => setLoading(false));
   }, []);
 
-  const seleccionar = (id: string) => {
-    const p = prestamos.find((x) => x.id === id);
-    setPrestamo(p ?? null);
+  const select = (id: string) => {
+    const p = loans.find((x) => x.id === id);
+    setLoan(p ?? null);
     if (p) {
       setRows(
-        p.detalles
-          .filter((d) => d.cantidad - d.devuelto > 0)
+        p.items
+          .filter((d) => d.quantity - d.returnedQuantity > 0)
           .map((d) => ({
             key: d.id,
-            prestamoDetalleId: d.id,
-            dispositivoNombre: d.dispositivo?.nombre ?? "",
-            prestado: d.cantidad,
-            devuelto: d.devuelto,
-            pendiente: d.cantidad - d.devuelto,
-            cantidad: String(d.cantidad - d.devuelto),
-            condicion: "BUENO",
-            observaciones: "",
-            activos: (d.unidades ?? [])
-              .filter((u) => !u.devuelto)
-              .map((u) => u.unidadFisica?.activoFijo ?? "")
+            loanItemId: d.id,
+            deviceName: d.device?.name ?? "",
+            loaned: d.quantity,
+            returnedQuantity: d.returnedQuantity,
+            pending: d.quantity - d.returnedQuantity,
+            quantity: String(d.quantity - d.returnedQuantity),
+            condition: "GOOD",
+            notes: "",
+            active: (d.units ?? [])
+              .filter((u) => !u.returned)
+              .map((u) => u.deviceUnit?.assetTag ?? "")
               .filter(Boolean),
           }))
       );
@@ -77,20 +77,20 @@ export default function NewDevolucionPage() {
   };
 
   useEffect(() => {
-    if (prestamoIdParam && prestamos.length > 0) seleccionar(prestamoIdParam);
+    if (loanIdParam && loans.length > 0) select(loanIdParam);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prestamoIdParam, prestamos.length]);
+  }, [loanIdParam, loans.length]);
 
   const updateRow = (key: string, patch: Partial<Row>) => setRows((r) => r.map((x) => (x.key === key ? { ...x, ...patch } : x)));
 
-  const totalADevolver = rows.reduce((sum, r) => sum + (Number(r.cantidad) || 0), 0);
-  const totalPendiente = rows.reduce((sum, r) => sum + r.pendiente, 0);
+  const totalToReturn = rows.reduce((sum, r) => sum + (Number(r.quantity) || 0), 0);
+  const pendingTotal = rows.reduce((sum, r) => sum + r.pending, 0);
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     // observación requerida si MALO/ROTO, mínimo 3 caracteres
     rows.forEach((r, idx) => {
-      if ((r.condicion === "MALO" || r.condicion === "ROTO") && r.observaciones.trim().length < 3) {
+      if ((r.condition === "POOR" || r.condition === "BROKEN") && r.notes.trim().length < 3) {
         e[`observaciones-${idx}`] = "La observación debe tener al menos 3 caracteres";
       }
     });
@@ -99,10 +99,10 @@ export default function NewDevolucionPage() {
   };
 
   const isValid =
-    !!prestamo &&
+    !!loan &&
     rows.length > 0 &&
-    rows.every((r) => Number(r.cantidad) >= 0 && Number(r.cantidad) <= r.pendiente && !!r.condicion) &&
-    totalADevolver > 0;
+    rows.every((r) => Number(r.quantity) >= 0 && Number(r.quantity) <= r.pending && !!r.condition) &&
+    totalToReturn > 0;
 
   const handleSubmit = async () => {
     if (!validate()) {
@@ -111,19 +111,19 @@ export default function NewDevolucionPage() {
     }
     setSaving(true);
     try {
-      await inventarioApi.crearDevolucion({
-        prestamoId: prestamo!.id,
-        detalles: rows
-          .filter((r) => Number(r.cantidad) > 0)
+      await inventoryApi.createLoanReturn({
+        loanId: loan!.id,
+        items: rows
+          .filter((r) => Number(r.quantity) > 0)
           .map((r) => ({
-            prestamoDetalleId: r.prestamoDetalleId,
-            cantidad: Number(r.cantidad),
-            condicion: r.condicion,
-            observaciones: (r.condicion === "MALO" || r.condicion === "ROTO") && r.observaciones.trim() ? r.observaciones : undefined,
+            loanItemId: r.loanItemId,
+            quantity: Number(r.quantity),
+            condition: r.condition,
+            notes: (r.condition === "POOR" || r.condition === "BROKEN") && r.notes.trim() ? r.notes : undefined,
           })),
       });
-      setToast({ message: t("devolucion.saved"), type: "success" });
-      setTimeout(() => navigate("/inventario/prestamos"), 1000);
+      setToast({ message: t("loanReturn.saved"), type: "success" });
+      setTimeout(() => navigate("/inventory/loans"), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -133,7 +133,7 @@ export default function NewDevolucionPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("devolucion.new")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("loanReturn.new")} loading backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
@@ -143,16 +143,16 @@ export default function NewDevolucionPage() {
 
   return (
     <ITPage
-      title={t("devolucion.new")}
-      description={t("devolucion.description")}
+      title={t("loanReturn.new")}
+      description={t("loanReturn.description")}
       icon={<FaUndoAlt size={20} />}
-      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventario") }, { label: t("devolucion.title"), onClick: () => navigate("/inventario/devoluciones") }, { label: t("devolucion.new") }]}
-      backAction={() => navigate("/inventario/prestamos")}
+      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loanReturn.title"), onClick: () => navigate("/inventory/returns") }, { label: t("loanReturn.new") }]}
+      backAction={() => navigate("/inventory/loans")}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>
             <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("devolucion.save")}</ITText>
+            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("loanReturn.save")}</ITText>
           </ITFlex>
         </ITButton>
       }
@@ -161,14 +161,14 @@ export default function NewDevolucionPage() {
         <ITGrid item xs={12} lg={8}>
           <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <ITSearchSelect
-              label={t("devolucion.selectPrestamo")}
-              placeholder={t("devolucion.selectPrestamoPlaceholder")}
-              options={prestamos.map((p) => ({ value: p.id, label: `${p.consecutivo} · ${p.responsable?.name ?? p.departamento?.name ?? ""}` }))}
-              value={prestamo?.id ?? ""}
-              onChange={(v) => seleccionar(String(v))}
+              label={t("loanReturn.selectLoan")}
+              placeholder={t("loanReturn.selectLoanPlaceholder")}
+              options={loans.map((p) => ({ value: p.id, label: `${p.number} · ${p.custodian?.name ?? p.department?.name ?? ""}` }))}
+              value={loan?.id ?? ""}
+              onChange={(v) => select(String(v))}
             />
 
-            {prestamo && rows.length > 0 && (
+            {loan && rows.length > 0 && (
               <>
                 <ITFlex direction="column" gap={3}>
                   {rows.map((r) => {
@@ -181,18 +181,18 @@ export default function NewDevolucionPage() {
                       >
                         <ITFlex align="center" justify="between" gap={3} wrap="wrap">
                           <ITFlex align="center" gap={2} className="min-w-0">
-                            <ITText className="text-sm font-bold text-slate-800">{r.dispositivoNombre}</ITText>
+                            <ITText className="text-sm font-bold text-slate-800">{r.deviceName}</ITText>
                           </ITFlex>
                           <ITFlex gap={1.5} wrap="wrap">
-                            <ITBadget color="gray" size="lg">{t("devolucion.prestado")}: {r.prestado}</ITBadget>
-                            <ITBadget color="success" size="lg">{t("devolucion.devuelto")}: {r.devuelto}</ITBadget>
-                            <ITBadget color="warning" size="lg">{t("devolucion.pendiente")}: {r.pendiente}</ITBadget>
+                            <ITBadget color="gray" size="lg">{t("loanReturn.loaned")}: {r.loaned}</ITBadget>
+                            <ITBadget color="success" size="lg">{t("loanReturn.returnedQuantity")}: {r.returnedQuantity}</ITBadget>
+                            <ITBadget color="warning" size="lg">{t("loanReturn.pending")}: {r.pending}</ITBadget>
                           </ITFlex>
                         </ITFlex>
 
-                        {r.activos.length > 0 && (
+                        {r.active.length > 0 && (
                           <ITFlex gap={1} wrap="wrap">
-                            {r.activos.map((a) => (
+                            {r.active.map((a) => (
                               <span key={a} className="rounded-md bg-slate-200/70 px-2 py-0.5 text-[10px] font-bold text-slate-600">
                                 {a}
                               </span>
@@ -204,28 +204,28 @@ export default function NewDevolucionPage() {
                           <ITGrid item xs={12} md={3}>
                             <ITInput
                               name={`devolver-${r.key}`}
-                              label={t("devolucion.devolver")}
+                              label={t("loanReturn.returnLoan")}
                               type="number"
                               min={0}
-                              max={r.pendiente}
-                              value={r.cantidad}
-                              onChange={(e) => updateRow(r.key, { cantidad: e.target.value })}
+                              max={r.pending}
+                              value={r.quantity}
+                              onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
                             />
                           </ITGrid>
                           <ITGrid item xs={12} md={9}>
                             <ITFlex as="fieldset" direction="column" gap={2}>
                               <ITText as="legend" className="text-sm font-semibold text-slate-700">
-                                {t("devolucion.condicion")}
+                                {t("loanReturn.condition")}
                               </ITText>
                               <ITFlex gap={2} wrap="wrap">
-                                {CONDICIONES.map((c) => {
+                                {CONDITIONS.map((c) => {
                                   const p = CONDITION_PRESETS[c];
-                                  const isActive = r.condicion === c;
+                                  const isActive = r.condition === c;
                                   return (
                                     <button
                                       key={c}
                                       type="button"
-                                      onClick={() => updateRow(r.key, { condicion: c })}
+                                      onClick={() => updateRow(r.key, { condition: c })}
                                       className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-all ${
                                         isActive
                                           ? `border-transparent bg-slate-50 ring-2 ${p.ring} ${p.text}`
@@ -233,7 +233,7 @@ export default function NewDevolucionPage() {
                                       }`}
                                     >
                                       {p.icon}
-                                      <span>{t(`devolucion.condicionLabels.${c}`)}</span>
+                                      <span>{t(`loanReturn.conditionLabels.${c}`)}</span>
                                     </button>
                                   );
                                 })}
@@ -242,17 +242,17 @@ export default function NewDevolucionPage() {
                           </ITGrid>
                         </ITGrid>
 
-                        {r.condicion === "ROTO" && (
-                          <ITText className="text-[11px] font-semibold text-red-600">{t("devolucion.rotoBajaHint")}</ITText>
+                        {r.condition === "BROKEN" && (
+                          <ITText className="text-[11px] font-semibold text-red-600">{t("loanReturn.brokenRetirementHint")}</ITText>
                         )}
-                        {(r.condicion === "MALO" || r.condicion === "ROTO") && (
+                        {(r.condition === "POOR" || r.condition === "BROKEN") && (
                           <div>
                             <ITInput
                               name={`observaciones-${r.key}`}
-                              label={t("new.comentario")}
-                              placeholder={t("devolucion.comentarioPlaceholder")}
-                              value={r.observaciones}
-                              onChange={(e) => updateRow(r.key, { observaciones: e.target.value })}
+                              label={t("new.comment")}
+                              placeholder={t("loanReturn.commentPlaceholder")}
+                              value={r.notes}
+                              onChange={(e) => updateRow(r.key, { notes: e.target.value })}
                               aria-invalid={!!errors[`observaciones-${rows.indexOf(r)}`]}
                             />
                             {errors[`observaciones-${rows.indexOf(r)}`] && (
@@ -273,29 +273,29 @@ export default function NewDevolucionPage() {
 
         <ITGrid item xs={12} lg={4}>
           <ITFlex direction="column" gap={4} className="lg:sticky lg:top-6">
-            {prestamo && (
+            {loan && (
               <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <ITFlex align="center" gap={2}>
                   <FaFileSignature className="text-slate-400" size={14} />
-                  <ITText className="text-sm font-semibold text-slate-800">{t("devolucion.cartaInfo")}</ITText>
+                  <ITText className="text-sm font-semibold text-slate-800">{t("loanReturn.custodyLetterInfo")}</ITText>
                 </ITFlex>
 
                 <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("prestamos.colConsecutivo")}</ITText>
-                  <ITText className="text-sm font-bold text-slate-900">{prestamo.consecutivo}</ITText>
+                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.colNumber")}</ITText>
+                  <ITText className="text-sm font-bold text-slate-900">{loan.number}</ITText>
                 </ITFlex>
 
                 <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("prestamos.colFecha")}</ITText>
-                  <ITText className="text-sm text-slate-600">{formatFecha(prestamo.fecha)}</ITText>
+                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.colDate")}</ITText>
+                  <ITText className="text-sm text-slate-600">{formatDate(loan.date)}</ITText>
                 </ITFlex>
 
                 <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("prestamos.asignacion")}</ITText>
+                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.assignment")}</ITText>
                   <ITFlex align="center" gap={2}>
                     <FaUserTie className="text-slate-400" size={12} />
                     <ITText className="text-sm font-semibold text-slate-700">
-                      {prestamo.responsable?.name ?? (prestamo.departamento?.name || "—")}
+                      {loan.custodian?.name ?? (loan.department?.name || "—")}
                     </ITText>
                   </ITFlex>
                 </ITFlex>
@@ -306,8 +306,8 @@ export default function NewDevolucionPage() {
                   gap={2}
                   className="rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3"
                 >
-                  <ITText className="text-xs text-slate-600">{t("devolucion.pendienteTotal")}</ITText>
-                  <ITText className="text-lg font-black text-slate-800">{totalPendiente}</ITText>
+                  <ITText className="text-xs text-slate-600">{t("loanReturn.pendingTotal")}</ITText>
+                  <ITText className="text-lg font-black text-slate-800">{pendingTotal}</ITText>
                 </ITFlex>
 
                 <ITFlex
@@ -316,8 +316,8 @@ export default function NewDevolucionPage() {
                   gap={2}
                   className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3"
                 >
-                  <ITText className="text-xs text-slate-600">{t("devolucion.aDevolver")}</ITText>
-                  <ITText className="text-lg font-black text-emerald-700">{totalADevolver}</ITText>
+                  <ITText className="text-xs text-slate-600">{t("loanReturn.toReturn")}</ITText>
+                  <ITText className="text-lg font-black text-emerald-700">{totalToReturn}</ITText>
                 </ITFlex>
               </ITFlex>
             )}

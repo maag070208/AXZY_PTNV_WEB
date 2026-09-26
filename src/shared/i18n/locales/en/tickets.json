@@ -1,14 +1,14 @@
 {
   "statusLabels": {
-    "ABIERTO": "Open",
-    "EN_SEGUIMIENTO": "Following up",
-    "CERRADO": "Closed"
+    "OPEN": "Open",
+    "IN_PROGRESS": "Following up",
+    "CLOSED": "Closed"
   },
   "priorityLabels": {
-    "BAJA": "Low",
-    "MEDIA": "Medium",
-    "ALTA": "High",
-    "URGENTE": "Urgent"
+    "LOW": "Low",
+    "MEDIUM": "Medium",
+    "HIGH": "High",
+    "URGENT": "Urgent"
   },
   "list": {
     "title": "Tickets",
@@ -29,13 +29,13 @@
       "priority": "Priority",
       "createdBy": "Created by",
       "assignedTo": "Assigned to",
-      "espera": "Days waiting"
+      "wait": "Days waiting"
     },
-    "esperaLabels": {
-      "EXCELENTE": "EXCELLENT",
-      "BUENO": "GOOD",
+    "waitLabels": {
+      "EXCELLENT": "EXCELLENT",
+      "GOOD": "GOOD",
       "REGULAR": "FAIR",
-      "MALO": "BAD"
+      "POOR": "BAD"
     }
   },
   "new": {
@@ -61,7 +61,7 @@
     "evidenceTitle": "Evidence",
     "evidenceSub": "Images or PDF of the issue",
     "removeFile": "Remove",
-    "resumenTitle": "Request summary"
+    "summaryTitle": "Request summary"
   },
   "edit": {
     "title": "Edit Ticket",
@@ -148,10 +148,10 @@
     "dueDate": "Expected end date",
     "taskStatus": "Task status",
     "taskStatusOptions": {
-      "PENDIENTE": "Pending",
-      "EN_PROGRESO": "In progress",
-      "EN_REVISION": "In review",
-      "COMPLETADA": "Completed"
+      "PENDING": "Pending",
+      "IN_PROGRESS": "In progress",
+      "IN_REVIEW": "In review",
+      "COMPLETED": "Completed"
     },
     "employeeNo": "No. {{number}}",
     "employeeLabel": "Employee",

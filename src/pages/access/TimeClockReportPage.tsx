@@ -3,36 +3,36 @@ import { FaUserClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AccessReportTab, useAccessReport, type AccessReportSource } from "@features/access/report";
-import { VinculosResumen } from "@features/access/checador-empleados";
-import { checadorApi } from "@entities/checador";
-import { downloadChecadorReportPDF } from "@widgets/reports";
+import { LinksSummary } from "@features/access/time-clock-employees";
+import { timeClockApi } from "@entities/time-clock";
+import { downloadTimeClockReportPdf } from "@widgets/reports";
 
 /** El mismo reporte de entradas/salidas, alimentado por las checadas del reloj. */
-const CHECADOR_SOURCE: AccessReportSource = {
-  report: checadorApi.report,
-  reportExport: checadorApi.reportExport,
-  csvPrefix: "checador",
+const TIME_CLOCK_SOURCE: AccessReportSource = {
+  report: timeClockApi.report,
+  reportExport: timeClockApi.reportExport,
+  csvPrefix: "timeClock",
 };
 
-export default function ChecadorReportPage() {
-  const { t } = useTranslation(["checador", "common"]);
+export default function TimeClockReportPage() {
+  const { t } = useTranslation(["time-clock", "common"]);
   const navigate = useNavigate();
-  const fx = useAccessReport({ download: downloadChecadorReportPDF, source: CHECADOR_SOURCE });
+  const fx = useAccessReport({ download: downloadTimeClockReportPdf, source: TIME_CLOCK_SOURCE });
 
   return (
     <ITPage
-      title={t("reporte.title")}
-      description={t("reporte.description")}
+      title={t("report.title")}
+      description={t("report.description")}
       icon={<FaUserClock size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("common:nav.access"), onClick: () => navigate("/access") },
-        { label: t("reporte.title") },
+        { label: t("report.title") },
       ]}
-      backAction={() => navigate("/access/checador")}
+      backAction={() => navigate("/access/time-clock")}
     >
       <ITFlex direction="column" gap={4}>
-        <VinculosResumen onIrAVincular={() => navigate("/access/checador/empleados")} />
+        <LinksSummary onGoToLink={() => navigate("/access/time-clock/employees")} />
         <AccessReportTab fx={fx} />
       </ITFlex>
     </ITPage>

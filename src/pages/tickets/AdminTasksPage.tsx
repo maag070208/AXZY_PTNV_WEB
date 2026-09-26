@@ -2,16 +2,16 @@ import { ITBadget, ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_sys
 import { FaSync, FaTasks, FaTrello } from "react-icons/fa";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
+import { useCan } from "@entities/user";
 import {
   useAssignmentList,
   AdminTasksTable,
 } from "@features/ticket/tasks-table";
 
-export default function AdminTareasPage() {
+export default function AdminTasksPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
-  const canCompleteTasks = usePuede("tareas.completar");
+  const canCompleteTasks = useCan("tasks.complete");
 
   const fx = useAssignmentList("admintasks.loadError");
 
@@ -53,9 +53,9 @@ export default function AdminTareasPage() {
         {fx.error && (
           <ITText className="text-[11px] font-bold text-red-600">{fx.error}</ITText>
         )}
-        {fx.vencidas > 0 && (
+        {fx.overdue > 0 && (
           <ITBadget color="danger" size="lg">
-            {tt("admintasks.overdueTasks", { count: fx.vencidas })}
+            {tt("admintasks.overdueTasks", { count: fx.overdue })}
           </ITBadget>
         )}
       </ITFlex>

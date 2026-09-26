@@ -16,10 +16,10 @@ import { dyn } from "@shared/i18n/dyn";
 import type { TicketEditDraft } from "../model/useEditTicket";
 
 const PRIORITIES = [
-  { value: "BAJA", icon: <FaInfoCircle size={11} />, color: "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200", activeColor: "bg-slate-600 text-white border-slate-600" },
-  { value: "MEDIA", icon: <FaExclamationTriangle size={11} />, color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100", activeColor: "bg-amber-500 text-white border-amber-500" },
-  { value: "ALTA", icon: <FaFire size={11} />, color: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100", activeColor: "bg-orange-500 text-white border-orange-500" },
-  { value: "URGENTE", icon: <FaBan size={11} />, color: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100", activeColor: "bg-red-500 text-white border-red-500" },
+  { value: "LOW", icon: <FaInfoCircle size={11} />, color: "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200", activeColor: "bg-slate-600 text-white border-slate-600" },
+  { value: "MEDIUM", icon: <FaExclamationTriangle size={11} />, color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100", activeColor: "bg-amber-500 text-white border-amber-500" },
+  { value: "HIGH", icon: <FaFire size={11} />, color: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100", activeColor: "bg-orange-500 text-white border-orange-500" },
+  { value: "URGENT", icon: <FaBan size={11} />, color: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100", activeColor: "bg-red-500 text-white border-red-500" },
 ];
 
 interface Props {
@@ -41,31 +41,31 @@ export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
 
             <div>
               <ITInput
-                name="titulo"
+                name="title"
                 label={tt("edit.titleLabel")}
-                value={form.titulo}
-                onChange={(e) => onFieldChange("titulo", e.target.value)}
+                value={form.title}
+                onChange={(e) => onFieldChange("title", e.target.value)}
                 placeholder={tt("edit.titlePlaceholder")}
-                aria-invalid={!!errors?.titulo}
+                aria-invalid={!!errors?.title}
               />
-              {errors?.titulo && (
+              {errors?.title && (
                 <span role="alert" className="text-red-500 text-xs mt-1 block">
-                  {errors.titulo}
+                  {errors.title}
                 </span>
               )}
             </div>
 
             <ITFlex direction="column" gap={1}>
               <ITTextarea
-                name="descripcion"
+                name="description"
                 label={tt("edit.descLabel")}
-                value={form.descripcion}
-                onChange={(v) => onFieldChange("descripcion", v)}
+                value={form.description}
+                onChange={(v) => onFieldChange("description", v)}
                 placeholder={tt("edit.descPlaceholder")}
                 rows={6}
               />
               <ITText className="text-[9px] text-slate-400 text-right">
-                {form.descripcion.length} / 2000
+                {form.description.length} / 2000
               </ITText>
             </ITFlex>
           </ITStack>

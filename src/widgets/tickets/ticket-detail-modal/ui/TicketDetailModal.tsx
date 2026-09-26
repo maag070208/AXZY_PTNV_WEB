@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import type { Ticket } from "@entities/ticket";
 import { formatDate } from "@shared/i18n";
-import { formatFechaHora } from "@shared/utils/dates";
+import { formatDateTime } from "@shared/utils/dates";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
 import {
   ASSIGNMENT_STATUS_META,
@@ -69,10 +69,10 @@ export default function TicketDetailModal({
               </span>
               <span className="text-slate-300">·</span>
               <span className="text-xs text-slate-400">
-                {tt("detail.createdOn", { date: formatFechaHora(ticket.creadoEn) })}
+                {tt("detail.createdOn", { date: formatDateTime(ticket.createdAt) })}
               </span>
             </ITFlex>
-            <ITText className="text-xl font-bold text-slate-900 leading-tight">{ticket.titulo}</ITText>
+            <ITText className="text-xl font-bold text-slate-900 leading-tight">{ticket.title}</ITText>
           </div>
 
           {/* Cuerpo en Grid/Flex estricto con estilos inline de respaldo por si fallan las utilidades */}
@@ -89,14 +89,14 @@ export default function TicketDetailModal({
                     {tt("detail.description")}
                   </ITText>
                   <div className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
-                    {ticket.descripcion || tt("detail.noDescription")}
+                    {ticket.description || tt("detail.noDescription")}
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <TicketAttachments
                     ticketId={ticket.id}
-                    canUpload={canManage || Boolean(ticket.creadoPorId === currentUserId)}
+                    canUpload={canManage || Boolean(ticket.createdById === currentUserId)}
                   />
                 </div>
 
@@ -119,7 +119,7 @@ export default function TicketDetailModal({
                     >
                       {ticket.assignments.map((t, i) => {
                         const overdue = Boolean(
-                          t.dueDate && t.status !== "COMPLETADA" && new Date(t.dueDate) < new Date()
+                          t.dueDate && t.status !== "COMPLETED" && new Date(t.dueDate) < new Date()
                         );
                         return (
                           <div
@@ -214,7 +214,7 @@ export default function TicketDetailModal({
                   />
                 </DetailRow>
                 <DetailRow label={tt("detail.createdByLabel")}>
-                  <span className="text-sm font-medium text-slate-700">{ticket.creadoPor?.name}</span>
+                  <span className="text-sm font-medium text-slate-700">{ticket.createdBy?.name}</span>
                 </DetailRow>
               </aside>
 

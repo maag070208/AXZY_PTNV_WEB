@@ -12,31 +12,31 @@ import {
 import type { Column } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaPlus, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { scheduleApi, type Horario, type HorarioDia } from "@entities/schedule";
+import { scheduleApi, type Schedule, type ScheduleDay } from "@entities/schedule";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 
 const DAY_ABBR = ["L", "M", "M", "J", "V", "S", "D"];
 
-const diaKey = (d: HorarioDia): string =>
-  d.descanso
+const dayKey = (d: ScheduleDay): string =>
+  d.restDay
     ? "rest"
-    : `${d.entrada}-${d.salida}${d.entrada2 && d.salida2 ? ` + ${d.entrada2}-${d.salida2}` : ""}`;
+    : `${d.startTime}-${d.endTime}${d.splitStartTime && d.splitEndTime ? ` + ${d.splitStartTime}-${d.splitEndTime}` : ""}`;
 
 /** "L-V 08:00-16:00 · S 08:00-14:00 · D descansa" */
-function formatDays(dias: HorarioDia[]): string {
-  const sorted = [...dias].sort((a, b) => a.diaSemana - b.diaSemana);
+function formatDays(days: ScheduleDay[]): string {
+  const sorted = [...days].sort((a, b) => a.weekday - b.weekday);
   const parts: string[] = [];
   let i = 0;
   while (i < sorted.length) {
-    const k = diaKey(sorted[i]);
+    const k = dayKey(sorted[i]);
     let j = i;
-    while (j + 1 < sorted.length && diaKey(sorted[j + 1]) === k && sorted[j + 1].diaSemana === sorted[j].diaSemana + 1) {
+    while (j + 1 < sorted.length && dayKey(sorted[j + 1]) === k && sorted[j + 1].weekday === sorted[j].weekday + 1) {
       j += 1;
     }
     const label =
-      sorted[i].diaSemana === sorted[j].diaSemana
-        ? DAY_ABBR[sorted[i].diaSemana - 1]
-        : `${DAY_ABBR[sorted[i].diaSemana - 1]}-${DAY_ABBR[sorted[j].diaSemana - 1]}`;
+      sorted[i].weekday === sorted[j].weekday
+        ? DAY_ABBR[sorted[i].weekday - 1]
+        : `${DAY_ABBR[sorted[i].weekday - 1]}-${DAY_ABBR[sorted[j].weekday - 1]}`;
     parts.push(`${label} ${k === "rest" ? "descansa" : k}`);
     i = j + 1;
   }
@@ -48,19 +48,19 @@ export default function SchedulesTable() {
   const navigate = useNavigate();
   const [reloadKey, setReloadKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [horarioToDeactivate, setHorarioToDeactivate] = useState<Horario | null>(null);
+  const [scheduleToDeactivate, setScheduleToDeactivate] = useState<Schedule | null>(null);
   const [saving, setSaving] = useState(false);
 
   // El fetcher corre en cada refetch; `reloadTrigger` fuerza a ITDataTable a
   // volver a pedir los datos tras un cambio.
   const fetchData = useMemo(
-    () => makeClientTableFetch<Horario>(() => scheduleApi.list(true)),
+    () => makeClientTableFetch<Schedule>(() => scheduleApi.list(true)),
     []
   );
 
-  const toggleActive = async (h: Horario) => {
+  const toggleActive = async (h: Schedule) => {
     try {
-      await scheduleApi.update(h.id, { activo: !h.activo });
+      await scheduleApi.update(h.id, { active: !h.active });
       setReloadKey((k) => k + 1);
     } catch (e) {
       setError((e as Error).message);
@@ -68,63 +68,63 @@ export default function SchedulesTable() {
   };
 
   const confirmDeactivate = async () => {
-    if (!horarioToDeactivate) return;
+    if (!scheduleToDeactivate) return;
     setSaving(true);
     try {
-      await scheduleApi.update(horarioToDeactivate.id, { activo: false });
+      await scheduleApi.update(scheduleToDeactivate.id, { active: false });
       setReloadKey((k) => k + 1);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setSaving(false);
-      setHorarioToDeactivate(null);
+      setScheduleToDeactivate(null);
     }
   };
 
-  const columns: Column<Horario>[] = [
+  const columns: Column<Schedule>[] = [
     {
-      key: "nombre",
+      key: "name",
       label: t("name"),
       type: "string",
       filter: true,
       sortable: true,
-      render: (h) => <ITText className="text-[12px] font-black text-slate-800">{h.nombre}</ITText>,
+      render: (h) => <ITText className="text-[12px] font-black text-slate-800">{h.name}</ITText>,
     },
     {
-      key: "dias",
+      key: "days",
       label: t("days"),
       type: "string",
       sortable: false,
       render: (h) => (
-        <ITText className="text-[11px] text-slate-600">{formatDays(h.dias)}</ITText>
+        <ITText className="text-[11px] text-slate-600">{formatDays(h.days)}</ITText>
       ),
     },
     {
       key: "reglas",
-      label: t("tolEntrada"),
+      label: t("tolEntry"),
       type: "string",
       sortable: false,
       render: (h) => (
         <ITText className="text-[11px] text-slate-500 whitespace-nowrap">
-          E{h.toleranciaEntradaMin} / S{h.toleranciaSalidaMin} · {t("comida")} {h.comidaMin} · {t("minExtra")} {h.minimoExtraMin}
+          E{h.entryToleranceMin} / S{h.exitToleranceMin} · {t("meal")} {h.mealBreakMin} · {t("minExtra")} {h.minOvertimeMin}
         </ITText>
       ),
     },
     {
-      key: "asignados",
+      key: "assigned",
       label: t("assignedLabel"),
       type: "number",
       sortable: false,
-      render: (h) => <ITText className="text-[12px] font-bold text-slate-700">{h.asignados ?? 0}</ITText>,
+      render: (h) => <ITText className="text-[12px] font-bold text-slate-700">{h.assigned ?? 0}</ITText>,
     },
     {
-      key: "activo",
+      key: "active",
       label: t("active"),
       type: "boolean",
       sortable: false,
       render: (h) => (
-        <ITBadget color={h.activo ? "success" : "danger"} size="sm">
-          {h.activo ? t("active") : t("inactive")}
+        <ITBadget color={h.active ? "success" : "danger"} size="sm">
+          {h.active ? t("active") : t("inactive")}
         </ITBadget>
       ),
     },
@@ -139,16 +139,16 @@ export default function SchedulesTable() {
             size="lg"
             color="primary"
             title={t("edit")}
-            onClick={() => navigate(`/horarios/${h.id}/editar`)}
+            onClick={() => navigate(`/schedules/${h.id}/edit`)}
           >
             <FaEdit size={12} />
           </ITButton>
           <ITButton
             variant="outlined"
             size="lg"
-            color={h.activo ? "error" : "success"}
-            title={h.activo ? t("delete") : t("reactivate")}
-            onClick={() => (h.activo ? setHorarioToDeactivate(h) : void toggleActive(h))}
+            color={h.active ? "error" : "success"}
+            title={h.active ? t("delete") : t("reactivate")}
+            onClick={() => (h.active ? setScheduleToDeactivate(h) : void toggleActive(h))}
           >
             <FaTrashRestore size={12} />
           </ITButton>
@@ -166,7 +166,7 @@ export default function SchedulesTable() {
       )}
 
       <ITFlex justify="end">
-        <ITButton variant="filled" color="primary" onClick={() => navigate("/horarios/nuevo")}>
+        <ITButton variant="filled" color="primary" onClick={() => navigate("/schedules/new")}>
           <ITFlex align="center" gap={1}>
             <FaPlus size={12} />
             <ITText className="font-bold text-[11px]">{t("new")}</ITText>
@@ -184,13 +184,13 @@ export default function SchedulesTable() {
       />
 
       <ITConfirmDialog
-        isOpen={!!horarioToDeactivate}
+        isOpen={!!scheduleToDeactivate}
         onClose={() => {
-          if (!saving) setHorarioToDeactivate(null);
+          if (!saving) setScheduleToDeactivate(null);
         }}
         onConfirm={confirmDeactivate}
         title={t("deactivateDialog.title")}
-        message={t("deactivateDialog.message", { name: horarioToDeactivate?.nombre ?? "" })}
+        message={t("deactivateDialog.message", { name: scheduleToDeactivate?.name ?? "" })}
         confirmLabel={t("deactivateDialog.confirm")}
         cancelLabel={t("cancel")}
         variant="danger"

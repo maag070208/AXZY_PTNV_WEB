@@ -26,7 +26,7 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
   }));
   const categoryOptions = fx.categories.map((c) => ({
     value: c.id,
-    label: c.nombre,
+    label: c.name,
   }));
 
   return (
@@ -79,13 +79,13 @@ export default function TicketManagerPanel({ fx, renderAssignmentAttachments }: 
 
         {fx.canEditTicket && (
           <ITSelect
-            name="responsable"
+            name="custodian"
             label={tt("detail.responsible")}
             options={[
               { value: "", label: tt("detail.noResponsible") },
-              ...fx.responsableOptions,
+              ...fx.assigneeOptions,
             ]}
-            value={ticket.asignadoAId ?? ""}
+            value={ticket.assignedToId ?? ""}
             onChange={(e) => fx.handleResponsibleChange(e.target.value)}
             disabled={fx.isClosed}
           />

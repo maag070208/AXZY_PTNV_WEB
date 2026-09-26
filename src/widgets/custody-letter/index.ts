@@ -1,4 +1,4 @@
-export { default as CartaResponsivaPDF } from "./ui/CartaResponsivaPDF";
-export { default as CartaResponsivaPreview } from "./ui/CartaResponsivaPreview";
-export { default as CartaResponsivaHtml } from "./ui/CartaResponsivaHtml";
-export { descargarCartaPDF } from "./model/pdf";
+export { default as CustodyLetterPdf } from "./ui/CustodyLetterPdf";
+export { default as CustodyLetterPreview } from "./ui/CustodyLetterPreview";
+export { default as CustodyLetterHtml } from "./ui/CustodyLetterHtml";
+export { downloadCustodyLetterPdf } from "./model/pdf";

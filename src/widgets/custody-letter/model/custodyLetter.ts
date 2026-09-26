@@ -1,4 +1,4 @@
-import type { Prestamo } from "@entities/inventario";
+import type { Loan } from "@entities/inventory";
 
 /**
  * Área que se imprime en el bloque "Recurso TIC:" de la carta responsiva.
@@ -9,8 +9,8 @@ import type { Prestamo } from "@entities/inventario";
  * "Departamento de " y no se fuerzan mayúsculas (el estilo de cada plantilla
  * se encarga).
  */
-export const resolveAreaName = (prestamo: Prestamo): string =>
-  (prestamo.departamento?.name || prestamo.responsable?.department?.name || "Sistemas").replace(
+export const resolveAreaName = (loan: Loan): string =>
+  (loan.department?.name || loan.custodian?.department?.name || "Sistemas").replace(
     /^Departamento de /i,
     ""
   );

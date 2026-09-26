@@ -14,16 +14,16 @@ import { FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 
-interface SimpleCatalogTabProps<T extends { id: string; nombre: string; activo: boolean }> {
+interface SimpleCatalogTabProps<T extends { id: string; name: string; active: boolean }> {
   list: (includeInactive?: boolean) => Promise<T[]>;
-  create: (nombre: string) => Promise<T>;
-  update: (id: string, data: { nombre?: string; activo?: boolean }) => Promise<T>;
+  create: (name: string) => Promise<T>;
+  update: (id: string, data: { name?: string; active?: boolean }) => Promise<T>;
   remove: (id: string) => Promise<{ soft: boolean; data: T }>;
   /** Incrementar para abrir el formulario de alta desde fuera (p.ej. botón del aside). */
   openCreateSignal?: number;
 }
 
-export default function SimpleCatalogTab<T extends { id: string; nombre: string; activo: boolean }>({
+export default function SimpleCatalogTab<T extends { id: string; name: string; active: boolean }>({
   list,
   create,
   update,
@@ -33,8 +33,8 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
   const { t } = useTranslation(["catalog", "common"]);
   const [reloadKey, setReloadKey] = useState(0);
   const [showForm, setShowForm] = useState(false);
-  const [editando, setEditando] = useState<T | null>(null);
-  const [nombre, setNombre] = useState("");
+  const [editing, setEditing] = useState<T | null>(null);
+  const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [toDelete, setToDelete] = useState<T | null>(null);
 
@@ -42,8 +42,8 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
   useEffect(() => {
     if (openCreateSignal === lastSignal.current) return;
     lastSignal.current = openCreateSignal;
-    setEditando(null);
-    setNombre("");
+    setEditing(null);
+    setName("");
     setShowForm(true);
   }, [openCreateSignal]);
 
@@ -52,27 +52,27 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
     [reloadKey]
   );
 
-  const abrirEdicion = (item: T) => {
-    setEditando(item);
-    setNombre(item.nombre);
+  const openEdit = (item: T) => {
+    setEditing(item);
+    setName(item.name);
     setShowForm(true);
   };
 
-  const cerrar = () => {
+  const close = () => {
     setShowForm(false);
-    setEditando(null);
+    setEditing(null);
   };
 
   const save = async () => {
-    if (!nombre.trim()) return;
+    if (!name.trim()) return;
     setError(null);
     try {
-      if (editando) {
-        await update(editando.id, { nombre: nombre.trim() });
+      if (editing) {
+        await update(editing.id, { name: name.trim() });
       } else {
-        await create(nombre.trim());
+        await create(name.trim());
       }
-      cerrar();
+      close();
       setReloadKey((k) => k + 1);
     } catch (e: any) {
       setError(e.message ?? t("saveError"));
@@ -82,7 +82,7 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
   const toggleActive = async (item: T) => {
     setError(null);
     try {
-      await update(item.id, { activo: !item.activo });
+      await update(item.id, { active: !item.active });
       setReloadKey((k) => k + 1);
     } catch (e: any) {
       setError(e.message ?? t("saveError"));
@@ -105,19 +105,19 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
   const columns: any[] = [
     {
       type: "string",
-      key: "nombre",
+      key: "name",
       label: t("name"),
       filter: true,
       sortable: false,
-      render: (item: T) => <ITText className="text-[11px] font-bold text-slate-800">{item.nombre}</ITText>,
+      render: (item: T) => <ITText className="text-[11px] font-bold text-slate-800">{item.name}</ITText>,
     },
     {
       type: "boolean",  
-      key: "activo",
+      key: "active",
       label: t("status"),
       sortable: false,
       render: (item: T) =>
-        item.activo ? (
+        item.active ? (
           <ITBadget color="success" size="lg">{t("active")}</ITBadget>
         ) : (
           <ITBadget color="danger" size="lg">{t("inactive")}</ITBadget>
@@ -125,23 +125,23 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
     },
     {
       type: "string",
-      key: "accion",
+      key: "action",
       label: "",
       render: (item: T) => (
         <ITFlex align="center" gap={2}>
-          <ITButton variant="outlined" color="primary" size="lg" onClick={() => abrirEdicion(item)}>
+          <ITButton variant="outlined" color="primary" size="lg" onClick={() => openEdit(item)}>
             <FaEdit size={12} />
           </ITButton>
           <ITButton
             variant="outlined"
-            color={item.activo ? "secondary" : "success"}
+            color={item.active ? "secondary" : "success"}
             size="lg"
             onClick={() => toggleActive(item)}
-            title={item.activo ? t("deactivate") : t("activate")}
+            title={item.active ? t("deactivate") : t("activate")}
           >
-            {item.activo ? <FaTrash size={12} /> : <FaTrashRestore size={12} />}
+            {item.active ? <FaTrash size={12} /> : <FaTrashRestore size={12} />}
           </ITButton>
-          {!item.activo && (
+          {!item.active && (
             <ITButton
               variant="outlined"
               color="error"
@@ -167,24 +167,24 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
 
       <ITDialog
         isOpen={showForm}
-        onClose={cerrar}
-        title={editando ? t("edit") : t("new")}
+        onClose={close}
+        title={editing ? t("edit") : t("new")}
         useFormHeader
       >
         <ITFlex direction="column" gap={4}>
           <ITInput
-            name="nombre"
+            name="name"
             label={t("name")}
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && save()}
             autoFocus
           />
           <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" onClick={cerrar}>
+            <ITButton variant="outlined" color="secondary" onClick={close}>
               <ITText className="font-bold text-[11px]">{t("common:actions.cancel")}</ITText>
             </ITButton>
-            <ITButton variant="filled" color="primary" onClick={save} disabled={!nombre.trim()}>
+            <ITButton variant="filled" color="primary" onClick={save} disabled={!name.trim()}>
               <ITText className="font-bold text-[11px]">{t("common:actions.save")}</ITText>
             </ITButton>
           </ITFlex>
@@ -205,7 +205,7 @@ export default function SimpleCatalogTab<T extends { id: string; nombre: string;
         onClose={() => setToDelete(null)}
         onConfirm={confirmDelete}
         title={t("deleteForever")}
-        message={t("deleteForeverConfirm", { name: toDelete?.nombre })}
+        message={t("deleteForeverConfirm", { name: toDelete?.name })}
         confirmLabel={t("deleteForever")}
         cancelLabel={t("common:actions.cancel")}
         variant="danger"

@@ -49,9 +49,9 @@
     "deleteSubareaForever": "Permanently delete area \"{{name}}\"? This action cannot be undone.",
     "ticketsTitle": "Tickets",
     "noTickets": "This department has no tickets.",
-    "cartasTitle": "Responsibility letters",
-    "noCartas": "This department has no responsibility letters.",
-    "cartaActive": "Active",
-    "cartaReturned": "Returned"
+    "custodyLettersTitle": "Responsibility letters",
+    "noCustodyLetters": "This department has no responsibility letters.",
+    "custodyLetterActive": "Active",
+    "custodyLetterReturned": "Returned"
   }
 }

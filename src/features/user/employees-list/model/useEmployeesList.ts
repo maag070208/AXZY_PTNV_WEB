@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
-import { personalApi } from "@entities/personal";
+import { personalApi } from "@entities/hr";
 import {
   departmentsApi,
   type Department,

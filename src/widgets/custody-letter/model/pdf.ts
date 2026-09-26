@@ -1,16 +1,16 @@
 import { createElement } from "react";
 import { pdf } from "@react-pdf/renderer";
-import type { Prestamo } from "@entities/inventario";
-import CartaResponsivaPDF from "../ui/CartaResponsivaPDF";
+import type { Loan } from "@entities/inventory";
+import CustodyLetterPdf from "../ui/CustodyLetterPdf";
 
-export const descargarCartaPDF = async (prestamo: Prestamo): Promise<void> => {
+export const downloadCustodyLetterPdf = async (loan: Loan): Promise<void> => {
   const blob = await pdf(
-    createElement(CartaResponsivaPDF, { prestamo }) as any
+    createElement(CustodyLetterPdf, { loan }) as any
   ).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${prestamo.consecutivo}.pdf`;
+  a.download = `${loan.number}.pdf`;
   a.click();
   URL.revokeObjectURL(url);
 };

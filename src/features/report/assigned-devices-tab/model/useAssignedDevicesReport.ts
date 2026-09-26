@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { reportsApi, type AsignadoRow } from "@entities/report";
+import { reportsApi, type AssignedDeviceRow } from "@entities/report";
 import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
 
-export type DownloadAsignadosPdf = (rows: AsignadoRow[]) => Promise<void>;
+export type DownloadAssignedDevicesPdf = (rows: AssignedDeviceRow[]) => Promise<void>;
 
 interface Options {
-  download: DownloadAsignadosPdf;
+  download: DownloadAssignedDevicesPdf;
 }
 
-export const useAsignadosReport = ({ download }: Options) => {
+export const useAssignedDevicesReport = ({ download }: Options) => {
   const { t } = useTranslation(["reports", "common"]);
-  const [rows, setRows] = useState<AsignadoRow[]>([]);
+  const [rows, setRows] = useState<AssignedDeviceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
@@ -21,9 +21,9 @@ export const useAsignadosReport = ({ download }: Options) => {
     setLoading(true);
     setError(null);
     reportsApi
-      .asignados()
+      .assigned()
       .then((res) => setRows(res.data))
-      .catch((e: any) => setError(e.message ?? t("asignados.errorLoad")))
+      .catch((e: any) => setError(e.message ?? t("assigned.errorLoad")))
       .finally(() => setLoading(false));
   }, [t]);
 
@@ -31,15 +31,15 @@ export const useAsignadosReport = ({ download }: Options) => {
     load();
   }, [load, reloadKey]);
 
-  const promedioDias = useMemo(() => {
+  const averageDays = useMemo(() => {
     if (rows.length === 0) return 0;
     return Math.round(
-      rows.reduce((acc, r) => acc + (r.diasAsignado ?? 0), 0) / rows.length
+      rows.reduce((acc, r) => acc + (r.daysAssigned ?? 0), 0) / rows.length
     );
   }, [rows]);
 
-  const masDe30 = useMemo(
-    () => rows.filter((r) => (r.diasAsignado ?? 0) > 30).length,
+  const moreDe30 = useMemo(
+    () => rows.filter((r) => (r.daysAssigned ?? 0) > 30).length,
     [rows]
   );
 
@@ -57,7 +57,7 @@ export const useAsignadosReport = ({ download }: Options) => {
   // ITDataTable exige un fetchData asíncrono (page/limit); como el universo
   // de asignados activos es acotado, paginamos en el cliente sobre `rows`.
   const fetchTableData = useCallback(
-    async (params: ITDataTableFetchParams): Promise<ITDataTableResponse<AsignadoRow>> => {
+    async (params: ITDataTableFetchParams): Promise<ITDataTableResponse<AssignedDeviceRow>> => {
       const start = (params.page - 1) * params.limit;
       return {
         data: rows.slice(start, start + params.limit),
@@ -76,11 +76,11 @@ export const useAsignadosReport = ({ download }: Options) => {
     exporting,
     reloadKey,
     setReloadKey,
-    promedioDias,
-    masDe30,
+    averageDays,
+    moreDe30,
     handleDownloadPdf,
     fetchTableData,
   };
 };
 
-export type UseAsignadosReport = ReturnType<typeof useAsignadosReport>;
+export type UseAssignedDevicesReport = ReturnType<typeof useAssignedDevicesReport>;

@@ -1,5 +1,5 @@
 import { test, expect } from "./support/fixtures";
-import { E2E, ruta } from "./support/env";
+import { E2E, route } from "./support/env";
 
 /**
  * Rol Guardia en el formulario de usuarios. El guardia (`GUARD`) opera la
@@ -11,16 +11,16 @@ test.describe("Usuarios — rol Guardia", () => {
     page,
     api,
   }) => {
-    const guardia = (await api.usuarios()).find((u) => u.username === E2E.guard.username);
-    expect(guardia, "el guardia de la suite").toBeDefined();
+    const guard = (await api.users()).find((u) => u.username === E2E.guard.username);
+    expect(guard, "el guardia de la suite").toBeDefined();
 
-    await page.goto(ruta(`/usuarios/${guardia!.id}/editar`));
+    await page.goto(route(`/users/${guard!.id}/edit`));
     await expect(page.getByRole("textbox", { name: /Apellido paterno/ })).toHaveValue("Guard");
     await page.getByRole("button", { name: "Siguiente" }).click();
 
-    const rol = page.locator('select[name="u_role"]');
-    await expect(rol).toHaveValue("GUARD");
-    await expect(rol.locator("option", { hasText: "GUARDIA" })).toHaveCount(1);
+    const role = page.locator('select[name="u_role"]');
+    await expect(role).toHaveValue("GUARD");
+    await expect(role.locator("option", { hasText: "GUARDIA" })).toHaveCount(1);
 
     await page.getByRole("button", { name: "Guía del rol" }).click();
     await expect(page.getByText(/Opera la portería desde la app/)).toBeVisible();

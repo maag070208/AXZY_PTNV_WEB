@@ -1,3 +1,3 @@
-export { default as ActaAdministrativaPDF } from "./ui/ActaAdministrativaPDF";
-export { default as ActaAdministrativaPreview } from "./ui/ActaAdministrativaPreview";
-export { descargarActaPDF } from "./model/pdf";
+export { default as DisciplinaryReportPdf } from "./ui/DisciplinaryReportPdf";
+export { default as DisciplinaryReportPreview } from "./ui/DisciplinaryReportPreview";
+export { downloadDisciplinaryReportPdf } from "./model/pdf";

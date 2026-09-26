@@ -13,22 +13,22 @@ import type {
 import { FaEdit, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
-import type { PersonalProfile } from "@entities/personal";
+import type { PersonalProfile } from "@entities/hr";
 
 const ROLE_LABEL: Record<string, string> = {
-  GERENTE: "GERENTE",
-  JEFE_DE_AREA: "JEFE DE ÁREA",
-  EMPLEADO: "EMPLEADO",
+  MANAGER: "MANAGER",
+  AREA_HEAD: "JEFE DE ÁREA",
+  EMPLOYEE: "EMPLOYEE",
 };
 
 const roleBadge = (role: string, label: string) => (
   <ITBadget
     color={
-      role === "GERENTE"
+      role === "MANAGER"
         ? "danger"
-        : role === "JEFE_DE_AREA"
+        : role === "AREA_HEAD"
         ? "warning"
-        : role === "EMPLEADO"
+        : role === "EMPLOYEE"
         ? "success"
         : "gray"
     }
@@ -70,14 +70,14 @@ export default function EmployeesTable({
 
   const columns: Column<PersonalProfile>[] = [
     {
-      key: "numeroEmpleado",
+      key: "employeeNumber",
       label: tt("table.employeeNoFull"),
       type: "string",
       filter: true,
       sortable: false,
       render: (u) => (
         <ITText className="text-[11px] font-black text-slate-700">
-          {u.numeroEmpleado ?? "—"}
+          {u.employeeNumber ?? "—"}
         </ITText>
       ),
     },
@@ -129,13 +129,13 @@ export default function EmployeesTable({
       ),
     },
     {
-      key: "puesto",
+      key: "jobTitle",
       label: tt("table.position"),
       type: "string",
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[11px] font-bold text-slate-600">{u.puesto ?? "—"}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-600">{u.jobTitle ?? "—"}</ITText>
       ),
     },
     {

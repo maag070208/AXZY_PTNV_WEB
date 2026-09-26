@@ -5,7 +5,7 @@ import {
   type ITDataTableFetchParamsPost,
 } from "@shared/api/table";
 import type {
-  AsignadoRow,
+  AssignedDeviceRow,
   DeviceReportRow,
   ReportFilters,
   ReportRow,
@@ -26,8 +26,8 @@ export const reportsApi = {
     tableRequest<ReportRow>(`/reports/query`, params),
   get: (filters: ReportFilters) =>
     api.get<{ data: ReportRow[]; total: number }>(`/reports${buildQS(filters)}`),
-  asignados: () =>
-    api.get<{ data: AsignadoRow[]; total: number }>(`/reports/asignados`),
+  assigned: () =>
+    api.get<{ data: AssignedDeviceRow[]; total: number }>(`/reports/assigned-devices`),
   devices: () =>
     api.get<{ data: DeviceReportRow[]; total: number }>(`/reports/devices`),
   csvUrl: (filters: ReportFilters) => {

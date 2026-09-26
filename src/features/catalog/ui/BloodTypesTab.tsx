@@ -1,13 +1,13 @@
-import { personalApi } from "@entities/personal";
+import { personalApi } from "@entities/hr";
 import SimpleCatalogTab from "./SimpleCatalogTab";
 
-export default function TiposSangreTab({ openCreateSignal }: { openCreateSignal?: number }) {
+export default function BloodTypesTab({ openCreateSignal }: { openCreateSignal?: number }) {
   return (
     <SimpleCatalogTab
-      list={personalApi.tiposSangre}
-      create={personalApi.crearTipoSangre}
-      update={personalApi.actualizarTipoSangre}
-      remove={personalApi.eliminarTipoSangre}
+      list={personalApi.bloodTypes}
+      create={personalApi.createBloodType}
+      update={personalApi.updateBloodType}
+      remove={personalApi.deleteBloodType}
       openCreateSignal={openCreateSignal}
     />
   );

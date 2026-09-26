@@ -1,6 +1,6 @@
 export {
-  useSalidasReport,
-  type UseSalidasReport,
-  type DownloadSalidasPdf,
-} from "./model/useSalidasReport";
-export { default as SalidasTab } from "./ui/SalidasTab";
+  useMaterialOutputsReport,
+  type UseMaterialOutputsReport,
+  type DownloadMaterialOutputsPdf,
+} from "./model/useMaterialOutputsReport";
+export { default as MaterialOutputsTab } from "./ui/MaterialOutputsTab";

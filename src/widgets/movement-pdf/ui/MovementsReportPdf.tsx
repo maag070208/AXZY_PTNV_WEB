@@ -1,52 +1,52 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { useTranslation } from "react-i18next";
-import type { Movimiento } from "@entities/inventario";
+import type { Movement } from "@entities/inventory";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
-import { TIPO_BADGE_COLOR } from "@entities/inventario/model/movimientoColores";
-import { formatFecha } from "@shared/utils/dates";
+import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
+import { formatDate } from "@shared/utils/dates";
 
 interface Props {
-  movimientos: Movimiento[];
+  movements: Movement[];
 }
 
 const styles = StyleSheet.create({
-  colFecha: { width: 50 },
+  colDate: { width: 50 },
   colFolio: { width: 62 },
-  colTipo: { width: 90 },
-  colDetalle: { flex: 1 },
-  colCant: { width: 32 },
+  colType: { width: 90 },
+  colItem: { flex: 1 },
+  colQty: { width: 32 },
   colResp: { width: 92 },
-  colEstado: { width: 52 },
+  colStatus: { width: 52 },
 });
 
-const tipoBadgeKind = (tipo: string) => {
-  const kind = TIPO_BADGE_COLOR[tipo as keyof typeof TIPO_BADGE_COLOR];
+const typeBadgeKind = (type: string) => {
+  const kind = TYPE_BADGE_COLOR[type as keyof typeof TYPE_BADGE_COLOR];
   return badgeStyleFor(kind === "info" ? "gray" : (kind as "success" | "warning" | "danger" | "gray"));
 };
 
-export default function MovimientosReportePDF({ movimientos }: Props) {
-  const { t } = useTranslation(["inventario"]);
-  const doc = t("movimientos.reporteDoc", { returnObjects: true }) as Record<string, string>;
+export default function MovementsReportPdf({ movements }: Props) {
+  const { t } = useTranslation(["inventory"]);
+  const doc = t("movements.reportDoc", { returnObjects: true }) as Record<string, string>;
   const today = new Date().toLocaleDateString("es-MX");
 
-  const totales = movimientos.length;
-  const entradas = movimientos.filter((m) => ["ENTRADA", "AJUSTE_ENTRADA", "DEVOLUCION"].includes(m.tipo)).length;
-  const salidas = movimientos.filter((m) => ["BAJA", "AJUSTE_SALIDA"].includes(m.tipo)).length;
-  const piezas = movimientos.reduce((acc, m) => acc + m.detalles.reduce((s, d) => s + d.cantidad, 0), 0);
+  const totals = movements.length;
+  const entries = movements.filter((m) => ["STOCK_IN", "ADJUSTMENT_IN", "RETURN"].includes(m.type)).length;
+  const exits = movements.filter((m) => ["RETIREMENT", "ADJUSTMENT_OUT"].includes(m.type)).length;
+  const pieces = movements.reduce((acc, m) => acc + m.items.reduce((s, d) => s + d.quantity, 0), 0);
 
   const summary = [
-    { label: doc.total, value: totales, color: PDF_COLORS.band },
-    { label: doc.entradas, value: entradas, color: PDF_COLORS.success },
-    { label: doc.salidas, value: salidas, color: PDF_COLORS.danger },
-    { label: doc.piezas, value: piezas, color: PDF_COLORS.bandAccent },
+    { label: doc.total, value: totals, color: PDF_COLORS.band },
+    { label: doc.entries, value: entries, color: PDF_COLORS.success },
+    { label: doc.exits, value: exits, color: PDF_COLORS.danger },
+    { label: doc.pieces, value: pieces, color: PDF_COLORS.bandAccent },
   ];
 
   const ROWS_PER_PAGE = 24;
-  const pages: Movimiento[][] = [];
-  for (let i = 0; i < movimientos.length; i += ROWS_PER_PAGE) {
-    pages.push(movimientos.slice(i, i + ROWS_PER_PAGE));
+  const pages: Movement[][] = [];
+  for (let i = 0; i < movements.length; i += ROWS_PER_PAGE) {
+    pages.push(movements.slice(i, i + ROWS_PER_PAGE));
   }
   if (pages.length === 0) pages.push([]);
 
@@ -69,30 +69,30 @@ export default function MovimientosReportePDF({ movimientos }: Props) {
             )}
 
             <View style={pdfTheme.tableHeader}>
-              <View style={styles.colFecha}><Text style={pdfTheme.tableHeaderText}>{doc.c_fecha}</Text></View>
+              <View style={styles.colDate}><Text style={pdfTheme.tableHeaderText}>{doc.c_date}</Text></View>
               <View style={styles.colFolio}><Text style={pdfTheme.tableHeaderText}>{doc.c_folio}</Text></View>
-              <View style={styles.colTipo}><Text style={pdfTheme.tableHeaderText}>{doc.c_tipo}</Text></View>
-              <View style={styles.colDetalle}><Text style={pdfTheme.tableHeaderText}>{doc.c_detalle}</Text></View>
-              <View style={styles.colCant}><Text style={[pdfTheme.tableHeaderText, { textAlign: "center" }]}>{doc.c_cant}</Text></View>
+              <View style={styles.colType}><Text style={pdfTheme.tableHeaderText}>{doc.c_type}</Text></View>
+              <View style={styles.colItem}><Text style={pdfTheme.tableHeaderText}>{doc.c_item}</Text></View>
+              <View style={styles.colQty}><Text style={[pdfTheme.tableHeaderText, { textAlign: "center" }]}>{doc.c_qty}</Text></View>
               <View style={styles.colResp}><Text style={pdfTheme.tableHeaderText}>{doc.c_resp}</Text></View>
-              <View style={styles.colEstado}><Text style={pdfTheme.tableHeaderText}>{doc.c_estado}</Text></View>
+              <View style={styles.colStatus}><Text style={pdfTheme.tableHeaderText}>{doc.c_status}</Text></View>
             </View>
 
             {pageRows.map((m, i) => (
               <View key={m.id} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
-                <View style={styles.colFecha}><Text style={pdfTheme.cellMuted}>{formatFecha(m.fecha)}</Text></View>
+                <View style={styles.colDate}><Text style={pdfTheme.cellMuted}>{formatDate(m.date)}</Text></View>
                 <View style={styles.colFolio}><Text style={pdfTheme.cellBold}>{`MV-${m.id.slice(0, 8).toUpperCase()}`}</Text></View>
-                <View style={styles.colTipo}><Text style={tipoBadgeKind(m.tipo)}>{t(`typeLabels.${m.tipo}`)}</Text></View>
-                <View style={styles.colDetalle}>
+                <View style={styles.colType}><Text style={typeBadgeKind(m.type)}>{t(`typeLabels.${m.type}`)}</Text></View>
+                <View style={styles.colItem}>
                   <Text style={pdfTheme.cellDescTitle}>
-                    {m.detalles.map((d) => `${d.dispositivo?.nombre ?? "—"} x${d.cantidad}`).join(", ")}
+                    {m.items.map((d) => `${d.device?.name ?? "—"} x${d.quantity}`).join(", ")}
                   </Text>
                 </View>
-                <View style={styles.colCant}><Text style={[pdfTheme.cellBold, { textAlign: "center" }]}>{m.detalles.reduce((s, d) => s + d.cantidad, 0)}</Text></View>
-                <View style={styles.colResp}><Text style={pdfTheme.cell}>{m.responsable?.name ?? m.usuario?.name ?? "—"}</Text></View>
-                <View style={styles.colEstado}>
-                  <Text style={m.status === "CANCELADO" ? badgeStyleFor("danger") : badgeStyleFor("success")}>
-                    {m.status === "CANCELADO" ? doc.d_cancelado : doc.d_activo}
+                <View style={styles.colQty}><Text style={[pdfTheme.cellBold, { textAlign: "center" }]}>{m.items.reduce((s, d) => s + d.quantity, 0)}</Text></View>
+                <View style={styles.colResp}><Text style={pdfTheme.cell}>{m.custodian?.name ?? m.createdBy?.name ?? "—"}</Text></View>
+                <View style={styles.colStatus}>
+                  <Text style={m.status === "CANCELLED" ? badgeStyleFor("danger") : badgeStyleFor("success")}>
+                    {m.status === "CANCELLED" ? doc.d_cancelled : doc.d_active}
                   </Text>
                 </View>
               </View>

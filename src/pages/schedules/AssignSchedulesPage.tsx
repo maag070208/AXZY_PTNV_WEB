@@ -15,10 +15,10 @@ export default function AssignSchedulesPage() {
       icon={<FaUserClock size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("title"), onClick: () => navigate("/horarios") },
+        { label: t("title"), onClick: () => navigate("/schedules") },
         { label: t("assign.title") },
       ]}
-      backAction={() => navigate("/horarios")}
+      backAction={() => navigate("/schedules")}
     >
       <AssignSchedules />
     </ITPage>

@@ -12,17 +12,17 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaEye, FaTrash } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
-import type { ActaAdministrativa } from "@entities/personal";
+import type { DisciplinaryReport } from "@entities/hr";
 
 type BadgeColor = "error" | "warning" | "info" | "success" | "danger" | "primary" | "secondary" | "purple" | "gray";
 
-const MOTIVO_COLOR: Record<string, BadgeColor> = {
-  INASISTENCIA: "danger",
-  RETARDO: "warning",
-  EBRIEDAD: "danger",
-  CONDUCTA: "warning",
-  INCUMPLIMIENTO: "warning",
-  OTRO: "secondary",
+const REASON_COLOR: Record<string, BadgeColor> = {
+  ABSENCE: "danger",
+  TARDINESS: "warning",
+  INTOXICATION: "danger",
+  MISCONDUCT: "warning",
+  NONCOMPLIANCE: "warning",
+  OTHER: "secondary",
 };
 
 interface Props {
@@ -30,44 +30,44 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
-  onView: (acta: ActaAdministrativa) => void;
-  onDelete: (acta: ActaAdministrativa) => void;
+  onView: (disciplinaryReport: DisciplinaryReport) => void;
+  onDelete: (disciplinaryReport: DisciplinaryReport) => void;
 }
 
-export default function ActasTable({
+export default function DisciplinaryReportsTable({
   fetchData,
   reloadKey,
   onView,
   onDelete,
 }: Props) {
-  const { t: tt } = useTranslation("actas");
+  const { t: tt } = useTranslation("disciplinary-reports");
 
-  const columns: Column<ActaAdministrativa>[] = [
+  const columns: Column<DisciplinaryReport>[] = [
     {
-      key: "fechaIncidente",
-      label: tt("table.fecha"),
+      key: "incidentDate",
+      label: tt("table.date"),
       type: "string",
       filter: true,
       sortable: false,
       render: (a) => (
-        <ITText className="text-[11px] font-black text-slate-700">{a.fechaIncidente}</ITText>
+        <ITText className="text-[11px] font-black text-slate-700">{a.incidentDate}</ITText>
       ),
     },
     {
-      key: "motivo",
-      label: tt("table.motivo"),
+      key: "reason",
+      label: tt("table.reason"),
       type: "string",
       filter: true,
       sortable: false,
       render: (a) => (
-        <ITBadget color={MOTIVO_COLOR[a.motivo] ?? "secondary"} size="lg">
-          {tt(`motivos.${a.motivo}`)}
+        <ITBadget color={REASON_COLOR[a.reason] ?? "secondary"} size="lg">
+          {tt(`reasons.${a.reason}`)}
         </ITBadget>
       ),
     },
     {
       key: "user",
-      label: tt("table.empleado"),
+      label: tt("table.employee"),
       type: "string",
       filter: true,
       sortable: false,
@@ -75,50 +75,50 @@ export default function ActasTable({
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{a.user.name}</ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            {a.user.numeroEmpleado ? `#${a.user.numeroEmpleado}` : "—"}
+            {a.user.employeeNumber ? `#${a.user.employeeNumber}` : "—"}
           </ITText>
         </ITFlex>
       ),
     },
     {
-      key: "puesto",
-      label: tt("table.puesto"),
+      key: "jobTitle",
+      label: tt("table.jobTitle"),
       type: "string",
       filter: false,
       sortable: false,
       render: (a) => (
         <ITText className="text-[11px] font-bold text-slate-600">
-          {a.user.puesto ?? "—"}
+          {a.user.jobTitle ?? "—"}
         </ITText>
       ),
     },
     {
-      key: "descripcion",
-      label: tt("table.descripcion"),
+      key: "description",
+      label: tt("table.description"),
       type: "string",
       filter: false,
       sortable: false,
       render: (a) => (
         <ITText className="text-[10px] text-slate-500 line-clamp-2 max-w-[260px]">
-          {a.descripcion}
+          {a.description}
         </ITText>
       ),
     },
     {
-      key: "sancion",
-      label: tt("table.sancion"),
+      key: "sanction",
+      label: tt("table.sanction"),
       type: "string",
       filter: false,
       sortable: false,
       render: (a) => (
         <ITText className="text-[10px] text-slate-500 line-clamp-2 max-w-[200px]">
-          {a.sancion || "—"}
+          {a.sanction || "—"}
         </ITText>
       ),
     },
     {
       key: "createdBy",
-      label: tt("table.creadoPor"),
+      label: tt("table.createdBy"),
       type: "string",
       filter: false,
       sortable: false,
@@ -131,13 +131,13 @@ export default function ActasTable({
       label: "",
       type: "string" as const,
       sortable: false,
-      render: (a: ActaAdministrativa) => (
+      render: (a: DisciplinaryReport) => (
         <ITFlex align="center" gap={2}>
           <ITButton
             onClick={() => onView(a)}
             size="lg"
             color="secondary"
-            title={tt("actions.ver")}
+            title={tt("actions.view")}
           >
             <FaEye size={14} />
           </ITButton>
@@ -145,7 +145,7 @@ export default function ActasTable({
             onClick={() => onDelete(a)}
             size="lg"
             color="danger"
-            title={tt("actions.eliminar")}
+            title={tt("actions.delete")}
           >
             <FaTrash size={14} />
           </ITButton>

@@ -2,14 +2,14 @@ type RuntimeConfig = { API_URL?: string };
 
 declare global {
   interface Window {
-    __CARTAS_CONFIG__?: RuntimeConfig;
+    __APP_CONFIG__?: RuntimeConfig;
   }
 }
 
 // Prioridad: 1) config en runtime (nginx/config.js desde AXZY_PTNV_SERVERS/.env),
 //            2) VITE_API_URL (build/dev), 3) por defecto ruta relativa del proxy.
 const BASE_URL =
-  window.__CARTAS_CONFIG__?.API_URL ||
+  window.__APP_CONFIG__?.API_URL ||
   ((import.meta as any).env?.VITE_API_URL as string | undefined) ||
   "/api/v1";
 

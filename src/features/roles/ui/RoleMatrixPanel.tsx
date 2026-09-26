@@ -12,18 +12,18 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaCheck, FaInfoCircle, FaUndo } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import type { PermisoCatalogo } from "@entities/permiso";
-import type { Alcance } from "@entities/user";
+import type { PermissionCatalog } from "@entities/permission";
+import type { PermissionScope } from "@entities/user";
 import { useRolesAdmin } from "@features/roles";
 
-const ALCANCE_ORDER: Alcance[] = ["NINGUNO", "PROPIO", "AREA", "TODO"];
+const SCOPE_ORDER: PermissionScope[] = ["NONE", "OWN", "AREA", "ALL"];
 
 interface ToastState {
   message: string;
   type: "success" | "error";
 }
 
-export default function MatrizRolesPanel() {
+export default function RoleMatrixPanel() {
   const { t } = useTranslation(["roles", "common"]);
   const {
     data,
@@ -34,34 +34,34 @@ export default function MatrizRolesPanel() {
     saving,
     error,
     saveError,
-    setAlcance,
+    setScope,
     save,
     discard,
   } = useRolesAdmin();
   const [toast, setToast] = useState<ToastState | null>(null);
 
-  const modules = useMemo<Array<[string, PermisoCatalogo[]]>>(() => {
+  const modules = useMemo<Array<[string, PermissionCatalog[]]>>(() => {
     if (!data) return [];
-    const map = new Map<string, PermisoCatalogo[]>();
-    for (const permiso of data.catalogo) {
-      const list = map.get(permiso.modulo) ?? [];
-      list.push(permiso);
-      map.set(permiso.modulo, list);
+    const map = new Map<string, PermissionCatalog[]>();
+    for (const permission of data.catalog) {
+      const list = map.get(permission.module) ?? [];
+      list.push(permission);
+      map.set(permission.module, list);
     }
     return [...map.entries()];
   }, [data]);
 
-  const hasInactive = data?.catalogo.some((permiso) => !permiso.activo) ?? false;
+  const hasInactive = data?.catalog.some((permission) => !permission.active) ?? false;
 
-  const optionsFor = (permiso: PermisoCatalogo) => {
-    const allowed = new Set<Alcance>(["NINGUNO", ...permiso.alcances]);
-    return ALCANCE_ORDER.filter((alcance) => allowed.has(alcance)).map(
-      (alcance) => ({ value: alcance, label: t(`alcance.${alcance}`) })
+  const optionsFor = (permission: PermissionCatalog) => {
+    const allowed = new Set<PermissionScope>(["NONE", ...permission.scopes]);
+    return SCOPE_ORDER.filter((scope) => allowed.has(scope)).map(
+      (scope) => ({ value: scope, label: t(`scope.${scope}`) })
     );
   };
 
-  const roleLabel = (rol: string) =>
-    t(`role.${rol}`, { defaultValue: rol.replace(/_/g, " ") });
+  const roleLabel = (role: string) =>
+    t(`role.${role}`, { defaultValue: role.replace(/_/g, " ") });
 
   const handleSave = async () => {
     const ok = await save();
@@ -142,15 +142,15 @@ export default function MatrizRolesPanel() {
         <ITFlex align="center" justify="center" className="py-16">
           <ITLoader />
         </ITFlex>
-      ) : !data || data.catalogo.length === 0 ? (
+      ) : !data || data.catalog.length === 0 ? (
         <ITText className="py-10 text-center text-xs italic text-slate-400">
           {t("matrix.empty")}
         </ITText>
       ) : (
         <ITFlex direction="column" gap={4}>
-          {modules.map(([modulo, permisos]) => (
+          {modules.map(([module, permissions]) => (
             <ITCard
-              key={modulo}
+              key={module}
               className="!p-0 overflow-hidden border border-slate-200"
             >
               <ITFlex
@@ -159,7 +159,7 @@ export default function MatrizRolesPanel() {
                 className="border-b border-slate-100 bg-slate-50/60 px-4 py-2.5"
               >
                 <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-                  {modulo}
+                  {module}
                 </ITText>
               </ITFlex>
               <div className="overflow-x-auto">
@@ -169,61 +169,61 @@ export default function MatrizRolesPanel() {
                       <th className="sticky left-0 z-10 bg-slate-50 px-3 py-2.5">
                         {t("matrix.permission")}
                       </th>
-                      {data.roles.map((rol) => (
-                        <th key={rol} className="px-3 py-2.5 text-center">
-                          {roleLabel(rol)}
+                      {data.roles.map((role) => (
+                        <th key={role} className="px-3 py-2.5 text-center">
+                          {roleLabel(role)}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {permisos.map((permiso, index) => (
+                    {permissions.map((permission, index) => (
                       <tr
-                        key={permiso.clave}
+                        key={permission.key}
                         className={`border-b border-slate-100 ${
                           index % 2 === 1 ? "bg-slate-50/40" : ""
-                        } ${permiso.activo ? "" : "opacity-60"}`}
+                        } ${permission.active ? "" : "opacity-60"}`}
                       >
                         <td className="sticky left-0 z-10 bg-inherit px-3 py-2 align-middle">
                           <ITFlex direction="column" gap={1}>
                             <ITFlex align="center" gap={2} wrap="wrap">
                               <ITText className="text-[12px] font-bold text-slate-800">
-                                {permiso.nombre}
+                                {permission.name}
                               </ITText>
-                              {permiso.sensible && (
+                              {permission.sensitive && (
                                 <ITBadget color="warning" size="sm">
                                   {t("matrix.sensitive")}
                                 </ITBadget>
                               )}
-                              {!permiso.activo && (
+                              {!permission.active && (
                                 <ITBadget color="danger" size="sm">
                                   {t("matrix.inactive")}
                                 </ITBadget>
                               )}
                             </ITFlex>
                             <ITText className="font-mono text-[10px] text-slate-400">
-                              {permiso.clave}
+                              {permission.key}
                             </ITText>
                           </ITFlex>
                         </td>
-                        {data.roles.map((rol) => {
-                          const key = `${permiso.clave}|${rol}`;
+                        {data.roles.map((role) => {
+                          const key = `${permission.key}|${role}`;
                           return (
                             <td
-                              key={rol}
+                              key={role}
                               className="px-3 py-2 align-middle"
                             >
                               <ITSelect
-                                name={`matriz_${permiso.clave}_${rol}`}
+                                name={`matriz_${permission.key}_${role}`}
                                 size="sm"
-                                options={optionsFor(permiso)}
-                                value={draft[key] ?? "NINGUNO"}
-                                disabled={!permiso.activo || saving}
+                                options={optionsFor(permission)}
+                                value={draft[key] ?? "NONE"}
+                                disabled={!permission.active || saving}
                                 onChange={(event) =>
-                                  setAlcance(
-                                    rol,
-                                    permiso.clave,
-                                    event.target.value as Alcance
+                                  setScope(
+                                    role,
+                                    permission.key,
+                                    event.target.value as PermissionScope
                                   )
                                 }
                               />

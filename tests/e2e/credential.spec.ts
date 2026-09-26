@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { test, expect } from "./support/fixtures";
-import { irARuta } from "./support/pages/componentes";
+import { goToRoute } from "./support/pages/components";
 import { E2E } from "./support/env";
-import type { ApiInventario, Usuario } from "./support/api";
+import type { ApiInventory, User } from "./support/api";
 import type { Locator, Page } from "@playwright/test";
 
 /**
@@ -14,14 +14,14 @@ import type { Locator, Page } from "@playwright/test";
  * se resuelve por API para navegar directo a su detalle.
  */
 
-const empleadoPorUsername = async (api: ApiInventario, username: string): Promise<Usuario> => {
-  const usuarios = await api.usuarios();
-  const usuario = usuarios.find((u) => u.username === username);
-  expect(usuario, `el usuario ${username} debe existir (auth.setup lo provisiona)`).toBeDefined();
-  return usuario!;
+const employeeByUsername = async (api: ApiInventory, username: string): Promise<User> => {
+  const users = await api.users();
+  const user = users.find((u) => u.username === username);
+  expect(user, `el usuario ${username} debe existir (auth.setup lo provisiona)`).toBeDefined();
+  return user!;
 };
 
-const abrirCredencial = async (page: Page) => {
+const openCredential = async (page: Page) => {
   await page.getByRole("button", { name: "Credencial" }).click();
   const dialog = page.locator('[data-it-dialog="true"]');
   await expect(dialog).toBeVisible();
@@ -29,10 +29,10 @@ const abrirCredencial = async (page: Page) => {
 };
 
 /** La imagen de la credencial se distingue por su `alt`, que sale de i18n. */
-const credencialImg = (dialog: Locator): Locator =>
+const credentialImg = (dialog: Locator): Locator =>
   dialog.getByRole("img", { name: "Credencial de empleado" });
 
-const esperarDescargaCredencial = (page: Page) =>
+const waitForDownloadCredential = (page: Page) =>
   page.waitForEvent("download", {
     predicate: (d) => d.suggestedFilename().startsWith("credencial-"),
   });
@@ -42,18 +42,18 @@ test.describe("Credencial de empleado", () => {
     page,
     api,
   }) => {
-    const admin = await empleadoPorUsername(api, E2E.admin.username);
+    const admin = await employeeByUsername(api, E2E.admin.username);
 
-    await irARuta(page, `/empleados/${admin.id}`);
+    await goToRoute(page, `/employees/${admin.id}`);
     await expect(page.getByText(E2E.admin.name).first()).toBeVisible();
 
-    const dialog = await abrirCredencial(page);
+    const dialog = await openCredential(page);
     await expect(dialog.getByText("Credencial de empleado")).toBeVisible();
 
     // Ya no hay visor de PDF incrustado.
     await expect(dialog.locator("iframe")).toHaveCount(0);
 
-    const img = credencialImg(dialog);
+    const img = credentialImg(dialog);
     await expect(img).toBeVisible();
 
     const src = await img.getAttribute("src");
@@ -68,31 +68,31 @@ test.describe("Credencial de empleado", () => {
   });
 
   test("descarga la credencial como PNG con el nombre esperado", async ({ page, api }) => {
-    const admin = await empleadoPorUsername(api, E2E.admin.username);
+    const admin = await employeeByUsername(api, E2E.admin.username);
 
-    await irARuta(page, `/empleados/${admin.id}`);
-    const dialog = await abrirCredencial(page);
+    await goToRoute(page, `/employees/${admin.id}`);
+    const dialog = await openCredential(page);
 
-    const descarga = esperarDescargaCredencial(page);
+    const downloadPromise = waitForDownloadCredential(page);
     await dialog.getByRole("button", { name: "Descargar imagen" }).click();
-    const download = await descarga;
+    const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toMatch(/^credencial-.+\.png$/);
   });
 
   test("el PNG descargado mide 1016 × 638 px y declara 300 DPI", async ({ page, api }) => {
-    const admin = await empleadoPorUsername(api, E2E.admin.username);
+    const admin = await employeeByUsername(api, E2E.admin.username);
 
-    await irARuta(page, `/empleados/${admin.id}`);
-    const dialog = await abrirCredencial(page);
+    await goToRoute(page, `/employees/${admin.id}`);
+    const dialog = await openCredential(page);
 
-    const descarga = esperarDescargaCredencial(page);
+    const downloadPromise = waitForDownloadCredential(page);
     await dialog.getByRole("button", { name: "Descargar imagen" }).click();
-    const download = await descarga;
+    const download = await downloadPromise;
 
-    const rutaDescarga = await download.path();
-    expect(rutaDescarga, "Playwright debe exponer el archivo descargado").not.toBeNull();
-    const bytes = await readFile(rutaDescarga!);
+    const downloadRoute = await download.path();
+    expect(downloadRoute, "Playwright debe exponer el archivo descargado").not.toBeNull();
+    const bytes = await readFile(downloadRoute!);
 
     // Firma PNG.
     expect(bytes.subarray(0, 8)).toEqual(
@@ -112,14 +112,14 @@ test.describe("Credencial de empleado", () => {
     page,
     api,
   }) => {
-    const empleado = await empleadoPorUsername(api, E2E.empleado.username);
-    expect(empleado.numeroEmpleado, "el empleado E2E no tiene número (caso fallback)").toBeFalsy();
+    const employee = await employeeByUsername(api, E2E.employee.username);
+    expect(employee.employeeNumber, "el empleado E2E no tiene número (caso fallback)").toBeFalsy();
 
-    await irARuta(page, `/empleados/${empleado.id}`);
-    await expect(page.getByText(E2E.empleado.name).first()).toBeVisible();
+    await goToRoute(page, `/employees/${employee.id}`);
+    await expect(page.getByText(E2E.employee.name).first()).toBeVisible();
 
-    const dialog = await abrirCredencial(page);
-    await expect(credencialImg(dialog)).toBeVisible();
+    const dialog = await openCredential(page);
+    await expect(credentialImg(dialog)).toBeVisible();
     await expect(dialog.getByText(/No se pudo generar/i)).toHaveCount(0);
   });
 
@@ -135,18 +135,18 @@ test.describe("Credencial de empleado", () => {
       const original = HTMLCanvasElement.prototype.getContext;
       HTMLCanvasElement.prototype.getContext = function (
         this: HTMLCanvasElement,
-        tipo: string,
+        type: string,
         ...args: any[]
       ) {
-        if (tipo === "2d" && this.width === 1016 && this.height === 638) return null;
-        return (original as any).apply(this, [tipo, ...args]);
+        if (type === "2d" && this.width === 1016 && this.height === 638) return null;
+        return (original as any).apply(this, [type, ...args]);
       } as typeof HTMLCanvasElement.prototype.getContext;
     });
 
-    const admin = await empleadoPorUsername(api, E2E.admin.username);
+    const admin = await employeeByUsername(api, E2E.admin.username);
 
-    await irARuta(page, `/empleados/${admin.id}`);
-    const dialog = await abrirCredencial(page);
+    await goToRoute(page, `/employees/${admin.id}`);
+    const dialog = await openCredential(page);
 
     await expect(dialog.getByText(/No se pudo generar la credencial/i)).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Descargar imagen" })).toHaveCount(0);

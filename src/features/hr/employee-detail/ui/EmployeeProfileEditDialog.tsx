@@ -16,10 +16,10 @@ import type {
   PersonalProfile,
   PersonalProfileUpdateInput,
   EmployeeDiscount,
-  TipoDescuento,
-  Genero,
-  TipoSangre,
-} from "@entities/personal";
+  DiscountType,
+  Gender,
+  BloodType,
+} from "@entities/hr";
 import {
   validateCurp,
   validateEmail,
@@ -29,7 +29,7 @@ import {
   validateRfc,
 } from "@shared/validation";
 
-const DISCOUNT_TYPES: TipoDescuento[] = ["INFONAVIT", "IMSS", "DEUDOR_ALIMENTICIO"];
+const DISCOUNT_TYPES: DiscountType[] = ["INFONAVIT", "IMSS", "CHILD_SUPPORT"];
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
 const dateStrToLocal = (value?: string | null): Date | undefined => {
@@ -50,38 +50,38 @@ type FormState = PersonalProfileUpdateInput;
 const emptyForm = (): FormState => ({});
 
 const formFromProfile = (p: PersonalProfile): FormState => ({
-  segundoNombre: p.segundoNombre ?? "",
-  apellidoPaterno: p.apellidoPaterno ?? "",
-  apellidoMaterno: p.apellidoMaterno ?? "",
+  middleName: p.middleName ?? "",
+  paternalSurname: p.paternalSurname ?? "",
+  maternalSurname: p.maternalSurname ?? "",
   email: p.email ?? "",
-  generoId: p.genero?.id ?? "",
-  tipoSangreId: p.tipoSangre?.id ?? "",
-  padecimiento: p.padecimiento ?? "",
-  alergias: p.alergias ?? "",
-  fechaNacimiento: p.fechaNacimiento ?? "",
-  fechaIngreso: p.fechaIngreso ?? "",
+  genderId: p.gender?.id ?? "",
+  bloodTypeId: p.bloodType?.id ?? "",
+  medicalConditions: p.medicalConditions ?? "",
+  allergies: p.allergies ?? "",
+  birthDate: p.birthDate ?? "",
+  hireDate: p.hireDate ?? "",
   rfc: p.rfc ?? "",
   curp: p.curp ?? "",
   nss: p.nss ?? "",
-  calleNumero: p.calleNumero ?? "",
-  colonia: p.colonia ?? "",
-  codigoPostal: p.codigoPostal ?? "",
-  ciudad: p.ciudad ?? "",
-  estadoDireccion: p.estadoDireccion ?? "",
-  pais: p.pais ?? "México",
-  celularPersonal: p.celularPersonal ?? "",
-  celularEmpresa: p.celularEmpresa ?? "",
-  contactoEmergenciaNombre: p.contactoEmergenciaNombre ?? "",
-  contactoEmergenciaTelefono: p.contactoEmergenciaTelefono ?? "",
-  contactoEmergenciaParentesco: p.contactoEmergenciaParentesco ?? "",
+  streetAddress: p.streetAddress ?? "",
+  neighborhood: p.neighborhood ?? "",
+  postalCode: p.postalCode ?? "",
+  city: p.city ?? "",
+  addressState: p.addressState ?? "",
+  country: p.country ?? "México",
+  personalPhone: p.personalPhone ?? "",
+  workPhone: p.workPhone ?? "",
+  emergencyContactName: p.emergencyContactName ?? "",
+  emergencyContactPhone: p.emergencyContactPhone ?? "",
+  emergencyContactRelationship: p.emergencyContactRelationship ?? "",
 });
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   profile: PersonalProfile | null;
-  generos: Genero[];
-  tiposSangre: TipoSangre[];
+  genders: Gender[];
+  bloodTypes: BloodType[];
   saving: boolean;
   onSave: (data: PersonalProfileUpdateInput, discounts: EmployeeDiscount[]) => Promise<boolean>;
 }
@@ -90,36 +90,36 @@ export default function EmployeeProfileEditDialog({
   isOpen,
   onClose,
   profile,
-  generos,
-  tiposSangre,
+  genders,
+  bloodTypes,
   saving,
   onSave,
 }: Props) {
   const { t: tt } = useTranslation(["employees", "common"]);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [discounts, setDiscounts] = useState<Record<TipoDescuento, string | null>>({
+  const [discounts, setDiscounts] = useState<Record<DiscountType, string | null>>({
     INFONAVIT: null,
     IMSS: null,
-    DEUDOR_ALIMENTICIO: null,
+    CHILD_SUPPORT: null,
   });
 
   useEffect(() => {
     if (!isOpen || !profile) return;
     setForm(formFromProfile(profile));
-    const next: Record<TipoDescuento, string | null> = {
+    const next: Record<DiscountType, string | null> = {
       INFONAVIT: null,
       IMSS: null,
-      DEUDOR_ALIMENTICIO: null,
+      CHILD_SUPPORT: null,
     };
-    for (const d of profile.discounts) next[d.tipo] = d.nota ?? "";
+    for (const d of profile.discounts) next[d.type] = d.note ?? "";
     setDiscounts(next);
   }, [isOpen, profile]);
 
   const field = (name: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [name]: e.target.value }));
 
-  const dateField = (name: "fechaNacimiento" | "fechaIngreso") => (
+  const dateField = (name: "birthDate" | "hireDate") => (
     e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: Date | [Date | null, Date | null] } }
   ) => {
     const value = e.target.value;
@@ -134,14 +134,14 @@ export default function EmployeeProfileEditDialog({
     if (curpErr) e.curp = curpErr;
     const nssErr = validateNss(form.nss);
     if (nssErr) e.nss = nssErr;
-    const postalErr = validatePostal(form.codigoPostal);
-    if (postalErr) e.codigoPostal = postalErr;
-    const personalPhoneErr = validatePhone(form.celularPersonal);
-    if (personalPhoneErr) e.celularPersonal = personalPhoneErr;
-    const companyPhoneErr = validatePhone(form.celularEmpresa);
-    if (companyPhoneErr) e.celularEmpresa = companyPhoneErr;
-    const emergencyPhoneErr = validatePhone(form.contactoEmergenciaTelefono);
-    if (emergencyPhoneErr) e.contactoEmergenciaTelefono = emergencyPhoneErr;
+    const postalErr = validatePostal(form.postalCode);
+    if (postalErr) e.postalCode = postalErr;
+    const personalPhoneErr = validatePhone(form.personalPhone);
+    if (personalPhoneErr) e.personalPhone = personalPhoneErr;
+    const companyPhoneErr = validatePhone(form.workPhone);
+    if (companyPhoneErr) e.workPhone = companyPhoneErr;
+    const emergencyPhoneErr = validatePhone(form.emergencyContactPhone);
+    if (emergencyPhoneErr) e.emergencyContactPhone = emergencyPhoneErr;
     const emailErr = validateEmail(form.email);
     if (emailErr) e.email = emailErr;
     setErrors(e);
@@ -156,8 +156,8 @@ export default function EmployeeProfileEditDialog({
       Object.entries(form).map(([key, value]) => [key, typeof value === "string" && value.trim() === "" ? null : value])
     ) as FormState;
     const discountList: EmployeeDiscount[] = DISCOUNT_TYPES.filter((t) => discounts[t] !== null).map((t) => ({
-      tipo: t,
-      nota: discounts[t] || undefined,
+      type: t,
+      note: discounts[t] || undefined,
     }));
     await onSave(normalized, discountList);
   };
@@ -166,36 +166,36 @@ export default function EmployeeProfileEditDialog({
     <ITFlex direction="column" gap={4} className="pt-4">
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="segundoNombre" label={tt("detail.fields.secondName")} value={form.segundoNombre ?? ""} onChange={field("segundoNombre")} />
+          <ITInput name="middleName" label={tt("detail.fields.secondName")} value={form.middleName ?? ""} onChange={field("middleName")} />
         </div>
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="apellidoPaterno" label={tt("detail.fields.apellidoPaterno")} value={form.apellidoPaterno ?? ""} onChange={field("apellidoPaterno")} />
+          <ITInput name="paternalSurname" label={tt("detail.fields.paternalSurname")} value={form.paternalSurname ?? ""} onChange={field("paternalSurname")} />
         </div>
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="apellidoMaterno" label={tt("detail.fields.apellidoMaterno")} value={form.apellidoMaterno ?? ""} onChange={field("apellidoMaterno")} />
+          <ITInput name="maternalSurname" label={tt("detail.fields.maternalSurname")} value={form.maternalSurname ?? ""} onChange={field("maternalSurname")} />
         </div>
       </ITFlex>
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[200px]">
           <ITSelect
-            name="generoId"
+            name="genderId"
             label={tt("detail.fields.gender")}
-            value={form.generoId ?? ""}
-            onChange={(e) => setForm((f) => ({ ...f, generoId: e.target.value }))}
-            options={[{ value: "", label: "—" }, ...generos.map((g) => ({ value: g.id, label: g.nombre }))]}
+            value={form.genderId ?? ""}
+            onChange={(e) => setForm((f) => ({ ...f, genderId: e.target.value }))}
+            options={[{ value: "", label: "—" }, ...genders.map((g) => ({ value: g.id, label: g.name }))]}
           />
         </div>
         <div className="flex-1 min-w-[200px]">
-          <ITDatePicker name="fechaNacimiento" label={tt("detail.fields.birthDate")} value={dateStrToLocal(form.fechaNacimiento)} onChange={dateField("fechaNacimiento")} />
+          <ITDatePicker name="birthDate" label={tt("detail.fields.birthDate")} value={dateStrToLocal(form.birthDate)} onChange={dateField("birthDate")} />
         </div>
         <div className="flex-1 min-w-[200px]">
-          <ITDatePicker name="fechaIngreso" label={tt("detail.fields.hireDate")} value={dateStrToLocal(form.fechaIngreso)} onChange={dateField("fechaIngreso")} />
+          <ITDatePicker name="hireDate" label={tt("detail.fields.hireDate")} value={dateStrToLocal(form.hireDate)} onChange={dateField("hireDate")} />
         </div>
       </ITFlex>
     </ITFlex>
   );
 
-  const oficialTab = (
+  const officialTab = (
     <ITFlex direction="column" gap={4} className="pt-4">
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[200px]">
@@ -214,42 +214,42 @@ export default function EmployeeProfileEditDialog({
     </ITFlex>
   );
 
-  const direccionTab = (
+  const addressTab = (
     <ITFlex direction="column" gap={4} className="pt-4">
-      <ITInput name="calleNumero" label={tt("detail.fields.street")} value={form.calleNumero ?? ""} onChange={field("calleNumero")} />
+      <ITInput name="streetAddress" label={tt("detail.fields.street")} value={form.streetAddress ?? ""} onChange={field("streetAddress")} />
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[160px]">
-          <ITInput name="colonia" label={tt("detail.fields.colony")} value={form.colonia ?? ""} onChange={field("colonia")} />
+          <ITInput name="neighborhood" label={tt("detail.fields.colony")} value={form.neighborhood ?? ""} onChange={field("neighborhood")} />
         </div>
         <div className="flex-1 min-w-[120px]">
-          <ITInput name="codigoPostal" label={tt("detail.fields.zip")} value={form.codigoPostal ?? ""} onChange={field("codigoPostal")} aria-invalid={!!errors.codigoPostal} />
-          {errors.codigoPostal && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.codigoPostal}</span>}
+          <ITInput name="postalCode" label={tt("detail.fields.zip")} value={form.postalCode ?? ""} onChange={field("postalCode")} aria-invalid={!!errors.postalCode} />
+          {errors.postalCode && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</span>}
         </div>
       </ITFlex>
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[160px]">
-          <ITInput name="ciudad" label={tt("detail.fields.city")} value={form.ciudad ?? ""} onChange={field("ciudad")} />
+          <ITInput name="city" label={tt("detail.fields.city")} value={form.city ?? ""} onChange={field("city")} />
         </div>
         <div className="flex-1 min-w-[160px]">
-          <ITInput name="estadoDireccion" label={tt("detail.fields.state")} value={form.estadoDireccion ?? ""} onChange={field("estadoDireccion")} />
+          <ITInput name="addressState" label={tt("detail.fields.state")} value={form.addressState ?? ""} onChange={field("addressState")} />
         </div>
         <div className="flex-1 min-w-[160px]">
-          <ITInput name="pais" label={tt("detail.fields.country")} value={form.pais ?? ""} onChange={field("pais")} />
+          <ITInput name="country" label={tt("detail.fields.country")} value={form.country ?? ""} onChange={field("country")} />
         </div>
       </ITFlex>
     </ITFlex>
   );
 
-  const contactoTab = (
+  const contactTab = (
     <ITFlex direction="column" gap={4} className="pt-4">
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="celularPersonal" label={tt("detail.fields.personalCell")} value={form.celularPersonal ?? ""} onChange={field("celularPersonal")} aria-invalid={!!errors.celularPersonal} />
-          {errors.celularPersonal && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.celularPersonal}</span>}
+          <ITInput name="personalPhone" label={tt("detail.fields.personalCell")} value={form.personalPhone ?? ""} onChange={field("personalPhone")} aria-invalid={!!errors.personalPhone} />
+          {errors.personalPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</span>}
         </div>
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="celularEmpresa" label={tt("detail.fields.companyCell")} value={form.celularEmpresa ?? ""} onChange={field("celularEmpresa")} aria-invalid={!!errors.celularEmpresa} />
-          {errors.celularEmpresa && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.celularEmpresa}</span>}
+          <ITInput name="workPhone" label={tt("detail.fields.companyCell")} value={form.workPhone ?? ""} onChange={field("workPhone")} aria-invalid={!!errors.workPhone} />
+          {errors.workPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</span>}
         </div>
         <div className="flex-1 min-w-[200px]">
           <ITInput name="email" type="email" label={tt("detail.fields.email")} value={form.email ?? ""} onChange={field("email")} aria-invalid={!!errors.email} />
@@ -261,48 +261,48 @@ export default function EmployeeProfileEditDialog({
       </ITText>
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="contactoEmergenciaNombre" label={tt("detail.fields.emergencyContact")} value={form.contactoEmergenciaNombre ?? ""} onChange={field("contactoEmergenciaNombre")} />
+          <ITInput name="emergencyContactName" label={tt("detail.fields.emergencyContact")} value={form.emergencyContactName ?? ""} onChange={field("emergencyContactName")} />
         </div>
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="contactoEmergenciaTelefono" label={tt("detail.fields.emergencyPhone")} value={form.contactoEmergenciaTelefono ?? ""} onChange={field("contactoEmergenciaTelefono")} aria-invalid={!!errors.contactoEmergenciaTelefono} />
-          {errors.contactoEmergenciaTelefono && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.contactoEmergenciaTelefono}</span>}
+          <ITInput name="emergencyContactPhone" label={tt("detail.fields.emergencyPhone")} value={form.emergencyContactPhone ?? ""} onChange={field("emergencyContactPhone")} aria-invalid={!!errors.emergencyContactPhone} />
+          {errors.emergencyContactPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</span>}
         </div>
         <div className="flex-1 min-w-[200px]">
-          <ITInput name="contactoEmergenciaParentesco" label={tt("detail.fields.emergencyRelation")} value={form.contactoEmergenciaParentesco ?? ""} onChange={field("contactoEmergenciaParentesco")} />
+          <ITInput name="emergencyContactRelationship" label={tt("detail.fields.emergencyRelation")} value={form.emergencyContactRelationship ?? ""} onChange={field("emergencyContactRelationship")} />
         </div>
       </ITFlex>
     </ITFlex>
   );
 
-  const medicaTab = (
+  const medicalTab = (
     <ITFlex direction="column" gap={4} className="pt-4">
       <div className="max-w-xs">
         <ITSelect
-          name="tipoSangreId"
+          name="bloodTypeId"
           label={tt("detail.fields.bloodType")}
-          value={form.tipoSangreId ?? ""}
-          onChange={(e) => setForm((f) => ({ ...f, tipoSangreId: e.target.value }))}
-          options={[{ value: "", label: "—" }, ...tiposSangre.map((b) => ({ value: b.id, label: b.nombre }))]}
+          value={form.bloodTypeId ?? ""}
+          onChange={(e) => setForm((f) => ({ ...f, bloodTypeId: e.target.value }))}
+          options={[{ value: "", label: "—" }, ...bloodTypes.map((b) => ({ value: b.id, label: b.name }))]}
         />
       </div>
       <ITTextarea
-        name="padecimiento"
+        name="medicalConditions"
         label={tt("detail.fields.condition")}
-        value={form.padecimiento ?? ""}
-        onChange={(value) => setForm((f) => ({ ...f, padecimiento: value }))}
+        value={form.medicalConditions ?? ""}
+        onChange={(value) => setForm((f) => ({ ...f, medicalConditions: value }))}
         rows={2}
       />
       <ITTextarea
-        name="alergias"
+        name="allergies"
         label={tt("detail.fields.allergies")}
-        value={form.alergias ?? ""}
-        onChange={(value) => setForm((f) => ({ ...f, alergias: value }))}
+        value={form.allergies ?? ""}
+        onChange={(value) => setForm((f) => ({ ...f, allergies: value }))}
         rows={2}
       />
     </ITFlex>
   );
 
-  const descuentosTab = (
+  const discountsTab = (
     <ITFlex direction="column" gap={4} className="pt-4">
       {DISCOUNT_TYPES.map((type) => {
         const checked = discounts[type] !== null;
@@ -338,11 +338,11 @@ export default function EmployeeProfileEditDialog({
         variant="line"
         items={[
           { id: "personal", label: tt("detail.tabs.personal"), content: personalTab },
-          { id: "oficial", label: tt("detail.tabs.official"), content: oficialTab },
-          { id: "direccion", label: tt("detail.tabs.address"), content: direccionTab },
-          { id: "contacto", label: tt("detail.tabs.contact"), content: contactoTab },
-          { id: "medica", label: tt("detail.tabs.medical"), content: medicaTab },
-          { id: "descuentos", label: tt("detail.tabs.discounts"), content: descuentosTab },
+          { id: "oficial", label: tt("detail.tabs.official"), content: officialTab },
+          { id: "direccion", label: tt("detail.tabs.address"), content: addressTab },
+          { id: "contacto", label: tt("detail.tabs.contact"), content: contactTab },
+          { id: "medica", label: tt("detail.tabs.medical"), content: medicalTab },
+          { id: "descuentos", label: tt("detail.tabs.discounts"), content: discountsTab },
         ]}
       />
       <ITFlex justify="end" gap={2} className="mt-6 pt-4 border-t border-slate-100">

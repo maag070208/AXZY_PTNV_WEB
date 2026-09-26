@@ -1,57 +1,57 @@
-export type MaterialOutputMotivo = "DANADO" | "OBSOLETO" | "EXTRAVIO" | "OTRO";
+export type MaterialOutputReason = "DAMAGED" | "OBSOLETE" | "LOST" | "OTHER";
 
 export interface MaterialOutput {
   id: string;
-  fecha: string;
-  descripcion: string;
-  modelo?: string | null;
-  marca?: string | null;
-  proyecto?: string | null;
-  cantidad: number;
-  departamento: string;
-  usuario: string;
-  observaciones?: string | null;
+  date: string;
+  description: string;
+  model?: string | null;
+  brand?: string | null;
+  project?: string | null;
+  quantity: number;
+  departmentName: string;
+  userName: string;
+  notes?: string | null;
   area: string;
-  motivo?: MaterialOutputMotivo | null;
+  reason?: MaterialOutputReason | null;
   deviceId?: string | null;
-  device?: { id: string; controlActivos: string } | null;
-  registradoPorId?: string | null;
-  registradoPor?: { id: string; name: string; username: string } | null;
+  device?: { id: string; assetTag: string } | null;
+  registeredById?: string | null;
+  registeredBy?: { id: string; name: string; username: string } | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface MaterialOutputInput {
-  fecha?: string;
-  descripcion: string;
-  modelo?: string;
-  marca?: string;
-  proyecto?: string;
-  cantidad?: number;
-  departamento: string;
-  usuario: string;
-  observaciones?: string;
+  date?: string;
+  description: string;
+  model?: string;
+  brand?: string;
+  project?: string;
+  quantity?: number;
+  departmentName: string;
+  userName: string;
+  notes?: string;
   area?: string;
-  motivo?: MaterialOutputMotivo;
+  reason?: MaterialOutputReason;
   deviceId?: string;
 }
 
-export interface SalidaFilters {
+export interface MaterialOutputFilters {
   start?: string;
   end?: string;
-  departamento?: string;
-  usuario?: string;
+  departmentName?: string;
+  userName?: string;
   area?: string;
-  proyecto?: string;
-  motivo?: MaterialOutputMotivo;
+  project?: string;
+  reason?: MaterialOutputReason;
   q?: string;
 }
 
-export interface SalidaSuggestions {
-  departamento: string[];
-  usuario: string[];
-  proyecto: string[];
-  marca: string[];
-  modelo: string[];
-  descripcion: string[];
+export interface MaterialOutputSuggestions {
+  departmentName: string[];
+  userName: string[];
+  project: string[];
+  brand: string[];
+  model: string[];
+  description: string[];
 }

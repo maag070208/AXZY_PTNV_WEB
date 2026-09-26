@@ -11,11 +11,11 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaCheckCircle, FaFileAlt, FaFilePdf, FaFileUpload, FaHourglassHalf, FaPaperclip, FaTimes } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import type { EmployeeDocument, TipoDocumento } from "@entities/personal";
+import type { EmployeeDocument, DocumentType } from "@entities/hr";
 import { StatCard } from "@shared/ui/stat-card";
 
 interface Props {
-  documentTypes: TipoDocumento[];
+  documentTypes: DocumentType[];
   documents: EmployeeDocument[];
   uploadingDocTypeId: string | null;
   onOpenUpload: (typeId: string) => void;
@@ -39,9 +39,9 @@ export default function EmployeeDocumentsCard({
   const byType = useMemo(() => {
     const map = new Map<string, EmployeeDocument[]>();
     for (const doc of documents) {
-      const list = map.get(doc.tipoDocumentoId) ?? [];
+      const list = map.get(doc.documentTypeId) ?? [];
       list.push(doc);
-      map.set(doc.tipoDocumentoId, list);
+      map.set(doc.documentTypeId, list);
     }
     return map;
   }, [documents]);
@@ -104,7 +104,7 @@ export default function EmployeeDocumentsCard({
               className="rounded-lg border border-slate-100 bg-slate-50/60 px-3 py-2.5"
             >
               <ITFlex justify="between" align="center" gap={2}>
-                <ITText className="text-[11px] font-bold text-slate-700">{type.nombre}</ITText>
+                <ITText className="text-[11px] font-bold text-slate-700">{type.name}</ITText>
                 <ITFlex align="center" gap={2}>
                   <ITBadget color={covered ? "success" : "warning"} size="lg">
                     {covered ? tt("detail.uploaded") : tt("detail.pendingOne")}
@@ -157,7 +157,7 @@ export default function EmployeeDocumentsCard({
       <ITDialog
         isOpen={!!uploadingDocTypeId}
         onClose={onCloseUpload}
-        title={uploadingType ? tt("detail.uploadFor", { tipo: uploadingType.nombre }) : ""}
+        title={uploadingType ? tt("detail.uploadFor", { type: uploadingType.name }) : ""}
         className="max-w-xl"
       >
         <ITDropfile

@@ -2,15 +2,15 @@ import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaFingerprint } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
-import { ChecadorTab, useChecador } from "@features/access/checador";
+import { useCan } from "@entities/user";
+import { TimeClockTab, useTimeClock } from "@features/access/time-clock";
 
-export default function ChecadorPage() {
-  const { t } = useTranslation(["checador", "common"]);
+export default function TimeClockPage() {
+  const { t } = useTranslation(["time-clock", "common"]);
   const navigate = useNavigate();
-  const fx = useChecador();
+  const fx = useTimeClock();
   // Dar de alta/baja relojes exige relojes.administrar (igual que en la API).
-  const canManageRelojes = usePuede("relojes.administrar");
+  const canManageClocks = useCan("time_clocks.manage");
 
   return (
     <ITPage
@@ -24,9 +24,9 @@ export default function ChecadorPage() {
       ]}
       backAction={() => navigate("/access")}
     >
-      <ChecadorTab
+      <TimeClockTab
         fx={fx}
-        onAdministrarRelojes={canManageRelojes ? () => navigate("/relojes") : undefined}
+        onManageClocks={canManageClocks ? () => navigate("/time-clocks") : undefined}
       />
     </ITPage>
   );

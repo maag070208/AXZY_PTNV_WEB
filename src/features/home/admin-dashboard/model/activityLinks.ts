@@ -6,11 +6,11 @@ export const activityHref = (a: DashboardActivity): string | null => {
   switch (a.scope) {
     case "tickets":
       return a.targetId ? `/tickets/${a.targetId}` : null;
-    case "cartas":
-      return a.targetId ? `/inventario/prestamos/${a.targetId}` : null;
+    case "custodyLetters":
+      return a.targetId ? `/inventory/loans/${a.targetId}` : null;
     case "inventory":
-      return a.deviceId ? `/inventario/dispositivos/${a.deviceId}` : null;
-    case "salidas":
+      return a.deviceId ? `/inventory/devices/${a.deviceId}` : null;
+    case "materialOutputs":
     case "devices":
       return null;
     default:

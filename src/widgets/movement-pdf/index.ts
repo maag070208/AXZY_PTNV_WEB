@@ -1,3 +1,3 @@
-export { default as MovimientoPDF } from "./ui/MovimientoPDF";
-export { default as MovimientosReportePDF } from "./ui/MovimientosReportePDF";
-export { descargarMovimientoPDF, descargarReporteMovimientosPDF } from "./model/pdf";
+export { default as MovementPdf } from "./ui/MovementPdf";
+export { default as MovementsReportPdf } from "./ui/MovementsReportPdf";
+export { downloadMovementPdf, downloadReportMovementsPdf } from "./model/pdf";

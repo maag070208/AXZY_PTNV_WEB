@@ -3,137 +3,137 @@ import { useNavigate } from "react-router-dom";
 import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { inventarioApi, type Condicion, type Dispositivo, type EstadoInventario, type TipoDispositivo, type TipoMovimiento, type UnidadFisica } from "@entities/inventario";
-import { TIPO_BADGE_COLOR } from "@entities/inventario/model/movimientoColores";
+import { inventoryApi, type Condition, type Device, type DeviceUnitStatus, type DeviceType, type MovementType, type DeviceUnit } from "@entities/inventory";
+import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 
-const ESTADO_LABEL_KEY = {
-  DISPONIBLE: "dashboard.disponibles",
-  PRESTADO: "dashboard.prestadas",
-  DANADO: "dashboard.danadas",
-  MANTENIMIENTO: "dashboard.mantenimiento",
-  BAJA: "dashboard.baja",
+const STATUS_LABEL_KEY = {
+  AVAILABLE: "dashboard.available",
+  ON_LOAN: "dashboard.loaned",
+  DAMAGED: "dashboard.damaged",
+  IN_MAINTENANCE: "dashboard.maintenance",
+  RETIRED: "dashboard.retirement",
 } as const;
 
-const MOVIMIENTO_HINT_KEY = {
-  BAJA: "movimientoHint.BAJA",
-  MANTENIMIENTO_ENTRADA: "movimientoHint.MANTENIMIENTO_ENTRADA",
-  MANTENIMIENTO_SALIDA: "movimientoHint.MANTENIMIENTO_SALIDA",
+const MOVEMENT_HINT_KEY = {
+  RETIREMENT: "movementHint.RETIREMENT",
+  MAINTENANCE_IN: "movementHint.MAINTENANCE_IN",
+  MAINTENANCE_OUT: "movementHint.MAINTENANCE_OUT",
 } as const;
 
-const TIPOS: TipoMovimiento[] = ["BAJA", "MANTENIMIENTO_ENTRADA", "MANTENIMIENTO_SALIDA"];
+const TYPES: MovementType[] = ["RETIREMENT", "MAINTENANCE_IN", "MAINTENANCE_OUT"];
 
 interface Row {
   key: string;
-  tipoFilter: string;
-  dispositivoId: string;
-  unidadId: string;
-  tipo: TipoMovimiento | "";
-  condicion: Condicion | "";
-  motivo: string;
-  observaciones: string;
-  unidades: UnidadFisica[];
-  unidadesLoading: boolean;
+  typeFilter: string;
+  deviceId: string;
+  unitId: string;
+  type: MovementType | "";
+  condition: Condition | "";
+  reason: string;
+  notes: string;
+  units: DeviceUnit[];
+  unitsLoading: boolean;
 }
 
-const CONDICIONES: Condicion[] = ["BUENO", "ACEPTABLE", "MALO", "ROTO"];
+const CONDITIONS: Condition[] = ["GOOD", "FAIR", "POOR", "BROKEN"];
 
-const CONDICION_BADGE_COLOR = {
-  BUENO: "success",
-  ACEPTABLE: "info",
-  MALO: "warning",
-  ROTO: "danger",
+const CONDITION_BADGE_COLOR = {
+  GOOD: "success",
+  FAIR: "info",
+  POOR: "warning",
+  BROKEN: "danger",
 } as const;
 
-const ESTADOS_OPERABLES: EstadoInventario[] = ["DISPONIBLE", "MANTENIMIENTO"];
+const OPERABLE_STATUSES: DeviceUnitStatus[] = ["AVAILABLE", "IN_MAINTENANCE"];
 
-const UNIDAD_ESTADO: Partial<Record<TipoMovimiento, EstadoInventario>> = {
-  BAJA: "DISPONIBLE",
-  MANTENIMIENTO_ENTRADA: "DISPONIBLE",
-  MANTENIMIENTO_SALIDA: "MANTENIMIENTO",
+const UNIT_STATUS: Partial<Record<MovementType, DeviceUnitStatus>> = {
+  RETIREMENT: "AVAILABLE",
+  MAINTENANCE_IN: "AVAILABLE",
+  MAINTENANCE_OUT: "IN_MAINTENANCE",
 };
 
-export default function NewMovimientoPage() {
-  const { t } = useTranslation(["inventario", "common"]);
+export default function NewMovementPage() {
+  const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
-  const [tipos, setTipos] = useState<TipoDispositivo[]>([]);
-  const [dispositivos, setDispositivos] = useState<Dispositivo[]>([]);
+  const [types, setTypes] = useState<DeviceType[]>([]);
+  const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
-  const [rows, setRows] = useState<Row[]>([{ key: crypto.randomUUID(), tipoFilter: "", dispositivoId: "", unidadId: "", tipo: "", condicion: "", motivo: "", observaciones: "", unidades: [], unidadesLoading: false }]);
+  const [rows, setRows] = useState<Row[]>([{ key: crypto.randomUUID(), typeFilter: "", deviceId: "", unitId: "", type: "", condition: "", reason: "", notes: "", units: [], unitsLoading: false }]);
 
   useEffect(() => {
-    Promise.all([inventarioApi.tipos(), inventarioApi.dispositivos()])
+    Promise.all([inventoryApi.types(), inventoryApi.devices()])
       .then(([ts, ds]) => {
-        setTipos(ts);
-        setDispositivos(ds);
+        setTypes(ts);
+        setDevices(ds);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const cargarUnidades = async (key: string, dispositivoId: string) => {
-    setRows((r) => r.map((x) => (x.key === key ? { ...x, unidades: [], unidadesLoading: true } : x)));
+  const loadUnits = async (key: string, deviceId: string) => {
+    setRows((r) => r.map((x) => (x.key === key ? { ...x, units: [], unitsLoading: true } : x)));
     try {
-      const todas = await inventarioApi.unidades(dispositivoId);
-      setRows((r) => r.map((x) => (x.key === key ? { ...x, unidades: todas, unidadesLoading: false } : x)));
+      const all = await inventoryApi.units(deviceId);
+      setRows((r) => r.map((x) => (x.key === key ? { ...x, units: all, unitsLoading: false } : x)));
     } catch {
-      setRows((r) => r.map((x) => (x.key === key ? { ...x, unidades: [], unidadesLoading: false } : x)));
+      setRows((r) => r.map((x) => (x.key === key ? { ...x, units: [], unitsLoading: false } : x)));
       window.alert("Error al cargar las unidades");
     }
   };
 
   const updateRow = (key: string, patch: Partial<Row>) => setRows((r) => r.map((x) => (x.key === key ? { ...x, ...patch } : x)));
 
-  const elegirDispositivo = (key: string, dispositivoId: string) => {
-    updateRow(key, { dispositivoId, unidadId: "", tipo: "", unidades: [] });
-    if (dispositivoId) cargarUnidades(key, dispositivoId);
+  const selectDevice = (key: string, deviceId: string) => {
+    updateRow(key, { deviceId, unitId: "", type: "", units: [] });
+    if (deviceId) loadUnits(key, deviceId);
   };
 
-  const elegirTipoFiltro = (key: string, tipoId: string) => {
-    updateRow(key, { tipoFilter: tipoId, dispositivoId: "", unidadId: "", tipo: "", unidades: [] });
+  const selectFilterType = (key: string, typeId: string) => {
+    updateRow(key, { typeFilter: typeId, deviceId: "", unitId: "", type: "", units: [] });
   };
 
-  const elegirTipo = (key: string, tp: TipoMovimiento) => {
+  const selectType = (key: string, tp: MovementType) => {
     setRows((r) =>
       r.map((x) => {
         if (x.key !== key) return x;
-        const estadoValido = UNIDAD_ESTADO[tp];
-        const unidadOk = x.unidadId && estadoValido && x.unidades.find((u) => u.id === x.unidadId)?.estado === estadoValido;
-        return { ...x, tipo: tp, unidadId: unidadOk ? x.unidadId : "" };
+        const validStatus = UNIT_STATUS[tp];
+        const unitOk = x.unitId && validStatus && x.units.find((u) => u.id === x.unitId)?.status === validStatus;
+        return { ...x, type: tp, unitId: unitOk ? x.unitId : "" };
       })
     );
   };
 
-  const addRow = () => setRows((r) => [...r, { key: crypto.randomUUID(), tipoFilter: "", dispositivoId: "", unidadId: "", tipo: "", condicion: "", motivo: "", observaciones: "", unidades: [], unidadesLoading: false }]);
+  const addRow = () => setRows((r) => [...r, { key: crypto.randomUUID(), typeFilter: "", deviceId: "", unitId: "", type: "", condition: "", reason: "", notes: "", units: [], unitsLoading: false }]);
   const removeRow = (key: string) => setRows((r) => r.filter((x) => x.key !== key));
 
-  const unidadesVisibles = (r: Row) => {
-    const base = r.unidades.filter((u) => ESTADOS_OPERABLES.includes(u.estado));
-    const estado = r.tipo ? UNIDAD_ESTADO[r.tipo as TipoMovimiento] : undefined;
-    return estado ? base.filter((u) => u.estado === estado) : base;
+  const visibleUnits = (r: Row) => {
+    const base = r.units.filter((u) => OPERABLE_STATUSES.includes(u.status));
+    const status = r.type ? UNIT_STATUS[r.type as MovementType] : undefined;
+    return status ? base.filter((u) => u.status === status) : base;
   };
 
-  const unidadLabel = (u: UnidadFisica) => {
-    const extras = [u.numeroSerie, u.nombreEquipo, u.macAddress].filter(Boolean).join(" · ");
-    return `${u.activoFijo}${extras ? ` · ${extras}` : ""} · ${u.estado}`;
+  const unitLabel = (u: DeviceUnit) => {
+    const extras = [u.serialNumber, u.hostname, u.macAddress].filter(Boolean).join(" · ");
+    return `${u.assetTag}${extras ? ` · ${extras}` : ""} · ${u.status}`;
   };
 
-  const rowValida = (r: Row) =>
-    !!r.dispositivoId &&
-    !!r.unidadId &&
-    !!r.tipo &&
-    (r.tipo === "BAJA" || r.tipo === "MANTENIMIENTO_ENTRADA" ? !!r.motivo.trim() : true) &&
-    (r.tipo !== "MANTENIMIENTO_SALIDA" || !!r.condicion);
+  const validRow = (r: Row) =>
+    !!r.deviceId &&
+    !!r.unitId &&
+    !!r.type &&
+    (r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN" ? !!r.reason.trim() : true) &&
+    (r.type !== "MAINTENANCE_OUT" || !!r.condition);
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     rows.forEach((r, idx) => {
-      if ((r.tipo === "BAJA" || r.tipo === "MANTENIMIENTO_ENTRADA") && r.motivo.trim().length < 3) {
+      if ((r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN") && r.reason.trim().length < 3) {
         e[`motivo-${idx}`] = "El motivo debe tener al menos 3 caracteres";
       }
-      if (r.tipo === "MANTENIMIENTO_SALIDA" && r.observaciones.trim().length > 0 && r.observaciones.trim().length < 3) {
+      if (r.type === "MAINTENANCE_OUT" && r.notes.trim().length > 0 && r.notes.trim().length < 3) {
         e[`observaciones-${idx}`] = "La observación debe tener al menos 3 caracteres";
       }
     });
@@ -141,7 +141,7 @@ export default function NewMovimientoPage() {
     return Object.keys(e).length === 0;
   };
 
-  const isValid = rows.length > 0 && rows.every(rowValida);
+  const isValid = rows.length > 0 && rows.every(validRow);
 
   const handleSubmit = async () => {
     if (!validate()) {
@@ -150,30 +150,30 @@ export default function NewMovimientoPage() {
     }
     setSaving(true);
     try {
-      const grupos = new Map<TipoMovimiento, Row[]>();
+      const groups = new Map<MovementType, Row[]>();
       rows.forEach((r) => {
-        if (!r.tipo) return;
-        const arr = grupos.get(r.tipo) ?? [];
+        if (!r.type) return;
+        const arr = groups.get(r.type) ?? [];
         arr.push(r);
-        grupos.set(r.tipo, arr);
+        groups.set(r.type, arr);
       });
       await Promise.all(
-        [...grupos.entries()].map(([tp, rs]) =>
-          inventarioApi.registrarMovimiento({
-            tipo: tp,
-            motivo: rs.find((r) => r.motivo.trim())?.motivo || undefined,
-            detalles: rs.map((r) => ({
-              dispositivoId: r.dispositivoId,
-              unidadId: r.unidadId,
-              cantidad: 1,
-              condicion: tp === "MANTENIMIENTO_SALIDA" ? (r.condicion as Condicion) : undefined,
-              observaciones: r.observaciones.trim() ? r.observaciones : undefined,
+        [...groups.entries()].map(([tp, rs]) =>
+          inventoryApi.registerMovement({
+            type: tp,
+            reason: rs.find((r) => r.reason.trim())?.reason || undefined,
+            items: rs.map((r) => ({
+              deviceId: r.deviceId,
+              unitId: r.unitId,
+              quantity: 1,
+              condition: tp === "MAINTENANCE_OUT" ? (r.condition as Condition) : undefined,
+              notes: r.notes.trim() ? r.notes : undefined,
             })),
           })
         )
       );
       setToast({ message: t("messages.movementRegistered"), type: "success" });
-      setTimeout(() => navigate("/inventario/movimientos"), 1000);
+      setTimeout(() => navigate("/inventory/movements"), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -196,8 +196,8 @@ export default function NewMovimientoPage() {
       title={t("new.title")}
       description={t("new.description")}
       icon={<FaSave size={20} />}
-      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventario") }, { label: t("movimientos.title"), onClick: () => navigate("/inventario/movimientos") }, { label: t("movimientos.new") }]}
-      backAction={() => navigate("/inventario/movimientos")}
+      breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("movements.title"), onClick: () => navigate("/inventory/movements") }, { label: t("movements.new") }]}
+      backAction={() => navigate("/inventory/movements")}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>
@@ -208,21 +208,21 @@ export default function NewMovimientoPage() {
       }
     >
       <ITFlex as="section" direction="column" gap={5} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <ITText className="text-sm font-semibold text-slate-700">{t("new.detalle")}</ITText>
+        <ITText className="text-sm font-semibold text-slate-700">{t("new.detail")}</ITText>
 
         <ITFlex align="center" justify="between" gap={2}>
           <ITText className="text-[11px] font-bold text-slate-500">
-            {rows.length} {rows.length === 1 ? t("new.row") : t("new.rows")} · {rows.length} {rows.length === 1 ? t("new.pieza") : t("new.piezas")}
+            {rows.length} {rows.length === 1 ? t("new.row") : t("new.rows")} · {rows.length} {rows.length === 1 ? t("new.piece") : t("new.pieces")}
           </ITText>
         </ITFlex>
 
         <ITFlex direction="column" gap={4}>
           {rows.map((r, idx) => {
-            const visibles = unidadesVisibles(r);
-            const estadoValido = r.tipo ? UNIDAD_ESTADO[r.tipo as TipoMovimiento] : undefined;
-            const dispFiltrados = r.tipoFilter ? dispositivos.filter((d) => d.tipoId === r.tipoFilter) : dispositivos;
-            const unidadSel = r.unidadId ? r.unidades.find((u) => u.id === r.unidadId) : undefined;
-            const tiposValidos = unidadSel ? TIPOS.filter((tp) => UNIDAD_ESTADO[tp as TipoMovimiento] === unidadSel.estado) : TIPOS;
+            const visible = visibleUnits(r);
+            const validStatus = r.type ? UNIT_STATUS[r.type as MovementType] : undefined;
+            const availFiltered = r.typeFilter ? devices.filter((d) => d.typeId === r.typeFilter) : devices;
+            const unitSel = r.unitId ? r.units.find((u) => u.id === r.unitId) : undefined;
+            const validTypes = unitSel ? TYPES.filter((tp) => UNIT_STATUS[tp as MovementType] === unitSel.status) : TYPES;
             return (
               <ITFlex key={r.key} direction="column" gap={3} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
                 <ITFlex align="center" justify="between" gap={2}>
@@ -237,47 +237,47 @@ export default function NewMovimientoPage() {
                 <ITGrid container columns={12} spacing={3}>
                   <ITGrid item xs={12} md={4}>
                     <ITSearchSelect
-                      label={t("new.tipoFilter")}
-                      placeholder={t("new.tipoFilterPlaceholder")}
-                      options={[{ value: "", label: t("new.todo") }, ...tipos.map((tp) => ({ value: tp.id, label: tp.name }))]}
-                      value={r.tipoFilter}
-                      onChange={(v) => elegirTipoFiltro(r.key, String(v))}
+                      label={t("new.typeFilter")}
+                      placeholder={t("new.typeFilterPlaceholder")}
+                      options={[{ value: "", label: t("new.all") }, ...types.map((tp) => ({ value: tp.id, label: tp.name }))]}
+                      value={r.typeFilter}
+                      onChange={(v) => selectFilterType(r.key, String(v))}
                     />
                   </ITGrid>
                   <ITGrid item xs={12} md={4}>
                     <ITSearchSelect
                       label={t("new.productType")}
                       placeholder={t("new.productTypePlaceholder")}
-                      options={dispFiltrados.map((d) => ({ value: d.id, label: `${d.nombre} (${d.marca} ${d.modelo})` }))}
-                      value={r.dispositivoId}
-                      onChange={(v) => elegirDispositivo(r.key, String(v))}
+                      options={availFiltered.map((d) => ({ value: d.id, label: `${d.name} (${d.brand} ${d.model})` }))}
+                      value={r.deviceId}
+                      onChange={(v) => selectDevice(r.key, String(v))}
                     />
                   </ITGrid>
                   <ITGrid item xs={12} md={4}>
                     <ITSearchSelect
-                      label={t("new.unidad")}
-                      placeholder={t("new.unidadPlaceholder")}
-                      options={visibles.map((u) => ({ value: u.id, label: unidadLabel(u) }))}
-                      value={r.unidadId}
-                      disabled={!r.dispositivoId}
-                      isLoading={r.unidadesLoading}
-                      onChange={(v) => updateRow(r.key, { unidadId: String(v) })}
+                      label={t("new.unit")}
+                      placeholder={t("new.unitPlaceholder")}
+                      options={visible.map((u) => ({ value: u.id, label: unitLabel(u) }))}
+                      value={r.unitId}
+                      disabled={!r.deviceId}
+                      isLoading={r.unitsLoading}
+                      onChange={(v) => updateRow(r.key, { unitId: String(v) })}
                     />
                   </ITGrid>
                 </ITGrid>
 
                 <ITText className="text-[11px] font-black uppercase tracking-wider text-slate-400">{t("new.howLabel")}</ITText>
                 <ITFlex gap={2} wrap="wrap">
-                  {tiposValidos.map((tp) => {
-                    const sel = r.tipo === tp;
+                  {validTypes.map((tp) => {
+                    const sel = r.type === tp;
                     return (
                       <button
                         key={tp}
                         type="button"
-                        onClick={() => elegirTipo(r.key, tp)}
+                        onClick={() => selectType(r.key, tp)}
                         className={`rounded-full p-0 transition-all ${sel ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                       >
-                        <ITBadget color={TIPO_BADGE_COLOR[tp]} variant={sel ? "filled" : "outlined"} size="lg">
+                        <ITBadget color={TYPE_BADGE_COLOR[tp]} variant={sel ? "filled" : "outlined"} size="lg">
                           {t(`typeLabels.${tp}`)}
                         </ITBadget>
                       </button>
@@ -285,13 +285,13 @@ export default function NewMovimientoPage() {
                   })}
                 </ITFlex>
 
-                {(r.tipo === "BAJA" || r.tipo === "MANTENIMIENTO_ENTRADA") && (
+                {(r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN") && (
                   <div>
                     <ITInput
                       name={`motivo-${r.key}`}
-                      label={t("new.motivo")}
-                      value={r.motivo}
-                      onChange={(e) => updateRow(r.key, { motivo: e.target.value })}
+                      label={t("new.reason")}
+                      value={r.reason}
+                      onChange={(e) => updateRow(r.key, { reason: e.target.value })}
                       required
                       aria-invalid={!!errors[`motivo-${idx}`]}
                     />
@@ -303,20 +303,20 @@ export default function NewMovimientoPage() {
                   </div>
                 )}
 
-                {r.tipo === "MANTENIMIENTO_SALIDA" && (
+                {r.type === "MAINTENANCE_OUT" && (
                       <>
-                        <ITText className="text-[11px] font-black uppercase tracking-wider text-slate-400">{t("devolucion.condicion")}</ITText>
+                        <ITText className="text-[11px] font-black uppercase tracking-wider text-slate-400">{t("loanReturn.condition")}</ITText>
                         <ITFlex gap={2} wrap="wrap">
-                          {CONDICIONES.map((c) => {
-                            const sel = r.condicion === c;
+                          {CONDITIONS.map((c) => {
+                            const sel = r.condition === c;
                             return (
                               <button
                                 key={c}
                                 type="button"
-                                onClick={() => updateRow(r.key, { condicion: c })}
+                                onClick={() => updateRow(r.key, { condition: c })}
                                 className={`rounded-full p-0 transition-all ${sel ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                               >
-                                <ITBadget color={CONDICION_BADGE_COLOR[c]} variant={sel ? "filled" : "outlined"} size="lg">
+                                <ITBadget color={CONDITION_BADGE_COLOR[c]} variant={sel ? "filled" : "outlined"} size="lg">
                                   {c}
                                 </ITBadget>
                               </button>
@@ -326,9 +326,9 @@ export default function NewMovimientoPage() {
                         <div>
                       <ITInput
                         name={`observaciones-${r.key}`}
-                        label={t("new.comentario")}
-                        value={r.observaciones}
-                        onChange={(e) => updateRow(r.key, { observaciones: e.target.value })}
+                        label={t("new.comment")}
+                        value={r.notes}
+                        onChange={(e) => updateRow(r.key, { notes: e.target.value })}
                         aria-invalid={!!errors[`observaciones-${idx}`]}
                       />
                       {errors[`observaciones-${idx}`] && (
@@ -337,24 +337,24 @@ export default function NewMovimientoPage() {
                         </span>
                       )}
                     </div>
-                        {r.condicion === "ROTO" && (
-                          <ITText className="text-[11px] font-semibold text-red-600">{t("devolucion.rotoBajaHint")}</ITText>
+                        {r.condition === "BROKEN" && (
+                          <ITText className="text-[11px] font-semibold text-red-600">{t("loanReturn.brokenRetirementHint")}</ITText>
                         )}
                       </>
                     )}
 
-                {r.tipo && estadoValido && (
+                {r.type && validStatus && (
                   <ITText className="text-[11px] font-semibold text-slate-500">
-                    {t("new.unidadEstadoHint", { estado: t(ESTADO_LABEL_KEY[estadoValido]) })}
+                    {t("new.unitStatusHint", { status: t(STATUS_LABEL_KEY[validStatus]) })}
                   </ITText>
                 )}
 
-                {r.tipo && r.dispositivoId && !r.unidadesLoading && visibles.length === 0 && (
-                  <ITText className="text-[11px] font-semibold text-amber-600">{t("new.sinUnidadesEstado")}</ITText>
+                {r.type && r.deviceId && !r.unitsLoading && visible.length === 0 && (
+                  <ITText className="text-[11px] font-semibold text-amber-600">{t("new.withoutUnitsStatus")}</ITText>
                 )}
 
-                {r.tipo && r.dispositivoId && visibles.length > 0 && (
-                  <ITText className="text-[11px] text-slate-400">{t(MOVIMIENTO_HINT_KEY[r.tipo as keyof typeof MOVIMIENTO_HINT_KEY])}</ITText>
+                {r.type && r.deviceId && visible.length > 0 && (
+                  <ITText className="text-[11px] text-slate-400">{t(MOVEMENT_HINT_KEY[r.type as keyof typeof MOVEMENT_HINT_KEY])}</ITText>
                 )}
               </ITFlex>
             );

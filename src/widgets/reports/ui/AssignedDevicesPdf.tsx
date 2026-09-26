@@ -1,18 +1,18 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { useTranslation } from "react-i18next";
-import type { AsignadoRow } from "@entities/report";
+import type { AssignedDeviceRow } from "@entities/report";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
 
 interface Props {
-  rows: AsignadoRow[];
+  rows: AssignedDeviceRow[];
   title?: string;
 }
 
 const styles = StyleSheet.create({
-  diasAlerta: { fontSize: 7.8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.danger, textAlign: "right" },
-  celdaNumero: { textAlign: "right" },
+  daysAlert: { fontSize: 7.8, fontFamily: "Helvetica-Bold", color: PDF_COLORS.danger, textAlign: "right" },
+  cellNumber: { textAlign: "right" },
 });
 
 const fmtDate = (d: string | null): string => {
@@ -24,45 +24,45 @@ const fmtDate = (d: string | null): string => {
   return `${dd}/${mm}/${yy}`;
 };
 
-const origenBadgeStyle = (origen: AsignadoRow["origen"]) =>
-  origen === "CARTA" ? badgeStyleFor("success") : origen === "MOVIMIENTO" ? badgeStyleFor("warning") : badgeStyleFor("gray");
+const sourceBadgeStyle = (source: AssignedDeviceRow["source"]) =>
+  source === "CUSTODY_LETTER" ? badgeStyleFor("success") : source === "MOVEMENT" ? badgeStyleFor("warning") : badgeStyleFor("gray");
 
 // Anchos en puntos; suman ~526 (folio LETTER − padding horizontal de 36×2),
 // igual que DevicePDF para que ambos reportes se lean igual.
 const COL = {
-  activo: 68,
+  active: 68,
   desc: 114,
   resp: 94,
-  depto: 72,
+  dept: 72,
   folio: 50,
-  fecha: 50,
-  dias: 36,
-  origen: 42,
+  date: 50,
+  days: 36,
+  source: 42,
 };
 
-export default function AsignadosPDF({ rows, title }: Props) {
+export default function AssignedDevicesPdf({ rows, title }: Props) {
   const { t: tt } = useTranslation(["reports"]);
-  const reportTitle = title ?? tt("pdf.asignadosTitle");
+  const reportTitle = title ?? tt("pdf.assignedTitle");
   const today = fmtDate(new Date().toISOString());
-  const totalAsignados = rows.length;
-  const conCarta = rows.filter((r) => r.origen === "CARTA").length;
-  const promedioDias = rows.length
-    ? Math.round(rows.reduce((acc, r) => acc + (r.diasAsignado ?? 0), 0) / rows.length)
+  const totalAssigned = rows.length;
+  const withCustodyLetter = rows.filter((r) => r.source === "CUSTODY_LETTER").length;
+  const averageDays = rows.length
+    ? Math.round(rows.reduce((acc, r) => acc + (r.daysAssigned ?? 0), 0) / rows.length)
     : 0;
-  const deptos = new Set(rows.map((r) => r.departamento).filter(Boolean)).size;
+  const depts = new Set(rows.map((r) => r.department).filter(Boolean)).size;
 
-  const origenLabel = (origen: AsignadoRow["origen"]) =>
-    origen === "CARTA" ? tt("asignados.origenCarta") : origen === "MOVIMIENTO" ? tt("asignados.origenMovimiento") : tt("asignados.origenDesconocido");
+  const sourceLabel = (source: AssignedDeviceRow["source"]) =>
+    source === "CUSTODY_LETTER" ? tt("assigned.sourceCustodyLetter") : source === "MOVEMENT" ? tt("assigned.sourceMovement") : tt("assigned.unknownSource");
 
   const summary: Array<{ label: string; value: number; color: string }> = [
-    { label: tt("pdf.summaryAsignados"), value: totalAsignados, color: PDF_COLORS.band },
-    { label: tt("pdf.summaryCarta"), value: conCarta, color: PDF_COLORS.success },
-    { label: tt("pdf.summaryPromedio"), value: promedioDias, color: PDF_COLORS.danger },
-    { label: tt("pdf.summaryDepartamentos"), value: deptos, color: PDF_COLORS.bandAccent },
+    { label: tt("pdf.summaryAssigned"), value: totalAssigned, color: PDF_COLORS.band },
+    { label: tt("pdf.summaryCustodyLetter"), value: withCustodyLetter, color: PDF_COLORS.success },
+    { label: tt("pdf.summaryAverage"), value: averageDays, color: PDF_COLORS.danger },
+    { label: tt("pdf.summaryDepartments"), value: depts, color: PDF_COLORS.bandAccent },
   ];
 
   const ROWS_PER_PAGE = 24;
-  const pages: AsignadoRow[][] = [];
+  const pages: AssignedDeviceRow[][] = [];
   for (let i = 0; i < rows.length; i += ROWS_PER_PAGE) {
     pages.push(rows.slice(i, i + ROWS_PER_PAGE));
   }
@@ -87,34 +87,34 @@ export default function AsignadosPDF({ rows, title }: Props) {
             )}
 
             <View style={pdfTheme.tableHeader} fixed>
-              <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colActivo")}</Text></View>
-              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescripcion")}</Text></View>
-              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colResponsable")}</Text></View>
-              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDepartamento")}</Text></View>
+              <View style={{ width: COL.active }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.activeCol")}</Text></View>
+              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescription")}</Text></View>
+              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colCustodian")}</Text></View>
+              <View style={{ width: COL.dept }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDepartment")}</Text></View>
               <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFolio")}</Text></View>
-              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFecha")}</Text></View>
-              <View style={{ width: COL.dias }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDias")}</Text></View>
-              <View style={{ width: COL.origen }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colOrigen")}</Text></View>
+              <View style={{ width: COL.date }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDate")}</Text></View>
+              <View style={{ width: COL.days }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDays")}</Text></View>
+              <View style={{ width: COL.source }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colSource")}</Text></View>
             </View>
 
             {pageRows.map((r, i) => (
               <View key={r.deviceId + i} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
-                <View style={{ width: COL.activo }}><Text style={pdfTheme.cellBold}>{r.controlActivos}</Text></View>
+                <View style={{ width: COL.active }}><Text style={pdfTheme.cellBold}>{r.assetTag}</Text></View>
                 <View style={{ width: COL.desc }}>
-                  <Text style={pdfTheme.cellDescTitle}>{r.descripcion}</Text>
-                  <Text style={pdfTheme.cellDescSub}>{r.tipo} · {r.marca} {r.modelo}</Text>
+                  <Text style={pdfTheme.cellDescTitle}>{r.description}</Text>
+                  <Text style={pdfTheme.cellDescSub}>{r.type} · {r.brand} {r.model}</Text>
                 </View>
-                <View style={{ width: COL.resp }}><Text style={pdfTheme.cell}>{r.responsable}</Text></View>
-                <View style={{ width: COL.depto }}><Text style={pdfTheme.cellMuted}>{r.departamento ?? "—"}</Text></View>
+                <View style={{ width: COL.resp }}><Text style={pdfTheme.cell}>{r.custodian}</Text></View>
+                <View style={{ width: COL.dept }}><Text style={pdfTheme.cellMuted}>{r.department ?? "—"}</Text></View>
                 <View style={{ width: COL.folio }}><Text style={pdfTheme.cellMuted}>{r.folio ?? "—"}</Text></View>
-                <View style={{ width: COL.fecha }}><Text style={pdfTheme.cellMuted}>{fmtDate(r.fecha)}</Text></View>
-                <View style={{ width: COL.dias }}>
-                  <Text style={(r.diasAsignado ?? 0) > 30 ? styles.diasAlerta : [pdfTheme.cell, styles.celdaNumero]}>
-                    {r.diasAsignado ?? "—"}
+                <View style={{ width: COL.date }}><Text style={pdfTheme.cellMuted}>{fmtDate(r.date)}</Text></View>
+                <View style={{ width: COL.days }}>
+                  <Text style={(r.daysAssigned ?? 0) > 30 ? styles.daysAlert : [pdfTheme.cell, styles.cellNumber]}>
+                    {r.daysAssigned ?? "—"}
                   </Text>
                 </View>
-                <View style={{ width: COL.origen }}>
-                  <Text style={origenBadgeStyle(r.origen)}>{origenLabel(r.origen)}</Text>
+                <View style={{ width: COL.source }}>
+                  <Text style={sourceBadgeStyle(r.source)}>{sourceLabel(r.source)}</Text>
                 </View>
               </View>
             ))}

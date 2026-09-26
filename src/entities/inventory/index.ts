@@ -1,3 +1,3 @@
 export * from "./model/types";
-export { inventarioApi } from "./api/inventarioApi";
-export type { MovimientoDetalleInput } from "./api/inventarioApi";
+export { inventoryApi } from "./api/inventoryApi";
+export type { MovementItemInput } from "./api/inventoryApi";

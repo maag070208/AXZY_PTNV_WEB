@@ -3,29 +3,29 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaChevronDown, FaChevronRight, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { inventarioApi, type Dispositivo, type EstadoInventario, type UnidadFisica } from "@entities/inventario";
+import { inventoryApi, type Device, type DeviceUnitStatus, type DeviceUnit } from "@entities/inventory";
 
-const ESTADO_COLOR: Record<EstadoInventario, "success" | "warning" | "danger" | "gray"> = {
-  DISPONIBLE: "success",
-  PRESTADO: "warning",
-  DANADO: "danger",
-  MANTENIMIENTO: "gray",
-  BAJA: "danger",
+const STATUS_COLOR: Record<DeviceUnitStatus, "success" | "warning" | "danger" | "gray"> = {
+  AVAILABLE: "success",
+  ON_LOAN: "warning",
+  DAMAGED: "danger",
+  IN_MAINTENANCE: "gray",
+  RETIRED: "danger",
 };
 
 interface UnitDraft {
-  numeroSerie: string;
+  serialNumber: string;
   macAddress: string;
   ip: string;
-  nombreEquipo: string;
+  hostname: string;
 }
 
-export default function EditDispositivoPage() {
+export default function EditDevicePage() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation(["inventario", "common"]);
+  const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
-  const [dispositivo, setDispositivo] = useState<Dispositivo | null>(null);
-  const [unidades, setUnidades] = useState<UnidadFisica[]>([]);
+  const [device, setDevice] = useState<Device | null>(null);
+  const [units, setUnits] = useState<DeviceUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savingUnitId, setSavingUnitId] = useState<string | null>(null);
@@ -36,33 +36,33 @@ export default function EditDispositivoPage() {
   const [allExpanded, setAllExpanded] = useState(false);
 
   const [form, setForm] = useState({
-    nombre: "",
-    marca: "",
-    modelo: "",
-    descripcion: "",
-    observaciones: "",
+    name: "",
+    brand: "",
+    model: "",
+    description: "",
+    notes: "",
   });
 
   useEffect(() => {
     if (!id) return;
-    Promise.all([inventarioApi.getDispositivo(id), inventarioApi.unidades(id)])
+    Promise.all([inventoryApi.getDevice(id), inventoryApi.units(id)])
       .then(([d, us]) => {
-        setDispositivo(d);
-        setUnidades(us);
+        setDevice(d);
+        setUnits(us);
         setForm({
-          nombre: d.nombre,
-          marca: d.marca,
-          modelo: d.modelo,
-          descripcion: d.descripcion ?? "",
-          observaciones: d.observaciones ?? "",
+          name: d.name,
+          brand: d.brand,
+          model: d.model,
+          description: d.description ?? "",
+          notes: d.notes ?? "",
         });
         const draftsInit: Record<string, UnitDraft> = {};
         for (const u of us) {
           draftsInit[u.id] = {
-            numeroSerie: u.numeroSerie ?? "",
+            serialNumber: u.serialNumber ?? "",
             macAddress: u.macAddress ?? "",
             ip: u.ip ?? "",
-            nombreEquipo: u.nombreEquipo ?? "",
+            hostname: u.hostname ?? "",
           };
         }
         setDrafts(draftsInit);
@@ -70,21 +70,21 @@ export default function EditDispositivoPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const isValid = !!form.nombre.trim() && !!form.marca.trim() && !!form.modelo.trim();
+  const isValid = !!form.name.trim() && !!form.brand.trim() && !!form.model.trim();
 
   const handleSubmit = async () => {
     if (!id) return;
     setSaving(true);
     try {
-      await inventarioApi.actualizarDispositivo(id, {
-        nombre: form.nombre.trim(),
-        marca: form.marca.trim(),
-        modelo: form.modelo.trim(),
-        descripcion: form.descripcion || undefined,
-        observaciones: form.observaciones || undefined,
+      await inventoryApi.updateDevice(id, {
+        name: form.name.trim(),
+        brand: form.brand.trim(),
+        model: form.model.trim(),
+        description: form.description || undefined,
+        notes: form.notes || undefined,
       });
-      setToast({ message: t("dispositivos.savedEdit"), type: "success" });
-      setTimeout(() => navigate(`/inventario/dispositivos/${id}`), 1000);
+      setToast({ message: t("devices.savedEdit"), type: "success" });
+      setTimeout(() => navigate(`/inventory/devices/${id}`), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -92,25 +92,25 @@ export default function EditDispositivoPage() {
     }
   };
 
-  const isUnitDirty = (u: UnidadFisica) => {
+  const isUnitDirty = (u: DeviceUnit) => {
     const d = drafts[u.id];
     if (!d) return false;
-    return d.numeroSerie !== (u.numeroSerie ?? "") || d.macAddress !== (u.macAddress ?? "") || d.ip !== (u.ip ?? "") || d.nombreEquipo !== (u.nombreEquipo ?? "");
+    return d.serialNumber !== (u.serialNumber ?? "") || d.macAddress !== (u.macAddress ?? "") || d.ip !== (u.ip ?? "") || d.hostname !== (u.hostname ?? "");
   };
 
-  const saveUnidad = async (u: UnidadFisica) => {
+  const saveUnit = async (u: DeviceUnit) => {
     const d = drafts[u.id];
     if (!d || !isUnitDirty(u)) return;
-    const tipo = dispositivo?.tipo;
+    const type = device?.type;
     setSavingUnitId(u.id);
     try {
-      await inventarioApi.actualizarUnidad(u.id, {
-        ...(tipo?.useSerie ? { numeroSerie: d.numeroSerie || undefined } : {}),
-        ...(tipo?.useMac ? { macAddress: d.macAddress || undefined } : {}),
-        ...(tipo?.useIp ? { ip: d.ip || undefined } : {}),
-        ...(tipo?.useEquipo ? { nombreEquipo: d.nombreEquipo || undefined } : {}),
+      await inventoryApi.updateUnit(u.id, {
+        ...(type?.useSerialNumber ? { serialNumber: d.serialNumber || undefined } : {}),
+        ...(type?.useMac ? { macAddress: d.macAddress || undefined } : {}),
+        ...(type?.useIp ? { ip: d.ip || undefined } : {}),
+        ...(type?.useHostname ? { hostname: d.hostname || undefined } : {}),
       });
-      setUnidades((prev) => prev.map((x) => (x.id === u.id ? { ...x, numeroSerie: d.numeroSerie, macAddress: d.macAddress, ip: d.ip, nombreEquipo: d.nombreEquipo } : x)));
+      setUnits((prev) => prev.map((x) => (x.id === u.id ? { ...x, serialNumber: d.serialNumber, macAddress: d.macAddress, ip: d.ip, hostname: d.hostname } : x)));
       setSavedUnitId(u.id);
       setTimeout(() => setSavedUnitId((prev) => (prev === u.id ? null : prev)), 2000);
     } catch (e: any) {
@@ -120,9 +120,9 @@ export default function EditDispositivoPage() {
     }
   };
 
-  if (loading || !dispositivo) {
+  if (loading || !device) {
     return (
-      <ITPage title={t("dispositivos.edit")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("devices.edit")} loading backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <ITLoader variant="spinner" size="lg" color="primary" />
         </ITFlex>
@@ -132,22 +132,22 @@ export default function EditDispositivoPage() {
 
   return (
     <ITPage
-      title={t("dispositivos.edit")}
-      description={dispositivo.nombre}
+      title={t("devices.edit")}
+      description={device.name}
       icon={<FaBoxOpen size={20} />}
-      backAction={() => navigate(`/inventario/dispositivos/${dispositivo.id}`)}
+      backAction={() => navigate(`/inventory/devices/${device.id}`)}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("dashboard.title"), onClick: () => navigate("/inventario") },
-        { label: t("dispositivos.title"), onClick: () => navigate("/inventario/dispositivos") },
-        { label: dispositivo.nombre, onClick: () => navigate(`/inventario/dispositivos/${dispositivo.id}`) },
-        { label: t("dispositivos.edit") },
+        { label: t("dashboard.title"), onClick: () => navigate("/inventory") },
+        { label: t("devices.title"), onClick: () => navigate("/inventory/devices") },
+        { label: device.name, onClick: () => navigate(`/inventory/devices/${device.id}`) },
+        { label: t("devices.edit") },
       ]}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>
             <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("dispositivos.saveDevice")}</ITText>
+            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("devices.saveDevice")}</ITText>
           </ITFlex>
         </ITButton>
       }
@@ -157,34 +157,34 @@ export default function EditDispositivoPage() {
         <ITGrid item xs={12} lg={8}>
           <ITFlex as="section" direction="column" gap={5} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <ITFlex direction="column" gap={1}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("dispositivos.tipo")}</ITText>
+              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("devices.type")}</ITText>
               <ITFlex align="center" gap={2} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
                 <FaBoxOpen className="text-slate-400" size={13} />
-                <ITText className="text-sm font-semibold text-slate-700">{dispositivo.tipo?.name ?? ""}</ITText>
-                {dispositivo.tipo?.folioPrefix && <ITText className="text-[10px] font-bold uppercase text-slate-400">{dispositivo.tipo.folioPrefix}</ITText>}
+                <ITText className="text-sm font-semibold text-slate-700">{device.type?.name ?? ""}</ITText>
+                {device.type?.assetTagPrefix && <ITText className="text-[10px] font-bold uppercase text-slate-400">{device.type.assetTagPrefix}</ITText>}
               </ITFlex>
             </ITFlex>
 
             <ITGrid container columns={12} spacing={5}>
               <ITGrid item xs={12}>
-                <ITInput name="nombre" label={t("dispositivos.nombre")} value={form.nombre} onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))} required />
+                <ITInput name="name" label={t("devices.name")} value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
               </ITGrid>
               <ITGrid item xs={12} md={6}>
-                <ITInput name="marca" label={t("dispositivos.marca")} value={form.marca} onChange={(e) => setForm((f) => ({ ...f, marca: e.target.value }))} required />
+                <ITInput name="brand" label={t("devices.brand")} value={form.brand} onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))} required />
               </ITGrid>
               <ITGrid item xs={12} md={6}>
-                <ITInput name="modelo" label={t("dispositivos.modelo")} value={form.modelo} onChange={(e) => setForm((f) => ({ ...f, modelo: e.target.value }))} required />
+                <ITInput name="model" label={t("devices.model")} value={form.model} onChange={(e) => setForm((f) => ({ ...f, model: e.target.value }))} required />
               </ITGrid>
               <ITGrid item xs={12}>
-                <ITInput name="descripcion" label={t("dispositivos.descripcion")} value={form.descripcion} onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))} />
+                <ITInput name="description" label={t("devices.descriptionField")} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
               </ITGrid>
               <ITGrid item xs={12}>
-                <ITInput name="observaciones" label={t("dispositivos.observaciones")} value={form.observaciones} onChange={(e) => setForm((f) => ({ ...f, observaciones: e.target.value }))} />
+                <ITInput name="notes" label={t("devices.notes")} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
               </ITGrid>
             </ITGrid>
 
             <ITAlert variant="info" dismissible={false}>
-              {t("dispositivos.editHint")}
+              {t("devices.editHint")}
             </ITAlert>
           </ITFlex>
         </ITGrid>
@@ -194,25 +194,25 @@ export default function EditDispositivoPage() {
           <ITFlex as="section" direction="column" gap={3} className="h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <ITFlex align="center" justify="between" gap={2}>
               <ITFlex align="center" gap={2}>
-                <ITText className="text-sm font-bold text-slate-800">{t("dispositivos.unitSidebar")}</ITText>
-                <ITBadget color="gray" size="lg">{unidades.length}</ITBadget>
+                <ITText className="text-sm font-bold text-slate-800">{t("devices.unitSidebar")}</ITText>
+                <ITBadget color="gray" size="lg">{units.length}</ITBadget>
               </ITFlex>
-              {unidades.length > 0 && (
+              {units.length > 0 && (
                 <ITButton variant="text" color="primary" size="lg" onClick={() => {
                   const next = !allExpanded;
                   setAllExpanded(next);
                   const map: Record<string, boolean> = {};
-                  for (const u of unidades) map[u.id] = next === true ? true : false;
+                  for (const u of units) map[u.id] = next === true ? true : false;
                   setExpanded(map);
                 }}>
-                  <ITText className="text-[10px] font-bold uppercase">{allExpanded ? t("dispositivos.collapseAll") : t("dispositivos.expandAll")}</ITText>
+                  <ITText className="text-[10px] font-bold uppercase">{allExpanded ? t("devices.collapseAll") : t("devices.expandAll")}</ITText>
                 </ITButton>
               )}
             </ITFlex>
-            <ITText className="text-[11px] text-slate-400">{t("dispositivos.unitSidebarHint")}</ITText>
+            <ITText className="text-[11px] text-slate-400">{t("devices.unitSidebarHint")}</ITText>
 
             <div className="flex max-h-[720px] flex-col gap-2 overflow-y-auto pr-1">
-              {unidades.map((u) => {
+              {units.map((u) => {
                 const d = drafts[u.id];
                 const dirty = isUnitDirty(u);
                 const savingThis = savingUnitId === u.id;
@@ -232,39 +232,39 @@ export default function EditDispositivoPage() {
                     >
                       <ITFlex align="center" gap={2} className="min-w-0">
                         {isOpen ? <FaChevronDown className="shrink-0 text-slate-400" size={11} /> : <FaChevronRight className="shrink-0 text-slate-400" size={11} />}
-                        <ITText className="truncate text-[11px] font-black uppercase tracking-tight text-emerald-700">{u.activoFijo}</ITText>
-                        {dirty && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" title={t("dispositivos.unsaved")} />}
+                        <ITText className="truncate text-[11px] font-black uppercase tracking-tight text-emerald-700">{u.assetTag}</ITText>
+                        {dirty && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" title={t("devices.unsaved")} />}
                       </ITFlex>
-                      <ITBadget color={ESTADO_COLOR[u.estado]} size="lg">{u.estado}</ITBadget>
+                      <ITBadget color={STATUS_COLOR[u.status]} size="lg">{u.status}</ITBadget>
                     </button>
 
                     {isOpen && d && (
                       <ITFlex direction="column" gap={2} className="border-t border-slate-100 px-3 pb-3 pt-2.5">
-                        {dispositivo.tipo?.useSerie && (
+                        {device.type?.useSerialNumber && (
                           <ITInput
                             name={`serie-${u.id}`}
-                            label={t("dispositivos.numeroSerie")}
-                            value={d.numeroSerie}
-                            onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, numeroSerie: e.target.value } }))}
+                            label={t("devices.serialNumber")}
+                            value={d.serialNumber}
+                            onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, serialNumber: e.target.value } }))}
                           />
                         )}
-                        {(dispositivo.tipo?.useMac || dispositivo.tipo?.useIp) && (
+                        {(device.type?.useMac || device.type?.useIp) && (
                           <ITGrid container columns={2} spacing={2}>
-                            {dispositivo.tipo?.useMac && (
-                              <ITGrid item xs={dispositivo.tipo?.useIp ? 6 : 12}>
+                            {device.type?.useMac && (
+                              <ITGrid item xs={device.type?.useIp ? 6 : 12}>
                                 <ITInput
                                   name={`mac-${u.id}`}
-                                  label={t("dispositivos.mac")}
+                                  label={t("devices.mac")}
                                   value={d.macAddress}
                                   onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, macAddress: e.target.value } }))}
                                 />
                               </ITGrid>
                             )}
-                            {dispositivo.tipo?.useIp && (
-                              <ITGrid item xs={dispositivo.tipo?.useMac ? 6 : 12}>
+                            {device.type?.useIp && (
+                              <ITGrid item xs={device.type?.useMac ? 6 : 12}>
                                 <ITInput
                                   name={`ip-${u.id}`}
-                                  label={t("dispositivos.ip")}
+                                  label={t("devices.ip")}
                                   value={d.ip}
                                   onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, ip: e.target.value } }))}
                                 />
@@ -272,22 +272,22 @@ export default function EditDispositivoPage() {
                             )}
                           </ITGrid>
                         )}
-                        {dispositivo.tipo?.useEquipo && (
+                        {device.type?.useHostname && (
                           <ITInput
                             name={`equipo-${u.id}`}
-                            label={t("dispositivos.nombreEquipo")}
-                            value={d.nombreEquipo}
-                            onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, nombreEquipo: e.target.value } }))}
+                            label={t("devices.hostname")}
+                            value={d.hostname}
+                            onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, hostname: e.target.value } }))}
                           />
                         )}
                         <ITFlex align="center" justify="end" gap={2}>
                           {savedUnitId === u.id && (
                             <ITFlex align="center" gap={1}>
                               <FaCheckCircle className="text-emerald-500" size={12} />
-                              <ITText className="text-[10px] font-bold text-emerald-600">{t("dispositivos.unitUpdated")}</ITText>
+                              <ITText className="text-[10px] font-bold text-emerald-600">{t("devices.unitUpdated")}</ITText>
                             </ITFlex>
                           )}
-                          <ITButton variant={dirty ? "filled" : "outlined"} color="primary" size="lg" onClick={() => saveUnidad(u)} disabled={!dirty || savingThis}>
+                          <ITButton variant={dirty ? "filled" : "outlined"} color="primary" size="lg" onClick={() => saveUnit(u)} disabled={!dirty || savingThis}>
                             {savingThis ? t("new.saving") : t("common:actions.save")}
                           </ITButton>
                         </ITFlex>
@@ -296,7 +296,7 @@ export default function EditDispositivoPage() {
                   </ITFlex>
                 );
               })}
-              {unidades.length === 0 && <ITText className="py-8 text-center text-sm text-slate-400">{t("dispositivos.noUnits")}</ITText>}
+              {units.length === 0 && <ITText className="py-8 text-center text-sm text-slate-400">{t("devices.noUnits")}</ITText>}
             </div>
           </ITFlex>
         </ITGrid>

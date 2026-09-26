@@ -1,13 +1,13 @@
 import { ticketsApi } from "@entities/ticket";
 import SimpleCatalogTab from "./SimpleCatalogTab";
 
-export default function CategoriasTicketTab({ openCreateSignal }: { openCreateSignal?: number }) {
+export default function TicketCategoriesTab({ openCreateSignal }: { openCreateSignal?: number }) {
   return (
     <SimpleCatalogTab
       list={ticketsApi.categories}
-      create={ticketsApi.crearCategoria}
-      update={ticketsApi.actualizarCategoria}
-      remove={ticketsApi.eliminarCategoria}
+      create={ticketsApi.createCategory}
+      update={ticketsApi.updateCategory}
+      remove={ticketsApi.deleteCategory}
       openCreateSignal={openCreateSignal}
     />
   );

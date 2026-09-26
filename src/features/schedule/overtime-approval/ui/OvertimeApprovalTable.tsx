@@ -30,22 +30,22 @@ import {
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { OvertimeDayRow, OvertimeDayStatus } from "@entities/overtime";
-import { formatFechaHora, formatMinutesAsHhMm } from "@shared/utils/dates";
+import { formatDateTime, formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { dayKeyOf, type Period, type StatusFilter, type UseOvertimeApproval } from "../model/useOvertimeApproval";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
 const STATUS_COLOR: Record<OvertimeDayStatus, BadgeColor> = {
-  PENDIENTE: "warning",
-  APROBADO: "success",
-  RECHAZADO: "danger",
+  PENDING: "warning",
+  APPROVED: "success",
+  REJECTED: "danger",
 };
 
 const STATUS_KEY = {
-  PENDIENTE: "statusPending",
-  APROBADO: "statusApproved",
-  RECHAZADO: "statusRejected",
+  PENDING: "statusPending",
+  APPROVED: "statusApproved",
+  REJECTED: "statusRejected",
 } as const satisfies Record<OvertimeDayStatus, string>;
 
 /** Día local `YYYY-MM-DD` sin conversión de zona (es una clave, no un instante). */
@@ -144,9 +144,9 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
   const statusOptions = useMemo(
     () => [
       { value: "", label: t("statusAll") },
-      { value: "PENDIENTE", label: t("statusPending") },
-      { value: "APROBADO", label: t("statusApproved") },
-      { value: "RECHAZADO", label: t("statusRejected") },
+      { value: "PENDING", label: t("statusPending") },
+      { value: "APPROVED", label: t("statusApproved") },
+      { value: "REJECTED", label: t("statusRejected") },
     ],
     [t]
   );
@@ -222,7 +222,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
+            {r.employeeNumber ? `#${r.employeeNumber}` : "—"}
           </ITText>
         </ITFlex>
       ),
@@ -248,13 +248,13 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       ),
     },
     {
-      key: "horarioNombre",
+      key: "scheduleName",
       label: t("columns.schedule"),
       type: "string",
       sortable: true,
       render: (r) =>
-        r.horarioNombre ? (
-          <ITText className="text-[11px] font-bold text-slate-700">{r.horarioNombre}</ITText>
+        r.scheduleName ? (
+          <ITText className="text-[11px] font-bold text-slate-700">{r.scheduleName}</ITText>
         ) : (
           <ITBadget color="gray" size="sm">
             {t("columns.noSchedule")}
@@ -299,7 +299,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] text-slate-600 whitespace-nowrap">
-          {r.decidedAt ? formatFechaHora(r.decidedAt) : "—"}
+          {r.decidedAt ? formatDateTime(r.decidedAt) : "—"}
         </ITText>
       ),
     },
@@ -465,7 +465,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
               variant="filled"
               color="success"
               size="sm"
-              onClick={() => requestDecision("APROBADO")}
+              onClick={() => requestDecision("APPROVED")}
               disabled={selectedCount === 0}
             >
               <ITFlex align="center" gap={1}>
@@ -479,7 +479,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
               variant="filled"
               color="error"
               size="sm"
-              onClick={() => requestDecision("RECHAZADO")}
+              onClick={() => requestDecision("REJECTED")}
               disabled={selectedCount === 0}
             >
               <ITFlex align="center" gap={1}>
@@ -517,17 +517,17 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
             if (!saving) setConfirm(null);
           }}
           onConfirm={() => void confirmDecision()}
-          title={confirm?.status === "APROBADO" ? t("dialog.approveTitle") : t("dialog.rejectTitle")}
+          title={confirm?.status === "APPROVED" ? t("dialog.approveTitle") : t("dialog.rejectTitle")}
           message={
-            confirm?.status === "APROBADO"
+            confirm?.status === "APPROVED"
               ? t("dialog.approveMessage", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })
               : t("dialog.rejectMessage", { count: selectedCount, time: formatMinutesAsHhMm(selectedMinutes) })
           }
           confirmLabel={
-            confirm?.status === "APROBADO" ? t("actions.approve") : t("actions.reject")
+            confirm?.status === "APPROVED" ? t("actions.approve") : t("actions.reject")
           }
           cancelLabel={t("cancel")}
-          variant={confirm?.status === "APROBADO" ? "success" : "danger"}
+          variant={confirm?.status === "APPROVED" ? "success" : "danger"}
           loading={saving}
         />
       )}

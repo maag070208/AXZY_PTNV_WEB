@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { ITFlex, ITGrid, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaBoxes, FaChartPie, FaCogs, FaLayerGroup, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { inventarioApi, type Dashboard, type DashboardStat, type TipoMovimiento } from "@entities/inventario";
-import { TIPO_BADGE_HEX } from "@entities/inventario/model/movimientoColores";
+import { inventoryApi, type Dashboard, type DashboardStat, type MovementType } from "@entities/inventory";
+import { TYPE_BADGE_HEX } from "@entities/inventory/model/movementColors";
 import { StatCard } from "@shared/ui/stat-card";
 
 type Distrib = { label: string; value: number; color: string; to: string }[];
 
 function distribDe(s: DashboardStat): Distrib {
   return [
-    { label: "disponibles", value: s.disponible, color: "#10b981", to: "/inventario/dispositivos" },
-    { label: "prestadas", value: s.prestado, color: "#f59e0b", to: "/inventario/prestamos" },
-    { label: "mantenimiento", value: s.mantenimiento, color: "#64748b", to: "/inventario/movimientos" },
-    { label: "danadas", value: s.danado, color: "#f97316", to: "/inventario/movimientos" },
-    { label: "baja", value: s.baja, color: "#ef4444", to: "/inventario/movimientos" },
+    { label: "available", value: s.available, color: "#10b981", to: "/inventory/devices" },
+    { label: "loaned", value: s.loaned, color: "#f59e0b", to: "/inventory/loans" },
+    { label: "maintenance", value: s.maintenance, color: "#64748b", to: "/inventory/movements" },
+    { label: "damaged", value: s.damaged, color: "#f97316", to: "/inventory/movements" },
+    { label: "retirement", value: s.retirement, color: "#ef4444", to: "/inventory/movements" },
   ];
 }
 
@@ -32,7 +32,7 @@ function DonutChart({ items, centerValue, centerLabel }: { items: Distrib; cente
         {total > 0 &&
           items.map((it) => {
             const pct = (it.value / total) * 100;
-            const seg = (
+            const sec = (
               <circle
                 key={it.label}
                 cx="21"
@@ -46,7 +46,7 @@ function DonutChart({ items, centerValue, centerLabel }: { items: Distrib; cente
               />
             );
             offset += pct;
-            return seg;
+            return sec;
           })}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -58,15 +58,15 @@ function DonutChart({ items, centerValue, centerLabel }: { items: Distrib; cente
 }
 
 export default function DashboardPage() {
-  const { t } = useTranslation(["inventario", "common"]);
+  const { t } = useTranslation(["inventory", "common"]);
   const tt = (k: string) => (t as unknown as (key: string) => string)(k);
   const navigate = useNavigate();
   const [data, setData] = useState<Dashboard | null>(null);
   const [loading, setLoading] = useState(true);
-  const [movs30, setMovs30] = useState<Record<TipoMovimiento, number> | null>(null);
+  const [movements30, setMovements30] = useState<Record<MovementType, number> | null>(null);
 
   useEffect(() => {
-    inventarioApi
+    inventoryApi
       .dashboard()
       .then(setData)
       .catch(() => {})
@@ -76,27 +76,27 @@ export default function DashboardPage() {
   useEffect(() => {
     const since = Date.now() - 30 * 24 * 60 * 60 * 1000;
     const empty = Object.fromEntries(
-      (["ENTRADA", "PRESTAMO", "DEVOLUCION", "BAJA", "TRASPASO", "AJUSTE_ENTRADA", "AJUSTE_SALIDA", "MANTENIMIENTO_ENTRADA", "MANTENIMIENTO_SALIDA", "REVERSION"] as TipoMovimiento[]).map((k) => [k, 0])
-    ) as Record<TipoMovimiento, number>;
-    inventarioApi
-      .movimientos()
+      (["STOCK_IN", "LOAN", "RETURN", "RETIREMENT", "TRANSFER", "ADJUSTMENT_IN", "ADJUSTMENT_OUT", "MAINTENANCE_IN", "MAINTENANCE_OUT", "REVERSAL"] as MovementType[]).map((k) => [k, 0])
+    ) as Record<MovementType, number>;
+    inventoryApi
+      .movements()
       .then((list) => {
         const counts = { ...empty };
         for (const m of list) {
-          if (new Date(m.fecha).getTime() >= since) counts[m.tipo as TipoMovimiento] += 1;
+          if (new Date(m.date).getTime() >= since) counts[m.type as MovementType] += 1;
         }
-        setMovs30(counts);
+        setMovements30(counts);
       })
-      .catch(() => setMovs30(empty));
+      .catch(() => setMovements30(empty));
   }, []);
 
   const rowsBars = useMemo(() => {
-    if (!movs30) return [];
-    return (Object.keys(movs30) as TipoMovimiento[])
-      .map((tp) => ({ tipo: tp, count: movs30[tp] }))
+    if (!movements30) return [];
+    return (Object.keys(movements30) as MovementType[])
+      .map((tp) => ({ type: tp, count: movements30[tp] }))
       .filter((r) => r.count > 0)
       .sort((a, b) => b.count - a.count);
-  }, [movs30]);
+  }, [movements30]);
 
   if (loading) {
     return (
@@ -109,14 +109,14 @@ export default function DashboardPage() {
   }
 
   const s = data?.stats ?? {
-    tipos: 0,
-    dispositivos: 0,
-    unidadesActivas: 0,
-    disponible: 0,
-    prestado: 0,
-    danado: 0,
-    mantenimiento: 0,
-    baja: 0,
+    types: 0,
+    devices: 0,
+    activeUnits: 0,
+    available: 0,
+    loaned: 0,
+    damaged: 0,
+    maintenance: 0,
+    retirement: 0,
   };
   const distrib = distribDe(s);
 
@@ -141,7 +141,7 @@ export default function DashboardPage() {
             <ITFlex direction="column" gap={4} className="h-full rounded-xl border border-slate-100 bg-slate-50/60 p-4">
               <ITText className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("dashboard.inventoryHealth")}</ITText>
               <ITFlex align="center" justify="center" gap={8} wrap="wrap">
-                <DonutChart items={distrib} centerValue={s?.unidadesActivas ?? 0} centerLabel={t("dashboard.donutUnits")} />
+                <DonutChart items={distrib} centerValue={s?.activeUnits ?? 0} centerLabel={t("dashboard.donutUnits")} />
                 <ITFlex direction="column" gap={2.5}>
                   {distrib.map((it) => (
                     <button key={it.label} className="flex items-center gap-2 text-left" onClick={() => navigate(it.to)} title={t("common:actions.view")}>
@@ -166,10 +166,10 @@ export default function DashboardPage() {
                     const max = rowsBars[0].count;
                     const pct = Math.round((r.count / max) * 100);
                     return (
-                      <button key={r.tipo} className="flex items-center gap-3 text-left" onClick={() => navigate("/inventario/movimientos")}>
-                        <ITText className="w-36 shrink-0 text-xs font-semibold text-slate-600">{tt(`typeLabels.${r.tipo}`)}</ITText>
+                      <button key={r.type} className="flex items-center gap-3 text-left" onClick={() => navigate("/inventory/movements")}>
+                        <ITText className="w-36 shrink-0 text-xs font-semibold text-slate-600">{tt(`typeLabels.${r.type}`)}</ITText>
                         <div className="h-4 flex-1 overflow-hidden rounded-full bg-slate-100">
-                          <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 6)}%`, backgroundColor: TIPO_BADGE_HEX[r.tipo] }} />
+                          <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 6)}%`, backgroundColor: TYPE_BADGE_HEX[r.type] }} />
                         </div>
                         <ITText className="min-w-6 text-right text-xs font-bold text-slate-800">{r.count}</ITText>
                       </button>
@@ -184,28 +184,28 @@ export default function DashboardPage() {
 
       <ITGrid container columns={12} spacing={4}>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaLayerGroup size={18} className="text-white" />} circleClass="bg-blue-500" value={s?.tipos ?? 0} label={t("dashboard.tipos")} onClick={() => navigate("/inventario/tipos")} />
+          <StatCard size="lg" icon={<FaLayerGroup size={18} className="text-white" />} circleClass="bg-blue-500" value={s?.types ?? 0} label={t("dashboard.types")} onClick={() => navigate("/inventory/device-types")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaBoxes size={18} className="text-white" />} circleClass="bg-indigo-500" value={s?.dispositivos ?? 0} label={t("dashboard.dispositivos")} onClick={() => navigate("/inventario/dispositivos")} />
+          <StatCard size="lg" icon={<FaBoxes size={18} className="text-white" />} circleClass="bg-indigo-500" value={s?.devices ?? 0} label={t("dashboard.devices")} onClick={() => navigate("/inventory/devices")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaChartPie size={18} className="text-white" />} circleClass="bg-emerald-500" value={s?.unidadesActivas ?? 0} label={t("dashboard.unidadesActivas")} onClick={() => navigate("/inventario/dispositivos")} />
+          <StatCard size="lg" icon={<FaChartPie size={18} className="text-white" />} circleClass="bg-emerald-500" value={s?.activeUnits ?? 0} label={t("dashboard.activeUnits")} onClick={() => navigate("/inventory/devices")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaUserTie size={18} className="text-white" />} circleClass="bg-purple-500" value={s?.prestado ?? 0} label={t("dashboard.prestadas")} onClick={() => navigate("/inventario/prestamos")} />
+          <StatCard size="lg" icon={<FaUserTie size={18} className="text-white" />} circleClass="bg-purple-500" value={s?.loaned ?? 0} label={t("dashboard.loaned")} onClick={() => navigate("/inventory/loans")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaToolbox size={18} className="text-white" />} circleClass="bg-amber-500" value={s?.mantenimiento ?? 0} label={t("dashboard.mantenimiento")} onClick={() => navigate("/inventario/movimientos")} />
+          <StatCard size="lg" icon={<FaToolbox size={18} className="text-white" />} circleClass="bg-amber-500" value={s?.maintenance ?? 0} label={t("dashboard.maintenance")} onClick={() => navigate("/inventory/movements")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaThumbsDown size={18} className="text-white" />} circleClass="bg-orange-500" value={s?.danado ?? 0} label={t("dashboard.danadas")} onClick={() => navigate("/inventario/movimientos")} />
+          <StatCard size="lg" icon={<FaThumbsDown size={18} className="text-white" />} circleClass="bg-orange-500" value={s?.damaged ?? 0} label={t("dashboard.damaged")} onClick={() => navigate("/inventory/movements")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaCogs size={18} className="text-white" />} circleClass="bg-red-500" value={s?.baja ?? 0} label={t("dashboard.baja")} onClick={() => navigate("/inventario/movimientos")} />
+          <StatCard size="lg" icon={<FaCogs size={18} className="text-white" />} circleClass="bg-red-500" value={s?.retirement ?? 0} label={t("dashboard.retirement")} onClick={() => navigate("/inventory/movements")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaBoxOpen size={18} className="text-white" />} circleClass="bg-slate-500" value={s.disponible} label={t("dashboard.disponibles")} onClick={() => navigate("/inventario/dispositivos")} />
+          <StatCard size="lg" icon={<FaBoxOpen size={18} className="text-white" />} circleClass="bg-slate-500" value={s.available} label={t("dashboard.available")} onClick={() => navigate("/inventory/devices")} />
         </ITGrid>
       </ITGrid>
     </ITPage>

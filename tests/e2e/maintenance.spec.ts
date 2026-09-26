@@ -1,6 +1,6 @@
 import { test, expect } from "./support/fixtures";
-import { esperarToast } from "./support/pages/componentes";
-import { ruta } from "./support/env";
+import { waitForToast } from "./support/pages/components";
+import { route } from "./support/env";
 
 /**
  * Flujo MOVIMIENTOS DE MANTENIMIENTO por pantalla — `/inventario/movimientos/nuevo`.
@@ -9,197 +9,197 @@ import { ruta } from "./support/env";
  * mueve una pieza concreta, elegida por su activo fijo.
  */
 test.describe("MANTENIMIENTO desde la web", () => {
-  test("manda una unidad a mantenimiento", async ({ page, movimientoPage, escenario, api }) => {
-    const dispositivo = await escenario.dispositivo(4);
-    const [unidad] = await api.unidades(dispositivo.id);
+  test("manda una unidad a mantenimiento", async ({ page, movementPage, scenario, api }) => {
+    const device = await scenario.device(4);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("A mantenimiento");
-    await movimientoPage.escribirMotivo("Revisión preventiva");
-    await movimientoPage.registrar();
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("A mantenimiento");
+    await movementPage.writeReason("Revisión preventiva");
+    await movementPage.register();
 
-    await esperarToast(page, "Movimiento registrado");
-    await page.waitForURL(`**${ruta("/inventario/movimientos")}`);
+    await waitForToast(page, "Movimiento registrado");
+    await page.waitForURL(`**${route("/inventory/movements")}`);
 
-    await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 3, MANTENIMIENTO: 1 });
+    await api.waitForStock(device.id, { AVAILABLE: 3, IN_MAINTENANCE: 1 });
 
     // Se movió exactamente la unidad elegida.
-    const unidades = await api.unidades(dispositivo.id);
-    expect(unidades.find((u) => u.id === unidad.id)?.estado).toBe("MANTENIMIENTO");
+    const units = await api.units(device.id);
+    expect(units.find((u) => u.id === unit.id)?.status).toBe("IN_MAINTENANCE");
   });
 
   test("regresa una unidad de mantenimiento en buen estado", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(3);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(3);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("A mantenimiento");
-    await movimientoPage.escribirMotivo("Cambio de batería");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
-    await api.esperarExistencias(dispositivo.id, { MANTENIMIENTO: 1 });
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("A mantenimiento");
+    await movementPage.writeReason("Cambio de batería");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
+    await api.waitForStock(device.id, { IN_MAINTENANCE: 1 });
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("De mantenimiento");
-    await movimientoPage.elegirCondicion("BUENO");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("De mantenimiento");
+    await movementPage.selectCondition("GOOD");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
 
-    await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 3, MANTENIMIENTO: 0 });
+    await api.waitForStock(device.id, { AVAILABLE: 3, IN_MAINTENANCE: 0 });
   });
 
   test("una unidad que vuelve en mal estado queda dañada", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(3);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(3);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("A mantenimiento");
-    await movimientoPage.escribirMotivo("Diagnóstico");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
-    await api.esperarExistencias(dispositivo.id, { MANTENIMIENTO: 1 });
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("A mantenimiento");
+    await movementPage.writeReason("Diagnóstico");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
+    await api.waitForStock(device.id, { IN_MAINTENANCE: 1 });
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("De mantenimiento");
-    await movimientoPage.elegirCondicion("MALO");
-    await movimientoPage.escribirComentario("Teclado intermitente");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("De mantenimiento");
+    await movementPage.selectCondition("POOR");
+    await movementPage.writeComment("Teclado intermitente");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
 
-    await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 2, DANADO: 1, MANTENIMIENTO: 0 });
+    await api.waitForStock(device.id, { AVAILABLE: 2, DAMAGED: 1, IN_MAINTENANCE: 0 });
   });
 
   test("una unidad que vuelve ROTA avisa y se da de baja sola", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(3);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(3);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("A mantenimiento");
-    await movimientoPage.escribirMotivo("Revisión");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
-    await api.esperarExistencias(dispositivo.id, { MANTENIMIENTO: 1 });
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("A mantenimiento");
+    await movementPage.writeReason("Revisión");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
+    await api.waitForStock(device.id, { IN_MAINTENANCE: 1 });
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("De mantenimiento");
-    await movimientoPage.elegirCondicion("ROTO");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("De mantenimiento");
+    await movementPage.selectCondition("BROKEN");
 
-    await expect(movimientoPage.avisoBajaAutomatica).toBeVisible();
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
+    await expect(movementPage.noticeAutomaticRetirement).toBeVisible();
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
 
-    await api.esperarExistencias(dispositivo.id, { DISPONIBLE: 2, BAJA: 1, MANTENIMIENTO: 0 });
-    const bajas = await api.movimientos({ dispositivoId: dispositivo.id, tipo: "BAJA" });
-    expect(bajas[0].motivo).toBe("Baja automática por estado ROTO");
+    await api.waitForStock(device.id, { AVAILABLE: 2, RETIREMENT: 1, IN_MAINTENANCE: 0 });
+    const retirements = await api.movements({ deviceId: device.id, type: "RETIREMENT" });
+    expect(retirements[0].reason).toBe("Baja automática por estado ROTO");
   });
 
   test("sólo ofrece los movimientos que caben según el estado de la unidad", async ({
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(2);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(2);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
 
     // Unidad disponible: se puede dar de baja o mandar a mantenimiento, no traerla de vuelta.
-    const renglon = movimientoPage.renglon();
-    await expect(renglon.getByRole("button", { name: "Baja" })).toBeVisible();
-    await expect(renglon.getByRole("button", { name: "A mantenimiento" })).toBeVisible();
-    await expect(renglon.getByRole("button", { name: "De mantenimiento" })).toBeHidden();
+    const row = movementPage.row();
+    await expect(row.getByRole("button", { name: "Baja" })).toBeVisible();
+    await expect(row.getByRole("button", { name: "A mantenimiento" })).toBeVisible();
+    await expect(row.getByRole("button", { name: "De mantenimiento" })).toBeHidden();
   });
 
   test("no ofrece unidades que no estén en el estado que pide el movimiento", async ({
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
   }) => {
-    const dispositivo = await escenario.dispositivo(2);
+    const device = await scenario.device(2);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
     // Sin unidad elegida, los tres tipos están disponibles: al pedir "De
     // mantenimiento" no hay ninguna pieza en taller que ofrecer.
-    await movimientoPage.elegirTipo("De mantenimiento");
+    await movementPage.selectType("De mantenimiento");
 
-    await expect(movimientoPage.avisoSinUnidades).toBeVisible();
-    await expect(movimientoPage.botonRegistrar).toBeDisabled();
+    await expect(movementPage.noticeWithoutUnits).toBeVisible();
+    await expect(movementPage.registerButton).toBeDisabled();
   });
 
   test("exige motivo para mandar a mantenimiento", async ({
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(2);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(2);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("A mantenimiento");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("A mantenimiento");
 
-    await expect(movimientoPage.botonRegistrar).toBeDisabled();
-    await movimientoPage.escribirMotivo("Ya con motivo");
-    await expect(movimientoPage.botonRegistrar).toBeEnabled();
+    await expect(movementPage.registerButton).toBeDisabled();
+    await movementPage.writeReason("Ya con motivo");
+    await expect(movementPage.registerButton).toBeEnabled();
   });
 
   test("exige condición al regresar de mantenimiento", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(2);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(2);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("A mantenimiento");
-    await movimientoPage.escribirMotivo("Revisión");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
-    await api.esperarExistencias(dispositivo.id, { MANTENIMIENTO: 1 });
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("A mantenimiento");
+    await movementPage.writeReason("Revisión");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
+    await api.waitForStock(device.id, { IN_MAINTENANCE: 1 });
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("De mantenimiento");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("De mantenimiento");
 
-    await expect(movimientoPage.botonRegistrar).toBeDisabled();
-    await movimientoPage.elegirCondicion("ACEPTABLE");
-    await expect(movimientoPage.botonRegistrar).toBeEnabled();
+    await expect(movementPage.registerButton).toBeDisabled();
+    await movementPage.selectCondition("FAIR");
+    await expect(movementPage.registerButton).toBeEnabled();
   });
 });

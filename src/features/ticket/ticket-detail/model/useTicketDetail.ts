@@ -12,8 +12,8 @@ import {
   type Ticket,
   type TicketCategory,
 } from "@entities/ticket";
-import type { Alcance, User, UserRole } from "@entities/user";
-import { usersApi, usePermiso } from "@entities/user";
+import type { PermissionScope, User, UserRole } from "@entities/user";
+import { usersApi, usePermission } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { useAblyChannel } from "@shared/lib/ably";
 import { todayInput } from "./timeline";
@@ -31,14 +31,14 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
   const ticket = useSelector((s: RootState) => s.tickets.current);
   const currentUser = useSelector((s: RootState) => s.auth.user);
 
-  const alcanceEditar = usePermiso("tickets.editar");
-  const alcanceCerrar = usePermiso("tickets.cerrar");
-  const alcanceAsignar = usePermiso("tareas.asignar");
-  const alcanceCompletar = usePermiso("tareas.completar");
-  const alcanceEliminar = usePermiso("tickets.eliminar");
+  const scopeEdit = usePermission("tickets.edit");
+  const scopeClose = usePermission("tickets.close");
+  const scopeAssign = usePermission("tasks.assign");
+  const scopeComplete = usePermission("tasks.complete");
+  const scopeDelete = usePermission("tickets.delete");
 
-  const isCreator = !!ticket && ticket.creadoPorId === currentUser?.id;
-  const isAssignee = !!ticket && ticket.asignadoAId === currentUser?.id;
+  const isCreator = !!ticket && ticket.createdById === currentUser?.id;
+  const isAssignee = !!ticket && ticket.assignedToId === currentUser?.id;
   const isSameDepartment =
     !!ticket &&
     !!currentUser?.departmentId &&
@@ -48,28 +48,28 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     (isCreator ||
       isAssignee ||
       ticket.assignments.some((a) => a.userId === currentUser?.id));
-  const isClosed = ticket?.status === "CERRADO";
+  const isClosed = ticket?.status === "CLOSED";
 
   /**
    * Alcance sobre el registro: TODO siempre; AREA incluye lo propio y su
    * departamento; PROPIO solo lo propio (ver ROLES_Y_PERMISOS.md §2).
    */
-  const alcancePermite = (alcance: Alcance, propio: boolean): boolean =>
-    alcance === "TODO" ||
-    (alcance === "AREA" && (propio || isSameDepartment)) ||
-    (alcance === "PROPIO" && propio);
+  const scopeAllows = (scope: PermissionScope, own: boolean): boolean =>
+    scope === "ALL" ||
+    (scope === "AREA" && (own || isSameDepartment)) ||
+    (scope === "OWN" && own);
 
-  const canEditTicket = alcancePermite(alcanceEditar, isCreator);
-  const canClose = alcancePermite(alcanceCerrar, isCreator);
+  const canEditTicket = scopeAllows(scopeEdit, isCreator);
+  const canClose = scopeAllows(scopeClose, isCreator);
   const canCreateTasks =
-    Boolean(ticket) && alcancePermite(alcanceAsignar, isCreator || isAssignee);
-  const canCompleteTask = alcancePermite(alcanceCompletar, isCreator || isAssignee);
-  const canDeleteTicket = alcanceEliminar !== "NINGUNO";
+    Boolean(ticket) && scopeAllows(scopeAssign, isCreator || isAssignee);
+  const canCompleteTask = scopeAllows(scopeComplete, isCreator || isAssignee);
+  const canDeleteTicket = scopeDelete !== "NONE";
   const canUploadToTicket = canEditTicket || isInvolved;
 
-  const [empleados, setEmpleados] = useState<User[]>([]);
-  const [responsables, setResponsables] = useState<User[]>([]);
-  const [busyEmpleados, setBusyEmpleados] = useState(false);
+  const [employees, setEmployees] = useState<User[]>([]);
+  const [assignees, setAssignees] = useState<User[]>([]);
+  const [busyEmployees, setBusyEmployees] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [commentText, setCommentText] = useState("");
@@ -124,13 +124,13 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
 
   useEffect(() => {
     usersApi
-      .empleados()
-      .then(setEmpleados)
-      .catch(() => setEmpleados([]));
+      .employees()
+      .then(setEmployees)
+      .catch(() => setEmployees([]));
     usersApi
-      .empleadosPorRoles(["ADMIN", "GERENTE", "JEFE_DE_AREA", "EMPLEADO"] as UserRole[])
-      .then(setResponsables)
-      .catch(() => setResponsables([]));
+      .employeesByRoles(["ADMIN", "MANAGER", "AREA_HEAD", "EMPLOYEE"] as UserRole[])
+      .then(setAssignees)
+      .catch(() => setAssignees([]));
   }, []);
 
   useEffect(() => {
@@ -141,15 +141,15 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     ticketsApi.categories().then(setCategories).catch(() => setCategories([]));
   }, []);
 
-  const buscarEmpleados = async (q?: string) => {
-    setBusyEmpleados(true);
+  const searchEmployees = async (q?: string) => {
+    setBusyEmployees(true);
     try {
-      const res = await usersApi.empleados(undefined, q || undefined);
-      setEmpleados(res);
+      const res = await usersApi.employees(undefined, q || undefined);
+      setEmployees(res);
     } catch {
-      setEmpleados([]);
+      setEmployees([]);
     } finally {
-      setBusyEmpleados(false);
+      setBusyEmployees(false);
     }
   };
 
@@ -190,7 +190,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
       setToast(
         tt("detail.categoryChanged", {
           category:
-            categories.find((c) => c.id === newCategoryId)?.nombre ?? newCategoryId,
+            categories.find((c) => c.id === newCategoryId)?.name ?? newCategoryId,
         })
       );
     }
@@ -217,7 +217,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
   const handleResponsibleChange = async (userId: string) => {
     if (!ticket) return;
     const action = await dispatch(
-      updateTicketThunk({ id: ticket.id, data: { asignadoAId: userId || null } })
+      updateTicketThunk({ id: ticket.id, data: { assignedToId: userId || null } })
     );
     if (updateTicketThunk.fulfilled.match(action)) {
       refresh();
@@ -299,11 +299,11 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
 
   const handleAddAssignmentComment = async (assignmentId: string) => {
     if (!ticket) return;
-    const texto = commentDrafts[assignmentId]?.trim();
-    if (!texto) return;
+    const text = commentDrafts[assignmentId]?.trim();
+    if (!text) return;
     setSendingCommentId(assignmentId);
     try {
-      await ticketsApi.addAssignmentComment(ticket.id, assignmentId, texto);
+      await ticketsApi.addAssignmentComment(ticket.id, assignmentId, text);
       setCommentDrafts((d) => ({ ...d, [assignmentId]: "" }));
       setToastType("success");
       setToast(tt("detail.commentAdded"));
@@ -321,7 +321,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     setSendingComment(true);
     try {
       const action = await dispatch(
-        addCommentThunk({ ticketId: ticket.id, texto: commentText.trim() })
+        addCommentThunk({ ticketId: ticket.id, text: commentText.trim() })
       );
       if (addCommentThunk.fulfilled.match(action)) {
         setCommentText("");
@@ -349,16 +349,16 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     }
   };
 
-  const empleadoOptions = empleados.map((u) => ({
+  const employeeOptions = employees.map((u) => ({
     value: u.id,
-    label: [u.name, u.numeroEmpleado ? `#${u.numeroEmpleado}` : null]
+    label: [u.name, u.employeeNumber ? `#${u.employeeNumber}` : null]
       .filter(Boolean)
       .join(" "),
   }));
 
-  const responsableOptions = responsables.map((u) => ({
+  const assigneeOptions = assignees.map((u) => ({
     value: u.id,
-    label: [u.name, u.puesto, u.numeroEmpleado ? `#${u.numeroEmpleado}` : null]
+    label: [u.name, u.jobTitle, u.employeeNumber ? `#${u.employeeNumber}` : null]
       .filter(Boolean)
       .join(" · "),
   }));
@@ -374,9 +374,9 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     isInvolved,
     isClosed,
     canClose,
-    empleadoOptions,
-    responsableOptions,
-    busyEmpleados,
+    employeeOptions,
+    assigneeOptions,
+    busyEmployees,
     departments,
     categories,
     commentText,
@@ -423,7 +423,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     handleAddAssignmentComment,
     handleAddComment,
     handleDownloadPDF,
-    buscarEmpleados,
+    searchEmployees,
     refresh,
   };
 };

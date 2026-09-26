@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  checadorApi,
-  type ChecadorDispositivo,
-  type ChecadorRelojConfig,
-  type ChecadorStatus,
-} from "@entities/checador";
+  timeClockApi,
+  type TimeClockDevice,
+  type TimeClockConfig,
+  type TimeClockStatus,
+} from "@entities/time-clock";
 
 /** Refresco del estado mientras algún reloj sincroniza. */
 const STATUS_POLL_MS = 5_000;
 
 /** Configuración de un reloj leída en vivo: cargando, leída o con error. */
-export interface ConfigDeReloj {
-  cargando: boolean;
-  data: ChecadorRelojConfig | null;
+export interface ClockConfig {
+  loading: boolean;
+  data: TimeClockConfig | null;
   error: string | null;
 }
 
-const mensajeDe = (e: unknown, fallback: string): string => (e instanceof Error ? e.message : fallback);
+const messageOf = (e: unknown, fallback: string): string => (e instanceof Error ? e.message : fallback);
 
 /**
  * Relojes dados de alta: su sincronización (se refresca sola mientras alguno
@@ -25,38 +25,38 @@ const mensajeDe = (e: unknown, fallback: string): string => (e instanceof Error 
  * cuenta para entradas/salidas) y la baja. Del reloj solo se LEE: nada de esto
  * lo modifica, solo cambia cómo el sistema se conecta y usa sus checadas.
  */
-export const useChecadorRelojes = () => {
-  const { t } = useTranslation(["checador", "common"]);
+export const useTimeClocks = () => {
+  const { t } = useTranslation(["time-clock", "common"]);
 
-  const [status, setStatus] = useState<ChecadorStatus | null>(null);
-  const [configs, setConfigs] = useState<Record<string, ConfigDeReloj>>({});
+  const [status, setStatus] = useState<TimeClockStatus | null>(null);
+  const [configs, setConfigs] = useState<Record<string, ClockConfig>>({});
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   // Alta
-  const [altaAbierta, setAltaAbierta] = useState(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [url, setUrl] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [asistencia, setAsistencia] = useState(true);
-  const [conectando, setConectando] = useState(false);
-  const [altaError, setAltaError] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [countsAttendance, setAttendance] = useState(true);
+  const [connecting, setConnecting] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
 
   // Edición (solo el registro del sistema)
-  const [editTarget, setEditTarget] = useState<ChecadorDispositivo | null>(null);
-  const [editNombre, setEditNombre] = useState("");
-  const [editAsistencia, setEditAsistencia] = useState(true);
-  const [guardando, setGuardando] = useState(false);
+  const [editTarget, setEditTarget] = useState<TimeClockDevice | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editAttendance, setEditAttendance] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
   // Baja
-  const [bajaTarget, setBajaTarget] = useState<ChecadorDispositivo | null>(null);
-  const [dandoDeBaja, setDandoDeBaja] = useState(false);
+  const [retirementTarget, setRetirementTarget] = useState<TimeClockDevice | null>(null);
+  const [retiring, setRetiring] = useState(false);
 
   const loadStatus = useCallback(async () => {
     try {
-      setStatus(await checadorApi.status());
+      setStatus(await timeClockApi.status());
     } catch (e) {
-      setError(mensajeDe(e, t("relojes.errors.status")));
+      setError(messageOf(e, t("clocks.errors.status")));
     }
   }, [t]);
 
@@ -64,23 +64,23 @@ export const useChecadorRelojes = () => {
     void loadStatus();
   }, [loadStatus]);
 
-  const sincronizando = status?.enCurso != null;
+  const syncing = status?.inProgress != null;
   useEffect(() => {
-    if (!sincronizando) return undefined;
+    if (!syncing) return undefined;
     const timer = window.setTimeout(() => void loadStatus(), STATUS_POLL_MS);
     return () => window.clearTimeout(timer);
-  }, [sincronizando, status, loadStatus]);
+  }, [syncing, status, loadStatus]);
 
-  const cargarConfig = useCallback(
-    async (serie: string) => {
-      setConfigs((c) => ({ ...c, [serie]: { cargando: true, data: c[serie]?.data ?? null, error: null } }));
+  const loadConfig = useCallback(
+    async (serial: string) => {
+      setConfigs((c) => ({ ...c, [serial]: { loading: true, data: c[serial]?.data ?? null, error: null } }));
       try {
-        const data = await checadorApi.configuracionReloj(serie);
-        setConfigs((c) => ({ ...c, [serie]: { cargando: false, data, error: null } }));
+        const data = await timeClockApi.clockSettings(serial);
+        setConfigs((c) => ({ ...c, [serial]: { loading: false, data, error: null } }));
       } catch (e) {
         setConfigs((c) => ({
           ...c,
-          [serie]: { cargando: false, data: null, error: mensajeDe(e, t("relojes.errors.config")) },
+          [serial]: { loading: false, data: null, error: messageOf(e, t("clocks.errors.config")) },
         }));
       }
     },
@@ -89,92 +89,92 @@ export const useChecadorRelojes = () => {
 
   // La configuración de cada reloj se lee una vez, al aparecer en la lista.
   const series = useMemo(
-    () => (status?.dispositivos ?? []).map((d) => d.dispositivoSerie).join("|"),
-    [status?.dispositivos]
+    () => (status?.devices ?? []).map((d) => d.clockSerial).join("|"),
+    [status?.devices]
   );
-  const pedidas = useRef(new Set<string>());
+  const requested = useRef(new Set<string>());
   useEffect(() => {
-    for (const serie of series ? series.split("|") : []) {
-      if (pedidas.current.has(serie)) continue;
-      pedidas.current.add(serie);
-      void cargarConfig(serie);
+    for (const serial of series ? series.split("|") : []) {
+      if (requested.current.has(serial)) continue;
+      requested.current.add(serial);
+      void loadConfig(serial);
     }
-  }, [series, cargarConfig]);
+  }, [series, loadConfig]);
 
-  const abrirAlta = () => {
+  const openRegistration = () => {
     setUrl("");
-    setNombre("");
-    setAsistencia(true);
-    setAltaError(null);
-    setAltaAbierta(true);
+    setName("");
+    setAttendance(true);
+    setRegistrationError(null);
+    setIsRegistrationOpen(true);
   };
 
-  const registrar = async () => {
-    setConectando(true);
-    setAltaError(null);
+  const register = async () => {
+    setConnecting(true);
+    setRegistrationError(null);
     try {
-      const reloj = await checadorApi.registrarReloj({
+      const clock = await timeClockApi.registerClock({
         url: url.trim(),
-        nombre: nombre.trim() || undefined,
-        asistencia,
+        name: name.trim() || undefined,
+        countsAttendance,
       });
-      setAltaAbierta(false);
-      setToast(t("relojes.toasts.alta", { nombre: reloj.nombre }));
+      setIsRegistrationOpen(false);
+      setToast(t("clocks.toasts.registration", { name: clock.name }));
       await loadStatus();
     } catch (e) {
-      setAltaError(mensajeDe(e, t("relojes.errors.alta")));
+      setRegistrationError(messageOf(e, t("clocks.errors.registration")));
     } finally {
-      setConectando(false);
+      setConnecting(false);
     }
   };
 
-  const abrirEdicion = (reloj: ChecadorDispositivo) => {
-    setEditNombre(reloj.nombre);
-    setEditAsistencia(reloj.asistencia);
+  const openEdit = (clock: TimeClockDevice) => {
+    setEditName(clock.name);
+    setEditAttendance(clock.countsAttendance);
     setEditError(null);
-    setEditTarget(reloj);
+    setEditTarget(clock);
   };
 
-  const guardarEdicion = async () => {
+  const saveEdit = async () => {
     if (!editTarget) return;
-    setGuardando(true);
+    setSaving(true);
     setEditError(null);
     try {
-      const reloj = await checadorApi.actualizarReloj(editTarget.dispositivoSerie, {
-        nombre: editNombre.trim(),
-        asistencia: editAsistencia,
+      const clock = await timeClockApi.updateClock(editTarget.clockSerial, {
+        name: editName.trim(),
+        countsAttendance: editAttendance,
       });
       setEditTarget(null);
-      setToast(t("relojes.toasts.editado", { nombre: reloj.nombre }));
+      setToast(t("clocks.toasts.edited", { name: clock.name }));
       await loadStatus();
     } catch (e) {
-      setEditError(mensajeDe(e, t("relojes.errors.editar")));
+      setEditError(messageOf(e, t("clocks.errors.edit")));
     } finally {
-      setGuardando(false);
+      setSaving(false);
     }
   };
 
-  const confirmarBaja = async () => {
-    if (!bajaTarget) return;
-    const { dispositivoSerie: serie, nombre: nombreReloj } = bajaTarget;
-    setDandoDeBaja(true);
+  const confirmRetirement = async () => {
+    if (!retirementTarget) return;
+    const { clockSerial: serial, name: clockName } = retirementTarget;
+    setRetiring(true);
     try {
-      await checadorApi.darDeBajaReloj(serie);
-      setBajaTarget(null);
-      setToast(t("relojes.toasts.baja", { nombre: nombreReloj }));
+      await timeClockApi.retireClock(serial);
+      setRetirementTarget(null);
+      setToast(t("clocks.toasts.retirement", { name: clockName }));
       // Si se vuelve a dar de alta, su configuración se lee de nuevo.
-      pedidas.current.delete(serie);
+      requested.current.delete(serial);
       setConfigs((c) => {
-        const resto = { ...c };
-        delete resto[serie];
-        return resto;
+        const rest = { ...c };
+        delete rest[serial];
+        return rest;
       });
       await loadStatus();
     } catch (e) {
-      setBajaTarget(null);
-      setError(mensajeDe(e, t("relojes.errors.baja")));
+      setRetirementTarget(null);
+      setError(messageOf(e, t("clocks.errors.retirement")));
     } finally {
-      setDandoDeBaja(false);
+      setRetiring(false);
     }
   };
 
@@ -182,33 +182,33 @@ export const useChecadorRelojes = () => {
     t,
     status,
     configs,
-    cargarConfig,
-    altaAbierta,
-    setAltaAbierta,
-    abrirAlta,
+    loadConfig,
+    isRegistrationOpen,
+    setIsRegistrationOpen,
+    openRegistration,
     url,
     setUrl,
-    nombre,
-    setNombre,
-    asistencia,
-    setAsistencia,
-    conectando,
-    altaError,
-    registrar,
+    name,
+    setName,
+    countsAttendance,
+    setAttendance,
+    connecting,
+    registrationError,
+    register,
     editTarget,
     setEditTarget,
-    abrirEdicion,
-    editNombre,
-    setEditNombre,
-    editAsistencia,
-    setEditAsistencia,
-    guardando,
+    openEdit,
+    editName,
+    setEditName,
+    editAttendance,
+    setEditAttendance,
+    saving,
     editError,
-    guardarEdicion,
-    bajaTarget,
-    setBajaTarget,
-    dandoDeBaja,
-    confirmarBaja,
+    saveEdit,
+    retirementTarget,
+    setRetirementTarget,
+    retiring,
+    confirmRetirement,
     error,
     setError,
     toast,
@@ -216,4 +216,4 @@ export const useChecadorRelojes = () => {
   };
 };
 
-export type UseChecadorRelojes = ReturnType<typeof useChecadorRelojes>;
+export type UseTimeClocks = ReturnType<typeof useTimeClocks>;

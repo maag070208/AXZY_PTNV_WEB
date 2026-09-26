@@ -2,20 +2,20 @@ import { useRef } from "react";
 import { ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaBriefcase, FaCamera, FaHeartbeat } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import type { PersonalProfile } from "@entities/personal";
+import type { PersonalProfile } from "@entities/hr";
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 
 const ROLE_COLOR: Record<string, string> = {
-  GERENTE: "purple",
-  JEFE_DE_AREA: "info",
-  EMPLEADO: "gray",
+  MANAGER: "purple",
+  AREA_HEAD: "info",
+  EMPLOYEE: "gray",
 };
 
 const ROLE_LABEL: Record<string, string> = {
-  GERENTE: "GERENTE",
-  JEFE_DE_AREA: "JEFE DE ÁREA",
-  EMPLEADO: "EMPLEADO",
+  MANAGER: "MANAGER",
+  AREA_HEAD: "JEFE DE ÁREA",
+  EMPLOYEE: "EMPLOYEE",
 };
 
 /** Fechas guardadas como "YYYY-MM-DD": formatear sin pasar por Date/huso horario. */
@@ -55,7 +55,7 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
     <div className="w-full min-w-0 flex flex-col gap-5 md:sticky md:top-24">
       <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-5 sm:p-6 text-center">
         <div className="relative inline-block">
-          <ProfileAvatar fotoUrl={profile.fotoUrl} initials={initials} alt={profile.name} size="xl" />
+          <ProfileAvatar photoUrl={profile.photoUrl} initials={initials} alt={profile.name} size="xl" />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -88,9 +88,9 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
           </ITBadget>
         </ITFlex>
 
-        {profile.numeroEmpleado && (
+        {profile.employeeNumber && (
           <ITText className="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            {tt("detail.employeeNo")} {profile.numeroEmpleado}
+            {tt("detail.employeeNo")} {profile.employeeNumber}
           </ITText>
         )}
       </div>
@@ -99,15 +99,15 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
         defaultOpen
         icon={<FaBriefcase size={12} className="text-white" />}
         iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
-        title={tt("detail.laboralTitle")}
+        title={tt("detail.employmentTitle")}
       >
         <ITFlex direction="column" gap={2.5}>
           <InfoRow label={tt("detail.fields.employeeType")} value={ROLE_LABEL[profile.role] ?? profile.role} />
-          <InfoRow label={tt("detail.fields.hireDate")} value={formatDateOnly(profile.fechaIngreso)} />
+          <InfoRow label={tt("detail.fields.hireDate")} value={formatDateOnly(profile.hireDate)} />
           <InfoRow label={tt("detail.fields.department")} value={profile.department?.name} />
           <InfoRow label={tt("detail.fields.subarea")} value={profile.subarea?.name} />
-          <InfoRow label={tt("detail.fields.position")} value={profile.puesto} />
-          <InfoRow label={tt("detail.fields.company")} value={profile.empresa} />
+          <InfoRow label={tt("detail.fields.position")} value={profile.jobTitle} />
+          <InfoRow label={tt("detail.fields.company")} value={profile.company} />
         </ITFlex>
       </CollapsibleCard>
 
@@ -118,9 +118,9 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
         title={tt("detail.medicalTitle")}
       >
         <ITFlex direction="column" gap={2.5}>
-          <InfoRow label={tt("detail.fields.bloodType")} value={profile.tipoSangre?.nombre} />
-          <InfoRow label={tt("detail.fields.condition")} value={profile.padecimiento} />
-          <InfoRow label={tt("detail.fields.allergies")} value={profile.alergias} />
+          <InfoRow label={tt("detail.fields.bloodType")} value={profile.bloodType?.name} />
+          <InfoRow label={tt("detail.fields.condition")} value={profile.medicalConditions} />
+          <InfoRow label={tt("detail.fields.allergies")} value={profile.allergies} />
         </ITFlex>
       </CollapsibleCard>
     </div>

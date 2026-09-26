@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import { boton, campo, elegirEnBuscador, irARuta } from "./componentes";
+import { button, field, selectInSearch, goToRoute } from "./components";
 
 /**
  * ALTA — `/inventario/dispositivos/nuevo`.
@@ -7,77 +7,77 @@ import { boton, campo, elegirEnBuscador, irARuta } from "./componentes";
  * Ojo con el orden: la pantalla sólo arma los renglones de unidades cuando ya
  * hay un tipo elegido, así que el tipo va primero y la cantidad después.
  */
-export class AltaDispositivoPage {
+export class DeviceRegistrationPage {
   constructor(private readonly page: Page) {}
 
-  async ir(): Promise<void> {
-    await irARuta(this.page, "/inventario/dispositivos/nuevo");
+  async go(): Promise<void> {
+    await goToRoute(this.page, "/inventory/devices/new");
     await expect(this.page.getByPlaceholder("Buscar tipo...")).toBeVisible();
   }
 
-  async elegirTipo(nombreTipo: string): Promise<void> {
-    await elegirEnBuscador(this.page, "Buscar tipo...", nombreTipo);
+  async selectType(typeName: string): Promise<void> {
+    await selectInSearch(this.page, "Buscar tipo...", typeName);
   }
 
-  async llenar(datos: {
-    nombre: string;
-    marca: string;
-    modelo: string;
-    descripcion?: string;
-    cantidad?: number;
+  async fill(data: {
+    name: string;
+    brand: string;
+    model: string;
+    description?: string;
+    quantity?: number;
   }): Promise<void> {
-    await campo(this.page, "Nombre / Modelo").fill(datos.nombre);
-    await campo(this.page, "Marca").fill(datos.marca);
-    await campo(this.page, "Modelo").fill(datos.modelo);
-    if (datos.descripcion !== undefined) {
-      await campo(this.page, /Descripción/).fill(datos.descripcion);
+    await field(this.page, "Nombre / Modelo").fill(data.name);
+    await field(this.page, "Marca").fill(data.brand);
+    await field(this.page, "Modelo").fill(data.model);
+    if (data.description !== undefined) {
+      await field(this.page, /Descripción/).fill(data.description);
     }
-    if (datos.cantidad !== undefined) {
-      await this.fijarCantidad(datos.cantidad);
+    if (data.quantity !== undefined) {
+      await this.setQuantity(data.quantity);
     }
   }
 
-  async fijarCantidad(cantidad: number): Promise<void> {
-    await campo(this.page, "Cantidad inicial").fill(String(cantidad));
-    await expect(this.promesaDeUnidades(cantidad)).toBeVisible();
+  async setQuantity(quantity: number): Promise<void> {
+    await field(this.page, "Cantidad inicial").fill(String(quantity));
+    await expect(this.unitsPromise(quantity)).toBeVisible();
   }
 
   /**
    * Lo que la pantalla le promete al usuario: "Al guardar se crearán N
    * unidades físicas (activo fijo) y se registrará la ENTRADA."
    */
-  promesaDeUnidades(cantidad: number) {
-    return this.page.getByText(new RegExp(`se crear[aá]n ${cantidad} unidades f[ií]sicas`, "i"));
+  unitsPromise(quantity: number) {
+    return this.page.getByText(new RegExp(`se crear[aá]n ${quantity} unidades f[ií]sicas`, "i"));
   }
 
   /** Renglones de unidad desplegados en el panel lateral. */
-  get renglonesDeUnidad() {
+  get unitRows() {
     return this.page.getByRole("button", { name: /^Unidad \d+/ });
   }
 
-  get botonGuardar() {
-    return boton(this.page, "Guardar");
+  get saveButton() {
+    return button(this.page, "Guardar");
   }
 
-  async guardar(): Promise<void> {
-    await this.botonGuardar.click();
+  async save(): Promise<void> {
+    await this.saveButton.click();
   }
 
   /** Abre el renglón de una unidad para capturar su serie, MAC, IP o nombre. */
-  async abrirUnidad(indice: number): Promise<void> {
-    await this.page.getByRole("button", { name: new RegExp(`Unidad\\s+${indice}\\b`, "i") }).click();
+  async openUnit(index: number): Promise<void> {
+    await this.page.getByRole("button", { name: new RegExp(`Unidad\\s+${index}\\b`, "i") }).click();
   }
 
-  async capturarUnidad(
-    indice: number,
-    datos: { numeroSerie?: string; mac?: string; ip?: string; nombreEquipo?: string }
+  async captureUnit(
+    index: number,
+    data: { serialNumber?: string; mac?: string; ip?: string; hostname?: string }
   ): Promise<void> {
-    await this.abrirUnidad(indice);
-    if (datos.numeroSerie !== undefined) await campo(this.page, "No. serie").fill(datos.numeroSerie);
-    if (datos.mac !== undefined) await campo(this.page, "MAC").fill(datos.mac);
-    if (datos.ip !== undefined) await campo(this.page, "IP").fill(datos.ip);
-    if (datos.nombreEquipo !== undefined) {
-      await campo(this.page, "Nombre equipo").fill(datos.nombreEquipo);
+    await this.openUnit(index);
+    if (data.serialNumber !== undefined) await field(this.page, "No. serie").fill(data.serialNumber);
+    if (data.mac !== undefined) await field(this.page, "MAC").fill(data.mac);
+    if (data.ip !== undefined) await field(this.page, "IP").fill(data.ip);
+    if (data.hostname !== undefined) {
+      await field(this.page, "Nombre equipo").fill(data.hostname);
     }
   }
 }

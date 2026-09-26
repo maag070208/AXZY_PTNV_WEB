@@ -8,11 +8,11 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaExclamationTriangle, FaFilePdf, FaSync } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
-import type { AsignadoRow } from "@entities/report";
+import type { AssignedDeviceRow } from "@entities/report";
 import { formatDate } from "@shared/i18n";
-import type { UseAsignadosReport } from "../model/useAsignadosReport";
+import type { UseAssignedDevicesReport } from "../model/useAssignedDevicesReport";
 
-export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
+export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesReport }) {
   const {
     t,
     rows,
@@ -21,80 +21,80 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
     exporting,
     reloadKey,
     setReloadKey,
-    promedioDias,
-    masDe30,
+    averageDays,
+    moreDe30,
     handleDownloadPdf,
     fetchTableData,
   } = fx;
 
-  const origenBadgeColor = (origen: AsignadoRow["origen"]) =>
-    origen === "CARTA" ? "success" : origen === "MOVIMIENTO" ? "warning" : "gray";
+  const sourceBadgeColor = (source: AssignedDeviceRow["source"]) =>
+    source === "CUSTODY_LETTER" ? "success" : source === "MOVEMENT" ? "warning" : "gray";
 
-  const origenLabel = (origen: AsignadoRow["origen"]) =>
-    origen === "CARTA"
-      ? t("asignados.origenCarta")
-      : origen === "MOVIMIENTO"
-      ? t("asignados.origenMovimiento")
-      : t("asignados.origenDesconocido");
+  const sourceLabel = (source: AssignedDeviceRow["source"]) =>
+    source === "CUSTODY_LETTER"
+      ? t("assigned.sourceCustodyLetter")
+      : source === "MOVEMENT"
+      ? t("assigned.sourceMovement")
+      : t("assigned.unknownSource");
 
-  const columns: Column<AsignadoRow>[] = [
+  const columns: Column<AssignedDeviceRow>[] = [
     {
-      key: "controlActivos",
-      label: t("asignados.colActivo"),
+      key: "assetTag",
+      label: t("assigned.activeCol"),
       type: "string",
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-800">
-          {r.controlActivos}
+          {r.assetTag}
         </ITText>
       ),
     },
     {
-      key: "descripcion",
-      label: t("asignados.colDescripcion"),
+      key: "description",
+      label: t("assigned.colDescription"),
       type: "string",
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
-            {r.descripcion}
+            {r.description}
           </ITText>
           <ITText className="text-[9px] uppercase tracking-widest text-slate-400">
-            {r.tipo}
+            {r.type}
           </ITText>
         </ITFlex>
       ),
     },
     {
-      key: "responsable",
-      label: t("asignados.colResponsable"),
+      key: "custodian",
+      label: t("assigned.colCustodian"),
       type: "string",
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[11px] text-slate-700">{r.responsable}</ITText>
-          {r.numeroEmpleado && (
+          <ITText className="text-[11px] text-slate-700">{r.custodian}</ITText>
+          {r.employeeNumber && (
             <ITText className="text-[9px] text-slate-400">
-              No. {r.numeroEmpleado}
+              No. {r.employeeNumber}
             </ITText>
           )}
         </ITFlex>
       ),
     },
     {
-      key: "departamento",
-      label: t("asignados.colDepto"),
+      key: "department",
+      label: t("assigned.colDept"),
       type: "string",
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">
-          {r.departamento ?? "—"}
+          {r.department ?? "—"}
         </ITText>
       ),
     },
     {
       key: "folio",
-      label: t("asignados.colFolioOrigen"),
+      label: t("assigned.colFolioSource"),
       type: "string",
       sortable: false,
       render: (r) => (
@@ -102,35 +102,35 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
           <ITText className="text-[11px] font-black text-emerald-700">
             {r.folio ?? "—"}
           </ITText>
-          <ITBadget color={origenBadgeColor(r.origen)} size="lg">
-            {origenLabel(r.origen)}
+          <ITBadget color={sourceBadgeColor(r.source)} size="lg">
+            {sourceLabel(r.source)}
           </ITBadget>
         </ITFlex>
       ),
     },
     {
-      key: "fecha",
-      label: t("asignados.colFecha"),
+      key: "date",
+      label: t("assigned.colDate"),
       type: "string",
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] text-slate-700">
-          {r.fecha ? formatDate(r.fecha) : "—"}
+          {r.date ? formatDate(r.date) : "—"}
         </ITText>
       ),
     },
     {
-      key: "diasAsignado",
-      label: t("asignados.colDias"),
+      key: "daysAssigned",
+      label: t("assigned.colDays"),
       type: "number",
       sortable: false,
       render: (r) => (
         <ITText
           className={`text-[11px] font-black ${
-            (r.diasAsignado ?? 0) > 30 ? "text-red-600" : "text-slate-700"
+            (r.daysAssigned ?? 0) > 30 ? "text-red-600" : "text-slate-700"
           }`}
         >
-          {r.diasAsignado ?? "—"}
+          {r.daysAssigned ?? "—"}
         </ITText>
       ),
     },
@@ -145,27 +145,27 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
               {rows.length}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("asignados.statAsignados")}
+              {t("assigned.statAssigned")}
             </ITText>
           </ITFlex>
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-amber-700 leading-none">
-              {promedioDias}
+              {averageDays}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("asignados.statPromedio")}
+              {t("assigned.statAverage")}
             </ITText>
           </ITFlex>
         </ITCard>
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
           <ITFlex direction="column" gap={0}>
             <ITText className="text-[18px] font-black text-red-600 leading-none">
-              {masDe30}
+              {moreDe30}
             </ITText>
             <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("asignados.statMas30")}
+              {t("assigned.statOver30")}
             </ITText>
           </ITFlex>
         </ITCard>
@@ -181,14 +181,14 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
         {loading && (
           <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {t("asignados.loading")}
+            {t("assigned.loading")}
           </ITText>
         )}
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
             <FaSync size={11} />
             <ITText className="font-bold text-[11px]">
-              {t("asignados.refresh")}
+              {t("assigned.refresh")}
             </ITText>
           </ITFlex>
         </ITButton>
@@ -201,7 +201,7 @@ export default function AsignadosTab({ fx }: { fx: UseAsignadosReport }) {
           <ITFlex align="center" gap={1}>
             <FaFilePdf className="text-red-600" size={13} />
             <ITText className="font-bold text-[11px]">
-              {exporting ? t("asignados.exporting") : t("asignados.export")}
+              {exporting ? t("assigned.exporting") : t("assigned.export")}
             </ITText>
           </ITFlex>
         </ITButton>

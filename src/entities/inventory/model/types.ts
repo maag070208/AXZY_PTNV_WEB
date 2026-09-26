@@ -1,197 +1,197 @@
-export type EstadoInventario = "DISPONIBLE" | "PRESTADO" | "DANADO" | "MANTENIMIENTO" | "BAJA";
+export type DeviceUnitStatus = "AVAILABLE" | "ON_LOAN" | "DAMAGED" | "IN_MAINTENANCE" | "RETIRED";
 
-export type TipoMovimiento =
-  | "ENTRADA"
-  | "PRESTAMO"
-  | "DEVOLUCION"
-  | "BAJA"
-  | "TRASPASO"
-  | "AJUSTE_ENTRADA"
-  | "AJUSTE_SALIDA"
-  | "MANTENIMIENTO_ENTRADA"
-  | "MANTENIMIENTO_SALIDA"
-  | "REVERSION";
+export type MovementType =
+  | "STOCK_IN"
+  | "LOAN"
+  | "RETURN"
+  | "RETIREMENT"
+  | "TRANSFER"
+  | "ADJUSTMENT_IN"
+  | "ADJUSTMENT_OUT"
+  | "MAINTENANCE_IN"
+  | "MAINTENANCE_OUT"
+  | "REVERSAL";
 
-export type Condicion = "BUENO" | "ACEPTABLE" | "MALO" | "ROTO";
+export type Condition = "GOOD" | "FAIR" | "POOR" | "BROKEN";
 
-export type EstadoPrestamo = "ACTIVO" | "PARCIAL" | "DEVUELTO" | "CANCELADO";
+export type LoanStatus = "ACTIVE" | "PARTIAL" | "RETURNED" | "CANCELLED";
 
-export interface TipoDispositivo {
+export interface DeviceType {
   id: string;
   code: string;
   name: string;
-  folioPrefix: string;
-  contador: number;
+  assetTagPrefix: string;
+  counter: number;
   active: boolean;
-  useSerie: boolean;
+  useSerialNumber: boolean;
   useMac: boolean;
   useIp: boolean;
-  useEquipo: boolean;
-  _count?: { dispositivos: number };
+  useHostname: boolean;
+  _count?: { devices: number };
 }
 
-export interface Dispositivo {
+export interface Device {
   id: string;
-  tipoId: string;
-  tipo?: TipoDispositivo;
-  nombre: string;
-  marca: string;
-  modelo: string;
-  descripcion?: string | null;
-  observaciones?: string | null;
-  existencias?: {
+  typeId: string;
+  type?: DeviceType;
+  name: string;
+  brand: string;
+  model: string;
+  description?: string | null;
+  notes?: string | null;
+  stock?: {
     total: number;
-    DISPONIBLE: number;
-    PRESTADO: number;
-    DANADO: number;
-    MANTENIMIENTO: number;
-    BAJA: number;
+    AVAILABLE: number;
+    ON_LOAN: number;
+    DAMAGED: number;
+    IN_MAINTENANCE: number;
+    RETIRED: number;
   };
 }
 
-export interface UnidadFisica {
+export interface DeviceUnit {
   id: string;
-  dispositivoId: string;
-  activoFijo: string;
-  numeroSerie?: string | null;
+  deviceId: string;
+  assetTag: string;
+  serialNumber?: string | null;
   macAddress?: string | null;
   ip?: string | null;
-  nombreEquipo?: string | null;
+  hostname?: string | null;
   area: string;
-  estado: EstadoInventario;
-  departamentoId?: string | null;
+  status: DeviceUnitStatus;
+  departmentId?: string | null;
 }
 
-export interface Existencias {
-  DISPONIBLE: number;
-  PRESTADO: number;
-  DANADO: number;
-  MANTENIMIENTO: number;
-  BAJA: number;
-  activa: number;
-  historica: number;
+export interface Stock {
+  AVAILABLE: number;
+  ON_LOAN: number;
+  DAMAGED: number;
+  IN_MAINTENANCE: number;
+  RETIRED: number;
+  active: number;
+  historical: number;
 }
 
-export interface MovimientoDetalle {
+export interface MovementItem {
   id: string;
-  dispositivoId: string;
-  dispositivo?: Dispositivo;
-  cantidad: number;
-  condicion?: Condicion | null;
-  observaciones?: string | null;
-  unidades?: { id: string; unidadFisica: UnidadFisica }[];
+  deviceId: string;
+  device?: Device;
+  quantity: number;
+  condition?: Condition | null;
+  notes?: string | null;
+  units?: { id: string; deviceUnit: DeviceUnit }[];
 }
 
-export interface Movimiento {
+export interface Movement {
   id: string;
-  tipo: TipoMovimiento;
-  fecha: string;
-  usuarioId: string;
-  usuario?: { id: string; name: string } | null;
-  responsable?: { id: string; name: string } | null;
-  departamentoId?: string | null;
-  motivo?: string | null;
-  observaciones?: string | null;
-  status: "ACTIVO" | "CANCELADO";
-  reversaDeId?: string | null;
-  prestamoId?: string | null;
-  detalles: MovimientoDetalle[];
+  type: MovementType;
+  date: string;
+  createdById: string;
+  createdBy?: { id: string; name: string } | null;
+  custodian?: { id: string; name: string } | null;
+  departmentId?: string | null;
+  reason?: string | null;
+  notes?: string | null;
+  status: "ACTIVE" | "CANCELLED";
+  reversalOfId?: string | null;
+  loanId?: string | null;
+  items: MovementItem[];
 }
 
-export interface PrestamoDetalle {
+export interface LoanItem {
   id: string;
-  dispositivoId: string;
-  dispositivo?: Dispositivo;
-  cantidad: number;
-  devuelto: number;
-  pendiente?: number;
-  unidades?: { id: string; devuelto?: boolean; unidadFisica: UnidadFisica }[];
+  deviceId: string;
+  device?: Device;
+  quantity: number;
+  returnedQuantity: number;
+  pending?: number;
+  units?: { id: string; returned?: boolean; deviceUnit: DeviceUnit }[];
 }
 
-export interface Prestamo {
+export interface Loan {
   id: string;
-  responsableId?: string | null;
-  responsable?: { id: string; name: string; username: string; numeroEmpleado?: string | null; department?: { id: string; name: string } | null } | null;
-  departamentoId?: string | null;
-  departamento?: { id: string; name: string } | null;
+  custodianId?: string | null;
+  custodian?: { id: string; name: string; username: string; employeeNumber?: string | null; department?: { id: string; name: string } | null } | null;
+  departmentId?: string | null;
+  department?: { id: string; name: string } | null;
   subareaId?: string | null;
   subarea?: { id: string; name: string } | null;
-  fecha: string;
-  status: EstadoPrestamo;
-  consecutivo: string;
-  observaciones?: string | null;
-  detalles: PrestamoDetalle[];
-  devoluciones?: Devolucion[];
+  date: string;
+  status: LoanStatus;
+  number: string;
+  notes?: string | null;
+  items: LoanItem[];
+  returns?: LoanReturn[];
 }
 
-export interface DevolucionDetalle {
+export interface LoanReturnItem {
   id: string;
-  dispositivoId: string;
-  dispositivo?: Dispositivo;
-  cantidad: number;
-  condicion: Condicion;
-  observaciones?: string | null;
-  unidades?: { id: string; unidadFisica: UnidadFisica }[];
+  deviceId: string;
+  device?: Device;
+  quantity: number;
+  condition: Condition;
+  notes?: string | null;
+  units?: { id: string; deviceUnit: DeviceUnit }[];
 }
 
-export interface Devolucion {
+export interface LoanReturn {
   id: string;
-  prestamoId: string;
-  prestamo?: {
+  loanId: string;
+  loan?: {
     id: string;
-    consecutivo: string;
-    responsable?: { name: string } | null;
-    departamento?: { name: string } | null;
+    number: string;
+    custodian?: { name: string } | null;
+    department?: { name: string } | null;
   } | null;
-  fecha: string;
-  consecutivo: string;
-  observaciones?: string | null;
-  responsable?: { id: string; name: string } | null;
-  detalles: DevolucionDetalle[];
+  date: string;
+  number: string;
+  notes?: string | null;
+  custodian?: { id: string; name: string } | null;
+  items: LoanReturnItem[];
 }
 
-export interface KardexRow {
-  fecha: string;
-  tipo: TipoMovimiento;
-  entrada: number;
-  salida: number;
-  saldo: number;
-  condicion?: Condicion | null;
-  motivo?: string | null;
-  observaciones?: string | null;
-  usuario?: string | null;
+export interface StockLedgerRow {
+  date: string;
+  type: MovementType;
+  stockIn: number;
+  stockOut: number;
+  balance: number;
+  condition?: Condition | null;
+  reason?: string | null;
+  notes?: string | null;
+  user?: string | null;
 }
 
 export interface DashboardStat {
-  tipos: number;
-  dispositivos: number;
-  unidadesActivas: number;
-  disponible: number;
-  prestado: number;
-  danado: number;
-  mantenimiento: number;
-  baja: number;
+  types: number;
+  devices: number;
+  activeUnits: number;
+  available: number;
+  loaned: number;
+  damaged: number;
+  maintenance: number;
+  retirement: number;
 }
 
-export interface DashboardPorTipo {
+export interface DashboardByType {
   id: string;
   code: string;
   name: string;
-  dispositivos: {
+  devices: {
     id: string;
-    nombre: string;
-    marca: string;
-    modelo: string;
-    disponible: number;
-    prestado: number;
-    danado: number;
-    mantenimiento: number;
-    baja: number;
+    name: string;
+    brand: string;
+    model: string;
+    available: number;
+    loaned: number;
+    damaged: number;
+    maintenance: number;
+    retirement: number;
     total: number;
   }[];
 }
 
 export interface Dashboard {
   stats: DashboardStat;
-  porTipo: DashboardPorTipo[];
+  byType: DashboardByType[];
 }

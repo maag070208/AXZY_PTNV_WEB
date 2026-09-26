@@ -31,7 +31,7 @@ export default function UserFormPage() {
   const handleFinish = () => {
     userForm.handleSubmit().then((ok) => {
       if (ok) {
-        navigate("/usuarios");
+        navigate("/users");
       } else {
         const invalidStep = userForm.firstInvalidStep();
         if (invalidStep >= 0) setStep(invalidStep);
@@ -54,7 +54,7 @@ export default function UserFormPage() {
         backAction={() => navigate(-1)}
         icon={<FaUserPlus size={20} />}
         breadcrumbs={[
-          { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+          { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
           { label: breadcrumb },
         ]}
       >
@@ -116,7 +116,7 @@ export default function UserFormPage() {
       backAction={() => navigate(-1)}
       icon={<FaUserPlus size={20} />}
       breadcrumbs={[
-        { label: tt("list.breadcrumb"), onClick: () => navigate("/usuarios") },
+        { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
         { label: breadcrumb },
       ]}
     >

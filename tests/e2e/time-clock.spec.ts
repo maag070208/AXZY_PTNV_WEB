@@ -1,6 +1,6 @@
 import { test, expect } from "./support/fixtures";
-import { E2E, ruta } from "./support/env";
-import { irARuta } from "./support/pages/componentes";
+import { E2E, route } from "./support/env";
+import { goToRoute } from "./support/pages/components";
 
 /**
  * Reloj checador (`/access/checador`): submódulo de Control de acceso con las
@@ -16,10 +16,10 @@ test.describe("Reloj checador", () => {
   test("ADMIN ve el estado de la sincronización y la tabla pide al servidor", async ({
     page,
   }) => {
-    const consulta = page.waitForResponse(
-      (r) => r.url().includes("/checador/query") && r.request().method() === "POST"
+    const query = page.waitForResponse(
+      (r) => r.url().includes("/time-clock/query") && r.request().method() === "POST"
     );
-    await irARuta(page, "/access/checador");
+    await goToRoute(page, "/access/time-clock");
 
     await expect(page.getByRole("heading", { level: 1, name: "Reloj checador" })).toBeVisible();
     await expect(page.getByText("Sincronización con los relojes", { exact: true })).toBeVisible();
@@ -32,19 +32,19 @@ test.describe("Reloj checador", () => {
     await expect(page.locator("table thead").getByText("Reloj", { exact: true })).toBeVisible();
 
     // El día lo resuelve la API con su TZ de empresa (la web no manda `tz`).
-    const res = await consulta;
+    const res = await query;
     expect(res.status()).toBe(200);
     const { filters } = res.request().postDataJSON() as { filters: Record<string, unknown> };
     expect(filters.tz).toBeUndefined();
-    expect(filters.desde).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(filters.from).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 
     // ADMIN administra los relojes (en Configuración) desde aquí.
     await page.getByRole("button", { name: "Administrar relojes" }).click();
-    await expect(page).toHaveURL(/#\/relojes$/);
+    await expect(page).toHaveURL(/#\/time-clocks$/);
   });
 
   test("el subitem de menú 'Reloj checador' es visible para ADMIN", async ({ page }) => {
-    await irARuta(page, "/access/checador");
+    await goToRoute(page, "/access/time-clock");
 
     // La barra lateral arranca colapsada; al pasar el mouse se expande y el
     // padre (auto-expandido por el subitem activo) muestra sus hijos.
@@ -58,31 +58,31 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
   test("el reporte de entradas/salidas del reloj reutiliza el de acceso con su propia fuente", async ({
     page,
   }) => {
-    const consulta = page.waitForResponse(
-      (r) => r.url().endsWith("/checador/report") && r.request().method() === "POST"
+    const query = page.waitForResponse(
+      (r) => r.url().endsWith("/time-clock/report") && r.request().method() === "POST"
     );
-    await irARuta(page, "/access/checador/entradas-salidas");
+    await goToRoute(page, "/access/time-clock/entries-exits");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Entradas/salidas del reloj" })
     ).toBeVisible();
     await expect(page.getByText(/empleados del reloj vinculados/)).toBeVisible();
 
-    const res = await consulta;
+    const res = await query;
     expect(res.status()).toBe(200);
     const { filters } = res.request().postDataJSON() as { filters: Record<string, unknown> };
     expect(filters).toMatchObject({ period: "DAY" });
 
     await page.getByRole("button", { name: "Vincular empleados" }).click();
-    await expect(page).toHaveURL(/#\/access\/checador\/empleados/);
+    await expect(page).toHaveURL(/#\/access\/time-clock\/employees/);
   });
 
   test("la pantalla de vínculos lista los empleados del reloj con sus sugerencias", async ({ page }) => {
-    const consulta = page.waitForResponse((r) => r.url().includes("/checador/empleados/query"));
-    await irARuta(page, "/access/checador/empleados");
+    const query = page.waitForResponse((r) => r.url().includes("/time-clock/employees/query"));
+    await goToRoute(page, "/access/time-clock/employees");
 
     await expect(page.getByRole("heading", { level: 1, name: "Empleados del reloj" })).toBeVisible();
-    expect((await consulta).status()).toBe(200);
+    expect((await query).status()).toBe(200);
     await expect(page.getByText("En el reloj", { exact: true })).toBeVisible();
     await expect(page.getByText("Sugerencias seguras", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /Vincular \d+ sugerencias seguras/ })).toBeVisible();
@@ -96,55 +96,55 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
  * inválida que se rechaza antes de conectarse a nada.
  */
 test.describe("Reloj checador — relojes", () => {
-  const SERIE = "E2E-RELOJ-WEB";
-  const RELOJ = {
-    dispositivoSerie: SERIE,
-    nombre: "E2E Puerta de personal",
+  const SERIAL = "E2E-CLOCK-WEB";
+  const CLOCK = {
+    clockSerial: SERIAL,
+    name: "E2E Puerta de personal",
     url: "https://10.0.0.99",
-    asistencia: true,
-    modelo: "DS-K1T320MFWX-B",
-    ultimoSerialNo: 4_321,
-    sincronizadoEn: "2026-09-24T20:00:00.000Z",
-    checadas: 1_234,
-    ultimaChecada: "2026-09-24T19:55:00.000Z",
-    enCurso: null,
-    ultimaCorrida: null,
-    pausadoPorCredenciales: false,
+    countsAttendance: true,
+    model: "DS-K1T320MFWX-B",
+    lastSerialNo: 4_321,
+    syncedAt: "2026-09-24T20:00:00.000Z",
+    punches: 1_234,
+    lastPunch: "2026-09-24T19:55:00.000Z",
+    inProgress: null,
+    lastRun: null,
+    pausedByCredentials: false,
   };
 
   test("ADMIN ve cada reloj con su sincronización y su configuración en vivo", async ({ page }) => {
-    await page.route("**/checador/status", (route) =>
+    await page.route("**/time-clock/status", (route) =>
       route.fulfill({
-        json: { configurado: true, enCurso: null, importacion: null, dispositivos: [RELOJ] },
+        json: { configured: true, inProgress: null, importJob: null, devices: [CLOCK] },
       })
     );
-    await page.route(`**/checador/relojes/${SERIE}/configuracion`, (route) =>
+    await page.route(`**/time-clock/clocks/${SERIAL}/settings`, (route) =>
       route.fulfill({
         json: {
-          dispositivoSerie: SERIE,
-          leidoEn: "2026-09-24T20:01:00.000Z",
-          dispositivo: {
-            nombre: "Administracion",
-            modelo: "DS-K1T320MFWX-B",
+          clockSerial: SERIAL,
+          readAt: "2026-09-24T20:01:00.000Z",
+          device: {
+            name: "Administracion",
+            model: "DS-K1T320MFWX-B",
             firmware: "V3.5.20",
             mac: "88:de:39:62:84:fb",
           },
-          hora: {
-            horaLocal: "2026-09-24T13:01:00-07:00",
-            modo: "manual",
-            zona: "CST+7:00:00",
-            desfaseSegundos: 150,
+          hour: {
+            localTime: "2026-09-24T13:01:00-07:00",
+            mode: "manual",
+            zone: "CST+7:00:00",
+            driftSeconds: 150,
           },
-          personas: { total: 38, conRostro: 37, conHuella: 35, conTarjeta: 0 },
+          people: { total: 38, withFace: 37, withFingerprint: 35, withCard: 0 },
         },
       })
     );
-    await irARuta(page, "/relojes");
+    await goToRoute(page, "/time-clocks");
 
     await expect(page.getByRole("heading", { level: 1, name: "Relojes checadores" })).toBeVisible();
     await expect(page.getByText(/Solo lectura: el sistema se conecta a los relojes/)).toBeVisible();
-    await expect(page.getByText(RELOJ.nombre, { exact: true })).toBeVisible();
-    await expect(page.getByText(RELOJ.url, { exact: true })).toBeVisible();
+    await expect(page.getByText(CLOCK.name, { exact: true })).toBeVisible();
+    await expect(page.getByText(CLOCK.url, { exact: true })).toBeVisible();
     await expect(page.getByText("Al día", { exact: true })).toBeVisible();
     await expect(page.getByText("Cuenta para entradas/salidas", { exact: true })).toBeVisible();
     // Configuración del reloj, tal como la reporta el equipo.
@@ -156,45 +156,45 @@ test.describe("Reloj checador — relojes", () => {
   });
 
   test("editar cambia si cuenta para entradas/salidas (solo el registro del sistema)", async ({ page }) => {
-    await page.route("**/checador/status", (route) =>
+    await page.route("**/time-clock/status", (route) =>
       route.fulfill({
-        json: { configurado: true, enCurso: null, importacion: null, dispositivos: [RELOJ] },
+        json: { configured: true, inProgress: null, importJob: null, devices: [CLOCK] },
       })
     );
-    await page.route(`**/checador/relojes/${SERIE}/configuracion`, (route) =>
-      route.fulfill({ status: 502, json: { code: "CHECADOR_SIN_CONEXION", message: "Sin conexión" } })
+    await page.route(`**/time-clock/clocks/${SERIAL}/settings`, (route) =>
+      route.fulfill({ status: 502, json: { code: "TIME_CLOCK_UNREACHABLE", message: "Sin conexión" } })
     );
-    let enviado: unknown = null;
-    await page.route(`**/checador/relojes/${SERIE}`, (route) => {
+    let sent: unknown = null;
+    await page.route(`**/time-clock/clocks/${SERIAL}`, (route) => {
       if (route.request().method() !== "PATCH") return route.fallback();
-      enviado = route.request().postDataJSON();
-      return route.fulfill({ json: { ...RELOJ, asistencia: false } });
+      sent = route.request().postDataJSON();
+      return route.fulfill({ json: { ...CLOCK, countsAttendance: false } });
     });
-    await irARuta(page, "/relojes");
+    await goToRoute(page, "/time-clocks");
 
     await page.getByRole("button", { name: "Editar", exact: true }).click();
     await page.getByText("Cuenta para entradas/salidas", { exact: true }).last().click();
     await page.getByRole("button", { name: "Guardar", exact: true }).click();
 
-    await expect(page.getByText(`${RELOJ.nombre} actualizado`)).toBeVisible();
-    expect(enviado).toEqual({ nombre: RELOJ.nombre, asistencia: false });
+    await expect(page.getByText(`${CLOCK.name} actualizado`)).toBeVisible();
+    expect(sent).toEqual({ name: CLOCK.name, countsAttendance: false });
   });
 
   test("el alta muestra el motivo si la dirección no sirve", async ({ page }) => {
-    await irARuta(page, "/relojes");
+    await goToRoute(page, "/time-clocks");
     await page.getByRole("button", { name: "Dar de alta un reloj" }).click();
 
     await page.getByRole("textbox", { name: "Dirección del reloj" }).fill("ftp://10.0.0.99");
-    const alta = page.waitForResponse(
-      (r) => r.url().endsWith("/checador/relojes") && r.request().method() === "POST"
+    const registration = page.waitForResponse(
+      (r) => r.url().endsWith("/time-clock/clocks") && r.request().method() === "POST"
     );
     await page.getByRole("button", { name: "Dar de alta", exact: true }).click();
-    expect((await alta).status()).toBe(400);
+    expect((await registration).status()).toBe(400);
     await expect(page.getByText(/no es una dirección válida/)).toBeVisible();
   });
 
   test("el subitem 'Relojes checadores' está en Configuración para ADMIN", async ({ page }) => {
-    await irARuta(page, "/relojes");
+    await goToRoute(page, "/time-clocks");
     const menu = page.locator("aside");
     await menu.hover();
     // Configuración se auto-expande por el subitem activo.
@@ -207,20 +207,20 @@ test.describe("Reloj checador — gate por rol", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test("un EMPLEADO no accede al checador", async ({ page, login }) => {
-    await login.entrarComo(E2E.empleado.username);
+    await login.enterAs(E2E.employee.username);
 
-    await page.goto(ruta("/access/checador"));
+    await page.goto(route("/access/time-clock"));
 
-    await expect(page).not.toHaveURL(/#\/access\/checador/);
+    await expect(page).not.toHaveURL(/#\/access\/time-clock/);
     await expect(page.getByRole("heading", { name: "Reloj checador" })).toHaveCount(0);
 
-    for (const destino of ["/access/checador/entradas-salidas", "/access/checador/empleados"]) {
-      await page.goto(ruta(destino));
-      await expect(page).not.toHaveURL(/#\/access\/checador/);
+    for (const destination of ["/access/time-clock/entries-exits", "/access/time-clock/employees"]) {
+      await page.goto(route(destination));
+      await expect(page).not.toHaveURL(/#\/access\/time-clock/);
     }
     // Relojes (Configuración) es solo de ADMIN.
-    await page.goto(ruta("/relojes"));
-    await expect(page).not.toHaveURL(/#\/relojes/);
+    await page.goto(route("/time-clocks"));
+    await expect(page).not.toHaveURL(/#\/time-clocks/);
     await expect(page.getByRole("heading", { name: "Relojes checadores" })).toHaveCount(0);
   });
 });

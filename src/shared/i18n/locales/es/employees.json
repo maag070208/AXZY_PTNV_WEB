@@ -16,7 +16,7 @@
     "credentialError": "No se pudo generar la credencial",
     "stepper": {
       "photoPersonal": "Foto y Datos Personales",
-      "laboral": "Laboral",
+      "employment": "Laboral",
       "contact": "Contacto"
     },
     "deactivate": "Dar de baja",
@@ -31,7 +31,7 @@
     "active": "Activo",
     "inactive": "Inactivo",
     "employeeNo": "No. Empleado",
-    "laboralTitle": "Información Laboral",
+    "employmentTitle": "Información Laboral",
     "medicalTitle": "Información Médica",
     "personalInfoTitle": "Información Personal",
     "officialDocsTitle": "Documentos Oficiales",
@@ -53,7 +53,7 @@
     "discountTypes": {
       "INFONAVIT": "INFONAVIT",
       "IMSS": "IMSS",
-      "DEUDOR_ALIMENTICIO": "Deudor Alimenticio"
+      "CHILD_SUPPORT": "Deudor Alimenticio"
     },
     "tabs": {
       "personal": "Personal",
@@ -68,8 +68,8 @@
       "employeeNo": "Número de Empleado",
       "firstName": "Nombre",
       "secondName": "Segundo Nombre",
-      "apellidoPaterno": "Apellido Paterno",
-      "apellidoMaterno": "Apellido Materno",
+      "paternalSurname": "Apellido Paterno",
+      "maternalSurname": "Apellido Materno",
       "gender": "Género",
       "birthDate": "Fecha de Nacimiento",
       "hireDate": "Fecha de Ingreso",

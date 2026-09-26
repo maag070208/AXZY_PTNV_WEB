@@ -1,6 +1,6 @@
 import { test, expect } from "./support/fixtures";
-import { esperarToast } from "./support/pages/componentes";
-import { ruta } from "./support/env";
+import { waitForToast } from "./support/pages/components";
+import { route } from "./support/env";
 
 /**
  * Flujo BAJA por pantalla — `/inventario/movimientos/nuevo`.
@@ -11,163 +11,163 @@ import { ruta } from "./support/env";
 test.describe("BAJA desde la web", () => {
   test("da de baja una unidad con su motivo", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(5);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(5);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("Baja");
-    await movimientoPage.escribirMotivo("Daño irreparable");
-    await movimientoPage.registrar();
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("Baja");
+    await movementPage.writeReason("Daño irreparable");
+    await movementPage.register();
 
-    await esperarToast(page, "Movimiento registrado");
-    await page.waitForURL(`**${ruta("/inventario/movimientos")}`);
+    await waitForToast(page, "Movimiento registrado");
+    await page.waitForURL(`**${route("/inventory/movements")}`);
 
     // La baja sale de la existencia activa pero permanece en la histórica.
-    const existencias = await api.esperarExistencias(dispositivo.id, {
-      DISPONIBLE: 4,
-      BAJA: 1,
+    const stock = await api.waitForStock(device.id, {
+      AVAILABLE: 4,
+      RETIREMENT: 1,
     });
-    expect(existencias.activa).toBe(4);
-    expect(existencias.historica).toBe(5);
+    expect(stock.active).toBe(4);
+    expect(stock.historical).toBe(5);
 
-    const unidades = await api.unidades(dispositivo.id);
-    expect(unidades.find((u) => u.id === unidad.id)?.estado).toBe("BAJA");
+    const units = await api.units(device.id);
+    expect(units.find((u) => u.id === unit.id)?.status).toBe("RETIREMENT");
   });
 
-  test("exige motivo para dar de baja", async ({ movimientoPage, escenario, api }) => {
-    const dispositivo = await escenario.dispositivo(3);
-    const [unidad] = await api.unidades(dispositivo.id);
+  test("exige motivo para dar de baja", async ({ movementPage, scenario, api }) => {
+    const device = await scenario.device(3);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("Baja");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("Baja");
 
-    await expect(movimientoPage.botonRegistrar).toBeDisabled();
-    await movimientoPage.escribirMotivo("Obsoleto");
-    await expect(movimientoPage.botonRegistrar).toBeEnabled();
+    await expect(movementPage.registerButton).toBeDisabled();
+    await movementPage.writeReason("Obsoleto");
+    await expect(movementPage.registerButton).toBeEnabled();
   });
 
   test("las unidades prestadas no se ofrecen para dar de baja", async ({
-    movimientoPage,
-    escenario,
-    departamento,
+    movementPage,
+    scenario,
+    department,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(4);
-    const unidades = await api.unidades(dispositivo.id);
-    await api.prestar({
-      departamentoId: departamento.id,
-      detalles: [{ dispositivoId: dispositivo.id, cantidad: 3 }],
+    const device = await scenario.device(4);
+    const units = await api.units(device.id);
+    await api.lend({
+      departmentId: department.id,
+      items: [{ deviceId: device.id, quantity: 3 }],
     });
 
-    const prestadas = (await api.unidades(dispositivo.id))
-      .filter((u) => u.estado === "PRESTADO")
-      .map((u) => u.activoFijo);
-    expect(prestadas).toHaveLength(3);
+    const loaned = (await api.units(device.id))
+      .filter((u) => u.status === "ON_LOAN")
+      .map((u) => u.assetTag);
+    expect(loaned).toHaveLength(3);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirTipo("Baja");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectType("Baja");
 
     // Sólo la pieza que quedó disponible aparece en el desplegable.
-    const ofrecidas = await movimientoPage.unidadesOfrecidas();
-    expect(ofrecidas).toHaveLength(1);
-    for (const activoFijo of prestadas) {
-      expect(ofrecidas.join(" ")).not.toContain(activoFijo);
+    const offered = await movementPage.offeredUnits();
+    expect(offered).toHaveLength(1);
+    for (const assetTag of loaned) {
+      expect(offered.join(" ")).not.toContain(assetTag);
     }
-    expect(unidades.map((u) => u.activoFijo)).toContain(
-      ofrecidas[0].split(" ")[0].replace(/\s.*$/, "")
+    expect(units.map((u) => u.assetTag)).toContain(
+      offered[0].split(" ")[0].replace(/\s.*$/, "")
     );
   });
 
   test("una unidad ya dada de baja deja de ofrecerse", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(2);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(2);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("Baja");
-    await movimientoPage.escribirMotivo("Robo");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
-    await api.esperarExistencias(dispositivo.id, { BAJA: 1, DISPONIBLE: 1 });
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("Baja");
+    await movementPage.writeReason("Robo");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
+    await api.waitForStock(device.id, { RETIREMENT: 1, AVAILABLE: 1 });
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirTipo("Baja");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectType("Baja");
 
-    const ofrecidas = await movimientoPage.unidadesOfrecidas();
-    expect(ofrecidas).toHaveLength(1);
-    expect(ofrecidas.join(" ")).not.toContain(unidad.activoFijo);
+    const offered = await movementPage.offeredUnits();
+    expect(offered).toHaveLength(1);
+    expect(offered.join(" ")).not.toContain(unit.assetTag);
   });
 
   test("da de baja dos dispositivos en un mismo movimiento", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const uno = await escenario.dispositivo(3);
-    const otro = await escenario.dispositivo(3);
-    const [unidadUno] = await api.unidades(uno.id);
-    const [unidadOtro] = await api.unidades(otro.id);
+    const one = await scenario.device(3);
+    const other = await scenario.device(3);
+    const [unitOne] = await api.units(one.id);
+    const [otherUnit] = await api.units(other.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(uno.nombreVisible, 1);
-    await movimientoPage.elegirUnidad(unidadUno.activoFijo, 1);
-    await movimientoPage.elegirTipo("Baja", 1);
-    await movimientoPage.escribirMotivo("Retiro de lote", 1);
+    await movementPage.go();
+    await movementPage.selectDevice(one.nameVisible, 1);
+    await movementPage.selectUnit(unitOne.assetTag, 1);
+    await movementPage.selectType("Baja", 1);
+    await movementPage.writeReason("Retiro de lote", 1);
 
-    await movimientoPage.agregarRenglon();
-    await movimientoPage.elegirDispositivo(otro.nombreVisible, 2);
-    await movimientoPage.elegirUnidad(unidadOtro.activoFijo, 2);
-    await movimientoPage.elegirTipo("Baja", 2);
-    await movimientoPage.escribirMotivo("Retiro de lote", 2);
+    await movementPage.addRow();
+    await movementPage.selectDevice(other.nameVisible, 2);
+    await movementPage.selectUnit(otherUnit.assetTag, 2);
+    await movementPage.selectType("Baja", 2);
+    await movementPage.writeReason("Retiro de lote", 2);
 
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
 
-    await api.esperarExistencias(uno.id, { DISPONIBLE: 2, BAJA: 1 });
-    await api.esperarExistencias(otro.id, { DISPONIBLE: 2, BAJA: 1 });
+    await api.waitForStock(one.id, { AVAILABLE: 2, RETIREMENT: 1 });
+    await api.waitForStock(other.id, { AVAILABLE: 2, RETIREMENT: 1 });
 
     // Los dos renglones viajaron en un solo movimiento de BAJA.
-    const bajas = await api.movimientos({ dispositivoId: uno.id, tipo: "BAJA" });
-    expect(bajas).toHaveLength(1);
-    expect(bajas[0].detalles).toHaveLength(2);
+    const retirements = await api.movements({ deviceId: one.id, type: "RETIREMENT" });
+    expect(retirements).toHaveLength(1);
+    expect(retirements[0].items).toHaveLength(2);
   });
 
   test("la baja queda registrada en el historial de movimientos", async ({
     page,
-    movimientoPage,
-    escenario,
+    movementPage,
+    scenario,
     api,
   }) => {
-    const dispositivo = await escenario.dispositivo(2);
-    const [unidad] = await api.unidades(dispositivo.id);
+    const device = await scenario.device(2);
+    const [unit] = await api.units(device.id);
 
-    await movimientoPage.ir();
-    await movimientoPage.elegirDispositivo(dispositivo.nombreVisible);
-    await movimientoPage.elegirUnidad(unidad.activoFijo);
-    await movimientoPage.elegirTipo("Baja");
-    await movimientoPage.escribirMotivo("Daño por agua");
-    await movimientoPage.registrar();
-    await esperarToast(page, "Movimiento registrado");
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectUnit(unit.assetTag);
+    await movementPage.selectType("Baja");
+    await movementPage.writeReason("Daño por agua");
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
 
-    await page.goto(ruta("/inventario/movimientos"));
+    await page.goto(route("/inventory/movements"));
     await expect(page.getByText("Daño por agua").first()).toBeVisible();
-    await expect(page.getByText(dispositivo.nombreVisible).first()).toBeVisible();
+    await expect(page.getByText(device.nameVisible).first()).toBeVisible();
   });
 });

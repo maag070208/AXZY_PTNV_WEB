@@ -16,30 +16,30 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaBed, FaCalendarCheck, FaClock, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { scheduleApi, type HorarioDiaInput, type HorarioInput } from "@entities/schedule";
+import { scheduleApi, type ScheduleDayInput, type ScheduleInput } from "@entities/schedule";
 import { dyn } from "@shared/i18n/dyn";
 import { useIsMobile } from "@shared/lib/useIsMobile";
 import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dayMinutes, daysWorked, restDays, weeklyMinutes } from "../model/summary";
 
-const emptyDays = (): HorarioDiaInput[] =>
-  [1, 2, 3, 4, 5, 6, 7].map((diaSemana) => ({
-    diaSemana,
-    entrada: "08:00",
-    salida: "16:00",
-    entrada2: null,
-    salida2: null,
-    descanso: diaSemana === 7,
+const emptyDays = (): ScheduleDayInput[] =>
+  [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({
+    weekday,
+    startTime: "08:00",
+    endTime: "16:00",
+    splitStartTime: null,
+    splitEndTime: null,
+    restDay: weekday === 7,
   }));
 
-const emptyForm = (): HorarioInput => ({
-  nombre: "",
-  toleranciaEntradaMin: 10,
-  toleranciaSalidaMin: 10,
-  comidaMin: 0,
-  minimoExtraMin: 60,
-  cruzaMedianoche: false,
-  dias: emptyDays(),
+const emptyForm = (): ScheduleInput => ({
+  name: "",
+  entryToleranceMin: 10,
+  exitToleranceMin: 10,
+  mealBreakMin: 0,
+  minOvertimeMin: 60,
+  crossesMidnight: false,
+  days: emptyDays(),
 });
 
 function ActionBar({
@@ -76,7 +76,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
   const isEdit = Boolean(id);
   const isMobile = useIsMobile();
 
-  const [form, setForm] = useState<HorarioInput>(emptyForm());
+  const [form, setForm] = useState<ScheduleInput>(emptyForm());
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,19 +93,19 @@ export default function ScheduleForm({ id }: { id?: string }) {
           return;
         }
         setForm({
-          nombre: h.nombre,
-          toleranciaEntradaMin: h.toleranciaEntradaMin,
-          toleranciaSalidaMin: h.toleranciaSalidaMin,
-          comidaMin: h.comidaMin,
-          minimoExtraMin: h.minimoExtraMin,
-          cruzaMedianoche: h.cruzaMedianoche,
-          dias: h.dias.map((d) => ({
-            diaSemana: d.diaSemana,
-            entrada: d.entrada,
-            salida: d.salida,
-            entrada2: d.entrada2,
-            salida2: d.salida2,
-            descanso: d.descanso,
+          name: h.name,
+          entryToleranceMin: h.entryToleranceMin,
+          exitToleranceMin: h.exitToleranceMin,
+          mealBreakMin: h.mealBreakMin,
+          minOvertimeMin: h.minOvertimeMin,
+          crossesMidnight: h.crossesMidnight,
+          days: h.days.map((d) => ({
+            weekday: d.weekday,
+            startTime: d.startTime,
+            endTime: d.endTime,
+            splitStartTime: d.splitStartTime,
+            splitEndTime: d.splitEndTime,
+            restDay: d.restDay,
           })),
         });
       })
@@ -113,15 +113,15 @@ export default function ScheduleForm({ id }: { id?: string }) {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const setDay = (diaSemana: number, patch: Partial<HorarioDiaInput>) => {
+  const setDay = (weekday: number, patch: Partial<ScheduleDayInput>) => {
     setForm((f) => ({
       ...f,
-      dias: f.dias.map((d) => (d.diaSemana === diaSemana ? { ...d, ...patch } : d)),
+      days: f.days.map((d) => (d.weekday === weekday ? { ...d, ...patch } : d)),
     }));
   };
 
   const save = async () => {
-    if (!form.nombre.trim()) {
+    if (!form.name.trim()) {
       setError(t("nameRequired"));
       return;
     }
@@ -131,7 +131,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
       if (isEdit) await scheduleApi.update(id!, form);
       else await scheduleApi.create(form);
       setToast(t("save"));
-      setTimeout(() => navigate("/horarios"), 500);
+      setTimeout(() => navigate("/schedules"), 500);
     } catch (e) {
       setError((e as Error).message ?? t("saveError"));
     } finally {
@@ -141,11 +141,11 @@ export default function ScheduleForm({ id }: { id?: string }) {
 
   const summary = useMemo(
     () => ({
-      days: daysWorked(form.dias),
-      rest: restDays(form.dias),
-      weekly: weeklyMinutes(form.dias, form.comidaMin ?? 0),
+      days: daysWorked(form.days),
+      rest: restDays(form.days),
+      weekly: weeklyMinutes(form.days, form.mealBreakMin ?? 0),
     }),
-    [form.dias, form.comidaMin]
+    [form.days, form.mealBreakMin]
   );
 
   if (loading) {
@@ -157,7 +157,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
   }
 
   const dayLabel = (n: number) => dyn(t)(`day${n}`);
-  const hasSecond = (d: HorarioDiaInput) => Boolean(d.entrada2 || d.salida2);
+  const hasSecond = (d: ScheduleDayInput) => Boolean(d.splitStartTime || d.splitEndTime);
 
   const summaryKpis = [
     {
@@ -189,7 +189,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
         saving={saving}
         cancelLabel={t("cancel")}
         saveLabel={t("save")}
-        onCancel={() => navigate("/horarios")}
+        onCancel={() => navigate("/schedules")}
         onSave={save}
       />
 
@@ -207,10 +207,10 @@ export default function ScheduleForm({ id }: { id?: string }) {
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={6}>
               <ITInput
-                name="nombre"
+                name="name"
                 label={t("name")}
-                value={form.nombre}
-                onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               />
             </ITGrid>
           </ITGrid>
@@ -253,16 +253,16 @@ export default function ScheduleForm({ id }: { id?: string }) {
               <ITInput
                 name="tolEntrada"
                 type="number"
-                label={t("tolEntrada")}
-                value={String(form.toleranciaEntradaMin ?? 0)}
-                onChange={(e) => setForm((f) => ({ ...f, toleranciaEntradaMin: Number(e.target.value) }))}
+                label={t("tolEntry")}
+                value={String(form.entryToleranceMin ?? 0)}
+                onChange={(e) => setForm((f) => ({ ...f, entryToleranceMin: Number(e.target.value) }))}
               />
               <ITInput
                 name="tolSalida"
                 type="number"
-                label={t("tolSalida")}
-                value={String(form.toleranciaSalidaMin ?? 0)}
-                onChange={(e) => setForm((f) => ({ ...f, toleranciaSalidaMin: Number(e.target.value) }))}
+                label={t("tolExit")}
+                value={String(form.exitToleranceMin ?? 0)}
+                onChange={(e) => setForm((f) => ({ ...f, exitToleranceMin: Number(e.target.value) }))}
               />
             </ITFlex>
           </ITGrid>
@@ -273,15 +273,15 @@ export default function ScheduleForm({ id }: { id?: string }) {
               <ITInput
                 name="comida"
                 type="number"
-                label={t("comida")}
-                value={String(form.comidaMin ?? 0)}
-                onChange={(e) => setForm((f) => ({ ...f, comidaMin: Number(e.target.value) }))}
+                label={t("meal")}
+                value={String(form.mealBreakMin ?? 0)}
+                onChange={(e) => setForm((f) => ({ ...f, mealBreakMin: Number(e.target.value) }))}
               />
               <ITCheckbox
-                name="cruzaMedianoche"
+                name="crossesMidnight"
                 label={t("crossesMidnight")}
-                checked={!!form.cruzaMedianoche}
-                onChange={(v) => setForm((f) => ({ ...f, cruzaMedianoche: v }))}
+                checked={!!form.crossesMidnight}
+                onChange={(v) => setForm((f) => ({ ...f, crossesMidnight: v }))}
               />
               <ITText className="text-[11px] text-slate-400">{t("crossesMidnightHint")}</ITText>
             </ITFlex>
@@ -294,8 +294,8 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 name="minExtra"
                 type="number"
                 label={t("minExtra")}
-                value={String(form.minimoExtraMin ?? 0)}
-                onChange={(e) => setForm((f) => ({ ...f, minimoExtraMin: Number(e.target.value) }))}
+                value={String(form.minOvertimeMin ?? 0)}
+                onChange={(e) => setForm((f) => ({ ...f, minOvertimeMin: Number(e.target.value) }))}
               />
               <ITText className="text-[11px] text-slate-500">{t("minExtraHint")}</ITText>
             </ITFlex>
@@ -321,24 +321,24 @@ export default function ScheduleForm({ id }: { id?: string }) {
             ))}
           </ITGrid>
 
-          {form.dias.map((d) => (
+          {form.days.map((d) => (
             <ITFlex
-              key={d.diaSemana}
+              key={d.weekday}
               direction="column"
               gap={2}
               className={`rounded-xl px-3 py-3 transition-colors ${
-                d.descanso ? "bg-slate-50/80" : "hover:bg-slate-50/60"
+                d.restDay ? "bg-slate-50/80" : "hover:bg-slate-50/60"
               }`}
             >
               <ITGrid container columns={12} spacing={3} className="items-end">
                 <ITGrid item xs={12} md={2}>
                   <ITFlex align="center" gap={2}>
                     <ITText
-                      className={`text-[12px] font-black ${d.descanso ? "text-slate-400" : "text-slate-700"}`}
+                      className={`text-[12px] font-black ${d.restDay ? "text-slate-400" : "text-slate-700"}`}
                     >
-                      {dayLabel(d.diaSemana)}
+                      {dayLabel(d.weekday)}
                     </ITText>
-                    {d.descanso && (
+                    {d.restDay && (
                       <ITBadget color="gray" size="sm">
                         {t("rest")}
                       </ITBadget>
@@ -347,58 +347,58 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
                   {!isMobile && (
-                    <label htmlFor={`entrada-${d.diaSemana}`} className="sr-only">
+                    <label htmlFor={`entrada-${d.weekday}`} className="sr-only">
                       {t("entry")}
                     </label>
                   )}
                   <ITTimePicker
-                    name={`entrada-${d.diaSemana}`}
+                    name={`entrada-${d.weekday}`}
                     label={isMobile ? t("entry") : undefined}
-                    value={d.entrada ?? ""}
-                    onChange={(e: { target: { value: string } }) => setDay(d.diaSemana, { entrada: e.target.value })}
-                    disabled={d.descanso}
+                    value={d.startTime ?? ""}
+                    onChange={(e: { target: { value: string } }) => setDay(d.weekday, { startTime: e.target.value })}
+                    disabled={d.restDay}
                   />
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
                   {!isMobile && (
-                    <label htmlFor={`salida-${d.diaSemana}`} className="sr-only">
+                    <label htmlFor={`salida-${d.weekday}`} className="sr-only">
                       {t("exit")}
                     </label>
                   )}
                   <ITTimePicker
-                    name={`salida-${d.diaSemana}`}
+                    name={`salida-${d.weekday}`}
                     label={isMobile ? t("exit") : undefined}
-                    value={d.salida ?? ""}
-                    onChange={(e: { target: { value: string } }) => setDay(d.diaSemana, { salida: e.target.value })}
-                    disabled={d.descanso}
+                    value={d.endTime ?? ""}
+                    onChange={(e: { target: { value: string } }) => setDay(d.weekday, { endTime: e.target.value })}
+                    disabled={d.restDay}
                   />
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
                   <ITFlex align="center" className="pb-2">
                     <ITCheckbox
-                      name={`second-${d.diaSemana}`}
+                      name={`second-${d.weekday}`}
                       label={t("second")}
                       checked={hasSecond(d)}
                       onChange={(v) =>
-                        setDay(d.diaSemana, {
-                          entrada2: v ? d.entrada2 ?? "16:00" : null,
-                          salida2: v ? d.salida2 ?? "20:00" : null,
+                        setDay(d.weekday, {
+                          splitStartTime: v ? d.splitStartTime ?? "16:00" : null,
+                          splitEndTime: v ? d.splitEndTime ?? "20:00" : null,
                         })
                       }
-                      disabled={d.descanso}
+                      disabled={d.restDay}
                     />
                   </ITFlex>
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
                   <ITFlex align="center" className="pb-2">
                     <ITCheckbox
-                      name={`rest-${d.diaSemana}`}
+                      name={`rest-${d.weekday}`}
                       label={t("rest")}
-                      checked={!!d.descanso}
+                      checked={!!d.restDay}
                       onChange={(v) =>
-                        setDay(d.diaSemana, {
-                          descanso: v,
-                          ...(v ? { entrada2: null, salida2: null } : {}),
+                        setDay(d.weekday, {
+                          restDay: v,
+                          ...(v ? { splitStartTime: null, splitEndTime: null } : {}),
                         })
                       }
                     />
@@ -406,12 +406,12 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 </ITGrid>
                 <ITGrid item xs={12} md={2}>
                   <ITText className="text-[11px] font-bold text-slate-500">
-                    {d.descanso ? "—" : formatMinutesAsHhMm(dayMinutes(d, form.comidaMin ?? 0))}
+                    {d.restDay ? "—" : formatMinutesAsHhMm(dayMinutes(d, form.mealBreakMin ?? 0))}
                   </ITText>
                 </ITGrid>
               </ITGrid>
 
-              {hasSecond(d) && !d.descanso && (
+              {hasSecond(d) && !d.restDay && (
                 <div className="md:ml-3 md:border-l-2 md:border-[#0D5777]/30 md:pl-3">
                   <ITGrid container columns={12} spacing={3} className="items-end mt-2">
                     <ITGrid item xs={12} md={2}>
@@ -422,31 +422,31 @@ export default function ScheduleForm({ id }: { id?: string }) {
                     </ITGrid>
                     <ITGrid item xs={6} md={2}>
                       {!isMobile && (
-                        <label htmlFor={`entrada2-${d.diaSemana}`} className="sr-only">
+                        <label htmlFor={`entrada2-${d.weekday}`} className="sr-only">
                           {t("entry")}
                         </label>
                       )}
                       <ITTimePicker
-                        name={`entrada2-${d.diaSemana}`}
+                        name={`entrada2-${d.weekday}`}
                         label={isMobile ? t("entry") : undefined}
-                        value={d.entrada2 ?? ""}
+                        value={d.splitStartTime ?? ""}
                         onChange={(e: { target: { value: string } }) =>
-                          setDay(d.diaSemana, { entrada2: e.target.value || null })
+                          setDay(d.weekday, { splitStartTime: e.target.value || null })
                         }
                       />
                     </ITGrid>
                     <ITGrid item xs={6} md={2}>
                       {!isMobile && (
-                        <label htmlFor={`salida2-${d.diaSemana}`} className="sr-only">
+                        <label htmlFor={`salida2-${d.weekday}`} className="sr-only">
                           {t("exit")}
                         </label>
                       )}
                       <ITTimePicker
-                        name={`salida2-${d.diaSemana}`}
+                        name={`salida2-${d.weekday}`}
                         label={isMobile ? t("exit") : undefined}
-                        value={d.salida2 ?? ""}
+                        value={d.splitEndTime ?? ""}
                         onChange={(e: { target: { value: string } }) =>
-                          setDay(d.diaSemana, { salida2: e.target.value || null })
+                          setDay(d.weekday, { splitEndTime: e.target.value || null })
                         }
                       />
                     </ITGrid>

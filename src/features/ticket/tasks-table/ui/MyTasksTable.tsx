@@ -47,7 +47,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       type: "string",
       sortable: false,
       render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.titulo}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.title}</ITText>
       ),
     },
     {
@@ -79,7 +79,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
             </ITText>
           )}
           {r.dueDate &&
-            r.status !== "COMPLETADA" &&
+            r.status !== "COMPLETED" &&
             new Date(r.dueDate) < new Date() && (
               <ITBadget color="danger" size="lg">{tt("tasksTable.overdue")}</ITBadget>
             )}
@@ -87,7 +87,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       ),
     },
     {
-      key: "acciones",
+      key: "actions",
       label: "",
       type: "string",
       sortable: false,

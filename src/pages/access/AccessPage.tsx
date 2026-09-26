@@ -34,8 +34,8 @@ import {
   FaUndo,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { usePuede } from "@entities/user";
-import { formatFechaHora } from "@shared/utils/dates";
+import { useCan } from "@entities/user";
+import { formatDateTime } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { LocationMap } from "@shared/ui/location-map";
 import {
@@ -67,7 +67,7 @@ const formatCoords = (lat: number | null, lng: number | null): string =>
 export default function AccessPage() {
   const { t: tt } = useTranslation(["access", "common"]);
   const navigate = useNavigate();
-  const canVoid = usePuede("acceso.anular");
+  const canVoid = useCan("access.void");
 
   const [sites, setSites] = useState<Site[]>([]);
   const [sitesError, setSitesError] = useState(false);
@@ -201,7 +201,7 @@ export default function AccessPage() {
         tt("columns.status"),
       ];
       const lines = res.data.map((e) => [
-        formatFechaHora(e.occurredAt),
+        formatDateTime(e.occurredAt),
         [e.employeeNameSnapshot, e.employeeNumberSnapshot ? `#${e.employeeNumberSnapshot}` : ""]
           .filter(Boolean)
           .join(" "),
@@ -287,7 +287,7 @@ export default function AccessPage() {
       sortable: false,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
-          {formatFechaHora(e.occurredAt)}
+          {formatDateTime(e.occurredAt)}
         </ITText>
       ),
     },
@@ -531,7 +531,7 @@ export default function AccessPage() {
                   {detail.voidedAt ? tt("status.voided") : tt("status.active")}
                 </ITBadget>
                 <span className="text-xs text-slate-400">
-                  · {formatFechaHora(detail.occurredAt)}
+                  · {formatDateTime(detail.occurredAt)}
                 </span>
               </ITFlex>
               <ITText className="text-xl font-bold leading-tight text-slate-900">
@@ -566,7 +566,7 @@ export default function AccessPage() {
                 <ITGrid item xs={12} md={6}>
                   <DetailRow
                     label={tt("detail.deviceTimestamp")}
-                    value={detail.deviceTimestamp ? formatFechaHora(detail.deviceTimestamp) : "—"}
+                    value={detail.deviceTimestamp ? formatDateTime(detail.deviceTimestamp) : "—"}
                   />
                 </ITGrid>
                 <ITGrid item xs={12} md={6}>
@@ -608,7 +608,7 @@ export default function AccessPage() {
                 <ITGrid item xs={12} md={6}>
                   <DetailRow
                     label={tt("detail.createdAt")}
-                    value={formatFechaHora(detail.createdAt)}
+                    value={formatDateTime(detail.createdAt)}
                   />
                 </ITGrid>
                 <ITGrid item xs={12} md={6}>
@@ -622,7 +622,7 @@ export default function AccessPage() {
                     <ITGrid item xs={12} md={6}>
                       <DetailRow
                         label={tt("detail.voidedAt")}
-                        value={formatFechaHora(detail.voidedAt)}
+                        value={formatDateTime(detail.voidedAt)}
                       />
                     </ITGrid>
                   </>

@@ -6,7 +6,7 @@
     "readOnly": "Solo lectura: la API nunca modifica la configuración de los relojes.",
     "states": {
       "notConfigured": "Sin configurar",
-      "sinRelojes": "Sin relojes",
+      "withoutClocks": "Sin relojes",
       "paused": "En pausa",
       "running": "Sincronizando",
       "error": "Con error",
@@ -15,7 +15,7 @@
     },
     "messages": {
       "notConfigured": "La API no tiene el usuario de los relojes (CHECADOR_USER): no se sincroniza.",
-      "sinRelojes": "Todavía no hay relojes dados de alta.",
+      "withoutClocks": "Todavía no hay relojes dados de alta.",
       "paused": "Un reloj rechazó la contraseña y se pausó su sincronización. Actualiza CHECADOR_PASS en la API y reiníciala.",
       "running": "Sincronizando: {{leidos}} de {{total}} eventos revisados · {{nuevas}} checadas nuevas · faltan {{restantes}}",
       "runningNoTotal": "Sincronizando: {{nuevas}} checadas nuevas",
@@ -23,18 +23,18 @@
       "pending": "La primera sincronización aún no termina."
     },
     "device": "Reloj",
-    "checadas": "Checadas guardadas",
-    "lastChecada": "Última checada",
+    "punches": "Checadas guardadas",
+    "lastPunch": "Última checada",
     "lastSync": "Última sincronización",
     "empty": "—",
-    "reloj": {
+    "clock": {
       "running": "{{leidos}} de {{total}} eventos revisados · {{nuevas}} checadas nuevas",
       "runningNoTotal": "{{nuevas}} checadas nuevas",
       "paused": "Rechazó la contraseña: sincronización en pausa.",
       "pending": "Su primera sincronización aún no termina."
     },
-    "administrar": "Administrar relojes",
-    "soloAcceso": "No cuenta para entradas/salidas"
+    "manage": "Administrar relojes",
+    "onlyAccess": "No cuenta para entradas/salidas"
   },
   "sync": {
     "button": "Sincronizar todo",
@@ -70,37 +70,37 @@
     "dateRange": "Rango de fechas",
     "employee": "Buscar empleado",
     "employeePlaceholder": "Nombre o número de empleado...",
-    "metodo": "Método",
-    "allMetodos": "Todos",
-    "reloj": "Reloj",
-    "allRelojes": "Todos",
+    "method": "Método",
+    "allMethods": "Todos",
+    "clock": "Reloj",
+    "allClocks": "Todos",
     "clear": "Limpiar filtros"
   },
   "columns": {
     "occurredAt": "Fecha y hora",
     "employee": "Empleado",
-    "metodo": "Método",
-    "reloj": "Reloj",
+    "method": "Método",
+    "clock": "Reloj",
     "serialNo": "Consecutivo"
   },
-  "metodos": {
-    "ROSTRO": "Rostro",
-    "HUELLA": "Huella",
-    "TARJETA": "Tarjeta",
-    "OTRO": "Otro"
+  "methods": {
+    "FACE": "Rostro",
+    "FINGERPRINT": "Huella",
+    "CARD": "Tarjeta",
+    "OTHER": "Otro"
   },
-  "otroHint": "No es una checada válida (código {{minor}} del reloj). No cuenta para asistencia.",
+  "otherHint": "No es una checada válida (código {{minor}} del reloj). No cuenta para asistencia.",
   "actions": {
     "exportCsv": "CSV",
     "exporting": "Generando…"
   },
   "csv": {
-    "fecha": "Fecha",
-    "hora": "Hora",
-    "numeroEmpleado": "Número de empleado",
-    "nombre": "Nombre",
-    "metodo": "Método",
-    "reloj": "Reloj",
+    "date": "Fecha",
+    "hour": "Hora",
+    "employeeNumber": "Número de empleado",
+    "name": "Nombre",
+    "method": "Método",
+    "clock": "Reloj",
     "serialNo": "Consecutivo del reloj"
   },
   "errors": {
@@ -109,157 +109,157 @@
     "sync": "No se pudo iniciar la sincronización",
     "export": "No se pudo generar el CSV"
   },
-  "reporte": {
+  "report": {
     "title": "Entradas/salidas del reloj",
     "description": "Jornadas armadas con las checadas del reloj y relacionadas con cada empleado por su número en el reloj.",
     "pdfTitle": "Entradas y salidas — Reloj checador",
-    "vinculos": "{{vinculados}} de {{total}} empleados del reloj vinculados",
-    "sinVincular": "Los {{count}} sin vincular salen con el nombre del reloj y la marca «Sin vincular».",
-    "irAVincular": "Vincular empleados",
-    "regla": "El reloj no distingue entrada de salida: las checadas se alternan, las repetidas en menos de 5 min se ignoran y una jornada dura máximo 13 h."
+    "links": "{{vinculados}} de {{total}} empleados del reloj vinculados",
+    "withoutLink": "Los {{count}} sin vincular salen con el nombre del reloj y la marca «Sin vincular».",
+    "goToLink": "Vincular empleados",
+    "rule": "El reloj no distingue entrada de salida: las checadas se alternan, las repetidas en menos de 5 min se ignoran y una jornada dura máximo 13 h."
   },
-  "empleados": {
+  "employees": {
     "title": "Empleados del reloj",
     "description": "Relaciona cada número del reloj con su usuario del sistema. El reloj antepone el área al número (070562 = nómina 562), por eso el vínculo se confirma aquí.",
     "kpis": {
       "total": "En el reloj",
-      "vinculados": "Vinculados",
-      "sinVincular": "Sin vincular",
-      "sugeridosAlta": "Sugerencias seguras"
+      "linkedCount": "Vinculados",
+      "withoutLink": "Sin vincular",
+      "registrationSuggestions": "Sugerencias seguras"
     },
     "filters": {
       "q": "Buscar",
       "qPlaceholder": "Número o nombre (reloj o sistema)...",
-      "estado": "Estado",
-      "todos": "Todos"
+      "status": "Estado",
+      "all": "Todos"
     },
-    "estados": {
-      "VINCULADO": "Vinculados",
-      "SIN_VINCULAR": "Sin vincular",
-      "SUGERIDO": "Con sugerencia"
+    "statuses": {
+      "LINKED": "Vinculados",
+      "UNLINKED": "Sin vincular",
+      "SUGGESTED": "Con sugerencia"
     },
     "columns": {
-      "numero": "Número en el reloj",
-      "nombre": "Nombre en el reloj",
-      "checadas": "Checadas",
-      "ultimaChecada": "Última checada",
-      "usuario": "Usuario del sistema",
-      "acciones": ""
+      "number": "Número en el reloj",
+      "name": "Nombre en el reloj",
+      "punches": "Checadas",
+      "lastPunch": "Última checada",
+      "user": "Usuario del sistema",
+      "actions": ""
     },
-    "confianza": {
-      "ALTA": "Coincide nombre y número",
-      "MEDIA": "Solo coincide el nombre"
+    "confidence": {
+      "HIGH": "Coincide nombre y número",
+      "MEDIUM": "Solo coincide el nombre"
     },
-    "sinVinculo": "Sin vincular",
-    "sugerencia": "Sugerencia",
-    "baja": "Baja en el sistema",
+    "withoutLink": "Sin vincular",
+    "suggestion": "Sugerencia",
+    "retirement": "Baja en el sistema",
     "actions": {
-      "aceptar": "Aceptar",
-      "vincular": "Vincular",
-      "cambiar": "Cambiar",
-      "desvincular": "Desvincular",
-      "vincularSugeridos": "Vincular {{count}} sugerencias seguras",
-      "cancelar": "Cancelar",
-      "guardar": "Vincular"
+      "accept": "Aceptar",
+      "linkEmployee": "Vincular",
+      "change": "Cambiar",
+      "unlinkEmployee": "Desvincular",
+      "linkSuggested": "Vincular {{count}} sugerencias seguras",
+      "cancel": "Cancelar",
+      "save": "Vincular"
     },
     "dialog": {
       "title": "Vincular número {{numero}}",
-      "reloj": "En el reloj: {{nombre}}",
-      "usuario": "Usuario del sistema",
-      "usuarioPlaceholder": "Busca por nombre o número..."
+      "clock": "En el reloj: {{nombre}}",
+      "user": "Usuario del sistema",
+      "userPlaceholder": "Busca por nombre o número..."
     },
     "toasts": {
-      "vinculado": "{{numero}} vinculado a {{nombre}}",
-      "desvinculado": "{{numero}} desvinculado",
-      "sugeridos": "{{count}} empleados vinculados"
+      "linked": "{{numero}} vinculado a {{nombre}}",
+      "unlinked": "{{numero}} desvinculado",
+      "suggested": "{{count}} empleados vinculados"
     },
     "errors": {
-      "usuarios": "No se pudieron cargar los usuarios",
-      "guardar": "No se pudo guardar el vínculo"
+      "users": "No se pudieron cargar los usuarios",
+      "save": "No se pudo guardar el vínculo"
     }
   },
-  "relojes": {
+  "clocks": {
     "title": "Relojes checadores",
     "description": "Da de alta los relojes y revisa su configuración y su sincronización. El sistema solo lee de los relojes.",
     "readOnly": "Solo lectura: el sistema se conecta a los relojes para leer sus checadas y su configuración; nunca les cambia nada. De cada reloj solo se leen las checadas (rostro, huella o tarjeta), no las aperturas de puerta.",
-    "credenciales": "Se conecta con el usuario y la contraseña configurados en la API (los mismos para todos los relojes).",
+    "credentials": "Se conecta con el usuario y la contraseña configurados en la API (los mismos para todos los relojes).",
     "notConfigured": "La API no tiene el usuario de los relojes (CHECADOR_USER / CHECADOR_PASS): no se puede conectar a ninguno.",
     "empty": "Todavía no hay relojes dados de alta.",
-    "uso": {
-      "asistencia": "Cuenta para entradas/salidas",
-      "soloAcceso": "No cuenta para entradas/salidas",
+    "usage": {
+      "countsAttendance": "Cuenta para entradas/salidas",
+      "onlyAccess": "No cuenta para entradas/salidas",
       "checkbox": "Cuenta para entradas/salidas",
       "hint": "Si cuenta, sus checadas arman las jornadas junto con las de los demás relojes que cuentan: la primera checada del turno es la entrada y la última, la salida, sin importar en qué reloj (puede entrar por uno y salir por otro). Si no cuenta, sus checadas se guardan y se ven en la tabla, pero no se usan para entradas/salidas ni horas extra."
     },
     "actions": {
-      "alta": "Dar de alta un reloj",
-      "baja": "Dar de baja",
-      "editar": "Editar",
-      "actualizar": "Volver a leer",
-      "cancelar": "Cancelar",
-      "confirmarAlta": "Dar de alta",
-      "conectando": "Conectando…",
-      "confirmarBaja": "Dar de baja",
-      "guardar": "Guardar"
+      "registration": "Dar de alta un reloj",
+      "retirement": "Dar de baja",
+      "edit": "Editar",
+      "update": "Volver a leer",
+      "cancel": "Cancelar",
+      "confirmRegistration": "Dar de alta",
+      "connecting": "Conectando…",
+      "confirmRetirement": "Dar de baja",
+      "save": "Guardar"
     },
     "sync": {
       "title": "Sincronización",
-      "checadas": "Checadas guardadas",
-      "ultimaChecada": "Última checada",
-      "ultimaSync": "Última sincronización",
-      "consecutivo": "Consecutivo leído"
+      "punches": "Checadas guardadas",
+      "lastPunch": "Última checada",
+      "lastSync": "Última sincronización",
+      "number": "Consecutivo leído"
     },
     "config": {
       "title": "Configuración del reloj",
       "hint": "Leída en vivo del reloj, sin cambiarle nada.",
-      "cargando": "Leyendo del reloj…",
-      "nombre": "Nombre en el reloj",
-      "modelo": "Modelo",
-      "serie": "Número de serie",
+      "loading": "Leyendo del reloj…",
+      "name": "Nombre en el reloj",
+      "model": "Modelo",
+      "serial": "Número de serie",
       "firmware": "Firmware",
       "mac": "MAC",
-      "direccion": "Dirección",
-      "hora": "Hora del reloj",
-      "modo": "Ajuste de hora",
-      "modos": {
+      "address": "Dirección",
+      "hour": "Hora del reloj",
+      "mode": "Ajuste de hora",
+      "modes": {
         "manual": "Manual",
         "NTP": "Automático (NTP)"
       },
-      "personas": "Personas registradas",
-      "personasDetalle": "{{conRostro}} con rostro · {{conHuella}} con huella · {{conTarjeta}} con tarjeta",
-      "enHora": "En hora",
-      "enHoraDetalle": "{{segundos}} s de diferencia con el servidor",
-      "adelantado": "Va {{tiempo}} adelantado",
-      "atrasado": "Va {{tiempo}} atrasado",
-      "desfaseHint": "Ajusta la hora en el propio reloj (de preferencia con NTP). Si los relojes no tienen la misma hora, una entrada en uno y una salida en otro dan horas trabajadas de más o de menos.",
-      "leidoEn": "Leída a las {{hora}}"
+      "people": "Personas registradas",
+      "peopleItem": "{{conRostro}} con rostro · {{conHuella}} con huella · {{conTarjeta}} con tarjeta",
+      "inHour": "En hora",
+      "inItemHour": "{{segundos}} s de diferencia con el servidor",
+      "ahead": "Va {{tiempo}} adelantado",
+      "behind": "Va {{tiempo}} atrasado",
+      "driftHint": "Ajusta la hora en el propio reloj (de preferencia con NTP). Si los relojes no tienen la misma hora, una entrada en uno y una salida en otro dan horas trabajadas de más o de menos.",
+      "readAt": "Leída a las {{hora}}"
     },
     "dialog": {
-      "altaTitle": "Dar de alta un reloj",
+      "registrationTitle": "Dar de alta un reloj",
       "url": "Dirección del reloj",
       "urlPlaceholder": "https://192.168.1.132",
       "urlHint": "La IP o la dirección que abres en el navegador para entrar al reloj.",
-      "nombre": "Nombre (opcional)",
-      "nombrePlaceholder": "p. ej. Entrada de personal",
-      "nombreHint": "Si lo dejas vacío se usa el nombre configurado en el reloj.",
-      "altaNota": "El sistema se conecta para confirmar la dirección y empieza a traer sus checadas. No modifica el reloj.",
-      "bajaTitle": "Dar de baja {{nombre}}",
-      "bajaTexto": "Se deja de sincronizar. Sus checadas se quedan y, si lo vuelves a dar de alta, sigue desde donde iba. No modifica el reloj.",
-      "editarTitle": "Editar {{nombre}}",
-      "nombreEditar": "Nombre",
-      "editarNota": "Solo cambia cómo el sistema usa las checadas de este reloj. No modifica el reloj."
+      "name": "Nombre (opcional)",
+      "namePlaceholder": "p. ej. Entrada de personal",
+      "nameHint": "Si lo dejas vacío se usa el nombre configurado en el reloj.",
+      "registrationNote": "El sistema se conecta para confirmar la dirección y empieza a traer sus checadas. No modifica el reloj.",
+      "retirementTitle": "Dar de baja {{nombre}}",
+      "retirementText": "Se deja de sincronizar. Sus checadas se quedan y, si lo vuelves a dar de alta, sigue desde donde iba. No modifica el reloj.",
+      "editTitle": "Editar {{nombre}}",
+      "nameEdit": "Nombre",
+      "editNote": "Solo cambia cómo el sistema usa las checadas de este reloj. No modifica el reloj."
     },
     "toasts": {
-      "alta": "{{nombre}} dado de alta: ya está trayendo sus checadas",
-      "baja": "{{nombre}} dado de baja",
-      "editado": "{{nombre}} actualizado"
+      "registration": "{{nombre}} dado de alta: ya está trayendo sus checadas",
+      "retirement": "{{nombre}} dado de baja",
+      "edited": "{{nombre}} actualizado"
     },
     "errors": {
       "status": "No se pudo leer el estado de los relojes",
       "config": "No se pudo leer la configuración del reloj",
-      "alta": "No se pudo dar de alta el reloj",
-      "baja": "No se pudo dar de baja el reloj",
-      "editar": "No se pudo actualizar el reloj"
+      "registration": "No se pudo dar de alta el reloj",
+      "retirement": "No se pudo dar de baja el reloj",
+      "edit": "No se pudo actualizar el reloj"
     }
   }
 }

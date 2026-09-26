@@ -1,13 +1,13 @@
-import type { PersonalProfile } from "@entities/personal";
+import type { PersonalProfile } from "@entities/hr";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
 import { PDF_COLORS } from "@shared/pdf/theme";
-import { CREDENCIAL_H_PX, CREDENCIAL_W_PX, LAYOUT } from "./cardSpec";
+import { CREDENTIAL_H_PX, CREDENTIAL_W_PX, LAYOUT } from "./cardSpec";
 
-export interface CredencialRenderInput {
+export interface CredentialRenderInput {
   profile: PersonalProfile;
   qrDataUrl: string | null;
-  fotoDataUrl: string | null;
-  iniciales: string;
+  photoDataUrl: string | null;
+  initials: string;
   year: number;
 }
 
@@ -15,7 +15,7 @@ export interface CredencialRenderInput {
 const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 /** Texto por defecto cuando un campo viene vacío. */
-const VACIO = "—";
+const EMPTY = "—";
 
 /** Carga una imagen (los dataURL no contaminan el canvas) o devuelve `null`. */
 const loadImage = async (src: string): Promise<HTMLImageElement | null> => {
@@ -62,9 +62,9 @@ const drawImageCover = (
   w: number,
   h: number
 ): void => {
-  const escala = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-  const dw = img.naturalWidth * escala;
-  const dh = img.naturalHeight * escala;
+  const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+  const dw = img.naturalWidth * scale;
+  const dh = img.naturalHeight * scale;
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 };
 
@@ -77,72 +77,72 @@ const drawImageContain = (
   w: number,
   h: number
 ): void => {
-  const escala = Math.min(w / img.naturalWidth, h / img.naturalHeight);
-  const dw = img.naturalWidth * escala;
-  const dh = img.naturalHeight * escala;
+  const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+  const dw = img.naturalWidth * scale;
+  const dh = img.naturalHeight * scale;
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 };
 
 /** Recorta el texto a `maxWidth` agregando elipsis si no cabe. */
-const truncate = (ctx: CanvasRenderingContext2D, texto: string, maxWidth: number): string => {
-  if (ctx.measureText(texto).width <= maxWidth) return texto;
-  let recorte = texto;
-  while (recorte.length > 1 && ctx.measureText(`${recorte}…`).width > maxWidth) {
-    recorte = recorte.slice(0, -1);
+const truncate = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string => {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let crop = text;
+  while (crop.length > 1 && ctx.measureText(`${crop}…`).width > maxWidth) {
+    crop = crop.slice(0, -1);
   }
-  return `${recorte}…`;
+  return `${crop}…`;
 };
 
 /** Reparte el texto en líneas que quepan, hasta `maxLines`, con elipsis si sobra. */
 const wrapLines = (
   ctx: CanvasRenderingContext2D,
-  texto: string,
+  text: string,
   maxWidth: number,
   maxLines: number
 ): string[] => {
-  const palabras = texto.split(/\s+/).filter(Boolean);
-  if (!palabras.length) return [VACIO];
+  const words = text.split(/\s+/).filter(Boolean);
+  if (!words.length) return [EMPTY];
 
-  const lineas: string[] = [];
+  const lines: string[] = [];
   let i = 0;
-  while (i < palabras.length && lineas.length < maxLines) {
-    let linea = palabras[i++];
-    while (i < palabras.length) {
-      const candidata = `${linea} ${palabras[i]}`;
-      if (ctx.measureText(candidata).width <= maxWidth) {
-        linea = candidata;
+  while (i < words.length && lines.length < maxLines) {
+    let line = words[i++];
+    while (i < words.length) {
+      const candidate = `${line} ${words[i]}`;
+      if (ctx.measureText(candidate).width <= maxWidth) {
+        line = candidate;
         i++;
       } else {
         break;
       }
     }
-    lineas.push(linea);
+    lines.push(line);
   }
 
-  const sobra = i < palabras.length;
-  if (sobra && lineas.length) {
-    lineas[lineas.length - 1] = truncate(ctx, `${lineas[lineas.length - 1]}…`, maxWidth);
+  const surplus = i < words.length;
+  if (surplus && lines.length) {
+    lines[lines.length - 1] = truncate(ctx, `${lines[lines.length - 1]}…`, maxWidth);
   }
-  return lineas;
+  return lines;
 };
 
 /** Dibuja la credencial completa sobre el contexto ya dimensionado. */
-export const drawCredencial = async (
+export const drawCredential = async (
   ctx: CanvasRenderingContext2D,
-  input: CredencialRenderInput
+  input: CredentialRenderInput
 ): Promise<void> => {
-  const { profile, qrDataUrl, fotoDataUrl, iniciales, year } = input;
-  const nombre = profile.name?.trim() || VACIO;
-  const numero = profile.numeroEmpleado?.trim() || VACIO;
-  const puesto = profile.puesto?.trim() || VACIO;
-  const departamento = profile.department?.name?.trim() || VACIO;
+  const { profile, qrDataUrl, photoDataUrl, initials, year } = input;
+  const name = profile.name?.trim() || EMPTY;
+  const number = profile.employeeNumber?.trim() || EMPTY;
+  const jobTitle = profile.jobTitle?.trim() || EMPTY;
+  const department = profile.department?.name?.trim() || EMPTY;
 
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
 
   // Fondo blanco opaco: la credencial se imprime, no debe tener transparencia.
   ctx.fillStyle = PDF_COLORS.white;
-  ctx.fillRect(0, 0, CREDENCIAL_W_PX, CREDENCIAL_H_PX);
+  ctx.fillRect(0, 0, CREDENTIAL_W_PX, CREDENTIAL_H_PX);
 
   // Banda superior + acento.
   ctx.fillStyle = PDF_COLORS.band;
@@ -174,13 +174,13 @@ export const drawCredencial = async (
   );
 
   // Foto o iniciales.
-  const foto = fotoDataUrl ? await loadImage(fotoDataUrl) : null;
-  const { x: fx, y: fy, w: fw, h: fh, radius, border } = LAYOUT.foto;
-  if (foto) {
+  const photo = photoDataUrl ? await loadImage(photoDataUrl) : null;
+  const { x: fx, y: fy, w: fw, h: fh, radius, border } = LAYOUT.photo;
+  if (photo) {
     ctx.save();
     roundRectPath(ctx, fx, fy, fw, fh, radius);
     ctx.clip();
-    drawImageCover(ctx, foto, fx, fy, fw, fh);
+    drawImageCover(ctx, photo, fx, fy, fw, fh);
     ctx.restore();
 
     roundRectPath(ctx, fx, fy, fw, fh, radius);
@@ -196,42 +196,42 @@ export const drawCredencial = async (
     ctx.font = `bold 84px ${FONT}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(iniciales || VACIO, fx + fw / 2, fy + fh / 2);
+    ctx.fillText(initials || EMPTY, fx + fw / 2, fy + fh / 2);
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
   }
 
   // Bloque de datos.
-  const filas = [
-    { label: "Número de empleado", valor: numero, size: 22 },
-    { label: "Nombre completo", valor: nombre, size: 24 },
-    { label: "Puesto", valor: puesto, size: 22 },
-    { label: "Departamento", valor: departamento, size: 22 },
+  const rows = [
+    { label: "Número de empleado", value: number, size: 22 },
+    { label: "Nombre completo", value: name, size: 24 },
+    { label: "Puesto", value: jobTitle, size: 22 },
+    { label: "Departamento", value: department, size: 22 },
   ];
-  const { x: dx, w: dw, startY, step } = LAYOUT.datos;
-  filas.forEach((fila, indice) => {
-    const y = startY + indice * step;
+  const { x: dx, w: dw, startY, step } = LAYOUT.data;
+  rows.forEach((row, index) => {
+    const y = startY + index * step;
 
     // Separador primero, para que el texto quede encima si llega a envolver.
     ctx.strokeStyle = PDF_COLORS.border;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(dx, y + LAYOUT.fila.separadorOffset);
-    ctx.lineTo(dx + dw, y + LAYOUT.fila.separadorOffset);
+    ctx.moveTo(dx, y + LAYOUT.row.separatorOffset);
+    ctx.lineTo(dx + dw, y + LAYOUT.row.separatorOffset);
     ctx.stroke();
 
     ctx.fillStyle = PDF_COLORS.muted;
     ctx.font = `bold 13px ${FONT}`;
     setLetterSpacing(ctx, "1px");
-    ctx.fillText(fila.label.toUpperCase(), dx, y + LAYOUT.fila.labelOffset);
+    ctx.fillText(row.label.toUpperCase(), dx, y + LAYOUT.row.labelOffset);
     setLetterSpacing(ctx, "0px");
 
     ctx.fillStyle = PDF_COLORS.ink;
-    ctx.font = `${fila.size}px ${FONT}`;
-    const lineas = wrapLines(ctx, fila.valor, dw, 2);
-    const lineHeight = fila.size + 4;
-    lineas.forEach((linea, i) => {
-      ctx.fillText(linea, dx, y + LAYOUT.fila.valorOffset + i * lineHeight);
+    ctx.font = `${row.size}px ${FONT}`;
+    const lines = wrapLines(ctx, row.value, dw, 2);
+    const lineHeight = row.size + 4;
+    lines.forEach((line, i) => {
+      ctx.fillText(line, dx, y + LAYOUT.row.valueOffset + i * lineHeight);
     });
   });
 
@@ -252,14 +252,14 @@ export const drawCredencial = async (
   ctx.fillStyle = PDF_COLORS.muted;
   ctx.font = `${LAYOUT.qrLabel.size}px ${FONT}`;
   ctx.textAlign = "center";
-  const etiquetas = wrapLines(
+  const labels = wrapLines(
     ctx,
     "Escanea para verificar esta credencial",
     qs + 40,
     LAYOUT.qrLabel.maxLines
   );
-  etiquetas.forEach((linea, i) => {
-    ctx.fillText(linea, LAYOUT.qrLabel.cx, LAYOUT.qrLabel.baseline + i * LAYOUT.qrLabel.lineHeight);
+  labels.forEach((line, i) => {
+    ctx.fillText(line, LAYOUT.qrLabel.cx, LAYOUT.qrLabel.baseline + i * LAYOUT.qrLabel.lineHeight);
   });
   ctx.textAlign = "left";
 
@@ -274,7 +274,7 @@ export const drawCredencial = async (
   ctx.fillStyle = PDF_COLORS.muted;
   ctx.font = `${LAYOUT.footerSize}px ${FONT}`;
   ctx.textAlign = "left";
-  ctx.fillText(numero, LAYOUT.footerLeftX, LAYOUT.footerBaseline);
+  ctx.fillText(number, LAYOUT.footerLeftX, LAYOUT.footerBaseline);
   ctx.textAlign = "right";
   ctx.fillText(`credencial-empleado · ${year}`, LAYOUT.footerRightX, LAYOUT.footerBaseline);
   ctx.textAlign = "left";

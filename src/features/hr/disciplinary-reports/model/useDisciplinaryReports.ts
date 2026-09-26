@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
-import { personalApi } from "@entities/personal";
+import { personalApi } from "@entities/hr";
 import type { User } from "@entities/user";
 import { usersApi } from "@entities/user";
 
-export const useActasReporte = () => {
+export const useDisciplinaryReports = () => {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -13,7 +13,7 @@ export const useActasReporte = () => {
   const reload = () => setReloadKey((k) => k + 1);
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
-    const res = await personalApi.actas({
+    const res = await personalApi.disciplinaryReports({
       page: params.page,
       limit: params.limit,
       filters: params.filters as Record<string, string | number | boolean>,
@@ -25,21 +25,21 @@ export const useActasReporte = () => {
     };
   }, []);
 
-  const createActa = async (input: {
+  const createDisciplinaryReport = async (input: {
     userId: string;
-    motivo: string;
-    fechaIncidente: string;
-    descripcion: string;
-    sancion?: string;
+    reason: string;
+    incidentDate: string;
+    description: string;
+    sanction?: string;
   }) => {
     setSaving(true);
     try {
-      await personalApi.crearActa({
+      await personalApi.createDisciplinaryReport({
         userId: input.userId,
-        motivo: input.motivo as never,
-        fechaIncidente: input.fechaIncidente,
-        descripcion: input.descripcion,
-        sancion: input.sancion,
+        reason: input.reason as never,
+        incidentDate: input.incidentDate,
+        description: input.description,
+        sanction: input.sanction,
       });
       setShowForm(false);
       reload();
@@ -54,9 +54,9 @@ export const useActasReporte = () => {
     }
   };
 
-  const deleteActa = async (id: string) => {
+  const deleteDisciplinaryReport = async (id: string) => {
     try {
-      await personalApi.eliminarActa(id);
+      await personalApi.deleteDisciplinaryReport(id);
       reload();
       return null;
     } catch (err: unknown) {
@@ -76,14 +76,14 @@ export const useActasReporte = () => {
     showForm,
     setShowForm,
     fetchTableData,
-    createActa,
-    deleteActa,
+    createDisciplinaryReport,
+    deleteDisciplinaryReport,
   };
 };
 
-export const searchEmpleados = async (query?: string): Promise<User[]> => {
+export const searchEmployees = async (query?: string): Promise<User[]> => {
   try {
-    return await usersApi.empleados(undefined, query || undefined);
+    return await usersApi.employees(undefined, query || undefined);
   } catch {
     return [];
   }

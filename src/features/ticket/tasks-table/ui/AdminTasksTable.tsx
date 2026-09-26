@@ -45,8 +45,8 @@ export default function AdminTasksTable({ fx }: Props) {
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
-          {row.user.numeroEmpleado && (
-            <ITText className="text-[9px] text-slate-400">{tt("tasksTable.employeeNo", { number: row.user.numeroEmpleado })}</ITText>
+          {row.user.employeeNumber && (
+            <ITText className="text-[9px] text-slate-400">{tt("tasksTable.employeeNo", { number: row.user.employeeNumber })}</ITText>
           )}
         </ITFlex>
       ),
@@ -57,7 +57,7 @@ export default function AdminTasksTable({ fx }: Props) {
       type: "string",
       sortable: false,
       render: (row) => (
-        <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.titulo}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.title}</ITText>
       ),
     },
     {
@@ -89,7 +89,7 @@ export default function AdminTasksTable({ fx }: Props) {
             </ITText>
           )}
           {row.dueDate &&
-            row.status !== "COMPLETADA" &&
+            row.status !== "COMPLETED" &&
             new Date(row.dueDate) < new Date() && (
               <ITBadget color="danger" size="lg">{tt("tasksTable.overdue")}</ITBadget>
             )}

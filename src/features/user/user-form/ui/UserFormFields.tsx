@@ -37,7 +37,7 @@ interface Props {
   roleGuidance: { title: string; summary: string; actions: string[] };
   roleOptions: Array<Record<string, string>>;
   // Documentación del alta
-  requiredDocs?: Array<{ key: string; label: string; tipoId: string | null }>;
+  requiredDocs?: Array<{ key: string; label: string; typeId: string | null }>;
   docsFiles?: Record<string, File | null>;
   onPickDoc?: (key: string, file: File) => void;
   docsError?: string | null;
@@ -104,22 +104,22 @@ export default function UserFormFields({
               <ITInput name="u_name" label={tt("form.name")} value={form.name} onChange={(e) => onFieldChange("name", e.target.value)} onBlur={blob("name")} required error={fieldError("name")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_second" label={tt("form.secondName")} value={form.segundoNombre} onChange={(e) => onFieldChange("segundoNombre", e.target.value)} />
+              <ITInput name="u_second" label={tt("form.secondName")} value={form.middleName} onChange={(e) => onFieldChange("middleName", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_apa" label={tt("form.apellidoPaterno")} value={form.apellidoPaterno} onChange={(e) => onFieldChange("apellidoPaterno", e.target.value)} />
+              <ITInput name="u_apa" label={tt("form.paternalSurname")} value={form.paternalSurname} onChange={(e) => onFieldChange("paternalSurname", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_ama" label={tt("form.apellidoMaterno")} value={form.apellidoMaterno} onChange={(e) => onFieldChange("apellidoMaterno", e.target.value)} />
+              <ITInput name="u_ama" label={tt("form.maternalSurname")} value={form.maternalSurname} onChange={(e) => onFieldChange("maternalSurname", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_num" label={tt("form.employeeNo")} value={form.numeroEmpleado} onChange={(e) => onFieldChange("numeroEmpleado", e.target.value)} onBlur={blob("numeroEmpleado")} error={fieldError("numeroEmpleado")} />
+              <ITInput name="u_num" label={tt("form.employeeNo")} value={form.employeeNumber} onChange={(e) => onFieldChange("employeeNumber", e.target.value)} onBlur={blob("employeeNumber")} error={fieldError("employeeNumber")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} onBlur={blob("email")} placeholder="usuario@empresa.com" error={fieldError("email")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_puesto" label={tt("form.position")} value={form.puesto} onChange={(e) => onFieldChange("puesto", e.target.value)} onBlur={blob("puesto")} error={fieldError("puesto")} />
+              <ITInput name="u_puesto" label={tt("form.position")} value={form.jobTitle} onChange={(e) => onFieldChange("jobTitle", e.target.value)} onBlur={blob("jobTitle")} error={fieldError("jobTitle")} />
             </ITGrid>
           </ITGrid>
         </section>

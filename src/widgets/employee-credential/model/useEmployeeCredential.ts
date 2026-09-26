@@ -1,82 +1,82 @@
 import { useEffect, useState } from "react";
-import type { PersonalProfile } from "@entities/personal";
-import { personalApi } from "@entities/personal";
-import { generarCredencialQR, fotoComoDataUrl, inicialesDe } from "./credencial";
-import { credencialDataUrl } from "./imagen";
+import type { PersonalProfile } from "@entities/hr";
+import { personalApi } from "@entities/hr";
+import { generateCredentialQr, photoAsDataUrl, initialsOf } from "./credential";
+import { credentialDataUrl } from "./image";
 
-const ERROR_CREDENCIAL_DEFAULT = "No se pudo generar la credencial";
+const ERROR_CREDENTIAL_DEFAULT = "No se pudo generar la credencial";
 
-interface CredencialEmpleadoEstado {
+interface EmployeeCredentialStatus {
   qrDataUrl: string | null;
-  fotoDataUrl: string | null;
-  imagenDataUrl: string | null;
-  iniciales: string;
+  photoDataUrl: string | null;
+  imageDataUrl: string | null;
+  initials: string;
   loading: boolean;
   error: string | null;
 }
 
-export const useCredencialEmpleado = (
+export const useEmployeeCredential = (
   profile: PersonalProfile | null
-): CredencialEmpleadoEstado => {
+): EmployeeCredentialStatus => {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [fotoDataUrl, setFotoDataUrl] = useState<string | null>(null);
-  const [imagenDataUrl, setImagenDataUrl] = useState<string | null>(null);
-  const [iniciales, setIniciales] = useState<string>("—");
+  const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const [initials, setInitials] = useState<string>("—");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!profile) {
       setQrDataUrl(null);
-      setFotoDataUrl(null);
-      setImagenDataUrl(null);
-      setIniciales("—");
+      setPhotoDataUrl(null);
+      setImageDataUrl(null);
+      setInitials("—");
       setError(null);
       setLoading(false);
       return;
     }
 
-    let cancelado = false;
+    let cancelled = false;
     setLoading(true);
     setError(null);
 
-    const ejecutar = async () => {
+    const run = async () => {
       try {
-        const [qr, foto] = await Promise.all([
-          generarCredencialQR(profile),
-          fotoComoDataUrl(
-            profile.id ? personalApi.fotoRawUrl(profile.id) : null
+        const [qr, photo] = await Promise.all([
+          generateCredentialQr(profile),
+          photoAsDataUrl(
+            profile.id ? personalApi.photoRawUrl(profile.id) : null
           ),
         ]);
-        if (cancelado) return;
-        const inicialesValor = inicialesDe(profile.name);
+        if (cancelled) return;
+        const initialsValue = initialsOf(profile.name);
         setQrDataUrl(qr);
-        setFotoDataUrl(foto);
-        setIniciales(inicialesValor);
+        setPhotoDataUrl(photo);
+        setInitials(initialsValue);
 
-        const imagen = await credencialDataUrl({
+        const image = await credentialDataUrl({
           profile,
           qrDataUrl: qr,
-          fotoDataUrl: foto,
-          iniciales: inicialesValor,
+          photoDataUrl: photo,
+          initials: initialsValue,
         });
-        if (cancelado) return;
-        setImagenDataUrl(imagen);
+        if (cancelled) return;
+        setImageDataUrl(image);
         setError(null);
       } catch {
-        if (cancelado) return;
-        setError(ERROR_CREDENCIAL_DEFAULT);
+        if (cancelled) return;
+        setError(ERROR_CREDENTIAL_DEFAULT);
       } finally {
-        if (!cancelado) setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    void ejecutar();
+    void run();
     return () => {
-      cancelado = true;
-      setImagenDataUrl(null);
+      cancelled = true;
+      setImageDataUrl(null);
     };
   }, [profile?.id, profile]);
 
-  return { qrDataUrl, fotoDataUrl, imagenDataUrl, iniciales, loading, error };
+  return { qrDataUrl, photoDataUrl, imageDataUrl, initials, loading, error };
 };

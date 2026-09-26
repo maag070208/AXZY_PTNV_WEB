@@ -2,21 +2,21 @@
   "title": "Roles and permissions",
   "description": "Manage the role matrix and the system permission catalog (ADMIN only)",
   "tabs": {
-    "matriz": "Matrix",
-    "catalogo": "Catalog"
+    "matrix": "Matrix",
+    "catalog": "Catalog"
   },
-  "alcance": {
-    "NINGUNO": "None",
-    "PROPIO": "Own",
+  "scope": {
+    "NONE": "None",
+    "OWN": "Own",
     "AREA": "Area",
-    "TODO": "All"
+    "ALL": "All"
   },
   "role": {
     "ADMIN": "ADMIN",
-    "GERENTE": "MANAGER",
-    "JEFE_DE_AREA": "AREA LEAD",
-    "EMPLEADO": "EMPLOYEE",
-    "RECURSOS_HUMANOS": "HUMAN RESOURCES",
+    "MANAGER": "MANAGER",
+    "AREA_HEAD": "AREA LEAD",
+    "EMPLOYEE": "EMPLOYEE",
+    "HUMAN_RESOURCES": "HUMAN RESOURCES",
     "GUARD": "GUARD"
   },
   "matrix": {
@@ -42,7 +42,7 @@
     "new": "New permission",
     "createTitle": "New permission",
     "editTitle": "Edit permission",
-    "sensible": "Sensitive",
+    "sensitive": "Sensitive",
     "active": "Active",
     "inactive": "Inactive",
     "activate": "Activate",
@@ -54,29 +54,29 @@
     "saveError": "Could not save the permission",
     "saving": "Saving...",
     "columns": {
-      "clave": "Key",
-      "modulo": "Module",
-      "nombre": "Name",
-      "alcances": "Scopes",
-      "sensible": "Sensitive",
-      "orden": "Order",
-      "activo": "Status"
+      "key": "Key",
+      "module": "Module",
+      "name": "Name",
+      "scopes": "Scopes",
+      "sensitive": "Sensitive",
+      "sortOrder": "Order",
+      "active": "Status"
     },
     "fields": {
-      "clave": "Key (module.action)",
-      "modulo": "Module",
-      "nombre": "Name",
-      "descripcion": "Description",
-      "alcances": "Allowed scopes",
-      "sensible": "Sensitive permission (ADMIN only)",
-      "orden": "Order"
+      "key": "Key (module.action)",
+      "module": "Module",
+      "name": "Name",
+      "description": "Description",
+      "scopes": "Allowed scopes",
+      "sensitive": "Sensitive permission (ADMIN only)",
+      "sortOrder": "Order"
     },
     "errors": {
-      "clave": "The key must use the module.action format (lowercase, digits and underscore)",
-      "modulo": "Module is required",
-      "nombre": "Name is required",
-      "alcances": "Select at least one scope",
-      "orden": "Order must be an integer greater than or equal to 0"
+      "key": "The key must use the module.action format (lowercase, digits and underscore)",
+      "module": "Module is required",
+      "name": "Name is required",
+      "scopes": "Select at least one scope",
+      "sortOrder": "Order must be an integer greater than or equal to 0"
     }
   }
 }

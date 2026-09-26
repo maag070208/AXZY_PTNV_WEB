@@ -1,28 +1,28 @@
 import { ITTabs } from "@axzydev/axzy_ui_system";
 import { FaTable, FaListUl } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import MatrizRolesPanel from "./MatrizRolesPanel";
-import CatalogoPermisosPanel from "./CatalogoPermisosPanel";
+import RoleMatrixPanel from "./RoleMatrixPanel";
+import PermissionCatalogPanel from "./PermissionCatalogPanel";
 
-export default function RolesPermisosTabs() {
+export default function RolesPermissionsTabs() {
   const { t } = useTranslation("roles");
 
   return (
     <ITTabs
       variant="line"
-      defaultActiveId="matriz"
+      defaultActiveId="matrix"
       items={[
         {
-          id: "matriz",
-          label: t("tabs.matriz"),
+          id: "matrix",
+          label: t("tabs.matrix"),
           icon: <FaTable size={12} />,
-          content: <MatrizRolesPanel />,
+          content: <RoleMatrixPanel />,
         },
         {
-          id: "catalogo",
-          label: t("tabs.catalogo"),
+          id: "catalog",
+          label: t("tabs.catalog"),
           icon: <FaListUl size={12} />,
-          content: <CatalogoPermisosPanel />,
+          content: <PermissionCatalogPanel />,
         },
       ]}
     />

@@ -1,43 +1,43 @@
-export type TipoDescuento = "INFONAVIT" | "IMSS" | "DEUDOR_ALIMENTICIO";
+export type DiscountType = "INFONAVIT" | "IMSS" | "CHILD_SUPPORT";
 
-export interface Genero {
+export interface Gender {
   id: string;
-  nombre: string;
-  activo: boolean;
+  name: string;
+  active: boolean;
 }
 
-export type PersonalRole = "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO";
+export type PersonalRole = "MANAGER" | "AREA_HEAD" | "EMPLOYEE";
 
 export interface PersonalStats {
   total: number;
-  activos: number;
-  inactivos: number;
+  active: number;
+  inactive: number;
   roles: Record<PersonalRole, number>;
 }
 
-export interface TipoSangre {
+export interface BloodType {
   id: string;
-  nombre: string;
-  activo: boolean;
+  name: string;
+  active: boolean;
 }
 
-export interface TipoDocumento {
+export interface DocumentType {
   id: string;
-  nombre: string;
-  activo: boolean;
-  orden: number;
+  name: string;
+  active: boolean;
+  sortOrder: number;
   createdAt: string;
 }
 
 export interface EmployeeDiscount {
-  tipo: TipoDescuento;
-  nota?: string | null;
+  type: DiscountType;
+  note?: string | null;
 }
 
 export interface EmployeeDocument {
   id: string;
-  tipoDocumentoId: string;
-  tipoDocumento: { id: string; nombre: string };
+  documentTypeId: string;
+  documentType: { id: string; name: string };
   originalName: string;
   mimeType: string;
   sizeBytes: number;
@@ -51,44 +51,44 @@ export interface PersonalProfile {
   username: string;
   name: string;
   email?: string | null;
-  role: "ADMIN" | "GERENTE" | "JEFE_DE_AREA" | "EMPLEADO" | "RECURSOS_HUMANOS";
+  role: "ADMIN" | "MANAGER" | "AREA_HEAD" | "EMPLOYEE" | "HUMAN_RESOURCES";
   active: boolean;
-  puesto?: string | null;
-  numeroEmpleado?: string | null;
-  empresa?: string | null;
+  jobTitle?: string | null;
+  employeeNumber?: string | null;
+  company?: string | null;
   department?: { id: string; name: string } | null;
   subarea?: { id: string; name: string } | null;
 
-  segundoNombre?: string | null;
-  apellidoPaterno?: string | null;
-  apellidoMaterno?: string | null;
-  fotoUrl?: string | null;
+  middleName?: string | null;
+  paternalSurname?: string | null;
+  maternalSurname?: string | null;
+  photoUrl?: string | null;
 
-  genero?: Genero | null;
-  tipoSangre?: TipoSangre | null;
-  padecimiento?: string | null;
-  alergias?: string | null;
+  gender?: Gender | null;
+  bloodType?: BloodType | null;
+  medicalConditions?: string | null;
+  allergies?: string | null;
 
-  fechaNacimiento?: string | null;
-  fechaIngreso?: string | null;
+  birthDate?: string | null;
+  hireDate?: string | null;
 
   rfc?: string | null;
   curp?: string | null;
   nss?: string | null;
 
-  calleNumero?: string | null;
-  colonia?: string | null;
-  codigoPostal?: string | null;
-  ciudad?: string | null;
-  estadoDireccion?: string | null;
-  pais?: string | null;
+  streetAddress?: string | null;
+  neighborhood?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
+  addressState?: string | null;
+  country?: string | null;
 
-  celularPersonal?: string | null;
-  celularEmpresa?: string | null;
+  personalPhone?: string | null;
+  workPhone?: string | null;
 
-  contactoEmergenciaNombre?: string | null;
-  contactoEmergenciaTelefono?: string | null;
-  contactoEmergenciaParentesco?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
+  emergencyContactRelationship?: string | null;
 
   discounts: EmployeeDiscount[];
 
@@ -96,68 +96,68 @@ export interface PersonalProfile {
 }
 
 export interface PersonalProfileUpdateInput {
-  segundoNombre?: string | null;
-  apellidoPaterno?: string | null;
-  apellidoMaterno?: string | null;
+  middleName?: string | null;
+  paternalSurname?: string | null;
+  maternalSurname?: string | null;
   email?: string | null;
 
-  generoId?: string | null;
-  tipoSangreId?: string | null;
-  padecimiento?: string | null;
-  alergias?: string | null;
+  genderId?: string | null;
+  bloodTypeId?: string | null;
+  medicalConditions?: string | null;
+  allergies?: string | null;
 
-  fechaNacimiento?: string | null;
-  fechaIngreso?: string | null;
+  birthDate?: string | null;
+  hireDate?: string | null;
 
   rfc?: string | null;
   curp?: string | null;
   nss?: string | null;
 
-  calleNumero?: string | null;
-  colonia?: string | null;
-  codigoPostal?: string | null;
-  ciudad?: string | null;
-  estadoDireccion?: string | null;
-  pais?: string | null;
+  streetAddress?: string | null;
+  neighborhood?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
+  addressState?: string | null;
+  country?: string | null;
 
-  celularPersonal?: string | null;
-  celularEmpresa?: string | null;
+  personalPhone?: string | null;
+  workPhone?: string | null;
 
-  contactoEmergenciaNombre?: string | null;
-  contactoEmergenciaTelefono?: string | null;
-  contactoEmergenciaParentesco?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
+  emergencyContactRelationship?: string | null;
 }
 
-export type MotivoActaAdministrativa =
-  | "INASISTENCIA"
-  | "RETARDO"
-  | "EBRIEDAD"
-  | "CONDUCTA"
-  | "INCUMPLIMIENTO"
-  | "OTRO";
+export type DisciplinaryReason =
+  | "ABSENCE"
+  | "TARDINESS"
+  | "INTOXICATION"
+  | "MISCONDUCT"
+  | "NONCOMPLIANCE"
+  | "OTHER";
 
-export interface ActaAdministrativa {
+export interface DisciplinaryReport {
   id: string;
-  motivo: MotivoActaAdministrativa;
-  fechaIncidente: string;
-  descripcion: string;
-  sancion?: string | null;
+  reason: DisciplinaryReason;
+  incidentDate: string;
+  description: string;
+  sanction?: string | null;
   createdAt: string;
   user: {
     id: string;
     name: string;
-    numeroEmpleado?: string | null;
-    puesto?: string | null;
+    employeeNumber?: string | null;
+    jobTitle?: string | null;
     department?: { id: string; name: string } | null;
     subarea?: { id: string; name: string } | null;
   };
   createdBy: { id: string; name: string };
 }
 
-export interface ActaAdministrativaCreateInput {
+export interface DisciplinaryReportCreateInput {
   userId: string;
-  motivo: MotivoActaAdministrativa;
-  fechaIncidente: string;
-  descripcion: string;
-  sancion?: string;
+  reason: DisciplinaryReason;
+  incidentDate: string;
+  description: string;
+  sanction?: string;
 }

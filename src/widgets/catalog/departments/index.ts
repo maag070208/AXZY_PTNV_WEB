@@ -1,1 +1,1 @@
-export { default as DepartamentosPanel } from "./ui/DepartamentosPanel";
+export { default as DepartmentsPanel } from "./ui/DepartmentsPanel";

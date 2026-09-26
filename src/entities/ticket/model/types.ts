@@ -1,10 +1,10 @@
 export interface TicketComment {
   id: string;
   ticketId: string;
-  autorId: string;
-  autor: { id: string; name: string; username: string };
-  texto: string;
-  creadoEn: string;
+  authorId: string;
+  author: { id: string; name: string; username: string };
+  text: string;
+  createdAt: string;
 }
 
 export interface TicketHistoryEntry {
@@ -12,26 +12,26 @@ export interface TicketHistoryEntry {
   ticketId: string;
   type: string;
   detail?: string | null;
-  autor?: { id: string; name: string; username: string } | null;
+  author?: { id: string; name: string; username: string } | null;
   createdAt: string;
 }
 
 export interface TicketAssignmentComment {
   id: string;
   assignmentId: string;
-  autorId: string;
-  autor: { id: string; name: string; username: string };
-  texto: string;
+  authorId: string;
+  author: { id: string; name: string; username: string };
+  text: string;
   createdAt: string;
 }
 
-export type AssignmentStatus = "PENDIENTE" | "EN_PROGRESO" | "EN_REVISION" | "COMPLETADA";
+export type AssignmentStatus = "PENDING" | "IN_PROGRESS" | "IN_REVIEW" | "COMPLETED";
 
 export interface TicketAssignment {
   id: string;
   ticketId: string;
   userId: string;
-  user: { id: string; name: string; username: string; numeroEmpleado?: string | null; puesto?: string | null };
+  user: { id: string; name: string; username: string; employeeNumber?: string | null; jobTitle?: string | null };
   title: string;
   description: string;
   startDate?: string | null;
@@ -56,24 +56,24 @@ export interface TicketAttachment {
 
 export interface TicketCategory {
   id: string;
-  nombre: string;
-  activo: boolean;
+  name: string;
+  active: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface Ticket {
   id: string;
-  titulo: string;
-  descripcion: string;
-  status: "ABIERTO" | "EN_SEGUIMIENTO" | "CERRADO";
-  priority: "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
+  title: string;
+  description: string;
+  status: "OPEN" | "IN_PROGRESS" | "CLOSED";
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   categoryId?: string | null;
   category?: TicketCategory | null;
-  creadoPorId: string;
-  creadoPor: { id: string; name: string; username: string; puesto?: string };
-  asignadoAId?: string | null;
-  asignadoA?: { id: string; name: string; username: string; puesto?: string } | null;
+  createdById: string;
+  createdBy: { id: string; name: string; username: string; jobTitle?: string };
+  assignedToId?: string | null;
+  assignedTo?: { id: string; name: string; username: string; jobTitle?: string } | null;
   departmentId?: string | null;
   department?: { id: string; name: string } | null;
   closedAt?: string | null;
@@ -83,24 +83,24 @@ export interface Ticket {
   attachments?: TicketAttachment[];
   comments: TicketComment[];
   history: TicketHistoryEntry[];
-  creadoEn: string;
-  actualizadoEn: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TicketInput {
-  titulo: string;
-  descripcion: string;
+  title: string;
+  description: string;
   priority?: string;
   categoryId?: string;
   departmentId?: string;
-  asignadoAId?: string;
+  assignedToId?: string;
 }
 
 export interface KanbanAssignment {
   id: string;
   ticketId: string;
   userId: string;
-  user: { id: string; name: string; username: string; numeroEmpleado?: string | null; puesto?: string | null };
+  user: { id: string; name: string; username: string; employeeNumber?: string | null; jobTitle?: string | null };
   title: string;
   description: string;
   startDate?: string | null;
@@ -110,9 +110,9 @@ export interface KanbanAssignment {
   comments?: TicketAssignmentComment[];
   ticket: {
     id: string;
-    titulo: string;
-    status: "ABIERTO" | "EN_SEGUIMIENTO" | "CERRADO";
-    priority: "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
+    title: string;
+    status: "OPEN" | "IN_PROGRESS" | "CLOSED";
+    priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
     deletedAt?: string | null;
     department?: { name: string } | null;
   };

@@ -9,7 +9,7 @@ const SIZE_MAP = {
 } as const;
 
 export interface ProfileAvatarProps {
-  fotoUrl?: string | null;
+  photoUrl?: string | null;
   initials: string;
   alt?: string;
   size?: keyof typeof SIZE_MAP;
@@ -27,14 +27,14 @@ export interface ProfileAvatarProps {
  * desmonta y las iniciales permanecen visibles.
  */
 export default function ProfileAvatar({
-  fotoUrl,
+  photoUrl,
   initials,
   alt,
   size = "xl",
   className,
 }: ProfileAvatarProps) {
   const [errored, setErrored] = useState(false);
-  const showImg = !!fotoUrl && !errored;
+  const showImg = !!photoUrl && !errored;
 
   return (
     <div
@@ -47,7 +47,7 @@ export default function ProfileAvatar({
       </span>
       {showImg && (
         <img
-          src={fotoUrl!}
+          src={photoUrl!}
           alt={alt ?? ""}
           className="absolute inset-0 w-full h-full object-cover"
           onError={() => setErrored(true)}

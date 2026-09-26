@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { boton, campo, irARuta, panelBuscador } from "./componentes";
+import { button, field, goToRoute, searchPanel } from "./components";
 
 /**
  * Page Object del módulo de tickets: lista, alta/edición, detalle, tablero
@@ -11,141 +11,141 @@ import { boton, campo, irARuta, panelBuscador } from "./componentes";
  * `title`, por eso se localiza por ese atributo.
  */
 
-const ORDEN_COLUMNAS = ["PENDIENTE", "EN_PROGRESO", "EN_REVISION", "COMPLETADA"] as const;
+const COLUMN_ORDER = ["PENDING", "IN_PROGRESS", "IN_REVIEW", "COMPLETED"] as const;
 
 export class TicketsPage {
   constructor(readonly page: Page) {}
 
-  async ir(): Promise<void> {
-    await irARuta(this.page, "/tickets");
+  async go(): Promise<void> {
+    await goToRoute(this.page, "/tickets");
   }
 
-  async irNuevo(): Promise<void> {
-    await irARuta(this.page, "/tickets/nuevo");
+  async goNew(): Promise<void> {
+    await goToRoute(this.page, "/tickets/new");
   }
 
-  async irDetalle(id: string): Promise<void> {
-    await irARuta(this.page, `/tickets/${id}`);
+  async goItem(id: string): Promise<void> {
+    await goToRoute(this.page, `/tickets/${id}`);
   }
 
-  async irEditar(id: string): Promise<void> {
-    await irARuta(this.page, `/tickets/${id}/editar`);
+  async goEdit(id: string): Promise<void> {
+    await goToRoute(this.page, `/tickets/${id}/edit`);
   }
 
-  async irKanban(ticketId?: string): Promise<void> {
-    await irARuta(this.page, ticketId ? `/tickets/kanban?ticketId=${ticketId}` : "/tickets/kanban");
+  async goKanban(ticketId?: string): Promise<void> {
+    await goToRoute(this.page, ticketId ? `/tickets/kanban?ticketId=${ticketId}` : "/tickets/kanban");
   }
 
-  async irMisTareas(): Promise<void> {
-    await irARuta(this.page, "/tickets/mis-tareas");
+  async goMyTasks(): Promise<void> {
+    await goToRoute(this.page, "/tickets/my-tasks");
   }
 
-  async irTareas(): Promise<void> {
-    await irARuta(this.page, "/tickets/tareas");
+  async goTasks(): Promise<void> {
+    await goToRoute(this.page, "/tickets/tasks");
   }
 
-  async irCatalogos(): Promise<void> {
-    await irARuta(this.page, "/catalogos");
+  async goCatalogs(): Promise<void> {
+    await goToRoute(this.page, "/catalogs");
   }
 
   // ── Lista ────────────────────────────────────────────────────────────────
 
-  fila(titulo: string): Locator {
-    return this.page.locator("table tbody tr", { hasText: titulo }).first();
+  row(title: string): Locator {
+    return this.page.locator("table tbody tr", { hasText: title }).first();
   }
 
   /** Botón "ver detalle" (icon-only `FaEye`, el primero de la celda de acciones). */
-  verDetalleDe(titulo: string): Locator {
-    return this.fila(titulo).getByRole("button").first();
+  viewDetailOf(title: string): Locator {
+    return this.row(title).getByRole("button").first();
   }
 
   /** Botón de borrar de la fila (icon-only, el único con `title`). */
-  borrarDeFila(titulo: string): Locator {
-    return this.fila(titulo).locator("button[title]");
+  deleteFromRow(title: string): Locator {
+    return this.row(title).locator("button[title]");
   }
 
-  async filtrarTitulo(q: string): Promise<void> {
+  async filterTitle(q: string): Promise<void> {
     await this.page.locator('input[name="filter-titulo"]').fill(q);
   }
 
-  async filtrarEstado(valor: string): Promise<void> {
-    await this.page.locator('select[name="filter-status"]').selectOption(valor);
+  async filterStatus(value: string): Promise<void> {
+    await this.page.locator('select[name="filter-status"]').selectOption(value);
   }
 
-  async filtrarPrioridad(valor: string): Promise<void> {
-    await this.page.locator('select[name="filter-priority"]').selectOption(valor);
+  async filterPriority(value: string): Promise<void> {
+    await this.page.locator('select[name="filter-priority"]').selectOption(value);
   }
 
-  pagina(n: number): Locator {
+  pageButton(n: number): Locator {
     return this.page.locator(`[title="Page ${n}"]`);
   }
 
-  get sinResultados(): Locator {
+  get withoutResults(): Locator {
     return this.page.getByText("No se encontraron resultados").first();
   }
 
   // ── Alta / edición ───────────────────────────────────────────────────────
 
-  async escribirTitulo(titulo: string): Promise<void> {
-    await campo(this.page, "Título").fill(titulo);
+  async writeTitle(title: string): Promise<void> {
+    await field(this.page, "Título").fill(title);
   }
 
-  async escribirDescripcion(texto: string): Promise<void> {
-    await campo(this.page, "Descripción").fill(texto);
+  async writeDescription(text: string): Promise<void> {
+    await field(this.page, "Descripción").fill(text);
   }
 
-  async elegirCategoria(nombre: string): Promise<void> {
-    await this.page.locator('select[name="category"]').selectOption({ label: nombre });
+  async selectCategory(name: string): Promise<void> {
+    await this.page.locator('select[name="category"]').selectOption({ label: name });
   }
 
-  async elegirPrioridad(nombre: string): Promise<void> {
-    await this.page.getByRole("button", { name: nombre, exact: true }).click();
+  async selectPriority(name: string): Promise<void> {
+    await this.page.getByRole("button", { name: name, exact: true }).click();
   }
 
-  get botonGuardar(): Locator {
+  get saveButton(): Locator {
     return this.page.getByRole("button", { name: /Crear ticket|Guardar cambios/ });
   }
 
-  async guardar(): Promise<void> {
-    await this.botonGuardar.click();
+  async save(): Promise<void> {
+    await this.saveButton.click();
   }
 
   // ── Detalle ──────────────────────────────────────────────────────────────
 
-  async comentar(texto: string): Promise<void> {
-    await this.page.locator('textarea[name="comment"]').fill(texto);
-    await boton(this.page, "Comentar").click();
+  async comment(text: string): Promise<void> {
+    await this.page.locator('textarea[name="comment"]').fill(text);
+    await button(this.page, "Comentar").click();
   }
 
-  async cambiarEstadoTicket(valor: string): Promise<void> {
-    await this.page.locator('select[name="status"]').selectOption(valor);
+  async changeStatusTicket(value: string): Promise<void> {
+    await this.page.locator('select[name="status"]').selectOption(value);
   }
 
-  async finalizar(): Promise<void> {
-    await boton(this.page, "Finalizar").click();
+  async finish(): Promise<void> {
+    await button(this.page, "Finalizar").click();
   }
 
   /** Diálogo modal de confirmación (el último montado). */
-  get dialogo(): Locator {
+  get dialog(): Locator {
     return this.page.locator("div.fixed.inset-0").last();
   }
 
-  async confirmarDialogo(label: string): Promise<void> {
-    await this.dialogo.getByRole("button", { name: label }).click();
+  async confirmDialog(label: string): Promise<void> {
+    await this.dialog.getByRole("button", { name: label }).click();
   }
 
   // ── Kanban / tareas ──────────────────────────────────────────────────────
 
-  get columnas(): Locator {
+  get columns(): Locator {
     return this.page.locator("div.overflow-x-auto.items-start").locator(":scope > div");
   }
 
-  columna(status: (typeof ORDEN_COLUMNAS)[number]): Locator {
-    return this.columnas.nth(ORDEN_COLUMNAS.indexOf(status));
+  column(status: (typeof COLUMN_ORDER)[number]): Locator {
+    return this.columns.nth(COLUMN_ORDER.indexOf(status));
   }
 
-  tarjeta(titulo: string): Locator {
-    return this.page.locator("div[draggable]").filter({ hasText: titulo }).first();
+  card(title: string): Locator {
+    return this.page.locator("div[draggable]").filter({ hasText: title }).first();
   }
 
   /**
@@ -156,52 +156,52 @@ export class TicketsPage {
    * `dispatchEvent("click")` (sin `mousedown`): mantiene el diálogo abierto. Es
    * una limitación de producto documentada, no del test.
    */
-  async nuevaTarea(ticketTitulo: string, empleado: string, tituloTarea: string): Promise<void> {
-    await boton(this.page, "Nueva tarea").click();
-    await this.elegirEnBuscadorDelDialogo("Buscar ticket...", ticketTitulo);
-    await this.elegirEnBuscadorDelDialogo("Buscar empleado...", empleado);
-    await campo(this.page, "Título de la tarea").fill(tituloTarea);
-    await boton(this.page, "Asignar tarea").click();
+  async newTask(ticketTitle: string, employee: string, taskTitle: string): Promise<void> {
+    await button(this.page, "Nueva tarea").click();
+    await this.selectInDialogSearch("Buscar ticket...", ticketTitle);
+    await this.selectInDialogSearch("Buscar empleado...", employee);
+    await field(this.page, "Título de la tarea").fill(taskTitle);
+    await button(this.page, "Asignar tarea").click();
   }
 
-  private async elegirEnBuscadorDelDialogo(placeholder: string, opcion: string): Promise<void> {
+  private async selectInDialogSearch(placeholder: string, option: string): Promise<void> {
     const input = this.page.getByPlaceholder(placeholder);
     await input.click();
-    await input.fill(opcion);
+    await input.fill(option);
 
-    const panel = panelBuscador(this.page);
-    const candidata = panel.getByText(opcion).first();
-    await expect(candidata).toBeVisible();
-    await candidata.dispatchEvent("click");
+    const panel = searchPanel(this.page);
+    const candidate = panel.getByText(option).first();
+    await expect(candidate).toBeVisible();
+    await candidate.dispatchEvent("click");
     await expect(panel).toHaveCount(0);
   }
 
-  selectEstadoTarea(assignmentId: string): Locator {
+  selectTaskStatus(assignmentId: string): Locator {
     return this.page.locator(`select[name="status-${assignmentId}"]`);
   }
 
   // ── Catálogo de categorías (`/catalogos`) ────────────────────────────────
 
-  async abrirTabCategorias(): Promise<void> {
+  async openCategoriesTab(): Promise<void> {
     await this.page.getByRole("button", { name: "Categorías de ticket", exact: true }).click();
   }
 
-  async crearCategoria(nombre: string): Promise<void> {
+  async createCategory(name: string): Promise<void> {
     await this.page.getByRole("button", { name: "Nuevo", exact: true }).click();
-    await this.page.locator('input[name="nombre"]').fill(nombre);
+    await this.page.locator('input[name="nombre"]').fill(name);
     await this.page.getByRole("button", { name: "Guardar", exact: true }).click();
   }
 
-  filaCatalogo(nombre: string): Locator {
-    return this.page.locator("table tbody tr", { hasText: nombre }).first();
+  catalogRow(name: string): Locator {
+    return this.page.locator("table tbody tr", { hasText: name }).first();
   }
 
-  async desactivarCategoria(nombre: string): Promise<void> {
-    await this.filaCatalogo(nombre).locator('button[title="Desactivar"]').click();
+  async deactivateCategory(name: string): Promise<void> {
+    await this.catalogRow(name).locator('button[title="Desactivar"]').click();
   }
 
-  async eliminarCategoriaDefinitivo(nombre: string): Promise<void> {
-    await this.filaCatalogo(nombre).locator('button[title="Eliminar definitivamente"]').click();
-    await this.confirmarDialogo("Eliminar definitivamente");
+  async deleteCategoryPermanently(name: string): Promise<void> {
+    await this.catalogRow(name).locator('button[title="Eliminar definitivamente"]').click();
+    await this.confirmDialog("Eliminar definitivamente");
   }
 }

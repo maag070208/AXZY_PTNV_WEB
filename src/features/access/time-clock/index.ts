@@ -1,6 +1,6 @@
 export {
-  useChecador,
-  type UseChecador,
-  type ChecadorRangePreset,
-} from "./model/useChecador";
-export { default as ChecadorTab } from "./ui/ChecadorTab";
+  useTimeClock,
+  type UseTimeClock,
+  type TimeClockRangePreset,
+} from "./model/useTimeClock";
+export { default as TimeClockTab } from "./ui/TimeClockTab";

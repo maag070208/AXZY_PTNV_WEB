@@ -1,5 +1,5 @@
 export {
-  useChecadorRelojes,
-  type UseChecadorRelojes,
-} from "./model/useChecadorRelojes";
-export { default as ChecadorRelojesTab } from "./ui/ChecadorRelojesTab";
+  useTimeClocks,
+  type UseTimeClocks,
+} from "./model/useTimeClocks";
+export { default as TimeClocksTab } from "./ui/TimeClocksTab";

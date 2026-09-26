@@ -17,7 +17,7 @@ interface Props {
 }
 
 const styles = StyleSheet.create({
-  badgePerdido: {
+  badgeLost: {
     fontSize: 6.8,
     fontFamily: "Helvetica-Bold",
     color: PDF_COLORS.danger,
@@ -44,23 +44,23 @@ const fmtFilterDate = (iso?: string): string => {
   return `${d}/${m}/${y}`;
 };
 
-const estadoBadge = (estado: string) =>
-  estado === "ASIGNADO"
+const statusBadge = (status: string) =>
+  status === "ASSIGNED"
     ? badgeStyleFor("success")
-    : estado === "DEVUELTO"
+    : status === "RETURNED"
     ? badgeStyleFor("warning")
-    : estado === "PERDIDO"
-    ? styles.badgePerdido
+    : status === "LOST"
+    ? styles.badgeLost
     : badgeStyleFor("gray");
 
 const COL = {
-  fecha: 52,
+  date: 52,
   folio: 60,
-  activo: 58,
+  active: 58,
   desc: 118,
   resp: 86,
-  depto: 72,
-  estado: 54,
+  dept: 72,
+  status: 54,
 };
 
 export default function ReportPDF({ rows, title, filters }: Props) {
@@ -68,16 +68,16 @@ export default function ReportPDF({ rows, title, filters }: Props) {
   const reportTitle = title ?? tt("pdf.deliveredTitle");
   const today = fmtDate(new Date());
 
-  const totalEntregas = rows.length;
-  const asignados = rows.filter((r) => r.estado === "ASIGNADO").length;
-  const devueltos = rows.filter((r) => r.estado === "DEVUELTO").length;
-  const deptos = new Set(rows.map((r) => r.department)).size;
+  const totalDeliveries = rows.length;
+  const assigned = rows.filter((r) => r.status === "ASSIGNED").length;
+  const returned = rows.filter((r) => r.status === "RETURNED").length;
+  const depts = new Set(rows.map((r) => r.department)).size;
 
   const summary: Array<{ label: string; value: number; color: string }> = [
-    { label: tt("pdf.summaryTotal"), value: totalEntregas, color: PDF_COLORS.band },
-    { label: tt("pdf.summaryAsignados"), value: asignados, color: PDF_COLORS.success },
-    { label: tt("pdf.summaryDevueltos"), value: devueltos, color: PDF_COLORS.warning },
-    { label: tt("pdf.summaryDepartamentos"), value: deptos, color: PDF_COLORS.bandAccent },
+    { label: tt("pdf.summaryTotal"), value: totalDeliveries, color: PDF_COLORS.band },
+    { label: tt("pdf.summaryAssigned"), value: assigned, color: PDF_COLORS.success },
+    { label: tt("pdf.summaryReturned"), value: returned, color: PDF_COLORS.warning },
+    { label: tt("pdf.summaryDepartments"), value: depts, color: PDF_COLORS.bandAccent },
   ];
 
   const hasFilters = filters && (filters.start || filters.end || filters.department || filters.employee);
@@ -85,10 +85,10 @@ export default function ReportPDF({ rows, title, filters }: Props) {
   if (filters?.start || filters?.end) {
     const from = filters?.start ? fmtFilterDate(filters.start) : "…";
     const to = filters?.end ? fmtFilterDate(filters.end) : "…";
-    filterParts.push(tt("pdf.filtroPeriodo", { from, to }));
+    filterParts.push(tt("pdf.filterPeriod", { from, to }));
   }
-  if (filters?.department) filterParts.push(tt("pdf.filtroDepartamento", { name: filters.department }));
-  if (filters?.employee) filterParts.push(tt("pdf.filtroEmpleado", { name: filters.employee }));
+  if (filters?.department) filterParts.push(tt("pdf.filterDepartment", { name: filters.department }));
+  if (filters?.employee) filterParts.push(tt("pdf.filterEmployee", { name: filters.employee }));
 
   const ROWS_PER_PAGE = 28;
   const pages: ReportRow[][] = [];
@@ -117,26 +117,26 @@ export default function ReportPDF({ rows, title, filters }: Props) {
 
             {pageIdx === 0 && hasFilters && (
               <View style={pdfTheme.filterBox}>
-                <Text style={pdfTheme.filterTitle}>{tt("pdf.filtrosAplicados")}</Text>
+                <Text style={pdfTheme.filterTitle}>{tt("pdf.appliedFilters")}</Text>
                 <Text style={pdfTheme.filterText}>{filterParts.join("  ·  ")}</Text>
               </View>
             )}
 
             <View style={pdfTheme.tableHeader}>
-              <View style={{ width: COL.fecha }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFecha")}</Text></View>
+              <View style={{ width: COL.date }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDate")}</Text></View>
               <View style={{ width: COL.folio }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colFolio")}</Text></View>
-              <View style={{ width: COL.activo }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colActivo")}</Text></View>
-              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescripcion")}</Text></View>
-              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colResponsable")}</Text></View>
-              <View style={{ width: COL.depto }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDepartamento")}</Text></View>
-              <View style={{ width: COL.estado }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colEstado")}</Text></View>
+              <View style={{ width: COL.active }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.activeCol")}</Text></View>
+              <View style={{ width: COL.desc }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDescription")}</Text></View>
+              <View style={{ width: COL.resp }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colCustodian")}</Text></View>
+              <View style={{ width: COL.dept }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colDepartment")}</Text></View>
+              <View style={{ width: COL.status }}><Text style={pdfTheme.tableHeaderText}>{tt("pdf.colStatus")}</Text></View>
             </View>
 
             {pageRows.map((r, i) => (
               <View key={r.id + i} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
-                <View style={{ width: COL.fecha }}><Text style={pdfTheme.cellMuted}>{fmtDate(r.fecha)}</Text></View>
+                <View style={{ width: COL.date }}><Text style={pdfTheme.cellMuted}>{fmtDate(r.date)}</Text></View>
                 <View style={{ width: COL.folio }}><Text style={pdfTheme.cellBold}>{r.document_code}</Text></View>
-                <View style={{ width: COL.activo }}><Text style={pdfTheme.cellBold}>{r.asset_code}</Text></View>
+                <View style={{ width: COL.active }}><Text style={pdfTheme.cellBold}>{r.asset_code}</Text></View>
                 <View style={{ width: COL.desc }}>
                   <Text style={pdfTheme.cellDescTitle}>{r.description}</Text>
                   {r.brand || r.model ? (
@@ -144,9 +144,9 @@ export default function ReportPDF({ rows, title, filters }: Props) {
                   ) : null}
                 </View>
                 <View style={{ width: COL.resp }}><Text style={pdfTheme.cell}>{r.responsible}</Text></View>
-                <View style={{ width: COL.depto }}><Text style={pdfTheme.cellMuted}>{r.department}</Text></View>
-                <View style={{ width: COL.estado }}>
-                  <Text style={estadoBadge(r.estado)}>{r.estado}</Text>
+                <View style={{ width: COL.dept }}><Text style={pdfTheme.cellMuted}>{r.department}</Text></View>
+                <View style={{ width: COL.status }}>
+                  <Text style={statusBadge(r.status)}>{r.status}</Text>
                 </View>
               </View>
             ))}

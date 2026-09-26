@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { i18n } from "@shared/i18n";
-import { personalApi } from "@entities/personal";
+import { personalApi } from "@entities/hr";
 import type {
   PersonalProfile,
   PersonalProfileUpdateInput,
   EmployeeDiscount,
   EmployeeDocument,
-  TipoDocumento,
-  Genero,
-  TipoSangre,
-} from "@entities/personal";
+  DocumentType,
+  Gender,
+  BloodType,
+} from "@entities/hr";
 import { usersApi } from "@entities/user";
 
 export const useEmployeeDetail = (id: string | undefined) => {
   const [profile, setProfile] = useState<PersonalProfile | null>(null);
   const [documents, setDocuments] = useState<EmployeeDocument[]>([]);
-  const [documentTypes, setDocumentTypes] = useState<TipoDocumento[]>([]);
-  const [generos, setGeneros] = useState<Genero[]>([]);
-  const [tiposSangre, setTiposSangre] = useState<TipoSangre[]>([]);
+  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
+  const [genders, setGenders] = useState<Gender[]>([]);
+  const [bloodTypes, setBloodTypes] = useState<BloodType[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,18 +31,18 @@ export const useEmployeeDetail = (id: string | undefined) => {
     if (!id) return;
     setLoading(true);
     try {
-      const [p, docs, types, gens, bloods] = await Promise.all([
+      const [p, docs, types, genders, bloods] = await Promise.all([
         personalApi.get(id),
         personalApi.documents(id),
         personalApi.documentTypes(),
-        personalApi.generos(),
-        personalApi.tiposSangre(),
+        personalApi.genders(),
+        personalApi.bloodTypes(),
       ]);
       setProfile(p);
       setDocuments(docs);
       setDocumentTypes(types);
-      setGeneros(gens);
-      setTiposSangre(bloods);
+      setGenders(genders);
+      setBloodTypes(bloods);
     } catch (e: any) {
       setError(e.message ?? i18n.t("employees:detail.loadError"));
     } finally {
@@ -58,18 +58,18 @@ export const useEmployeeDetail = (id: string | undefined) => {
     if (!id) return;
     setError(null);
     try {
-      const { fotoUrl } = await personalApi.uploadPhoto(id, file);
-      setProfile((p) => (p ? { ...p, fotoUrl } : p));
+      const { photoUrl } = await personalApi.uploadPhoto(id, file);
+      setProfile((p) => (p ? { ...p, photoUrl } : p));
     } catch (e: any) {
       setError(e.message ?? i18n.t("employees:detail.photoUploadError"));
     }
   };
 
-  const uploadDocument = async (tipoDocumentoId: string, file: File): Promise<boolean> => {
+  const uploadDocument = async (documentTypeId: string, file: File): Promise<boolean> => {
     if (!id) return false;
     setError(null);
     try {
-      const doc = await personalApi.uploadDocument(id, tipoDocumentoId, file);
+      const doc = await personalApi.uploadDocument(id, documentTypeId, file);
       setDocuments((current) => [doc, ...current]);
       return true;
     } catch (e: any) {
@@ -144,8 +144,8 @@ export const useEmployeeDetail = (id: string | undefined) => {
     profile,
     documents,
     documentTypes,
-    generos,
-    tiposSangre,
+    genders,
+    bloodTypes,
     loading,
     saving,
     error,

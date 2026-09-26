@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import { usersApi } from "@entities/user";
 
 export interface ImportResult {
-  creados: number;
-  omitidos: { fila: number; username: string; motivo: string }[];
+  created: number;
+  skipped: { row: number; username: string; reason: string }[];
 }
 
 export const useUserImport = () => {

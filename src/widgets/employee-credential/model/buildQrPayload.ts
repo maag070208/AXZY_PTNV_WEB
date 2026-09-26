@@ -1,4 +1,4 @@
-import type { PersonalProfile } from "@entities/personal";
+import type { PersonalProfile } from "@entities/hr";
 
 /**
  * Payload embebido en el QR de la credencial — esquema v2.
@@ -22,7 +22,7 @@ import type { PersonalProfile } from "@entities/personal";
 /** Versión del esquema del payload del QR. */
 export const QR_PAYLOAD_VERSION = 2;
 
-export interface CredencialQrPayload {
+export interface CredentialQrPayload {
   v: number;
   id: string;
   no?: string;
@@ -37,12 +37,12 @@ const clean = (value?: string | null): string | undefined => {
   return trimmed ? trimmed : undefined;
 };
 
-export const buildQrPayload = (profile: PersonalProfile): CredencialQrPayload => ({
+export const buildQrPayload = (profile: PersonalProfile): CredentialQrPayload => ({
   v: QR_PAYLOAD_VERSION,
   id: profile.id,
-  no: clean(profile.numeroEmpleado),
+  no: clean(profile.employeeNumber),
   name: clean(profile.name),
-  pos: clean(profile.puesto),
+  pos: clean(profile.jobTitle),
   dept: clean(profile.department?.name),
 });
 
@@ -50,7 +50,7 @@ export const buildQrPayload = (profile: PersonalProfile): CredencialQrPayload =>
  * Serializa el payload a JSON omitiendo claves vacías. `v` e `id` siempre van
  * presentes; el orden de claves es estable para que el símbolo sea reproducible.
  */
-export const serializeQrPayload = (payload: CredencialQrPayload): string => {
+export const serializeQrPayload = (payload: CredentialQrPayload): string => {
   const data: Record<string, string | number> = {
     v: payload.v,
     id: payload.id,

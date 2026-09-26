@@ -1,5 +1,5 @@
 import { test, expect } from "./support/fixtures";
-import { nuevoRunId, ruta } from "./support/env";
+import { newRunId, route } from "./support/env";
 
 /**
  * Requerimiento del Área en la carta responsiva:
@@ -11,78 +11,78 @@ import { nuevoRunId, ruta } from "./support/env";
  * recoge el teardown de `api/`.
  */
 
-const escaparRegex = (texto: string): string => texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** El `Área:` de la carta imprime el departamento sin el prefijo "Departamento de ". */
-const areaEsperada = (nombreDepartamento: string): string =>
-  nombreDepartamento.replace(/^Departamento de /i, "");
+const areaExpected = (departmentName: string): string =>
+  departmentName.replace(/^Departamento de /i, "");
 
-const coincidenciaInsensible = (texto: string): RegExp =>
-  new RegExp(escaparRegex(texto), "i");
+const matchInsensible = (text: string): RegExp =>
+  new RegExp(escapeRegex(text), "i");
 
 test.describe("Responsable de la carta responsiva", () => {
   test("REQ-B: un empleado con departamento imprime su Área en la carta", async ({
-    prestamoPage,
+    loanPage,
     api,
-    departamento,
+    department,
   }) => {
-    const id = nuevoRunId();
-    const usuario = await api.crearUsuario({
+    const id = newRunId();
+    const user = await api.createUser({
       username: `e2e_web_dept_${id}`.toLowerCase(),
       name: `E2E Depto UI ${id}`,
-      departmentId: departamento.id,
+      departmentId: department.id,
     });
     try {
-      await prestamoPage.ir();
-      await prestamoPage.asignarAEmpleado(usuario.name);
-      await expect(prestamoPage.areaPreview).toHaveText(
-        coincidenciaInsensible(areaEsperada(departamento.name))
+      await loanPage.go();
+      await loanPage.assignToEmployee(user.name);
+      await expect(loanPage.areaPreview).toHaveText(
+        matchInsensible(areaExpected(department.name))
       );
     } finally {
-      await api.eliminarUsuario(usuario.id);
+      await api.deleteUser(user.id);
     }
   });
 
-  test("REQ-B: un empleado sin departamento imprime Sistemas", async ({ prestamoPage, api }) => {
-    const id = nuevoRunId();
-    const usuario = await api.crearUsuario({
+  test("REQ-B: un empleado sin departamento imprime Sistemas", async ({ loanPage, api }) => {
+    const id = newRunId();
+    const user = await api.createUser({
       username: `e2e_web_nodept_${id}`.toLowerCase(),
       name: `E2E SinDepto UI ${id}`,
     });
     try {
-      await prestamoPage.ir();
-      await prestamoPage.asignarAEmpleado(usuario.name);
-      await expect(prestamoPage.areaPreview).toHaveText(coincidenciaInsensible("Sistemas"));
+      await loanPage.go();
+      await loanPage.assignToEmployee(user.name);
+      await expect(loanPage.areaPreview).toHaveText(matchInsensible("Sistemas"));
     } finally {
-      await api.eliminarUsuario(usuario.id);
+      await api.deleteUser(user.id);
     }
   });
 
   test("REQ-B detalle: la carta del préstamo muestra el Área del responsable", async ({
     page,
-    escenario,
+    scenario,
     api,
-    departamento,
+    department,
   }) => {
-    const id = nuevoRunId();
-    const usuario = await api.crearUsuario({
+    const id = newRunId();
+    const user = await api.createUser({
       username: `e2e_web_det_${id}`.toLowerCase(),
       name: `E2E Detalle UI ${id}`,
-      departmentId: departamento.id,
+      departmentId: department.id,
     });
     try {
-      const dispositivo = await escenario.dispositivo(2);
-      const prestamo = await api.prestar({
-        responsableId: usuario.id,
-        detalles: [{ dispositivoId: dispositivo.id, cantidad: 1 }],
+      const device = await scenario.device(2);
+      const loan = await api.lend({
+        custodianId: user.id,
+        items: [{ deviceId: device.id, quantity: 1 }],
       });
 
-      await page.goto(ruta(`/inventario/prestamos/${prestamo.id}`));
-      await expect(page.getByTestId("carta-area")).toHaveText(
-        coincidenciaInsensible(areaEsperada(departamento.name))
+      await page.goto(route(`/inventory/loans/${loan.id}`));
+      await expect(page.getByTestId("custody-letter-area")).toHaveText(
+        matchInsensible(areaExpected(department.name))
       );
     } finally {
-      await api.eliminarUsuario(usuario.id);
+      await api.deleteUser(user.id);
     }
   });
 });

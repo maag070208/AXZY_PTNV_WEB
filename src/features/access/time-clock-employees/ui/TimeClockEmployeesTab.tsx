@@ -19,135 +19,135 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { FaCheck, FaLink, FaMagic, FaUnlink } from "react-icons/fa";
-import type { ChecadorEmpleado, ChecadorEmpleadoEstado } from "@entities/checador";
-import { formatFechaHora } from "@shared/utils/dates";
-import type { UseChecadorEmpleados } from "../model/useChecadorEmpleados";
+import type { TimeClockEmployee, TimeClockEmployeeStatus } from "@entities/time-clock";
+import { formatDateTime } from "@shared/utils/dates";
+import type { UseTimeClockEmployees } from "../model/useTimeClockEmployees";
 
-const ESTADOS: ChecadorEmpleadoEstado[] = ["VINCULADO", "SIN_VINCULAR", "SUGERIDO"];
+const STATUSES: TimeClockEmployeeStatus[] = ["LINKED", "UNLINKED", "SUGGESTED"];
 
-export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados }) {
+export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployees }) {
   const {
     t,
     canLink,
     q,
     setQ,
-    estado,
-    setEstado,
+    status,
+    setStatus,
     externalFilters,
     fetchTableData,
     reloadKey,
     summary,
-    usuarios,
+    users,
     target,
     setTarget,
     userId,
     setUserId,
     saving,
-    abrirVincular,
-    confirmar,
-    aceptarSugerencia,
-    desvincular,
-    vincularSugeridos,
+    openLink,
+    confirm,
+    acceptSuggestion,
+    unlinkEmployee,
+    linkSuggested,
     error,
     setError,
     toast,
     setToast,
   } = fx;
 
-  const estadoOptions = useMemo(
+  const statusOptions = useMemo(
     () => [
-      { value: "", label: t("empleados.filters.todos") },
-      ...ESTADOS.map((e) => ({ value: e, label: t(`empleados.estados.${e}`) })),
+      { value: "", label: t("employees.filters.all") },
+      ...STATUSES.map((e) => ({ value: e, label: t(`employees.statuses.${e}`) })),
     ],
     [t]
   );
 
-  const usuarioOptions = useMemo(
+  const userOptions = useMemo(
     () =>
-      usuarios.map((u) => ({
+      users.map((u) => ({
         value: u.id,
-        label: u.numeroEmpleado ? `${u.name} · #${u.numeroEmpleado}` : u.name,
+        label: u.employeeNumber ? `${u.name} · #${u.employeeNumber}` : u.name,
       })),
-    [usuarios]
+    [users]
   );
 
   const kpis = [
     { key: "total", value: summary?.total ?? 0, tint: "bg-[#0D5777]/10 text-[#0D5777]" },
-    { key: "vinculados", value: summary?.vinculados ?? 0, tint: "bg-emerald-50 text-emerald-600" },
-    { key: "sinVincular", value: summary?.sinVincular ?? 0, tint: "bg-slate-100 text-slate-500" },
-    { key: "sugeridosAlta", value: summary?.sugeridosAlta ?? 0, tint: "bg-amber-50 text-amber-600" },
+    { key: "linkedCount", value: summary?.linkedCount ?? 0, tint: "bg-emerald-50 text-emerald-600" },
+    { key: "withoutLink", value: summary?.withoutLink ?? 0, tint: "bg-slate-100 text-slate-500" },
+    { key: "registrationSuggestions", value: summary?.registrationSuggestions ?? 0, tint: "bg-amber-50 text-amber-600" },
   ] as const;
 
-  const columns = useMemo<Column<ChecadorEmpleado>[]>(
+  const columns = useMemo<Column<TimeClockEmployee>[]>(
     () => [
       {
-        key: "numeroEmpleado",
-        label: t("empleados.columns.numero"),
+        key: "employeeNumber",
+        label: t("employees.columns.number"),
         type: "string",
         sortable: true,
         render: (r) => (
           <ITText className="text-[12px] font-black text-slate-800 whitespace-nowrap">
-            #{r.numeroEmpleado}
+            #{r.employeeNumber}
           </ITText>
         ),
       },
       {
-        key: "nombre",
-        label: t("empleados.columns.nombre"),
+        key: "name",
+        label: t("employees.columns.name"),
         type: "string",
         sortable: true,
-        render: (r) => <ITText className="text-[12px] font-bold text-slate-700">{r.nombre}</ITText>,
+        render: (r) => <ITText className="text-[12px] font-bold text-slate-700">{r.name}</ITText>,
       },
       {
-        key: "checadas",
-        label: t("empleados.columns.checadas"),
+        key: "punches",
+        label: t("employees.columns.punches"),
         type: "number",
         sortable: true,
         render: (r) => (
           <ITFlex direction="column" gap={0.5}>
-            <ITText className="text-[12px] font-bold text-slate-700">{r.checadas}</ITText>
+            <ITText className="text-[12px] font-bold text-slate-700">{r.punches}</ITText>
             <ITText className="text-[9px] font-bold text-slate-400 whitespace-nowrap">
-              {formatFechaHora(r.ultimaChecada)}
+              {formatDateTime(r.lastPunch)}
             </ITText>
           </ITFlex>
         ),
       },
       {
-        key: "vinculo",
-        label: t("empleados.columns.usuario"),
+        key: "link",
+        label: t("employees.columns.user"),
         type: "string",
         render: (r) => {
-          if (r.vinculo) {
+          if (r.link) {
             return (
               <ITFlex direction="column" gap={0.5}>
-                <ITText className="text-[12px] font-black text-emerald-700">{r.vinculo.name}</ITText>
+                <ITText className="text-[12px] font-black text-emerald-700">{r.link.name}</ITText>
                 <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                  {r.vinculo.numeroEmpleado ? `#${r.vinculo.numeroEmpleado}` : "—"}
-                  {!r.vinculo.active && ` · ${t("empleados.baja")}`}
+                  {r.link.employeeNumber ? `#${r.link.employeeNumber}` : "—"}
+                  {!r.link.active && ` · ${t("employees.retirement")}`}
                 </ITText>
               </ITFlex>
             );
           }
-          if (r.sugerencia) {
+          if (r.suggestion) {
             return (
               <ITFlex direction="column" gap={0.5}>
                 <ITFlex align="center" gap={1}>
-                  <ITBadget color={r.sugerencia.confianza === "ALTA" ? "success" : "warning"} size="sm">
-                    {t("empleados.sugerencia")}
+                  <ITBadget color={r.suggestion.confidence === "HIGH" ? "success" : "warning"} size="sm">
+                    {t("employees.suggestion")}
                   </ITBadget>
-                  <ITText className="text-[12px] font-bold text-slate-700">{r.sugerencia.name}</ITText>
+                  <ITText className="text-[12px] font-bold text-slate-700">{r.suggestion.name}</ITText>
                 </ITFlex>
                 <ITText className="text-[9px] font-bold text-slate-400">
-                  {r.sugerencia.numeroEmpleado ? `#${r.sugerencia.numeroEmpleado} · ` : ""}
-                  {!r.sugerencia.active && `${t("empleados.baja")} · `}
-                  {t(`empleados.confianza.${r.sugerencia.confianza}`)}
+                  {r.suggestion.employeeNumber ? `#${r.suggestion.employeeNumber} · ` : ""}
+                  {!r.suggestion.active && `${t("employees.retirement")} · `}
+                  {t(`employees.confidence.${r.suggestion.confidence}`)}
                 </ITText>
               </ITFlex>
             );
           }
           return (
             <ITBadget color="gray" size="sm">
-              {t("empleados.sinVinculo")}
+              {t("employees.withoutLink")}
             </ITBadget>
           );
         },
@@ -155,32 +155,32 @@ export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados 
       ...(canLink
         ? [
             {
-              key: "acciones",
-              label: t("empleados.columns.acciones"),
+              key: "actions",
+              label: t("employees.columns.actions"),
               type: "actions" as const,
-              actions: (r: ChecadorEmpleado) => (
+              actions: (r: TimeClockEmployee) => (
                 <ITFlex align="center" gap={1}>
-                  {!r.vinculo && r.sugerencia && (
-                    <ITButton variant="filled" color="primary" size="sm" onClick={() => aceptarSugerencia(r)}>
+                  {!r.link && r.suggestion && (
+                    <ITButton variant="filled" color="primary" size="sm" onClick={() => acceptSuggestion(r)}>
                       <ITFlex align="center" gap={1}>
                         <FaCheck size={10} />
-                        <ITText className="font-bold text-[11px]">{t("empleados.actions.aceptar")}</ITText>
+                        <ITText className="font-bold text-[11px]">{t("employees.actions.accept")}</ITText>
                       </ITFlex>
                     </ITButton>
                   )}
-                  <ITButton variant="outlined" color="secondary" size="sm" onClick={() => abrirVincular(r)}>
+                  <ITButton variant="outlined" color="secondary" size="sm" onClick={() => openLink(r)}>
                     <ITFlex align="center" gap={1}>
                       <FaLink size={10} />
                       <ITText className="font-bold text-[11px]">
-                        {r.vinculo ? t("empleados.actions.cambiar") : t("empleados.actions.vincular")}
+                        {r.link ? t("employees.actions.change") : t("employees.actions.linkEmployee")}
                       </ITText>
                     </ITFlex>
                   </ITButton>
-                  {r.vinculo && (
-                    <ITButton variant="text" color="danger" size="sm" onClick={() => void desvincular(r)}>
+                  {r.link && (
+                    <ITButton variant="text" color="danger" size="sm" onClick={() => void unlinkEmployee(r)}>
                       <ITFlex align="center" gap={1}>
                         <FaUnlink size={10} />
-                        <ITText className="font-bold text-[11px]">{t("empleados.actions.desvincular")}</ITText>
+                        <ITText className="font-bold text-[11px]">{t("employees.actions.unlinkEmployee")}</ITText>
                       </ITFlex>
                     </ITButton>
                   )}
@@ -190,7 +190,7 @@ export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados 
           ]
         : []),
     ],
-    [t, canLink, abrirVincular, aceptarSugerencia, desvincular]
+    [t, canLink, openLink, acceptSuggestion, unlinkEmployee]
   );
 
   return (
@@ -216,7 +216,7 @@ export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados 
               <ITText className="text-sm font-black">{k.value}</ITText>
             </ITFlex>
             <ITText className="truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">
-              {t(`empleados.kpis.${k.key}`)}
+              {t(`employees.kpis.${k.key}`)}
             </ITText>
           </ITFlex>
         ))}
@@ -228,8 +228,8 @@ export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados 
           <ITGrid item xs={12} md={5}>
             <ITInput
               name="checadorEmpleadosQ"
-              label={t("empleados.filters.q")}
-              placeholder={t("empleados.filters.qPlaceholder")}
+              label={t("employees.filters.q")}
+              placeholder={t("employees.filters.qPlaceholder")}
               value={q}
               onChange={(e) => setQ(e.target.value)}
               className="w-full min-w-0"
@@ -238,10 +238,10 @@ export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados 
           <ITGrid item xs={12} md={4}>
             <ITSearchSelect
               name="checadorEmpleadosEstado"
-              label={t("empleados.filters.estado")}
-              options={estadoOptions}
-              value={estado}
-              onChange={(value) => setEstado(String(value) as ChecadorEmpleadoEstado | "")}
+              label={t("employees.filters.status")}
+              options={statusOptions}
+              value={status}
+              onChange={(value) => setStatus(String(value) as TimeClockEmployeeStatus | "")}
               className="w-full min-w-0"
             />
           </ITGrid>
@@ -252,13 +252,13 @@ export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados 
                   variant="filled"
                   color="primary"
                   size="sm"
-                  disabled={saving || !summary?.sugeridosAlta}
-                  onClick={() => void vincularSugeridos()}
+                  disabled={saving || !summary?.registrationSuggestions}
+                  onClick={() => void linkSuggested()}
                 >
                   <ITFlex align="center" gap={1}>
                     <FaMagic size={11} />
                     <ITText className="font-bold text-[11px]">
-                      {t("empleados.actions.vincularSugeridos", { count: summary?.sugeridosAlta ?? 0 })}
+                      {t("employees.actions.linkSuggested", { count: summary?.registrationSuggestions ?? 0 })}
                     </ITText>
                   </ITFlex>
                 </ITButton>
@@ -286,28 +286,28 @@ export default function ChecadorEmpleadosTab({ fx }: { fx: UseChecadorEmpleados 
       <ITDialog
         isOpen={!!target}
         onClose={() => setTarget(null)}
-        title={t("empleados.dialog.title", { numero: target?.numeroEmpleado ?? "" })}
+        title={t("employees.dialog.title", { number: target?.employeeNumber ?? "" })}
         className="max-w-md"
       >
         <ITFlex direction="column" gap={3} className="mt-2">
           <ITText className="text-[12px] text-slate-600">
-            {t("empleados.dialog.reloj", { nombre: target?.nombre ?? "" })}
+            {t("employees.dialog.clock", { name: target?.name ?? "" })}
           </ITText>
           <ITSearchSelect
             name="checadorVinculoUsuario"
-            label={t("empleados.dialog.usuario")}
-            placeholder={t("empleados.dialog.usuarioPlaceholder")}
-            options={usuarioOptions}
+            label={t("employees.dialog.user")}
+            placeholder={t("employees.dialog.userPlaceholder")}
+            options={userOptions}
             value={userId}
             onChange={(value) => setUserId(String(value))}
             className="w-full min-w-0"
           />
           <ITFlex justify="end" gap={2}>
             <ITButton variant="outlined" color="secondary" onClick={() => setTarget(null)}>
-              {t("empleados.actions.cancelar")}
+              {t("employees.actions.cancel")}
             </ITButton>
-            <ITButton variant="filled" color="primary" disabled={!userId || saving} onClick={confirmar}>
-              {t("empleados.actions.guardar")}
+            <ITButton variant="filled" color="primary" disabled={!userId || saving} onClick={confirm}>
+              {t("employees.actions.save")}
             </ITButton>
           </ITFlex>
         </ITFlex>

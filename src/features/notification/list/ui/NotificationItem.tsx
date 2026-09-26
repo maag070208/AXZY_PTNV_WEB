@@ -9,7 +9,7 @@ import {
   FaUserSlash,
 } from "react-icons/fa";
 import type { Notification } from "@entities/notification";
-import { formatFechaHora } from "@shared/utils/dates";
+import { formatDateTime } from "@shared/utils/dates";
 
 const TYPE_STYLES: Record<string, { icon: React.ReactNode; color: string }> = {
   COMMENT: { icon: <FaComment size={12} />, color: "bg-blue-500" },
@@ -65,7 +65,7 @@ export default function NotificationItem({
         )}
         <div className="flex items-center justify-between mt-1.5">
           <ITText className="text-[9px] text-slate-400 tabular-nums">
-            {formatFechaHora(n.createdAt)}
+            {formatDateTime(n.createdAt)}
           </ITText>
           <div className="flex items-center gap-1">
             {n.read && <FaCheck size={8} className="text-emerald-400" />}

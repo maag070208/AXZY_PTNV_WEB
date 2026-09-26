@@ -1,29 +1,29 @@
 import { ITAlert, ITBadget, ITButton, ITCard, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
 import { FaPen, FaRedo, FaTrashAlt } from "react-icons/fa";
 import {
-  ESTADO_RELOJ_COLOR,
-  estadoDelReloj,
-  type ChecadorDispositivo,
-  type ChecadorRelojConfig,
-} from "@entities/checador";
-import { formatFechaHora } from "@shared/utils/dates";
-import type { ConfigDeReloj, UseChecadorRelojes } from "../model/useChecadorRelojes";
+  CLOCK_STATUS_COLOR,
+  clockStatus,
+  type TimeClockDevice,
+  type TimeClockConfig,
+} from "@entities/time-clock";
+import { formatDateTime } from "@shared/utils/dates";
+import type { ClockConfig, UseTimeClocks } from "../model/useTimeClocks";
 
 /** A partir de esta diferencia con el servidor se avisa que el reloj no está en hora. */
-const DESFASE_AVISO_S = 60;
+const DRIFT_NOTICE_S = 60;
 
-const numero = (n: number): string => n.toLocaleString("es-MX");
+const number = (n: number): string => n.toLocaleString("es-MX");
 
 /** `2026-09-24T13:51:43-07:00` → `24/09/2026 13:51:43 (UTC-07:00)`, tal como lo marca el reloj. */
-const horaDelReloj = (iso: string): string => {
+const clockTime = (iso: string): string => {
   const offset = iso.slice(19);
   const base = `${iso.slice(0, 10).split("-").reverse().join("/")} ${iso.slice(11, 19)}`;
   return offset ? `${base} (UTC${offset === "Z" ? "" : offset})` : base;
 };
 
 /** Segundos → "45 s", "3 min 20 s", "2 h 5 min". */
-const tiempo = (segundos: number): string => {
-  const s = Math.abs(segundos);
+const time = (seconds: number): string => {
+  const s = Math.abs(seconds);
   if (s < 60) return `${s} s`;
   const min = Math.floor(s / 60);
   if (min < 60) return s % 60 ? `${min} min ${s % 60} s` : `${min} min`;
@@ -31,36 +31,36 @@ const tiempo = (segundos: number): string => {
 };
 
 interface Props {
-  fx: UseChecadorRelojes;
-  reloj: ChecadorDispositivo;
-  config: ConfigDeReloj | undefined;
+  fx: UseTimeClocks;
+  clock: TimeClockDevice;
+  config: ClockConfig | undefined;
 }
 
 /** Un reloj dado de alta: su sincronización y su configuración leída en vivo. */
-export default function RelojCard({ fx, reloj, config }: Props) {
-  const { t, cargarConfig, abrirEdicion, setBajaTarget } = fx;
-  const estado = estadoDelReloj(reloj);
+export default function ClockCard({ fx, clock, config }: Props) {
+  const { t, loadConfig, openEdit, setRetirementTarget } = fx;
+  const status = clockStatus(clock);
 
-  const detalle = ((): string | null => {
-    switch (estado) {
+  const item = ((): string | null => {
+    switch (status) {
       case "running":
-        if (!reloj.enCurso) return null;
-        return reloj.enCurso.total != null
-          ? t("status.reloj.running", {
-              leidos: numero(reloj.enCurso.leidos),
-              total: numero(reloj.enCurso.total),
-              nuevas: numero(reloj.enCurso.nuevas),
+        if (!clock.inProgress) return null;
+        return clock.inProgress.total != null
+          ? t("status.clock.running", {
+              readCount: number(clock.inProgress.readCount),
+              total: number(clock.inProgress.total),
+              newCount: number(clock.inProgress.newCount),
             })
-          : t("status.reloj.runningNoTotal", {
-              leidos: numero(reloj.enCurso.leidos),
-              nuevas: numero(reloj.enCurso.nuevas),
+          : t("status.clock.runningNoTotal", {
+              readCount: number(clock.inProgress.readCount),
+              newCount: number(clock.inProgress.newCount),
             });
       case "paused":
-        return t("status.reloj.paused");
+        return t("status.clock.paused");
       case "error":
-        return reloj.ultimaCorrida?.error ?? null;
+        return clock.lastRun?.error ?? null;
       case "pending":
-        return t("status.reloj.pending");
+        return t("status.clock.pending");
       default:
         return null;
     }
@@ -72,66 +72,66 @@ export default function RelojCard({ fx, reloj, config }: Props) {
         <ITFlex align="start" wrap="wrap" gap={3}>
           <ITFlex direction="column" gap={1} className="min-w-0">
             <ITFlex align="center" wrap="wrap" gap={2}>
-              <ITText className="text-[15px] font-black text-slate-800">{reloj.nombre}</ITText>
-              <ITBadget color={ESTADO_RELOJ_COLOR[estado]} size="sm">
-                {t(`status.states.${estado}`)}
+              <ITText className="text-[15px] font-black text-slate-800">{clock.name}</ITText>
+              <ITBadget color={CLOCK_STATUS_COLOR[status]} size="sm">
+                {t(`status.states.${status}`)}
               </ITBadget>
-              <ITBadget color={reloj.asistencia ? "info" : "gray"} variant="outlined" size="sm">
-                {reloj.asistencia ? t("relojes.uso.asistencia") : t("relojes.uso.soloAcceso")}
+              <ITBadget color={clock.countsAttendance ? "info" : "gray"} variant="outlined" size="sm">
+                {clock.countsAttendance ? t("clocks.usage.countsAttendance") : t("clocks.usage.onlyAccess")}
               </ITBadget>
             </ITFlex>
-            <ITText className="text-[11px] font-bold text-slate-400 break-words">{reloj.url}</ITText>
-            {detalle && <ITText className="text-[12px] text-slate-600 break-words">{detalle}</ITText>}
+            <ITText className="text-[11px] font-bold text-slate-400 break-words">{clock.url}</ITText>
+            {item && <ITText className="text-[12px] text-slate-600 break-words">{item}</ITText>}
           </ITFlex>
           <ITFlex align="center" gap={2} className="ml-auto">
             <ITButton
               variant="outlined"
               color="secondary"
               size="sm"
-              disabled={config?.cargando}
-              onClick={() => void cargarConfig(reloj.dispositivoSerie)}
+              disabled={config?.loading}
+              onClick={() => void loadConfig(clock.clockSerial)}
             >
               <ITFlex align="center" gap={1}>
-                <FaRedo size={10} className={config?.cargando ? "animate-spin" : undefined} />
-                <ITText className="font-bold text-[11px]">{t("relojes.actions.actualizar")}</ITText>
+                <FaRedo size={10} className={config?.loading ? "animate-spin" : undefined} />
+                <ITText className="font-bold text-[11px]">{t("clocks.actions.update")}</ITText>
               </ITFlex>
             </ITButton>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => abrirEdicion(reloj)}>
+            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => openEdit(clock)}>
               <ITFlex align="center" gap={1}>
                 <FaPen size={10} />
-                <ITText className="font-bold text-[11px]">{t("relojes.actions.editar")}</ITText>
+                <ITText className="font-bold text-[11px]">{t("clocks.actions.edit")}</ITText>
               </ITFlex>
             </ITButton>
-            <ITButton variant="outlined" color="danger" size="sm" onClick={() => setBajaTarget(reloj)}>
+            <ITButton variant="outlined" color="danger" size="sm" onClick={() => setRetirementTarget(clock)}>
               <ITFlex align="center" gap={1}>
                 <FaTrashAlt size={10} />
-                <ITText className="font-bold text-[11px]">{t("relojes.actions.baja")}</ITText>
+                <ITText className="font-bold text-[11px]">{t("clocks.actions.retirement")}</ITText>
               </ITFlex>
             </ITButton>
           </ITFlex>
         </ITFlex>
 
-        <Seccion titulo={t("relojes.sync.title")}>
-          <Dato label={t("relojes.sync.checadas")} value={numero(reloj.checadas)} />
-          <Dato
-            label={t("relojes.sync.ultimaChecada")}
-            value={reloj.ultimaChecada ? formatFechaHora(reloj.ultimaChecada) : t("status.empty")}
+        <Section title={t("clocks.sync.title")}>
+          <Datum label={t("clocks.sync.punches")} value={number(clock.punches)} />
+          <Datum
+            label={t("clocks.sync.lastPunch")}
+            value={clock.lastPunch ? formatDateTime(clock.lastPunch) : t("status.empty")}
           />
-          <Dato
-            label={t("relojes.sync.ultimaSync")}
-            value={reloj.sincronizadoEn ? formatFechaHora(reloj.sincronizadoEn) : t("status.empty")}
+          <Datum
+            label={t("clocks.sync.lastSync")}
+            value={clock.syncedAt ? formatDateTime(clock.syncedAt) : t("status.empty")}
           />
-          <Dato label={t("relojes.sync.consecutivo")} value={numero(reloj.ultimoSerialNo)} />
-        </Seccion>
+          <Datum label={t("clocks.sync.number")} value={number(clock.lastSerialNo)} />
+        </Section>
 
-        <Seccion
-          titulo={t("relojes.config.title")}
-          nota={
+        <Section
+          title={t("clocks.config.title")}
+          note={
             config?.data
-              ? `${t("relojes.config.hint")} ${t("relojes.config.leidoEn", {
-                  hora: new Date(config.data.leidoEn).toLocaleTimeString("es-MX"),
+              ? `${t("clocks.config.hint")} ${t("clocks.config.readAt", {
+                  hour: new Date(config.data.readAt).toLocaleTimeString("es-MX"),
                 })}`
-              : t("relojes.config.hint")
+              : t("clocks.config.hint")
           }
         >
           {config?.error ? (
@@ -139,82 +139,82 @@ export default function RelojCard({ fx, reloj, config }: Props) {
               <ITAlert variant="warning">{config.error}</ITAlert>
             </ITGrid>
           ) : config?.data ? (
-            <Configuracion fx={fx} reloj={reloj} config={config.data} />
+            <Settings fx={fx} clock={clock} config={config.data} />
           ) : (
             <ITGrid item xs={12}>
-              <ITText className="text-[12px] text-slate-500">{t("relojes.config.cargando")}</ITText>
+              <ITText className="text-[12px] text-slate-500">{t("clocks.config.loading")}</ITText>
             </ITGrid>
           )}
-        </Seccion>
+        </Section>
       </ITFlex>
     </ITCard>
   );
 }
 
-function Configuracion({
+function Settings({
   fx,
-  reloj,
+  clock,
   config,
 }: {
-  fx: UseChecadorRelojes;
-  reloj: ChecadorDispositivo;
-  config: ChecadorRelojConfig;
+  fx: UseTimeClocks;
+  clock: TimeClockDevice;
+  config: TimeClockConfig;
 }) {
   const { t } = fx;
-  const { dispositivo, hora, personas } = config;
-  const modos: Record<string, string> = {
-    manual: t("relojes.config.modos.manual"),
-    NTP: t("relojes.config.modos.NTP"),
+  const { device, hour, people } = config;
+  const modes: Record<string, string> = {
+    manual: t("clocks.config.modes.manual"),
+    NTP: t("clocks.config.modes.NTP"),
   };
-  const desfase = hora?.desfaseSegundos ?? 0;
-  const enHora = Math.abs(desfase) < DESFASE_AVISO_S;
+  const drift = hour?.driftSeconds ?? 0;
+  const inHour = Math.abs(drift) < DRIFT_NOTICE_S;
 
   return (
     <>
-      <Dato label={t("relojes.config.nombre")} value={dispositivo.nombre ?? t("status.empty")} />
-      <Dato label={t("relojes.config.modelo")} value={dispositivo.modelo ?? t("status.empty")} />
-      <Dato label={t("relojes.config.firmware")} value={dispositivo.firmware ?? t("status.empty")} />
-      <Dato label={t("relojes.config.mac")} value={dispositivo.mac ?? t("status.empty")} />
-      <Dato label={t("relojes.config.serie")} value={reloj.dispositivoSerie} md={6} />
-      <Dato
-        label={t("relojes.config.personas")}
-        value={personas ? numero(personas.total) : t("status.empty")}
-        detalle={
-          personas
-            ? t("relojes.config.personasDetalle", {
-                conRostro: numero(personas.conRostro),
-                conHuella: numero(personas.conHuella),
-                conTarjeta: numero(personas.conTarjeta),
+      <Datum label={t("clocks.config.name")} value={device.name ?? t("status.empty")} />
+      <Datum label={t("clocks.config.model")} value={device.model ?? t("status.empty")} />
+      <Datum label={t("clocks.config.firmware")} value={device.firmware ?? t("status.empty")} />
+      <Datum label={t("clocks.config.mac")} value={device.mac ?? t("status.empty")} />
+      <Datum label={t("clocks.config.serial")} value={clock.clockSerial} md={6} />
+      <Datum
+        label={t("clocks.config.people")}
+        value={people ? number(people.total) : t("status.empty")}
+        item={
+          people
+            ? t("clocks.config.peopleItem", {
+                withFace: number(people.withFace),
+                withFingerprint: number(people.withFingerprint),
+                withCard: number(people.withCard),
               })
             : undefined
         }
         md={6}
       />
-      <Dato
-        label={t("relojes.config.hora")}
-        value={hora ? horaDelReloj(hora.horaLocal) : t("status.empty")}
+      <Datum
+        label={t("clocks.config.hour")}
+        value={hour ? clockTime(hour.localTime) : t("status.empty")}
         md={6}
       />
-      <Dato
-        label={t("relojes.config.modo")}
-        value={hora?.modo ? (modos[hora.modo] ?? hora.modo) : t("status.empty")}
-        detalle={hora?.zona ?? undefined}
+      <Datum
+        label={t("clocks.config.mode")}
+        value={hour?.mode ? (modes[hour.mode] ?? hour.mode) : t("status.empty")}
+        item={hour?.zone ?? undefined}
         md={6}
       />
-      {hora && (
+      {hour && (
         <ITGrid item xs={12}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITBadget color={enHora ? "success" : "warning"} size="lg">
-              {enHora
-                ? t("relojes.config.enHora")
-                : t(desfase > 0 ? "relojes.config.adelantado" : "relojes.config.atrasado", {
-                    tiempo: tiempo(desfase),
+            <ITBadget color={inHour ? "success" : "warning"} size="lg">
+              {inHour
+                ? t("clocks.config.inHour")
+                : t(drift > 0 ? "clocks.config.ahead" : "clocks.config.behind", {
+                    time: time(drift),
                   })}
             </ITBadget>
             <ITText className="text-[12px] text-slate-600">
-              {enHora
-                ? t("relojes.config.enHoraDetalle", { segundos: Math.abs(desfase) })
-                : t("relojes.config.desfaseHint")}
+              {inHour
+                ? t("clocks.config.inItemHour", { seconds: Math.abs(drift) })
+                : t("clocks.config.driftHint")}
             </ITText>
           </ITFlex>
         </ITGrid>
@@ -223,20 +223,20 @@ function Configuracion({
   );
 }
 
-function Seccion({
-  titulo,
-  nota,
+function Section({
+  title,
+  note,
   children,
 }: {
-  titulo: string;
-  nota?: string;
+  title: string;
+  note?: string;
   children: React.ReactNode;
 }) {
   return (
     <ITFlex direction="column" gap={2} className="border-t border-slate-100 pt-3">
       <ITFlex align="baseline" wrap="wrap" gap={2}>
-        <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">{titulo}</ITText>
-        {nota && <ITText className="text-[11px] text-slate-400">{nota}</ITText>}
+        <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">{title}</ITText>
+        {note && <ITText className="text-[11px] text-slate-400">{note}</ITText>}
       </ITFlex>
       <ITGrid container columns={12} spacing={4}>
         {children}
@@ -245,15 +245,15 @@ function Seccion({
   );
 }
 
-function Dato({
+function Datum({
   label,
   value,
-  detalle,
+  item,
   md = 3,
 }: {
   label: string;
   value: string;
-  detalle?: string;
+  item?: string;
   md?: number;
 }) {
   return (
@@ -261,7 +261,7 @@ function Dato({
       <ITFlex direction="column" gap={0.5} className="min-w-0">
         <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</ITText>
         <ITText className="text-[12px] font-bold text-slate-800 break-words">{value}</ITText>
-        {detalle && <ITText className="text-[11px] text-slate-500 break-words">{detalle}</ITText>}
+        {item && <ITText className="text-[11px] text-slate-500 break-words">{item}</ITText>}
       </ITFlex>
     </ITGrid>
   );

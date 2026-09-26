@@ -1,18 +1,18 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { salidasApi, type MaterialOutput, type SalidaFilters } from "@entities/salida";
+import { materialOutputsApi, type MaterialOutput, type MaterialOutputFilters } from "@entities/material-output";
 import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
 
-export type DownloadSalidasPdf = (rows: MaterialOutput[]) => Promise<void>;
+export type DownloadMaterialOutputsPdf = (rows: MaterialOutput[]) => Promise<void>;
 
 interface Options {
-  download: DownloadSalidasPdf;
+  download: DownloadMaterialOutputsPdf;
 }
 
-export const useSalidasReport = ({ download }: Options) => {
+export const useMaterialOutputsReport = ({ download }: Options) => {
   const { t } = useTranslation(["reports", "common"]);
   const [total, setTotal] = useState(0);
-  const [lastFilters, setLastFilters] = useState<SalidaFilters>({});
+  const [lastFilters, setLastFilters] = useState<MaterialOutputFilters>({});
   const [reloadKey, setReloadKey] = useState(0);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,10 +21,10 @@ export const useSalidasReport = ({ download }: Options) => {
     async (
       params: ITDataTableFetchParams
     ): Promise<ITDataTableResponse<Record<string, unknown>>> => {
-      const filters = params.filters as unknown as SalidaFilters;
+      const filters = params.filters as unknown as MaterialOutputFilters;
       setLastFilters(filters);
       try {
-        const res = await salidasApi.table({
+        const res = await materialOutputsApi.table({
           page: params.page,
           limit: params.limit,
           filters: params.filters as Record<string, string | number | boolean>,
@@ -36,7 +36,7 @@ export const useSalidasReport = ({ download }: Options) => {
           total: res.total,
         };
       } catch (e: any) {
-        setError(e.message ?? t("salidas.errorLoad"));
+        setError(e.message ?? t("exits.errorLoad"));
         return { data: [], total: 0 };
       }
     },
@@ -46,7 +46,7 @@ export const useSalidasReport = ({ download }: Options) => {
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
     try {
-      const res = await salidasApi.list(lastFilters);
+      const res = await materialOutputsApi.list(lastFilters);
       await download(res.data);
     } catch (e) {
       console.error("Error al exportar PDF de salidas", e);
@@ -68,4 +68,4 @@ export const useSalidasReport = ({ download }: Options) => {
   };
 };
 
-export type UseSalidasReport = ReturnType<typeof useSalidasReport>;
+export type UseMaterialOutputsReport = ReturnType<typeof useMaterialOutputsReport>;

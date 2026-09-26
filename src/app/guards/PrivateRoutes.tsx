@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
-import { logout, meThunk, puede } from "@entities/user";
+import { logout, meThunk, can } from "@entities/user";
 import { fetchUnreadCount } from "@entities/notification";
 import { useAblyNotifications } from "./useAblyNotifications";
 
@@ -40,7 +40,7 @@ export default function PrivateRoutes() {
     // Rehidrata la sesión cuando falta el usuario o cuando viene de un storage
     // viejo sin permisos (rollout de ROLES_Y_PERMISOS). Al volver a la ventana
     // se refresca `/auth/me` para que un cambio de permisos aplique sin relogin.
-    if (token && (!user || !user.permisos)) {
+    if (token && (!user || !user.permissions)) {
       dispatch(meThunk());
     }
     if (token) {
@@ -67,28 +67,28 @@ export default function PrivateRoutes() {
 
   // El menú se arma por permisos efectivos (`GET /auth/me`); la web no
   // reimplementa la matriz de roles.
-  const permisos = user?.permisos;
-  const canViewDevices = puede(permisos, "dispositivos.ver");
-  const canViewLoans = puede(permisos, "prestamos.ver");
+  const permissions = user?.permissions;
+  const canViewDevices = can(permissions, "devices.view");
+  const canViewLoans = can(permissions, "loans.view");
   const canViewInventory = canViewDevices || canViewLoans;
-  const canViewReports = puede(permisos, "reportes.ver");
-  const canViewAccess = puede(permisos, "acceso.bitacora");
-  const canViewChecador = puede(permisos, "checador.ver");
-  const canViewSchedules = puede(permisos, "horarios.ver");
-  const canViewOvertime = puede(permisos, "horas_extra.ver");
-  const canViewHR = puede(permisos, "personal.expediente");
-  const canAdminCatalogs = puede(permisos, "catalogos.administrar");
-  const canViewUsers = puede(permisos, "usuarios.ver");
-  const canAdminRelojes = puede(permisos, "relojes.administrar");
-  const canAdminRoles = puede(permisos, "roles.administrar");
-  const canManageTasks = puede(permisos, "tareas.completar");
-  const isEmpleado = user?.role === "EMPLEADO";
+  const canViewReports = can(permissions, "reports.view");
+  const canViewAccess = can(permissions, "access.log");
+  const canViewTimeClock = can(permissions, "time_clock.view");
+  const canViewSchedules = can(permissions, "schedules.view");
+  const canViewOvertime = can(permissions, "overtime.view");
+  const canViewHR = can(permissions, "hr.records");
+  const canAdminCatalogs = can(permissions, "catalogs.manage");
+  const canViewUsers = can(permissions, "users.view");
+  const canAdminClocks = can(permissions, "time_clocks.manage");
+  const canAdminRoles = can(permissions, "roles.manage");
+  const canManageTasks = can(permissions, "tasks.complete");
+  const isEmployee = user?.role === "EMPLOYEE";
 
   const active = (to: string) => location.pathname.startsWith(to);
 
   const navigationItems = [
     {
-      id: "inicio",
+      id: "start",
       label: tt("nav.home"),
       icon: <FaHouseUser size={14} />,
       action: () => navigate("/"),
@@ -105,25 +105,25 @@ export default function PrivateRoutes() {
           id: "tickets",
           label: tt("nav.tickets"),
           action: () => navigate("/tickets"),
-          isActive: active("/tickets") && !active("/tickets/tareas") && !active("/tickets/mis-tareas"),
+          isActive: active("/tickets") && !active("/tickets/tasks") && !active("/tickets/my-tasks"),
         },
         ...(canManageTasks
           ? [
             {
               id: "adminTareas",
               label: tt("nav.adminTasks"),
-              action: () => navigate("/tickets/tareas"),
-              isActive: active("/tickets/tareas"),
+              action: () => navigate("/tickets/tasks"),
+              isActive: active("/tickets/tasks"),
             },
           ]
           : []),
-        ...(isEmpleado
+        ...(isEmployee
           ? [
             {
               id: "misTareas",
               label: tt("nav.myTasks"),
-              action: () => navigate("/tickets/mis-tareas"),
-              isActive: active("/tickets/mis-tareas"),
+              action: () => navigate("/tickets/my-tasks"),
+              isActive: active("/tickets/my-tasks"),
             },
           ]
           : []),
@@ -133,46 +133,46 @@ export default function PrivateRoutes() {
     ...(canViewInventory
       ? [
         {
-          id: "inventario",
+          id: "inventory",
           label: tt("nav.inventory"),
           icon: <FaBoxes size={14} />,
-          isActive: active("/inventario"),
+          isActive: active("/inventory"),
           subitems: [
             ...(canViewDevices
               ? [
                 {
                   id: "dashboard",
                   label: tt("nav.inventory"),
-                  action: () => navigate("/inventario"),
-                  isActive: active("/inventario") && location.pathname === "/inventario",
+                  action: () => navigate("/inventory"),
+                  isActive: active("/inventory") && location.pathname === "/inventory",
                 },
                 {
-                  id: "dispositivos",
+                  id: "devices",
                   label: tt("nav.devices"),
-                  action: () => navigate("/inventario/dispositivos"),
-                  isActive: active("/inventario/dispositivos"),
+                  action: () => navigate("/inventory/devices"),
+                  isActive: active("/inventory/devices"),
                 },
                 {
-                  id: "movimientos",
-                  label: tt("nav.movimientos"),
-                  action: () => navigate("/inventario/movimientos"),
-                  isActive: active("/inventario/movimientos"),
+                  id: "movements",
+                  label: tt("nav.movements"),
+                  action: () => navigate("/inventory/movements"),
+                  isActive: active("/inventory/movements"),
                 },
               ]
               : []),
             ...(canViewLoans
               ? [
                 {
-                  id: "prestamos",
-                  label: tt("nav.prestamos"),
-                  action: () => navigate("/inventario/prestamos"),
-                  isActive: active("/inventario/prestamos"),
+                  id: "loans",
+                  label: tt("nav.loans"),
+                  action: () => navigate("/inventory/loans"),
+                  isActive: active("/inventory/loans"),
                 },
                 {
-                  id: "devoluciones",
-                  label: tt("nav.devoluciones"),
-                  action: () => navigate("/inventario/devoluciones"),
-                  isActive: active("/inventario/devoluciones"),
+                  id: "returns",
+                  label: tt("nav.returns"),
+                  action: () => navigate("/inventory/returns"),
+                  isActive: active("/inventory/returns"),
                 },
               ]
               : []),
@@ -187,13 +187,13 @@ export default function PrivateRoutes() {
           id: "reportes",
           label: tt("nav.reports"),
           icon: <FaChartBar size={14} />,
-          action: () => navigate("/reportes"),
-          isActive: active("/reportes"),
+          action: () => navigate("/reports"),
+          isActive: active("/reports"),
         },
       ]
       : []),
     // CONTROL DE ACCESO (acceso.bitacora / checador.ver)
-    ...(canViewAccess || canViewChecador
+    ...(canViewAccess || canViewTimeClock
       ? [
         {
           id: "accesos",
@@ -208,7 +208,7 @@ export default function PrivateRoutes() {
                   label: tt("nav.accessLog"),
                   action: () => navigate("/access"),
                   isActive:
-                    active("/access") && !active("/access/report") && !active("/access/checador"),
+                    active("/access") && !active("/access/report") && !active("/access/time-clock"),
                 },
                 {
                   id: "accessReport",
@@ -218,25 +218,25 @@ export default function PrivateRoutes() {
                 },
               ]
               : []),
-            ...(canViewChecador
+            ...(canViewTimeClock
               ? [
                 {
                   id: "accessChecador",
-                  label: tt("nav.accessChecador"),
-                  action: () => navigate("/access/checador"),
-                  isActive: location.pathname === "/access/checador",
+                  label: tt("nav.accessTimeClock"),
+                  action: () => navigate("/access/time-clock"),
+                  isActive: location.pathname === "/access/time-clock",
                 },
                 {
                   id: "accessChecadorReport",
-                  label: tt("nav.accessChecadorReport"),
-                  action: () => navigate("/access/checador/entradas-salidas"),
-                  isActive: active("/access/checador/entradas-salidas"),
+                  label: tt("nav.accessTimeClockReport"),
+                  action: () => navigate("/access/time-clock/entries-exits"),
+                  isActive: active("/access/time-clock/entries-exits"),
                 },
                 {
                   id: "accessChecadorEmpleados",
-                  label: tt("nav.accessChecadorEmpleados"),
-                  action: () => navigate("/access/checador/empleados"),
-                  isActive: active("/access/checador/empleados"),
+                  label: tt("nav.accessTimeClockEmployees"),
+                  action: () => navigate("/access/time-clock/employees"),
+                  isActive: active("/access/time-clock/employees"),
                 },
               ]
               : []),
@@ -248,30 +248,30 @@ export default function PrivateRoutes() {
     ...(canViewSchedules
       ? [
         {
-          id: "horarios",
+          id: "schedules",
           label: tt("nav.schedules"),
           icon: <FaRegClock size={14} />,
-          isActive: active("/horarios"),
+          isActive: active("/schedules"),
           subitems: [
             {
               id: "schedulesAdmin",
               label: tt("nav.schedulesAdmin"),
-              action: () => navigate("/horarios"),
-              isActive: active("/horarios") && location.pathname === "/horarios",
+              action: () => navigate("/schedules"),
+              isActive: active("/schedules") && location.pathname === "/schedules",
             },
             {
               id: "schedulesAssign",
               label: tt("nav.schedulesAssign"),
-              action: () => navigate("/horarios/asignar"),
-              isActive: active("/horarios/asignar"),
+              action: () => navigate("/schedules/assign"),
+              isActive: active("/schedules/assign"),
             },
             ...(canViewOvertime
               ? [
                 {
                   id: "overtime",
                   label: tt("nav.overtime"),
-                  action: () => navigate("/horarios/horas-extra/aprobacion"),
-                  isActive: active("/horarios/horas-extra/aprobacion"),
+                  action: () => navigate("/schedules/overtime/approval"),
+                  isActive: active("/schedules/overtime/approval"),
                 },
               ]
               : []),
@@ -286,35 +286,35 @@ export default function PrivateRoutes() {
           id: "recursosHumanos",
           label: tt("nav.hr"),
           icon: <FaUserTie size={14} />,
-          isActive: active("/empleados"),
+          isActive: active("/employees"),
           subitems: [
             {
               id: "personal",
               label: tt("nav.employees"),
-              action: () => navigate("/empleados"),
-              isActive: active("/empleados") && !active("/empleados/reportes"),
+              action: () => navigate("/employees"),
+              isActive: active("/employees") && !active("/employees/disciplinary-reports"),
             },
             {
               id: "reportesPersonal",
               label: tt("nav.hrReports"),
-              action: () => navigate("/empleados/reportes"),
-              isActive: active("/empleados/reportes"),
+              action: () => navigate("/employees/disciplinary-reports"),
+              isActive: active("/employees/disciplinary-reports"),
             },
           ],
         },
       ]
       : []),
     // CONFIGURACIÓN (catalogos.administrar / usuarios.ver / relojes.administrar / roles.administrar)
-    ...(canAdminCatalogs || canViewUsers || canAdminRelojes || canAdminRoles
+    ...(canAdminCatalogs || canViewUsers || canAdminClocks || canAdminRoles
       ? [
         {
-          id: "configuracion",
+          id: "settings",
           label: "Configuración",
           icon: <FaCog size={14} />,
           isActive:
-            active("/catalogos") ||
-            active("/usuarios") ||
-            active("/relojes") ||
+            active("/catalogs") ||
+            active("/users") ||
+            active("/time-clocks") ||
             active("/roles"),
           subitems: [
             ...(canAdminCatalogs
@@ -322,29 +322,29 @@ export default function PrivateRoutes() {
                 {
                   id: "catalogos",
                   label: tt("nav.catalogs"),
-                  action: () => navigate("/catalogos"),
-                  isActive: active("/catalogos"),
+                  action: () => navigate("/catalogs"),
+                  isActive: active("/catalogs"),
                 },
               ]
               : []),
             ...(canViewUsers
               ? [
                 {
-                  id: "usuarios",
+                  id: "users",
                   label: tt("nav.users"),
-                  action: () => navigate("/usuarios"),
-                  isActive: active("/usuarios"),
+                  action: () => navigate("/users"),
+                  isActive: active("/users"),
                 },
               ]
               : []),
             // Alta/baja de relojes checadores: solo ADMIN (relojes.administrar).
-            ...(canAdminRelojes
+            ...(canAdminClocks
               ? [
                 {
-                  id: "relojes",
-                  label: tt("nav.relojes"),
-                  action: () => navigate("/relojes"),
-                  isActive: active("/relojes"),
+                  id: "clocks",
+                  label: tt("nav.clocks"),
+                  action: () => navigate("/time-clocks"),
+                  isActive: active("/time-clocks"),
                 },
               ]
               : []),
@@ -391,7 +391,7 @@ export default function PrivateRoutes() {
         menuItems: [
           {
             label: unreadCount > 0 ? tt('nav.notifications', { count: unreadCount }) : tt('nav.notifications'),
-            onClick: () => navigate("/notificaciones"),
+            onClick: () => navigate("/notifications"),
           },
           { label: tt("nav.logout"), onClick: handleLogout },
         ],

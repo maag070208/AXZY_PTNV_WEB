@@ -134,9 +134,9 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            {r.numeroEmpleado ? `#${r.numeroEmpleado}` : "—"}
+            {r.employeeNumber ? `#${r.employeeNumber}` : "—"}
             {!r.active && ` · ${t("status.inactive")}`}
-            {r.vinculado === false && ` · ${t("unlinked")}`}
+            {r.linked === false && ` · ${t("unlinked")}`}
           </ITText>
         </ITFlex>
       ),
@@ -156,12 +156,12 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         ),
     },
     {
-      key: "puesto",
-      label: t("columns.puesto"),
+      key: "jobTitle",
+      label: t("columns.jobTitle"),
       type: "string",
       sortable: true,
       render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-700">{r.puesto ?? "—"}</ITText>
+        <ITText className="text-[11px] font-bold text-slate-700">{r.jobTitle ?? "—"}</ITText>
       ),
     },
     {

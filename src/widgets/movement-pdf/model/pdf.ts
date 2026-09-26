@@ -1,21 +1,21 @@
 import { createElement } from "react";
 import { pdf } from "@react-pdf/renderer";
-import type { Movimiento } from "@entities/inventario";
-import MovimientoPDF from "../ui/MovimientoPDF";
-import MovimientosReportePDF from "../ui/MovimientosReportePDF";
+import type { Movement } from "@entities/inventory";
+import MovementPdf from "../ui/MovementPdf";
+import MovementsReportPdf from "../ui/MovementsReportPdf";
 
-export const descargarMovimientoPDF = async (movimiento: Movimiento): Promise<void> => {
-  const blob = await pdf(createElement(MovimientoPDF, { movimiento }) as any).toBlob();
+export const downloadMovementPdf = async (movement: Movement): Promise<void> => {
+  const blob = await pdf(createElement(MovementPdf, { movement }) as any).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `MV-${movimiento.id.slice(0, 8).toUpperCase()}-${movimiento.tipo}.pdf`;
+  a.download = `MV-${movement.id.slice(0, 8).toUpperCase()}-${movement.type}.pdf`;
   a.click();
   URL.revokeObjectURL(url);
 };
 
-export const descargarReporteMovimientosPDF = async (movimientos: Movimiento[]): Promise<void> => {
-  const blob = await pdf(createElement(MovimientosReportePDF, { movimientos }) as any).toBlob();
+export const downloadReportMovementsPdf = async (movements: Movement[]): Promise<void> => {
+  const blob = await pdf(createElement(MovementsReportPdf, { movements }) as any).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

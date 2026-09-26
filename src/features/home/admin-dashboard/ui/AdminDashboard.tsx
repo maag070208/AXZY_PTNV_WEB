@@ -10,12 +10,12 @@ import {
   FaTrashAlt,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { formatFechaHora } from "@shared/utils/dates";
+import { formatDateTime } from "@shared/utils/dates";
 import type { DashboardActivity } from "@entities/dashboard";
 import {
-  RATING_ESPERA_COLOR,
-  ratingEspera,
-  type RatingEspera,
+  WAIT_RATING_COLOR,
+  waitRating,
+  type WaitRating,
 } from "@entities/ticket";
 import type { UseAdminDashboard } from "../model/useAdminDashboard";
 import { activityHref } from "../model/activityLinks";
@@ -24,16 +24,16 @@ import DonutChart from "./DonutChart";
 const SCOPE_ICON: Record<DashboardActivity["scope"], React.ReactNode> = {
   devices: <FaBoxOpen size={11} />,
   tickets: <FaTicketAlt size={11} />,
-  cartas: <FaFileSignature size={11} />,
-  salidas: <FaTrashAlt size={11} />,
+  custodyLetters: <FaFileSignature size={11} />,
+  materialOutputs: <FaTrashAlt size={11} />,
   inventory: <FaFileSignature size={11} />,
 };
 
 const SCOPE_COLOR: Record<DashboardActivity["scope"], string> = {
   devices: "bg-blue-500",
   tickets: "bg-amber-500",
-  cartas: "bg-emerald-500",
-  salidas: "bg-rose-500",
+  custodyLetters: "bg-emerald-500",
+  materialOutputs: "bg-rose-500",
   inventory: "bg-indigo-500",
 };
 
@@ -80,18 +80,18 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
 
   if (!summary) return null;
 
-  const avgDias = summary.ticketMetricas.avgResolucionDias;
-  const eficienciaSegments = summary.ticketEficiencia.map((e, i) => ({
+  const avgDays = summary.ticketMetrics.avgResolutionDays;
+  const efficiencySegments = summary.ticketEfficiency.map((e, i) => ({
     label: e.user.name,
-    value: e.resueltas,
+    value: e.resolved,
     color: AGENT_COLORS[i % AGENT_COLORS.length],
   }));
   const ticketStatusSegments = [
-    { label: t("adminDashboard.open"), value: summary.tickets.abierto, color: "#f59e0b" },
-    { label: t("adminDashboard.following"), value: summary.tickets.enSeguimiento, color: "#3b82f6" },
-    { label: t("adminDashboard.closed"), value: summary.tickets.cerrado, color: "#10b981" },
+    { label: t("adminDashboard.open"), value: summary.tickets.open, color: "#f59e0b" },
+    { label: t("adminDashboard.following"), value: summary.tickets.inProgress, color: "#3b82f6" },
+    { label: t("adminDashboard.closed"), value: summary.tickets.closed, color: "#10b981" },
   ];
-  const urgente = (dias: number): RatingEspera => ratingEspera(dias);
+  const urgent = (days: number): WaitRating => waitRating(days);
 
   return (
     <ITFlex direction="column" gap={4}>
@@ -118,26 +118,26 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
         <KpiCard
           icon={<FaTicketAlt size={16} />}
           iconBg="bg-gradient-to-br from-indigo-500 to-violet-600"
-          label={t("adminDashboard.ticketsResueltos")}
-          value={summary.ticketMetricas.tareasResueltas}
+          label={t("adminDashboard.resolvedTickets")}
+          value={summary.ticketMetrics.resolvedTasks}
         />
         <KpiCard
           icon={<FaTicketAlt size={16} />}
           iconBg="bg-gradient-to-br from-amber-500 to-orange-600"
           label={t("adminDashboard.openTickets")}
-          value={summary.tickets.abierto + summary.tickets.enSeguimiento}
+          value={summary.tickets.open + summary.tickets.inProgress}
         />
         <KpiCard
           icon={<FaClock size={16} />}
           iconBg="bg-gradient-to-br from-emerald-500 to-teal-600"
-          label={t("adminDashboard.avgResolucion")}
-          value={avgDias !== null ? `${avgDias} d` : "—"}
+          label={t("adminDashboard.avgResolution")}
+          value={avgDays !== null ? `${avgDays} d` : "—"}
         />
         <KpiCard
           icon={<FaHourglassHalf size={16} />}
           iconBg="bg-gradient-to-br from-rose-500 to-red-600"
-          label={t("adminDashboard.tareasPendientes")}
-          value={summary.ticketMetricas.tareasPendientes}
+          label={t("adminDashboard.pendingTasks")}
+          value={summary.ticketMetrics.pendingTasks}
         />
       </ITFlex>
 
@@ -147,12 +147,12 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
               {t("adminDashboard.teamEfficiency")}
             </ITText>
-            {eficienciaSegments.length === 0 ? (
+            {efficiencySegments.length === 0 ? (
               <ITText className="text-[12px] font-bold text-slate-400">
                 {t("adminDashboard.noEfficiency")}
               </ITText>
             ) : (
-              <DonutChart segments={eficienciaSegments} />
+              <DonutChart segments={efficiencySegments} />
             )}
           </ITCard>
 
@@ -169,14 +169,14 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
             <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
               {t("adminDashboard.urgentTitle")}
             </ITText>
-            {summary.ticketsUrgentes.length === 0 ? (
+            {summary.urgentTickets.length === 0 ? (
               <ITText className="text-[12px] font-bold text-slate-400">
                 {t("adminDashboard.noUrgent")}
               </ITText>
             ) : (
               <div className="flex flex-col gap-2">
-                {summary.ticketsUrgentes.map((u) => {
-                  const rating = urgente(u.diasEnEspera);
+                {summary.urgentTickets.map((u) => {
+                  const rating = urgent(u.daysOnHold);
                   return (
                     <button
                       key={u.id}
@@ -185,22 +185,22 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
                     >
                       <ITFlex direction="column" gap={0.5} className="min-w-0 flex-1">
                         <ITText className="text-[11px] font-semibold text-slate-600 truncate">
-                          {u.titulo}
+                          {u.title}
                         </ITText>
                         <ITText className="text-[9px] text-slate-400">
-                          {formatFecha(u.creadoEn)} · {u.asignado ?? "sin asignar"} ·{" "}
-                          {u.prioridad}
+                          {formatDate(u.createdAt)} · {u.assigned ?? "sin asignar"} ·{" "}
+                          {u.priority}
                         </ITText>
                       </ITFlex>
                       <ITFlex align="center" gap={1} className="shrink-0">
                         <ITText className="text-[11px] font-bold text-slate-600">
-                          {u.diasEnEspera} d
+                          {u.daysOnHold} d
                         </ITText>
                         <ITBadget
                           size="lg"
-                          color={(RATING_ESPERA_COLOR[rating] as any) ?? "gray"}
+                          color={(WAIT_RATING_COLOR[rating] as any) ?? "gray"}
                         >
-                          {rating === "MALO" ? t("adminDashboard.urgentTag") : ticketsT(`list.esperaLabels.${rating}`)}
+                          {rating === "POOR" ? t("adminDashboard.urgentTag") : ticketsT(`list.waitLabels.${rating}`)}
                         </ITBadget>
                       </ITFlex>
                     </button>
@@ -236,7 +236,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
                           {a.message}
                         </ITText>
                         <ITText className="text-[9px] text-slate-400">
-                          {formatFechaHora(a.at)}
+                          {formatDateTime(a.at)}
                         </ITText>
                       </ITFlex>
                       {href && (
@@ -267,7 +267,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
   );
 }
 
-const formatFecha = (iso: string): string => {
+const formatDate = (iso: string): string => {
   const d = new Date(iso);
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");

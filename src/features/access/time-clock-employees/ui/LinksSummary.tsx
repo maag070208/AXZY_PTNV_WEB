@@ -2,20 +2,20 @@ import { useEffect, useState } from "react";
 import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaInfoCircle, FaLink } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { checadorApi, type ChecadorEmpleadosSummary } from "@entities/checador";
+import { timeClockApi, type TimeClockEmployeesSummary } from "@entities/time-clock";
 
 /**
  * Aviso del reporte de entradas/salidas del reloj: cuántos empleados del reloj
  * ya están vinculados y cómo se arman las jornadas.
  */
-export default function VinculosResumen({ onIrAVincular }: { onIrAVincular: () => void }) {
-  const { t } = useTranslation(["checador", "common"]);
-  const [summary, setSummary] = useState<ChecadorEmpleadosSummary | null>(null);
+export default function LinksSummary({ onGoToLink }: { onGoToLink: () => void }) {
+  const { t } = useTranslation(["time-clock", "common"]);
+  const [summary, setSummary] = useState<TimeClockEmployeesSummary | null>(null);
 
   useEffect(() => {
     let active = true;
-    checadorApi
-      .empleados({ page: 1, limit: 1, filters: {} })
+    timeClockApi
+      .employees({ page: 1, limit: 1, filters: {} })
       .then((res) => {
         if (active) setSummary(res.summary);
       })
@@ -38,21 +38,21 @@ export default function VinculosResumen({ onIrAVincular }: { onIrAVincular: () =
       <ITFlex direction="column" gap={0.5} className="min-w-0 flex-1">
         {summary && (
           <ITText className="text-[12px] font-black text-slate-800">
-            {t("reporte.vinculos", { vinculados: summary.vinculados, total: summary.total })}
-            {summary.sinVincular > 0 && (
+            {t("report.links", { linkedCount: summary.linkedCount, total: summary.total })}
+            {summary.withoutLink > 0 && (
               <span className="font-bold text-slate-500">
                 {" · "}
-                {t("reporte.sinVincular", { count: summary.sinVincular })}
+                {t("report.withoutLink", { count: summary.withoutLink })}
               </span>
             )}
           </ITText>
         )}
-        <ITText className="text-[11px] text-slate-500">{t("reporte.regla")}</ITText>
+        <ITText className="text-[11px] text-slate-500">{t("report.rule")}</ITText>
       </ITFlex>
-      <ITButton variant="outlined" color="primary" size="sm" onClick={onIrAVincular}>
+      <ITButton variant="outlined" color="primary" size="sm" onClick={onGoToLink}>
         <ITFlex align="center" gap={1}>
           <FaLink size={11} />
-          <ITText className="font-bold text-[11px]">{t("reporte.irAVincular")}</ITText>
+          <ITText className="font-bold text-[11px]">{t("report.goToLink")}</ITText>
         </ITFlex>
       </ITButton>
     </ITFlex>

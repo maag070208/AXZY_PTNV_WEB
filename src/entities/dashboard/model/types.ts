@@ -1,4 +1,4 @@
-export type DashboardActivityScope = "devices" | "tickets" | "cartas" | "salidas" | "inventory";
+export type DashboardActivityScope = "devices" | "tickets" | "custodyLetters" | "materialOutputs" | "inventory";
 
 export interface DashboardActivity {
   id: string;
@@ -10,32 +10,32 @@ export interface DashboardActivity {
 }
 
 export interface DashboardSummary {
-  devices: { total: number; disponible: number; asignado: number; baja: number };
-  tickets: { total: number; abierto: number; enSeguimiento: number; cerrado: number };
-  cartas: { total: number; activas: number };
-  salidas: { total: number; danadas: number };
-  departamentos: number;
-  empleados: number;
-  ticketMetricas: {
-    tareasResueltas: number;
-    tareasPendientes: number;
-    avgResolucionDias: number | null;
+  devices: { total: number; available: number; assigned: number; retirement: number };
+  tickets: { total: number; open: number; inProgress: number; closed: number };
+  custodyLetters: { total: number; active: number };
+  materialOutputs: { total: number; damaged: number };
+  departments: number;
+  employees: number;
+  ticketMetrics: {
+    resolvedTasks: number;
+    pendingTasks: number;
+    avgResolutionDays: number | null;
   };
-  ticketEficiencia: {
-    user: { id: string; name: string; puesto: string | null };
-    resueltas: number;
-    pendientes: number;
-    avgDias: number | null;
+  ticketEfficiency: {
+    user: { id: string; name: string; jobTitle: string | null };
+    resolved: number;
+    pending: number;
+    avgDays: number | null;
   }[];
-  ticketsUrgentes: {
+  urgentTickets: {
     id: string;
-    titulo: string;
-    prioridad: TicketPrioridad;
-    creadoEn: string;
-    diasEnEspera: number;
-    asignado: string | null;
+    title: string;
+    priority: TicketPriority;
+    createdAt: string;
+    daysOnHold: number;
+    assigned: string | null;
   }[];
   recentActivity: DashboardActivity[];
 }
 
-export type TicketPrioridad = "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
+export type TicketPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";

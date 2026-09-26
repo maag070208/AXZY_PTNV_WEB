@@ -12,16 +12,16 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaFilePen } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
-import type { MotivoActaAdministrativa } from "@entities/personal";
-import { searchEmpleados } from "../model/useActasReporte";
+import type { DisciplinaryReason } from "@entities/hr";
+import { searchEmployees } from "../model/useDisciplinaryReports";
 
-const MOTIVOS: MotivoActaAdministrativa[] = [
-  "INASISTENCIA",
-  "RETARDO",
-  "EBRIEDAD",
-  "CONDUCTA",
-  "INCUMPLIMIENTO",
-  "OTRO",
+const REASONS: DisciplinaryReason[] = [
+  "ABSENCE",
+  "TARDINESS",
+  "INTOXICATION",
+  "MISCONDUCT",
+  "NONCOMPLIANCE",
+  "OTHER",
 ];
 
 interface Props {
@@ -30,14 +30,14 @@ interface Props {
   onClose: () => void;
   onSave: (input: {
     userId: string;
-    motivo: MotivoActaAdministrativa;
-    fechaIncidente: string;
-    descripcion: string;
-    sancion?: string;
+    reason: DisciplinaryReason;
+    incidentDate: string;
+    description: string;
+    sanction?: string;
   }) => void;
 }
 
-interface EmpleadoOption {
+interface EmployeeOption {
   value: string;
   label: string;
 }
@@ -49,28 +49,28 @@ const localToDateStr = (value: Date): string => {
   return `${y}-${m}-${d}`;
 };
 
-export default function ActaAdministrativaForm({
+export default function DisciplinaryReportForm({
   isOpen,
   saving,
   onClose,
   onSave,
 }: Props) {
-  const { t: tt } = useTranslation(["actas", "common"]);
-  const [empleados, setEmpleados] = useState<EmpleadoOption[]>([]);
-  const [busyEmpleados, setBusyEmpleados] = useState(false);
+  const { t: tt } = useTranslation(["disciplinary-reports", "common"]);
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
+  const [busyEmployees, setBusyEmployees] = useState(false);
   const [userId, setUserId] = useState("");
-  const [motivo, setMotivo] = useState<MotivoActaAdministrativa | "">("");
-  const [fechaIncidente, setFechaIncidente] = useState<string>("");
-  const [descripcion, setDescripcion] = useState("");
-  const [sancion, setSancion] = useState("");
+  const [reason, setReason] = useState<DisciplinaryReason | "">("");
+  const [incidentDate, setIncidentDate] = useState<string>("");
+  const [description, setDescription] = useState("");
+  const [sanction, setSanction] = useState("");
 
   const reset = () => {
     setUserId("");
-    setMotivo("");
-    setFechaIncidente("");
-    setDescripcion("");
-    setSancion("");
-    setEmpleados([]);
+    setReason("");
+    setIncidentDate("");
+    setDescription("");
+    setSanction("");
+    setEmployees([]);
   };
 
   const close = () => {
@@ -78,35 +78,35 @@ export default function ActaAdministrativaForm({
     onClose();
   };
 
-  const handleSearchEmpleados = async (query?: string) => {
-    setBusyEmpleados(true);
+  const handleSearchEmployees = async (query?: string) => {
+    setBusyEmployees(true);
     try {
-      const data = await searchEmpleados(query);
-      setEmpleados(
+      const data = await searchEmployees(query);
+      setEmployees(
         data.map((u) => ({
           value: u.id,
-          label: [u.name, u.numeroEmpleado ? `#${u.numeroEmpleado}` : null]
+          label: [u.name, u.employeeNumber ? `#${u.employeeNumber}` : null]
             .filter(Boolean)
             .join(" "),
         }))
       );
     } finally {
-      setBusyEmpleados(false);
+      setBusyEmployees(false);
     }
   };
 
   const handleSave = () => {
-    if (!userId || !motivo || !fechaIncidente || !descripcion.trim()) return;
+    if (!userId || !reason || !incidentDate || !description.trim()) return;
     onSave({
       userId,
-      motivo,
-      fechaIncidente,
-      descripcion: descripcion.trim(),
-      sancion: sancion.trim() || undefined,
+      reason,
+      incidentDate,
+      description: description.trim(),
+      sanction: sanction.trim() || undefined,
     });
   };
 
-  const canSave = Boolean(userId && motivo && fechaIncidente && descripcion.trim()) && !saving;
+  const canSave = Boolean(userId && reason && incidentDate && description.trim()) && !saving;
 
   return (
     <ITDialog
@@ -128,56 +128,56 @@ export default function ActaAdministrativaForm({
         <ITGrid item xs={12}>
           <ITSearchSelect
             name="actaEmpleado"
-            label={tt("form.empleado")}
-            placeholder={tt("form.empleadoHint")}
-            options={empleados}
+            label={tt("form.employee")}
+            placeholder={tt("form.employeeHint")}
+            options={employees}
             value={userId}
             onChange={(value) => setUserId(String(value))}
-            onSearch={handleSearchEmpleados}
-            isLoading={busyEmpleados}
+            onSearch={handleSearchEmployees}
+            isLoading={busyEmployees}
           />
         </ITGrid>
         <ITGrid item xs={12} sm={6}>
           <ITSelect
             name="actaMotivo"
-            label={tt("form.motivo")}
-            value={motivo}
-            onChange={(e) => setMotivo(e.target.value as MotivoActaAdministrativa)}
+            label={tt("form.reason")}
+            value={reason}
+            onChange={(e) => setReason(e.target.value as DisciplinaryReason)}
             options={[
               { value: "", label: "—" },
-              ...MOTIVOS.map((m) => ({ value: m, label: tt(`motivos.${m}`) })),
+              ...REASONS.map((m) => ({ value: m, label: tt(`reasons.${m}`) })),
             ]}
           />
         </ITGrid>
         <ITGrid item xs={12} sm={6}>
           <ITDatePicker
             name="actaFechaIncidente"
-            label={tt("form.fechaIncidente")}
-            value={fechaIncidente ? new Date(`${fechaIncidente}T12:00:00`) : undefined}
+            label={tt("form.incidentDate")}
+            value={incidentDate ? new Date(`${incidentDate}T12:00:00`) : undefined}
             onChange={(event) => {
               const value = event.target.value;
-              setFechaIncidente(value instanceof Date ? localToDateStr(value) : "");
+              setIncidentDate(value instanceof Date ? localToDateStr(value) : "");
             }}
           />
         </ITGrid>
         <ITGrid item xs={12}>
           <ITTextarea
             name="actaDescripcion"
-            label={tt("form.descripcion")}
-            value={descripcion}
-            onChange={setDescripcion}
+            label={tt("form.description")}
+            value={description}
+            onChange={setDescription}
             rows={4}
-            placeholder={tt("form.descripcionHint")}
+            placeholder={tt("form.descriptionHint")}
           />
         </ITGrid>
         <ITGrid item xs={12}>
           <ITTextarea
             name="actaSancion"
-            label={tt("form.sancion")}
-            value={sancion}
-            onChange={setSancion}
+            label={tt("form.sanction")}
+            value={sanction}
+            onChange={setSanction}
             rows={2}
-            placeholder={tt("form.sancionHint")}
+            placeholder={tt("form.sanctionHint")}
           />
         </ITGrid>
       </ITGrid>
@@ -188,7 +188,7 @@ export default function ActaAdministrativaForm({
         </ITButton>
         <ITButton variant="filled" color="primary" onClick={handleSave} disabled={!canSave}>
           <ITText className="font-bold text-[11px]">
-            {saving ? tt("form.guardando") : tt("form.guardar")}
+            {saving ? tt("form.saving") : tt("form.save")}
           </ITText>
         </ITButton>
       </ITFlex>

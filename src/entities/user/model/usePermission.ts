@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import type { Alcance, Permiso } from "./types";
+import type { PermissionScope, Permission } from "./types";
 
 /**
  * Forma mínima del estado que necesita el hook. Se declara aquí en vez de
@@ -7,20 +7,20 @@ import type { Alcance, Permiso } from "./types";
  * de `app` (regla FSD en `eslint.config.js`).
  */
 interface AuthStateLike {
-  auth: { user: { permisos?: Partial<Record<Permiso, Alcance>> } | null };
+  auth: { user: { permissions?: Partial<Record<Permission, PermissionScope>> } | null };
 }
 
 /** Alcance efectivo del permiso para la sesión actual (NINGUNO si no aplica). */
-export const usePermiso = (permiso: Permiso): Alcance =>
+export const usePermission = (permission: Permission): PermissionScope =>
   useSelector(
-    (state: AuthStateLike) => state.auth.user?.permisos?.[permiso] ?? "NINGUNO"
+    (state: AuthStateLike) => state.auth.user?.permissions?.[permission] ?? "NONE"
   );
 
 /** ¿La sesión actual tiene el permiso con cualquier alcance? */
-export const usePuede = (permiso: Permiso): boolean => usePermiso(permiso) !== "NINGUNO";
+export const useCan = (permission: Permission): boolean => usePermission(permission) !== "NONE";
 
 /** Helper puro para decidir sobre un mapa de permisos ya cargado. */
-export const puede = (
-  permisos: Partial<Record<Permiso, Alcance>> | undefined,
-  permiso: Permiso
-): boolean => (permisos?.[permiso] ?? "NINGUNO") !== "NINGUNO";
+export const can = (
+  permissions: Partial<Record<Permission, PermissionScope>> | undefined,
+  permission: Permission
+): boolean => (permissions?.[permission] ?? "NONE") !== "NONE";

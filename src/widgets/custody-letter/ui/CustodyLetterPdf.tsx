@@ -6,14 +6,14 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import { formatFecha } from "@shared/utils/dates";
+import { formatDate } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
-import type { Prestamo } from "@entities/inventario";
+import type { Loan } from "@entities/inventory";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
-import { resolveAreaName } from "../model/carta";
+import { resolveAreaName } from "../model/custodyLetter";
 
 interface Props {
-  prestamo: Prestamo;
+  loan: Loan;
 }
 
 const styles = StyleSheet.create({
@@ -59,13 +59,13 @@ const styles = StyleSheet.create({
     paddingBottom: 1,
     minHeight: 10,
   },
-  metaPaginaRow: {
+  metaPageRow: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginBottom: 0,
   },
-  metaPaginaLabel: { width: 50, fontSize: 8.5, fontFamily: "Helvetica-Bold" },
-  barraFolio: {
+  metaPageLabel: { width: 50, fontSize: 8.5, fontFamily: "Helvetica-Bold" },
+  folioBar: {
     backgroundColor: "#b4c6e7",
     borderWidth: 0.8,
     borderColor: "#000",
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     fontSize: 9,
   },
-  bloquePrincipal: {
+  principalBlock: {
     borderWidth: 0.8,
     borderColor: "#000",
     borderStyle: "solid",
@@ -83,30 +83,30 @@ const styles = StyleSheet.create({
     padding: 5,
     paddingBottom: 0,
   },
-  parrafo: {
+  paragraph: {
     marginBottom: 2,
     textAlign: "justify",
     lineHeight: 1.25,
   },
-  parrafoIntro: {
+  paragraphIntro: {
     marginBottom: 2,
     textAlign: "justify",
     lineHeight: 1.1,
   },
   bold: { fontFamily: "Helvetica-Bold" },
-  compromisos: {
+  commitments: {
     marginVertical: 1,
     marginLeft: 8,
     lineHeight: 1.2,
   },
-  compromisoItem: { marginBottom: 0.5 },
-  recursoTitulo: {
+  commitmentItem: { marginBottom: 0.5 },
+  resourceTitle: {
     fontFamily: "Helvetica-Bold",
     marginBottom: 2,
     fontSize: 8.5,
   },
-  recursoLista: { marginTop: 0 },
-  recursoRow: {
+  resourceList: { marginTop: 0 },
+  resourceRow: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginBottom: 1,
@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     minHeight: 9,
   },
-  bloqueSeguimiento: {
+  followUpBlock: {
     borderWidth: 0.8,
     borderColor: "#000",
     borderStyle: "solid",
     marginTop: 3,
   },
-  barraSeguimiento: {
+  followUpBar: {
     backgroundColor: "#d9d9d9",
     borderBottomWidth: 0.8,
     borderBottomColor: "#000",
@@ -140,85 +140,85 @@ const styles = StyleSheet.create({
     fontSize: 9.5,
     fontFamily: "Helvetica-Bold",
   },
-  seguimientoContenido: { padding: 10 },
-  lineaCampo: {
+  followUpContent: { padding: 10 },
+  fieldLine: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginBottom: 2,
   },
-  segLabel: { marginRight: 4, fontSize: 9.5 },
-  segLine: {
+  secLabel: { marginRight: 4, fontSize: 9.5 },
+  secLine: {
     flex: 1,
     borderBottomWidth: 0.8,
     borderBottomColor: "#000",
     borderBottomStyle: "solid",
     height: 8,
   },
-  lineaVacia: {
+  emptyLine: {
     borderBottomWidth: 0.8,
     borderBottomColor: "#000",
     borderBottomStyle: "solid",
     height: 9,
     marginBottom: 2,
   },
-  notaRh: {
+  noteRh: {
     marginTop: 3,
     fontSize: 7.5,
   },
-  firmas: {
+  signatures: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 50,
     marginBottom: 0,
   },
-  firmaBox: {
+  signatureBox: {
     width: 140,
     alignItems: "center",
   },
-  lineaFirma: {
+  signatureLine: {
     width: "100%",
     borderTopWidth: 0.8,
     borderTopColor: "#000",
     borderTopStyle: "solid",
     marginBottom: 1.5,
   },
-  firmaLabel: { fontSize: 8, fontFamily: "Helvetica-Bold" },
-  firmaNombre: { fontSize: 8 },
+  signatureLabel: { fontSize: 8, fontFamily: "Helvetica-Bold" },
+  signatureName: { fontSize: 8 },
 });
 
-export default function CartaResponsivaPDF({ prestamo }: Props) {
-  const { t: tt } = useTranslation("cartas");
-  const fechaTxt = formatFecha(prestamo.fecha) || tt("doc.dateLetters");
-  const primerDetalle = prestamo.detalles?.[0] ?? null;
-  const areaNombre = resolveAreaName(prestamo);
+export default function CustodyLetterPdf({ loan }: Props) {
+  const { t: tt } = useTranslation("custody-letters");
+  const dateTxt = formatDate(loan.date) || tt("doc.dateLetters");
+  const firstItem = loan.items?.[0] ?? null;
+  const areaName = resolveAreaName(loan);
 
-  const responsableName = prestamo.responsable?.name ?? "";
-  const encargadoName = "";
+  const custodianName = loan.custodian?.name ?? "";
+  const supervisorName = "";
   const deliveryBy = "Departamento de Sistemas";
 
-  const observableTxt = prestamo.departamento?.name
-    ? `${prestamo.departamento.name}${prestamo.subarea ? ` — ${prestamo.subarea.name}` : ""}`
+  const observableTxt = loan.department?.name
+    ? `${loan.department.name}${loan.subarea ? ` — ${loan.subarea.name}` : ""}`
     : "";
   // En modo departamento la carta se asigna a un departamento, no a un
   // empleado: la firma "Responsable" y el dato muestran el departamento.
-  const responsableTxt = observableTxt || responsableName || "";
+  const custodianTxt = observableTxt || custodianName || "";
 
-  const totalPiezas = prestamo.detalles.reduce((sum, d) => sum + d.cantidad, 0);
-  const piezas = `${totalPiezas} ${totalPiezas === 1 ? "pieza" : "piezas"}`;
-  const descripcionConCantidad =
-    (primerDetalle?.dispositivo?.nombre || "CONTROL DE TV") + ` (${piezas})`;
+  const totalPieces = loan.items.reduce((sum, d) => sum + d.quantity, 0);
+  const pieces = `${totalPieces} ${totalPieces === 1 ? "pieza" : "pieces"}`;
+  const descriptionWithQuantity =
+    (firstItem?.device?.name || "CONTROL DE TV") + ` (${pieces})`;
 
   // El documento oficial se llama "SIS-001" — nuestro folio (consecutivo)
   // NO debe aparecer en el PDF.
-  const documentoOficial = "SIS-001";
+  const officialDocument = "SIS-001";
 
-  const activoFijo = primerDetalle?.unidades?.[0]?.unidadFisica?.activoFijo ?? "TBE-0001";
-  const numeroSerie = primerDetalle?.unidades?.[0]?.unidadFisica?.numeroSerie;
-  const nombreEquipo = primerDetalle?.unidades?.[0]?.unidadFisica?.nombreEquipo;
+  const assetTag = firstItem?.units?.[0]?.deviceUnit?.assetTag ?? "TBE-0001";
+  const serialNumber = firstItem?.units?.[0]?.deviceUnit?.serialNumber;
+  const hostname = firstItem?.units?.[0]?.deviceUnit?.hostname;
 
   return (
     <Document
-      title={`${documentoOficial} - ${tt("detail.title")}`}
+      title={`${officialDocument} - ${tt("detail.title")}`}
       author="Puerto Nuevo Hotel y Villas"
     >
       <Page size="LETTER" style={styles.page}>
@@ -230,35 +230,35 @@ export default function CartaResponsivaPDF({ prestamo }: Props) {
           <View style={styles.metaBox}>
             <View style={styles.metaRow}>
               <Text style={styles.metaLabel}>{tt("doc.date")}</Text>
-              <Text style={styles.metaVal}>{fechaTxt}</Text>
+              <Text style={styles.metaVal}>{dateTxt}</Text>
             </View>
             <View style={styles.metaRow}>
               <Text style={styles.metaLabel}>
-                {prestamo.departamentoId ? tt("doc.departamento") : tt("doc.employeeNo")}
+                {loan.departmentId ? tt("doc.department") : tt("doc.employeeNo")}
               </Text>
               <Text style={styles.metaVal}>
-                {prestamo.departamentoId
-                  ? responsableTxt
-                  : prestamo.responsable?.numeroEmpleado || "N/A"}
+                {loan.departmentId
+                  ? custodianTxt
+                  : loan.custodian?.employeeNumber || "N/A"}
               </Text>
             </View>
-            <View style={styles.metaPaginaRow}>
-              <Text style={styles.metaPaginaLabel}>{tt("doc.page")}</Text>
+            <View style={styles.metaPageRow}>
+              <Text style={styles.metaPageLabel}>{tt("doc.page")}</Text>
               <Text style={styles.metaVal}>{tt("doc.pageOf", { current: 1, total: 1 })}</Text>
             </View>
           </View>
         </View>
 
         {/* 2. Barra de título con folio */}
-        <View style={styles.barraFolio}>
-          <Text>{tt("doc.barraFolio")}</Text>
+        <View style={styles.folioBar}>
+          <Text>{tt("doc.folioBar")}</Text>
         </View>
 
         {/* 3. Bloque de contenido principal */}
-        <View style={styles.bloquePrincipal}>
-          <Text style={styles.parrafoIntro}>
+        <View style={styles.principalBlock}>
+          <Text style={styles.paragraphIntro}>
             {tt("doc.para1a")}{" "}
-            <Text style={styles.bold}>{tt("doc.recursoTic")}</Text>{" "}
+            <Text style={styles.bold}>{tt("doc.resourceTic")}</Text>{" "}
             {tt("doc.para1b")}{" "}
             <Text style={styles.bold}>
               {"Puerto Nuevo Hotel y Villas."}
@@ -266,107 +266,107 @@ export default function CartaResponsivaPDF({ prestamo }: Props) {
             {tt("doc.para1c")}
           </Text>
 
-          <View style={styles.compromisos}>
-            <Text style={styles.compromisoItem}>• {tt("doc.compromiso1")}</Text>
-            <Text style={styles.compromisoItem}>• {tt("doc.compromiso2")}</Text>
-            <Text style={styles.compromisoItem}>• {tt("doc.compromiso3")}</Text>
-            <Text style={styles.compromisoItem}>• {tt("doc.compromiso4")}</Text>
-            <Text style={styles.compromisoItem}>• {tt("doc.compromiso5")}</Text>
+          <View style={styles.commitments}>
+            <Text style={styles.commitmentItem}>• {tt("doc.compromiso1")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.compromiso2")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.compromiso3")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.compromiso4")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.compromiso5")}</Text>
           </View>
 
-          <Text style={styles.recursoTitulo}>{tt("doc.recursoTitulo")}</Text>
-          <View style={styles.recursoLista}>
-            <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>{tt("doc.descripcionGeneral")}</Text>
-              <Text style={styles.recVal}>{descripcionConCantidad}</Text>
+          <Text style={styles.resourceTitle}>{tt("doc.resourceTitle")}</Text>
+          <View style={styles.resourceList}>
+            <View style={styles.resourceRow}>
+              <Text style={styles.recLabel}>{tt("doc.descriptionGeneral")}</Text>
+              <Text style={styles.recVal}>{descriptionWithQuantity}</Text>
             </View>
-            <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>{tt("doc.marca")}</Text>
-              <Text style={styles.recVal}>{primerDetalle?.dispositivo?.marca || "STEREN"}</Text>
+            <View style={styles.resourceRow}>
+              <Text style={styles.recLabel}>{tt("doc.brand")}</Text>
+              <Text style={styles.recVal}>{firstItem?.device?.brand || "STEREN"}</Text>
             </View>
-            <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>{tt("doc.modelo")}</Text>
-              <Text style={styles.recVal}>{primerDetalle?.dispositivo?.modelo || "RM-115"}</Text>
+            <View style={styles.resourceRow}>
+              <Text style={styles.recLabel}>{tt("doc.model")}</Text>
+              <Text style={styles.recVal}>{firstItem?.device?.model || "RM-115"}</Text>
             </View>
-            {numeroSerie && (
-              <View style={styles.recursoRow}>
-                <Text style={styles.recLabel}>{tt("doc.numeroSerie")}</Text>
-                <Text style={styles.recVal}>{numeroSerie}</Text>
+            {serialNumber && (
+              <View style={styles.resourceRow}>
+                <Text style={styles.recLabel}>{tt("doc.serialNumber")}</Text>
+                <Text style={styles.recVal}>{serialNumber}</Text>
               </View>
             )}
-            {nombreEquipo && (
-              <View style={styles.recursoRow}>
-                <Text style={styles.recLabel}>{tt("doc.nombreEquipo")}</Text>
-                <Text style={styles.recVal}>{nombreEquipo}</Text>
+            {hostname && (
+              <View style={styles.resourceRow}>
+                <Text style={styles.recLabel}>{tt("doc.hostname")}</Text>
+                <Text style={styles.recVal}>{hostname}</Text>
               </View>
             )}
-            <View style={styles.recursoRow}>
-              <Text style={styles.recLabel}>{tt("doc.controlActivos")}</Text>
-              <Text style={styles.recVal}>{activoFijo}</Text>
+            <View style={styles.resourceRow}>
+              <Text style={styles.recLabel}>{tt("doc.assetTag")}</Text>
+              <Text style={styles.recVal}>{assetTag}</Text>
             </View>
-            <View style={styles.recursoRow}>
+            <View style={styles.resourceRow}>
               <Text style={styles.recLabel}>{tt("doc.area")}</Text>
-              <Text style={styles.recVal}>{areaNombre}</Text>
+              <Text style={styles.recVal}>{areaName}</Text>
             </View>
           </View>
 
-          <Text style={{ ...styles.parrafo, marginTop: 6 }}>
+          <Text style={{ ...styles.paragraph, marginTop: 6 }}>
             {tt("doc.para2a")}{" "}
             <Text style={styles.bold}>
-              {tt("doc.reglamentoDepartamento")} {areaNombre}
+              {tt("doc.departmentRegulations")} {areaName}
             </Text>{" "}
             {tt("doc.para2b")}{" "}
-            <Text style={styles.bold}>{tt("doc.estrictamenteProhibido")}</Text>{" "}
+            <Text style={styles.bold}>{tt("doc.strictlyProhibited")}</Text>{" "}
             {tt("doc.para2c")}{" "}
-            <Text style={styles.bold}>{tt("doc.reglamentoInterior")}</Text>
+            <Text style={styles.bold}>{tt("doc.interiorRegulations")}</Text>
           </Text>
         </View>
 
         {/* 4. Bloque de Seguimiento */}
-        <View style={styles.bloqueSeguimiento} wrap={false}>
-          <View style={styles.barraSeguimiento}>
-            <Text>{tt("doc.seguimientoBarra")}</Text>
+        <View style={styles.followUpBlock} wrap={false}>
+          <View style={styles.followUpBar}>
+            <Text>{tt("doc.followUpBar")}</Text>
           </View>
-          <View style={styles.seguimientoContenido}>
-            <View style={styles.lineaCampo}>
-              <Text style={styles.segLabel}>{tt("doc.fechaDevolucion")}</Text>
-              <View style={styles.segLine} />
+          <View style={styles.followUpContent}>
+            <View style={styles.fieldLine}>
+              <Text style={styles.secLabel}>{tt("doc.loanReturnDate")}</Text>
+              <View style={styles.secLine} />
             </View>
-            <View style={styles.lineaCampo}>
-              <Text style={styles.segLabel}>{tt("doc.nombreResguarda")}</Text>
-              <View style={styles.segLine} />
+            <View style={styles.fieldLine}>
+              <Text style={styles.secLabel}>{tt("doc.nameKeeper")}</Text>
+              <View style={styles.secLine} />
             </View>
-            <View style={styles.lineaCampo}>
-              <Text style={styles.segLabel}>
-                {tt("doc.condicionesDevuelve")}
+            <View style={styles.fieldLine}>
+              <Text style={styles.secLabel}>
+                {tt("doc.conditionsReturns")}
               </Text>
-              <View style={styles.segLine} />
+              <View style={styles.secLine} />
             </View>
-            <View style={styles.lineaVacia} />
-            <View style={styles.lineaVacia} />
+            <View style={styles.emptyLine} />
+            <View style={styles.emptyLine} />
 
-            <Text style={styles.notaRh}>
-              <Text style={styles.bold}>{tt("doc.notaRh1")}</Text> {tt("doc.notaRh2")}
+            <Text style={styles.noteRh}>
+              <Text style={styles.bold}>{tt("doc.noteRh1")}</Text> {tt("doc.noteRh2")}
             </Text>
           </View>
         </View>
 
         {/* 5. Firmas (3 columnas) */}
-        <View style={styles.firmas}>
-          <View style={styles.firmaBox}>
-            <View style={styles.lineaFirma} />
-            <Text style={styles.firmaNombre}>{responsableTxt}</Text>
-            <Text style={styles.firmaLabel}>{tt("doc.firmaResponsable")}</Text>
+        <View style={styles.signatures}>
+          <View style={styles.signatureBox}>
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureName}>{custodianTxt}</Text>
+            <Text style={styles.signatureLabel}>{tt("doc.signatureCustodian")}</Text>
           </View>
-          <View style={styles.firmaBox}>
-            <View style={styles.lineaFirma} />
-            <Text style={styles.firmaNombre}>{encargadoName}</Text>
-            <Text style={styles.firmaLabel}>{tt("doc.firmaJefeArea")}</Text>
+          <View style={styles.signatureBox}>
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureName}>{supervisorName}</Text>
+            <Text style={styles.signatureLabel}>{tt("doc.signatureHeadArea")}</Text>
           </View>
-          <View style={styles.firmaBox}>
-            <View style={styles.lineaFirma} />
-            <Text style={styles.firmaNombre}>{deliveryBy}</Text>
-            <Text style={styles.firmaLabel}>{tt("doc.firmaEntrega")}</Text>
+          <View style={styles.signatureBox}>
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureName}>{deliveryBy}</Text>
+            <Text style={styles.signatureLabel}>{tt("doc.signatureDelivery")}</Text>
           </View>
         </View>
       </Page>

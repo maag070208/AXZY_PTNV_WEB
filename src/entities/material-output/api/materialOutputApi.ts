@@ -6,35 +6,35 @@ import {
 import type {
   MaterialOutput,
   MaterialOutputInput,
-  SalidaFilters,
-  SalidaSuggestions,
+  MaterialOutputFilters,
+  MaterialOutputSuggestions,
 } from "../model/types";
 
-const buildQuery = (filters: SalidaFilters = {}): string => {
+const buildQuery = (filters: MaterialOutputFilters = {}): string => {
   const params = new URLSearchParams();
   if (filters.start) params.set("start", filters.start);
   if (filters.end) params.set("end", filters.end);
-  if (filters.departamento) params.set("departamento", filters.departamento);
-  if (filters.usuario) params.set("usuario", filters.usuario);
+  if (filters.departmentName) params.set("departmentName", filters.departmentName);
+  if (filters.userName) params.set("userName", filters.userName);
   if (filters.area) params.set("area", filters.area);
-  if (filters.proyecto) params.set("proyecto", filters.proyecto);
-  if (filters.motivo) params.set("motivo", filters.motivo);
+  if (filters.project) params.set("project", filters.project);
+  if (filters.reason) params.set("reason", filters.reason);
   if (filters.q) params.set("q", filters.q);
   const qs = params.toString();
   return qs ? `?${qs}` : "";
 };
 
-export const salidasApi = {
+export const materialOutputsApi = {
   table: (params: ITDataTableFetchParamsPost) =>
-    tableRequest<MaterialOutput>(`/salidas/query`, params),
-  list: (filters: SalidaFilters = {}) =>
-    api.get<{ data: MaterialOutput[]; total: number }>(`/salidas${buildQuery(filters)}`),
-  get: (id: string) => api.get<MaterialOutput>(`/salidas/${id}`),
-  create: (data: MaterialOutputInput) => api.post<MaterialOutput>(`/salidas`, data),
+    tableRequest<MaterialOutput>(`/material-outputs/query`, params),
+  list: (filters: MaterialOutputFilters = {}) =>
+    api.get<{ data: MaterialOutput[]; total: number }>(`/material-outputs${buildQuery(filters)}`),
+  get: (id: string) => api.get<MaterialOutput>(`/material-outputs/${id}`),
+  create: (data: MaterialOutputInput) => api.post<MaterialOutput>(`/material-outputs`, data),
   createBatch: (rows: MaterialOutputInput[]) =>
-    api.post<{ data: MaterialOutput[]; total: number }>(`/salidas/batch`, { rows }),
+    api.post<{ data: MaterialOutput[]; total: number }>(`/material-outputs/batch`, { rows }),
   update: (id: string, data: Partial<MaterialOutputInput>) =>
-    api.put<MaterialOutput>(`/salidas/${id}`, data),
-  remove: (id: string) => api.delete<MaterialOutput>(`/salidas/${id}`),
-  suggestions: () => api.get<SalidaSuggestions>(`/salidas/suggestions`),
+    api.put<MaterialOutput>(`/material-outputs/${id}`, data),
+  remove: (id: string) => api.delete<MaterialOutput>(`/material-outputs/${id}`),
+  suggestions: () => api.get<MaterialOutputSuggestions>(`/material-outputs/suggestions`),
 };

@@ -1,16 +1,16 @@
 import { createElement } from "react";
 import { pdf } from "@react-pdf/renderer";
-import type { ActaAdministrativa } from "@entities/personal";
-import ActaAdministrativaPDF from "../ui/ActaAdministrativaPDF";
+import type { DisciplinaryReport } from "@entities/hr";
+import DisciplinaryReportPdf from "../ui/DisciplinaryReportPdf";
 
-export const descargarActaPDF = async (acta: ActaAdministrativa): Promise<void> => {
+export const downloadDisciplinaryReportPdf = async (disciplinaryReport: DisciplinaryReport): Promise<void> => {
   const blob = await pdf(
-    createElement(ActaAdministrativaPDF, { acta }) as any
+    createElement(DisciplinaryReportPdf, { disciplinaryReport }) as any
   ).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `acta-administrativa-${acta.user.numeroEmpleado ?? acta.user.id}.pdf`;
+  a.download = `acta-administrativa-${disciplinaryReport.user.employeeNumber ?? disciplinaryReport.user.id}.pdf`;
   a.click();
   URL.revokeObjectURL(url);
 };

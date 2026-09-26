@@ -1,5 +1,5 @@
 import * as QRCode from "qrcode";
-import type { PersonalProfile } from "@entities/personal";
+import type { PersonalProfile } from "@entities/hr";
 import { PDF_COLORS } from "@shared/pdf/theme";
 import { buildQrPayload, serializeQrPayload } from "./buildQrPayload";
 
@@ -10,7 +10,7 @@ import { buildQrPayload, serializeQrPayload } from "./buildQrPayload";
  */
 const QR_PIXEL_SCALE = 12;
 
-export const generarCredencialQR = async (profile: PersonalProfile): Promise<string> => {
+export const generateCredentialQr = async (profile: PersonalProfile): Promise<string> => {
   const text = serializeQrPayload(buildQrPayload(profile));
   const { modules } = QRCode.create(text, { errorCorrectionLevel: "M" });
   return QRCode.toDataURL(text, {
@@ -21,10 +21,10 @@ export const generarCredencialQR = async (profile: PersonalProfile): Promise<str
   });
 };
 
-export const fotoComoDataUrl = async (
-  fotoUrl?: string | null
+export const photoAsDataUrl = async (
+  photoUrl?: string | null
 ): Promise<string | null> => {
-  if (!fotoUrl) {
+  if (!photoUrl) {
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
       console.warn("[credencial] fotoUrl vacío: el perfil no tiene fotoKey/fotoUrl");
@@ -32,7 +32,7 @@ export const fotoComoDataUrl = async (
     return null;
   }
   try {
-    const res = await fetch(fotoUrl);
+    const res = await fetch(photoUrl);
     if (!res.ok) {
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
@@ -62,7 +62,7 @@ export const fotoComoDataUrl = async (
   }
 };
 
-export const inicialesDe = (name: string): string => {
+export const initialsOf = (name: string): string => {
   const parts = name.split(/\s+/).filter(Boolean);
   const prefix = parts.slice(0, 2);
   if (!prefix.length) return "—";

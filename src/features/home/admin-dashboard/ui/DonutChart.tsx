@@ -12,7 +12,7 @@ interface Props {
 // Dona simple en SVG inline — no hay librería de gráficas instalada en el
 // proyecto y esto es lo único que se necesita (2 gráficas chicas).
 export default function DonutChart({ segments, size = 128 }: Props) {
-  const total = segments.reduce((s, seg) => s + seg.value, 0);
+  const total = segments.reduce((s, sec) => s + sec.value, 0);
   const radius = size / 2 - 12;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
@@ -32,21 +32,21 @@ export default function DonutChart({ segments, size = 128 }: Props) {
           strokeWidth={12}
         />
         {total > 0 &&
-          segments.map((seg) => {
-            if (seg.value === 0) return null;
-            const fraction = seg.value / total;
+          segments.map((sec) => {
+            if (sec.value === 0) return null;
+            const fraction = sec.value / total;
             const dash = fraction * circumference;
             const dashArray = `${dash} ${circumference - dash}`;
             const dashOffset = -offset;
             offset += dash;
             return (
               <circle
-                key={seg.label}
+                key={sec.label}
                 cx={center}
                 cy={center}
                 r={radius}
                 fill="none"
-                stroke={seg.color}
+                stroke={sec.color}
                 strokeWidth={12}
                 strokeDasharray={dashArray}
                 strokeDashoffset={dashOffset}
@@ -67,14 +67,14 @@ export default function DonutChart({ segments, size = 128 }: Props) {
         </text>
       </svg>
       <div className="flex flex-col gap-2 min-w-0 flex-1">
-        {segments.map((seg) => {
-          const pct = total > 0 ? Math.round((seg.value / total) * 100) : 0;
+        {segments.map((sec) => {
+          const pct = total > 0 ? Math.round((sec.value / total) * 100) : 0;
           return (
-            <div key={seg.label} className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
-              <span className="text-[10px] font-bold text-slate-500 truncate">{seg.label}</span>
+            <div key={sec.label} className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: sec.color }} />
+              <span className="text-[10px] font-bold text-slate-500 truncate">{sec.label}</span>
               <span className="text-[10px] font-black text-slate-700 ml-auto">
-                {seg.value} · {pct}%
+                {sec.value} · {pct}%
               </span>
             </div>
           );

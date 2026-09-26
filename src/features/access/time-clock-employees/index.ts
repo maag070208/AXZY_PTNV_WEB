@@ -1,6 +1,6 @@
 export {
-  useChecadorEmpleados,
-  type UseChecadorEmpleados,
-} from "./model/useChecadorEmpleados";
-export { default as ChecadorEmpleadosTab } from "./ui/ChecadorEmpleadosTab";
-export { default as VinculosResumen } from "./ui/VinculosResumen";
+  useTimeClockEmployees,
+  type UseTimeClockEmployees,
+} from "./model/useTimeClockEmployees";
+export { default as TimeClockEmployeesTab } from "./ui/TimeClockEmployeesTab";
+export { default as LinksSummary } from "./ui/LinksSummary";

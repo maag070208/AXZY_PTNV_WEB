@@ -1,13 +1,13 @@
-import { personalApi } from "@entities/personal";
+import { personalApi } from "@entities/hr";
 import SimpleCatalogTab from "./SimpleCatalogTab";
 
-export default function GenerosTab({ openCreateSignal }: { openCreateSignal?: number }) {
+export default function GendersTab({ openCreateSignal }: { openCreateSignal?: number }) {
   return (
     <SimpleCatalogTab
-      list={personalApi.generos}
-      create={personalApi.crearGenero}
-      update={personalApi.actualizarGenero}
-      remove={personalApi.eliminarGenero}
+      list={personalApi.genders}
+      create={personalApi.createGender}
+      update={personalApi.updateGender}
+      remove={personalApi.deleteGender}
       openCreateSignal={openCreateSignal}
     />
   );

@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { ticketsApi, type KanbanAssignment } from "@entities/ticket";
 
 export const ASSIGNMENT_STATUS_BADGE: Record<string, { color: string }> = {
-  PENDIENTE: { color: "gray" },
-  EN_PROGRESO: { color: "info" },
-  EN_REVISION: { color: "purple" },
-  COMPLETADA: { color: "success" },
+  PENDING: { color: "gray" },
+  IN_PROGRESS: { color: "info" },
+  IN_REVIEW: { color: "purple" },
+  COMPLETED: { color: "success" },
 };
 
 export const useAssignmentList = (loadErrorKey: string) => {
@@ -43,10 +43,10 @@ export const useAssignmentList = (loadErrorKey: string) => {
     [rows]
   );
 
-  const vencidas = useMemo(
+  const overdue = useMemo(
     () =>
       rows.filter(
-        (r) => r.status !== "COMPLETADA" && r.dueDate && new Date(r.dueDate) < new Date()
+        (r) => r.status !== "COMPLETED" && r.dueDate && new Date(r.dueDate) < new Date()
       ).length,
     [rows]
   );
@@ -59,7 +59,7 @@ export const useAssignmentList = (loadErrorKey: string) => {
     reloadKey,
     reload: () => setReloadKey((k) => k + 1),
     fetchTableData,
-    vencidas,
+    overdue,
   };
 };
 

@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { ruta } from "../env";
+import { route } from "../env";
 
 /**
  * Helpers de los controles del kit `@axzydev/axzy_ui_system`.
@@ -12,8 +12,8 @@ import { ruta } from "../env";
  */
 
 /** Resuelve el `Page` dueño del ámbito (acepta `Page` o `Locator`). */
-const paginaDe = (ambito: Page | Locator): Page =>
-  typeof (ambito as Locator).page === "function" ? (ambito as Locator).page() : (ambito as Page);
+const pageOf = (scope: Page | Locator): Page =>
+  typeof (scope as Locator).page === "function" ? (scope as Locator).page() : (scope as Page);
 
 /**
  * Panel desplegable de `ITSearchSelect` / `ITMultiSelect`.
@@ -24,12 +24,12 @@ const paginaDe = (ambito: Page | Locator): Page =>
  * profundidad del input; `.last()` toma el panel más reciente si hubiera más de
  * uno abierto (p. ej. dos buscadores en la misma pantalla).
  */
-export const panelBuscador = (ambito: Page | Locator): Locator =>
-  paginaDe(ambito).locator("body > div:has(> div.max-h-60)").last();
+export const searchPanel = (scope: Page | Locator): Locator =>
+  pageOf(scope).locator("body > div:has(> div.max-h-60)").last();
 
 /** Opciones clickeables del panel de un buscador (ya sin el `role` que no expone el kit). */
-export const opcionesBuscador = (ambito: Page | Locator): Locator =>
-  panelBuscador(ambito).locator("div.max-h-60 > div[class*='cursor-pointer']");
+export const searchOptions = (scope: Page | Locator): Locator =>
+  searchPanel(scope).locator("div.max-h-60 > div[class*='cursor-pointer']");
 
 /**
  * Combobox con búsqueda: enfoca, filtra y elige una opción del desplegable.
@@ -37,29 +37,29 @@ export const opcionesBuscador = (ambito: Page | Locator): Locator =>
  * `opcion` acota cuál tomar cuando el filtro deja varias; si se omite, toma la
  * primera, que es lo natural cuando la búsqueda ya es única.
  */
-export const elegirEnBuscador = async (
-  ambito: Page | Locator,
+export const selectInSearch = async (
+  scope: Page | Locator,
   placeholder: string,
-  busqueda: string,
-  opcion?: string | RegExp
+  search: string,
+  option?: string | RegExp
 ): Promise<void> => {
-  const input = ambito.getByPlaceholder(placeholder);
+  const input = scope.getByPlaceholder(placeholder);
   await input.click();
-  await input.fill(busqueda);
+  await input.fill(search);
 
-  const panel = panelBuscador(ambito);
-  const candidata = opcion
-    ? panel.getByText(opcion).first()
-    : opcionesBuscador(ambito).first();
+  const panel = searchPanel(scope);
+  const candidate = option
+    ? panel.getByText(option).first()
+    : searchOptions(scope).first();
 
-  await expect(candidata).toBeVisible();
-  await candidata.click();
+  await expect(candidate).toBeVisible();
+  await candidate.click();
 
   // Al elegir, el control cierra y DESMONTA el panel portado.
   await expect(panel).toHaveCount(0);
 };
 
-const escaparRegex = (texto: string): string => texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Campo de `ITInput`, que sí liga label e id por `name`.
@@ -68,22 +68,22 @@ const escaparRegex = (texto: string): string => texto.replace(/[.*+?^${}()|[\]\\
  * mismo formulario. El `*` de los campos requeridos vive dentro del `<label>`,
  * así que se contempla al final.
  */
-export const campo = (ambito: Page | Locator, label: string | RegExp): Locator =>
-  ambito.getByLabel(
-    typeof label === "string" ? new RegExp(`^\\s*${escaparRegex(label)}\\s*\\*?\\s*$`) : label
+export const field = (scope: Page | Locator, label: string | RegExp): Locator =>
+  scope.getByLabel(
+    typeof label === "string" ? new RegExp(`^\\s*${escapeRegex(label)}\\s*\\*?\\s*$`) : label
   );
 
 /** Chips y badges que funcionan como botón (tipo de movimiento, condición). */
-export const chip = (ambito: Page | Locator, texto: string | RegExp): Locator =>
-  ambito.getByRole("button").filter({ hasText: texto });
+export const chip = (scope: Page | Locator, text: string | RegExp): Locator =>
+  scope.getByRole("button").filter({ hasText: text });
 
 /** Botón por su texto visible. */
-export const boton = (ambito: Page | Locator, texto: string | RegExp): Locator =>
-  ambito.getByRole("button", { name: texto });
+export const button = (scope: Page | Locator, text: string | RegExp): Locator =>
+  scope.getByRole("button", { name: text });
 
 /** Espera el toast de confirmación de la app. */
-export const esperarToast = async (page: Page, texto: string | RegExp): Promise<void> => {
-  await expect(page.getByText(texto).first()).toBeVisible({ timeout: 15_000 });
+export const waitForToast = async (page: Page, text: string | RegExp): Promise<void> => {
+  await expect(page.getByText(text).first()).toBeVisible({ timeout: 15_000 });
 };
 
 /**
@@ -95,7 +95,7 @@ export const esperarToast = async (page: Page, texto: string | RegExp): Promise<
  * para que se alcance a ver el toast— y ese `navigate` tardío desmontaría el
  * formulario al que acabamos de llegar. El `reload` corta esa herencia.
  */
-export const irARuta = async (page: Page, path: string): Promise<void> => {
-  await page.goto(ruta(path));
+export const goToRoute = async (page: Page, path: string): Promise<void> => {
+  await page.goto(route(path));
   await page.reload();
 };
