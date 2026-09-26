@@ -48,6 +48,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "username",
       label: tt("table.username"),
       type: "string",
+      width: 110,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -58,6 +59,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "name",
       label: tt("table.name"),
       type: "string",
+      width: 300,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -73,6 +75,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "role",
       label: tt("table.role"),
       type: "catalog",
+      width: 140,
       filter: "catalog",
       sortable: false,
       catalogOptions: {
@@ -86,6 +89,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "employeeNumber",
       label: tt("table.employeeNo"),
       type: "string",
+      width: 110,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -96,6 +100,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "department",
       label: tt("table.department"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
       catalogOptions: { data: [], loading: false, error: false },
       render: (u) => (
@@ -108,6 +113,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "subarea",
       label: tt("table.subarea"),
       type: "catalog",
+      width: 200,
       filter: "catalog",
       catalogOptions: { data: [], loading: false, error: false },
       render: (u) => (
@@ -120,6 +126,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "actions",
       label: "",
       type: "string",
+      width: 200,
       sortable: false,
       render: (u) => (
         <ITFlex align="center" gap={2}>
@@ -175,9 +182,13 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={10}
+      defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
+      onRowClick={(row) => onView(row as unknown as User)}
     />
   );
 }

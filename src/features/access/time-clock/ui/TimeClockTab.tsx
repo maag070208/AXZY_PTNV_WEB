@@ -270,7 +270,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={25}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50, 100]}
         debounceMs={350}
         size="lg"

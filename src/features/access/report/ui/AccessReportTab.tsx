@@ -487,7 +487,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           ) => Promise<{ data: Record<string, unknown>[]; total: number }>
         }
         externalFilters={externalFilters}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"

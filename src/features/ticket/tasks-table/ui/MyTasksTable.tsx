@@ -116,7 +116,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={10}
+      defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
     />

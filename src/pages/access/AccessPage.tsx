@@ -504,7 +504,7 @@ export default function AccessPage() {
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"

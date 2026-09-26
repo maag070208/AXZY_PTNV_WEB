@@ -218,7 +218,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
           }>
         }
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />

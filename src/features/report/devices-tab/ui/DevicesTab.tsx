@@ -270,7 +270,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           }>
         }
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />

@@ -107,7 +107,7 @@ export default function AdminTasksTable({ fx }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={10}
+      defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
     />

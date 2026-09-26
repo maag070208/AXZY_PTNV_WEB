@@ -505,7 +505,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         fetchData={fetchTableData as never}
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={25}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[25, 50, 100]}
         size="lg"
       />

@@ -181,7 +181,7 @@ export default function SchedulesTable() {
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchData as never}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
         size="lg"
       />

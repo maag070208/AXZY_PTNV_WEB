@@ -106,7 +106,7 @@ export default function DevicesPage() {
       <ITDataTable
         columns={columns as any}
         fetchData={fetchData as any}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />

@@ -277,7 +277,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={25}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50, 100]}
         debounceMs={350}
         size="lg"

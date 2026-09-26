@@ -204,7 +204,7 @@ export default function EmployeesTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={10}
+      defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
       virtualized

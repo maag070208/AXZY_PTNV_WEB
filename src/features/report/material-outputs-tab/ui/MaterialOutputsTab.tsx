@@ -163,7 +163,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchTableData}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={10}
+        defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />
