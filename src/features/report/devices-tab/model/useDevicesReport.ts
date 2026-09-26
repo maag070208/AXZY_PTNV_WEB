@@ -67,9 +67,6 @@ export const useDevicesReport = ({ download }: Options) => {
     return filters;
   }, [dateRange]);
 
-  /** Firma del rango: remonta la tabla al cambiar para volver a la página 1. */
-  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
-
   /** Última consulta de la tabla; el export reutiliza su recorte y su orden. */
   const lastQuery = useRef<TableQuery>({ filters: {}, sort: DEFAULT_DEVICES_SORT });
 
@@ -119,7 +116,6 @@ export const useDevicesReport = ({ download }: Options) => {
     dateRange,
     setDateRange,
     externalFilters,
-    tableKey,
     handleDownloadPdf,
     fetchTableData,
   };

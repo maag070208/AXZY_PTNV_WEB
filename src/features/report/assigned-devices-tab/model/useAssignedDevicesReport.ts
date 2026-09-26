@@ -68,9 +68,6 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     return filters;
   }, [dateRange]);
 
-  /** Firma del rango: remonta la tabla al cambiar para volver a la página 1. */
-  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
-
   /**
    * Última consulta que la tabla encontró. Los filtros de columna viven dentro
    * de `ITDataTable`, así que se_guardan aquí para que el PDF salga con el mismo
@@ -124,7 +121,6 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     dateRange,
     setDateRange,
     externalFilters,
-    tableKey,
     handleDownloadPdf,
     fetchTableData,
   };

@@ -15,6 +15,45 @@ const errorMessage = (err: unknown, fallback: string): string =>
 
 const cellKey = (role: string, permission: string): string => `${permission}|${role}`;
 
+/**
+ * Alcance por defecto cuando se marca desde "no" un permiso con alcance de
+ * datos. Se eligió el **mínimo útil** para no ampliar accesos sin querer: los
+ * tickets/tareas arrancan en Propio y la bitácora/checador/horas extra en Área.
+ * El usuario puede cambiarlo desde el modal "cambiar alcance".
+ */
+export const DEFAULT_SCOPE: Record<string, PermissionScope> = {
+  "tickets.view": "OWN",
+  "tickets.edit": "OWN",
+  "tickets.close": "OWN",
+  "tasks.view": "OWN",
+  "tasks.assign": "OWN",
+  "tasks.complete": "OWN",
+  "access.log": "AREA",
+  "time_clock.view": "AREA",
+  "overtime.view": "AREA",
+  "overtime.approve": "AREA",
+  "users.permissions": "AREA",
+};
+
+/** Permiso con alcance de datos (admite Propio/Área además de Todo). */
+export const isScopedPermission = (permission: PermissionCatalog): boolean =>
+  permission.scopes.some((scope) => scope === "OWN" || scope === "AREA");
+
+/** Alcance que se aplica al marcar un permiso desde "no". */
+export const defaultScopeFor = (
+  permission: string,
+  catalog: readonly PermissionCatalog[]
+): PermissionScope => {
+  const definition = catalog.find((item) => item.key === permission);
+  const predefined = DEFAULT_SCOPE[permission];
+  if (predefined && (!definition || definition.scopes.includes(predefined))) {
+    return predefined;
+  }
+  if (!definition) return predefined ?? "ALL";
+  if (definition.scopes.includes("ALL")) return "ALL";
+  return definition.scopes[0] ?? "NONE";
+};
+
 const toBaseline = (data: RolesAdminData): Record<string, PermissionScope> => {
   const base: Record<string, PermissionScope> = {};
   for (const cell of data.matrix) {
@@ -27,6 +66,8 @@ export interface RolesAdminState {
   data: RolesAdminData | null;
   /** Alcance en edición por celda (`permiso|rol`). */
   draft: Record<string, PermissionScope>;
+  /** Permisos en edición agrupados por rol (solo los ≠ NONE). */
+  permissionsByRole: Record<string, Partial<Record<string, PermissionScope>>>;
   /** Cambios pendientes respecto a lo persistido. */
   changes: MatrixChange[];
   dirty: boolean;
@@ -35,6 +76,8 @@ export interface RolesAdminState {
   error: string | null;
   saveError: string | null;
   setScope: (role: string, permission: string, scope: PermissionScope) => void;
+  /** Marca/desmarca una celda (sí/no). Al marcar aplica el alcance por defecto. */
+  toggle: (role: string, permission: string) => void;
   save: () => Promise<boolean>;
   reload: () => Promise<void>;
   discard: () => void;
@@ -82,6 +125,37 @@ export const useRolesAdmin = (): RolesAdminState => {
     []
   );
 
+  const toggle = useCallback(
+    (role: string, permission: string) => {
+      setDraft((prev) => {
+        const key = cellKey(role, permission);
+        const current = prev[key] ?? "NONE";
+        const next =
+          current === "NONE"
+            ? defaultScopeFor(permission, data?.catalog ?? [])
+            : "NONE";
+        return { ...prev, [key]: next };
+      });
+    },
+    [data]
+  );
+
+  /** Mapa rol → { permiso: alcance } con los permisos ≠ NONE del borrador. */
+  const permissionsByRole = useMemo<
+    Record<string, Partial<Record<string, PermissionScope>>>
+  >(() => {
+    if (!data) return {};
+    const map: Record<string, Partial<Record<string, PermissionScope>>> = {};
+    for (const role of data.roles) map[role] = {};
+    for (const permission of data.catalog) {
+      for (const role of data.roles) {
+        const scope = draft[cellKey(role, permission.key)] ?? "NONE";
+        if (scope !== "NONE") map[role][permission.key] = scope;
+      }
+    }
+    return map;
+  }, [data, draft]);
+
   const discard = useCallback(() => {
     setDraft({ ...baseline });
     setSaveError(null);
@@ -122,6 +196,7 @@ export const useRolesAdmin = (): RolesAdminState => {
   return {
     data,
     draft,
+    permissionsByRole,
     changes,
     dirty: changes.length > 0,
     loading,
@@ -129,6 +204,7 @@ export const useRolesAdmin = (): RolesAdminState => {
     error,
     saveError,
     setScope,
+    toggle,
     save,
     reload,
     discard,

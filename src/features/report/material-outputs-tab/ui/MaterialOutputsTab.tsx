@@ -31,7 +31,6 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
     dateRange,
     setDateRange,
     externalFilters,
-    tableKey,
     handleDownloadPdf,
     fetchTableData,
   } = fx;
@@ -214,7 +213,6 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       </ITFlex>
 
       <ITDataTable
-        key={tableKey}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchTableData}
         externalFilters={externalFilters}

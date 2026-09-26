@@ -53,9 +53,6 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
     return filters;
   }, [dateRange]);
 
-  /** Firma del rango: remonta la tabla al cambiar para volver a la página 1. */
-  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
-
   const fetchTableData = useCallback(
     async (
       params: ITDataTableFetchParams
@@ -114,7 +111,6 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
     dateRange,
     setDateRange,
     externalFilters,
-    tableKey,
     handleDownloadPdf,
     fetchTableData,
   };

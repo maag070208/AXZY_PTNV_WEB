@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   timeClockApi,
@@ -87,19 +87,8 @@ export const useTimeClocks = () => {
     [t]
   );
 
-  // La configuración de cada reloj se lee una vez, al aparecer en la lista.
-  const series = useMemo(
-    () => (status?.devices ?? []).map((d) => d.clockSerial).join("|"),
-    [status?.devices]
-  );
-  const requested = useRef(new Set<string>());
-  useEffect(() => {
-    for (const serial of series ? series.split("|") : []) {
-      if (requested.current.has(serial)) continue;
-      requested.current.add(serial);
-      void loadConfig(serial);
-    }
-  }, [series, loadConfig]);
+  // La configuración se lee al abrir el detalle de un reloj (carga perezosa:
+  // no se consulta cada reloj hasta que hace falta).
 
   const openRegistration = () => {
     setUrl("");
@@ -162,8 +151,6 @@ export const useTimeClocks = () => {
       await timeClockApi.retireClock(serial);
       setRetirementTarget(null);
       setToast(t("clocks.toasts.retirement", { name: clockName }));
-      // Si se vuelve a dar de alta, su configuración se lee de nuevo.
-      requested.current.delete(serial);
       setConfigs((c) => {
         const rest = { ...c };
         delete rest[serial];

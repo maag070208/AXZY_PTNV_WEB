@@ -9,3 +9,17 @@ export {
   type CatalogCreateDto,
   type CatalogUpdateDto,
 } from "./api/permissionApi";
+export {
+  APP_SCREENS,
+  isScreenVisible,
+  isScreenVisibleInGroup,
+  referencedPermissions,
+  screenHasPermission,
+  screenLeaves,
+  screenScopeOf,
+  type AppScreen,
+  type NavLabelKey,
+  type PermissionMap,
+  type ScreenLeaf,
+  type ScreenRequirement,
+} from "./model/screens";

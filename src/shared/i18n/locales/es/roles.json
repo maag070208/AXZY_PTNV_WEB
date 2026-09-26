@@ -1,8 +1,8 @@
 {
   "title": "Roles y permisos",
-  "description": "Administra la matriz de roles y el catálogo de permisos del sistema (solo ADMIN)",
+  "description": "Administra qué puede hacer cada rol y qué pantallas ve (solo ADMIN)",
   "tabs": {
-    "matrix": "Matriz",
+    "access": "Accesos",
     "catalog": "Catálogo"
   },
   "scope": {
@@ -10,6 +10,18 @@
     "OWN": "Propio",
     "AREA": "Área",
     "ALL": "Todo"
+  },
+  "scopePlain": {
+    "NONE": "Sin permiso",
+    "OWN": "Solo lo suyo",
+    "AREA": "Su área",
+    "ALL": "Todo"
+  },
+  "scopeExample": {
+    "NONE": "No tiene el permiso.",
+    "OWN": "Por ejemplo: solo sus propios tickets o sus propias tareas.",
+    "AREA": "Por ejemplo: la bitácora o el checador de las personas de su departamento.",
+    "ALL": "Por ejemplo: la bitácora o los tickets de toda la empresa."
   },
   "role": {
     "ADMIN": "ADMIN",
@@ -20,21 +32,65 @@
     "GUARD": "GUARDIA"
   },
   "matrix": {
-    "title": "Matriz de roles",
-    "subtitle": "Define el alcance de cada permiso por rol. Los permisos inactivos no se pueden conceder.",
+    "title": "Accesos por rol",
+    "subtitle": "Marca los permisos que tiene cada rol. Los permisos con alcance muestran un botón para ajustar sobre qué datos aplican.",
     "permission": "Permiso",
+    "permissionCount": "{{count}} permisos",
+    "permissionCount_one": "{{count}} permiso",
+    "permissionCount_other": "{{count}} permisos",
     "sensitive": "Sensible",
+    "scoped": "Con alcance",
     "inactive": "Inactivo",
-    "inactiveWarning": "Hay permisos inactivos: sus celdas están deshabilitadas y no se pueden modificar.",
+    "inactiveWarning": "Hay permisos inactivos: sus casillas están deshabilitadas y no se pueden modificar.",
     "changeCount": "{{count}} cambios pendientes",
     "changeCount_one": "{{count}} cambio pendiente",
     "changeCount_other": "{{count}} cambios pendientes",
+    "searchPlaceholder": "Buscar permiso por nombre, clave o módulo…",
+    "noResults": "No hay permisos que coincidan con la búsqueda",
+    "changeScope": "Cambiar sobre qué datos aplica",
+    "adminLocked": "El ADMIN no puede quedarse sin administrar roles y permisos",
     "save": "Guardar",
     "saving": "Guardando...",
-    "saved": "Matriz guardada correctamente",
+    "saved": "Cambios guardados. Los usuarios de esos roles lo verán al recargar o volver a la ventana.",
     "saveError": "No se pudo guardar la matriz",
     "discard": "Descartar",
     "empty": "No hay permisos en el catálogo"
+  },
+  "scopeDialog": {
+    "title": "Alcance de “{{permission}}”",
+    "intro": "¿Sobre qué datos aplica este permiso para el rol {{role}}?",
+    "hint": "El cambio se aplica al pulsar Guardar en la pestaña Accesos."
+  },
+  "access": {
+    "title": "Roles del sistema",
+    "subtitle": "Elige un rol para ver y editar lo que puede hacer y las pantallas que ve.",
+    "roleSummary": "{{permissions}} permisos · {{screens}} pantallas",
+    "edit": "Editar lo que ve",
+    "back": "Volver a roles",
+    "detailSubtitle": "Marca lo que este rol puede hacer. Los permisos con alcance muestran un botón para elegir sobre qué datos aplican.",
+    "screensTitle": "Pantallas que ve",
+    "screensEmpty": "Con estos permisos, este rol no vería ninguna pantalla.",
+    "permissionsTitle": "Permisos",
+    "preview": "Ver menú",
+    "previewTitle": "Menú de {{role}}",
+    "previewEmpty": "Este rol no vería ninguna sección del menú."
+  },
+  "help": {
+    "open": "Ayuda",
+    "title": "Cómo funcionan los roles y permisos",
+    "intro": "Aquí decides qué puede hacer cada rol. Marcas un permiso y ese rol lo tiene; lo desmarcas y deja de tenerlo.",
+    "howTitle": "Casillas",
+    "howBody": "Cada fila es una acción y cada columna un rol. Una palomita significa que ese rol tiene el permiso. Los marcados como sensibles conviene revisarlos dos veces.",
+    "scopeTitle": "Alcance de datos",
+    "scopeIntro": "Algunos permisos (los que muestran un botón de ajustes) además definen sobre qué datos aplican:",
+    "scopeOwnExample": "Solo lo suyo: por ejemplo, únicamente sus propios tickets o tareas.",
+    "scopeAreaExample": "Su área: lo de las personas de su departamento.",
+    "scopeAllExample": "Todo: toda la empresa.",
+    "scopeNote": "Al marcar uno de estos permisos se aplica el alcance más prudente; puedes ajustarlo con el botón de ajustes que aparece junto a la casilla.",
+    "appliesTitle": "A quién le aplica",
+    "appliesBody": "El cambio es para todo el rol: cada persona con ese rol lo verá cuando su sesión se actualice (al recargar o volver a la ventana). Tu propia sesión no cambia salvo que tengas ese rol.",
+    "catalogTitle": "Catálogo",
+    "catalogBody": "En la pestaña Catálogo se crean, editan y activan/desactivan los permisos. Un permiso inactivo no se puede conceder y no aplica para nadie."
   },
   "catalog": {
     "title": "Catálogo de permisos",

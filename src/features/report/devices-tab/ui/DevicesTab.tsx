@@ -33,7 +33,6 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     dateRange,
     setDateRange,
     externalFilters,
-    tableKey,
     handleDownloadPdf,
     fetchTableData,
   } = fx;
@@ -311,7 +310,6 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       </ITFlex>
 
       <ITDataTable
-        key={tableKey}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (

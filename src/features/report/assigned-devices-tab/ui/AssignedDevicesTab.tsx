@@ -24,7 +24,6 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
     dateRange,
     setDateRange,
     externalFilters,
-    tableKey,
     handleDownloadPdf,
     fetchTableData,
   } = fx;
@@ -252,7 +251,6 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       </ITFlex>
 
       <ITDataTable
-        key={tableKey}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (

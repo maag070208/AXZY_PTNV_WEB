@@ -1,4 +1,4 @@
-export { default as RoleMatrixPanel } from "./ui/RoleMatrixPanel";
+export { default as RoleAccessPanel } from "./ui/RoleAccessPanel";
 export { default as PermissionCatalogPanel } from "./ui/PermissionCatalogPanel";
 export { default as RolesPermissionsTabs } from "./ui/RolesPermissionsTabs";
 export {

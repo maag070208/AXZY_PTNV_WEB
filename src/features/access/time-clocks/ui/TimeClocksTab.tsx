@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ITAlert,
   ITButton,
@@ -10,18 +11,22 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaLock, FaPlus } from "react-icons/fa";
+import type { TimeClockDevice } from "@entities/time-clock";
 import type { UseTimeClocks } from "../model/useTimeClocks";
 import ClockCard from "./ClockCard";
+import ClockDetail from "./ClockDetail";
 
 /**
- * Relojes checadores: alta, baja, sincronización y configuración leída en vivo.
- * Del reloj solo se lee; nada de esta pantalla le cambia algo al equipo.
+ * Relojes checadores: lista en tarjetas y, al entrar a una, el detalle con su
+ * sincronización, su configuración leída en vivo y las acciones. Del reloj solo
+ * se lee; nada de esta pantalla le cambia algo al equipo.
  */
 export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
   const {
     t,
     status,
     configs,
+    loadConfig,
     isRegistrationOpen,
     setIsRegistrationOpen,
     openRegistration,
@@ -53,6 +58,18 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
     setToast,
   } = fx;
 
+  const [selectedSerial, setSelectedSerial] = useState<string | null>(null);
+
+  const clocks = status?.devices ?? [];
+  const selected = selectedSerial
+    ? clocks.find((clock) => clock.clockSerial === selectedSerial) ?? null
+    : null;
+
+  const openClock = (clock: TimeClockDevice) => {
+    setSelectedSerial(clock.clockSerial);
+    void loadConfig(clock.clockSerial);
+  };
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && (
@@ -61,47 +78,68 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
         </ITAlert>
       )}
 
-      <ITCard className="!p-5 border border-slate-200">
-        <ITFlex align="center" wrap="wrap" gap={3}>
-          <ITFlex direction="column" gap={1} className="min-w-0">
-            <ITFlex align="center" gap={1}>
-              <FaLock size={11} className="text-slate-400" />
-              <ITText className="text-[12px] font-bold text-slate-700">{t("clocks.readOnly")}</ITText>
-            </ITFlex>
-            <ITText className="text-[11px] text-slate-500">{t("clocks.credentials")}</ITText>
-          </ITFlex>
-          <ITButton
-            variant="filled"
-            color="primary"
-            size="sm"
-            className="ml-auto"
-            disabled={!status?.configured}
-            onClick={openRegistration}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaPlus size={10} />
-              <ITText className="font-bold text-[11px]">{t("clocks.actions.registration")}</ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
-      </ITCard>
-
-      {status && !status.configured && <ITAlert variant="warning">{t("clocks.notConfigured")}</ITAlert>}
-
-      {status && status.devices.length === 0 && (
-        <ITCard className="!p-5 border border-slate-200">
-          <ITText className="text-[12px] text-slate-500">{t("clocks.empty")}</ITText>
-        </ITCard>
-      )}
-
-      {status?.devices.map((clock) => (
-        <ClockCard
-          key={clock.clockSerial}
+      {selected ? (
+        <ClockDetail
           fx={fx}
-          clock={clock}
-          config={configs[clock.clockSerial]}
+          clock={selected}
+          config={configs[selected.clockSerial]}
+          onBack={() => setSelectedSerial(null)}
         />
-      ))}
+      ) : (
+        <>
+          <ITCard className="!p-5 border border-slate-200">
+            <ITFlex align="center" wrap="wrap" gap={3}>
+              <ITFlex direction="column" gap={1} className="min-w-0">
+                <ITFlex align="center" gap={1}>
+                  <FaLock size={11} className="text-slate-400" />
+                  <ITText className="text-[12px] font-bold text-slate-700">
+                    {t("clocks.readOnly")}
+                  </ITText>
+                </ITFlex>
+                <ITText className="text-[11px] text-slate-500">
+                  {t("clocks.credentials")}
+                </ITText>
+              </ITFlex>
+              <ITButton
+                variant="filled"
+                color="primary"
+                size="sm"
+                className="ml-auto"
+                disabled={!status?.configured}
+                onClick={openRegistration}
+              >
+                <ITFlex align="center" gap={1}>
+                  <FaPlus size={10} />
+                  <ITText className="font-bold text-[11px]">
+                    {t("clocks.actions.registration")}
+                  </ITText>
+                </ITFlex>
+              </ITButton>
+            </ITFlex>
+          </ITCard>
+
+          {status && !status.configured && (
+            <ITAlert variant="warning">{t("clocks.notConfigured")}</ITAlert>
+          )}
+
+          {status && clocks.length === 0 ? (
+            <ITCard className="!p-5 border border-slate-200">
+              <ITText className="text-[12px] text-slate-500">{t("clocks.empty")}</ITText>
+            </ITCard>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {clocks.map((clock) => (
+                <ClockCard
+                  key={clock.clockSerial}
+                  fx={fx}
+                  clock={clock}
+                  onOpen={() => openClock(clock)}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       <ITDialog
         isOpen={isRegistrationOpen}
@@ -133,8 +171,15 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
             />
             <ITText className="text-[11px] text-slate-500">{t("clocks.dialog.nameHint")}</ITText>
           </ITFlex>
-          <ClockUsage fx={fx} checked={countsAttendance} onChange={setAttendance} name="checadorRelojAsistencia" />
-          <ITText className="text-[11px] text-slate-600">{t("clocks.dialog.registrationNote")}</ITText>
+          <ClockUsage
+            fx={fx}
+            checked={countsAttendance}
+            onChange={setAttendance}
+            name="checadorRelojAsistencia"
+          />
+          <ITText className="text-[11px] text-slate-600">
+            {t("clocks.dialog.registrationNote")}
+          </ITText>
           {registrationError && <ITAlert variant="error">{registrationError}</ITAlert>}
           <ITFlex justify="end" gap={2}>
             <ITButton
@@ -208,7 +253,9 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
         className="max-w-md"
       >
         <ITFlex direction="column" gap={3} className="mt-2">
-          <ITText className="text-[12px] text-slate-600">{t("clocks.dialog.retirementText")}</ITText>
+          <ITText className="text-[12px] text-slate-600">
+            {t("clocks.dialog.retirementText")}
+          </ITText>
           <ITFlex justify="end" gap={2}>
             <ITButton
               variant="outlined"
