@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
@@ -24,6 +24,16 @@ const FILTER_LABELS: Record<string, string> = {
   folio: "assigned.colFolioSource",
   date: "assigned.colDate",
   daysAssigned: "assigned.colDays",
+  start: "pdf.filterFrom",
+  end: "pdf.filterTo",
+};
+
+/** Fecha local `YYYY-MM-DD`, la clave de día que el API resuelve en su zona. */
+const toDateInput = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 
 export type { AssignedDevicesPdfPayload } from "@entities/report";
@@ -45,6 +55,21 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  // Rango vacío = sin recorte (comportamiento previo). Con rango, el API filtra
+  // por la fecha del préstamo VIGENTE, así que las unidades no prestadas quedan
+  // fuera y tabla, KPIs y PDF quedan consistentes.
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+
+  /** Rango de fechas expuesto a la tabla como filtros externos (clave de día). */
+  const externalFilters = useMemo(() => {
+    const filters: Record<string, string | number | boolean> = {};
+    if (dateRange[0]) filters.start = toDateInput(dateRange[0]);
+    if (dateRange[1]) filters.end = toDateInput(dateRange[1]);
+    return filters;
+  }, [dateRange]);
+
+  /** Firma del rango: remonta la tabla al cambiar para volver a la página 1. */
+  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
 
   /**
    * Última consulta que la tabla encontró. Los filtros de columna viven dentro
@@ -96,6 +121,10 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     exporting,
     reloadKey,
     setReloadKey,
+    dateRange,
+    setDateRange,
+    externalFilters,
+    tableKey,
     handleDownloadPdf,
     fetchTableData,
   };

@@ -3,10 +3,11 @@ import {
   ITButton,
   ITCard,
   ITDataTable,
+  ITDatePicker,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaExclamationTriangle, FaFilePdf, FaSync } from "react-icons/fa";
+import { FaExclamationTriangle, FaFilePdf, FaSync, FaUndo } from "react-icons/fa";
 import { useMemo } from "react";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { DeviceReportRow, DeviceReportStatus } from "@entities/report";
@@ -29,9 +30,22 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     reloadKey,
     setReloadKey,
     stats,
+    dateRange,
+    setDateRange,
+    externalFilters,
+    tableKey,
     handleDownloadPdf,
     fetchTableData,
   } = fx;
+
+  const handleDateRange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: Date | [Date | null, Date | null] } }
+  ) => {
+    const value = e.target.value;
+    if (Array.isArray(value)) setDateRange(value);
+  };
 
   const statusLabel = (status: string) =>
     status === "ASSIGNED"
@@ -187,6 +201,31 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
 
   return (
     <ITFlex direction="column" gap={4}>
+      <ITFlex align="end" wrap="wrap" gap={3}>
+        <div className="min-w-[240px] max-w-[340px] flex-1">
+          <ITDatePicker
+            name="devicesDateRange"
+            label={t("filters.dateRange")}
+            range
+            value={dateRange}
+            onChange={handleDateRange}
+            className="w-full min-w-0"
+          />
+        </div>
+        <ITButton
+          variant="text"
+          color="gray"
+          size="sm"
+          onClick={() => setDateRange([null, null])}
+          disabled={!dateRange[0] && !dateRange[1]}
+        >
+          <ITFlex align="center" gap={1}>
+            <FaUndo size={11} />
+            <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
+          </ITFlex>
+        </ITButton>
+      </ITFlex>
+
       <ITFlex gap={3} wrap="wrap">
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
@@ -272,6 +311,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       </ITFlex>
 
       <ITDataTable
+        key={tableKey}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (
@@ -281,6 +321,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
             total: number;
           }>
         }
+        externalFilters={externalFilters}
         reloadTrigger={reloadKey}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}

@@ -3,10 +3,11 @@ import {
   ITButton,
   ITCard,
   ITDataTable,
+  ITDatePicker,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaExclamationTriangle, FaFilePdf } from "react-icons/fa";
+import { FaExclamationTriangle, FaFilePdf, FaUndo } from "react-icons/fa";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
@@ -22,7 +23,27 @@ const REASON_COLORS: Record<MaterialOutputReason, "danger" | "warning" | "gray">
 
 export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsReport }) {
   const { t } = useTranslation(["reports", "material-outputs", "common"]);
-  const { total, error, exporting, reloadKey, handleDownloadPdf, fetchTableData } = fx;
+  const {
+    total,
+    error,
+    exporting,
+    reloadKey,
+    dateRange,
+    setDateRange,
+    externalFilters,
+    tableKey,
+    handleDownloadPdf,
+    fetchTableData,
+  } = fx;
+
+  const handleDateRange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: Date | [Date | null, Date | null] } }
+  ) => {
+    const value = e.target.value;
+    if (Array.isArray(value)) setDateRange(value);
+  };
 
   const columns: Column<MaterialOutput>[] = [
     {
@@ -131,6 +152,31 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
 
   return (
     <ITFlex direction="column" gap={4}>
+      <ITFlex align="end" wrap="wrap" gap={3}>
+        <div className="min-w-[240px] max-w-[340px] flex-1">
+          <ITDatePicker
+            name="exitsDateRange"
+            label={t("filters.dateRange")}
+            range
+            value={dateRange}
+            onChange={handleDateRange}
+            className="w-full min-w-0"
+          />
+        </div>
+        <ITButton
+          variant="text"
+          color="gray"
+          size="sm"
+          onClick={() => setDateRange([null, null])}
+          disabled={!dateRange[0] && !dateRange[1]}
+        >
+          <ITFlex align="center" gap={1}>
+            <FaUndo size={11} />
+            <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
+          </ITFlex>
+        </ITButton>
+      </ITFlex>
+
       <ITFlex gap={3} wrap="wrap">
         <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
           <ITFlex direction="column" gap={0}>
@@ -168,8 +214,10 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       </ITFlex>
 
       <ITDataTable
+        key={tableKey}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchTableData}
+        externalFilters={externalFilters}
         reloadTrigger={reloadKey}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}

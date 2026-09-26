@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
@@ -23,6 +23,16 @@ const FILTER_LABELS: Record<string, string> = {
   custodian: "devices.colCustodian",
   department: "devices.colDept",
   area: "devices.colArea",
+  start: "pdf.filterFrom",
+  end: "pdf.filterTo",
+};
+
+/** Fecha local `YYYY-MM-DD`, la clave de día que el API resuelve en su zona. */
+const toDateInput = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 
 export type { DevicesPdfPayload } from "@entities/report";
@@ -44,6 +54,21 @@ export const useDevicesReport = ({ download }: Options) => {
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  // Rango vacío = sin recorte (comportamiento previo). Con rango, el API filtra
+  // por la fecha del préstamo VIGENTE: las unidades no prestadas quedan fuera y
+  // tabla, KPIs y PDF comparten el mismo recorte.
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+
+  /** Rango de fechas expuesto a la tabla como filtros externos (clave de día). */
+  const externalFilters = useMemo(() => {
+    const filters: Record<string, string | number | boolean> = {};
+    if (dateRange[0]) filters.start = toDateInput(dateRange[0]);
+    if (dateRange[1]) filters.end = toDateInput(dateRange[1]);
+    return filters;
+  }, [dateRange]);
+
+  /** Firma del rango: remonta la tabla al cambiar para volver a la página 1. */
+  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
 
   /** Última consulta de la tabla; el export reutiliza su recorte y su orden. */
   const lastQuery = useRef<TableQuery>({ filters: {}, sort: DEFAULT_DEVICES_SORT });
@@ -91,6 +116,10 @@ export const useDevicesReport = ({ download }: Options) => {
     exporting,
     reloadKey,
     setReloadKey,
+    dateRange,
+    setDateRange,
+    externalFilters,
+    tableKey,
     handleDownloadPdf,
     fetchTableData,
   };

@@ -8,6 +8,8 @@ import PdfFooter from "@shared/pdf/PdfFooter";
 interface Props {
   rows: MaterialOutput[];
   title?: string;
+  /** Filtros aplicados que el servidor recortó (etiqueta ya traducida). */
+  appliedFilters?: Array<{ label: string; value: string }>;
 }
 
 const fmtDate = (d: string | null): string => {
@@ -40,7 +42,7 @@ const COL = {
   device: 66,
 };
 
-export default function MaterialOutputsPdf({ rows, title }: Props) {
+export default function MaterialOutputsPdf({ rows, title, appliedFilters }: Props) {
   const { t: tt } = useTranslation(["reports", "material-outputs"]);
   const reportTitle = title ?? tt("pdf.exitsTitle");
   const today = fmtDate(new Date().toISOString());
@@ -113,6 +115,17 @@ export default function MaterialOutputsPdf({ rows, title }: Props) {
                 <View style={{ width: COL.device }}><Text style={pdfTheme.cellMuted}>{r.device?.assetTag ?? "—"}</Text></View>
               </View>
             ))}
+
+            {pageIdx === pages.length - 1 && (appliedFilters?.length ?? 0) > 0 && (
+              <View style={pdfTheme.filterBox} wrap={false}>
+                <Text style={pdfTheme.filterTitle}>{tt("pdf.appliedFilters")}</Text>
+                {appliedFilters!.map((f) => (
+                  <Text key={f.label} style={pdfTheme.filterText}>
+                    {f.label}: {f.value}
+                  </Text>
+                ))}
+              </View>
+            )}
           </View>
 
           <PdfFooter pageIndex={pageIdx} pageCount={pages.length} />

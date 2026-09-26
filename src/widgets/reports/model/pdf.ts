@@ -8,7 +8,7 @@ import type {
   AssignedDevicesPdfPayload,
   DevicesPdfPayload,
 } from "@entities/report";
-import type { MaterialOutput } from "@entities/material-output";
+import type { MaterialOutputsPdfPayload } from "@entities/material-output";
 import type {
   AccessReportPdfMeta,
   AccessReportSessionRow,
@@ -68,8 +68,15 @@ export const downloadDevicesPDF = async (payload: DevicesPdfPayload): Promise<vo
   saveAs(blob, `${fileName("devicesReport")}_${yy}${mm}${dd}.pdf`);
 };
 
-export const downloadMaterialOutputsPdf = async (rows: MaterialOutput[]): Promise<void> => {
-  const blob = await pdf(createElement(MaterialOutputsPdf, { rows }) as any).toBlob();
+export const downloadMaterialOutputsPdf = async (
+  payload: MaterialOutputsPdfPayload
+): Promise<void> => {
+  const blob = await pdf(
+    createElement(MaterialOutputsPdf, {
+      rows: payload.data,
+      appliedFilters: payload.meta.appliedFilters,
+    }) as any
+  ).toBlob();
   const now = new Date();
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");

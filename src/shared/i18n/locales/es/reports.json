@@ -6,6 +6,10 @@
     "devices": "Dispositivos",
     "exits": "Salidas"
   },
+  "filters": {
+    "dateRange": "Rango de fechas",
+    "clear": "Limpiar"
+  },
   "assigned": {
     "statAssigned": "Asignados",
     "statAverage": "Días promedio",
@@ -94,6 +98,8 @@
     "availableStatus": "Disponible",
     "retirementStatus": "Baja",
     "appliedFilters": "Filtros aplicados",
+    "filterFrom": "Desde",
+    "filterTo": "Hasta",
     "truncatedRows": "Se muestran sólo los primeros {{shown}} registros",
     "filterPeriod": "Periodo: {{from}} — {{to}}",
     "filterDepartment": "Departamento: {{name}}",

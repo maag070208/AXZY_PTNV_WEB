@@ -55,3 +55,9 @@ export interface MaterialOutputSuggestions {
   model: string[];
   description: string[];
 }
+
+/** Payload del PDF de salidas: filas filtradas + filtros aplicados (ya traducidos). */
+export interface MaterialOutputsPdfPayload {
+  data: MaterialOutput[];
+  meta: { appliedFilters: Array<{ label: string; value: string }> };
+}
