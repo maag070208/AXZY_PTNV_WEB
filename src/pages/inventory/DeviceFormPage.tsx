@@ -301,7 +301,7 @@ export default function DeviceFormPage() {
                         <ITFlex direction="column" gap={2} className="border-t border-slate-100 px-3 pb-3 pt-2.5">
                           {type.useSerialNumber && (
                             <ITInput
-                              name={`serie-${u.id}`}
+                              name={`serialNumber-${u.id}`}
                               label={t("devices.serialNumber")}
                               value={u.serialNumber}
                               onChange={(e) => updateUnit(u.id, "serialNumber", e.target.value)}
@@ -333,7 +333,7 @@ export default function DeviceFormPage() {
                           )}
                           {type.useHostname && (
                             <ITInput
-                              name={`equipo-${u.id}`}
+                              name={`hostname-${u.id}`}
                               label={t("devices.hostname")}
                               value={u.hostname}
                               onChange={(e) => updateUnit(u.id, "hostname", e.target.value)}

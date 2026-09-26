@@ -375,7 +375,7 @@ export default function PermissionCatalogPanel() {
               {SCOPE_ORDER.map((scope) => (
                 <ITCheckbox
                   key={scope}
-                  name={`alcance_${scope}`}
+                  name={`scope_${scope}`}
                   checked={form.scopes.includes(scope)}
                   onChange={(checked) => toggleScope(scope, checked)}
                   label={t(`scope.${scope}`)}

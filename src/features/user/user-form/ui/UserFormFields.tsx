@@ -21,7 +21,7 @@ import {
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
-import { ROLE_LABELS } from "@entities/user";
+import { roleLabel } from "@entities/user";
 import type { UserFormValues } from "../model/useUserForm";
 
 interface Props {
@@ -119,7 +119,7 @@ export default function UserFormFields({
               <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} onBlur={blob("email")} placeholder="usuario@empresa.com" error={fieldError("email")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_puesto" label={tt("form.position")} value={form.jobTitle} onChange={(e) => onFieldChange("jobTitle", e.target.value)} onBlur={blob("jobTitle")} error={fieldError("jobTitle")} />
+              <ITInput name="u_jobTitle" label={tt("form.position")} value={form.jobTitle} onChange={(e) => onFieldChange("jobTitle", e.target.value)} onBlur={blob("jobTitle")} error={fieldError("jobTitle")} />
             </ITGrid>
           </ITGrid>
         </section>
@@ -225,7 +225,7 @@ export default function UserFormFields({
       >
         <div className="space-y-3 p-5">
           <ITFlex align="center" gap={2}>
-            <ITText className="rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700">{ROLE_LABELS[form.role]}</ITText>
+            <ITText className="rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700">{roleLabel(form.role)}</ITText>
           </ITFlex>
           <ITText className="text-[12px] font-black text-slate-700">{roleGuidance.title}</ITText>
           <ITText className="text-[11px] leading-5 text-slate-600">{roleGuidance.summary}</ITText>

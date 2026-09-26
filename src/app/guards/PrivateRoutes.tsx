@@ -96,8 +96,8 @@ export default function PrivateRoutes() {
     },
     // TAREAS (Tickets, Admin Tareas, Mis Tareas)
     {
-      id: "tareas",
-      label: "Tareas",
+      id: "tasks",
+      label: tt("nav.tasks"),
       icon: <FaTicketAlt size={14} />,
       isActive: active("/tickets"),
       subitems: [
@@ -110,7 +110,7 @@ export default function PrivateRoutes() {
         ...(canManageTasks
           ? [
             {
-              id: "adminTareas",
+              id: "adminTasks",
               label: tt("nav.adminTasks"),
               action: () => navigate("/tickets/tasks"),
               isActive: active("/tickets/tasks"),
@@ -120,7 +120,7 @@ export default function PrivateRoutes() {
         ...(isEmployee
           ? [
             {
-              id: "misTareas",
+              id: "myTasks",
               label: tt("nav.myTasks"),
               action: () => navigate("/tickets/my-tasks"),
               isActive: active("/tickets/my-tasks"),
@@ -184,7 +184,7 @@ export default function PrivateRoutes() {
     ...(canViewReports
       ? [
         {
-          id: "reportes",
+          id: "reports",
           label: tt("nav.reports"),
           icon: <FaChartBar size={14} />,
           action: () => navigate("/reports"),
@@ -196,7 +196,7 @@ export default function PrivateRoutes() {
     ...(canViewAccess || canViewTimeClock
       ? [
         {
-          id: "accesos",
+          id: "access",
           label: tt("nav.access"),
           icon: <FaDoorOpen size={14} />,
           isActive: active("/access"),
@@ -221,19 +221,19 @@ export default function PrivateRoutes() {
             ...(canViewTimeClock
               ? [
                 {
-                  id: "accessChecador",
+                  id: "accessTimeClock",
                   label: tt("nav.accessTimeClock"),
                   action: () => navigate("/access/time-clock"),
                   isActive: location.pathname === "/access/time-clock",
                 },
                 {
-                  id: "accessChecadorReport",
+                  id: "accessTimeClockReport",
                   label: tt("nav.accessTimeClockReport"),
                   action: () => navigate("/access/time-clock/entries-exits"),
                   isActive: active("/access/time-clock/entries-exits"),
                 },
                 {
-                  id: "accessChecadorEmpleados",
+                  id: "accessTimeClockEmployees",
                   label: tt("nav.accessTimeClockEmployees"),
                   action: () => navigate("/access/time-clock/employees"),
                   isActive: active("/access/time-clock/employees"),
@@ -283,19 +283,19 @@ export default function PrivateRoutes() {
     ...(canViewHR
       ? [
         {
-          id: "recursosHumanos",
+          id: "hr",
           label: tt("nav.hr"),
           icon: <FaUserTie size={14} />,
           isActive: active("/employees"),
           subitems: [
             {
-              id: "personal",
+              id: "employees",
               label: tt("nav.employees"),
               action: () => navigate("/employees"),
               isActive: active("/employees") && !active("/employees/disciplinary-reports"),
             },
             {
-              id: "reportesPersonal",
+              id: "hrReports",
               label: tt("nav.hrReports"),
               action: () => navigate("/employees/disciplinary-reports"),
               isActive: active("/employees/disciplinary-reports"),
@@ -309,7 +309,7 @@ export default function PrivateRoutes() {
       ? [
         {
           id: "settings",
-          label: "Configuración",
+          label: tt("nav.settings"),
           icon: <FaCog size={14} />,
           isActive:
             active("/catalogs") ||
@@ -320,7 +320,7 @@ export default function PrivateRoutes() {
             ...(canAdminCatalogs
               ? [
                 {
-                  id: "catalogos",
+                  id: "catalogs",
                   label: tt("nav.catalogs"),
                   action: () => navigate("/catalogs"),
                   isActive: active("/catalogs"),

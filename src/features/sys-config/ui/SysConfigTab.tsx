@@ -16,6 +16,7 @@ import {
   useGetSysConfig,
   useUpdateSysConfig,
 } from "@features/sys-config";
+import SystemLanguageCard from "./SystemLanguageCard";
 
 const KEY = "EMAIL_NOTIFICATION_RECIPIENTS";
 const SEND_EMAIL_KEY = "ENABLE_SEND_EMAIL";
@@ -35,7 +36,7 @@ interface ToastState {
 }
 
 export default function SysConfigTab() {
-  const { t } = useTranslation(["catalog", "common"]);
+  const { t, i18n } = useTranslation(["catalog", "common"]);
   const { data, loading, error, reload } = useGetSysConfig(KEY);
   const { mutate, loading: saving, error: saveError } = useUpdateSysConfig(KEY);
 
@@ -258,7 +259,7 @@ export default function SysConfigTab() {
         {data?.updatedBy && (
           <ITText className="mt-3 block text-[10px] text-slate-400">
             {data.updatedBy.name} ·{" "}
-            {new Date(data.updatedAt).toLocaleString("es-MX")}
+            {new Date(data.updatedAt).toLocaleString(i18n.language)}
           </ITText>
         )}
       </ITCard>
@@ -322,10 +323,12 @@ export default function SysConfigTab() {
         {sendEmailData?.updatedBy && (
           <ITText className="mt-3 block text-[10px] text-slate-400">
             {sendEmailData.updatedBy.name} ·{" "}
-            {new Date(sendEmailData.updatedAt).toLocaleString("es-MX")}
+            {new Date(sendEmailData.updatedAt).toLocaleString(i18n.language)}
           </ITText>
         )}
       </ITCard>
+
+      <SystemLanguageCard onResult={(message, type) => setToast({ message, type })} />
 
       {toast && (
         <ITToast

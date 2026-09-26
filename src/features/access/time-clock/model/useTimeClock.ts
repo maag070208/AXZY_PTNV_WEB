@@ -7,6 +7,7 @@ import {
   type TimeClockStatus,
   type PunchMethod,
 } from "@entities/time-clock";
+import { fileName } from "@shared/i18n";
 
 /** Refresco del estado mientras corre una sincronización o una importación. */
 const STATUS_POLL_MS = 5_000;
@@ -275,7 +276,7 @@ export const useTimeClock = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `checadas-${String(externalFilters.from ?? "")}_${String(externalFilters.to ?? "")}.csv`;
+      link.download = `${fileName("timeClockPunches")}-${String(externalFilters.from ?? "")}_${String(externalFilters.to ?? "")}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     } catch (e) {

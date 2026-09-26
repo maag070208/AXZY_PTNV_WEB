@@ -51,6 +51,24 @@
     "schedules": "Schedules",
     "schedulesAdmin": "Schedules",
     "schedulesAssign": "Assign schedules",
-    "overtime": "Overtime"
+    "overtime": "Overtime",
+    "tasks": "Tasks",
+    "settings": "Settings"
+  },
+  "files": {
+    "access": "access",
+    "accessReport": "access_report",
+    "timeClock": "time-clock",
+    "timeClockReport": "time_clock_report",
+    "timeClockPunches": "punches",
+    "approvedOvertime": "approved-overtime",
+    "approvedOvertimeReport": "approved_overtime_report",
+    "disciplinaryReport": "disciplinary-report",
+    "credential": "badge",
+    "movementsReport": "movements-report",
+    "deliveryReport": "delivery_report",
+    "assignedDevicesReport": "assigned_devices_report",
+    "devicesReport": "devices_report",
+    "materialOutputsReport": "material_outputs_report"
   }
 }

@@ -51,6 +51,24 @@
     "schedules": "Horarios",
     "schedulesAdmin": "Horarios",
     "schedulesAssign": "Asignar horarios",
-    "overtime": "Tiempo extra"
+    "overtime": "Tiempo extra",
+    "tasks": "Tareas",
+    "settings": "Configuración"
+  },
+  "files": {
+    "access": "accesos",
+    "accessReport": "reporte_accesos",
+    "timeClock": "checador",
+    "timeClockReport": "reporte_checador",
+    "timeClockPunches": "checadas",
+    "approvedOvertime": "horas-extra-aprobadas",
+    "approvedOvertimeReport": "reporte_horas_extra_aprobadas",
+    "disciplinaryReport": "acta-administrativa",
+    "credential": "credencial",
+    "movementsReport": "reporte-movimientos",
+    "deliveryReport": "reporte_entregas",
+    "assignedDevicesReport": "reporte_asignados",
+    "devicesReport": "reporte_dispositivos",
+    "materialOutputsReport": "reporte_salidas"
   }
 }

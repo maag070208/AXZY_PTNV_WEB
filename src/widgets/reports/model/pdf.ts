@@ -1,7 +1,7 @@
 import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import { createElement } from "react";
-import { i18n } from "@shared/i18n";
+import { fileName, i18n } from "@shared/i18n";
 import type { ReportFilters, ReportRow, AssignedDeviceRow, DeviceReportRow } from "@entities/report";
 import type { MaterialOutput } from "@entities/material-output";
 import type {
@@ -28,7 +28,7 @@ export const downloadReportPDF = async (
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");
   const yy = now.getFullYear();
-  saveAs(blob, `reporte_entregas_${yy}${mm}${dd}.pdf`);
+  saveAs(blob, `${fileName("deliveryReport")}_${yy}${mm}${dd}.pdf`);
 };
 
 export const downloadAssignedDevicesPdf = async (rows: AssignedDeviceRow[]): Promise<void> => {
@@ -37,7 +37,7 @@ export const downloadAssignedDevicesPdf = async (rows: AssignedDeviceRow[]): Pro
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");
   const yy = now.getFullYear();
-  saveAs(blob, `reporte_asignados_${yy}${mm}${dd}.pdf`);
+  saveAs(blob, `${fileName("assignedDevicesReport")}_${yy}${mm}${dd}.pdf`);
 };
 
 export const downloadDevicesPDF = async (rows: DeviceReportRow[]): Promise<void> => {
@@ -46,7 +46,7 @@ export const downloadDevicesPDF = async (rows: DeviceReportRow[]): Promise<void>
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");
   const yy = now.getFullYear();
-  saveAs(blob, `reporte_dispositivos_${yy}${mm}${dd}.pdf`);
+  saveAs(blob, `${fileName("devicesReport")}_${yy}${mm}${dd}.pdf`);
 };
 
 export const downloadMaterialOutputsPdf = async (rows: MaterialOutput[]): Promise<void> => {
@@ -55,7 +55,7 @@ export const downloadMaterialOutputsPdf = async (rows: MaterialOutput[]): Promis
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");
   const yy = now.getFullYear();
-  saveAs(blob, `reporte_salidas_${yy}${mm}${dd}.pdf`);
+  saveAs(blob, `${fileName("materialOutputsReport")}_${yy}${mm}${dd}.pdf`);
 };
 
 export const downloadAccessReportPDF = async (
@@ -67,7 +67,7 @@ export const downloadAccessReportPDF = async (
     createElement(AccessReportPDF, { rows, summary, meta }) as any
   ).toBlob();
   const stamp = meta.date;
-  saveAs(blob, `reporte_accessos_${meta.period}_${stamp}.pdf`);
+  saveAs(blob, `${fileName("accessReport")}_${meta.period}_${stamp}.pdf`);
 };
 
 /** Entradas/salidas del reloj checador: mismo PDF que el de accesos, con su título. */
@@ -80,7 +80,7 @@ export const downloadTimeClockReportPdf = async (
   const blob = await pdf(
     createElement(AccessReportPDF, { rows, summary, meta, title }) as any
   ).toBlob();
-  saveAs(blob, `reporte_checador_${meta.period}_${meta.date}.pdf`);
+  saveAs(blob, `${fileName("timeClockReport")}_${meta.period}_${meta.date}.pdf`);
 };
 
 export const downloadOvertimePDF = async (
@@ -92,5 +92,5 @@ export const downloadOvertimePDF = async (
     createElement(OvertimePDF, { rows, summary, meta }) as any
   ).toBlob();
   const stamp = meta.date.replace(/-/g, "");
-  saveAs(blob, `reporte_horas_extra_aprobadas_${meta.period.toLowerCase()}_${stamp}.pdf`);
+  saveAs(blob, `${fileName("approvedOvertimeReport")}_${meta.period.toLowerCase()}_${stamp}.pdf`);
 };

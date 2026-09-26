@@ -12,7 +12,7 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaEye, FaKey, FaTrash, FaUndo } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { ROLE_LABELS, type User, type UserRole } from "@entities/user";
+import { USER_ROLES, roleLabel, type User } from "@entities/user";
 import type { UseUsersList } from "../model/useUsersList";
 
 interface Props {
@@ -36,7 +36,7 @@ const roleBadge = (role: string) => (
     }
     size="lg"
   >
-    {ROLE_LABELS[role as UserRole] ?? role}
+    {roleLabel(role)}
   </ITBadget>
 );
 
@@ -75,7 +75,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       filter: "catalog",
       sortable: false,
       catalogOptions: {
-        data: (Object.keys(ROLE_LABELS) as UserRole[]).map((id) => ({ id, name: ROLE_LABELS[id] })),
+        data: USER_ROLES.map((id) => ({ id, name: roleLabel(id) })),
         loading: false,
         error: false,
       },

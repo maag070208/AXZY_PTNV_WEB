@@ -214,7 +214,7 @@ export default function RoleMatrixPanel() {
                               className="px-3 py-2 align-middle"
                             >
                               <ITSelect
-                                name={`matriz_${permission.key}_${role}`}
+                                name={`matrix_${permission.key}_${role}`}
                                 size="sm"
                                 options={optionsFor(permission)}
                                 value={draft[key] ?? "NONE"}

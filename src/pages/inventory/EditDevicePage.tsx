@@ -242,7 +242,7 @@ export default function EditDevicePage() {
                       <ITFlex direction="column" gap={2} className="border-t border-slate-100 px-3 pb-3 pt-2.5">
                         {device.type?.useSerialNumber && (
                           <ITInput
-                            name={`serie-${u.id}`}
+                            name={`serialNumber-${u.id}`}
                             label={t("devices.serialNumber")}
                             value={d.serialNumber}
                             onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, serialNumber: e.target.value } }))}
@@ -274,7 +274,7 @@ export default function EditDevicePage() {
                         )}
                         {device.type?.useHostname && (
                           <ITInput
-                            name={`equipo-${u.id}`}
+                            name={`hostname-${u.id}`}
                             label={t("devices.hostname")}
                             value={d.hostname}
                             onChange={(e) => setDrafts((prev) => ({ ...prev, [u.id]: { ...d, hostname: e.target.value } }))}

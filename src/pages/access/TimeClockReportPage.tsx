@@ -11,7 +11,7 @@ import { downloadTimeClockReportPdf } from "@widgets/reports";
 const TIME_CLOCK_SOURCE: AccessReportSource = {
   report: timeClockApi.report,
   reportExport: timeClockApi.reportExport,
-  csvPrefix: "timeClock",
+  csvFile: "timeClock",
 };
 
 export default function TimeClockReportPage() {

@@ -115,13 +115,13 @@ export default function DeviceDetailPage() {
           <StatCard size="lg" icon={<FaCheckCircle size={16} className="text-white" />} circleClass="bg-emerald-500" value={s?.AVAILABLE ?? 0} label={t("devices.avail")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaUserTie size={16} className="text-white" />} circleClass="bg-amber-500" value={s?.ON_LOAN ?? 0} label={t("devices.prest")} />
+          <StatCard size="lg" icon={<FaUserTie size={16} className="text-white" />} circleClass="bg-amber-500" value={s?.ON_LOAN ?? 0} label={t("devices.loaned")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaThumbsDown size={16} className="text-white" />} circleClass="bg-orange-500" value={s?.DAMAGED ?? 0} label={t("devices.dan")} />
+          <StatCard size="lg" icon={<FaThumbsDown size={16} className="text-white" />} circleClass="bg-orange-500" value={s?.DAMAGED ?? 0} label={t("devices.damaged")} />
         </ITGrid>
         <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaToolbox size={16} className="text-white" />} circleClass="bg-slate-500" value={s?.IN_MAINTENANCE ?? 0} label={t("devices.mant")} />
+          <StatCard size="lg" icon={<FaToolbox size={16} className="text-white" />} circleClass="bg-slate-500" value={s?.IN_MAINTENANCE ?? 0} label={t("devices.maintenance")} />
         </ITGrid>
       </ITGrid>
 

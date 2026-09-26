@@ -33,11 +33,11 @@ export default function CustodyLetterHtml({ loan }: { loan: Loan }) {
   const hostname = firstItem?.units?.[0]?.deviceUnit?.hostname;
 
   const commitments = [
-    tt("doc.compromiso1"),
-    tt("doc.compromiso2"),
-    tt("doc.compromiso3"),
-    tt("doc.compromiso4"),
-    tt("doc.compromiso5"),
+    tt("doc.commitment1"),
+    tt("doc.commitment2"),
+    tt("doc.commitment3"),
+    tt("doc.commitment4"),
+    tt("doc.commitment5"),
   ];
 
   const resourceRows: Array<{ label: string; value: string; testId?: string }> = [

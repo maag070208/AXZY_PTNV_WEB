@@ -1,5 +1,5 @@
 import { ITFlex, ITStack, ITText } from "@axzydev/axzy_ui_system";
-import { ROLE_LABELS, type User } from "@entities/user";
+import { roleLabel, type User } from "@entities/user";
 
 interface Props {
   user: User;
@@ -22,7 +22,7 @@ export default function UserHeaderCard({ user }: Props) {
             Rol
           </ITText>
           <ITText className="text-[12px] font-bold text-slate-700">
-            {ROLE_LABELS[user.role] ?? user.role}
+            {roleLabel(user.role)}
           </ITText>
         </ITStack>
         {user.employeeNumber && (

@@ -1,3 +1,6 @@
+import i18n from "@shared/i18n";
+import type { AppLanguage } from "@shared/i18n/config";
+
 export type UserRole =
   | "ADMIN"
   | "MANAGER"
@@ -6,15 +9,11 @@ export type UserRole =
   | "HUMAN_RESOURCES"
   | "GUARD";
 
-/** Etiqueta visible de cada rol. El guardia se guarda como `GUARD`. */
-export const ROLE_LABELS: Record<UserRole, string> = {
-  ADMIN: "ADMIN",
-  MANAGER: "MANAGER",
-  AREA_HEAD: "JEFE DE AREA",
-  EMPLOYEE: "EMPLOYEE",
-  HUMAN_RESOURCES: "RECURSOS HUMANOS",
-  GUARD: "GUARDIA",
-};
+export const USER_ROLES: UserRole[] = ["ADMIN", "MANAGER", "AREA_HEAD", "EMPLOYEE", "HUMAN_RESOURCES", "GUARD"];
+
+/** Etiqueta visible de un rol, en el idioma de la interfaz (`roles:role.*`). */
+export const roleLabel = (role: string): string =>
+  i18n.t(`roles:role.${role as UserRole}`, { defaultValue: role });
 
 export interface AuthUser {
   id: string;
@@ -48,6 +47,8 @@ export interface AuthMe extends AuthUser {
   department: { id: string; name: string } | null;
   photoUrl: string | null;
   permissions: Partial<Record<Permission, PermissionScope>>;
+  /** Idioma del sistema (`sys_config.LANGUAGE`): la interfaz lo adopta. */
+  language: AppLanguage;
 }
 
 export interface LoginResponse {

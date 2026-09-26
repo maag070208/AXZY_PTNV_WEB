@@ -10,3 +10,7 @@ export const formatDate = (
   if (isNaN(d.getTime())) return "—";
   return d.toLocaleDateString(locale(), options);
 };
+export type FileNameKey = keyof (typeof import("./locales/es/common.json"))["files"];
+
+/** Prefijo de un archivo descargado (CSV/PDF), en el idioma de la interfaz. */
+export const fileName = (key: FileNameKey): string => i18n.t(`common:files.${key}`);

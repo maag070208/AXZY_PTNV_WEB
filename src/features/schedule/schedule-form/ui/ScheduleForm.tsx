@@ -271,7 +271,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
             <ITFlex direction="column" gap={3}>
               <ITText className={sectionLabel}>{t("sections.workday")}</ITText>
               <ITInput
-                name="comida"
+                name="mealBreak"
                 type="number"
                 label={t("meal")}
                 value={String(form.mealBreakMin ?? 0)}
@@ -347,12 +347,12 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
                   {!isMobile && (
-                    <label htmlFor={`entrada-${d.weekday}`} className="sr-only">
+                    <label htmlFor={`start-${d.weekday}`} className="sr-only">
                       {t("entry")}
                     </label>
                   )}
                   <ITTimePicker
-                    name={`entrada-${d.weekday}`}
+                    name={`start-${d.weekday}`}
                     label={isMobile ? t("entry") : undefined}
                     value={d.startTime ?? ""}
                     onChange={(e: { target: { value: string } }) => setDay(d.weekday, { startTime: e.target.value })}
@@ -361,12 +361,12 @@ export default function ScheduleForm({ id }: { id?: string }) {
                 </ITGrid>
                 <ITGrid item xs={6} md={2}>
                   {!isMobile && (
-                    <label htmlFor={`salida-${d.weekday}`} className="sr-only">
+                    <label htmlFor={`end-${d.weekday}`} className="sr-only">
                       {t("exit")}
                     </label>
                   )}
                   <ITTimePicker
-                    name={`salida-${d.weekday}`}
+                    name={`end-${d.weekday}`}
                     label={isMobile ? t("exit") : undefined}
                     value={d.endTime ?? ""}
                     onChange={(e: { target: { value: string } }) => setDay(d.weekday, { endTime: e.target.value })}
@@ -422,12 +422,12 @@ export default function ScheduleForm({ id }: { id?: string }) {
                     </ITGrid>
                     <ITGrid item xs={6} md={2}>
                       {!isMobile && (
-                        <label htmlFor={`entrada2-${d.weekday}`} className="sr-only">
+                        <label htmlFor={`splitStart-${d.weekday}`} className="sr-only">
                           {t("entry")}
                         </label>
                       )}
                       <ITTimePicker
-                        name={`entrada2-${d.weekday}`}
+                        name={`splitStart-${d.weekday}`}
                         label={isMobile ? t("entry") : undefined}
                         value={d.splitStartTime ?? ""}
                         onChange={(e: { target: { value: string } }) =>
@@ -437,12 +437,12 @@ export default function ScheduleForm({ id }: { id?: string }) {
                     </ITGrid>
                     <ITGrid item xs={6} md={2}>
                       {!isMobile && (
-                        <label htmlFor={`salida2-${d.weekday}`} className="sr-only">
+                        <label htmlFor={`splitEnd-${d.weekday}`} className="sr-only">
                           {t("exit")}
                         </label>
                       )}
                       <ITTimePicker
-                        name={`salida2-${d.weekday}`}
+                        name={`splitEnd-${d.weekday}`}
                         label={isMobile ? t("exit") : undefined}
                         value={d.splitEndTime ?? ""}
                         onChange={(e: { target: { value: string } }) =>

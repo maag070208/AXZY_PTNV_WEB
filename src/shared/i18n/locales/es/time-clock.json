@@ -17,8 +17,8 @@
       "notConfigured": "La API no tiene el usuario de los relojes (CHECADOR_USER): no se sincroniza.",
       "withoutClocks": "Todavía no hay relojes dados de alta.",
       "paused": "Un reloj rechazó la contraseña y se pausó su sincronización. Actualiza CHECADOR_PASS en la API y reiníciala.",
-      "running": "Sincronizando: {{leidos}} de {{total}} eventos revisados · {{nuevas}} checadas nuevas · faltan {{restantes}}",
-      "runningNoTotal": "Sincronizando: {{nuevas}} checadas nuevas",
+      "running": "Sincronizando: {{readCount}} de {{total}} eventos revisados · {{newCount}} checadas nuevas · faltan {{remaining}}",
+      "runningNoTotal": "Sincronizando: {{newCount}} checadas nuevas",
       "error": "Hubo un error en la última sincronización de un reloj; revisa cuál abajo.",
       "pending": "La primera sincronización aún no termina."
     },
@@ -28,8 +28,8 @@
     "lastSync": "Última sincronización",
     "empty": "—",
     "clock": {
-      "running": "{{leidos}} de {{total}} eventos revisados · {{nuevas}} checadas nuevas",
-      "runningNoTotal": "{{nuevas}} checadas nuevas",
+      "running": "{{readCount}} de {{total}} eventos revisados · {{newCount}} checadas nuevas",
+      "runningNoTotal": "{{newCount}} checadas nuevas",
       "paused": "Rechazó la contraseña: sincronización en pausa.",
       "pending": "Su primera sincronización aún no termina."
     },
@@ -54,9 +54,9 @@
       "ok": "Importación terminada",
       "error": "Importación con error"
     },
-    "progress": "{{desde}} – {{hasta}} · {{leidos}} de {{total}} checadas leídas · {{nuevas}} nuevas",
-    "progressNoTotal": "{{desde}} – {{hasta}} · conectando con los relojes…",
-    "done": "{{desde}} – {{hasta}} · {{nuevas}} checadas nuevas de {{leidos}} leídas",
+    "progress": "{{from}} – {{to}} · {{readCount}} de {{total}} checadas leídas · {{newCount}} nuevas",
+    "progressNoTotal": "{{from}} – {{to}} · conectando con los relojes…",
+    "done": "{{from}} – {{to}} · {{newCount}} checadas nuevas de {{readCount}} leídas",
     "toast": "Importación terminada: {{count}} checadas nuevas"
   },
   "presets": {
@@ -113,7 +113,7 @@
     "title": "Entradas/salidas del reloj",
     "description": "Jornadas armadas con las checadas del reloj y relacionadas con cada empleado por su número en el reloj.",
     "pdfTitle": "Entradas y salidas — Reloj checador",
-    "links": "{{vinculados}} de {{total}} empleados del reloj vinculados",
+    "links": "{{linkedCount}} de {{total}} empleados del reloj vinculados",
     "withoutLink": "Los {{count}} sin vincular salen con el nombre del reloj y la marca «Sin vincular».",
     "goToLink": "Vincular empleados",
     "rule": "El reloj no distingue entrada de salida: las checadas se alternan, las repetidas en menos de 5 min se ignoran y una jornada dura máximo 13 h."
@@ -163,14 +163,14 @@
       "save": "Vincular"
     },
     "dialog": {
-      "title": "Vincular número {{numero}}",
-      "clock": "En el reloj: {{nombre}}",
+      "title": "Vincular número {{number}}",
+      "clock": "En el reloj: {{name}}",
       "user": "Usuario del sistema",
       "userPlaceholder": "Busca por nombre o número..."
     },
     "toasts": {
-      "linked": "{{numero}} vinculado a {{nombre}}",
-      "unlinked": "{{numero}} desvinculado",
+      "linked": "{{number}} vinculado a {{name}}",
+      "unlinked": "{{number}} desvinculado",
       "suggested": "{{count}} empleados vinculados"
     },
     "errors": {
@@ -226,13 +226,13 @@
         "NTP": "Automático (NTP)"
       },
       "people": "Personas registradas",
-      "peopleItem": "{{conRostro}} con rostro · {{conHuella}} con huella · {{conTarjeta}} con tarjeta",
+      "peopleItem": "{{withFace}} con rostro · {{withFingerprint}} con huella · {{withCard}} con tarjeta",
       "inHour": "En hora",
-      "inItemHour": "{{segundos}} s de diferencia con el servidor",
-      "ahead": "Va {{tiempo}} adelantado",
-      "behind": "Va {{tiempo}} atrasado",
+      "inItemHour": "{{seconds}} s de diferencia con el servidor",
+      "ahead": "Va {{time}} adelantado",
+      "behind": "Va {{time}} atrasado",
       "driftHint": "Ajusta la hora en el propio reloj (de preferencia con NTP). Si los relojes no tienen la misma hora, una entrada en uno y una salida en otro dan horas trabajadas de más o de menos.",
-      "readAt": "Leída a las {{hora}}"
+      "readAt": "Leída a las {{hour}}"
     },
     "dialog": {
       "registrationTitle": "Dar de alta un reloj",
@@ -243,16 +243,16 @@
       "namePlaceholder": "p. ej. Entrada de personal",
       "nameHint": "Si lo dejas vacío se usa el nombre configurado en el reloj.",
       "registrationNote": "El sistema se conecta para confirmar la dirección y empieza a traer sus checadas. No modifica el reloj.",
-      "retirementTitle": "Dar de baja {{nombre}}",
+      "retirementTitle": "Dar de baja {{name}}",
       "retirementText": "Se deja de sincronizar. Sus checadas se quedan y, si lo vuelves a dar de alta, sigue desde donde iba. No modifica el reloj.",
-      "editTitle": "Editar {{nombre}}",
+      "editTitle": "Editar {{name}}",
       "nameEdit": "Nombre",
       "editNote": "Solo cambia cómo el sistema usa las checadas de este reloj. No modifica el reloj."
     },
     "toasts": {
-      "registration": "{{nombre}} dado de alta: ya está trayendo sus checadas",
-      "retirement": "{{nombre}} dado de baja",
-      "edited": "{{nombre}} actualizado"
+      "registration": "{{name}} dado de alta: ya está trayendo sus checadas",
+      "retirement": "{{name}} dado de baja",
+      "edited": "{{name}} actualizado"
     },
     "errors": {
       "status": "No se pudo leer el estado de los relojes",

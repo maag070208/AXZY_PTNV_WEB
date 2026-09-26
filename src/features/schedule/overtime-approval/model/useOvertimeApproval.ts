@@ -11,6 +11,7 @@ import { departmentsApi, type Department } from "@entities/department";
 import { scheduleApi } from "@entities/schedule";
 import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import type { DownloadOvertimePdf } from "./types";
+import { fileName } from "@shared/i18n";
 
 export type Period = "DAY" | "WEEK" | "MONTH";
 export type StatusFilter = "" | OvertimeDayStatus;
@@ -244,7 +245,7 @@ export const useOvertimeApproval = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `horas-extra-aprobadas-${period.toLowerCase()}-${toDateInput(date)}.csv`;
+      a.download = `${fileName("approvedOvertime")}-${period.toLowerCase()}-${toDateInput(date)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {

@@ -46,7 +46,7 @@
     "noDocumentTypes": "No document types configured",
     "uploaded": "Uploaded",
     "pendingOne": "Pending",
-    "uploadFor": "Upload {{tipo}}",
+    "uploadFor": "Upload {{type}}",
     "documentUploadError": "Could not upload the document",
     "documentDeleteError": "Could not delete the document",
     "discountNote": "Note (credit number, amount, case number, etc.)",

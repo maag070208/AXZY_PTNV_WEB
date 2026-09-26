@@ -267,11 +267,11 @@ export default function CustodyLetterPdf({ loan }: Props) {
           </Text>
 
           <View style={styles.commitments}>
-            <Text style={styles.commitmentItem}>• {tt("doc.compromiso1")}</Text>
-            <Text style={styles.commitmentItem}>• {tt("doc.compromiso2")}</Text>
-            <Text style={styles.commitmentItem}>• {tt("doc.compromiso3")}</Text>
-            <Text style={styles.commitmentItem}>• {tt("doc.compromiso4")}</Text>
-            <Text style={styles.commitmentItem}>• {tt("doc.compromiso5")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.commitment1")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.commitment2")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.commitment3")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.commitment4")}</Text>
+            <Text style={styles.commitmentItem}>• {tt("doc.commitment5")}</Text>
           </View>
 
           <Text style={styles.resourceTitle}>{tt("doc.resourceTitle")}</Text>

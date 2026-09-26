@@ -45,6 +45,7 @@ import {
   type AccessStats,
   type Site,
 } from "@entities/access";
+import { fileName } from "@shared/i18n";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -217,7 +218,7 @@ export default function AccessPage() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `accesos-${toDateInput(dateRange[0] ?? new Date())}.csv`;
+      link.download = `${fileName("access")}-${toDateInput(dateRange[0] ?? new Date())}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     } catch (err) {

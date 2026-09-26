@@ -12,6 +12,7 @@ import {
 import { departmentsApi, type Department } from "@entities/department";
 import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
+import { fileName, type FileNameKey } from "@shared/i18n";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
 export type DownloadAccessReportPdf = (
@@ -28,7 +29,7 @@ export interface AccessReportSource {
   report: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
   reportExport: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
   /** Prefijo del nombre del CSV. */
-  csvPrefix: string;
+  csvFile: FileNameKey;
 }
 
 /** Llave de orden del reporte: la columna ES una sesión; su ancla es `entryAt`. */
@@ -45,7 +46,7 @@ export const DEFAULT_REPORT_SORT: AccessReportSort = { key: "entryAt", direction
 const ACCESS_SOURCE: AccessReportSource = {
   report: accessApi.report,
   reportExport: accessApi.reportExport,
-  csvPrefix: "accesos",
+  csvFile: "access",
 };
 
 interface Options {
@@ -202,7 +203,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${source.csvPrefix}-${period.toLowerCase()}-${dateKey}.csv`;
+      link.download = `${fileName(source.csvFile)}-${period.toLowerCase()}-${dateKey}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     } catch (e) {

@@ -100,7 +100,7 @@ export default function TicketsTable({
       ),
     },
     {
-      key: "espera",
+      key: "wait",
       label: tt("list.columns.wait"),
       type: "number",
       render: (t) => {
@@ -180,6 +180,7 @@ export default function TicketsTable({
       debounceMs={350}
       variant="bordered"
       size="lg"
+      onRowClick={(row)=> onView(row as unknown as Ticket)}
     />
   );
 }

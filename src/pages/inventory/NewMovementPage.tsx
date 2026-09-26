@@ -131,10 +131,10 @@ export default function NewMovementPage() {
     const e: Record<string, string> = {};
     rows.forEach((r, idx) => {
       if ((r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN") && r.reason.trim().length < 3) {
-        e[`motivo-${idx}`] = "El motivo debe tener al menos 3 caracteres";
+        e[`reason-${idx}`] = "El motivo debe tener al menos 3 caracteres";
       }
       if (r.type === "MAINTENANCE_OUT" && r.notes.trim().length > 0 && r.notes.trim().length < 3) {
-        e[`observaciones-${idx}`] = "La observación debe tener al menos 3 caracteres";
+        e[`notes-${idx}`] = "La observación debe tener al menos 3 caracteres";
       }
     });
     setErrors(e);
@@ -288,16 +288,16 @@ export default function NewMovementPage() {
                 {(r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN") && (
                   <div>
                     <ITInput
-                      name={`motivo-${r.key}`}
+                      name={`reason-${r.key}`}
                       label={t("new.reason")}
                       value={r.reason}
                       onChange={(e) => updateRow(r.key, { reason: e.target.value })}
                       required
-                      aria-invalid={!!errors[`motivo-${idx}`]}
+                      aria-invalid={!!errors[`reason-${idx}`]}
                     />
-                    {errors[`motivo-${idx}`] && (
+                    {errors[`reason-${idx}`] && (
                       <span role="alert" className="text-red-500 text-xs mt-1 block">
-                        {errors[`motivo-${idx}`]}
+                        {errors[`reason-${idx}`]}
                       </span>
                     )}
                   </div>
@@ -325,15 +325,15 @@ export default function NewMovementPage() {
                         </ITFlex>
                         <div>
                       <ITInput
-                        name={`observaciones-${r.key}`}
+                        name={`notes-${r.key}`}
                         label={t("new.comment")}
                         value={r.notes}
                         onChange={(e) => updateRow(r.key, { notes: e.target.value })}
-                        aria-invalid={!!errors[`observaciones-${idx}`]}
+                        aria-invalid={!!errors[`notes-${idx}`]}
                       />
-                      {errors[`observaciones-${idx}`] && (
+                      {errors[`notes-${idx}`] && (
                         <span role="alert" className="text-red-500 text-xs mt-1 block">
-                          {errors[`observaciones-${idx}`]}
+                          {errors[`notes-${idx}`]}
                         </span>
                       )}
                     </div>

@@ -17,8 +17,8 @@
       "notConfigured": "The API has no clock user (CHECADOR_USER): nothing is synced.",
       "withoutClocks": "No time clocks have been added yet.",
       "paused": "A clock rejected the password and its sync was paused. Update CHECADOR_PASS in the API and restart it.",
-      "running": "Syncing: {{leidos}} of {{total}} events reviewed · {{nuevas}} new punches · {{restantes}} left",
-      "runningNoTotal": "Syncing: {{nuevas}} new punches",
+      "running": "Syncing: {{readCount}} of {{total}} events reviewed · {{newCount}} new punches · {{remaining}} left",
+      "runningNoTotal": "Syncing: {{newCount}} new punches",
       "error": "A clock failed on its last sync; see which one below.",
       "pending": "The first sync has not finished yet."
     },
@@ -28,8 +28,8 @@
     "lastSync": "Last sync",
     "empty": "—",
     "clock": {
-      "running": "{{leidos}} of {{total}} events reviewed · {{nuevas}} new punches",
-      "runningNoTotal": "{{nuevas}} new punches",
+      "running": "{{readCount}} of {{total}} events reviewed · {{newCount}} new punches",
+      "runningNoTotal": "{{newCount}} new punches",
       "paused": "Rejected the password: sync paused.",
       "pending": "Its first sync has not finished yet."
     },
@@ -54,9 +54,9 @@
       "ok": "Import finished",
       "error": "Import failed"
     },
-    "progress": "{{desde}} – {{hasta}} · {{leidos}} of {{total}} punches read · {{nuevas}} new",
-    "progressNoTotal": "{{desde}} – {{hasta}} · connecting to the clocks…",
-    "done": "{{desde}} – {{hasta}} · {{nuevas}} new punches out of {{leidos}} read",
+    "progress": "{{from}} – {{to}} · {{readCount}} of {{total}} punches read · {{newCount}} new",
+    "progressNoTotal": "{{from}} – {{to}} · connecting to the clocks…",
+    "done": "{{from}} – {{to}} · {{newCount}} new punches out of {{readCount}} read",
     "toast": "Import finished: {{count}} new punches"
   },
   "presets": {
@@ -113,7 +113,7 @@
     "title": "Time clock entries/exits",
     "description": "Shifts built from the time clock punches and matched to each employee by their time clock number.",
     "pdfTitle": "Entries and exits — Time clock",
-    "links": "{{vinculados}} of {{total}} time clock employees linked",
+    "links": "{{linkedCount}} of {{total}} time clock employees linked",
     "withoutLink": "The {{count}} unlinked ones show the time clock name and the “Not linked” mark.",
     "goToLink": "Link employees",
     "rule": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h."
@@ -163,14 +163,14 @@
       "save": "Link"
     },
     "dialog": {
-      "title": "Link number {{numero}}",
-      "clock": "In the clock: {{nombre}}",
+      "title": "Link number {{number}}",
+      "clock": "In the clock: {{name}}",
       "user": "System user",
       "userPlaceholder": "Search by name or number..."
     },
     "toasts": {
-      "linked": "{{numero}} linked to {{nombre}}",
-      "unlinked": "{{numero}} unlinked",
+      "linked": "{{number}} linked to {{name}}",
+      "unlinked": "{{number}} unlinked",
       "suggested": "{{count}} employees linked"
     },
     "errors": {
@@ -226,13 +226,13 @@
         "NTP": "Automatic (NTP)"
       },
       "people": "Enrolled people",
-      "peopleItem": "{{conRostro}} with face · {{conHuella}} with fingerprint · {{conTarjeta}} with card",
+      "peopleItem": "{{withFace}} with face · {{withFingerprint}} with fingerprint · {{withCard}} with card",
       "inHour": "On time",
-      "inItemHour": "{{segundos}} s off the server",
-      "ahead": "{{tiempo}} fast",
-      "behind": "{{tiempo}} slow",
+      "inItemHour": "{{seconds}} s off the server",
+      "ahead": "{{time}} fast",
+      "behind": "{{time}} slow",
       "driftHint": "Set the time on the clock itself (preferably with NTP). If the clocks disagree, an entry on one and an exit on another add or remove worked time.",
-      "readAt": "Read at {{hora}}"
+      "readAt": "Read at {{hour}}"
     },
     "dialog": {
       "registrationTitle": "Add a time clock",
@@ -243,16 +243,16 @@
       "namePlaceholder": "e.g. Staff entrance",
       "nameHint": "Leave it empty to use the name configured on the clock.",
       "registrationNote": "The system connects to confirm the address and starts pulling its punches. It does not change the clock.",
-      "retirementTitle": "Remove {{nombre}}",
+      "retirementTitle": "Remove {{name}}",
       "retirementText": "It stops syncing. Its punches stay and, if you add it again, it resumes where it left off. It does not change the clock.",
-      "editTitle": "Edit {{nombre}}",
+      "editTitle": "Edit {{name}}",
       "nameEdit": "Name",
       "editNote": "It only changes how the system uses this clock's punches. It does not change the clock."
     },
     "toasts": {
-      "registration": "{{nombre}} added: it is already pulling its punches",
-      "retirement": "{{nombre}} removed",
-      "edited": "{{nombre}} updated"
+      "registration": "{{name}} added: it is already pulling its punches",
+      "retirement": "{{name}} removed",
+      "edited": "{{name}} updated"
     },
     "errors": {
       "status": "Could not read the clocks status",

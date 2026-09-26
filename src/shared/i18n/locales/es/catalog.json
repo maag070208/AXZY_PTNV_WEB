@@ -54,6 +54,14 @@
     "sendEmailOn": "Activado",
     "sendEmailOff": "Desactivado",
     "sendEmailSaved": "Preferencia de correo guardada",
-    "sendEmailSaveError": "No se pudo guardar la preferencia de correo"
+    "sendEmailSaveError": "No se pudo guardar la preferencia de correo",
+    "languageLabel": "Idioma del sistema",
+    "languageHelp": "Idioma de la interfaz y de los textos que genera la API: correos, notificaciones, historial de tickets y mensajes de error.",
+    "languageSaved": "Idioma actualizado",
+    "languageSaveError": "No se pudo guardar el idioma",
+    "languages": {
+      "es": "Español",
+      "en": "English"
+    }
   }
 }

@@ -49,15 +49,15 @@ export default function DevicesPage() {
     },
     {
       type: "number",
-      key: "disp",
+      key: "available",
       label: t("devices.colAvail"),
       sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-emerald-600">{d.stock?.AVAILABLE ?? 0}</ITText>,
     },
     {
       type: "number",
-      key: "prest",
-      label: t("devices.colPrest"),
+      key: "loaned",
+      label: t("devices.colLoaned"),
       sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-amber-600">{d.stock?.ON_LOAN ?? 0}</ITText>,
     },

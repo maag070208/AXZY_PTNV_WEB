@@ -338,11 +338,11 @@ export default function EmployeeProfileEditDialog({
         variant="line"
         items={[
           { id: "personal", label: tt("detail.tabs.personal"), content: personalTab },
-          { id: "oficial", label: tt("detail.tabs.official"), content: officialTab },
-          { id: "direccion", label: tt("detail.tabs.address"), content: addressTab },
-          { id: "contacto", label: tt("detail.tabs.contact"), content: contactTab },
-          { id: "medica", label: tt("detail.tabs.medical"), content: medicalTab },
-          { id: "descuentos", label: tt("detail.tabs.discounts"), content: discountsTab },
+          { id: "official", label: tt("detail.tabs.official"), content: officialTab },
+          { id: "address", label: tt("detail.tabs.address"), content: addressTab },
+          { id: "contact", label: tt("detail.tabs.contact"), content: contactTab },
+          { id: "medical", label: tt("detail.tabs.medical"), content: medicalTab },
+          { id: "discounts", label: tt("detail.tabs.discounts"), content: discountsTab },
         ]}
       />
       <ITFlex justify="end" gap={2} className="mt-6 pt-4 border-t border-slate-100">

@@ -91,7 +91,7 @@ export default function NewLoanReturnPage() {
     // observación requerida si MALO/ROTO, mínimo 3 caracteres
     rows.forEach((r, idx) => {
       if ((r.condition === "POOR" || r.condition === "BROKEN") && r.notes.trim().length < 3) {
-        e[`observaciones-${idx}`] = "La observación debe tener al menos 3 caracteres";
+        e[`notes-${idx}`] = "La observación debe tener al menos 3 caracteres";
       }
     });
     setErrors(e);
@@ -203,7 +203,7 @@ export default function NewLoanReturnPage() {
                         <ITGrid container columns={12} spacing={4}>
                           <ITGrid item xs={12} md={3}>
                             <ITInput
-                              name={`devolver-${r.key}`}
+                              name={`return-${r.key}`}
                               label={t("loanReturn.returnLoan")}
                               type="number"
                               min={0}
@@ -248,16 +248,16 @@ export default function NewLoanReturnPage() {
                         {(r.condition === "POOR" || r.condition === "BROKEN") && (
                           <div>
                             <ITInput
-                              name={`observaciones-${r.key}`}
+                              name={`notes-${r.key}`}
                               label={t("new.comment")}
                               placeholder={t("loanReturn.commentPlaceholder")}
                               value={r.notes}
                               onChange={(e) => updateRow(r.key, { notes: e.target.value })}
-                              aria-invalid={!!errors[`observaciones-${rows.indexOf(r)}`]}
+                              aria-invalid={!!errors[`notes-${rows.indexOf(r)}`]}
                             />
-                            {errors[`observaciones-${rows.indexOf(r)}`] && (
+                            {errors[`notes-${rows.indexOf(r)}`] && (
                               <span role="alert" className="text-red-500 text-xs mt-1 block">
-                                {errors[`observaciones-${rows.indexOf(r)}`]}
+                                {errors[`notes-${rows.indexOf(r)}`]}
                               </span>
                             )}
                           </div>

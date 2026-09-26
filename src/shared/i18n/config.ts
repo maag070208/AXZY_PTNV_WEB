@@ -53,6 +53,9 @@ import rolesEs from "./locales/es/roles.json";
 
 export const defaultNS = "common" as const;
 
+export const APP_LANGUAGES = ["es", "en"] as const;
+export type AppLanguage = (typeof APP_LANGUAGES)[number];
+
 export const NS_LIST = [
   "common",
   "device",

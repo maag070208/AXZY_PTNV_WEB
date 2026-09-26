@@ -46,7 +46,7 @@
     "noDocumentTypes": "No hay tipos de documento configurados",
     "uploaded": "Cargado",
     "pendingOne": "Pendiente",
-    "uploadFor": "Subir {{tipo}}",
+    "uploadFor": "Subir {{type}}",
     "documentUploadError": "No se pudo subir el documento",
     "documentDeleteError": "No se pudo eliminar el documento",
     "discountNote": "Nota (número de crédito, monto, folio, etc.)",

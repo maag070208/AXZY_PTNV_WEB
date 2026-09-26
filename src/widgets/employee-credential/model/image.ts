@@ -3,6 +3,7 @@ import type { PersonalProfile } from "@entities/hr";
 import { CREDENTIAL_DPI, CREDENTIAL_H_PX, CREDENTIAL_W_PX } from "./cardSpec";
 import { drawCredential } from "./renderCredential";
 import { setPngDpi } from "./pngDpi";
+import { fileName } from "@shared/i18n";
 
 export interface CredentialImageInput {
   profile: PersonalProfile;
@@ -52,5 +53,5 @@ export const downloadCredentialImage = async ({
 }): Promise<void> => {
   const bytes = setPngDpi(dataUrlABytes(imageDataUrl), CREDENTIAL_DPI);
   const blob = new Blob([bytes], { type: "image/png" });
-  saveAs(blob, `credencial-${profile.employeeNumber ?? profile.id}.png`);
+  saveAs(blob, `${fileName("credential")}-${profile.employeeNumber ?? profile.id}.png`);
 };

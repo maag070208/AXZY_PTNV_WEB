@@ -3,6 +3,7 @@ import { pdf } from "@react-pdf/renderer";
 import type { Movement } from "@entities/inventory";
 import MovementPdf from "../ui/MovementPdf";
 import MovementsReportPdf from "../ui/MovementsReportPdf";
+import { fileName } from "@shared/i18n";
 
 export const downloadMovementPdf = async (movement: Movement): Promise<void> => {
   const blob = await pdf(createElement(MovementPdf, { movement }) as any).toBlob();
@@ -19,7 +20,7 @@ export const downloadReportMovementsPdf = async (movements: Movement[]): Promise
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `Reporte-Movimientos-${new Date().toISOString().slice(0, 10)}.pdf`;
+  a.download = `${fileName("movementsReport")}-${new Date().toISOString().slice(0, 10)}.pdf`;
   a.click();
   URL.revokeObjectURL(url);
 };

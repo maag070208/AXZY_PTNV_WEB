@@ -32,19 +32,19 @@ export default function CatalogTabs() {
     { id: "departments", label: t("tabs.departments"), icon: <FaBuilding size={12} />, canCreate: true, content: <DepartmentsPanel openCreateSignal={createSignal} /> },
     { id: "subareas", label: t("tabs.subareas"), icon: <FaNetworkWired size={12} />, canCreate: true, content: <SubareasPanel openCreateSignal={createSignal} /> },
     { id: "deviceTypes", label: t("tabs.deviceTypes"), icon: <FaMicrochip size={12} />, canCreate: true, content: <DeviceTypesTab openCreateSignal={createSignal} /> },
-    { id: "tiposDocumento", label: t("tabs.documentTypes"), icon: <FaFileAlt size={12} />, canCreate: true, content: <DocumentTypesTab openCreateSignal={createSignal} /> },
+    { id: "documentTypes", label: t("tabs.documentTypes"), icon: <FaFileAlt size={12} />, canCreate: true, content: <DocumentTypesTab openCreateSignal={createSignal} /> },
     { id: "genders", label: t("tabs.genders"), icon: <FaVenusMars size={12} />, canCreate: true, content: <GendersTab openCreateSignal={createSignal} /> },
     { id: "bloodTypes", label: t("tabs.bloodTypes"), icon: <FaTint size={12} />, canCreate: true, content: <BloodTypesTab openCreateSignal={createSignal} /> },
-    { id: "categoriasTicket", label: t("tabs.categoriesTicket"), icon: <FaTags size={12} />, canCreate: true, content: <TicketCategoriesTab openCreateSignal={createSignal} /> },
-    { id: "notificaciones", label: t("tabs.notifications"), icon: <FaEnvelope size={12} />, canCreate: false, content: <SysConfigTab /> },
+    { id: "ticketCategories", label: t("tabs.categoriesTicket"), icon: <FaTags size={12} />, canCreate: true, content: <TicketCategoriesTab openCreateSignal={createSignal} /> },
+    { id: "notifications", label: t("tabs.notifications"), icon: <FaEnvelope size={12} />, canCreate: false, content: <SysConfigTab /> },
   ];
 
   const groups = [
-    { id: "organizacion", label: t("groups.organization"), ids: ["departments", "subareas"] },
+    { id: "organization", label: t("groups.organization"), ids: ["departments", "subareas"] },
     { id: "inventory", label: t("groups.inventory"), ids: ["deviceTypes"] },
-    { id: "personal", label: t("groups.personal"), ids: ["tiposDocumento", "genders", "bloodTypes"] },
-    { id: "tickets", label: t("groups.tickets"), ids: ["categoriasTicket"] },
-    { id: "sistema", label: t("groups.system"), ids: ["notificaciones"] },
+    { id: "employees", label: t("groups.personal"), ids: ["documentTypes", "genders", "bloodTypes"] },
+    { id: "tickets", label: t("groups.tickets"), ids: ["ticketCategories"] },
+    { id: "system", label: t("groups.system"), ids: ["notifications"] },
   ];
 
   const current = items.find((item) => item.id === active) ?? items[0];

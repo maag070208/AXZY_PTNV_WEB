@@ -6,6 +6,7 @@ import axios, {
 } from "axios";
 import { API_CONSTANTS } from "./constants/API_CONSTANTS";
 import { getSessionToken, handleUnauthorized } from "./session";
+import i18n from "@shared/i18n/config";
 
 class ApiError extends Error {
   public readonly code?: string;
@@ -39,6 +40,8 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // Los mensajes de la API vienen en el idioma de la interfaz.
+    config.headers["Accept-Language"] = i18n.language;
     return config;
   },
   (error: AxiosError) => {

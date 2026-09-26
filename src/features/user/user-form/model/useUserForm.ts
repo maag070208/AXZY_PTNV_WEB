@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
-import { ROLE_LABELS, usersApi, type User, type UserRole } from "@entities/user";
+import { USER_ROLES, roleLabel, usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
@@ -49,11 +49,6 @@ export const ROLE_GUIDANCE: Record<
     actions: ["form.roles.GUARD.actions.0", "form.roles.GUARD.actions.1", "form.roles.GUARD.actions.2"],
   },
 };
-
-const ROLE_OPTIONS = (Object.keys(ROLE_LABELS) as UserRole[]).map((value) => ({
-  value,
-  label: ROLE_LABELS[value],
-}));
 
 /** Documentación obligatoria del alta de un empleado (se resuelve por nombre). */
 export const REQUIRED_DOCS: Array<{ key: string; test: RegExp; fallback: string }> = [
@@ -410,6 +405,6 @@ export const useUserForm = () => {
     setDocFile,
     docsError,
     tt,
-    ROLE_OPTIONS,
+    ROLE_OPTIONS: USER_ROLES.map((value) => ({ value, label: roleLabel(value) })),
   };
 };
