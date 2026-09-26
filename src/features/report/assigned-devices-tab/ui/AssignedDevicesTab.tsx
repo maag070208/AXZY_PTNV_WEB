@@ -42,6 +42,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "assetTag",
       label: t("assigned.activeCol"),
       type: "string",
+      width: 110,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-800">
@@ -53,6 +54,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "description",
       label: t("assigned.colDescription"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -69,6 +71,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "custodian",
       label: t("assigned.colCustodian"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -85,6 +88,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "department",
       label: t("assigned.colDept"),
       type: "string",
+      width: 200,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">
@@ -96,6 +100,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "folio",
       label: t("assigned.colFolioSource"),
       type: "string",
+      width: 180,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -112,6 +117,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "date",
       label: t("assigned.colDate"),
       type: "string",
+      width: 130,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] text-slate-700">
@@ -123,6 +129,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "daysAssigned",
       label: t("assigned.colDays"),
       type: "number",
+      width: 100,
       sortable: false,
       render: (r) => (
         <ITText
@@ -221,6 +228,9 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITFlex>
   );

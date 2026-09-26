@@ -31,6 +31,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "title",
       label: tt("tasksTable.task"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -45,6 +46,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "ticket",
       label: tt("tasksTable.ticket"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.title}</ITText>
@@ -54,6 +56,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "status",
       label: tt("tasksTable.status"),
       type: "string",
+      width: 150,
       sortable: false,
       render: (r) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="lg">
@@ -65,6 +68,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "dates",
       label: tt("tasksTable.dates"),
       type: "string",
+      width: 220,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -90,6 +94,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       key: "actions",
       label: "",
       type: "string",
+      width: 100,
       sortable: false,
       render: () => (
         <ITFlex justify="end">
@@ -119,6 +124,9 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
     />
   );
 }

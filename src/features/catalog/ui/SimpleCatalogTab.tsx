@@ -107,6 +107,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
       type: "string",
       key: "name",
       label: t("name"),
+      width: 300,
       filter: true,
       sortable: false,
       render: (item: T) => <ITText className="text-[11px] font-bold text-slate-800">{item.name}</ITText>,
@@ -115,6 +116,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
       type: "boolean",  
       key: "active",
       label: t("status"),
+      width: 130,
       sortable: false,
       render: (item: T) =>
         item.active ? (
@@ -127,6 +129,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
       type: "string",
       key: "action",
       label: "",
+      width: 140,
       render: (item: T) => (
         <ITFlex align="center" gap={2}>
           <ITButton variant="outlined" color="primary" size="lg" onClick={() => openEdit(item)}>
@@ -198,6 +201,9 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       <ITConfirmDialog

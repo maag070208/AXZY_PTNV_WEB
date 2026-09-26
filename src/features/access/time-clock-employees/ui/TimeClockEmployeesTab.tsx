@@ -84,6 +84,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         key: "employeeNumber",
         label: t("employees.columns.number"),
         type: "string",
+        width: 120,
         sortable: true,
         render: (r) => (
           <ITText className="text-[12px] font-black text-slate-800 whitespace-nowrap">
@@ -95,6 +96,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         key: "name",
         label: t("employees.columns.name"),
         type: "string",
+        width: 300,
         sortable: true,
         render: (r) => <ITText className="text-[12px] font-bold text-slate-700">{r.name}</ITText>,
       },
@@ -102,6 +104,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         key: "punches",
         label: t("employees.columns.punches"),
         type: "number",
+        width: 200,
         sortable: true,
         render: (r) => (
           <ITFlex direction="column" gap={0.5}>
@@ -116,6 +119,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         key: "link",
         label: t("employees.columns.user"),
         type: "string",
+        width: 260,
         render: (r) => {
           if (r.link) {
             return (
@@ -158,6 +162,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
               key: "actions",
               label: t("employees.columns.actions"),
               type: "actions" as const,
+              width: 260,
               actions: (r: TimeClockEmployee) => (
                 <ITFlex align="center" gap={1}>
                   {!r.link && r.suggestion && (
@@ -281,6 +286,9 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         itemsPerPageOptions={[10, 25, 50, 100]}
         debounceMs={350}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       <ITDialog

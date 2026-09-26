@@ -172,6 +172,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "key",
       label: t("catalog.columns.key"),
+      width: 260,
       filter: true,
       render: (permission: PermissionCatalog) => (
         <ITText className="font-mono text-[11px] text-slate-700">
@@ -183,6 +184,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "module",
       label: t("catalog.columns.module"),
+      width: 200,
       filter: true,
       render: (permission: PermissionCatalog) => (
         <ITText className="text-[11px] text-slate-600">{permission.module}</ITText>
@@ -192,6 +194,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "name",
       label: t("catalog.columns.name"),
+      width: 240,
       filter: true,
       render: (permission: PermissionCatalog) => (
         <ITText className="text-[11px] font-bold text-slate-800">
@@ -203,6 +206,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "scopes",
       label: t("catalog.columns.scopes"),
+      width: 260,
       render: (permission: PermissionCatalog) => (
         <ITFlex align="center" gap={1} wrap="wrap">
           {permission.scopes.map((scope) => (
@@ -217,6 +221,7 @@ export default function PermissionCatalogPanel() {
       type: "boolean",
       key: "sensitive",
       label: t("catalog.columns.sensitive"),
+      width: 130,
       render: (permission: PermissionCatalog) =>
         permission.sensitive ? (
           <ITBadget color="warning" size="sm">
@@ -230,6 +235,7 @@ export default function PermissionCatalogPanel() {
       type: "number",
       key: "sortOrder",
       label: t("catalog.columns.sortOrder"),
+      width: 110,
       render: (permission: PermissionCatalog) => (
         <ITText className="text-[11px] text-slate-500">{permission.sortOrder}</ITText>
       ),
@@ -238,6 +244,7 @@ export default function PermissionCatalogPanel() {
       type: "boolean",
       key: "active",
       label: t("catalog.columns.active"),
+      width: 130,
       render: (permission: PermissionCatalog) =>
         permission.active ? (
           <ITBadget color="success" size="sm">
@@ -253,6 +260,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "actions",
       label: "",
+      width: 110,
       render: (permission: PermissionCatalog) => (
         <ITFlex align="center" gap={2}>
           <ITButton
@@ -313,6 +321,9 @@ export default function PermissionCatalogPanel() {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       <ITDialog

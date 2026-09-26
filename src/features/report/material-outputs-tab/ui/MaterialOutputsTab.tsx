@@ -29,6 +29,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "date",
       label: t("exits.colDate"),
       type: "date",
+      width: 130,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">
@@ -40,6 +41,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "q",
       label: t("exits.colDescription"),
       type: "string",
+      width: 300,
       filter: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -58,6 +60,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "quantity",
       label: t("exits.colQty"),
       type: "number",
+      width: 90,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-700">{r.quantity}</ITText>
@@ -67,6 +70,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "departmentName",
       label: t("exits.colDept"),
       type: "string",
+      width: 200,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -77,6 +81,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "userName",
       label: t("exits.colUser"),
       type: "string",
+      width: 240,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -87,6 +92,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "reason",
       label: t("exits.colReason"),
       type: "string",
+      width: 140,
       render: (r) =>
         r.reason ? (
           <ITBadget color={REASON_COLORS[r.reason]} size="lg">
@@ -100,6 +106,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "device",
       label: t("exits.colDevice"),
       type: "string",
+      width: 150,
       render: (r) =>
         r.device ? (
           <ITText className="text-[11px] font-black text-emerald-700">
@@ -113,6 +120,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "notes",
       label: t("exits.colNotes"),
       type: "string",
+      width: 260,
       render: (r) => (
         <ITText className="text-[10px] text-slate-500 max-w-[220px] truncate">
           {r.notes ?? "—"}
@@ -166,6 +174,9 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITFlex>
   );

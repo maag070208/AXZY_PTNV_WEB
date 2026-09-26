@@ -48,6 +48,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "assetTag",
       label: t("devices.activeCol"),
       type: "string",
+      width: 160,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -66,6 +67,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "description",
       label: t("devices.colDescription"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -82,6 +84,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "quantity",
       label: t("devices.colQty"),
       type: "number",
+      width: 90,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-700">
@@ -93,6 +96,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "status",
       label: t("devices.colStatus"),
       type: "string",
+      width: 140,
       sortable: false,
       render: (r) => statusBadge(r.status),
     },
@@ -100,6 +104,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "custodian",
       label: t("devices.colCustodian"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (r) =>
         r.status === "ASSIGNED" ? (
@@ -121,6 +126,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "department",
       label: t("devices.colDept"),
       type: "string",
+      width: 200,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">
@@ -132,6 +138,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "daysAssigned",
       label: t("devices.colDays"),
       type: "number",
+      width: 110,
       sortable: false,
       render: (r) => (
         <ITText
@@ -150,6 +157,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "folio",
       label: t("devices.colFolio"),
       type: "string",
+      width: 150,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-emerald-700">
@@ -161,6 +169,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "area",
       label: t("devices.colArea"),
       type: "string",
+      width: 160,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">{r.area}</ITText>
@@ -273,6 +282,9 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITFlex>
   );

@@ -91,6 +91,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         key: "occurredAt",
         label: t("columns.occurredAt"),
         type: "date",
+        width: 160,
         sortable: true,
         render: (c) => (
           <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -102,6 +103,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         key: "name",
         label: t("columns.employee"),
         type: "string",
+        width: 300,
         sortable: true,
         render: (c) => (
           <ITFlex direction="column" gap={0.5}>
@@ -116,6 +118,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         key: "method",
         label: t("columns.method"),
         type: "string",
+        width: 140,
         sortable: true,
         render: (c) => (
           <span title={c.method === "OTHER" ? t("otherHint", { minor: c.minor }) : undefined}>
@@ -129,6 +132,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         key: "clock",
         label: t("columns.clock"),
         type: "string",
+        width: 200,
         render: (c) => (
           <span title={c.clockSerial}>
             <ITText className="text-[11px] font-bold text-slate-600">{c.clock ?? c.clockSerial}</ITText>
@@ -139,6 +143,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         key: "serialNo",
         label: t("columns.serialNo"),
         type: "number",
+        width: 100,
         render: (c) => (
           <ITText className="text-[10px] font-bold text-slate-400">{c.serialNo}</ITText>
         ),
@@ -274,6 +279,9 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         itemsPerPageOptions={[10, 25, 50, 100]}
         debounceMs={350}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       {toast && (

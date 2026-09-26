@@ -89,6 +89,7 @@ export default function SchedulesTable() {
       key: "name",
       label: t("name"),
       type: "string",
+      width: 300,
       filter: true,
       sortable: true,
       render: (h) => <ITText className="text-[12px] font-black text-slate-800">{h.name}</ITText>,
@@ -97,6 +98,7 @@ export default function SchedulesTable() {
       key: "days",
       label: t("days"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (h) => (
         <ITText className="text-[11px] text-slate-600">{formatDays(h.days)}</ITText>
@@ -106,6 +108,7 @@ export default function SchedulesTable() {
       key: "rules",
       label: t("tolEntry"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (h) => (
         <ITText className="text-[11px] text-slate-500 whitespace-nowrap">
@@ -117,6 +120,7 @@ export default function SchedulesTable() {
       key: "assigned",
       label: t("assignedLabel"),
       type: "number",
+      width: 110,
       sortable: false,
       render: (h) => <ITText className="text-[12px] font-bold text-slate-700">{h.assigned ?? 0}</ITText>,
     },
@@ -124,6 +128,7 @@ export default function SchedulesTable() {
       key: "active",
       label: t("active"),
       type: "boolean",
+      width: 130,
       sortable: false,
       render: (h) => (
         <ITBadget color={h.active ? "success" : "danger"} size="sm">
@@ -135,6 +140,7 @@ export default function SchedulesTable() {
       key: "actions",
       label: "",
       type: "actions",
+      width: 110,
       actions: (h) => (
         <ITFlex align="center" gap={1}>
           <ITButton
@@ -184,6 +190,9 @@ export default function SchedulesTable() {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       <ITConfirmDialog

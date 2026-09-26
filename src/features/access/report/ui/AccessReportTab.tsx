@@ -130,6 +130,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "employeeName",
       label: t("columns.employee"),
       type: "string",
+      width: 300,
       sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -146,6 +147,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "departmentName",
       label: t("columns.department"),
       type: "string",
+      width: 200,
       sortable: true,
       render: (r) =>
         r.departmentName ? (
@@ -160,6 +162,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "jobTitle",
       label: t("columns.jobTitle"),
       type: "string",
+      width: 200,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700">{r.jobTitle ?? "—"}</ITText>
@@ -169,6 +172,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "date",
       label: t("columns.date"),
       type: "string",
+      width: 130,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -180,6 +184,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "entryAt",
       label: t("columns.entry"),
       type: "string",
+      width: 150,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-emerald-700 whitespace-nowrap">
@@ -191,6 +196,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "exitAt",
       label: t("columns.exit"),
       type: "string",
+      width: 150,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -202,6 +208,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "workedMinutes",
       label: t("columns.hours"),
       type: "number",
+      width: 100,
       sortable: true,
       render: (r) => (
         <ITText className="text-[12px] font-black text-emerald-700">
@@ -213,6 +220,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "incident",
       label: t("columns.incident"),
       type: "string",
+      width: 160,
       sortable: false,
       render: (r) => renderIncident(r.incident),
     },
@@ -491,6 +499,9 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
     </ITFlex>
   );

@@ -27,6 +27,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "title",
       label: tt("tasksTable.task"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
@@ -41,6 +42,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "employee",
       label: tt("tasksTable.employee"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
@@ -55,6 +57,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "ticket",
       label: tt("tasksTable.ticket"),
       type: "string",
+      width: 300,
       sortable: false,
       render: (row) => (
         <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.title}</ITText>
@@ -64,6 +67,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "status",
       label: tt("tasksTable.status"),
       type: "string",
+      width: 150,
       sortable: false,
       render: (row) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="lg">
@@ -75,6 +79,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "dates",
       label: tt("tasksTable.dates"),
       type: "string",
+      width: 220,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
@@ -110,6 +115,9 @@ export default function AdminTasksTable({ fx }: Props) {
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
       size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
     />
   );
 }

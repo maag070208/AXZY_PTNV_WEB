@@ -202,6 +202,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
     key: "select",
     label: "",
     type: "actions",
+    width: 80,
     actions: (r) => (
       <ITCheckbox
         name={`sel-${dayKeyOf(r)}`}
@@ -217,6 +218,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "employeeName",
       label: t("columns.employee"),
       type: "string",
+      width: 300,
       sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -231,6 +233,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "departmentName",
       label: t("columns.department"),
       type: "string",
+      width: 200,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.departmentName ?? "—"}</ITText>
@@ -240,6 +243,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "date",
       label: t("columns.date"),
       type: "string",
+      width: 130,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -251,6 +255,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "scheduleName",
       label: t("columns.schedule"),
       type: "string",
+      width: 220,
       sortable: true,
       render: (r) =>
         r.scheduleName ? (
@@ -265,6 +270,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "extraMin",
       label: canApprove ? t("columns.extra") : t("statusApproved"),
       type: "number",
+      width: 120,
       sortable: true,
       render: (r) => (
         <ITText className={canApprove ? "text-[12px] font-black text-rose-600" : "text-[12px] font-black text-emerald-700"}>
@@ -276,6 +282,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "status",
       label: t("status"),
       type: "string",
+      width: 140,
       sortable: true,
       render: (r) => (
         <ITBadget color={STATUS_COLOR[r.status]} size="sm">
@@ -287,6 +294,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "decidedByName",
       label: t("columns.decidedBy"),
       type: "string",
+      width: 200,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.decidedByName ?? "—"}</ITText>
@@ -296,6 +304,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "decidedAt",
       label: t("columns.decidedAt"),
       type: "string",
+      width: 170,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] text-slate-600 whitespace-nowrap">
@@ -307,6 +316,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "note",
       label: t("columns.note"),
       type: "string",
+      width: 240,
       sortable: false,
       render: (r) => <ITText className="text-[11px] text-slate-500">{r.note ?? "—"}</ITText>,
     },
@@ -508,6 +518,9 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         defaultItemsPerPage={100}
         itemsPerPageOptions={[25, 50, 100]}
         size="lg"
+        virtualized
+        virtualizedMaxHeight={420}
+        rowHeight={50}
       />
 
       {canApprove && (
