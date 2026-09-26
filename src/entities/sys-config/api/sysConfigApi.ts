@@ -12,6 +12,7 @@ export interface SysConfig {
 
 const EMAIL_KEY = "EMAIL_NOTIFICATION_RECIPIENTS";
 const SEND_EMAIL_KEY = "ENABLE_SEND_EMAIL";
+const WEEK_START_DAY_KEY = "WEEK_START_DAY";
 
 export const sysConfigApi = {
   list: () => api.get<SysConfig[]>("/sys-config"),
@@ -39,5 +40,13 @@ export const sysConfigApi = {
       SEND_EMAIL_KEY,
       enabled ? "true" : "false",
       "Global switch for transactional email"
+    ),
+  /** Primer día de la semana laboral para los reportes por periodo. */
+  getWeekStartDay: () => sysConfigApi.get(WEEK_START_DAY_KEY),
+  setWeekStartDay: (value: string) =>
+    sysConfigApi.update(
+      WEEK_START_DAY_KEY,
+      value,
+      "First day of the work week for report ranges (SUNDAY…SATURDAY)"
     ),
 };

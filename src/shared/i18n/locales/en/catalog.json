@@ -62,6 +62,19 @@
     "languages": {
       "es": "Español",
       "en": "English"
+    },
+    "weekStartLabel": "First day of the week",
+    "weekStartHelp": "Day the weekly ranges of the Daily/Weekly/Monthly filters start on. The client operates Wednesday to Wednesday.",
+    "weekStartSaved": "Week start day updated",
+    "weekStartSaveError": "Could not save the week start day",
+    "weekdays": {
+      "SUNDAY": "Sunday",
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday",
+      "SATURDAY": "Saturday"
     }
   }
 }

@@ -33,6 +33,7 @@ import {
   type AccessReportPeriod,
   type AccessReportSessionRow,
 } from "@entities/access";
+import { useWeekStartDay } from "@entities/sys-config";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import type { UseAccessReport } from "../model/useAccessReport";
@@ -240,11 +241,12 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
     setIncludeInactive(false);
   };
 
-  /** Rango [inicio, fin] de la semana (lunes–domingo) o del mes que contiene `date`. */
+  /** Rango [inicio, fin] de la semana (según `WEEK_START_DAY`) o del mes que contiene `date`. */
+  const weekStart = useWeekStartDay();
   const periodRange = useMemo<[Date, Date]>(() => {
     const d = date ?? new Date();
     if (period === "WEEK") {
-      const offset = (d.getDay() + 6) % 7; // 0 = lunes
+      const offset = (d.getDay() - weekStart + 7) % 7; // 0 = primer día configurado
       const start = new Date(d);
       start.setDate(d.getDate() - offset);
       start.setHours(0, 0, 0, 0);
@@ -261,7 +263,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
     const start = new Date(d);
     start.setHours(0, 0, 0, 0);
     return [start, start];
-  }, [period, date]);
+  }, [period, date, weekStart]);
 
   const handleRange = (
     e:
