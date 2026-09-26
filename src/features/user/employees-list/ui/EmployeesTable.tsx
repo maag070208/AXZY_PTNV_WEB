@@ -89,9 +89,8 @@ export default function EmployeesTable({
           direction="column"
           gap={0.5}
           className="cursor-pointer"
-          onClick={() => onView(u)}
         >
-          <ITText className="text-[12px] font-black text-slate-800 hover:text-blue-600">{u.name}</ITText>
+          <ITText className="text-[12px] font-black text-slate-800">{u.name}</ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
             @{u.username}
           </ITText>
