@@ -21,6 +21,7 @@ import { dyn } from "@shared/i18n/dyn";
 import { useIsMobile } from "@shared/lib/useIsMobile";
 import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dayMinutes, daysWorked, restDays, weeklyMinutes } from "../model/summary";
+import { i18n } from "@shared/i18n";
 
 const emptyDays = (): ScheduleDayInput[] =>
   [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({
@@ -89,7 +90,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
       .then((rows) => {
         const h = rows.find((x) => x.id === id);
         if (!h) {
-          setError("Horario no encontrado");
+          setError(i18n.t("schedules:form.notFound"));
           return;
         }
         setForm({

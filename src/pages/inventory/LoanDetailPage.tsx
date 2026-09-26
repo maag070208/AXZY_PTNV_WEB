@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate, formatDateTime } from "@shared/utils/dates";
 import { inventoryApi, type Condition, type Loan } from "@entities/inventory";
 import { CustodyLetterPreview, downloadCustodyLetterPdf } from "@widgets/custody-letter";
+import { i18n } from "@shared/i18n";
 
 const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = {
   ACTIVE: "success",
@@ -178,7 +179,7 @@ export default function LoanDetailPage() {
                             <ITBadget color="info" size="lg">{dv.number}</ITBadget>
                           </ITFlex>
                           {dv.custodian?.name && (
-                            <ITText className="text-[10px] text-slate-400">por {dv.custodian.name}</ITText>
+                            <ITText className="text-[10px] text-slate-400">{i18n.t("common:labels.byName", { name: dv.custodian.name })}</ITText>
                           )}
                         </ITFlex>
                         {dv.items.map((dd) => (

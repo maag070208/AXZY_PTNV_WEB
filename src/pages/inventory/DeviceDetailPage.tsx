@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
 import { inventoryApi, type Device, type Stock, type StockLedgerRow, type MovementType, type DeviceUnit } from "@entities/inventory";
 import { StatCard } from "@shared/ui/stat-card";
+import { i18n } from "@shared/i18n";
 
 const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = {
   AVAILABLE: "success",
@@ -139,10 +140,10 @@ export default function DeviceDetailPage() {
                   <ITFlex direction="column" gap={0.5} className="min-w-0">
                     <ITText className="font-black text-emerald-700 text-[12px] uppercase tracking-tight">{u.assetTag}</ITText>
                     <ITFlex gap={2} wrap="wrap" className="text-[10px] text-slate-400">
-                      {device.type?.useSerialNumber && u.serialNumber && <span>Serie: {u.serialNumber}</span>}
+                      {device.type?.useSerialNumber && u.serialNumber && <span>{i18n.t("common:labels.serialNumber", { value: u.serialNumber })}</span>}
                       {device.type?.useMac && u.macAddress && <span>MAC: {u.macAddress}</span>}
                       {device.type?.useIp && u.ip && <span>IP: {u.ip}</span>}
-                      {device.type?.useHostname && u.hostname && <span>Equipo: {u.hostname}</span>}
+                      {device.type?.useHostname && u.hostname && <span>{i18n.t("common:labels.hostname", { value: u.hostname })}</span>}
                       {!u.serialNumber && !u.macAddress && !u.ip && !u.hostname && <span>—</span>}
                     </ITFlex>
                   </ITFlex>

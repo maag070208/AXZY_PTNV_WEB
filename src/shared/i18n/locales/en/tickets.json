@@ -177,7 +177,9 @@
     "startShort": "Start",
     "dueShort": "Due",
     "systemUser": "System",
-    "byUser": "User"
+    "byUser": "User",
+    "confirmHardDelete": "Permanently delete \"{{title}}\"? Its comments and history will be erased. This action cannot be undone.",
+    "confirmSoftDelete": "Move \"{{title}}\" to the trash? It will be marked as deleted and you can permanently delete it later."
   },
   "kanban": {
     "byTicket": "Ticket tasks",
@@ -271,7 +273,8 @@
     "commentBy": "Comment by {{author}}",
     "fallbackUser": "User",
     "byAuthor": "By {{name}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "footer": "Puerto Nuevo Hotel y Villas — Ticket System"
   },
   "attachments": {
     "loadError": "Could not load the files",
@@ -284,5 +287,11 @@
     "uploadEvidence": "Upload evidence",
     "uploadTicketFiles": "Upload ticket files",
     "fallbackExt": "FILE"
+  },
+  "form": {
+    "validation": {
+      "titleRequired": "Title is required",
+      "titleMin": "Title must have at least {{min}} characters"
+    }
   }
 }

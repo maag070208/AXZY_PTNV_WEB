@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { ITInput } from "@axzydev/axzy_ui_system";
 import { FaCalendarAlt } from "react-icons/fa";
 import { usePopoverPosition } from "./usePopoverPosition";
+import { i18n } from "@shared/i18n";
 
 /**
  * DatePickerPortal: selector de fecha portado a `document.body` para evitar
@@ -131,7 +132,7 @@ export default function DatePickerPortal({
                   setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
                 }
                 style={{ fontSize: 18, color: "#64748b", padding: "4px 8px" }}
-                aria-label="Mes anterior"
+                aria-label={i18n.t("common:datePicker.previousMonth")}
               >
                 ‹
               </button>
@@ -144,7 +145,7 @@ export default function DatePickerPortal({
                   setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
                 }
                 style={{ fontSize: 18, color: "#64748b", padding: "4px 8px" }}
-                aria-label="Mes siguiente"
+                aria-label={i18n.t("common:datePicker.nextMonth")}
               >
                 ›
               </button>
@@ -210,14 +211,14 @@ export default function DatePickerPortal({
                 onClick={() => emit(new Date())}
                 style={{ fontSize: 11, color: "#475569" }}
               >
-                Hoy
+                {i18n.t("common:datePicker.today")}
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 style={{ fontSize: 11, color: "#475569" }}
               >
-                Cerrar
+                {i18n.t("common:datePicker.close")}
               </button>
             </div>
             {/* Hidden native date input keeps the browser-native picker accessible. */}
@@ -231,7 +232,7 @@ export default function DatePickerPortal({
                 if (d) emit(d);
               }}
               style={{ marginTop: 8, width: "100%", fontSize: 12 }}
-              aria-label={`${label ?? name} selector de fecha nativo`}
+              aria-label={i18n.t("common:datePicker.native", { label: label ?? name })}
             />
           </div>,
           document.body

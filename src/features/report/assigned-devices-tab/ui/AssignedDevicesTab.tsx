@@ -219,7 +219,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         }
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
-        itemsPerPageOptions={[5, 10, 50]}
+        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />
     </ITFlex>

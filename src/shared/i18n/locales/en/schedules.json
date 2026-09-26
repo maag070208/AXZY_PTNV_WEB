@@ -137,5 +137,8 @@
     }
   },
   "assignedLabel": "Assigned",
-  "secondHint": "Enable it on days with a split shift (e.g. housekeeping or restaurant)."
+  "secondHint": "Enable it on days with a split shift (e.g. housekeeping or restaurant).",
+  "form": {
+    "notFound": "Schedule not found"
+  }
 }

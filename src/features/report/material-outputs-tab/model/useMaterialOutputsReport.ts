@@ -49,7 +49,7 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
       const res = await materialOutputsApi.list(lastFilters);
       await download(res.data);
     } catch (e) {
-      console.error("Error al exportar PDF de salidas", e);
+      console.error("Error exporting the material outputs PDF", e);
     } finally {
       setExporting(false);
     }

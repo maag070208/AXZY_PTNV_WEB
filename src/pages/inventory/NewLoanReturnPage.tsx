@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import { inventoryApi, type Condition, type Loan } from "@entities/inventory";
+import { i18n } from "@shared/i18n";
 
 interface Row {
   key: string;
@@ -91,7 +92,7 @@ export default function NewLoanReturnPage() {
     // observación requerida si MALO/ROTO, mínimo 3 caracteres
     rows.forEach((r, idx) => {
       if ((r.condition === "POOR" || r.condition === "BROKEN") && r.notes.trim().length < 3) {
-        e[`notes-${idx}`] = "La observación debe tener al menos 3 caracteres";
+        e[`notes-${idx}`] = i18n.t("inventory:validation.notesMin", { min: 3 });
       }
     });
     setErrors(e);
@@ -106,7 +107,7 @@ export default function NewLoanReturnPage() {
 
   const handleSubmit = async () => {
     if (!validate()) {
-      setToast({ message: "Revisa las observaciones marcadas", type: "error" });
+      setToast({ message: i18n.t("inventory:validation.reviewNotes"), type: "error" });
       return;
     }
     setSaving(true);

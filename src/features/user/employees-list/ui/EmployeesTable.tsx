@@ -14,12 +14,7 @@ import { FaEdit, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
 import type { PersonalProfile } from "@entities/hr";
-
-const ROLE_LABEL: Record<string, string> = {
-  MANAGER: "MANAGER",
-  AREA_HEAD: "JEFE DE ÁREA",
-  EMPLOYEE: "EMPLOYEE",
-};
+import { roleLabel } from "@entities/user";
 
 const roleBadge = (role: string, label: string) => (
   <ITBadget
@@ -107,7 +102,7 @@ export default function EmployeesTable({
       type: "string",
       filter: false,
       sortable: false,
-      render: (u) => roleBadge(u.role, ROLE_LABEL[u.role] ?? u.role),
+      render: (u) => roleBadge(u.role, roleLabel(u.role)),
     },
     {
       key: "active",
@@ -202,7 +197,7 @@ export default function EmployeesTable({
       }
       reloadTrigger={reloadKey}
       defaultItemsPerPage={10}
-      itemsPerPageOptions={[5, 10, 50]}
+      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
     />
   );

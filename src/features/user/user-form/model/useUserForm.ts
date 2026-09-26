@@ -50,11 +50,15 @@ export const ROLE_GUIDANCE: Record<
   },
 };
 
-/** Documentación obligatoria del alta de un empleado (se resuelve por nombre). */
-export const REQUIRED_DOCS: Array<{ key: string; test: RegExp; fallback: string }> = [
-  { key: "ineFrente", test: /ine.*frente|frente.*ine/i, fallback: "INE (Frente)" },
-  { key: "ineReverso", test: /ine.*reverso|reverso.*ine/i, fallback: "INE (Reverso)" },
-  { key: "comprobante", test: /domicilio/i, fallback: "Comprobante de Domicilio" },
+/**
+ * Documentación obligatoria del alta de un empleado. Se resuelve contra el
+ * catálogo de tipos de documento por nombre (datos del cliente, en español);
+ * si no existe, la etiqueta sale de `users:form.docs`.
+ */
+export const REQUIRED_DOCS: Array<{ key: "ineFront" | "ineBack" | "proofOfAddress"; test: RegExp }> = [
+  { key: "ineFront", test: /ine.*frente|frente.*ine/i },
+  { key: "ineBack", test: /ine.*reverso|reverso.*ine/i },
+  { key: "proofOfAddress", test: /domicilio/i },
 ];
 
 export interface UserFormValues {
@@ -202,7 +206,7 @@ export const useUserForm = () => {
   const requiresDocs = !isEdit && form.role === "EMPLOYEE";
   const requiredDocs = REQUIRED_DOCS.map((r) => {
     const type = documentTypes.find((d) => r.test.test(d.name));
-    return { key: r.key, label: type?.name ?? r.fallback, typeId: type?.id ?? null };
+    return { key: r.key, label: type?.name ?? i18n.t(`users:form.docs.${r.key}`), typeId: type?.id ?? null };
   });
   const setDocFile = (key: string, file: File | null) =>
     setDocsFiles((prev) => ({ ...prev, [key]: file }));
@@ -241,35 +245,35 @@ export const useUserForm = () => {
     const trimmed = value.trim();
     switch (field) {
       case "username":
-        if (!trimmed) return "El usuario es obligatorio";
+        if (!trimmed) return i18n.t("users:form.validation.usernameRequired");
         if (trimmed.length < LIMITS.username.min)
-          return `El usuario debe tener al menos ${LIMITS.username.min} caracteres`;
+          return i18n.t("users:form.validation.usernameMin", { min: LIMITS.username.min });
         if (trimmed.length > LIMITS.username.max)
-          return `El usuario debe tener máximo ${LIMITS.username.max} caracteres`;
+          return i18n.t("users:form.validation.usernameMax", { max: LIMITS.username.max });
         return null;
       case "password":
-        if (!isEdit && !value) return "La contraseña es obligatoria";
+        if (!isEdit && !value) return i18n.t("users:form.validation.passwordRequired");
         if (value && value.length < LIMITS.password.min)
-          return `La contraseña debe tener al menos ${LIMITS.password.min} caracteres`;
+          return i18n.t("users:form.validation.passwordMin", { min: LIMITS.password.min });
         if (value.length > LIMITS.password.max)
-          return `La contraseña debe tener máximo ${LIMITS.password.max} caracteres`;
+          return i18n.t("users:form.validation.passwordMax", { max: LIMITS.password.max });
         return null;
       case "name":
-        if (!trimmed) return "El nombre es obligatorio";
+        if (!trimmed) return i18n.t("users:form.validation.nameRequired");
         if (trimmed.length > LIMITS.name.max)
-          return `El nombre debe tener máximo ${LIMITS.name.max} caracteres`;
+          return i18n.t("users:form.validation.nameMax", { max: LIMITS.name.max });
         return null;
       case "email":
         if (!trimmed) return null;
-        if (trimmed.length > 254) return "El correo debe tener máximo 254 caracteres";
+        if (trimmed.length > 254) return i18n.t("users:form.validation.emailMax", { max: 254 });
         return validateEmail(trimmed);
       case "employeeNumber":
         if (trimmed.length > LIMITS.employeeNumber.max)
-          return `El número de empleado debe tener máximo ${LIMITS.employeeNumber.max} caracteres`;
+          return i18n.t("users:form.validation.employeeNumberMax", { max: LIMITS.employeeNumber.max });
         return null;
       case "jobTitle":
         if (trimmed.length > LIMITS.jobTitle.max)
-          return `El puesto debe tener máximo ${LIMITS.jobTitle.max} caracteres`;
+          return i18n.t("users:form.validation.jobTitleMax", { max: LIMITS.jobTitle.max });
         return null;
       default:
         return null;
@@ -362,7 +366,7 @@ export const useUserForm = () => {
       return true;
     } catch (e: any) {
       const code: unknown = e?.code;
-      const msg: string = e?.message ?? "Error al guardar";
+      const msg: string = e?.message ?? i18n.t("common:errors.save");
       // Duplicados que manda la API → error inline en el campo + toast global.
       if (code === "EMAIL_TAKEN" || code === "USERNAME_TAKEN" || code === "EMPLOYEE_NUMBER_TAKEN") {
         const field =

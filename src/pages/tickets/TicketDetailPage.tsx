@@ -29,6 +29,7 @@ import {
   TicketComments,
   TasksGraph,
 } from "@features/ticket/ticket-detail";
+import { i18n } from "@shared/i18n";
 
 export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -196,8 +197,8 @@ export default function TicketDetailPage() {
         title={ticket.deletedAt ? tt("detail.deleteForever") : tt("detail.moveTrash")}
         message={
           ticket.deletedAt
-            ? `¿Eliminar definitivamente "${ticket.title}"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.`
-            : `¿Mover a papelera "${ticket.title}"? Quedará en estado eliminado y podrás borrarlo definitivamente después.`
+            ? i18n.t("tickets:detail.confirmHardDelete", { title: ticket.title })
+            : i18n.t("tickets:detail.confirmSoftDelete", { title: ticket.title })
         }
         confirmLabel={ticket.deletedAt ? tt("detail.deleteForever") : tt("detail.moveTrash")}
         cancelLabel={tt("common:actions.cancel")}

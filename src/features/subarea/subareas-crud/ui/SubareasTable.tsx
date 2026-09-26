@@ -114,7 +114,7 @@ export default function SubareasTable({
       }
       reloadTrigger={reloadKey}
       defaultItemsPerPage={10}
-      itemsPerPageOptions={[5, 10, 50]}
+      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
     />
   );

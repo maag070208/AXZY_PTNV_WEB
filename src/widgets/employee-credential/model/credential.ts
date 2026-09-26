@@ -27,7 +27,7 @@ export const photoAsDataUrl = async (
   if (!photoUrl) {
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      console.warn("[credencial] fotoUrl vacío: el perfil no tiene fotoKey/fotoUrl");
+      console.warn("[credential] empty photoUrl: the profile has no photoKey/photoUrl");
     }
     return null;
   }
@@ -36,7 +36,7 @@ export const photoAsDataUrl = async (
     if (!res.ok) {
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
-        console.warn(`[credencial] fetch falló: ${res.status} ${res.statusText}`);
+        console.warn(`[credential] fetch failed: ${res.status} ${res.statusText}`);
       }
       return null;
     }
@@ -47,7 +47,7 @@ export const photoAsDataUrl = async (
       reader.onerror = () => {
         if (import.meta.env.DEV) {
           // eslint-disable-next-line no-console
-          console.warn("[credencial] FileReader onerror");
+          console.warn("[credential] FileReader onerror");
         }
         resolve(null);
       };
@@ -56,7 +56,7 @@ export const photoAsDataUrl = async (
   } catch (err) {
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      console.warn("[credencial] excepción al cargar foto:", err);
+      console.warn("[credential] exception loading the photo:", err);
     }
     return null;
   }

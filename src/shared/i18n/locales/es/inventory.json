@@ -310,6 +310,12 @@
     "errorRegistering": "Error al registrar"
   },
   "validation": {
-    "overStock": "La cantidad no puede superar el disponible"
+    "overStock": "La cantidad no puede superar el disponible",
+    "reasonMin": "El motivo debe tener al menos {{min}} caracteres",
+    "notesMin": "La observación debe tener al menos {{min}} caracteres",
+    "reviewNotes": "Revisa las observaciones marcadas"
+  },
+  "units": {
+    "loadError": "Error al cargar las unidades"
   }
 }

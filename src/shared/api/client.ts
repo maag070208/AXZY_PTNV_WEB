@@ -80,7 +80,7 @@ const handleError = (error: any): never => {
     | undefined;
   const status = error?.response?.status ?? 0;
   const message =
-    data?.message ?? error?.message ?? "Error de red o del servidor";
+    data?.message ?? error?.message ?? i18n.t("common:errors.network");
   throw new ApiError(status, message, data, data?.code);
 };
 

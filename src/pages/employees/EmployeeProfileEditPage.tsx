@@ -27,6 +27,7 @@ import {
   validatePostal,
   validateRfc,
 } from "@shared/validation";
+import { i18n } from "@shared/i18n";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
 const dateStrToLocal = (value?: string | null): Date | undefined => {
@@ -145,7 +146,7 @@ export default function EmployeeProfileEditPage() {
   const handleFinish = async () => {
     if (!validate()) {
       // Surface a generic alert; per-field messages are inline.
-      detail.setError("Por favor revisa los campos marcados");
+      detail.setError(i18n.t("common:validation.reviewFields"));
       return;
     }
     const normalized: FormState = Object.fromEntries(

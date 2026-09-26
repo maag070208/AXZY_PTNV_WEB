@@ -20,6 +20,7 @@ import {
 import type { UseAdminDashboard } from "../model/useAdminDashboard";
 import { activityHref } from "../model/activityLinks";
 import DonutChart from "./DonutChart";
+import { i18n } from "@shared/i18n";
 
 const SCOPE_ICON: Record<DashboardActivity["scope"], React.ReactNode> = {
   devices: <FaBoxOpen size={11} />,
@@ -188,7 +189,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
                           {u.title}
                         </ITText>
                         <ITText className="text-[9px] text-slate-400">
-                          {formatDate(u.createdAt)} · {u.assigned ?? "sin asignar"} ·{" "}
+                          {formatDate(u.createdAt)} · {u.assigned ?? i18n.t("common:labels.unassigned")} ·{" "}
                           {u.priority}
                         </ITText>
                       </ITFlex>

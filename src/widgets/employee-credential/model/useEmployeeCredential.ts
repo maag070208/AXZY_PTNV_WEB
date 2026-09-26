@@ -3,8 +3,7 @@ import type { PersonalProfile } from "@entities/hr";
 import { personalApi } from "@entities/hr";
 import { generateCredentialQr, photoAsDataUrl, initialsOf } from "./credential";
 import { credentialDataUrl } from "./image";
-
-const ERROR_CREDENTIAL_DEFAULT = "No se pudo generar la credencial";
+import { i18n } from "@shared/i18n";
 
 interface EmployeeCredentialStatus {
   qrDataUrl: string | null;
@@ -65,7 +64,7 @@ export const useEmployeeCredential = (
         setError(null);
       } catch {
         if (cancelled) return;
-        setError(ERROR_CREDENTIAL_DEFAULT);
+        setError(i18n.t("employees:credential.generateError"));
       } finally {
         if (!cancelled) setLoading(false);
       }

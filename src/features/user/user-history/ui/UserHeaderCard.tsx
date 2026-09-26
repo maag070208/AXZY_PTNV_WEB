@@ -1,5 +1,6 @@
 import { ITFlex, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { roleLabel, type User } from "@entities/user";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   user: User;
@@ -19,7 +20,7 @@ export default function UserHeaderCard({ user }: Props) {
         </ITStack>
         <ITStack direction="column" spacing={1}>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            Rol
+            {i18n.t("common:labels.role")}
           </ITText>
           <ITText className="text-[12px] font-bold text-slate-700">
             {roleLabel(user.role)}
@@ -28,7 +29,7 @@ export default function UserHeaderCard({ user }: Props) {
         {user.employeeNumber && (
           <ITStack direction="column" spacing={1}>
             <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-              No. Empleado
+              {i18n.t("common:labels.employeeNo")}
             </ITText>
             <ITText className="text-[12px] font-bold text-slate-700">
               {user.employeeNumber}

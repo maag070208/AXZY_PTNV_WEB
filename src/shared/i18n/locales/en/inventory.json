@@ -310,6 +310,12 @@
     "errorRegistering": "Error registering"
   },
   "validation": {
-    "overStock": "Quantity cannot exceed the available"
+    "overStock": "Quantity cannot exceed the available",
+    "reasonMin": "The reason must have at least {{min}} characters",
+    "notesMin": "The note must have at least {{min}} characters",
+    "reviewNotes": "Check the highlighted notes"
+  },
+  "units": {
+    "loadError": "Error loading the units"
   }
 }

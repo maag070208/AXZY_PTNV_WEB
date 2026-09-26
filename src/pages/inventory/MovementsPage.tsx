@@ -9,6 +9,7 @@ import { inventoryApi, type Movement, type MovementType } from "@entities/invent
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 import { downloadReportMovementsPdf } from "@widgets/movement-pdf";
 import { StatCard } from "@shared/ui/stat-card";
+import { i18n } from "@shared/i18n";
 
 interface StatCounts {
   total: number;
@@ -142,7 +143,7 @@ export default function MovementsPage() {
       const list = await inventoryApi.movements();
       await downloadReportMovementsPdf(list);
     } catch {
-      window.alert("Error al generar el reporte");
+      window.alert(i18n.t("common:errors.report"));
     } finally {
       setGeneratingPdf(false);
     }
@@ -259,7 +260,7 @@ export default function MovementsPage() {
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
-        itemsPerPageOptions={[5, 10, 50]}
+        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />
     </ITPage>

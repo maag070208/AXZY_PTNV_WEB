@@ -48,7 +48,7 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     try {
       await download(rows);
     } catch (e) {
-      console.error("Error al exportar PDF de asignados", e);
+      console.error("Error exporting the assigned devices PDF", e);
     } finally {
       setExporting(false);
     }

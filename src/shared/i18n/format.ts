@@ -1,6 +1,7 @@
 import i18n from "./config";
 
-const locale = () => (i18n.language?.startsWith("en") ? "en-US" : "es-MX");
+/** Locale de `Intl` para el idioma de la interfaz. */
+export const dateLocale = (): string => (i18n.language?.startsWith("en") ? "en-US" : "es-MX");
 
 export const formatDate = (
   value: string | Date,
@@ -8,7 +9,7 @@ export const formatDate = (
 ): string => {
   const d = typeof value === "string" ? new Date(value) : value;
   if (isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString(locale(), options);
+  return d.toLocaleDateString(dateLocale(), options);
 };
 export type FileNameKey = keyof (typeof import("./locales/es/common.json"))["files"];
 

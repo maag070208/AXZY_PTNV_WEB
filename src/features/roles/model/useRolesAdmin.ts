@@ -8,6 +8,7 @@ import {
   type RolesAdminData,
 } from "@entities/permission";
 import type { PermissionScope } from "@entities/user";
+import { i18n } from "@shared/i18n";
 
 const errorMessage = (err: unknown, fallback: string): string =>
   (err as { message?: string })?.message ?? fallback;
@@ -63,7 +64,7 @@ export const useRolesAdmin = (): RolesAdminState => {
       setBaseline(base);
       setDraft({ ...base });
     } catch (err) {
-      setError(errorMessage(err, "Error al cargar los permisos"));
+      setError(errorMessage(err, i18n.t("roles:errors.load")));
       setData(null);
     } finally {
       setLoading(false);
@@ -111,7 +112,7 @@ export const useRolesAdmin = (): RolesAdminState => {
       await reload();
       return true;
     } catch (err) {
-      setSaveError(errorMessage(err, "Error al guardar la matriz"));
+      setSaveError(errorMessage(err, i18n.t("roles:errors.saveMatrix")));
       return false;
     } finally {
       setSaving(false);
@@ -187,7 +188,7 @@ export const usePermissionCatalog = (): CatalogAdminState => {
 
   const create = useCallback(
     (dto: CatalogCreateDto) =>
-      run(() => permissionApi.createCatalog(dto), "Error al crear el permiso"),
+      run(() => permissionApi.createCatalog(dto), i18n.t("roles:errors.create")),
     [run]
   );
 
@@ -195,7 +196,7 @@ export const usePermissionCatalog = (): CatalogAdminState => {
     (key: string, dto: CatalogUpdateDto) =>
       run(
         () => permissionApi.updateCatalog(key, dto),
-        "Error al actualizar el permiso"
+        i18n.t("roles:errors.update")
       ),
     [run]
   );
@@ -204,7 +205,7 @@ export const usePermissionCatalog = (): CatalogAdminState => {
     (permission: PermissionCatalog) =>
       run(
         () => permissionApi.updateCatalog(permission.key, { active: !permission.active }),
-        "Error al cambiar el estado del permiso"
+        i18n.t("roles:errors.toggle")
       ),
     [run]
   );

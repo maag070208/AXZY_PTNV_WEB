@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
 import type { HistoryEntry } from "../model/types";
+import { i18n } from "@shared/i18n";
 
 const TYPE_CONFIG: Record<string, { icon: React.ReactNode; bg: string }> = {
   CUSTODY_LETTER_CREATED: { icon: <FaFileSignature size={9} />, bg: "bg-emerald-500" },
@@ -39,7 +40,7 @@ export default function UserHistoryTimeline({ history }: Props) {
         <ITFlex align="center" gap={2} className="mb-5">
           <FaClock size={14} className="text-slate-400" />
           <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            Actividad ({history.length})
+            {i18n.t("common:labels.activity", { count: history.length })}
           </ITText>
         </ITFlex>
 

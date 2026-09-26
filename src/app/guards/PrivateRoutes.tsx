@@ -23,7 +23,7 @@ import { fetchUnreadCount } from "@entities/notification";
 import { useAblyNotifications } from "./useAblyNotifications";
 
 export default function PrivateRoutes() {
-  const { t: tt } = useTranslation(["common"]);
+  const { t: tt, i18n } = useTranslation(["common"]);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -36,13 +36,21 @@ export default function PrivateRoutes() {
     setTimeout(() => setToast(null), 3000);
   }, []);
 
+  // Al abrir la app (o iniciar sesión) se refresca `/auth/me`: el usuario
+  // guardado puede traer permisos o idioma viejos. Al volver a la ventana se
+  // refresca otra vez para que un cambio aplique sin relogin.
   useEffect(() => {
-    // Rehidrata la sesión cuando falta el usuario o cuando viene de un storage
-    // viejo sin permisos (rollout de ROLES_Y_PERMISOS). Al volver a la ventana
-    // se refresca `/auth/me` para que un cambio de permisos aplique sin relogin.
-    if (token && (!user || !user.permissions)) {
-      dispatch(meThunk());
+    if (token) dispatch(meThunk());
+  }, [token, dispatch]);
+
+  // La interfaz sigue el idioma del sistema que trae la sesión.
+  useEffect(() => {
+    if (user?.language && user.language !== i18n.language) {
+      void i18n.changeLanguage(user.language);
     }
+  }, [user, i18n]);
+
+  useEffect(() => {
     if (token) {
       dispatch(fetchUnreadCount());
     }

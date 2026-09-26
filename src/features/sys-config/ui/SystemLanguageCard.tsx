@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 import { ITAlert, ITButton, ITCard, ITFlex, ITSelect, ITText } from "@axzydev/axzy_ui_system";
 import { FaUndo } from "react-icons/fa";
 import { APP_LANGUAGES, type AppLanguage } from "@shared/i18n/config";
+import type { AppDispatch } from "@app/store";
+import { meThunk } from "@entities/user";
 import { useGetSysConfig, useUpdateSysConfig } from "@features/sys-config";
 
 const LANGUAGE_KEY = "LANGUAGE";
@@ -20,6 +23,7 @@ interface Props {
  */
 export default function SystemLanguageCard({ onResult }: Props) {
   const { t, i18n } = useTranslation(["catalog", "common"]);
+  const dispatch = useDispatch<AppDispatch>();
   const { data, loading, error, reload } = useGetSysConfig(LANGUAGE_KEY);
   const { mutate, loading: saving, error: saveError } = useUpdateSysConfig(LANGUAGE_KEY);
 
@@ -36,7 +40,11 @@ export default function SystemLanguageCard({ onResult }: Props) {
       await mutate(language);
       setDirty(false);
       await i18n.changeLanguage(language);
-      onResult(t("sysConfig.languageSaved"), "success");
+      // La sesión trae el idioma del sistema y la interfaz lo sigue: se refresca
+      // para que una respuesta de `/auth/me` anterior al guardado no lo revierta.
+      await dispatch(meThunk());
+      // `t` quedó ligado al idioma anterior: el aviso ya sale en el nuevo.
+      onResult(i18n.t("catalog:sysConfig.languageSaved"), "success");
       await reload();
     } catch {
       onResult(t("sysConfig.languageSaveError"), "error");

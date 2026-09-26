@@ -93,7 +93,7 @@ export default function UsersListPage() {
         onClose={() => fx.setUserToForceDelete(null)}
         onConfirm={fx.handleForceDelete}
         title={tt("list.forceDeleteTitle")}
-        message={`${fx.userToForceDelete?.username} tiene historial ligado (tickets, cartas, comentarios, movimientos, etc.) que normalmente bloquea el borrado. Como administrador puedes forzar su eliminación: los registros con autor obligatorio se reasignarán a tu usuario y el resto quedará sin autor. Esta acción no se puede deshacer.`}
+        message={tt("list.forceDeleteMessage", { username: fx.userToForceDelete?.username ?? "" })}
         confirmLabel={tt("list.forceDeleteBtn")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"

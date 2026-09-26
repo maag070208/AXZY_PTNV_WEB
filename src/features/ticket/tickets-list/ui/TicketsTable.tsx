@@ -46,6 +46,7 @@ export default function TicketsTable({
       key: "title",
       label: tt("list.columns.title"),
       type: "string",
+      width: 300,
       filter: true,
       render: (t) => (
         <ITFlex direction="column" gap={0.5}>
@@ -65,6 +66,7 @@ export default function TicketsTable({
       key: "status",
       label: tt("list.columns.status"),
       type: "catalog",
+      width: 100,
       filter: "catalog",
       catalogOptions: {
         data: Object.keys(STATUS_BADGE).map((id) => ({
@@ -84,6 +86,7 @@ export default function TicketsTable({
       key: "priority",
       label: tt("list.columns.priority"),
       type: "catalog",
+      width: 80,
       filter: "catalog",
       catalogOptions: {
         data: Object.keys(PRIORITY_BADGE).map((id) => ({
@@ -103,6 +106,7 @@ export default function TicketsTable({
       key: "wait",
       label: tt("list.columns.wait"),
       type: "number",
+      width: 100,
       render: (t) => {
         const days = daysOnHold(t.createdAt, t.closedAt);
         const rating = waitRating(days);
@@ -119,6 +123,7 @@ export default function TicketsTable({
     {
       key: "createdBy",
       label: tt("list.columns.createdBy"),
+      width: 100,
       type: "string",
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
@@ -129,6 +134,7 @@ export default function TicketsTable({
     {
       key: "assignedTo",
       label: tt("list.columns.assignedTo"),
+      width: 100,
       type: "string",
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
@@ -175,11 +181,13 @@ export default function TicketsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={5}
-      itemsPerPageOptions={[5, 10, 50]}
+      defaultItemsPerPage={100}
+      itemsPerPageOptions={[50, 100, 150]}
       debounceMs={350}
       variant="bordered"
-      size="lg"
+      virtualized
+      virtualizedMaxHeight={420}
+      rowHeight={50}
       onRowClick={(row)=> onView(row as unknown as Ticket)}
     />
   );

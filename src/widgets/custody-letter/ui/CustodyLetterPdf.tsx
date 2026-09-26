@@ -194,7 +194,7 @@ export default function CustodyLetterPdf({ loan }: Props) {
 
   const custodianName = loan.custodian?.name ?? "";
   const supervisorName = "";
-  const deliveryBy = "Departamento de Sistemas";
+  const deliveryBy = tt("doc.systemsDepartment");
 
   const observableTxt = loan.department?.name
     ? `${loan.department.name}${loan.subarea ? ` — ${loan.subarea.name}` : ""}`
@@ -204,9 +204,9 @@ export default function CustodyLetterPdf({ loan }: Props) {
   const custodianTxt = observableTxt || custodianName || "";
 
   const totalPieces = loan.items.reduce((sum, d) => sum + d.quantity, 0);
-  const pieces = `${totalPieces} ${totalPieces === 1 ? "pieza" : "pieces"}`;
+  const pieces = `${totalPieces} ${tt(totalPieces === 1 ? "doc.piece" : "doc.pieces")}`;
   const descriptionWithQuantity =
-    (firstItem?.device?.name || "CONTROL DE TV") + ` (${pieces})`;
+    (firstItem?.device?.name || tt("doc.sampleDevice")) + ` (${pieces})`;
 
   // El documento oficial se llama "SIS-001" — nuestro folio (consecutivo)
   // NO debe aparecer en el PDF.

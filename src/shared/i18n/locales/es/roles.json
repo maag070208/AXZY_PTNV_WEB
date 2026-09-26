@@ -78,5 +78,12 @@
       "scopes": "Selecciona al menos un alcance",
       "sortOrder": "El orden debe ser un entero mayor o igual a 0"
     }
+  },
+  "errors": {
+    "load": "Error al cargar los permisos",
+    "saveMatrix": "Error al guardar la matriz",
+    "create": "Error al crear el permiso",
+    "update": "Error al actualizar el permiso",
+    "toggle": "Error al cambiar el estado del permiso"
   }
 }

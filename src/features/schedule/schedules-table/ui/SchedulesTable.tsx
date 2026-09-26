@@ -14,8 +14,11 @@ import { FaEdit, FaPlus, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { scheduleApi, type Schedule, type ScheduleDay } from "@entities/schedule";
 import { makeClientTableFetch } from "@shared/api/clientTable";
+import { i18n, dateLocale } from "@shared/i18n";
 
-const DAY_ABBR = ["L", "M", "M", "J", "V", "S", "D"];
+// Inicial de cada día (lunes = 1), en el idioma de la interfaz. 2024-01-01 fue lunes.
+const dayAbbr = (weekday: number): string =>
+  new Date(Date.UTC(2024, 0, weekday)).toLocaleDateString(dateLocale(), { weekday: "narrow", timeZone: "UTC" });
 
 const dayKey = (d: ScheduleDay): string =>
   d.restDay
@@ -35,9 +38,9 @@ function formatDays(days: ScheduleDay[]): string {
     }
     const label =
       sorted[i].weekday === sorted[j].weekday
-        ? DAY_ABBR[sorted[i].weekday - 1]
-        : `${DAY_ABBR[sorted[i].weekday - 1]}-${DAY_ABBR[sorted[j].weekday - 1]}`;
-    parts.push(`${label} ${k === "rest" ? "descansa" : k}`);
+        ? dayAbbr(sorted[i].weekday)
+        : `${dayAbbr(sorted[i].weekday)}-${dayAbbr(sorted[j].weekday)}`;
+    parts.push(`${label} ${k === "rest" ? i18n.t("common:labels.rest") : k}`);
     i = j + 1;
   }
   return parts.join(" · ");
@@ -100,7 +103,7 @@ export default function SchedulesTable() {
       ),
     },
     {
-      key: "reglas",
+      key: "rules",
       label: t("tolEntry"),
       type: "string",
       sortable: false,

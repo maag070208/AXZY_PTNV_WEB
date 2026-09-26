@@ -12,7 +12,7 @@ import {
 import { departmentsApi, type Department } from "@entities/department";
 import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
-import { fileName, type FileNameKey } from "@shared/i18n";
+import { fileName, type FileNameKey, dateLocale } from "@shared/i18n";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
 export type DownloadAccessReportPdf = (
@@ -175,7 +175,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
       const stamp = (iso: string | null): string => {
         if (!iso) return "";
         if (period === "DAY") return formatTimeInTZ(iso, tz);
-        return `${new Date(iso).toLocaleDateString("es-MX")} ${formatTimeInTZ(iso, tz)}`;
+        return `${new Date(iso).toLocaleDateString(dateLocale())} ${formatTimeInTZ(iso, tz)}`;
       };
       const header = [
         t("columns.date"),

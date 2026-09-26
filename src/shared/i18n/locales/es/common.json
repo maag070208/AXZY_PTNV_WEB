@@ -70,5 +70,58 @@
     "assignedDevicesReport": "reporte_asignados",
     "devicesReport": "reporte_dispositivos",
     "materialOutputsReport": "reporte_salidas"
+  },
+  "errors": {
+    "network": "Error de red o del servidor",
+    "load": "Error al cargar",
+    "save": "Error al guardar",
+    "report": "Error al generar el reporte"
+  },
+  "labels": {
+    "unassigned": "Sin asignar",
+    "byName": "por {{name}}",
+    "role": "Rol",
+    "employeeNo": "No. Empleado",
+    "serialNumber": "Serie: {{value}}",
+    "hostname": "Equipo: {{value}}",
+    "inactive": "inactivo",
+    "activity": "Actividad ({{count}})",
+    "rest": "descansa",
+    "processing": "Procesando..."
+  },
+  "validation": {
+    "required": "{{label}} es obligatorio",
+    "minLength": "{{label}} debe tener al menos {{min}} caracteres",
+    "thisField": "Este campo",
+    "invalidCurp": "CURP debe tener 18 caracteres alfanuméricos",
+    "invalidEmail": "Email inválido",
+    "invalidNss": "NSS debe tener 11 dígitos",
+    "invalidPhone": "Teléfono debe tener entre 10 y 13 dígitos",
+    "invalidPostal": "Código postal debe tener 5 dígitos",
+    "invalidRfc": "RFC inválido (formato esperado: 4 letras + 6 dígitos + 3 caracteres)",
+    "reviewFields": "Revisa los campos marcados"
+  },
+  "datePicker": {
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "today": "Hoy",
+    "close": "Cerrar",
+    "native": "{{label}} selector de fecha nativo"
+  },
+  "map": {
+    "view": "Ver en el mapa",
+    "title": "Mapa"
+  },
+  "pdf": {
+    "footer": "Puerto Nuevo Hotel y Villas — Sistema de Control de Activos",
+    "pageOf": "Página {{current}} de {{total}}",
+    "page": "Página",
+    "of": "de",
+    "generated": "Generado:"
+  },
+  "itDevices": {
+    "PC": "PC de escritorio",
+    "TABLET": "Tablet",
+    "LAPTOP": "Laptop"
   }
 }

@@ -118,5 +118,28 @@
     "deleteForeverConfirm": "This will permanently delete \"{{name}}\". This action cannot be undone.",
     "saveError": "Could not save the document type",
     "deleteError": "Could not delete the document type"
+  },
+  "disciplinary": {
+    "saveError": "Could not save the disciplinary report",
+    "deleteError": "Could not delete the disciplinary report",
+    "loadError": "Could not load the disciplinary report",
+    "notFound": "Disciplinary report not found"
+  },
+  "deactivate": {
+    "reasonMin": "The reason must have at least {{min}} characters",
+    "reasonLabel": "Deactivation reason",
+    "reasonPlaceholder": "Briefly describe the reason..."
+  },
+  "credential": {
+    "title": "EMPLOYEE BADGE",
+    "subtitle": "Puerto Nuevo Hotel y Villas · Authorized Staff",
+    "employeeNumber": "Employee number",
+    "fullName": "Full name",
+    "jobTitle": "Job title",
+    "department": "Department",
+    "scanToVerify": "Scan to verify this badge",
+    "footer": "employee-badge · {{year}}",
+    "renderError": "Could not get the 2D context to draw the badge",
+    "generateError": "Could not generate the badge"
   }
 }

@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { loginThunk } from "@entities/user";
 import type { AppDispatch } from "@app/store";
+import { i18n } from "@shared/i18n";
 
 export const useLogin = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,10 +20,10 @@ export const useLogin = () => {
 
   const validate = (): boolean => {
     const e: { username?: string; password?: string } = {};
-    if (!username.trim()) e.username = "El usuario es obligatorio";
-    else if (username.trim().length < 3) e.username = "El usuario debe tener al menos 3 caracteres";
-    if (!password) e.password = "La contraseña es obligatoria";
-    else if (password.length < 6) e.password = "La contraseña debe tener al menos 6 caracteres";
+    if (!username.trim()) e.username = i18n.t("auth:login.validation.usernameRequired");
+    else if (username.trim().length < 3) e.username = i18n.t("auth:login.validation.usernameMin", { min: 3 });
+    if (!password) e.password = i18n.t("auth:login.validation.passwordRequired");
+    else if (password.length < 6) e.password = i18n.t("auth:login.validation.passwordMin", { min: 6 });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -49,8 +50,8 @@ export const useLogin = () => {
         const reason = (rejected as { details?: { reason?: string } }).details?.reason;
         setDeactivatedMsg(
           reason
-            ? `Tu cuenta fue dada de baja. Motivo: ${reason}. Contacta al administrador para reactivarla.`
-            : "Tu cuenta fue dada de baja. Contacta al administrador para reactivarla."
+            ? i18n.t("auth:login.deactivatedWithReason", { reason })
+            : i18n.t("auth:login.deactivated")
         );
         return false;
       }

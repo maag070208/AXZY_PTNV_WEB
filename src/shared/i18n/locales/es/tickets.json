@@ -177,7 +177,9 @@
     "startShort": "Inicio",
     "dueShort": "Límite",
     "systemUser": "Sistema",
-    "byUser": "Usuario"
+    "byUser": "Usuario",
+    "confirmHardDelete": "¿Eliminar definitivamente \"{{title}}\"? Se borrarán sus comentarios e historial. Esta acción no se puede deshacer.",
+    "confirmSoftDelete": "¿Mover a papelera \"{{title}}\"? Quedará en estado eliminado y podrás borrarlo definitivamente después."
   },
   "kanban": {
     "byTicket": "Tareas del ticket",
@@ -271,7 +273,8 @@
     "commentBy": "Comentario de {{author}}",
     "fallbackUser": "Usuario",
     "byAuthor": "Por {{name}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "footer": "Puerto Nuevo Hotel y Villas — Sistema de Tickets"
   },
   "attachments": {
     "loadError": "No se pudieron cargar los archivos",
@@ -284,5 +287,11 @@
     "uploadEvidence": "Subir evidencia",
     "uploadTicketFiles": "Subir archivos del ticket",
     "fallbackExt": "ARCHIVO"
+  },
+  "form": {
+    "validation": {
+      "titleRequired": "El título es obligatorio",
+      "titleMin": "El título debe tener al menos {{min}} caracteres"
+    }
   }
 }

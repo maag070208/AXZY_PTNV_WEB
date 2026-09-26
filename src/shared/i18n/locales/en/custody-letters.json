@@ -130,7 +130,12 @@
     "signatureCustodian": "Responsible",
     "signatureSupervisor": "Area manager",
     "signatureHeadArea": "Area head",
-    "signatureDelivery": "Delivery"
+    "signatureDelivery": "Delivery",
+    "piece": "piece",
+    "pieces": "pieces",
+    "sampleDevice": "TV REMOTE",
+    "systemsDepartment": "IT Department",
+    "defaultArea": "IT"
   },
   "card": {
     "folio": "Folio",

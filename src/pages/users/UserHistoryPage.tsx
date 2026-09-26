@@ -7,6 +7,7 @@ import {
   UserHistoryTimeline,
   useUserHistory,
 } from "@features/user/user-history";
+import { i18n } from "@shared/i18n";
 
 export default function UserHistoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -45,7 +46,7 @@ export default function UserHistoryPage() {
           { label: tt("history.breadcrumb") },
         ]}
       >
-        <ITText className="text-slate-400">Usuario no encontrado</ITText>
+        <ITText className="text-slate-400">{i18n.t("users:history.notFound")}</ITText>
       </ITPage>
     );
   }

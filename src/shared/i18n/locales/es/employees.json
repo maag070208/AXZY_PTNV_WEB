@@ -118,5 +118,28 @@
     "deleteForeverConfirm": "Esto eliminará definitivamente \"{{name}}\". Esta acción no se puede deshacer.",
     "saveError": "No se pudo guardar el tipo de documento",
     "deleteError": "No se pudo eliminar el tipo de documento"
+  },
+  "disciplinary": {
+    "saveError": "No se pudo guardar el acta administrativa",
+    "deleteError": "No se pudo eliminar el acta administrativa",
+    "loadError": "No se pudo cargar el acta administrativa",
+    "notFound": "No se encontró el acta administrativa"
+  },
+  "deactivate": {
+    "reasonMin": "El motivo debe tener al menos {{min}} caracteres",
+    "reasonLabel": "Motivo de la baja",
+    "reasonPlaceholder": "Describe brevemente el motivo..."
+  },
+  "credential": {
+    "title": "CREDENCIAL DE EMPLEADO",
+    "subtitle": "Puerto Nuevo Hotel y Villas · Personal Autorizado",
+    "employeeNumber": "Número de empleado",
+    "fullName": "Nombre completo",
+    "jobTitle": "Puesto",
+    "department": "Departamento",
+    "scanToVerify": "Escanea para verificar esta credencial",
+    "footer": "credencial-empleado · {{year}}",
+    "renderError": "No se pudo obtener el contexto 2D para dibujar la credencial",
+    "generateError": "No se pudo generar la credencial"
   }
 }

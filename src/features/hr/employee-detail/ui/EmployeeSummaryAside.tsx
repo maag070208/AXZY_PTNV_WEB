@@ -5,17 +5,12 @@ import { useTranslation } from "react-i18next";
 import type { PersonalProfile } from "@entities/hr";
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { roleLabel } from "@entities/user";
 
 const ROLE_COLOR: Record<string, string> = {
   MANAGER: "purple",
   AREA_HEAD: "info",
   EMPLOYEE: "gray",
-};
-
-const ROLE_LABEL: Record<string, string> = {
-  MANAGER: "MANAGER",
-  AREA_HEAD: "JEFE DE ÁREA",
-  EMPLOYEE: "EMPLOYEE",
 };
 
 /** Fechas guardadas como "YYYY-MM-DD": formatear sin pasar por Date/huso horario. */
@@ -81,7 +76,7 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
 
         <ITFlex justify="center" gap={1.5} className="mt-2 flex-wrap">
           <ITBadget color={(ROLE_COLOR[profile.role] as any) ?? "gray"} size="lg">
-            {ROLE_LABEL[profile.role] ?? profile.role}
+            {roleLabel(profile.role)}
           </ITBadget>
           <ITBadget color={profile.active ? "success" : "danger"} size="lg">
             {profile.active ? tt("detail.active") : tt("detail.inactive")}
@@ -102,7 +97,7 @@ export default function EmployeeSummaryAside({ profile, onPhotoUpload }: Props) 
         title={tt("detail.employmentTitle")}
       >
         <ITFlex direction="column" gap={2.5}>
-          <InfoRow label={tt("detail.fields.employeeType")} value={ROLE_LABEL[profile.role] ?? profile.role} />
+          <InfoRow label={tt("detail.fields.employeeType")} value={roleLabel(profile.role)} />
           <InfoRow label={tt("detail.fields.hireDate")} value={formatDateOnly(profile.hireDate)} />
           <InfoRow label={tt("detail.fields.department")} value={profile.department?.name} />
           <InfoRow label={tt("detail.fields.subarea")} value={profile.subarea?.name} />

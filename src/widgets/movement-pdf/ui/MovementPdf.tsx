@@ -4,6 +4,7 @@ import type { Movement } from "@entities/inventory";
 import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
+import { dateLocale } from "@shared/i18n";
 
 interface Props {
   movement: Movement;
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
 export default function MovementPdf({ movement }: Props) {
   const { t } = useTranslation(["inventory"]);
   const doc = t("movements.doc", { returnObjects: true }) as Record<string, string>;
-  const today = new Date().toLocaleDateString("es-MX");
+  const today = new Date().toLocaleDateString(dateLocale());
   const folio = `MV-${movement.id.slice(0, 8).toUpperCase()}`;
   const statusBadge = movement.status === "CANCELLED" ? badgeStyleFor("danger") : badgeStyleFor("success");
   const custodian = movement.custodian?.name ?? "—";

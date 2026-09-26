@@ -108,7 +108,7 @@ export default function EditLoanPage() {
 
   const draftLoan = useMemo<Loan>(
     () => ({
-      id: "borrador",
+      id: "draft",
       number: loan?.number ?? "CARTA-XXXX",
       date: new Date().toISOString(),
       custodianId: assignment === "EMPLOYEE" ? custodianId : null,

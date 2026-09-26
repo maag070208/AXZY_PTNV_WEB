@@ -311,7 +311,7 @@ export default function PermissionCatalogPanel() {
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
         defaultItemsPerPage={10}
-        itemsPerPageOptions={[5, 10, 50]}
+        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />
 

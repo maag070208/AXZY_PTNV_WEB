@@ -107,7 +107,7 @@ export default function DevicesPage() {
         columns={columns as any}
         fetchData={fetchData as any}
         defaultItemsPerPage={10}
-        itemsPerPageOptions={[5, 10, 50]}
+        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
       />
     </ITPage>

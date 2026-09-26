@@ -62,10 +62,7 @@ export const loginThunk = createAsyncThunk(
 );
 
 export const meThunk = createAsyncThunk("auth/me", async () => {
-  const me = await authApi.me();
-  // La interfaz sigue el idioma del sistema (sys_config.LANGUAGE).
-  if (me.language && me.language !== i18n.language) void i18n.changeLanguage(me.language);
-  return me;
+  return authApi.me();
 });
 
 const slice = createSlice({

@@ -31,7 +31,9 @@
     "errorPassword": "Error al cambiar contraseña",
     "confirmBackToOfficeBtn": "Reasignar a Oficina (soft)",
     "backToOfficeToast": "Usuario reasignado a Oficina",
-    "backToOfficeError": "Error al reasignar a Oficina"
+    "backToOfficeError": "Error al reasignar a Oficina",
+    "defaultDeactivationReason": "Baja sin motivo especificado",
+    "forceDeleteMessage": "{{username}} tiene historial ligado (tickets, cartas, comentarios, movimientos, etc.) que normalmente bloquea el borrado. Como administrador puedes forzar su eliminación: los registros con autor obligatorio se reasignarán a tu usuario y el resto quedará sin autor. Esta acción no se puede deshacer."
   },
   "form": {
     "titleNew": "Nuevo usuario",
@@ -137,7 +139,26 @@
     "pickFile": "Elegir archivo",
     "changeFile": "Cambiar archivo",
     "docsRequired": "Sube las 3 documentaciones: INE frente, INE reverso y comprobante de domicilio.",
-    "docsUploading": "Subiendo documentos…"
+    "docsUploading": "Subiendo documentos…",
+    "validation": {
+      "usernameRequired": "El usuario es obligatorio",
+      "usernameMin": "El usuario debe tener al menos {{min}} caracteres",
+      "usernameMax": "El usuario debe tener máximo {{max}} caracteres",
+      "passwordRequired": "La contraseña es obligatoria",
+      "passwordMin": "La contraseña debe tener al menos {{min}} caracteres",
+      "passwordMax": "La contraseña debe tener máximo {{max}} caracteres",
+      "nameRequired": "El nombre es obligatorio",
+      "nameMax": "El nombre debe tener máximo {{max}} caracteres",
+      "emailMax": "El correo debe tener máximo {{max}} caracteres",
+      "employeeNumberMax": "El número de empleado debe tener máximo {{max}} caracteres",
+      "jobTitleMax": "El puesto debe tener máximo {{max}} caracteres"
+    },
+    "emailPlaceholder": "usuario@empresa.com",
+    "docs": {
+      "ineFront": "INE (Frente)",
+      "ineBack": "INE (Reverso)",
+      "proofOfAddress": "Comprobante de Domicilio"
+    }
   },
   "history": {
     "title": "Historial",
@@ -145,7 +166,8 @@
     "breadcrumb": "Historial",
     "historyTitle": "Historial del usuario",
     "loading": "Cargando…",
-    "empty": "Sin registros en el historial"
+    "empty": "Sin registros en el historial",
+    "notFound": "Usuario no encontrado"
   },
   "import": {
     "title": "Cargar usuarios desde Excel",
@@ -163,7 +185,11 @@
     "errorImport": "Error al importar usuarios",
     "errorNoFile": "Selecciona un archivo Excel primero",
     "goToList": "Ir a Usuarios",
-    "noFile": "Ningún archivo seleccionado"
+    "noFile": "Ningún archivo seleccionado",
+    "resultTitle": "Resultado de la carga",
+    "skippedCount": "{{count}} omitido(s)",
+    "skippedRows": "Filas omitidas",
+    "skippedRow": "Fila {{row}} ({{username}}): {{reason}}"
   },
   "table": {
     "username": "Username",

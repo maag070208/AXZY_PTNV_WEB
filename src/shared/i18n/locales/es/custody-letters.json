@@ -131,7 +131,12 @@
     "signatureCustodian": "Responsable",
     "signatureSupervisor": "Encargado del área",
     "signatureHeadArea": "Jefe de área",
-    "signatureDelivery": "Entrega"
+    "signatureDelivery": "Entrega",
+    "piece": "pieza",
+    "pieces": "piezas",
+    "sampleDevice": "CONTROL DE TV",
+    "systemsDepartment": "Departamento de Sistemas",
+    "defaultArea": "Sistemas"
   },
   "card": {
     "folio": "Folio",

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ITButton, ITDialog, ITFlex, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   isOpen: boolean;
@@ -27,7 +28,7 @@ export default function DeactivateDialog({ isOpen, onClose, onConfirm, userName 
 
   const trimmed = reason.trim();
   const isValid = trimmed.length >= 3;
-  const errorMsg = !isValid && reason.length > 0 ? "El motivo debe tener al menos 3 caracteres" : null;
+  const errorMsg = !isValid && reason.length > 0 ? i18n.t("employees:deactivate.reasonMin", { min: 3 }) : null;
 
   const handleConfirm = async () => {
     if (!isValid) return;
@@ -53,10 +54,10 @@ export default function DeactivateDialog({ isOpen, onClose, onConfirm, userName 
         <div>
           <ITTextarea
             name="deactivate_reason"
-            label="Motivo de la baja"
+            label={i18n.t("employees:deactivate.reasonLabel")}
             value={reason}
             onChange={setReason}
-            placeholder="Describe brevemente el motivo..."
+            placeholder={i18n.t("employees:deactivate.reasonPlaceholder")}
             rows={3}
             error={errorMsg ?? undefined}
             disabled={submitting}
@@ -73,7 +74,7 @@ export default function DeactivateDialog({ isOpen, onClose, onConfirm, userName 
             disabled={!isValid || submitting}
           >
             <ITText className="font-bold text-[11px]">
-              {submitting ? "Procesando..." : tt("employees:detail.deactivate")}
+              {submitting ? i18n.t("common:labels.processing") : tt("employees:detail.deactivate")}
             </ITText>
           </ITButton>
         </ITFlex>

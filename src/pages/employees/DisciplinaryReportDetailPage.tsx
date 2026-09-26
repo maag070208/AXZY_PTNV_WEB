@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import { personalApi, type DisciplinaryReport } from "@entities/hr";
 import { DisciplinaryReportPreview, downloadDisciplinaryReportPdf } from "@widgets/disciplinary-report";
+import { i18n } from "@shared/i18n";
 
 export default function DisciplinaryReportDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ export default function DisciplinaryReportDetailPage() {
       .disciplinaryReport(id)
       .then(setDisciplinaryReport)
       .catch((err: unknown) =>
-        setError(err instanceof Error ? err.message : "No se pudo cargar el acta administrativa")
+        setError(err instanceof Error ? err.message : i18n.t("employees:disciplinary.loadError"))
       )
       .finally(() => setLoading(false));
   }, [id]);
@@ -50,7 +51,7 @@ export default function DisciplinaryReportDetailPage() {
         ]}
       >
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
-          {error ?? "No se encontró el acta administrativa"}
+          {error ?? i18n.t("employees:disciplinary.notFound")}
         </ITAlert>
       </ITPage>
     );

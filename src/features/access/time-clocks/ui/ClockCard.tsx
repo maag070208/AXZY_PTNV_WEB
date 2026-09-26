@@ -8,11 +8,12 @@ import {
 } from "@entities/time-clock";
 import { formatDateTime } from "@shared/utils/dates";
 import type { ClockConfig, UseTimeClocks } from "../model/useTimeClocks";
+import { dateLocale } from "@shared/i18n";
 
 /** A partir de esta diferencia con el servidor se avisa que el reloj no está en hora. */
 const DRIFT_NOTICE_S = 60;
 
-const number = (n: number): string => n.toLocaleString("es-MX");
+const number = (n: number): string => n.toLocaleString(dateLocale());
 
 /** `2026-09-24T13:51:43-07:00` → `24/09/2026 13:51:43 (UTC-07:00)`, tal como lo marca el reloj. */
 const clockTime = (iso: string): string => {
@@ -129,7 +130,7 @@ export default function ClockCard({ fx, clock, config }: Props) {
           note={
             config?.data
               ? `${t("clocks.config.hint")} ${t("clocks.config.readAt", {
-                  hour: new Date(config.data.readAt).toLocaleTimeString("es-MX"),
+                  hour: new Date(config.data.readAt).toLocaleTimeString(dateLocale()),
                 })}`
               : t("clocks.config.hint")
           }

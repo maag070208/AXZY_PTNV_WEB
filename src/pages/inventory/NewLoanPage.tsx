@@ -77,7 +77,7 @@ export default function NewLoanPage() {
 
   const draftLoan = useMemo(
     () => ({
-      id: "borrador",
+      id: "draft",
       number: "CARTA-XXXX",
       date: new Date().toISOString(),
       custodianId: assignment === "EMPLOYEE" ? custodianId : null,

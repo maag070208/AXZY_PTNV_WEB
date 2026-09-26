@@ -70,5 +70,58 @@
     "assignedDevicesReport": "assigned_devices_report",
     "devicesReport": "devices_report",
     "materialOutputsReport": "material_outputs_report"
+  },
+  "errors": {
+    "network": "Network or server error",
+    "load": "Error loading",
+    "save": "Error saving",
+    "report": "Error generating the report"
+  },
+  "labels": {
+    "unassigned": "Unassigned",
+    "byName": "by {{name}}",
+    "role": "Role",
+    "employeeNo": "Employee no.",
+    "serialNumber": "Serial: {{value}}",
+    "hostname": "Hostname: {{value}}",
+    "inactive": "inactive",
+    "activity": "Activity ({{count}})",
+    "rest": "rest",
+    "processing": "Processing..."
+  },
+  "validation": {
+    "required": "{{label}} is required",
+    "minLength": "{{label}} must have at least {{min}} characters",
+    "thisField": "This field",
+    "invalidCurp": "CURP must have 18 alphanumeric characters",
+    "invalidEmail": "Invalid email",
+    "invalidNss": "NSS must have 11 digits",
+    "invalidPhone": "Phone number must have between 10 and 13 digits",
+    "invalidPostal": "Postal code must have 5 digits",
+    "invalidRfc": "Invalid RFC (expected format: 4 letters + 6 digits + 3 characters)",
+    "reviewFields": "Check the highlighted fields"
+  },
+  "datePicker": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "close": "Close",
+    "native": "{{label}} native date picker"
+  },
+  "map": {
+    "view": "View on map",
+    "title": "Map"
+  },
+  "pdf": {
+    "footer": "Puerto Nuevo Hotel y Villas — Asset Control System",
+    "pageOf": "Page {{current}} of {{total}}",
+    "page": "Page",
+    "of": "of",
+    "generated": "Generated:"
+  },
+  "itDevices": {
+    "PC": "Desktop PC",
+    "TABLET": "Tablet",
+    "LAPTOP": "Laptop"
   }
 }

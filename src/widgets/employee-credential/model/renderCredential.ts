@@ -2,6 +2,7 @@ import type { PersonalProfile } from "@entities/hr";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
 import { PDF_COLORS } from "@shared/pdf/theme";
 import { CREDENTIAL_H_PX, CREDENTIAL_W_PX, LAYOUT } from "./cardSpec";
+import { i18n } from "@shared/i18n";
 
 export interface CredentialRenderInput {
   profile: PersonalProfile;
@@ -164,11 +165,11 @@ export const drawCredential = async (
   // Encabezados.
   ctx.fillStyle = PDF_COLORS.white;
   ctx.font = `bold ${LAYOUT.title.size}px ${FONT}`;
-  ctx.fillText("CREDENCIAL DE EMPLEADO", LAYOUT.title.x, LAYOUT.title.baseline);
+  ctx.fillText(i18n.t("employees:credential.title"), LAYOUT.title.x, LAYOUT.title.baseline);
   ctx.fillStyle = "#bfe0f0";
   ctx.font = `${LAYOUT.subtitle.size}px ${FONT}`;
   ctx.fillText(
-    "Puerto Nuevo Hotel y Villas · Personal Autorizado",
+    i18n.t("employees:credential.subtitle"),
     LAYOUT.subtitle.x,
     LAYOUT.subtitle.baseline
   );
@@ -203,10 +204,10 @@ export const drawCredential = async (
 
   // Bloque de datos.
   const rows = [
-    { label: "Número de empleado", value: number, size: 22 },
-    { label: "Nombre completo", value: name, size: 24 },
-    { label: "Puesto", value: jobTitle, size: 22 },
-    { label: "Departamento", value: department, size: 22 },
+    { label: i18n.t("employees:credential.employeeNumber"), value: number, size: 22 },
+    { label: i18n.t("employees:credential.fullName"), value: name, size: 24 },
+    { label: i18n.t("employees:credential.jobTitle"), value: jobTitle, size: 22 },
+    { label: i18n.t("employees:credential.department"), value: department, size: 22 },
   ];
   const { x: dx, w: dw, startY, step } = LAYOUT.data;
   rows.forEach((row, index) => {
@@ -254,7 +255,7 @@ export const drawCredential = async (
   ctx.textAlign = "center";
   const labels = wrapLines(
     ctx,
-    "Escanea para verificar esta credencial",
+    i18n.t("employees:credential.scanToVerify"),
     qs + 40,
     LAYOUT.qrLabel.maxLines
   );
@@ -276,6 +277,6 @@ export const drawCredential = async (
   ctx.textAlign = "left";
   ctx.fillText(number, LAYOUT.footerLeftX, LAYOUT.footerBaseline);
   ctx.textAlign = "right";
-  ctx.fillText(`credencial-empleado · ${year}`, LAYOUT.footerRightX, LAYOUT.footerBaseline);
+  ctx.fillText(i18n.t("employees:credential.footer", { year }), LAYOUT.footerRightX, LAYOUT.footerBaseline);
   ctx.textAlign = "left";
 };

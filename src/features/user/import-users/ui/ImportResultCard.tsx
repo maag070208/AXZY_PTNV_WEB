@@ -2,6 +2,7 @@ import { ITBadget, ITButton, ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_sys
 import { FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { UseUserImport } from "../model/useUserImport";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   fx: UseUserImport;
@@ -18,7 +19,7 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
       <ITFlex align="center" gap={2} className="mb-4">
         <FaCheckCircle size={14} className="text-emerald-600" />
         <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          Resultado de la carga
+          {i18n.t("users:import.resultTitle")}
         </ITText>
       </ITFlex>
 
@@ -28,7 +29,7 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
         </ITBadget>
         {result.skipped.length > 0 && (
           <ITBadget color="warning" size="lg">
-            {`${result.skipped.length} omitido(s)`}
+            {i18n.t("users:import.skippedCount", { count: result.skipped.length })}
           </ITBadget>
         )}
       </ITFlex>
@@ -38,12 +39,12 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
           <ITFlex align="center" gap={2} className="mb-2">
             <FaExclamationTriangle size={12} className="text-amber-500" />
             <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Filas omitidas
+              {i18n.t("users:import.skippedRows")}
             </ITText>
           </ITFlex>
           {result.skipped.map((o, i) => (
             <ITText key={i} className="text-[11px] text-slate-500">
-              Fila {o.row} ({o.username}): {o.reason}
+              {i18n.t("users:import.skippedRow", { row: o.row, username: o.username, reason: o.reason })}
             </ITText>
           ))}
         </div>

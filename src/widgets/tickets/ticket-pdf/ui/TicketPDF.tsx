@@ -390,7 +390,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
           )}
         </View>
 
-        <PdfFooter pageIndex={0} pageCount={1} note="Puerto Nuevo Hotel y Villas — Sistema de Tickets" />
+        <PdfFooter pageIndex={0} pageCount={1} note={tt("pdf.footer")} />
       </Page>
     </Document>
   );

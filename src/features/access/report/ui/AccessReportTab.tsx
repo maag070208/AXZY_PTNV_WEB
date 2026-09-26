@@ -36,6 +36,7 @@ import {
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import type { UseAccessReport } from "../model/useAccessReport";
+import { dateLocale } from "@shared/i18n";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -267,15 +268,15 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const rangeLabel = useMemo(() => {
     if (period === "WEEK") {
       const [s, en] = periodRange;
-      return `${t("periods.WEEK")} · ${s.toLocaleDateString("es-MX", { day: "2-digit", month: "short" })} — ${en.toLocaleDateString("es-MX", { day: "2-digit", month: "short" })}`;
+      return `${t("periods.WEEK")} · ${s.toLocaleDateString(dateLocale(), { day: "2-digit", month: "short" })} — ${en.toLocaleDateString(dateLocale(), { day: "2-digit", month: "short" })}`;
     }
     if (period === "MONTH") {
-      return (date ?? new Date()).toLocaleDateString("es-MX", {
+      return (date ?? new Date()).toLocaleDateString(dateLocale(), {
         month: "long",
         year: "numeric",
       });
     }
-    return (date ?? new Date()).toLocaleDateString("es-MX", {
+    return (date ?? new Date()).toLocaleDateString(dateLocale(), {
       weekday: "long",
       day: "numeric",
       month: "long",

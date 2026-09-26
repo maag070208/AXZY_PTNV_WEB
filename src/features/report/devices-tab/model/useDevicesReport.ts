@@ -36,7 +36,7 @@ export const useDevicesReport = ({ download }: Options) => {
     try {
       await download(rows);
     } catch (e) {
-      console.error("Error al exportar PDF de dispositivos", e);
+      console.error("Error exporting the devices PDF", e);
     } finally {
       setExporting(false);
     }

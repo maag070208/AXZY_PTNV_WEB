@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch } from "@app/store";
 import { createTicketThunk, ticketsApi, type TicketCategory } from "@entities/ticket";
+import { i18n } from "@shared/i18n";
 
 export interface TicketDraft {
   title: string;
@@ -55,8 +56,8 @@ export const useCreateTicket = () => {
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
-    if (!form.title.trim()) e.title = "El título es obligatorio";
-    else if (form.title.trim().length < 3) e.title = "El título debe tener al menos 3 caracteres";
+    if (!form.title.trim()) e.title = i18n.t("tickets:form.validation.titleRequired");
+    else if (form.title.trim().length < 3) e.title = i18n.t("tickets:form.validation.titleMin", { min: 3 });
     setErrors(e);
     return Object.keys(e).length === 0;
   };

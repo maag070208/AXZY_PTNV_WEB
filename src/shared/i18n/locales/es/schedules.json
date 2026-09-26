@@ -137,5 +137,8 @@
     }
   },
   "assignedLabel": "Asignados",
-  "secondHint": "Actívalo en los días con jornada partida (p. ej. camaristas o restaurante)."
+  "secondHint": "Actívalo en los días con jornada partida (p. ej. camaristas o restaurante).",
+  "form": {
+    "notFound": "Horario no encontrado"
+  }
 }

@@ -17,6 +17,7 @@ import { usersApi, usePermission } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { useAblyChannel } from "@shared/lib/ably";
 import { todayInput } from "./timeline";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   id?: string;
@@ -209,7 +210,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
       setToastType("success");
       const dept = departments.find((d) => d.id === newDepartmentId);
       setToast(
-        tt("detail.departmentChanged", { department: dept?.name ?? "Sin asignar" })
+        tt("detail.departmentChanged", { department: dept?.name ?? i18n.t("common:labels.unassigned") })
       );
     }
   };

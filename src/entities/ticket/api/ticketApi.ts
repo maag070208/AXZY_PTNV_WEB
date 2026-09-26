@@ -41,7 +41,7 @@ export const ticketsApi = {
     api.get<TicketAttachment[]>(`/tickets/${id}/assignments/${assignmentId}/attachments`),
   downloadAssignmentAttachment: (id: string, assignmentId: string, attachmentId: string) =>
     api.get<Blob>(`/tickets/${id}/assignments/${assignmentId}/attachments/${attachmentId}/download`, { responseType: "blob" }),
-  uploadAssignmentAttachment: (id: string, assignmentId: string, file: File, kind = "EVIDENCIA") => {
+  uploadAssignmentAttachment: (id: string, assignmentId: string, file: File, kind = "EVIDENCE") => {
     const form = new FormData();
     form.append("file", file);
     form.append("kind", kind);

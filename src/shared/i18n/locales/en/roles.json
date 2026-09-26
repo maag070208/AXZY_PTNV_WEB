@@ -78,5 +78,12 @@
       "scopes": "Select at least one scope",
       "sortOrder": "Order must be an integer greater than or equal to 0"
     }
+  },
+  "errors": {
+    "load": "Error loading the permissions",
+    "saveMatrix": "Error saving the matrix",
+    "create": "Error creating the permission",
+    "update": "Error updating the permission",
+    "toggle": "Error changing the permission status"
   }
 }

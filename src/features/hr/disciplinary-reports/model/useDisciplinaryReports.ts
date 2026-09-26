@@ -3,6 +3,7 @@ import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { personalApi } from "@entities/hr";
 import type { User } from "@entities/user";
 import { usersApi } from "@entities/user";
+import { i18n } from "@shared/i18n";
 
 export const useDisciplinaryReports = () => {
   const [error, setError] = useState<string | null>(null);
@@ -46,9 +47,9 @@ export const useDisciplinaryReports = () => {
       return null;
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : "No se pudo guardar el acta administrativa"
+        err instanceof Error ? err.message : i18n.t("employees:disciplinary.saveError")
       );
-      return err instanceof Error ? err.message : "No se pudo guardar el acta administrativa";
+      return err instanceof Error ? err.message : i18n.t("employees:disciplinary.saveError");
     } finally {
       setSaving(false);
     }
@@ -61,7 +62,7 @@ export const useDisciplinaryReports = () => {
       return null;
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "No se pudo eliminar el acta administrativa";
+        err instanceof Error ? err.message : i18n.t("employees:disciplinary.deleteError");
       setError(message);
       return message;
     }

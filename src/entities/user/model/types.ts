@@ -24,17 +24,19 @@ export interface AuthUser {
   departmentId?: string | null;
   /**
    * Permisos efectivos del usuario (`GET /auth/me`): clave → alcance, solo los
-   * distintos de NINGUNO. Opcional porque las sesiones persistidas antes del
+   * distintos de NONE. Opcional porque las sesiones persistidas antes del
    * rollout de permisos no lo traen y `PrivateRoutes` las rehidrata.
    */
   permissions?: Partial<Record<Permission, PermissionScope>>;
+  /** Idioma del sistema (`GET /auth/me`); opcional por la misma razón. */
+  language?: AppLanguage;
 }
 
 /** Alcance efectivo de un permiso (ver ROLES_Y_PERMISOS.md §2). */
 export type PermissionScope = "NONE" | "OWN" | "AREA" | "ALL";
 
 /**
- * Clave del catálogo dinámico de permisos del API (`GET /permisos/catalogo`).
+ * Clave del catálogo dinámico de permisos del API (`GET /permissions/catalog`).
  * Antes era un union hardcodeado; ahora el catálogo vive en la BD y puede
  * crecer sin recompilar la web, así que la clave se tipa como string libre.
  */

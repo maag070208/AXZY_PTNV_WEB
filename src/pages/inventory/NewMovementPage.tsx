@@ -5,6 +5,7 @@ import { FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Condition, type Device, type DeviceUnitStatus, type DeviceType, type MovementType, type DeviceUnit } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
+import { i18n } from "@shared/i18n";
 
 const STATUS_LABEL_KEY = {
   AVAILABLE: "dashboard.available",
@@ -80,7 +81,7 @@ export default function NewMovementPage() {
       setRows((r) => r.map((x) => (x.key === key ? { ...x, units: all, unitsLoading: false } : x)));
     } catch {
       setRows((r) => r.map((x) => (x.key === key ? { ...x, units: [], unitsLoading: false } : x)));
-      window.alert("Error al cargar las unidades");
+      window.alert(i18n.t("inventory:units.loadError"));
     }
   };
 
@@ -131,10 +132,10 @@ export default function NewMovementPage() {
     const e: Record<string, string> = {};
     rows.forEach((r, idx) => {
       if ((r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN") && r.reason.trim().length < 3) {
-        e[`reason-${idx}`] = "El motivo debe tener al menos 3 caracteres";
+        e[`reason-${idx}`] = i18n.t("inventory:validation.reasonMin", { min: 3 });
       }
       if (r.type === "MAINTENANCE_OUT" && r.notes.trim().length > 0 && r.notes.trim().length < 3) {
-        e[`notes-${idx}`] = "La observación debe tener al menos 3 caracteres";
+        e[`notes-${idx}`] = i18n.t("inventory:validation.notesMin", { min: 3 });
       }
     });
     setErrors(e);
@@ -145,7 +146,7 @@ export default function NewMovementPage() {
 
   const handleSubmit = async () => {
     if (!validate()) {
-      setToast({ message: "Revisa los campos marcados", type: "error" });
+      setToast({ message: i18n.t("common:validation.reviewFields"), type: "error" });
       return;
     }
     setSaving(true);

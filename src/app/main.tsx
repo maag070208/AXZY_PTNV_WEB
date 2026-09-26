@@ -34,6 +34,7 @@ const customTheme: ITThemePalette = {
     headerText: "#0D5777",
     rowBg: "#ffffff",
     rowText: "#1B1B1F",
+    rowHover: "#0d5777c4",
   },
 };
 

@@ -6,6 +6,7 @@ import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 import { formatDate } from "@shared/utils/dates";
+import { dateLocale } from "@shared/i18n";
 
 interface Props {
   movements: Movement[];
@@ -29,7 +30,7 @@ const typeBadgeKind = (type: string) => {
 export default function MovementsReportPdf({ movements }: Props) {
   const { t } = useTranslation(["inventory"]);
   const doc = t("movements.reportDoc", { returnObjects: true }) as Record<string, string>;
-  const today = new Date().toLocaleDateString("es-MX");
+  const today = new Date().toLocaleDateString(dateLocale());
 
   const totals = movements.length;
   const entries = movements.filter((m) => ["STOCK_IN", "ADJUSTMENT_IN", "RETURN"].includes(m.type)).length;

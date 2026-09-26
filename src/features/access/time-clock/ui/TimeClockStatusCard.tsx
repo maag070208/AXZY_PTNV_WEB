@@ -10,6 +10,7 @@ import {
 } from "@entities/time-clock";
 import { formatDateTime } from "@shared/utils/dates";
 import type { UseTimeClock } from "../model/useTimeClock";
+import { dateLocale } from "@shared/i18n";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 type OverallState = "notConfigured" | "withoutClocks" | TimeClockState;
@@ -40,7 +41,7 @@ const statusOf = (s: TimeClockStatus): OverallState => {
 const importStatusOf = (i: TimeClockImport): ImportStatus =>
   !i.finishedAt ? "running" : i.error ? "error" : "ok";
 
-const number = (n: number): string => n.toLocaleString("es-MX");
+const number = (n: number): string => n.toLocaleString(dateLocale());
 
 /** Día `YYYY-MM-DD` → `DD/MM/AAAA` (es una clave, no un instante). */
 const day = (key: string): string => key.split("-").reverse().join("/");

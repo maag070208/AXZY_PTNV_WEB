@@ -24,9 +24,9 @@ export default function CustodyLetterHtml({ loan }: { loan: Loan }) {
   const totalPieces = loan.items.length
     ? loan.items.reduce((sum, d) => sum + d.quantity, 0)
     : 0;
-  const pieces = `${totalPieces} ${totalPieces === 1 ? "pieza" : "pieces"}`;
+  const pieces = `${totalPieces} ${tt(totalPieces === 1 ? "doc.piece" : "doc.pieces")}`;
   const descriptionWithQuantity =
-    (firstItem?.device?.name || "CONTROL DE TV") + (totalPieces > 0 ? ` (${pieces})` : "");
+    (firstItem?.device?.name || tt("doc.sampleDevice")) + (totalPieces > 0 ? ` (${pieces})` : "");
   const officialDocument = "SIS-001";
   const assetTag = firstItem?.units?.[0]?.deviceUnit?.assetTag ?? "TBE-0001";
   const serialNumber = firstItem?.units?.[0]?.deviceUnit?.serialNumber;
@@ -161,7 +161,7 @@ export default function CustodyLetterHtml({ loan }: { loan: Loan }) {
           </div>
           <div className="w-28">
             <div className="border-t border-black" />
-            <p className="font-bold">{"Departamento de Sistemas"}</p>
+            <p className="font-bold">{tt("doc.systemsDepartment")}</p>
             <p>{tt("doc.signatureDelivery")}</p>
           </div>
         </div>

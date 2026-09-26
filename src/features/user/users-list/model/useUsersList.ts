@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { usersApi, type User } from "@entities/user";
+import { i18n } from "@shared/i18n";
 
 export const useUsersList = () => {
   const { t: tt } = useTranslation("users");
@@ -60,7 +61,7 @@ export const useUsersList = () => {
     const target = userToToggle;
     setUserToToggle(null);
     try {
-      await usersApi.deactivate(target.id, { reason: "Baja sin motivo especificado", notifyUser: true });
+      await usersApi.deactivate(target.id, { reason: i18n.t("users:list.defaultDeactivationReason"), notifyUser: true });
       setReloadKey((k) => k + 1);
       setToast({ message: tt("list.toastDeactivated"), type: "success" });
     } catch (e: any) {

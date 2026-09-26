@@ -14,6 +14,7 @@ import { FaEdit, FaEye, FaKey, FaTrash, FaUndo } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { USER_ROLES, roleLabel, type User } from "@entities/user";
 import type { UseUsersList } from "../model/useUsersList";
+import { i18n } from "@shared/i18n";
 
 interface Props {
   fx: UseUsersList;
@@ -63,7 +64,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
         <ITFlex align="center" gap={1}>
           <ITText className="text-[12px] text-slate-800">{u.name}</ITText>
           {!u.active && (
-            <ITBadget color="danger" size="lg">inactivo</ITBadget>
+            <ITBadget color="danger" size="lg">{i18n.t("common:labels.inactive")}</ITBadget>
           )}
         </ITFlex>
       ),
@@ -175,7 +176,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       }
       reloadTrigger={fx.reloadKey}
       defaultItemsPerPage={10}
-      itemsPerPageOptions={[5, 10, 50]}
+      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
     />
   );

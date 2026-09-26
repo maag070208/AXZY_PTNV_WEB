@@ -1,4 +1,5 @@
 import type { Loan } from "@entities/inventory";
+import { i18n } from "@shared/i18n";
 
 /**
  * Área que se imprime en el bloque "Recurso TIC:" de la carta responsiva.
@@ -10,7 +11,7 @@ import type { Loan } from "@entities/inventory";
  * se encarga).
  */
 export const resolveAreaName = (loan: Loan): string =>
-  (loan.department?.name || loan.custodian?.department?.name || "Sistemas").replace(
+  (loan.department?.name || loan.custodian?.department?.name || i18n.t("custody-letters:doc.defaultArea")).replace(
     /^Departamento de /i,
     ""
   );

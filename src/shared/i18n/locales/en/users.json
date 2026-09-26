@@ -31,7 +31,9 @@
     "errorPassword": "Error changing password",
     "confirmBackToOfficeBtn": "Reassign to Office (soft)",
     "backToOfficeToast": "User reassigned to Office",
-    "backToOfficeError": "Error reassigning to Office"
+    "backToOfficeError": "Error reassigning to Office",
+    "defaultDeactivationReason": "Deactivated without a stated reason",
+    "forceDeleteMessage": "{{username}} has linked history (tickets, letters, comments, movements, etc.) that normally blocks deletion. As an administrator you can force the deletion: records with a mandatory author will be reassigned to your user and the rest will be left without an author. This action cannot be undone."
   },
   "form": {
     "titleNew": "New user",
@@ -137,7 +139,26 @@
     "pickFile": "Choose file",
     "changeFile": "Change file",
     "docsRequired": "Upload all 3 documents: INE front, INE back and proof of address.",
-    "docsUploading": "Uploading documents…"
+    "docsUploading": "Uploading documents…",
+    "validation": {
+      "usernameRequired": "Username is required",
+      "usernameMin": "Username must have at least {{min}} characters",
+      "usernameMax": "Username must have at most {{max}} characters",
+      "passwordRequired": "Password is required",
+      "passwordMin": "Password must have at least {{min}} characters",
+      "passwordMax": "Password must have at most {{max}} characters",
+      "nameRequired": "Name is required",
+      "nameMax": "Name must have at most {{max}} characters",
+      "emailMax": "Email must have at most {{max}} characters",
+      "employeeNumberMax": "Employee number must have at most {{max}} characters",
+      "jobTitleMax": "Job title must have at most {{max}} characters"
+    },
+    "emailPlaceholder": "user@company.com",
+    "docs": {
+      "ineFront": "INE (Front)",
+      "ineBack": "INE (Back)",
+      "proofOfAddress": "Proof of address"
+    }
   },
   "history": {
     "title": "History",
@@ -145,7 +166,8 @@
     "breadcrumb": "History",
     "historyTitle": "User history",
     "loading": "Loading…",
-    "empty": "No records in the history"
+    "empty": "No records in the history",
+    "notFound": "User not found"
   },
   "import": {
     "title": "Upload users from Excel",
@@ -163,7 +185,11 @@
     "errorImport": "Error importing users",
     "errorNoFile": "Select an Excel file first",
     "goToList": "Go to Users",
-    "noFile": "No file selected"
+    "noFile": "No file selected",
+    "resultTitle": "Import result",
+    "skippedCount": "{{count}} skipped",
+    "skippedRows": "Skipped rows",
+    "skippedRow": "Row {{row}} ({{username}}): {{reason}}"
   },
   "table": {
     "username": "Username",
