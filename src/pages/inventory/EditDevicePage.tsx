@@ -235,7 +235,7 @@ export default function EditDevicePage() {
                         <ITText className="truncate text-[11px] font-black uppercase tracking-tight text-emerald-700">{u.assetTag}</ITText>
                         {dirty && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" title={t("devices.unsaved")} />}
                       </ITFlex>
-                      <ITBadget color={STATUS_COLOR[u.status]} size="lg">{u.status}</ITBadget>
+                      <ITBadget color={STATUS_COLOR[u.status]} size="lg">{t(`unitStatus.${u.status}`)}</ITBadget>
                     </button>
 
                     {isOpen && d && (

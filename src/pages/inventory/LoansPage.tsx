@@ -101,7 +101,7 @@ export default function LoansPage() {
       key: "status",
       label: t("loans.colStatus"),
       width: 130,
-      render: (p: Loan) => <ITBadget color={STATUS_COLOR[p.status]} size="lg">{p.status}</ITBadget>,
+      render: (p: Loan) => <ITBadget color={STATUS_COLOR[p.status]} size="lg">{t(`loanStatus.${p.status}`)}</ITBadget>,
     },
     {
       type: "string",

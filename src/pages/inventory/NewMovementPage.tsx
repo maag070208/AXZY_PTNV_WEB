@@ -118,7 +118,7 @@ export default function NewMovementPage() {
 
   const unitLabel = (u: DeviceUnit) => {
     const extras = [u.serialNumber, u.hostname, u.macAddress].filter(Boolean).join(" · ");
-    return `${u.assetTag}${extras ? ` · ${extras}` : ""} · ${u.status}`;
+    return `${u.assetTag}${extras ? ` · ${extras}` : ""} · ${t(`unitStatus.${u.status}`)}`;
   };
 
   const validRow = (r: Row) =>
@@ -318,7 +318,7 @@ export default function NewMovementPage() {
                                 className={`rounded-full p-0 transition-all ${sel ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                               >
                                 <ITBadget color={CONDITION_BADGE_COLOR[c]} variant={sel ? "filled" : "outlined"} size="lg">
-                                  {c}
+                                  {t(`loanReturn.conditionLabels.${c}`)}
                                 </ITBadget>
                               </button>
                             );

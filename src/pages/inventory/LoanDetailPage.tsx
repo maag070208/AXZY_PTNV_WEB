@@ -78,7 +78,7 @@ export default function LoanDetailPage() {
         </ITFlex>
       }
     >
-      <ITBadget color={STATUS_COLOR[loan.status]} size="lg">{loan.status}</ITBadget>
+      <ITBadget color={STATUS_COLOR[loan.status]} size="lg">{t(`loanStatus.${loan.status}`)}</ITBadget>
 
       <ITGrid container columns={12} spacing={6}>
         <ITGrid item xs={12} lg={5}>

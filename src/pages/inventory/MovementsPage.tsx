@@ -171,11 +171,15 @@ export default function MovementsPage() {
       sortable: false,
       filter: "catalog",
       catalogOptions: {
-        data: MOVEMENT_TYPES.map((id) => ({ id, name: id })),
+        data: MOVEMENT_TYPES.map((id) => ({ id, name: t(`typeLabels.${id}`) })),
         loading: false,
         error: false,
       },
-      render: (m: MovementRow) => <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">{m.type}</ITBadget>,
+      render: (m: MovementRow) => (
+        <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">
+          {t(`typeLabels.${m.type}`)}
+        </ITBadget>
+      ),
     },
     {
       type: "string",

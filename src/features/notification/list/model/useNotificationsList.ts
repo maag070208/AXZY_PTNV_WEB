@@ -7,6 +7,7 @@ import {
   fetchUnreadCount,
   markAllNotificationsRead,
   markNotificationRead,
+  notificationRoute,
   notificationsApi,
   type Notification,
 } from "@entities/notification";
@@ -26,7 +27,8 @@ export const useNotificationsList = () => {
   const handleSlotClick = useCallback(
     (n: Notification) => {
       if (!n.read) dispatch(markNotificationRead(n.id));
-      if (n.ticketId) navigate(`/tickets/${n.ticketId}`);
+      const route = notificationRoute(n);
+      if (route) navigate(route);
     },
     [dispatch, navigate]
   );

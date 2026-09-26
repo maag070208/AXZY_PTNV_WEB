@@ -210,7 +210,7 @@ export const TicketPDF = ({ ticket, attachments = [] }: Props) => {
     timeline.push({
       id: h.id,
       ts: h.createdAt,
-      title: h.detail ?? h.type,
+      title: h.detail ?? tt("pdf.historyFallback"),
       detail: h.author?.name ? tt("pdf.byAuthor", { name: h.author.name }) : undefined,
       dot: dotColorFor(h.type, h.detail),
     });

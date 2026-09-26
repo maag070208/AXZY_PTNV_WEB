@@ -8,13 +8,18 @@ export interface TableQuery {
  * Traduce los filtros de columna vigentes a pares etiqueta/valor para el pie de
  * un PDF. La etiqueta la resuelve quien llama (cada pestaña tiene su propio
  * namespace i18n), así que aquí sólo se ordena y se descartan las claves que no
- * tienen traducción.
+ * tienen traducción. `translateValue` permite traducir VALORES que son enums
+ * (p. ej. Estado `ASSIGNED` → "Asignado"); sin él, el valor se imprime tal cual.
  */
 export const appliedFilters = (
   filters: Record<string, string | number | boolean>,
   labels: Record<string, string>,
-  t: (key: string) => string
+  t: (key: string) => string,
+  translateValue?: (key: string, value: string) => string
 ): Array<{ label: string; value: string }> =>
   Object.entries(filters)
     .filter(([key, value]) => labels[key] !== undefined && value !== "" && value != null)
-    .map(([key, value]) => ({ label: t(labels[key]), value: String(value) }));
+    .map(([key, value]) => ({
+      label: t(labels[key]),
+      value: translateValue ? translateValue(key, String(value)) : String(value),
+    }));

@@ -15,8 +15,9 @@ import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
 import { logout, meThunk } from "@entities/user";
 import { APP_SCREENS, isScreenVisible, type AppScreen } from "@entities/permission";
-import { fetchUnreadCount } from "@entities/notification";
-import { useAblyNotifications } from "./useAblyNotifications";
+import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
+import { desktop } from "@shared/lib/desktop";
+import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
 
 /** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
 const NAV_ICONS: Record<string, ReactNode> = {
@@ -38,10 +39,36 @@ export default function PrivateRoutes() {
   const unreadCount = useSelector((s: RootState) => s.notifications.unreadCount);
   const [toast, setToast] = useState<string | null>(null);
 
-  const handleNewNotification = useCallback((title: string) => {
-    setToast(title);
-    setTimeout(() => setToast(null), 3000);
-  }, []);
+  // En la app de escritorio llega como notificación nativa del sistema; en el
+  // navegador, como aviso dentro de la página.
+  const handleNewNotification = useCallback(
+    (n: LiveNotification) => {
+      const title = n.title ?? i18n.t("notifications:newNotification");
+      if (desktop) {
+        desktop.notify({
+          id: n.id,
+          title,
+          body: n.detail ?? undefined,
+          route: notificationRoute(n) ?? "/notifications",
+        });
+        return;
+      }
+      setToast(title);
+      setTimeout(() => setToast(null), 3000);
+    },
+    [i18n]
+  );
+
+  // Clic en una notificación nativa: la app ya se trajo al frente; se abre su
+  // pantalla y se marca leída.
+  useEffect(
+    () =>
+      desktop?.onNotificationClick(({ id, route }) => {
+        if (id) void dispatch(markNotificationRead(id));
+        if (route) navigate(route);
+      }),
+    [dispatch, navigate]
+  );
 
   // Al abrir la app (o iniciar sesión) se refresca `/auth/me`: el usuario
   // guardado puede traer permisos o idioma viejos. Al volver a la ventana se

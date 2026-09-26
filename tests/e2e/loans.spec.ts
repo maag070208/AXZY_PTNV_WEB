@@ -120,7 +120,7 @@ test.describe("PRÉSTAMOS desde la web", () => {
 
     await page.goto(route("/inventory/loans"));
     await expect(page.getByText(created.number)).toBeVisible();
-    await expect(page.getByText("ACTIVE").first()).toBeVisible();
+    await expect(page.getByText("Activo").first()).toBeVisible();
   });
 
   test("el preview de la carta muestra el departamento elegido en Área", async ({

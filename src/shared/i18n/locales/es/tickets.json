@@ -273,6 +273,7 @@
     "historyTitle": "Historial ({{count}})",
     "commentBy": "Comentario de {{author}}",
     "fallbackUser": "Usuario",
+    "historyFallback": "Actividad",
     "byAuthor": "Por {{name}}",
     "employeeNo": "No. {{number}}",
     "footer": "Puerto Nuevo Hotel y Villas — Sistema de Tickets"

@@ -8,3 +8,6 @@ export interface Notification {
   read: boolean;
   createdAt: string;
 }
+/** Pantalla que abre una notificación: su ticket, si tiene. */
+export const notificationRoute = (n: Pick<Notification, "ticketId">): string | null =>
+  n.ticketId ? `/tickets/${n.ticketId}` : null;

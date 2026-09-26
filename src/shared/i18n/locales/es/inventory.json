@@ -123,6 +123,19 @@
     "MAINTENANCE_OUT": "De mantenimiento",
     "REVERSAL": "Reversión"
   },
+  "unitStatus": {
+    "AVAILABLE": "Disponible",
+    "ON_LOAN": "Prestado",
+    "DAMAGED": "Dañado",
+    "IN_MAINTENANCE": "Mantenimiento",
+    "RETIRED": "Baja"
+  },
+  "loanStatus": {
+    "ACTIVE": "Activo",
+    "PARTIAL": "Parcial",
+    "RETURNED": "Devuelta",
+    "CANCELLED": "Cancelada"
+  },
   "new": {
     "title": "Nuevo movimiento",
     "description": "Registra una operación de inventario",
