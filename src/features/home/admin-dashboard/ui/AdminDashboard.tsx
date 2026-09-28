@@ -19,7 +19,7 @@ import {
 } from "@entities/ticket";
 import type { UseAdminDashboard } from "../model/useAdminDashboard";
 import { activityHref } from "../model/activityLinks";
-import DonutChart from "./DonutChart";
+import { DonutChart } from "@shared/ui/charts";
 import { i18n } from "@shared/i18n";
 
 const SCOPE_ICON: Record<DashboardActivity["scope"], React.ReactNode> = {

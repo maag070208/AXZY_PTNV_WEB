@@ -185,7 +185,7 @@ export default function UserFormFields({
             icon={<FaFileUpload size={15} className="text-amber-600" />}
             iconBg="bg-amber-50"
             title={tt("form.stepDocs")}
-            hint={tt("form.docsHint")}
+            hint={tt("form.docsHint", { docs: (requiredDocs ?? []).map((d) => d.label).join(", ") })}
           />
           {docsError && (
             <ITFlex className="mb-3">

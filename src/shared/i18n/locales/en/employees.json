@@ -117,7 +117,12 @@
     "deleteForever": "Delete permanently",
     "deleteForeverConfirm": "This will permanently delete \"{{name}}\". This action cannot be undone.",
     "saveError": "Could not save the document type",
-    "deleteError": "Could not delete the document type"
+    "deleteError": "Could not delete the document type",
+    "required": "Required",
+    "requiredYes": "Required",
+    "requiredNo": "Optional",
+    "markRequired": "Mark as required",
+    "markOptional": "Mark as optional"
   },
   "disciplinary": {
     "saveError": "Could not save the disciplinary report",

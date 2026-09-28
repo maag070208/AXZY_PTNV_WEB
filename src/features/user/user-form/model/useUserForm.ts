@@ -50,17 +50,6 @@ export const ROLE_GUIDANCE: Record<
   },
 };
 
-/**
- * Documentación obligatoria del alta de un empleado. Se resuelve contra el
- * catálogo de tipos de documento por nombre (datos del cliente, en español);
- * si no existe, la etiqueta sale de `users:form.docs`.
- */
-export const REQUIRED_DOCS: Array<{ key: "ineFront" | "ineBack" | "proofOfAddress"; test: RegExp }> = [
-  { key: "ineFront", test: /ine.*frente|frente.*ine/i },
-  { key: "ineBack", test: /ine.*reverso|reverso.*ine/i },
-  { key: "proofOfAddress", test: /domicilio/i },
-];
-
 export interface UserFormValues {
   username: string;
   email: string;
@@ -154,7 +143,7 @@ export const useUserForm = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Documentación obligatoria del alta (INE frente/reverso + comprobante).
+  // Documentación obligatoria del alta (tipos marcados `required` en el catálogo).
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [docsFiles, setDocsFiles] = useState<Record<string, File | null>>({});
   const [docsError, setDocsError] = useState<string | null>(null);
@@ -202,12 +191,12 @@ export const useUserForm = () => {
 
   const selectedDept = departments.find((d) => d.id === form.departmentId);
 
-  /** En el alta de un empleado se exigen las 3 documentaciones. */
+  /** En el alta de un empleado se exigen los documentos obligatorios. */
   const requiresDocs = !isEdit && form.role === "EMPLOYEE";
-  const requiredDocs = REQUIRED_DOCS.map((r) => {
-    const type = documentTypes.find((d) => r.test.test(d.name));
-    return { key: r.key, label: type?.name ?? i18n.t(`users:form.docs.${r.key}`), typeId: type?.id ?? null };
-  });
+  // Los obligatorios los marca RH en el catálogo de documentos (`required`).
+  const requiredDocs = documentTypes
+    .filter((d) => d.required && d.active)
+    .map((d) => ({ key: d.id, label: d.name, typeId: d.id as string | null }));
   const setDocFile = (key: string, file: File | null) =>
     setDocsFiles((prev) => ({ ...prev, [key]: file }));
   const missingDocs = requiredDocs.filter((d) => !docsFiles[d.key]);
@@ -314,7 +303,7 @@ export const useUserForm = () => {
 
   const handleSubmit = async (): Promise<boolean> => {
     if (requiresDocs && missingDocs.length > 0) {
-      setDocsError(i18n.t("users:form.docsRequired"));
+      setDocsError(i18n.t("users:form.docsRequired", { docs: requiredDocs.map((d) => d.label).join(", ") }));
       return false;
     }
     if (!validate()) return false;

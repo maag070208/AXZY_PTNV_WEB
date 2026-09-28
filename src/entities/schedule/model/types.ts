@@ -139,7 +139,9 @@ export interface WeeklyAttendanceDay {
   scheduledMin: number;
   extraMin: number;
   missingMin: number;
+  lateMin: number;
   shift: string | null;
+  scheduledStartAt: string | null;
   approval: WeeklyAttendanceApproval | null;
   approvedExtraMin: number;
 }

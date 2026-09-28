@@ -25,6 +25,8 @@ export interface DocumentType {
   id: string;
   name: string;
   active: boolean;
+  /** Obligatorio en el expediente (el alta lo exige; el tablero de RH marca a quien le falta). */
+  required: boolean;
   sortOrder: number;
   createdAt: string;
 }

@@ -9,8 +9,14 @@ interface Props {
   size?: number;
 }
 
-// Dona simple en SVG inline — no hay librería de gráficas instalada en el
-// proyecto y esto es lo único que se necesita (2 gráficas chicas).
+/** Separación entre segmentos (px de arco), para que cada uno se distinga sin depender solo del color. */
+const GAP = 2;
+
+/**
+ * Dona simple en SVG inline (no hay librería de gráficas en el proyecto): total
+ * al centro, leyenda con valor y porcentaje, y el detalle de cada segmento al
+ * pasar el mouse. Los segmentos deben ser partes de un todo (suman el total).
+ */
 export default function DonutChart({ segments, size = 128 }: Props) {
   const total = segments.reduce((s, sec) => s + sec.value, 0);
   const radius = size / 2 - 12;
@@ -36,7 +42,8 @@ export default function DonutChart({ segments, size = 128 }: Props) {
             if (sec.value === 0) return null;
             const fraction = sec.value / total;
             const dash = fraction * circumference;
-            const dashArray = `${dash} ${circumference - dash}`;
+            const visible = segments.filter((x) => x.value > 0).length > 1 ? Math.max(dash - GAP, 1) : dash;
+            const dashArray = `${visible} ${circumference - visible}`;
             const dashOffset = -offset;
             offset += dash;
             return (
@@ -52,7 +59,10 @@ export default function DonutChart({ segments, size = 128 }: Props) {
                 strokeDashoffset={dashOffset}
                 transform={`rotate(-90 ${center} ${center})`}
                 strokeLinecap="butt"
-              />
+                className="transition-opacity hover:opacity-80"
+              >
+                <title>{`${sec.label}: ${sec.value} (${Math.round(fraction * 100)}%)`}</title>
+              </circle>
             );
           })}
         <text

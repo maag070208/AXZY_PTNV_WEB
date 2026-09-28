@@ -28,7 +28,10 @@ export default function DocumentCatalogPage() {
   const [toDelete, setToDelete] = useState<DocumentType | null>(null);
 
   const fetchData = useMemo(
-    () => makeClientTableFetch<DocumentType>(() => personalApi.documentTypes(true), { active: { match: "equals" } }),
+    () => makeClientTableFetch<DocumentType>(() => personalApi.documentTypes(true), {
+        active: { match: "equals" },
+        required: { match: "equals" },
+      }),
     [reloadKey]
   );
 
@@ -59,6 +62,16 @@ export default function DocumentCatalogPage() {
         await personalApi.createDocumentType(name.trim());
       }
       close();
+      setReloadKey((k) => k + 1);
+    } catch (e: any) {
+      setError(e.message ?? tt("catalog.saveError"));
+    }
+  };
+
+  const toggleRequired = async (type: DocumentType) => {
+    setError(null);
+    try {
+      await personalApi.updateDocumentType(type.id, { required: !type.required });
       setReloadKey((k) => k + 1);
     } catch (e: any) {
       setError(e.message ?? tt("catalog.saveError"));
@@ -117,6 +130,33 @@ export default function DocumentCatalogPage() {
         ) : (
           <ITBadget color="danger" size="lg">{tt("catalog.inactive")}</ITBadget>
         ),
+    },
+    {
+      type: "catalog",
+      key: "required",
+      label: tt("catalog.required"),
+      width: 170,
+      filter: "catalog",
+      sortable: true,
+      catalogOptions: {
+        data: [
+          { id: "true", name: tt("catalog.requiredYes") },
+          { id: "false", name: tt("catalog.requiredNo") },
+        ],
+      },
+      render: (type: DocumentType) => (
+        <ITButton
+          variant="text"
+          size="lg"
+          color={type.required ? "danger" : "gray"}
+          onClick={() => toggleRequired(type)}
+          title={type.required ? tt("catalog.markOptional") : tt("catalog.markRequired")}
+        >
+          <ITBadget color={type.required ? "danger" : "gray"} size="lg">
+            {type.required ? tt("catalog.requiredYes") : tt("catalog.requiredNo")}
+          </ITBadget>
+        </ITButton>
+      ),
     },
     {
       type: "string",

@@ -18,6 +18,7 @@ import deviceTypesEn from "./locales/en/device-types.json";
 import deviceEn from "./locales/en/device.json";
 import employeesEn from "./locales/en/employees.json";
 import homeEn from "./locales/en/home.json";
+import dashboardEn from "./locales/en/dashboard.json";
 import inventoryEn from "./locales/en/inventory.json";
 import notificationsEn from "./locales/en/notifications.json";
 import reportsEn from "./locales/en/reports.json";
@@ -44,6 +45,7 @@ import deviceTypesEs from "./locales/es/device-types.json";
 import deviceEs from "./locales/es/device.json";
 import employeesEs from "./locales/es/employees.json";
 import homeEs from "./locales/es/home.json";
+import dashboardEs from "./locales/es/dashboard.json";
 import inventoryEs from "./locales/es/inventory.json";
 import notificationsEs from "./locales/es/notifications.json";
 import reportsEs from "./locales/es/reports.json";
@@ -64,6 +66,7 @@ export const NS_LIST = [
   "device-types",
   "auth",
   "home",
+  "dashboard",
   "custody-letters",
   "tickets",
   "users",
@@ -93,6 +96,7 @@ export const resources = {
     "device-types": deviceTypesEn,
     auth: authEn,
     home: homeEn,
+    dashboard: dashboardEn,
     "custody-letters": custodyLettersEn,
     "disciplinary-reports": disciplinaryReportsEn,
     tickets: ticketsEn,
@@ -120,6 +124,7 @@ export const resources = {
     "device-types": deviceTypesEs,
     auth: authEs,
     home: homeEs,
+    dashboard: dashboardEs,
     "custody-letters": custodyLettersEs,
     "disciplinary-reports": disciplinaryReportsEs,
     tickets: ticketsEs,

@@ -133,12 +133,12 @@
       }
     },
     "stepDocs": "Documentation",
-    "docsHint": "Upload INE (front), INE (back) and proof of address (required for registration).",
+    "docsHint": "Upload the documents required for onboarding: {{docs}}.",
     "ine": "INE (photo)",
     "proof": "Proof of address",
     "pickFile": "Choose file",
     "changeFile": "Change file",
-    "docsRequired": "Upload all 3 documents: INE front, INE back and proof of address.",
+    "docsRequired": "Upload the required documents: {{docs}}.",
     "docsUploading": "Uploading documents…",
     "validation": {
       "usernameRequired": "Username is required",
@@ -153,12 +153,7 @@
       "employeeNumberMax": "Employee number must have at most {{max}} characters",
       "jobTitleMax": "Job title must have at most {{max}} characters"
     },
-    "emailPlaceholder": "user@company.com",
-    "docs": {
-      "ineFront": "INE (Front)",
-      "ineBack": "INE (Back)",
-      "proofOfAddress": "Proof of address"
-    }
+    "emailPlaceholder": "user@company.com"
   },
   "history": {
     "title": "History",

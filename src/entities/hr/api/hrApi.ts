@@ -54,7 +54,7 @@ export const personalApi = {
     api.get<DocumentType[]>(`/hr/catalogs/document-types${includeInactive ? "?includeInactive=true" : ""}`),
   createDocumentType: (name: string) =>
     api.post<DocumentType>(`/hr/catalogs/document-types`, { name }),
-  updateDocumentType: (id: string, data: { name?: string; active?: boolean }) =>
+  updateDocumentType: (id: string, data: { name?: string; active?: boolean; required?: boolean }) =>
     api.patch<DocumentType>(`/hr/catalogs/document-types/${id}`, data),
   removeDocumentType: (id: string) =>
     api.delete<{ soft: boolean; data: DocumentType }>(`/hr/catalogs/document-types/${id}`),

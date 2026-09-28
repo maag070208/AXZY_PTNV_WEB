@@ -133,12 +133,12 @@
       }
     },
     "stepDocs": "Documentación",
-    "docsHint": "Sube INE (frente), INE (reverso) y comprobante de domicilio (obligatorios para el alta).",
+    "docsHint": "Sube los documentos obligatorios para el alta: {{docs}}.",
     "ine": "INE (foto)",
     "proof": "Comprobante de domicilio",
     "pickFile": "Elegir archivo",
     "changeFile": "Cambiar archivo",
-    "docsRequired": "Sube las 3 documentaciones: INE frente, INE reverso y comprobante de domicilio.",
+    "docsRequired": "Sube los documentos obligatorios: {{docs}}.",
     "docsUploading": "Subiendo documentos…",
     "validation": {
       "usernameRequired": "El usuario es obligatorio",
@@ -153,12 +153,7 @@
       "employeeNumberMax": "El número de empleado debe tener máximo {{max}} caracteres",
       "jobTitleMax": "El puesto debe tener máximo {{max}} caracteres"
     },
-    "emailPlaceholder": "usuario@empresa.com",
-    "docs": {
-      "ineFront": "INE (Frente)",
-      "ineBack": "INE (Reverso)",
-      "proofOfAddress": "Comprobante de Domicilio"
-    }
+    "emailPlaceholder": "usuario@empresa.com"
   },
   "history": {
     "title": "Historial",

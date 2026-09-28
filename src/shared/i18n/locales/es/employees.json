@@ -117,7 +117,12 @@
     "deleteForever": "Eliminar definitivamente",
     "deleteForeverConfirm": "Esto eliminará definitivamente \"{{name}}\". Esta acción no se puede deshacer.",
     "saveError": "No se pudo guardar el tipo de documento",
-    "deleteError": "No se pudo eliminar el tipo de documento"
+    "deleteError": "No se pudo eliminar el tipo de documento",
+    "required": "Obligatorio",
+    "requiredYes": "Obligatorio",
+    "requiredNo": "Opcional",
+    "markRequired": "Marcar como obligatorio",
+    "markOptional": "Marcar como opcional"
   },
   "disciplinary": {
     "saveError": "No se pudo guardar el acta administrativa",
