@@ -1,5 +1,5 @@
-import { api, post } from "@shared/api/client";
-import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
+import { api } from "@shared/api/client";
+import { tableQuery, tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
 import type {
   AssignmentRow,
   AssignedPerson,
@@ -37,5 +37,5 @@ export const scheduleApi = {
 
   /** Universo completo sin paginar, SOLO aprobado (para CSV/KPIs/PDF). */
   overtimeExport: (params: ITDataTableFetchParamsPost) =>
-    post<OvertimeResponse>(`/schedules/overtime/export`, params),
+    tableQuery<OvertimeResponse>(`/schedules/overtime/export`, params),
 };

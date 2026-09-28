@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   materialOutputsApi,
@@ -7,6 +7,8 @@ import {
   type MaterialOutputsPdfPayload,
 } from "@entities/material-output";
 import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
+
+type CatalogOption = { id: string; name: string };
 import { appliedFilters } from "@shared/utils/tableFilters";
 import { dyn } from "@shared/i18n/dyn";
 
@@ -16,6 +18,9 @@ const FILTER_LABELS: Record<string, string> = {
   userName: "exits.colUser",
   q: "exits.colDescription",
   reason: "exits.colReason",
+  date: "exits.colDate",
+  device: "exits.colDevice",
+  notes: "exits.colNotes",
   start: "pdf.filterFrom",
   end: "pdf.filterTo",
 };
@@ -37,7 +42,7 @@ interface Options {
 export const useMaterialOutputsReport = ({ download }: Options) => {
   const { t } = useTranslation(["reports", "material-outputs", "common"]);
   const [total, setTotal] = useState(0);
-  const [lastFilters, setLastFilters] = useState<MaterialOutputFilters>({});
+  const [lastFilters, setLastFilters] = useState<ITDataTableFetchParams["filters"]>({});
   const [reloadKey, setReloadKey] = useState(0);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +50,24 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
   // por `materialOutput.date` con fin EXCLUSIVO y la tabla, la KPIs y el PDF
   // comparten el mismo recorte.
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  // Opciones de Departamento y Usuario: todos los valores registrados (texto libre).
+  const [nameOptions, setNameOptions] = useState<{ departments: CatalogOption[]; users: CatalogOption[] }>({
+    departments: [],
+    users: [],
+  });
+  const [nameOptionsState, setNameOptionsState] = useState<"loading" | "ready" | "error">("loading");
+  useEffect(() => {
+    const toOptions = (values: string[]) => values.map((v) => ({ id: v, name: v }));
+    materialOutputsApi
+      .filterOptions()
+      .then((o) => {
+        setNameOptions({ departments: toOptions(o.departmentName), users: toOptions(o.userName) });
+        setNameOptionsState("ready");
+      })
+      .catch(() => setNameOptionsState("error"));
+  }, [reloadKey]);
+  const departmentOptions = { data: nameOptions.departments, loading: nameOptionsState === "loading", error: nameOptionsState === "error" };
+  const userOptions = { data: nameOptions.users, loading: nameOptionsState === "loading", error: nameOptionsState === "error" };
 
   /** Rango de fechas expuesto a la tabla como filtros externos (clave de día). */
   const externalFilters = useMemo(() => {
@@ -58,13 +81,12 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
     async (
       params: ITDataTableFetchParams
     ): Promise<ITDataTableResponse<Record<string, unknown>>> => {
-      const filters = params.filters as unknown as MaterialOutputFilters;
-      setLastFilters(filters);
+      setLastFilters(params.filters);
       try {
         const res = await materialOutputsApi.table({
           page: params.page,
           limit: params.limit,
-          filters: params.filters as Record<string, string | number | boolean>,
+          filters: params.filters,
           sort: params.sort,
         });
         setTotal(res.total);
@@ -95,16 +117,13 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
       // El rango manda desde el `externalFilters` VIGENTE: se descarta el
       // `start`/`end` de la última consulta (podía estar desfasado) y se fusiona
       // el actual, para que el PDF coincida con el rango que se ve.
-      const { start: _start, end: _end, ...rest } = lastFilters as unknown as Record<
-        string,
-        string | number | boolean
-      >;
+      const { start: _start, end: _end, ...rest } = lastFilters;
       const exportFilters = { ...rest, ...externalFilters };
-      const res = await materialOutputsApi.list(exportFilters as MaterialOutputFilters);
+      const res = await materialOutputsApi.exportAll(exportFilters);
       await download({
         data: res.data,
         meta: {
-          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t), valueLabel),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t), { translateValue: valueLabel }),
         },
       });
     } catch (e) {
@@ -127,6 +146,8 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
     externalFilters,
     handleDownloadPdf,
     fetchTableData,
+    departmentOptions,
+    userOptions,
   };
 };
 

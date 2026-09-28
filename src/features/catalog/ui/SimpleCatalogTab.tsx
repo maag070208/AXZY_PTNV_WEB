@@ -48,7 +48,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
   }, [openCreateSignal]);
 
   const fetchData = useMemo(
-    () => makeClientTableFetch<T>(() => list(true)),
+    () => makeClientTableFetch<T>(() => list(true), { active: { match: "equals" } }),
     [reloadKey]
   );
 
@@ -109,15 +109,22 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
       label: t("name"),
       width: 300,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (item: T) => <ITText className="text-[11px] font-bold text-slate-800">{item.name}</ITText>,
     },
     {
-      type: "boolean",  
+      type: "catalog",
       key: "active",
       label: t("status"),
       width: 130,
-      sortable: false,
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "true", name: t("active") },
+          { id: "false", name: t("inactive") },
+        ],
+      },
+      sortable: true,
       render: (item: T) =>
         item.active ? (
           <ITBadget color="success" size="lg">{t("active")}</ITBadget>

@@ -30,6 +30,7 @@
       "priority": "Priority",
       "createdBy": "Created by",
       "assignedTo": "Assigned to",
+      "createdAt": "Created on",
       "wait": "Days waiting"
     },
     "waitLabels": {

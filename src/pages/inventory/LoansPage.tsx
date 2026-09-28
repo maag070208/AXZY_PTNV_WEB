@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ITBadget, ITButton, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaFilePdf, FaFileSignature, FaPlus } from "react-icons/fa";
@@ -21,16 +21,18 @@ export default function LoansPage() {
 
   const fetchData = useMemo(
     () =>
-      makeClientTableFetch<Record<string, unknown>>(async () => {
-        const list = await inventoryApi.loans();
-        return list as unknown as Record<string, unknown>[];
+      makeClientTableFetch<Loan>(() => inventoryApi.loans(), {
+        custodian: {
+          value: (p) =>
+            p.custodian
+              ? [p.custodian.name, p.custodian.employeeNumber]
+              : [p.department?.name, p.subarea?.name],
+        },
+        item: { value: (p) => p.items.flatMap((d) => [d.device?.name, d.device?.brand, d.device?.model]) },
+        status: { match: "equals" },
       }),
     []
   );
-
-  useEffect(() => {
-    // Precarga (para el conteo en cabecera, si hiciera falta).
-  }, []);
 
   // La lista no trae las unidades físicas (activo fijo, número de serie): la
   // carta se genera con el préstamo completo, igual que desde su detalle.
@@ -48,7 +50,7 @@ export default function LoansPage() {
       key: "number",
       label: t("loans.colNumber"),
       width: 150,
-      sortable: false,
+      sortable: true,
       filter: true,
       render: (p: Loan) => <ITText className="text-[11px] font-bold text-slate-800">{p.number}</ITText>,
     },
@@ -58,6 +60,7 @@ export default function LoansPage() {
       label: t("loans.colCustodian"),
       width: 240,
       filter: true,
+      sortable: true,
       render: (p: Loan) => (
         <ITFlex direction="column" gap={0.5} className="min-w-0">
           {p.custodian ? (
@@ -82,8 +85,10 @@ export default function LoansPage() {
       type: "date",
       key: "date",
       label: t("loans.colDate"),
-      width: 140,
-      sortable: false,
+      width: 190,
+      sortable: true,
+      filter: "date-range",
+      dateFilterOptions: { maxDate: new Date() },
       render: (p: Loan) => <ITText className="text-[11px] text-slate-500">{formatDate(p.date)}</ITText>,
     },
     {
@@ -91,6 +96,7 @@ export default function LoansPage() {
       key: "item",
       label: t("loans.colItem"),
       width: 300,
+      filter: true,
       render: (p: Loan) => (
         <ITFlex direction="column" gap={0.5} className="min-w-0">
           {p.items.map((d) => {
@@ -111,6 +117,11 @@ export default function LoansPage() {
       key: "status",
       label: t("loans.colStatus"),
       width: 130,
+      filter: "catalog",
+      sortable: true,
+      catalogOptions: {
+        data: (Object.keys(STATUS_COLOR) as Loan["status"][]).map((id) => ({ id, name: t(`loanStatus.${id}`) })),
+      },
       render: (p: Loan) => <ITBadget color={STATUS_COLOR[p.status]} size="lg">{t(`loanStatus.${p.status}`)}</ITBadget>,
     },
     {

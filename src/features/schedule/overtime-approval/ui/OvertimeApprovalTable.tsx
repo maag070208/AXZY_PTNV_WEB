@@ -221,6 +221,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       label: t("columns.employee"),
       type: "string",
       width: 300,
+      filter: true,
       sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -236,16 +237,19 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       label: t("columns.department"),
       type: "string",
       width: 200,
+      filter: true,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.departmentName ?? "—"}</ITText>
       ),
     },
     {
-      key: "date",
+      // "day": `date` es el ancla del periodo que manda la barra.
+      key: "day",
       label: t("columns.date"),
-      type: "string",
+      type: "date",
       width: 130,
+      filter: "date-range",
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -258,6 +262,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       label: t("columns.schedule"),
       type: "string",
       width: 220,
+      filter: true,
       sortable: true,
       render: (r) =>
         r.scheduleName ? (
@@ -297,7 +302,8 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       label: t("columns.decidedBy"),
       type: "string",
       width: 200,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.decidedByName ?? "—"}</ITText>
       ),
@@ -305,8 +311,9 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
     {
       key: "decidedAt",
       label: t("columns.decidedAt"),
-      type: "string",
+      type: "date",
       width: 170,
+      filter: "date-range",
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] text-slate-600 whitespace-nowrap">
@@ -319,7 +326,8 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       label: t("columns.note"),
       type: "string",
       width: 240,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => <ITText className="text-[11px] text-slate-500">{r.note ?? "—"}</ITText>,
     },
   ];

@@ -85,6 +85,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         label: t("employees.columns.number"),
         type: "string",
         width: 120,
+        filter: true,
         sortable: true,
         render: (r) => (
           <ITText className="text-[12px] font-black text-slate-800 whitespace-nowrap">
@@ -97,6 +98,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         label: t("employees.columns.name"),
         type: "string",
         width: 300,
+        filter: true,
         sortable: true,
         render: (r) => <ITText className="text-[12px] font-bold text-slate-700">{r.name}</ITText>,
       },
@@ -120,6 +122,8 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         label: t("employees.columns.user"),
         type: "string",
         width: 260,
+        filter: true,
+        sortable: true,
         render: (r) => {
           if (r.link) {
             return (

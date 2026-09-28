@@ -1,5 +1,6 @@
 import { api } from "@shared/api/client";
 import {
+  tableQuery,
   tableRequest,
   type ITDataTableFetchParamsPost,
 } from "@shared/api/table";
@@ -27,6 +28,9 @@ const buildQuery = (filters: MaterialOutputFilters = {}): string => {
 export const materialOutputsApi = {
   table: (params: ITDataTableFetchParamsPost) =>
     tableRequest<MaterialOutput>(`/material-outputs/query`, params),
+  /** Todo lo filtrado, sin paginar (PDF), con los mismos filtros que la tabla. */
+  exportAll: (filters: ITDataTableFetchParamsPost["filters"]) =>
+    tableQuery<{ data: MaterialOutput[]; total: number }>(`/material-outputs/export`, { page: 1, limit: 1, filters }),
   list: (filters: MaterialOutputFilters = {}) =>
     api.get<{ data: MaterialOutput[]; total: number }>(`/material-outputs${buildQuery(filters)}`),
   get: (id: string) => api.get<MaterialOutput>(`/material-outputs/${id}`),
@@ -37,4 +41,7 @@ export const materialOutputsApi = {
     api.put<MaterialOutput>(`/material-outputs/${id}`, data),
   remove: (id: string) => api.delete<MaterialOutput>(`/material-outputs/${id}`),
   suggestions: () => api.get<MaterialOutputSuggestions>(`/material-outputs/suggestions`),
+  /** Todos los departamentos y usuarios registrados (opciones de los filtros de la tabla). */
+  filterOptions: () =>
+    api.get<{ departmentName: string[]; userName: string[] }>(`/material-outputs/filter-options`),
 };

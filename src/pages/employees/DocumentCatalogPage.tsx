@@ -28,7 +28,7 @@ export default function DocumentCatalogPage() {
   const [toDelete, setToDelete] = useState<DocumentType | null>(null);
 
   const fetchData = useMemo(
-    () => makeClientTableFetch<DocumentType>(() => personalApi.documentTypes(true)),
+    () => makeClientTableFetch<DocumentType>(() => personalApi.documentTypes(true), { active: { match: "equals" } }),
     [reloadKey]
   );
 
@@ -95,15 +95,22 @@ export default function DocumentCatalogPage() {
       label: tt("catalog.name"),
       width: 300,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (type: DocumentType) => <ITText className="text-[11px] font-bold text-slate-800">{type.name}</ITText>,
     },
     {
-      type: "boolean",
+      type: "catalog",
       key: "active",
       label: tt("catalog.status"),
       width: 140,
-      sortable: false,
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "true", name: tt("catalog.active") },
+          { id: "false", name: tt("catalog.inactive") },
+        ],
+      },
+      sortable: true,
       render: (type: DocumentType) =>
         type.active ? (
           <ITBadget color="success" size="lg">{tt("catalog.active")}</ITBadget>

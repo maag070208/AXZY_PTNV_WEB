@@ -82,11 +82,12 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       ),
     },
     {
-      key: "custodian",
+      key: "custodianId",
       label: t("assigned.colCustodian"),
-      type: "string",
+      type: "catalog",
       width: 240,
-      filter: true,
+      filter: "search",
+      catalogOptions: fx.peopleOptions,
       sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -100,11 +101,12 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       ),
     },
     {
-      key: "department",
+      key: "departmentId",
       label: t("assigned.colDept"),
-      type: "string",
+      type: "catalog",
       width: 200,
-      filter: true,
+      filter: "search",
+      catalogOptions: fx.departmentOptions,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">
@@ -131,10 +133,13 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       ),
     },
     {
-      key: "date",
+      // "loanDate": `date`/`start`/`end` son el rango de la barra (heredado).
+      key: "loanDate",
       label: t("assigned.colDate"),
-      type: "string",
-      width: 130,
+      type: "date",
+      width: 190,
+      filter: "date-range",
+      dateFilterOptions: { maxDate: new Date() },
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] text-slate-700">

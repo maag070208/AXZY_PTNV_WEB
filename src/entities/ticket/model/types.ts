@@ -87,6 +87,21 @@ export interface Ticket {
   updatedAt: string;
 }
 
+/** Opción de un filtro de la tabla de tickets. */
+export interface TicketFilterOption {
+  id: string;
+  name: string;
+}
+
+export interface TicketFilterOptions {
+  categories: TicketFilterOption[];
+  creators: TicketFilterOption[];
+  assignees: TicketFilterOption[];
+}
+
+/** Valor del filtro "Asignado a" para los tickets sin responsable (igual que la API). */
+export const UNASSIGNED = "UNASSIGNED";
+
 export interface TicketInput {
   title: string;
   description: string;

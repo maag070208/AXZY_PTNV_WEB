@@ -14,7 +14,7 @@ export interface MaterialOutput {
   area: string;
   reason?: MaterialOutputReason | null;
   deviceId?: string | null;
-  device?: { id: string; assetTag: string } | null;
+  deviceUnit?: { id: string; assetTag: string; serialNumber?: string | null } | null;
   registeredById?: string | null;
   registeredBy?: { id: string; name: string; username: string } | null;
   createdAt: string;
@@ -44,6 +44,9 @@ export interface MaterialOutputFilters {
   area?: string;
   project?: string;
   reason?: MaterialOutputReason;
+  notes?: string;
+  /** Activo fijo o número de serie de la unidad. */
+  device?: string;
   q?: string;
 }
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { personalApi } from "@entities/hr";
 import type { User } from "@entities/user";
@@ -6,7 +6,6 @@ import { usersApi } from "@entities/user";
 import { i18n } from "@shared/i18n";
 
 export const useDisciplinaryReports = () => {
-  const [employees, setEmployees] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -14,16 +13,11 @@ export const useDisciplinaryReports = () => {
 
   const reload = () => setReloadKey((k) => k + 1);
 
-  // Empleados para el filtro "Empleado" (Responsable).
-  useEffect(() => {
-    usersApi.employees().then(setEmployees).catch(() => setEmployees([]));
-  }, []);
-
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
     const res = await personalApi.disciplinaryReports({
       page: params.page,
       limit: params.limit,
-      filters: params.filters as Record<string, string | number | boolean>,
+      filters: params.filters,
       sort: params.sort,
     });
     return {
@@ -75,7 +69,6 @@ export const useDisciplinaryReports = () => {
   };
 
   return {
-    employees,
     error,
     setError,
     reloadKey,

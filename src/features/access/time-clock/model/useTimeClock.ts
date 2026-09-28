@@ -152,18 +152,22 @@ export const useTimeClock = () => {
   // Sort vigente de la tabla, compartido con el export. Al cambiar los filtros
   // la tabla se remonta y pierde su orden: el ref vuelve al default.
   const sortRef = useRef<PunchesSort>(DEFAULT_PUNCHES_SORT);
+  // Filtros vigentes de la tabla (barra + columnas): el CSV exporta lo mismo que se ve.
+  const filtersRef = useRef<ITDataTableFetchParams["filters"]>(externalFilters);
 
   useEffect(() => {
     sortRef.current = DEFAULT_PUNCHES_SORT;
+    filtersRef.current = externalFilters;
   }, [externalFilters]);
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
     const sort = params.sort ?? DEFAULT_PUNCHES_SORT;
     sortRef.current = sort;
+    filtersRef.current = params.filters;
     const res = await timeClockApi.table({
       page: params.page,
       limit: params.limit,
-      filters: params.filters as Record<string, string | number | boolean>,
+      filters: params.filters,
       sort,
     });
     return {
@@ -247,7 +251,7 @@ export const useTimeClock = () => {
         const res = await timeClockApi.table({
           page,
           limit: EXPORT_PAGE_SIZE,
-          filters: externalFilters,
+          filters: filtersRef.current,
           sort: sortRef.current,
         });
         rows.push(...res.data);

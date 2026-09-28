@@ -107,7 +107,7 @@ export const useOvertimeApproval = ({
     const res = await overtimeApi.query({
       page: params.page,
       limit: params.limit,
-      filters: params.filters as Record<string, string | number | boolean>,
+      filters: params.filters,
       ...(params.sort ? { sort: params.sort } : {}),
     });
     setSummary(res.summary);

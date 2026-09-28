@@ -34,6 +34,12 @@ export const usersApi = {
     const qs = params.toString();
     return api.get<User[]>(`/users/employees${qs ? `?${qs}` : ""}`);
   },
+  /** Todas las personas (incluidas las inactivas), para las opciones de filtros de tablas. */
+  people: (roles?: UserRole[]) => {
+    const params = new URLSearchParams({ includeInactive: "true" });
+    if (roles?.length) params.set("roles", roles.join(","));
+    return api.get<User[]>(`/users/employees?${params.toString()}`);
+  },
   create: (data: {
     username: string;
     email?: string;

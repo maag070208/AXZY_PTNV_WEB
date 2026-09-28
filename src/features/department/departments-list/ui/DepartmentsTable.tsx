@@ -40,7 +40,7 @@ export default function DepartmentsTable({
       key: "name",
       label: tt("list.colDepartment"),
       width: 240,
-      sortable: false,
+      sortable: true,
       filter: true,
       render: (d: Department) => (
         <ITFlex direction="column" gap={0.5}>
@@ -60,6 +60,7 @@ export default function DepartmentsTable({
       key: "subareas",
       label: tt("list.colAreas"),
       width: 200,
+      filter: true,
       render: (d: Department) =>
         d.subareas.length === 0 ? (
           <ITText className="text-[10px] font-bold text-slate-400 uppercase">
@@ -80,6 +81,7 @@ export default function DepartmentsTable({
       key: "count",
       label: tt("list.colUsers"),
       width: 100,
+      sortable: true,
       render: (d: Department) => (
         <ITText className="text-[11px] font-black text-slate-600">
           {d._count?.users ?? 0}

@@ -20,7 +20,7 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
   const [useHostname, setUseHostname] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useMemo(() => makeClientTableFetch<DeviceType>(() => inventoryApi.types()), []);
+  const fetchData = useMemo(() => makeClientTableFetch<DeviceType>(() => inventoryApi.types(), { active: { match: "equals" } }), []);
 
   const lastSignal = useRef(openCreateSignal);
   useEffect(() => {
@@ -80,17 +80,24 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
       label: t("types.name"),
       width: 300,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (tp: DeviceType) => <ITText className="text-[11px] font-bold text-slate-800">{tp.name}</ITText>,
     },
-    { type: "string", key: "code", label: t("types.code"), width: 110, sortable: false, render: (tp: DeviceType) => <ITText className="text-[11px] text-slate-500">{tp.code}</ITText> },
-    { type: "string", key: "assetTagPrefix", label: t("types.prefix"), width: 120, sortable: false, render: (tp: DeviceType) => <ITBadget color="gray" size="lg">{tp.assetTagPrefix}</ITBadget> },
+    { type: "string", key: "code", label: t("types.code"), width: 110, filter: true, sortable: true, render: (tp: DeviceType) => <ITText className="text-[11px] text-slate-500">{tp.code}</ITText> },
+    { type: "string", key: "assetTagPrefix", label: t("types.prefix"), width: 120, filter: true, sortable: true, render: (tp: DeviceType) => <ITBadget color="gray" size="lg">{tp.assetTagPrefix}</ITBadget> },
     {
-      type: "boolean",
+      type: "catalog",
       key: "active",
       label: t("types.status"),
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "true", name: t("types.active") },
+          { id: "false", name: t("types.inactive") },
+        ],
+      },
       width: 130,
-      sortable: false,
+      sortable: true,
       render: (tp: DeviceType) => (tp.active ? <ITBadget color="success" size="lg">{t("types.active")}</ITBadget> : <ITBadget color="danger" size="lg">{t("types.inactive")}</ITBadget>),
     },
     {

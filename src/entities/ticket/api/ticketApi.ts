@@ -11,12 +11,15 @@ import type {
   TicketAttachment,
   TicketCategory,
   TicketComment,
+  TicketFilterOptions,
   TicketInput,
 } from "../model/types";
 
 export const ticketsApi = {
   table: (params: ITDataTableFetchParamsPost) =>
     tableRequest<Ticket>(`/tickets/query`, params),
+  /** Categorías y personas presentes en los tickets visibles (filtros de la tabla). */
+  filterOptions: () => api.get<TicketFilterOptions>(`/tickets/filter-options`),
   list: (search?: string) => {
     const qs = search ? `?q=${encodeURIComponent(search)}` : "";
     return api.get<{ data: Ticket[]; total: number }>(`/tickets${qs}`);

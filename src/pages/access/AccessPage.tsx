@@ -140,7 +140,7 @@ export default function AccessPage() {
     const res = await accessApi.table({
       page: params.page,
       limit: params.limit,
-      filters: params.filters as Record<string, string | number | boolean>,
+      filters: params.filters,
       sort: params.sort,
     });
     return {
@@ -282,11 +282,12 @@ export default function AccessPage() {
 
   const columns: Column<AccessEvent>[] = [
     {
+      // El rango de fechas es el de la barra de filtros (lo comparten KPIs y CSV).
       key: "occurredAt",
       label: tt("columns.occurredAt"),
       type: "date",
       width: 160,
-      sortable: false,
+      sortable: true,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
           {formatDateTime(e.occurredAt)}
@@ -298,7 +299,8 @@ export default function AccessPage() {
       label: tt("columns.employee"),
       type: "string",
       width: 240,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (e) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">
@@ -315,7 +317,7 @@ export default function AccessPage() {
       label: tt("columns.type"),
       type: "catalog",
       width: 130,
-      sortable: false,
+      sortable: true,
       filter: "catalog",
       catalogOptions: { data: typeOptions, loading: false, error: false },
       render: (e) => (
@@ -330,6 +332,7 @@ export default function AccessPage() {
       type: "catalog",
       width: 200,
       filter: "catalog",
+      sortable: true,
       catalogOptions: {
         data: sites.map((s) => ({ id: s.id, name: s.name })),
         loading: false,
@@ -346,6 +349,8 @@ export default function AccessPage() {
       label: tt("columns.guard"),
       type: "string",
       width: 200,
+      filter: true,
+      sortable: true,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {e.guard?.name ?? "—"}

@@ -54,6 +54,8 @@
     "assignedStatus": "Assigned",
     "availableStatus": "Available",
     "retirementStatus": "Retired",
+    "damagedStatus": "Damaged",
+    "maintenanceStatus": "In maintenance",
     "otherStatus": "Other"
   },
   "exits": {

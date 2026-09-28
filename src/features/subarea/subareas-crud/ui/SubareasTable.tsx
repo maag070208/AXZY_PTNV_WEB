@@ -13,6 +13,8 @@ import { useTranslation } from "react-i18next";
 import type { Subarea } from "@entities/subarea";
 
 interface Props {
+  /** Opciones del filtro Departamento (todos, incluidos inactivos). */
+  departments: Array<{ id: string; name: string }>;
   fetchData: (
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
@@ -23,6 +25,7 @@ interface Props {
 }
 
 export default function SubareasTable({
+  departments,
   fetchData,
   reloadKey,
   onEdit,
@@ -37,7 +40,7 @@ export default function SubareasTable({
       key: "name",
       label: tt("list.colName"),
       width: 240,
-      sortable: false,
+      sortable: true,
       filter: true,
       render: (s: Subarea) => (
         <ITFlex direction="column" gap={0.5}>
@@ -53,11 +56,13 @@ export default function SubareasTable({
       ),
     },
     {
-      type: "string",
-      key: "department",
+      type: "catalog",
+      key: "departmentId",
       label: tt("list.colDepartment"),
       width: 200,
-      sortable: false,
+      sortable: true,
+      filter: "search",
+      catalogOptions: { data: departments.map((d) => ({ id: d.id, name: d.name })) },
       render: (s: Subarea) => (
         <ITText className="text-[11px] font-black uppercase tracking-wide text-slate-600">
           {s.department?.name ?? "—"}

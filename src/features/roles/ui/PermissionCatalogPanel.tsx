@@ -69,7 +69,11 @@ export default function PermissionCatalogPanel() {
   const [toast, setToast] = useState<ToastState | null>(null);
 
   const fetchData = useMemo(
-    () => makeClientTableFetch<PermissionCatalog>(list),
+    () => makeClientTableFetch<PermissionCatalog>(list, {
+        scopes: { match: "equals", sortValue: (p) => p.scopes.length },
+        sensitive: { match: "equals" },
+        active: { match: "equals" },
+      }),
     [list]
   );
 
@@ -172,6 +176,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "key",
       label: t("catalog.columns.key"),
+      sortable: true,
       width: 260,
       filter: true,
       render: (permission: PermissionCatalog) => (
@@ -184,6 +189,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "module",
       label: t("catalog.columns.module"),
+      sortable: true,
       width: 200,
       filter: true,
       render: (permission: PermissionCatalog) => (
@@ -194,6 +200,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "name",
       label: t("catalog.columns.name"),
+      sortable: true,
       width: 240,
       filter: true,
       render: (permission: PermissionCatalog) => (
@@ -207,6 +214,8 @@ export default function PermissionCatalogPanel() {
       key: "scopes",
       label: t("catalog.columns.scopes"),
       width: 260,
+      filter: "catalog",
+      catalogOptions: { data: SCOPE_ORDER.map((id) => ({ id, name: t(`scope.${id}`) })) },
       render: (permission: PermissionCatalog) => (
         <ITFlex align="center" gap={1} wrap="wrap">
           {permission.scopes.map((scope) => (
@@ -218,10 +227,18 @@ export default function PermissionCatalogPanel() {
       ),
     },
     {
-      type: "boolean",
+      type: "catalog",
       key: "sensitive",
       label: t("catalog.columns.sensitive"),
       width: 130,
+      sortable: true,
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "true", name: t("catalog.sensitive") },
+          { id: "false", name: t("catalog.notSensitive") },
+        ],
+      },
       render: (permission: PermissionCatalog) =>
         permission.sensitive ? (
           <ITBadget color="warning" size="sm">
@@ -236,15 +253,24 @@ export default function PermissionCatalogPanel() {
       key: "sortOrder",
       label: t("catalog.columns.sortOrder"),
       width: 110,
+      sortable: true,
       render: (permission: PermissionCatalog) => (
         <ITText className="text-[11px] text-slate-500">{permission.sortOrder}</ITText>
       ),
     },
     {
-      type: "boolean",
+      type: "catalog",
       key: "active",
       label: t("catalog.columns.active"),
       width: 130,
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "true", name: t("catalog.active") },
+          { id: "false", name: t("catalog.inactive") },
+        ],
+      },
+      sortable: true,
       render: (permission: PermissionCatalog) =>
         permission.active ? (
           <ITBadget color="success" size="sm">

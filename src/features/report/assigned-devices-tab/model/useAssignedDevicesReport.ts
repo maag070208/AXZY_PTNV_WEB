@@ -8,6 +8,8 @@ import {
 } from "@entities/report";
 import { appliedFilters, type TableQuery } from "@shared/utils/tableFilters";
 import { dyn } from "@shared/i18n/dyn";
+import { usePeopleOptions } from "@entities/user";
+import { useDepartmentOptions } from "@entities/department";
 
 /** Orden vigente de la tabla; la columna ES una unidad física. */
 export type AssignedDevicesSort = NonNullable<ITDataTableFetchParams["sort"]>;
@@ -19,10 +21,10 @@ export const DEFAULT_ASSIGNED_SORT: AssignedDevicesSort = { key: "assetTag", dir
 const FILTER_LABELS: Record<string, string> = {
   assetTag: "assigned.activeCol",
   description: "assigned.colDescription",
-  custodian: "assigned.colCustodian",
-  department: "assigned.colDept",
+  custodianId: "assigned.colCustodian",
+  departmentId: "assigned.colDept",
   folio: "assigned.colFolioSource",
-  date: "assigned.colDate",
+  loanDate: "assigned.colDate",
   daysAssigned: "assigned.colDays",
   start: "pdf.filterFrom",
   end: "pdf.filterTo",
@@ -55,6 +57,9 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  // Opciones de los filtros Responsable y Departamento (también en el pie del PDF).
+  const peopleOptions = usePeopleOptions();
+  const departmentOptions = useDepartmentOptions();
   // Rango vacío = sin recorte (comportamiento previo). Con rango, el API filtra
   // por la fecha del préstamo VIGENTE, así que las unidades no prestadas quedan
   // fuera y tabla, KPIs y PDF quedan consistentes.
@@ -76,7 +81,7 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
   const lastQuery = useRef<TableQuery>({ filters: {}, sort: DEFAULT_ASSIGNED_SORT });
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
-    const filters = params.filters as Record<string, string | number | boolean>;
+    const filters = params.filters;
     const sort = params.sort ?? DEFAULT_ASSIGNED_SORT;
     lastQuery.current = { filters, sort };
 
@@ -105,7 +110,7 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
         truncated: res.truncated,
         meta: {
           generatedAt: new Date().toISOString(),
-          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t)),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t), { catalogs: { custodianId: peopleOptions.data, departmentId: departmentOptions.data } }),
         },
       });
     } catch (e) {
@@ -113,7 +118,7 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [download, t, externalFilters]);
+  }, [download, t, externalFilters, peopleOptions.data, departmentOptions.data]);
 
   return {
     t,
@@ -128,6 +133,8 @@ export const useAssignedDevicesReport = ({ download }: Options) => {
     externalFilters,
     handleDownloadPdf,
     fetchTableData,
+    peopleOptions,
+    departmentOptions,
   };
 };
 

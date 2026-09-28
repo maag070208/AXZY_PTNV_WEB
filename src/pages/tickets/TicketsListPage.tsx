@@ -61,8 +61,9 @@ export default function TicketsListPage() {
         canDelete={canDelete}
         fetchData={list.fetchTableData}
         reloadKey={list.reloadKey}
-        categoryOptions={list.categoryOptions}
-        userOptions={list.userOptions}
+        filterOptions={list.filterOptions}
+        filterOptionsLoading={list.filterOptionsLoading}
+        filterOptionsError={list.filterOptionsError}
         onView={(t) => navigate(`/tickets/${t.id}`)}
         onMarkForDelete={list.setTicketToDelete}
       />

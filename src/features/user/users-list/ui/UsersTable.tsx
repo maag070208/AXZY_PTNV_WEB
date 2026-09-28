@@ -59,7 +59,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       type: "string",
       width: 110,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (u) => (
         <ITText className="text-[12px] font-black text-slate-700">@{u.username}</ITText>
       ),
@@ -70,7 +70,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       type: "string",
       width: 300,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (u) => (
         <ITFlex align="center" gap={1}>
           <ITText className="text-[12px] text-slate-800">{u.name}</ITText>
@@ -86,7 +86,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       type: "catalog",
       width: 140,
       filter: "catalog",
-      sortable: false,
+      sortable: true,
       catalogOptions: {
         data: USER_ROLES.map((id) => ({ id, name: roleLabel(id) })),
         loading: false,
@@ -100,17 +100,18 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       type: "string",
       width: 110,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (u) => (
         <ITText className="text-[11px] text-slate-600">{u.employeeNumber ?? "—"}</ITText>
       ),
     },
     {
-      key: "department",
+      key: "departmentId",
       label: tt("table.department"),
       type: "catalog",
       width: 200,
-      filter: "catalog",
+      filter: "search",
+      sortable: true,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] uppercase text-slate-500">
@@ -123,7 +124,8 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       label: tt("table.subarea"),
       type: "catalog",
       width: 200,
-      filter: "catalog",
+      filter: "search",
+      sortable: true,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] uppercase text-slate-500">

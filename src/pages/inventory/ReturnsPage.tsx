@@ -13,11 +13,20 @@ export default function ReturnsPage() {
 
   const fetchData = useMemo(
     () =>
-      makeClientTableFetch<Record<string, unknown>>(async () => {
-        const list = await inventoryApi.returns();
-        return list as unknown as Record<string, unknown>[];
+      makeClientTableFetch<LoanReturn>(() => inventoryApi.returns(), {
+        loan: { value: (d) => d.loan?.number },
+        assigned: { value: (d) => d.loan?.custodian?.name ?? d.loan?.department?.name },
+        item: {
+          value: (d) =>
+            d.items.flatMap((x) => [
+              x.device?.name,
+              x.device?.brand,
+              x.device?.model,
+              t(`loanReturn.conditionLabels.${x.condition}`),
+            ]),
+        },
       }),
-    []
+    [t]
   );
 
   const columns: any[] = [
@@ -26,7 +35,7 @@ export default function ReturnsPage() {
       key: "number",
       label: t("loanReturn.colNumber"),
       width: 150,
-      sortable: false,
+      sortable: true,
       filter: true,
       render: (d: LoanReturn) => <ITText className="text-[11px] font-bold text-slate-800">{d.number}</ITText>,
     },
@@ -36,6 +45,7 @@ export default function ReturnsPage() {
       label: t("loanReturn.colLoan"),
       width: 160,
       filter: true,
+      sortable: true,
       render: (d: LoanReturn) => (
         <ITButton
           variant="text"
@@ -55,6 +65,8 @@ export default function ReturnsPage() {
       key: "assigned",
       label: t("loanReturn.colAssigned"),
       width: 200,
+      filter: true,
+      sortable: true,
       render: (d: LoanReturn) => (
         <ITText className="text-[11px] text-slate-600">
           {d.loan?.custodian?.name ?? d.loan?.department?.name ?? "—"}
@@ -65,8 +77,10 @@ export default function ReturnsPage() {
       type: "date",
       key: "date",
       label: t("loanReturn.colDate"),
-      width: 140,
-      sortable: false,
+      width: 190,
+      sortable: true,
+      filter: "date-range",
+      dateFilterOptions: { maxDate: new Date() },
       render: (d: LoanReturn) => <ITText className="text-[11px] text-slate-500 whitespace-nowrap">{formatDate(d.date)}</ITText>,
     },
     {
@@ -74,6 +88,7 @@ export default function ReturnsPage() {
       key: "item",
       label: t("loanReturn.colItem"),
       width: 300,
+      filter: true,
       render: (d: LoanReturn) => (
         <ITFlex direction="column" gap={0.5} className="min-w-0">
           {d.items.map((x) => (

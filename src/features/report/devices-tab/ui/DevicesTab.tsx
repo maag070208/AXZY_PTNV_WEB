@@ -38,14 +38,14 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     if (Array.isArray(value)) setDateRange(value);
   };
 
-  const statusLabel = (status: string) =>
-    status === "ASSIGNED"
-      ? t("devices.assignedStatus")
-      : status === "AVAILABLE"
-        ? t("devices.availableStatus")
-        : status === "RETIRED"
-          ? t("devices.retirementStatus")
-          : t("devices.otherStatus");
+  const STATUS_LABELS: Record<string, string> = {
+    ASSIGNED: t("devices.assignedStatus"),
+    AVAILABLE: t("devices.availableStatus"),
+    DAMAGED: t("devices.damagedStatus"),
+    IN_MAINTENANCE: t("devices.maintenanceStatus"),
+    RETIRED: t("devices.retirementStatus"),
+  };
+  const statusLabel = (status: string) => STATUS_LABELS[status] ?? t("devices.otherStatus");
 
   const statusBadge = (status: string) => (
     <ITBadget
@@ -62,7 +62,8 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       label: t("devices.activeCol"),
       type: "string",
       width: 160,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-black text-slate-800">
@@ -81,7 +82,8 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       label: t("devices.colDescription"),
       type: "string",
       width: 300,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
@@ -108,16 +110,22 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     {
       key: "status",
       label: t("devices.colStatus"),
-      type: "string",
+      type: "catalog",
       width: 140,
-      sortable: false,
+      filter: "catalog",
+      sortable: true,
+      catalogOptions: {
+        data: Object.entries(STATUS_LABELS).map(([id, name]) => ({ id, name })),
+      },
       render: (r) => statusBadge(r.status),
     },
     {
-      key: "custodian",
+      key: "custodianId",
       label: t("devices.colCustodian"),
-      type: "string",
+      type: "catalog",
       width: 240,
+      filter: "search",
+      catalogOptions: fx.peopleOptions,
       sortable: false,
       render: (r) =>
         r.status === "ASSIGNED" ? (
@@ -136,10 +144,12 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         ),
     },
     {
-      key: "department",
+      key: "departmentId",
       label: t("devices.colDept"),
-      type: "string",
+      type: "catalog",
       width: 200,
+      filter: "search",
+      catalogOptions: fx.departmentOptions,
       sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">
@@ -152,6 +162,8 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       label: t("devices.colDays"),
       type: "number",
       width: 110,
+      // Número N = asignados hace N días o más.
+      filter: true,
       sortable: false,
       render: (r) => (
         <ITText
@@ -171,6 +183,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       label: t("devices.colFolio"),
       type: "string",
       width: 150,
+      filter: true,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-emerald-700">
@@ -183,7 +196,8 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       label: t("devices.colArea"),
       type: "string",
       width: 160,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">{r.area}</ITText>
       ),

@@ -34,7 +34,8 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       label: tt("tasksTable.task"),
       type: "string",
       width: 300,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.title}</ITText>
@@ -49,7 +50,8 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       label: tt("tasksTable.ticket"),
       type: "string",
       width: 300,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.title}</ITText>
       ),
@@ -57,9 +59,16 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
     {
       key: "status",
       label: tt("tasksTable.status"),
-      type: "string",
+      type: "catalog",
       width: 150,
-      sortable: false,
+      filter: "catalog",
+      catalogOptions: {
+        data: Object.keys(ASSIGNMENT_STATUS_BADGE).map((id) => ({
+          id,
+          name: dyn(tt)(`detail.taskStatusOptions.${id}`),
+        })),
+      },
+      sortable: true,
       render: (r) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="lg">
           {dyn(tt)(`detail.taskStatusOptions.${r.status}`)}
@@ -69,9 +78,10 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
     {
       key: "dates",
       label: tt("tasksTable.dates"),
-      type: "string",
+      type: "date",
       width: 220,
-      sortable: false,
+      filter: "date-range",
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           {r.startDate && (
