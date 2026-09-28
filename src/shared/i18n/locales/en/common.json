@@ -49,6 +49,7 @@
     "accessReport": "Entry/exit report",
     "accessTimeClock": "Time clock punches",
     "accessTimeClockReport": "Time clock entries/exits",
+    "timeClock": "Time clock",
     "accessTimeClockEmployees": "Time clock employees",
     "schedules": "Schedules",
     "schedulesAdmin": "Calendar",

@@ -10,7 +10,9 @@ import type { Permission, PermissionScope, UserRole } from "@entities/user";
  *
  * Cada entrada requiere uno o más permisos (`requirement`) o una regla fija de
  * negocio (`fixedRole`, p. ej. "Mis Tareas" solo para EMPLEADO). Un grupo
- * (con `children`) es visible si lo es al menos uno de sus hijos.
+ * (con `children`) es visible si lo es al menos uno de sus hijos. Dentro de un
+ * grupo, un hijo con `children` es una **sección**: el menú la muestra como
+ * encabezado de subítems (ITSidebar no tiene tercer nivel) y no navega.
  */
 
 /** Requisito de visibilidad: cualquiera (`anyOf`) o todas (`allOf`) las claves. */
@@ -38,6 +40,7 @@ export type NavLabelKey =
   | "nav.accessTimeClock"
   | "nav.accessTimeClockReport"
   | "nav.accessTimeClockEmployees"
+  | "nav.timeClock"
   | "nav.schedules"
   | "nav.schedulesAdmin"
   | "nav.schedulesAssign"
@@ -99,34 +102,39 @@ export const APP_SCREENS: readonly AppScreen[] = [
     ],
   },
   {
-    id: "access",
-    labelKey: "nav.access",
-    children: [
-      { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] } },
-      { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] } },
-    ],
-  },
-  {
-    id: "schedules",
-    labelKey: "nav.schedules",
-    requirement: { anyOf: ["schedules.view"] },
-    children: [
-      { id: "schedulesAdmin", labelKey: "nav.schedulesAdmin", path: "/schedules", match: "exact", requirement: { anyOf: ["schedules.view"] } },
-      { id: "schedulesAssign", labelKey: "nav.schedulesAssign", path: "/schedules/assign", requirement: { anyOf: ["schedules.view"] } },
-      { id: "overtime", labelKey: "nav.overtime", path: "/schedules/overtime/approval", requirement: { anyOf: ["overtime.view"] } },
-    ],
-  },
-  {
     id: "hr",
     labelKey: "nav.hr",
     children: [
       { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] } },
       { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] } },
       { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] } },
-      { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
-      { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] } },
-      { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] } },
-      { id: "payroll", labelKey: "nav.payroll", path: "/schedules/payroll", requirement: { anyOf: ["payroll.view"] } },
+      {
+        id: "access",
+        labelKey: "nav.access",
+        children: [
+          { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] } },
+          { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] } },
+        ],
+      },
+      {
+        id: "timeClock",
+        labelKey: "nav.timeClock",
+        children: [
+          { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
+          { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] } },
+          { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] } },
+        ],
+      },
+      {
+        id: "schedules",
+        labelKey: "nav.schedules",
+        children: [
+          { id: "schedulesAdmin", labelKey: "nav.schedulesAdmin", path: "/schedules", match: "exact", requirement: { anyOf: ["schedules.view"] } },
+          { id: "schedulesAssign", labelKey: "nav.schedulesAssign", path: "/schedules/assign", requirement: { anyOf: ["schedules.view"] } },
+          { id: "overtime", labelKey: "nav.overtime", path: "/schedules/overtime/approval", requirement: { anyOf: ["overtime.view"] } },
+          { id: "payroll", labelKey: "nav.payroll", path: "/schedules/payroll", requirement: { anyOf: ["payroll.view"] } },
+        ],
+      },
     ],
   },
   {
@@ -205,7 +213,8 @@ export const screenLeaves = (): ScreenLeaf[] => {
   const out: ScreenLeaf[] = [];
   const walk = (screens: readonly AppScreen[], parent?: AppScreen): void => {
     for (const screen of screens) {
-      if (screen.children?.length) walk(screen.children, screen);
+      // Una sección hereda el grupo de primer nivel: solo agrupa en el menú.
+      if (screen.children?.length) walk(screen.children, parent ?? screen);
       else out.push({ screen, parent });
     }
   };

@@ -577,14 +577,31 @@ export default function RoleAccessPanel({ admin }: RoleAccessPanelProps) {
                   ?.filter((child) =>
                     isScreenVisible(permissionsByRole[selectedRole], child, selectedRole)
                   )
-                  .map((child) => (
-                    <ITFlex key={child.id} align="center" gap={2} className="pl-5">
-                      <span className="h-1 w-1 rounded-full bg-slate-300" />
-                      <ITText className="text-[11px] text-slate-600">
-                        {tc(child.labelKey)}
-                      </ITText>
-                    </ITFlex>
-                  ))}
+                  .map((child) =>
+                    child.children?.length ? (
+                      // Sección del menú: encabezado y sus pantallas.
+                      <ITFlex key={child.id} direction="column" gap={1} className="pl-5 pt-1">
+                        <ITText className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          {tc(child.labelKey)}
+                        </ITText>
+                        {child.children
+                          .filter((leaf) => isScreenVisible(permissionsByRole[selectedRole], leaf, selectedRole))
+                          .map((leaf) => (
+                            <ITFlex key={leaf.id} align="center" gap={2} className="pl-2">
+                              <span className="h-1 w-1 rounded-full bg-slate-300" />
+                              <ITText className="text-[11px] text-slate-600">{tc(leaf.labelKey)}</ITText>
+                            </ITFlex>
+                          ))}
+                      </ITFlex>
+                    ) : (
+                      <ITFlex key={child.id} align="center" gap={2} className="pl-5">
+                        <span className="h-1 w-1 rounded-full bg-slate-300" />
+                        <ITText className="text-[11px] text-slate-600">
+                          {tc(child.labelKey)}
+                        </ITText>
+                      </ITFlex>
+                    )
+                  )}
               </ITFlex>
             ))
           )}

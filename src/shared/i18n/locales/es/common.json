@@ -49,6 +49,7 @@
     "accessReport": "Reporte entradas/salidas",
     "accessTimeClock": "Checadas del reloj",
     "accessTimeClockReport": "Entradas/salidas del reloj",
+    "timeClock": "Reloj checador",
     "accessTimeClockEmployees": "Empleados del reloj",
     "schedules": "Horarios",
     "schedulesAdmin": "Calendario",

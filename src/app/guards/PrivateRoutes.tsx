@@ -2,12 +2,10 @@ import { ITLayout, ITSidebarProps, ITToast, type ITNavigationItem } from "@axzyd
 import { useEffect, useState, useCallback, type ReactNode } from "react";
 import {
   FaBoxes,
-  FaDoorOpen,
   FaHouseUser,
   FaTicketAlt,
   FaUserTie,
   FaCog,
-  FaRegClock,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -25,8 +23,6 @@ const NAV_ICONS: Record<string, ReactNode> = {
   start: <FaHouseUser size={14} />,
   tasks: <FaTicketAlt size={14} />,
   inventory: <FaBoxes size={14} />,
-  access: <FaDoorOpen size={14} />,
-  schedules: <FaRegClock size={14} />,
   hr: <FaUserTie size={14} />,
   settings: <FaCog size={14} />,
 };
@@ -136,6 +132,15 @@ export default function PrivateRoutes() {
   const canView = (screen: AppScreen): boolean =>
     isScreenVisible(permissions, screen, user?.role);
 
+  const toSubItem = (screen: AppScreen) => ({
+    id: screen.id,
+    label: tt(screen.labelKey),
+    action: () => {
+      if (screen.path) navigate(screen.path);
+    },
+    isActive: isScreenActive(screen),
+  });
+
   const toNavigationItem = (screen: AppScreen): ITNavigationItem | null => {
     if (!canView(screen)) return null;
     const children = (screen.children ?? []).filter((child) => canView(child));
@@ -147,14 +152,16 @@ export default function PrivateRoutes() {
       isActive: isScreenActive(screen),
       ...(children.length > 0
         ? {
-            subitems: children.map((child) => ({
-              id: child.id,
-              label: tt(child.labelKey),
-              action: () => {
-                if (child.path) navigate(child.path);
-              },
-              isActive: isScreenActive(child),
-            })),
+            // Una sección (hijo con hijos) va como grupo con título del ITSidebar.
+            subitems: children.map((child) =>
+              child.children?.length
+                ? {
+                    id: child.id,
+                    label: tt(child.labelKey),
+                    items: child.children.filter((leaf) => canView(leaf)).map(toSubItem),
+                  }
+                : toSubItem(child)
+            ),
           }
         : {}),
     };
