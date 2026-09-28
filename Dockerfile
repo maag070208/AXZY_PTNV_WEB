@@ -1,19 +1,25 @@
+# syntax=docker/dockerfile:1
+
 # =========================
 # Builder
 # =========================
-FROM node:20-bullseye AS builder
+FROM node:20-bullseye-slim AS builder
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml* .npmrc* ./
-RUN corepack enable || true
-RUN npm install -g pnpm@10 || true
-RUN (pnpm install --frozen-lockfile --no-audit --no-fund 2>/dev/null) || npm install --no-audit --no-fund
+# pnpm (la caché de npm evita re-descargarlo en cada build).
+RUN --mount=type=cache,target=/root/.npm npm install -g pnpm@10
 
+# Dependencias primero: esta capa se reusa mientras no cambie el lockfile.
+COPY package.json pnpm-lock.yaml .npmrc* ./
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile --store-dir=/pnpm/store
+
+# Código y build.
 COPY . .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
-RUN npm run build
+RUN pnpm run build
 
 
 # =========================

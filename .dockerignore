@@ -1,16 +1,18 @@
+# Nada que no sea necesario para `vite build` (el build context pesa de más).
 node_modules
 dist
+dist-electron
+release
+build
+tests
+playwright-report
+test-results
+.agents
+docs
 .git
 .gitignore
 .env
 .env.local
 *.log
-.DS_Store
-node_modules
-dist
-.git
-.gitignore
-.env
-.env.local
-*.log
+*.tsbuildinfo
 .DS_Store
