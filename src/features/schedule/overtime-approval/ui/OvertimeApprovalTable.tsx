@@ -34,6 +34,8 @@ import { useWeekStartDay } from "@entities/sys-config";
 import { formatDateTime, formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { dayKeyOf, type Period, type StatusFilter, type UseOvertimeApproval } from "../model/useOvertimeApproval";
+import { usePeopleOptions } from "@entities/user";
+import { useDepartmentOptions } from "@entities/department";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -214,15 +216,20 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
     ),
   };
 
+  // Opciones de Empleado, Departamento y Decidió (incluye bajas e inactivos).
+  const peopleOptions = usePeopleOptions();
+  const departmentFilterOptions = useDepartmentOptions();
+
   const columns: Column<OvertimeDayRow>[] = [
     ...(canApprove ? [selectColumn] : []),
     {
-      key: "employeeName",
+      key: "userId",
       label: t("columns.employee"),
-      type: "string",
+      type: "catalog",
       width: 300,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: peopleOptions,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
@@ -233,12 +240,13 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       ),
     },
     {
-      key: "departmentName",
+      key: "departmentId",
       label: t("columns.department"),
-      type: "string",
+      type: "catalog",
       width: 200,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: departmentFilterOptions,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.departmentName ?? "—"}</ITText>
       ),
@@ -250,7 +258,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       type: "date",
       width: 130,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
           {formatDayKey(r.date)}
@@ -263,7 +271,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       type: "string",
       width: 220,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) =>
         r.scheduleName ? (
           <ITText className="text-[11px] font-bold text-slate-700">{r.scheduleName}</ITText>
@@ -278,7 +286,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       label: canApprove ? t("columns.extra") : t("statusApproved"),
       type: "number",
       width: 120,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className={canApprove ? "text-[12px] font-black text-rose-600" : "text-[12px] font-black text-emerald-700"}>
           {formatMinutesAsHhMm(canApprove ? r.extraMin : r.approvedExtraMin)}
@@ -290,7 +298,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       label: t("status"),
       type: "string",
       width: 140,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITBadget color={STATUS_COLOR[r.status]} size="sm">
           {t(STATUS_KEY[r.status])}
@@ -298,12 +306,13 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       ),
     },
     {
-      key: "decidedByName",
+      key: "decidedById",
       label: t("columns.decidedBy"),
-      type: "string",
+      type: "catalog",
       width: 200,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: peopleOptions,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.decidedByName ?? "—"}</ITText>
       ),
@@ -314,7 +323,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       type: "date",
       width: 170,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] text-slate-600 whitespace-nowrap">
           {r.decidedAt ? formatDateTime(r.decidedAt) : "—"}
@@ -327,7 +336,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       type: "string",
       width: 240,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => <ITText className="text-[11px] text-slate-500">{r.note ?? "—"}</ITText>,
     },
   ];

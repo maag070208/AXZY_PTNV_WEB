@@ -80,11 +80,11 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
       label: t("types.name"),
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (tp: DeviceType) => <ITText className="text-[11px] font-bold text-slate-800">{tp.name}</ITText>,
     },
-    { type: "string", key: "code", label: t("types.code"), width: 110, filter: true, sortable: true, render: (tp: DeviceType) => <ITText className="text-[11px] text-slate-500">{tp.code}</ITText> },
-    { type: "string", key: "assetTagPrefix", label: t("types.prefix"), width: 120, filter: true, sortable: true, render: (tp: DeviceType) => <ITBadget color="gray" size="lg">{tp.assetTagPrefix}</ITBadget> },
+    { type: "string", key: "code", label: t("types.code"), width: 110, filter: true, sortable: false, render: (tp: DeviceType) => <ITText className="text-[11px] text-slate-500">{tp.code}</ITText> },
+    { type: "string", key: "assetTagPrefix", label: t("types.prefix"), width: 120, filter: true, sortable: false, render: (tp: DeviceType) => <ITBadget color="gray" size="lg">{tp.assetTagPrefix}</ITBadget> },
     {
       type: "catalog",
       key: "active",
@@ -97,7 +97,7 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
         ],
       },
       width: 130,
-      sortable: true,
+      sortable: false,
       render: (tp: DeviceType) => (tp.active ? <ITBadget color="success" size="lg">{t("types.active")}</ITBadget> : <ITBadget color="danger" size="lg">{t("types.inactive")}</ITBadget>),
     },
     {

@@ -54,7 +54,10 @@ export interface ReportRow {
 }
 
 export interface AssignedDeviceRow {
+  /** Dispositivo del catálogo (el detalle `/inventory/devices/:id`). */
   deviceId: string;
+  /** Unidad física de la fila. */
+  unitId: string;
   assetTag: string;
   description: string;
   brand: string;
@@ -94,7 +97,10 @@ export type DeviceReportStatus =
   | "RETIRED";
 
 export interface DeviceReportRow {
+  /** Dispositivo del catálogo (el detalle `/inventory/devices/:id`). */
   deviceId: string;
+  /** Unidad física de la fila. */
+  unitId: string;
   assetTag: string;
   description: string;
   brand: string;

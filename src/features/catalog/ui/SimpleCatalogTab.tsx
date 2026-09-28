@@ -109,7 +109,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
       label: t("name"),
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (item: T) => <ITText className="text-[11px] font-bold text-slate-800">{item.name}</ITText>,
     },
     {
@@ -124,7 +124,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
           { id: "false", name: t("inactive") },
         ],
       },
-      sortable: true,
+      sortable: false,
       render: (item: T) =>
         item.active ? (
           <ITBadget color="success" size="lg">{t("active")}</ITBadget>

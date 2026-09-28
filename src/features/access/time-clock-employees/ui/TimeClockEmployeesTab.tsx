@@ -22,6 +22,7 @@ import { FaCheck, FaLink, FaMagic, FaUnlink } from "react-icons/fa";
 import type { TimeClockEmployee, TimeClockEmployeeStatus } from "@entities/time-clock";
 import { formatDateTime } from "@shared/utils/dates";
 import type { UseTimeClockEmployees } from "../model/useTimeClockEmployees";
+import { usePeopleOptions } from "@entities/user";
 
 const STATUSES: TimeClockEmployeeStatus[] = ["LINKED", "UNLINKED", "SUGGESTED"];
 
@@ -78,6 +79,9 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
     { key: "registrationSuggestions", value: summary?.registrationSuggestions ?? 0, tint: "bg-amber-50 text-amber-600" },
   ] as const;
 
+  // Opciones del filtro Usuario (incluye bajas: pueden seguir vinculadas).
+  const peopleOptions = usePeopleOptions();
+
   const columns = useMemo<Column<TimeClockEmployee>[]>(
     () => [
       {
@@ -86,7 +90,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         type: "string",
         width: 120,
         filter: true,
-        sortable: true,
+        sortable: false,
         render: (r) => (
           <ITText className="text-[12px] font-black text-slate-800 whitespace-nowrap">
             #{r.employeeNumber}
@@ -99,7 +103,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         type: "string",
         width: 300,
         filter: true,
-        sortable: true,
+        sortable: false,
         render: (r) => <ITText className="text-[12px] font-bold text-slate-700">{r.name}</ITText>,
       },
       {
@@ -107,7 +111,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         label: t("employees.columns.punches"),
         type: "number",
         width: 200,
-        sortable: true,
+        sortable: false,
         render: (r) => (
           <ITFlex direction="column" gap={0.5}>
             <ITText className="text-[12px] font-bold text-slate-700">{r.punches}</ITText>
@@ -120,10 +124,11 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
       {
         key: "link",
         label: t("employees.columns.user"),
-        type: "string",
+        type: "catalog",
         width: 260,
-        filter: true,
-        sortable: true,
+        filter: "search",
+        catalogOptions: peopleOptions,
+        sortable: false,
         render: (r) => {
           if (r.link) {
             return (
@@ -199,7 +204,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
           ]
         : []),
     ],
-    [t, canLink, openLink, acceptSuggestion, unlinkEmployee]
+    [t, canLink, openLink, acceptSuggestion, unlinkEmployee, peopleOptions]
   );
 
   return (

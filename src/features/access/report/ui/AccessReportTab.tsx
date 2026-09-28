@@ -38,6 +38,8 @@ import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import type { UseAccessReport } from "../model/useAccessReport";
 import { dateLocale } from "@shared/i18n";
+import { usePeopleOptions } from "@entities/user";
+import { useDepartmentOptions } from "@entities/department";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -126,14 +128,19 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       <ITText className="text-[11px] text-slate-400">—</ITText>
     );
 
+  // Opciones de Empleado y Departamento (incluye bajas e inactivos).
+  const peopleOptions = usePeopleOptions();
+  const departmentFilterOptions = useDepartmentOptions();
+
   const columns: Column<AccessReportSessionRow>[] = [
     {
-      key: "employeeName",
+      key: "employeeId",
       label: t("columns.employee"),
-      type: "string",
+      type: "catalog",
       width: 300,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: peopleOptions,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
@@ -146,12 +153,13 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       ),
     },
     {
-      key: "departmentName",
+      key: "departmentId",
       label: t("columns.department"),
-      type: "string",
+      type: "catalog",
       width: 200,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: departmentFilterOptions,
+      sortable: false,
       render: (r) =>
         r.departmentName ? (
           <ITText className="text-[11px] font-bold text-slate-600">{r.departmentName}</ITText>
@@ -167,7 +175,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       type: "string",
       width: 200,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700">{r.jobTitle ?? "—"}</ITText>
       ),
@@ -179,7 +187,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       type: "date",
       width: 190,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
           {formatDayKey(r.date)}
@@ -191,7 +199,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.entry"),
       type: "string",
       width: 150,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-emerald-700 whitespace-nowrap">
           {formatStamp(r.entryAt)}
@@ -203,7 +211,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.exit"),
       type: "string",
       width: 150,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
           {formatStamp(r.exitAt)}
@@ -215,7 +223,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.hours"),
       type: "number",
       width: 100,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[12px] font-black text-emerald-700">
           {r.entryAt && r.exitAt ? formatMinutesAsHhMm(r.workedMinutes) : "—"}
@@ -227,7 +235,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.incident"),
       type: "catalog",
       width: 160,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: {
         data: [...(Object.keys(INCIDENT_COLOR) as AccessIncidentCode[]), "NONE" as const].map((id) => ({

@@ -6,6 +6,7 @@ export { default as AssignedDevicesPdf } from "./ui/AssignedDevicesPdf";
 export { default as MaterialOutputsPdf } from "./ui/MaterialOutputsPdf";
 export { default as AccessReportPDF } from "./ui/AccessReportPDF";
 export { default as OvertimePDF } from "./ui/OvertimePDF";
+export { default as WeeklyAttendancePdf } from "./ui/WeeklyAttendancePdf";
 export {
   downloadReportPDF,
   downloadAssignedDevicesPdf,
@@ -14,4 +15,5 @@ export {
   downloadAccessReportPDF,
   downloadTimeClockReportPdf,
   downloadOvertimePDF,
+  downloadWeeklyAttendancePdf,
 } from "./model/pdf";

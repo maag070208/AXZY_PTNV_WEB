@@ -112,3 +112,75 @@ export interface OvertimePdfMeta {
   date: string;
   timezone: string;
 }
+
+// ── Reporte semanal de asistencia (RH) ─────────────────────────────────────
+
+/** Estado del día (mismo contrato que `POST /schedules/weekly-attendance`). */
+export type WeeklyAttendanceDayStatus =
+  | "WORKED"
+  | "OVERTIME"
+  | "ABSENCE"
+  | "INCOMPLETE"
+  | "REST"
+  | "REST_WORKED"
+  | "NO_INFO"
+  | "FUTURE";
+
+/** Decisión sobre el tiempo extra del día; PENDING = aún no aprobado. */
+export type WeeklyAttendanceApproval = "APPROVED" | "REJECTED" | "PENDING";
+
+export interface WeeklyAttendanceDay {
+  date: string;
+  status: WeeklyAttendanceDayStatus;
+  entryAt: string | null;
+  exitAt: string | null;
+  sessions: Array<{ entryAt: string | null; exitAt: string | null; workedMinutes: number; incident: string | null }>;
+  workedMin: number;
+  scheduledMin: number;
+  extraMin: number;
+  missingMin: number;
+  shift: string | null;
+  approval: WeeklyAttendanceApproval | null;
+  approvedExtraMin: number;
+}
+
+export interface WeeklyAttendanceTotals {
+  workedMin: number;
+  scheduledMin: number;
+  extraMin: number;
+  approvedExtraMin: number;
+  pendingExtraMin: number;
+  rejectedExtraMin: number;
+  missingMin: number;
+  absences: number;
+  incompleteDays: number;
+}
+
+export interface WeeklyAttendanceRow {
+  userId: string;
+  employeeNumber: string | null;
+  clockNumbers: string[];
+  name: string;
+  jobTitle: string | null;
+  departmentId: string | null;
+  departmentName: string | null;
+  active: boolean;
+  linked: boolean;
+  scheduleName: string | null;
+  withoutSchedule: boolean;
+  days: WeeklyAttendanceDay[];
+  totals: WeeklyAttendanceTotals;
+}
+
+export interface WeeklyAttendanceReport {
+  range: { start: string; end: string; timezone: string; days: string[] };
+  rows: WeeklyAttendanceRow[];
+  summary: WeeklyAttendanceTotals & { people: number; unlinked: number; withoutSchedule: number };
+}
+
+export interface WeeklyAttendanceQuery {
+  /** Cualquier día de la semana (`YYYY-MM-DD`). */
+  date: string;
+  departmentId?: string;
+  q?: string;
+}

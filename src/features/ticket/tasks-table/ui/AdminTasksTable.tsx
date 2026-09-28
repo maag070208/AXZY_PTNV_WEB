@@ -31,7 +31,7 @@ export default function AdminTasksTable({ fx }: Props) {
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{row.title}</ITText>
@@ -47,7 +47,7 @@ export default function AdminTasksTable({ fx }: Props) {
       type: "string",
       width: 240,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
@@ -63,7 +63,7 @@ export default function AdminTasksTable({ fx }: Props) {
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.title}</ITText>
       ),
@@ -80,7 +80,7 @@ export default function AdminTasksTable({ fx }: Props) {
           name: dyn(tt)(`detail.taskStatusOptions.${id}`),
         })),
       },
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="lg">
           {dyn(tt)(`detail.taskStatusOptions.${row.status}`)}
@@ -93,7 +93,7 @@ export default function AdminTasksTable({ fx }: Props) {
       type: "date",
       width: 220,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           {row.startDate && (

@@ -108,7 +108,7 @@ export default function AssignedDevicesPdf({ rows, title, truncated, appliedFilt
             </View>
 
             {pageRows.map((r, i) => (
-              <View key={r.deviceId + i} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
+              <View key={r.unitId} style={i % 2 === 0 ? pdfTheme.tableRow : pdfTheme.tableRowAlt}>
                 <View style={{ width: COL.active }}><Text style={pdfTheme.cellBold}>{r.assetTag}</Text></View>
                 <View style={{ width: COL.desc }}>
                   <Text style={pdfTheme.cellDescTitle}>{r.description}</Text>

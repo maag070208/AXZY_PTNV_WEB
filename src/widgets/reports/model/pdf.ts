@@ -14,13 +14,14 @@ import type {
   AccessReportSessionRow,
   AccessReportSummary,
 } from "@entities/access";
-import type { OvertimePdfMeta, OvertimeRow, OvertimeSummary } from "@entities/schedule";
+import type { OvertimePdfMeta, OvertimeRow, OvertimeSummary, WeeklyAttendanceReport } from "@entities/schedule";
 import ReportPDF from "../ui/ReportPDF";
 import AssignedDevicesPdf from "../ui/AssignedDevicesPdf";
 import DevicePDF from "../ui/DevicePDF";
 import MaterialOutputsPdf from "../ui/MaterialOutputsPdf";
 import AccessReportPDF from "../ui/AccessReportPDF";
 import OvertimePDF from "../ui/OvertimePDF";
+import WeeklyAttendancePdf from "../ui/WeeklyAttendancePdf";
 
 export const downloadReportPDF = async (
   rows: ReportRow[],
@@ -119,4 +120,15 @@ export const downloadOvertimePDF = async (
   ).toBlob();
   const stamp = meta.date.replace(/-/g, "");
   saveAs(blob, `${fileName("approvedOvertimeReport")}_${meta.period.toLowerCase()}_${stamp}.pdf`);
+};
+
+/** Nómina semanal: asistencia de la semana por departamento (una fila por persona). */
+export const downloadWeeklyAttendancePdf = async (
+  report: WeeklyAttendanceReport,
+  meta: { departmentName: string | null }
+): Promise<void> => {
+  const blob = await pdf(
+    createElement(WeeklyAttendancePdf, { report, meta }) as any
+  ).toBlob();
+  saveAs(blob, `${fileName("payroll")}_${report.range.days[0]}.pdf`);
 };

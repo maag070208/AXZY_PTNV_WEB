@@ -35,7 +35,7 @@ export default function ReturnsPage() {
       key: "number",
       label: t("loanReturn.colNumber"),
       width: 150,
-      sortable: true,
+      sortable: false,
       filter: true,
       render: (d: LoanReturn) => <ITText className="text-[11px] font-bold text-slate-800">{d.number}</ITText>,
     },
@@ -45,7 +45,7 @@ export default function ReturnsPage() {
       label: t("loanReturn.colLoan"),
       width: 160,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (d: LoanReturn) => (
         <ITButton
           variant="text"
@@ -66,7 +66,7 @@ export default function ReturnsPage() {
       label: t("loanReturn.colAssigned"),
       width: 200,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (d: LoanReturn) => (
         <ITText className="text-[11px] text-slate-600">
           {d.loan?.custodian?.name ?? d.loan?.department?.name ?? "—"}
@@ -78,7 +78,7 @@ export default function ReturnsPage() {
       key: "date",
       label: t("loanReturn.colDate"),
       width: 190,
-      sortable: true,
+      sortable: false,
       filter: "date-range",
       dateFilterOptions: { maxDate: new Date() },
       render: (d: LoanReturn) => <ITText className="text-[11px] text-slate-500 whitespace-nowrap">{formatDate(d.date)}</ITText>,

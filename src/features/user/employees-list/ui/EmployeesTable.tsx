@@ -73,7 +73,7 @@ export default function EmployeesTable({
       type: "string",
       width: 110,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (u) => (
         <ITText className="text-[11px] font-black text-slate-700">
           {u.employeeNumber ?? "—"}
@@ -86,7 +86,7 @@ export default function EmployeesTable({
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (u) => (
         <ITFlex
           direction="column"
@@ -106,7 +106,7 @@ export default function EmployeesTable({
       type: "catalog",
       width: 140,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: { data: roleOptions, loading: false, error: false },
       render: (u) => roleBadge(u.role, roleLabel(u.role)),
     },
@@ -114,7 +114,7 @@ export default function EmployeesTable({
       key: "active",
       label: tt("table.status"),
       type: "catalog" as const,
-      sortable: true,
+      sortable: false,
       width: 140,
       filter: "catalog",
       catalogOptions: {
@@ -137,7 +137,7 @@ export default function EmployeesTable({
       type: "string",
       width: 220,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (u) => (
         <ITText className="text-[11px] font-bold text-slate-600">{u.jobTitle ?? "—"}</ITText>
       ),
@@ -148,7 +148,7 @@ export default function EmployeesTable({
       type: "catalog",
       width: 200,
       filter: "search",
-      sortable: true,
+      sortable: false,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] font-black text-slate-600 uppercase">
@@ -162,7 +162,7 @@ export default function EmployeesTable({
       type: "catalog",
       width: 200,
       filter: "search",
-      sortable: true,
+      sortable: false,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] font-bold text-slate-500 uppercase">

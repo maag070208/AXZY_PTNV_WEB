@@ -6,6 +6,7 @@ import accessReportEn from "./locales/en/access-report.json";
 import timeClockEn from "./locales/en/time-clock.json";
 import schedulesEn from "./locales/en/schedules.json";
 import overtimeEn from "./locales/en/overtime.json";
+import weeklyAttendanceEn from "./locales/en/weekly-attendance.json";
 import auditEn from "./locales/en/audit.json";
 import authEn from "./locales/en/auth.json";
 import custodyLettersEn from "./locales/en/custody-letters.json";
@@ -31,6 +32,7 @@ import accessReportEs from "./locales/es/access-report.json";
 import timeClockEs from "./locales/es/time-clock.json";
 import schedulesEs from "./locales/es/schedules.json";
 import overtimeEs from "./locales/es/overtime.json";
+import weeklyAttendanceEs from "./locales/es/weekly-attendance.json";
 import auditEs from "./locales/es/audit.json";
 import authEs from "./locales/es/auth.json";
 import custodyLettersEs from "./locales/es/custody-letters.json";
@@ -81,6 +83,7 @@ export const NS_LIST = [
   "time-clock",
   "schedules",
   "overtime",
+  "weekly-attendance",
 ] as const;
 
 export const resources = {
@@ -109,6 +112,7 @@ export const resources = {
     "time-clock": timeClockEn,
     schedules: schedulesEn,
     overtime: overtimeEn,
+    "weekly-attendance": weeklyAttendanceEn,
   },
   es: {
     common: commonEs,
@@ -135,6 +139,7 @@ export const resources = {
     "time-clock": timeClockEs,
     schedules: schedulesEs,
     overtime: overtimeEs,
+    "weekly-attendance": weeklyAttendanceEs,
   },
 } as const;
 

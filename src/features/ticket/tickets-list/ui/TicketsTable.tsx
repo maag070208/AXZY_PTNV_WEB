@@ -63,7 +63,7 @@ export default function TicketsTable({
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (t) => (
         <ITFlex direction="column" gap={0.5}>
           <ITFlex align="center" gap={1}>
@@ -84,7 +84,7 @@ export default function TicketsTable({
       type: "catalog",
       width: 140,
       filter: "search",
-      sortable: true,
+      sortable: false,
       catalogOptions: catalog(filterOptions.categories),
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
@@ -98,7 +98,7 @@ export default function TicketsTable({
       type: "catalog",
       width: 100,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: Object.keys(STATUS_BADGE).map((id) => ({
           id,
@@ -119,7 +119,7 @@ export default function TicketsTable({
       type: "catalog",
       width: 80,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: Object.keys(PRIORITY_BADGE).map((id) => ({
           id,
@@ -140,7 +140,7 @@ export default function TicketsTable({
       type: "date",
       width: 190,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       dateFilterOptions: { maxDate: new Date() },
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">{formatDate(t.createdAt)}</ITText>
@@ -170,7 +170,7 @@ export default function TicketsTable({
       width: 100,
       type: "catalog",
       filter: "search",
-      sortable: true,
+      sortable: false,
       catalogOptions: catalog(filterOptions.creators),
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
@@ -184,7 +184,7 @@ export default function TicketsTable({
       width: 100,
       type: "catalog",
       filter: "search",
-      sortable: true,
+      sortable: false,
       catalogOptions: catalog([{ id: UNASSIGNED, name: tt("list.unassigned") }, ...filterOptions.assignees]),
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">

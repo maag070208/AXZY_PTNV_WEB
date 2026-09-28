@@ -106,7 +106,7 @@ export default function SchedulesTable() {
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (h) => <ITText className="text-[12px] font-black text-slate-800">{h.name}</ITText>,
     },
     {
@@ -114,7 +114,7 @@ export default function SchedulesTable() {
       label: t("days"),
       type: "catalog",
       width: 300,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: { data: [1, 2, 3, 4, 5, 6, 7].map((id) => ({ id: String(id), name: dayName(id) })) },
       render: (h) => (
@@ -126,7 +126,7 @@ export default function SchedulesTable() {
       label: t("tolEntry"),
       type: "string",
       width: 300,
-      sortable: true,
+      sortable: false,
       render: (h) => (
         <ITText className="text-[11px] text-slate-500 whitespace-nowrap">
           E{h.entryToleranceMin} / S{h.exitToleranceMin} · {t("meal")} {h.mealBreakMin} · {t("minExtra")} {h.minOvertimeMin}
@@ -138,7 +138,7 @@ export default function SchedulesTable() {
       label: t("assignedLabel"),
       type: "number",
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (h) => <ITText className="text-[12px] font-bold text-slate-700">{h.assigned ?? 0}</ITText>,
     },
     {
@@ -146,7 +146,7 @@ export default function SchedulesTable() {
       label: t("active"),
       type: "catalog",
       width: 130,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: {
         data: [

@@ -182,7 +182,7 @@ export default function MovementsPage() {
       key: "date",
       label: t("stockLedger.date"),
       width: 190,
-      sortable: true,
+      sortable: false,
       filter: "date-range",
       dateFilterOptions: { maxDate: new Date() },
       render: (m: MovementRow) => <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">{formatDateTime(m.date)}</ITText>,
@@ -192,7 +192,7 @@ export default function MovementsPage() {
       key: "type",
       label: t("movements.colType"),
       width: 160,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: {
         data: MOVEMENT_TYPES.map((id) => ({ id, name: t(`typeLabels.${id}`) })),
@@ -211,7 +211,7 @@ export default function MovementsPage() {
       label: t("movements.colItem"),
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (m: MovementRow) => (
         <ITText className="text-[11px] text-slate-600 truncate">
           {m.name} {m.unit !== "—" && <b className="text-slate-800">· {m.unit}</b>}
@@ -232,7 +232,7 @@ export default function MovementsPage() {
       label: t("movements.colCustodian"),
       width: 200,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (m: MovementRow) => <ITText className="text-[11px] text-slate-600">{m.custodian?.name ?? m.user?.name ?? "—"}</ITText>,
     },
     {

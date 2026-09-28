@@ -63,7 +63,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       type: "string",
       width: 160,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-black text-slate-800">
@@ -83,7 +83,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
@@ -113,7 +113,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       type: "catalog",
       width: 140,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: Object.entries(STATUS_LABELS).map(([id, name]) => ({ id, name })),
       },
@@ -197,7 +197,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       type: "string",
       width: 160,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">{r.area}</ITText>
       ),

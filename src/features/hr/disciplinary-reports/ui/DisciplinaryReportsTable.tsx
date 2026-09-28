@@ -13,6 +13,7 @@ import type {
 import { FaEye, FaTrash } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
 import type { DisciplinaryReport } from "@entities/hr";
+import { usePeopleOptions } from "@entities/user";
 
 type BadgeColor = "error" | "warning" | "info" | "success" | "danger" | "primary" | "secondary" | "purple" | "gray";
 
@@ -51,6 +52,9 @@ export default function DisciplinaryReportsTable({
 }: Props) {
   const { t: tt } = useTranslation("disciplinary-reports");
 
+  // Opciones de Empleado y Registró (incluye a quien ya se dio de baja).
+  const peopleOptions = usePeopleOptions();
+
   const columns: Column<DisciplinaryReport>[] = [
     {
       key: "incidentDate",
@@ -58,7 +62,7 @@ export default function DisciplinaryReportsTable({
       type: "date",
       width: 190,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       dateFilterOptions: { maxDate: new Date() },
       render: (a) => (
         <ITText className="text-[11px] font-black text-slate-700">{a.incidentDate}</ITText>
@@ -70,7 +74,7 @@ export default function DisciplinaryReportsTable({
       type: "catalog",
       width: 140,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: REASONS.map((id) => ({ id, name: tt(`reasons.${id}`) })),
         loading: false,
@@ -83,13 +87,13 @@ export default function DisciplinaryReportsTable({
       ),
     },
     {
-      // Texto (nombre o número): incluye a quien ya no está activo.
-      key: "employee",
+      key: "userId",
       label: tt("table.employee"),
-      type: "string",
+      type: "catalog",
       width: 220,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: peopleOptions,
+      sortable: false,
       render: (a) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{a.user.name}</ITText>
@@ -105,7 +109,7 @@ export default function DisciplinaryReportsTable({
       type: "string",
       width: 220,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (a) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {a.user.jobTitle ?? "—"}
@@ -139,12 +143,13 @@ export default function DisciplinaryReportsTable({
       ),
     },
     {
-      key: "createdBy",
+      key: "createdById",
       label: tt("table.createdBy"),
-      type: "string",
+      type: "catalog",
       width: 200,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: peopleOptions,
+      sortable: false,
       render: (a) => (
         <ITText className="text-[10px] font-bold text-slate-500">{a.createdBy.name}</ITText>
       ),

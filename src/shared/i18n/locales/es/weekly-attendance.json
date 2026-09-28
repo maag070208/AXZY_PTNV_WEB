@@ -1,0 +1,86 @@
+{
+  "title": "Nómina",
+  "description": "Entradas, salidas, horas trabajadas y tiempo extra de la semana por departamento para nómina",
+  "breadcrumb": "Nómina",
+  "filters": {
+    "week": "Semana",
+    "previousWeek": "Semana anterior",
+    "nextWeek": "Semana siguiente",
+    "thisWeek": "Esta semana",
+    "department": "Departamento",
+    "allDepartments": "Todos los departamentos",
+    "search": "Buscar empleado",
+    "searchPlaceholder": "Nombre o número"
+  },
+  "range": "Del {{from}} al {{to}}",
+  "timezone": "Zona horaria: {{tz}}",
+  "columns": {
+    "code": "Cód.",
+    "employee": "Empleado",
+    "entry": "Entrada",
+    "exit": "Salida",
+    "workedTime": "T.T",
+    "hours": "Hrs",
+    "overtime": "HE",
+    "week": "Semana",
+    "approved": "HE aprob.",
+    "absences": "Faltas"
+  },
+  "status": {
+    "WORKED": "Trabajado",
+    "OVERTIME": "Horas extra",
+    "ABSENCE": "Falta",
+    "INCOMPLETE": "Checada incompleta",
+    "REST": "Descanso",
+    "REST_WORKED": "Descanso trabajado",
+    "NO_INFO": "Sin información",
+    "FUTURE": "Por venir"
+  },
+  "approval": {
+    "APPROVED": "Aprobada",
+    "PENDING": "No aprobada",
+    "REJECTED": "Rechazada"
+  },
+  "kpis": {
+    "people": "Personas",
+    "worked": "Horas trabajadas",
+    "overtime": "HE calculadas",
+    "approved": "HE aprobadas",
+    "notApproved": "HE no aprobadas",
+    "absences": "Faltas",
+    "incomplete": "Checadas incompletas"
+  },
+  "legend": "Simbología",
+  "withoutSchedule": "Sin horario: se calcula contra 8 h",
+  "unlinked": "Sin vínculo al reloj",
+  "unlinkedHint": "{{count}} persona(s) sin vínculo al reloj: sus días salen sin información. Vincúlalas en Control de acceso → Empleados del reloj.",
+  "withoutScheduleHint": "{{count}} persona(s) sin horario asignado: su tiempo extra se calcula contra una jornada de 8 h.",
+  "tooltip": {
+    "shift": "Horario: {{shift}}",
+    "noShift": "Sin horario ese día",
+    "scheduled": "Programado: {{hours}}",
+    "worked": "Trabajado: {{hours}}",
+    "missing": "Faltante: {{hours}}",
+    "sessions": "Checadas",
+    "incident": "Incidencia: {{incident}}",
+    "approvedMinutes": "Aprobado: {{hours}}"
+  },
+  "incidents": {
+    "ENTRY_WITHOUT_EXIT": "entrada sin salida",
+    "EXIT_WITHOUT_ENTRY": "salida sin entrada",
+    "OPEN_ENTRY": "en sitio"
+  },
+  "empty": "No hay personal para esta semana y filtros",
+  "loadError": "No se pudo cargar el reporte",
+  "exportPdf": "PDF",
+  "exportExcel": "Excel",
+  "exporting": "Generando…",
+  "pdf": {
+    "title": "Puerto Nuevo · Nómina semanal",
+    "company": "Puerto Nuevo Baja Hotel y Villas",
+    "department": "Departamento",
+    "week": "Semana",
+    "generatedAt": "Generado el {{date}}"
+  },
+  "sheetName": "Nómina"
+}

@@ -52,7 +52,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       width: 190,
       filter: "date-range",
       dateFilterOptions: { maxDate: new Date() },
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">
           {formatDate(r.date)}
@@ -65,7 +65,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
@@ -84,7 +84,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       label: t("exits.colQty"),
       type: "number",
       width: 90,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-700">{r.quantity}</ITText>
       ),
@@ -96,7 +96,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       width: 200,
       filter: "search",
       catalogOptions: fx.departmentOptions,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">{r.departmentName}</ITText>
       ),
@@ -108,7 +108,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       width: 240,
       filter: "search",
       catalogOptions: fx.userOptions,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.userName}</ITText>
       ),
@@ -119,7 +119,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       type: "catalog",
       width: 140,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: (Object.keys(REASON_COLORS) as MaterialOutputReason[]).map((id) => ({
           id,
@@ -141,7 +141,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       type: "string",
       width: 150,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) =>
         r.deviceUnit ? (
           <ITText className="text-[11px] font-black text-emerald-700">

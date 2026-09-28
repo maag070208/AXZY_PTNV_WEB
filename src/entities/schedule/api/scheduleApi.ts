@@ -6,6 +6,8 @@ import type {
   OvertimeResponse,
   Schedule,
   ScheduleInput,
+  WeeklyAttendanceQuery,
+  WeeklyAttendanceReport,
 } from "../model/types";
 
 export const scheduleApi = {
@@ -34,6 +36,10 @@ export const scheduleApi = {
   /** Quita (cierra la vigencia) la asignación de varias personas. */
   removeAssignments: (data: { scheduleId: string; userIds: string[] }) =>
     api.post<{ removed: number }>(`/schedules/assignments/remove`, data),
+
+  /** Reporte semanal de asistencia de un departamento (RH). */
+  weeklyAttendance: (query: WeeklyAttendanceQuery) =>
+    api.post<WeeklyAttendanceReport>(`/schedules/weekly-attendance`, query),
 
   /** Universo completo sin paginar, SOLO aprobado (para CSV/KPIs/PDF). */
   overtimeExport: (params: ITDataTableFetchParamsPost) =>

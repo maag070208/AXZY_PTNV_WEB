@@ -40,7 +40,7 @@ export default function SubareasTable({
       key: "name",
       label: tt("list.colName"),
       width: 240,
-      sortable: true,
+      sortable: false,
       filter: true,
       render: (s: Subarea) => (
         <ITFlex direction="column" gap={0.5}>
@@ -60,7 +60,7 @@ export default function SubareasTable({
       key: "departmentId",
       label: tt("list.colDepartment"),
       width: 200,
-      sortable: true,
+      sortable: false,
       filter: "search",
       catalogOptions: { data: departments.map((d) => ({ id: d.id, name: d.name })) },
       render: (s: Subarea) => (

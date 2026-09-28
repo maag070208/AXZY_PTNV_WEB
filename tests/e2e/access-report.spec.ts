@@ -192,31 +192,27 @@ test.describe("Reporte de entradas/salidas", () => {
     expect(body.sort).toEqual({ key: "entryAt", direction: "desc" });
   });
 
-  test("el export respeta el orden de la tabla (paridad al ordenar por Empleado)", async ({
-    page,
-  }) => {
+  test("el export comparte los filtros vigentes de la tabla", async ({ page }) => {
     await goToRoute(page, "/access/report");
     await expect(page.locator("table tbody")).toBeVisible();
 
-    // Primer click en el encabezado sortable → `asc`. La petición de tabla con
-    // ese sort confirma que el hook ya lo guardó como orden vigente.
-    const reordered = page.waitForRequest((r) => {
+    // Al filtrar, la tabla pide con ese filtro (el reporte lista sesiones y sus
+    // columnas no son ordenables; lo que el export debe respetar son los filtros).
+    const filtered = page.waitForRequest((r) => {
       if (r.method() !== "POST" || !r.url().endsWith("/access/report")) return false;
-      const data = r.postDataJSON() as { sort?: { key?: string } };
-      return data?.sort?.key === "employeeName";
+      const data = r.postDataJSON() as { filters?: { q?: string } };
+      return data?.filters?.q === NAME_WITH_EVENTS;
     });
-    await page.getByTitle("Ordenar por Empleado").click();
-    expect((await reordered).postDataJSON()).toMatchObject({
-      sort: { key: "employeeName", direction: "asc" },
-    });
+    await field(page, "Buscar empleado").fill(NAME_WITH_EVENTS);
+    await filtered;
 
-    // El export comparte el sort vigente de la tabla.
+    // El export comparte los filtros vigentes de la tabla.
     const exportRequest = page.waitForRequest(
       (r) => r.method() === "POST" && r.url().endsWith("/access/report/export")
     );
     await page.getByRole("button", { name: "CSV" }).click();
     expect((await exportRequest).postDataJSON()).toMatchObject({
-      sort: { key: "employeeName", direction: "asc" },
+      filters: { q: NAME_WITH_EVENTS },
     });
   });
 

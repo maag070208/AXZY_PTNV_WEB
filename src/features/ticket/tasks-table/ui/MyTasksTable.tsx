@@ -35,7 +35,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.title}</ITText>
@@ -51,7 +51,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.ticket.title}</ITText>
       ),
@@ -68,7 +68,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
           name: dyn(tt)(`detail.taskStatusOptions.${id}`),
         })),
       },
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[r.status]?.color as any) ?? "gray"} size="lg">
           {dyn(tt)(`detail.taskStatusOptions.${r.status}`)}
@@ -81,7 +81,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       type: "date",
       width: 220,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           {r.startDate && (

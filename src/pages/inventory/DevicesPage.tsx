@@ -34,7 +34,7 @@ export default function DevicesPage() {
       key: "name",
       label: t("devices.colName"),
       width: 300,
-      sortable: true,
+      sortable: false,
       filter: true,
       render: (d: Device) => (
         <ITFlex direction="column" gap={0.5}>
@@ -48,7 +48,7 @@ export default function DevicesPage() {
       key: "typeId",
       label: t("devices.colType"),
       width: 160,
-      sortable: true,
+      sortable: false,
       filter: "catalog" as const,
       catalogOptions: {
         // Todos los tipos: también hay dispositivos de tipos inactivos.
@@ -63,7 +63,7 @@ export default function DevicesPage() {
       key: "available",
       label: t("devices.colAvail"),
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-emerald-600">{d.stock?.AVAILABLE ?? 0}</ITText>,
     },
     {
@@ -71,7 +71,7 @@ export default function DevicesPage() {
       key: "loaned",
       label: t("devices.colLoaned"),
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-amber-600">{d.stock?.ON_LOAN ?? 0}</ITText>,
     },
     {
@@ -79,7 +79,7 @@ export default function DevicesPage() {
       key: "retirement",
       label: t("devices.colRetirement"),
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-red-500">{d.stock?.RETIRED ?? 0}</ITText>,
     },
     {
@@ -87,7 +87,7 @@ export default function DevicesPage() {
       key: "total",
       label: t("devices.colTotal"),
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (d: Device) => <ITText className="text-[11px] font-black text-slate-800">{d.stock?.total ?? 0}</ITText>,
     },
     {

@@ -50,7 +50,7 @@ export default function LoansPage() {
       key: "number",
       label: t("loans.colNumber"),
       width: 150,
-      sortable: true,
+      sortable: false,
       filter: true,
       render: (p: Loan) => <ITText className="text-[11px] font-bold text-slate-800">{p.number}</ITText>,
     },
@@ -60,7 +60,7 @@ export default function LoansPage() {
       label: t("loans.colCustodian"),
       width: 240,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (p: Loan) => (
         <ITFlex direction="column" gap={0.5} className="min-w-0">
           {p.custodian ? (
@@ -86,7 +86,7 @@ export default function LoansPage() {
       key: "date",
       label: t("loans.colDate"),
       width: 190,
-      sortable: true,
+      sortable: false,
       filter: "date-range",
       dateFilterOptions: { maxDate: new Date() },
       render: (p: Loan) => <ITText className="text-[11px] text-slate-500">{formatDate(p.date)}</ITText>,
@@ -118,7 +118,7 @@ export default function LoansPage() {
       label: t("loans.colStatus"),
       width: 130,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: (Object.keys(STATUS_COLOR) as Loan["status"][]).map((id) => ({ id, name: t(`loanStatus.${id}`) })),
       },

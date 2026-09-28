@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usersApi } from "../api/userApi";
 import type { UserRole } from "./types";
 
@@ -40,5 +40,5 @@ export const usePeopleOptions = (roles?: UserRole[]) => {
   }, [rolesKey]);
 
   /** Listo para `catalogOptions` de ITDataTable. */
-  return { data: options, loading, error };
+  return useMemo(() => ({ data: options, loading, error }), [options, loading, error]);
 };

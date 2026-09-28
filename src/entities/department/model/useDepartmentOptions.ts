@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { departmentsApi } from "../api/departmentApi";
 
 /**
@@ -28,5 +28,5 @@ export const useDepartmentOptions = ({ byName = false }: { byName?: boolean } = 
   }, [byName]);
 
   /** Listo para `catalogOptions` de ITDataTable. */
-  return { data: options, loading, error };
+  return useMemo(() => ({ data: options, loading, error }), [options, loading, error]);
 };

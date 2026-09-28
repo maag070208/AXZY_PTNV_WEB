@@ -91,8 +91,10 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         key: "occurredAt",
         label: t("columns.occurredAt"),
         type: "date",
-        width: 160,
-        sortable: true,
+        width: 190,
+        filter: "date-range",
+        dateFilterOptions: { maxDate: new Date() },
+        sortable: false,
         render: (c) => (
           <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
             {formatDateTime(c.occurredAt)}
@@ -100,12 +102,13 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         ),
       },
       {
-        key: "name",
+        key: "employeeNumber",
         label: t("columns.employee"),
-        type: "string",
+        type: "catalog",
         width: 300,
-        filter: true,
-        sortable: true,
+        filter: "search",
+        catalogOptions: fx.employeeOptions,
+        sortable: false,
         render: (c) => (
           <ITFlex direction="column" gap={0.5}>
             <ITText className="text-[12px] font-black text-slate-800">{c.name || "—"}</ITText>
@@ -120,7 +123,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         label: t("columns.method"),
         type: "catalog",
         width: 140,
-        sortable: true,
+        sortable: false,
         filter: "catalog",
         catalogOptions: { data: METHODS.map((m) => ({ id: m, name: t(`methods.${m}`) })) },
         render: (c) => (
@@ -136,7 +139,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         label: t("columns.clock"),
         type: "catalog",
         width: 200,
-        sortable: true,
+        sortable: false,
         filter: "catalog",
         catalogOptions: { data: (status?.devices ?? []).map((d) => ({ id: d.clockSerial, name: d.name })) },
         render: (c) => (
@@ -151,13 +154,13 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         type: "number",
         width: 100,
         filter: true,
-        sortable: true,
+        sortable: false,
         render: (c) => (
           <ITText className="text-[10px] font-bold text-slate-400">{c.serialNo}</ITText>
         ),
       },
     ],
-    [t, status?.devices]
+    [t, status?.devices, fx.employeeOptions]
   );
 
   const handleDateRange = (

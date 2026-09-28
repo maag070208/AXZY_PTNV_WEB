@@ -12,6 +12,7 @@ import SchedulesPage from "@pages/schedules/SchedulesPage";
 import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
 import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
 import OvertimeApprovalPage from "@pages/overtime/OvertimeApprovalPage";
+import PayrollPage from "@pages/schedules/PayrollPage";
 import HomePage from "@pages/home/HomePage";
 import DashboardPage from "@pages/inventory/DashboardPage";
 import DevicesPage from "@pages/inventory/DevicesPage";
@@ -365,6 +366,14 @@ export default function App() {
           element={
             <RequiresPermission permission="overtime.view">
               <OvertimeApprovalPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/schedules/payroll"
+          element={
+            <RequiresPermission permission="payroll.view">
+              <PayrollPage />
             </RequiresPermission>
           }
         />

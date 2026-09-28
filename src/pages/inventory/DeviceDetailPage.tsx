@@ -1,7 +1,7 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaEdit, FaHistory, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
@@ -39,9 +39,12 @@ export default function DeviceDetailPage() {
   const [units, setUnits] = useState<DeviceUnit[]>([]);
   const [stockLedger, setStockLedger] = useState<StockLedgerRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
+    setLoading(true);
+    setError(null);
     Promise.all([inventoryApi.getDevice(id), inventoryApi.stock(id), inventoryApi.units(id), inventoryApi.stockLedger(id)])
       .then(([d, ex, un, k]) => {
         setDevice(d);
@@ -49,8 +52,20 @@ export default function DeviceDetailPage() {
         setUnits(un);
         setStockLedger(k.rows);
       })
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : t("common:errors.load")))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, t]);
+
+  // Sin dispositivo (no existe o falló la carga): el error, no un cargador infinito.
+  if (!loading && !device) {
+    return (
+      <ITPage title={t("devices.detail")} backAction={() => navigate("/inventory/devices")}>
+        <ITAlert variant="error" dismissible={false}>
+          {error ?? t("common:errors.load")}
+        </ITAlert>
+      </ITPage>
+    );
+  }
 
   if (loading || !device) {
     return (

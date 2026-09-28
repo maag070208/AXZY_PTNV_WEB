@@ -58,6 +58,32 @@ export const useTimeClock = () => {
   /** Serie del reloj ("" = todos). */
   const [clock, setClock] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
+  // Opciones del filtro Empleado: las personas del reloj (número + nombre del reloj),
+  // porque las checadas son del número del reloj, no de un usuario.
+  const [employeeOptions, setEmployeeOptions] = useState<Array<{ id: string; name: string }>>([]);
+  const [employeeOptionsState, setEmployeeOptionsState] = useState<"loading" | "ready" | "error">("loading");
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const rows: Array<{ id: string; name: string }> = [];
+      for (let page = 1; ; page++) {
+        const res = await timeClockApi.employees({ page, limit: 200, filters: {} });
+        rows.push(...res.data.map((e) => ({ id: e.employeeNumber, name: `${e.name} #${e.employeeNumber}` })));
+        if (rows.length >= res.total || res.data.length === 0) break;
+      }
+      if (active) {
+        setEmployeeOptions(rows.sort((a, b) => a.name.localeCompare(b.name)));
+        setEmployeeOptionsState("ready");
+      }
+    })().catch(() => active && setEmployeeOptionsState("error"));
+    return () => {
+      active = false;
+    };
+  }, [reloadKey]);
+  const employeeFilterOptions = useMemo(
+    () => ({ data: employeeOptions, loading: employeeOptionsState === "loading", error: employeeOptionsState === "error" }),
+    [employeeOptions, employeeOptionsState]
+  );
 
   const [status, setStatus] = useState<TimeClockStatus | null>(null);
   const [starting, setStarting] = useState(false);
@@ -303,6 +329,7 @@ export const useTimeClock = () => {
     applyRange,
     clearFilters,
     externalFilters,
+    employeeOptions: employeeFilterOptions,
     fetchTableData,
     reloadKey,
     status,

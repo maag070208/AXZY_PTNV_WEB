@@ -1,0 +1,86 @@
+{
+  "title": "Payroll",
+  "description": "Entries, exits, hours worked and overtime for the week by department for payroll",
+  "breadcrumb": "Payroll",
+  "filters": {
+    "week": "Week",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "thisWeek": "This week",
+    "department": "Department",
+    "allDepartments": "All departments",
+    "search": "Search employee",
+    "searchPlaceholder": "Name or number"
+  },
+  "range": "From {{from}} to {{to}}",
+  "timezone": "Time zone: {{tz}}",
+  "columns": {
+    "code": "Code",
+    "employee": "Employee",
+    "entry": "In",
+    "exit": "Out",
+    "workedTime": "W.T",
+    "hours": "Hrs",
+    "overtime": "OT",
+    "week": "Week",
+    "approved": "OT appr.",
+    "absences": "Absences"
+  },
+  "status": {
+    "WORKED": "Worked",
+    "OVERTIME": "Overtime",
+    "ABSENCE": "Absence",
+    "INCOMPLETE": "Incomplete punch",
+    "REST": "Day off",
+    "REST_WORKED": "Day off worked",
+    "NO_INFO": "No information",
+    "FUTURE": "Upcoming"
+  },
+  "approval": {
+    "APPROVED": "Approved",
+    "PENDING": "Not approved",
+    "REJECTED": "Rejected"
+  },
+  "kpis": {
+    "people": "People",
+    "worked": "Hours worked",
+    "overtime": "Calculated OT",
+    "approved": "Approved OT",
+    "notApproved": "Not approved OT",
+    "absences": "Absences",
+    "incomplete": "Incomplete punches"
+  },
+  "legend": "Legend",
+  "withoutSchedule": "No schedule: calculated against 8 h",
+  "unlinked": "Not linked to the time clock",
+  "unlinkedHint": "{{count}} person(s) not linked to the time clock: their days show no information. Link them in Access control → Time clock employees.",
+  "withoutScheduleHint": "{{count}} person(s) without an assigned schedule: their overtime is calculated against an 8 h workday.",
+  "tooltip": {
+    "shift": "Schedule: {{shift}}",
+    "noShift": "No schedule that day",
+    "scheduled": "Scheduled: {{hours}}",
+    "worked": "Worked: {{hours}}",
+    "missing": "Missing: {{hours}}",
+    "sessions": "Punches",
+    "incident": "Incident: {{incident}}",
+    "approvedMinutes": "Approved: {{hours}}"
+  },
+  "incidents": {
+    "ENTRY_WITHOUT_EXIT": "entry without exit",
+    "EXIT_WITHOUT_ENTRY": "exit without entry",
+    "OPEN_ENTRY": "on site"
+  },
+  "empty": "No staff for this week and filters",
+  "loadError": "Could not load the report",
+  "exportPdf": "PDF",
+  "exportExcel": "Excel",
+  "exporting": "Generating…",
+  "pdf": {
+    "title": "Puerto Nuevo · Weekly payroll",
+    "company": "Puerto Nuevo Baja Hotel y Villas",
+    "department": "Department",
+    "week": "Week",
+    "generatedAt": "Generated on {{date}}"
+  },
+  "sheetName": "Payroll"
+}

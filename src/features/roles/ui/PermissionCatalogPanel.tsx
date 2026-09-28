@@ -176,7 +176,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "key",
       label: t("catalog.columns.key"),
-      sortable: true,
+      sortable: false,
       width: 260,
       filter: true,
       render: (permission: PermissionCatalog) => (
@@ -189,7 +189,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "module",
       label: t("catalog.columns.module"),
-      sortable: true,
+      sortable: false,
       width: 200,
       filter: true,
       render: (permission: PermissionCatalog) => (
@@ -200,7 +200,7 @@ export default function PermissionCatalogPanel() {
       type: "string",
       key: "name",
       label: t("catalog.columns.name"),
-      sortable: true,
+      sortable: false,
       width: 240,
       filter: true,
       render: (permission: PermissionCatalog) => (
@@ -231,7 +231,7 @@ export default function PermissionCatalogPanel() {
       key: "sensitive",
       label: t("catalog.columns.sensitive"),
       width: 130,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: {
         data: [
@@ -253,7 +253,7 @@ export default function PermissionCatalogPanel() {
       key: "sortOrder",
       label: t("catalog.columns.sortOrder"),
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (permission: PermissionCatalog) => (
         <ITText className="text-[11px] text-slate-500">{permission.sortOrder}</ITText>
       ),
@@ -270,7 +270,7 @@ export default function PermissionCatalogPanel() {
           { id: "false", name: t("catalog.inactive") },
         ],
       },
-      sortable: true,
+      sortable: false,
       render: (permission: PermissionCatalog) =>
         permission.active ? (
           <ITBadget color="success" size="sm">

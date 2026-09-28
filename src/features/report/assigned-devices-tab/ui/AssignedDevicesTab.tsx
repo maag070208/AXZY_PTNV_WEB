@@ -56,7 +56,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       type: "string",
       width: 110,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-800">
           {r.assetTag}
@@ -69,7 +69,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       type: "string",
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">

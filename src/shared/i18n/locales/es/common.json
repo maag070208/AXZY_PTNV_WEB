@@ -53,6 +53,8 @@
     "schedulesAdmin": "Calendario",
     "schedulesAssign": "Asignar horarios",
     "overtime": "Tiempo extra",
+    "weeklyAttendance": "Asistencia semanal",
+    "payroll": "Nómina",
     "tasks": "Tickets",
     "settings": "Configuración"
   },
@@ -64,6 +66,8 @@
     "timeClockPunches": "checadas",
     "approvedOvertime": "horas-extra-aprobadas",
     "approvedOvertimeReport": "reporte_horas_extra_aprobadas",
+    "weeklyAttendance": "asistencia_semanal",
+    "payroll": "nomina",
     "disciplinaryReport": "acta-administrativa",
     "credential": "credencial",
     "movementsReport": "reporte-movimientos",

@@ -95,7 +95,7 @@ export default function DocumentCatalogPage() {
       label: tt("catalog.name"),
       width: 300,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (type: DocumentType) => <ITText className="text-[11px] font-bold text-slate-800">{type.name}</ITText>,
     },
     {
@@ -110,7 +110,7 @@ export default function DocumentCatalogPage() {
           { id: "false", name: tt("catalog.inactive") },
         ],
       },
-      sortable: true,
+      sortable: false,
       render: (type: DocumentType) =>
         type.active ? (
           <ITBadget color="success" size="lg">{tt("catalog.active")}</ITBadget>

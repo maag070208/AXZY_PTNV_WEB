@@ -34,7 +34,7 @@ import {
   FaUndo,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { useCan } from "@entities/user";
+import { useCan, usePeopleOptions, type UserRole } from "@entities/user";
 import { formatDateTime } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { LocationMap } from "@shared/ui/location-map";
@@ -64,6 +64,8 @@ const toDateInput = (date: Date): string => {
 
 const formatCoords = (lat: number | null, lng: number | null): string =>
   lat != null && lng != null ? `${lat.toFixed(6)}, ${lng.toFixed(6)}` : "";
+
+const GUARD_ROLES: UserRole[] = ["GUARD"];
 
 export default function AccessPage() {
   const { t: tt } = useTranslation(["access", "common"]);
@@ -108,6 +110,9 @@ export default function AccessPage() {
   }, []);
 
   const reload = () => setReloadKey((k) => k + 1);
+  // Opciones de los filtros Empleado y Guardia (incluye a quien ya se dio de baja).
+  const peopleOptions = usePeopleOptions();
+  const guardOptions = usePeopleOptions(GUARD_ROLES);
 
   const externalFilters = useMemo(() => {
     const filters: Record<string, string | number | boolean> = {};
@@ -282,12 +287,13 @@ export default function AccessPage() {
 
   const columns: Column<AccessEvent>[] = [
     {
-      // El rango de fechas es el de la barra de filtros (lo comparten KPIs y CSV).
       key: "occurredAt",
       label: tt("columns.occurredAt"),
       type: "date",
-      width: 160,
-      sortable: true,
+      width: 190,
+      filter: "date-range",
+      dateFilterOptions: { maxDate: new Date() },
+      sortable: false,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
           {formatDateTime(e.occurredAt)}
@@ -295,12 +301,13 @@ export default function AccessPage() {
       ),
     },
     {
-      key: "employeeNameSnapshot",
+      key: "employeeId",
       label: tt("columns.employee"),
-      type: "string",
+      type: "catalog",
       width: 240,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: peopleOptions,
+      sortable: false,
       render: (e) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">
@@ -317,7 +324,7 @@ export default function AccessPage() {
       label: tt("columns.type"),
       type: "catalog",
       width: 130,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: { data: typeOptions, loading: false, error: false },
       render: (e) => (
@@ -332,7 +339,7 @@ export default function AccessPage() {
       type: "catalog",
       width: 200,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: sites.map((s) => ({ id: s.id, name: s.name })),
         loading: false,
@@ -345,12 +352,13 @@ export default function AccessPage() {
       ),
     },
     {
-      key: "guard.name",
+      key: "guardId",
       label: tt("columns.guard"),
-      type: "string",
+      type: "catalog",
       width: 200,
-      filter: true,
-      sortable: true,
+      filter: "search",
+      catalogOptions: guardOptions,
+      sortable: false,
       render: (e) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {e.guard?.name ?? "—"}

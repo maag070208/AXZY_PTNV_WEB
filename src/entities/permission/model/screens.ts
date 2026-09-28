@@ -49,6 +49,7 @@ export type NavLabelKey =
   | "nav.catalogs"
   | "nav.users"
   | "nav.clocks"
+  | "nav.payroll"
   | "nav.roles";
 
 export interface AppScreen {
@@ -123,6 +124,7 @@ export const APP_SCREENS: readonly AppScreen[] = [
     children: [
       { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports"], requirement: { anyOf: ["hr.records"] } },
       { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] } },
+      { id: "payroll", labelKey: "nav.payroll", path: "/schedules/payroll", requirement: { anyOf: ["payroll.view"] } },
     ],
   },
   {

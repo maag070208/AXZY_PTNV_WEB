@@ -53,6 +53,8 @@
     "schedulesAdmin": "Calendar",
     "schedulesAssign": "Assign schedules",
     "overtime": "Overtime",
+    "weeklyAttendance": "Weekly attendance",
+    "payroll": "Payroll",
     "tasks": "Tickets",
     "settings": "Settings"
   },
@@ -64,6 +66,8 @@
     "timeClockPunches": "punches",
     "approvedOvertime": "approved-overtime",
     "approvedOvertimeReport": "approved_overtime_report",
+    "weeklyAttendance": "weekly_attendance",
+    "payroll": "payroll",
     "disciplinaryReport": "disciplinary-report",
     "credential": "badge",
     "movementsReport": "movements-report",
