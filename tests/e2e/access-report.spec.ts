@@ -25,7 +25,9 @@ import { field, goToRoute } from "./support/pages/components";
  */
 
 const RUN = newRunId();
-const TZ = "America/Mazatlan";
+// Mismo huso que resuelve la API por defecto: así el día de referencia del
+// navegador y el que calcula la API no se desfasan en el borde de la medianoche.
+const TZ = "America/Mexico_City";
 const USERNAME_WITH_EVENTS = "e2e_report_con";
 const USERNAME_WITH_EVENTS_2 = "e2e_report_con2";
 const USERNAME_WITHOUT_EVENTS = "e2e_report_sin";

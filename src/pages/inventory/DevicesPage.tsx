@@ -119,6 +119,7 @@ export default function DevicesPage() {
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}
+        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as Device).id}`)}
       />
     </ITPage>
   );

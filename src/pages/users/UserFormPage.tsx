@@ -1,8 +1,8 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useState } from "react";
 import {
   ITAlert,
   ITFlex,
-  ITLoader,
   ITPage,
   ITStepper,
 } from "@axzydev/axzy_ui_system";
@@ -59,7 +59,7 @@ export default function UserFormPage() {
         ]}
       >
         <ITFlex justify="center" align="center">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );

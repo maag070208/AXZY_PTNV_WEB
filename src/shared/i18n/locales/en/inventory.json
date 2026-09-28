@@ -316,7 +316,9 @@
     "brokenRetirementHint": "This(these) unit(s) will be written off automatically",
     "pendingTotal": "Total pending",
     "toReturn": "To return",
-    "colAssigned": "ASSIGNED TO"
+    "colAssigned": "ASSIGNED TO",
+    "unitsHint": "Check the units that come back and the condition of each one.",
+    "returnUnit": "Return {{assetTag}}"
   },
   "messages": {
     "movementRegistered": "Movement registered",
@@ -329,6 +331,46 @@
     "reviewNotes": "Check the highlighted notes"
   },
   "units": {
-    "loadError": "Error loading the units"
+    "loadError": "Error loading the units",
+    "title": "Units to deliver",
+    "hint": "Check the exact pieces being delivered: the letter prints their asset tag and serial number.",
+    "search": "Search by asset tag, serial or hostname",
+    "selected": "{{count}} of {{total}} selected",
+    "selectAll": "Select all",
+    "clear": "Clear selection",
+    "empty": "There are no available units of this device",
+    "noMatch": "No unit matches the search",
+    "serial": "Serial: {{value}}",
+    "noSerial": "No serial number",
+    "hostname": "Hostname: {{value}}",
+    "inThisLoan": "In this letter",
+    "selectAtLeastOne": "Select at least one unit"
+  },
+  "audit": {
+    "title": "Inventory audit",
+    "hint": "Checks that loans, units and ledger balance. It also runs daily and warns when something changes.",
+    "run": "Check now",
+    "ok": "Everything balances: loans, units and ledger are consistent.",
+    "checkedAt": "Checked: {{date}}",
+    "checks": {
+      "UNIT_IN_MULTIPLE_OPEN_LOANS": "Units in more than one open loan",
+      "LOAN_ITEM_PENDING_MISMATCH": "Loans whose pending quantity does not match their units",
+      "OPEN_LOAN_UNIT_NOT_ON_LOAN": "Units in an open loan that are not on loan",
+      "ON_LOAN_UNIT_WITHOUT_LOAN": "Units on loan without an open loan",
+      "CLOSED_LOAN_WITH_OPEN_UNITS": "Closed loans with unreturned units",
+      "LOAN_STATUS_MISMATCH": "Loans with a wrong status",
+      "MOVEMENT_UNITS_MISMATCH": "Movements whose quantity does not match their units",
+      "LEDGER_MISMATCH": "Devices whose ledger does not match what is available"
+    },
+    "fix": {
+      "UNIT_IN_MULTIPLE_OPEN_LOANS": "Check the letters of those units and return the extra one.",
+      "LOAN_ITEM_PENDING_MISMATCH": "Check the detail of those letters.",
+      "OPEN_LOAN_UNIT_NOT_ON_LOAN": "The unit changed status without being returned: register its return or check its history.",
+      "ON_LOAN_UNIT_WITHOUT_LOAN": "The unit shows as on loan without a letter: check its history.",
+      "CLOSED_LOAN_WITH_OPEN_UNITS": "Check those closed letters.",
+      "LOAN_STATUS_MISMATCH": "The letter status does not match its returns.",
+      "MOVEMENT_UNITS_MISMATCH": "Check those movements.",
+      "LEDGER_MISMATCH": "Count the pieces physically and register the matching adjustment in or out."
+    }
   }
 }

@@ -117,9 +117,9 @@ test.describe("MANTENIMIENTO desde la web", () => {
     await movementPage.register();
     await waitForToast(page, "Movimiento registrado");
 
-    await api.waitForStock(device.id, { AVAILABLE: 2, RETIREMENT: 1, IN_MAINTENANCE: 0 });
+    await api.waitForStock(device.id, { AVAILABLE: 2, RETIRED: 1, IN_MAINTENANCE: 0 });
     const retirements = await api.movements({ deviceId: device.id, type: "RETIREMENT" });
-    expect(retirements[0].reason).toBe("Baja automática por estado ROTO");
+    expect(retirements[0].reason).toBe("Baja automática por equipo roto");
   });
 
   test("sólo ofrece los movimientos que caben según el estado de la unidad", async ({

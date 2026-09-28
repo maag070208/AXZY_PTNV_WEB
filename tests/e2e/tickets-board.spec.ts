@@ -170,8 +170,8 @@ test.describe("Tickets — tareas por rol (EMPLEADO)", () => {
     await page.getByRole("button", { name: "Abrir", exact: true }).click();
 
     const select = ticketsPage.selectTaskStatus(assignment.id);
-    await expect(select.locator('option[value="COMPLETADA"]')).toHaveCount(0);
-    await expect(select.locator('option[value="EN_REVISION"]')).toHaveCount(1);
+    await expect(select.locator('option[value="COMPLETED"]')).toHaveCount(0);
+    await expect(select.locator('option[value="IN_REVIEW"]')).toHaveCount(1);
 
     // La API también rechaza: completar exige ADMIN/GERENTE y no hay retroceso.
     const ctx = await createContextApiAs(E2E.employee.username);
@@ -220,6 +220,31 @@ test.describe("Tickets — tareas por rol (EMPLEADO)", () => {
   });
 });
 
+/**
+ * La tabla de tareas está virtualizada: solo monta las filas visibles. Para
+ * encontrar una tarea hay que recorrer el scroller interno de la tabla.
+ */
+const findRowByText = async (page: import("@playwright/test").Page, text: string) => {
+  const scroller = page.locator("table").first().locator("xpath=..");
+  const row = page.locator("tr", { hasText: text }).first();
+  // La tabla monta las filas cuando llega la data; se espera antes de recorrer.
+  await expect.poll(() => page.locator("table tbody tr").count()).toBeGreaterThan(0);
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const max = await scroller.evaluate((el) => el.scrollHeight);
+    const view = await scroller.evaluate((el) => el.clientHeight);
+    const step = Math.max(80, view - 40);
+    for (let top = 0; top <= max + step; top += step) {
+      await scroller.evaluate((el, t) => {
+        el.scrollTop = t;
+      }, top);
+      await page.waitForTimeout(60);
+      if (await row.isVisible().catch(() => false)) return row;
+    }
+    await page.waitForTimeout(300);
+  }
+  return row;
+};
+
 test.describe("Tickets — administración de tareas", () => {
   test("ADMIN ve todas las tareas con la columna Empleado", async ({
     page,
@@ -229,19 +254,46 @@ test.describe("Tickets — administración de tareas", () => {
     const taskTitle = `Tarea ${ticketScenario.title}`;
     await ticketScenario.assignA(E2E.admin.username, taskTitle);
 
+    const kanbanLoaded = page.waitForResponse(
+      (r) => r.url().includes("/tickets/kanban") && r.status() === 200
+    );
     await ticketsPage.goTasks();
+    await kanbanLoaded;
     await expect(page.getByText("Empleado", { exact: true }).first()).toBeVisible();
-
-    // La tabla de tareas no filtra por servidor: se amplía la página para que
-    // la tarea recién creada entre en el primer lote.
-    await page.locator('select[name="itemsPerPage"]').selectOption("50");
-    await expect(page.getByText(taskTitle).first()).toBeVisible();
+    // La tabla pagina en el servidor y está virtualizada: se recorre para
+    // confirmar que la tarea recién creada está en el listado.
+    await expect(await findRowByText(page, taskTitle)).toBeVisible();
   });
+});
 
-  test.skip("GERENTE gestiona las tareas de su área en /tickets/tareas (requiere e2e_gerente)", () => {
-    // D2: la Fase 1 no provisiona `e2e_gerente`. ADMIN cubre los caminos
-    // privilegiados y EMPLEADO las restricciones; este caso se retoma cuando
-    // exista la cuenta (ver README).
+test.describe("Tickets — administración de tareas (MANAGER)", () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test("un MANAGER accede a la administración de tareas", async ({
+    page,
+    login,
+    ticketsPage,
+    ticketScenario,
+  }) => {
+    await ticketScenario.assignA(E2E.admin.username, `Tarea ${ticketScenario.title}`);
+
+    // `tasks.complete` (AREA para MANAGER) habilita la pantalla; el EMPLEADO
+    // —que no lo tiene— es redirigido (spec de arriba).
+    await login.enterAs(E2E.manager.username);
+    // El login trae al usuario SIN permisos; `meThunk` los carga enseguida. Se
+    // espera a que estén para que el guard no redirija en falso.
+    await page.waitForFunction(
+      (key) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return false;
+        const state = JSON.parse(raw) as { user?: { permissions?: Record<string, string> } };
+        return Object.keys(state.user?.permissions ?? {}).length > 0;
+      },
+      E2E.storageKey
+    );
+    await ticketsPage.goTasks();
+    await expect(page).toHaveURL(/#\/tickets\/tasks/);
+    await expect(page.getByText("Empleado", { exact: true }).first()).toBeVisible();
   });
 });
 

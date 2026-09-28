@@ -32,6 +32,16 @@ export default function LoansPage() {
     // Precarga (para el conteo en cabecera, si hiciera falta).
   }, []);
 
+  // La lista no trae las unidades físicas (activo fijo, número de serie): la
+  // carta se genera con el préstamo completo, igual que desde su detalle.
+  const downloadLetter = async (id: string) => {
+    try {
+      await downloadCustodyLetterPdf(await inventoryApi.getLoan(id));
+    } catch {
+      window.alert(t("common:errors.report"));
+    }
+  };
+
   const columns: any[] = [
     {
       type: "string",
@@ -113,7 +123,7 @@ export default function LoansPage() {
           <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/loans/${p.id}`)}>
             <ITText className="font-bold text-[10px]">{t("common:actions.view")}</ITText>
           </ITButton>
-          <ITButton variant="outlined" color="secondary" size="lg" onClick={() => downloadCustodyLetterPdf(p)} title={t("loans.custodyLetterPdf")}>
+          <ITButton variant="outlined" color="secondary" size="lg" onClick={() => void downloadLetter(p.id)} title={t("loans.custodyLetterPdf")}>
             <FaFilePdf className="text-red-600" size={13} />
           </ITButton>
         </ITFlex>
@@ -146,6 +156,7 @@ export default function LoansPage() {
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}
+        onRowClick={(row) => navigate(`/inventory/loans/${(row as unknown as Loan).id}`)}
       />
     </ITPage>
   );

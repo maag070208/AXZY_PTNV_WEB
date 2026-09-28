@@ -10,7 +10,7 @@ import { formatDate } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
 import type { Loan } from "@entities/inventory";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
-import { resolveAreaName } from "../model/custodyLetter";
+import { letterUnitDetails, resolveAreaName } from "../model/custodyLetter";
 
 interface Props {
   loan: Loan;
@@ -106,6 +106,21 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
   },
   resourceList: { marginTop: 0 },
+  unitsTitle: { fontFamily: "Helvetica-Bold", fontSize: 8, marginTop: 4, marginBottom: 1 },
+  unitsTable: { borderTopWidth: 0.6, borderLeftWidth: 0.6, borderColor: "#000", borderStyle: "solid" },
+  unitsRow: { flexDirection: "row" },
+  unitsHead: { backgroundColor: "#f1f5f9" },
+  unitsCell: {
+    borderRightWidth: 0.6,
+    borderBottomWidth: 0.6,
+    borderColor: "#000",
+    borderStyle: "solid",
+    paddingHorizontal: 2,
+    paddingVertical: 1,
+    fontSize: 7.5,
+  },
+  unitsNo: { width: 24 },
+  unitsCol: { flex: 1 },
   resourceRow: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -206,15 +221,17 @@ export default function CustodyLetterPdf({ loan }: Props) {
   const totalPieces = loan.items.reduce((sum, d) => sum + d.quantity, 0);
   const pieces = `${totalPieces} ${tt(totalPieces === 1 ? "doc.piece" : "doc.pieces")}`;
   const descriptionWithQuantity =
-    (firstItem?.device?.name || tt("doc.sampleDevice")) + ` (${pieces})`;
+    (firstItem?.device?.name || tt("doc.pendingAssignment")) + ` (${pieces})`;
 
   // El documento oficial se llama "SIS-001" — nuestro folio (consecutivo)
   // NO debe aparecer en el PDF.
   const officialDocument = "SIS-001";
 
-  const assetTag = firstItem?.units?.[0]?.deviceUnit?.assetTag ?? "TBE-0001";
-  const serialNumber = firstItem?.units?.[0]?.deviceUnit?.serialNumber;
-  const hostname = firstItem?.units?.[0]?.deviceUnit?.hostname;
+  const units = letterUnitDetails(loan);
+  const assetTag = units.assetTags || "—";
+  const serialNumber = units.serialNumbers;
+  const hostname = units.hostnames;
+  const multiUnit = units.units.length > 1;
 
   return (
     <Document
@@ -282,19 +299,19 @@ export default function CustodyLetterPdf({ loan }: Props) {
             </View>
             <View style={styles.resourceRow}>
               <Text style={styles.recLabel}>{tt("doc.brand")}</Text>
-              <Text style={styles.recVal}>{firstItem?.device?.brand || "STEREN"}</Text>
+              <Text style={styles.recVal}>{firstItem?.device?.brand || "—"}</Text>
             </View>
             <View style={styles.resourceRow}>
               <Text style={styles.recLabel}>{tt("doc.model")}</Text>
-              <Text style={styles.recVal}>{firstItem?.device?.model || "RM-115"}</Text>
+              <Text style={styles.recVal}>{firstItem?.device?.model || "—"}</Text>
             </View>
-            {serialNumber && (
+            {!multiUnit && serialNumber && (
               <View style={styles.resourceRow}>
                 <Text style={styles.recLabel}>{tt("doc.serialNumber")}</Text>
                 <Text style={styles.recVal}>{serialNumber}</Text>
               </View>
             )}
-            {hostname && (
+            {!multiUnit && hostname && (
               <View style={styles.resourceRow}>
                 <Text style={styles.recLabel}>{tt("doc.hostname")}</Text>
                 <Text style={styles.recVal}>{hostname}</Text>
@@ -302,13 +319,38 @@ export default function CustodyLetterPdf({ loan }: Props) {
             )}
             <View style={styles.resourceRow}>
               <Text style={styles.recLabel}>{tt("doc.assetTag")}</Text>
-              <Text style={styles.recVal}>{assetTag}</Text>
+              <Text style={styles.recVal}>{multiUnit ? tt("doc.unitsSeeList") : assetTag}</Text>
             </View>
             <View style={styles.resourceRow}>
               <Text style={styles.recLabel}>{tt("doc.area")}</Text>
               <Text style={styles.recVal}>{areaName}</Text>
             </View>
           </View>
+
+          {/* Con varias piezas: activo fijo y serie de cada una. */}
+          {multiUnit && (
+            <View wrap={false}>
+              <Text style={styles.unitsTitle}>{tt("doc.unitsTitle")}</Text>
+              <View style={styles.unitsTable}>
+                <View style={[styles.unitsRow, styles.unitsHead]}>
+                  <Text style={[styles.unitsCell, styles.unitsNo, styles.bold]}>{tt("doc.unitsNo")}</Text>
+                  <Text style={[styles.unitsCell, styles.unitsCol, styles.bold]}>{tt("doc.unitsAssetTag")}</Text>
+                  <Text style={[styles.unitsCell, styles.unitsCol, styles.bold]}>{tt("doc.unitsSerial")}</Text>
+                  {units.anyHostname && (
+                    <Text style={[styles.unitsCell, styles.unitsCol, styles.bold]}>{tt("doc.unitsHostname")}</Text>
+                  )}
+                </View>
+                {units.units.map((u, i) => (
+                  <View key={u.id} style={styles.unitsRow}>
+                    <Text style={[styles.unitsCell, styles.unitsNo]}>{i + 1}</Text>
+                    <Text style={[styles.unitsCell, styles.unitsCol, styles.bold]}>{u.assetTag}</Text>
+                    <Text style={[styles.unitsCell, styles.unitsCol, styles.bold]}>{u.serialNumber || "—"}</Text>
+                    {units.anyHostname && <Text style={[styles.unitsCell, styles.unitsCol]}>{u.hostname || "—"}</Text>}
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           <Text style={{ ...styles.paragraph, marginTop: 6 }}>
             {tt("doc.para2a")}{" "}

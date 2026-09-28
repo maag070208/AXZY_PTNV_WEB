@@ -1,3 +1,4 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
@@ -6,7 +7,6 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITLoader,
   ITSearchSelect,
   ITSegmentedControl,
   ITText,
@@ -131,7 +131,7 @@ export default function AssignSchedules() {
   if (loading) {
     return (
       <ITFlex justify="center" className="py-10">
-        <ITLoader variant="spinner" size="lg" color="primary" />
+        <LottieLoader size="lg" />
       </ITFlex>
     );
   }

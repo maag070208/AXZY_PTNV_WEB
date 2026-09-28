@@ -1,3 +1,4 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   ITAlert,
@@ -8,7 +9,6 @@ import {
   ITDialog,
   ITFlex,
   ITInput,
-  ITLoader,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
@@ -158,7 +158,7 @@ export default function RoleAccessPanel({ admin }: RoleAccessPanelProps) {
   if (loading) {
     return (
       <ITFlex align="center" justify="center" className="py-16">
-        <ITLoader />
+        <LottieLoader />
       </ITFlex>
     );
   }

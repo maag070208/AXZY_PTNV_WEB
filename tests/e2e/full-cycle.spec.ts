@@ -19,7 +19,7 @@ const verify = async (
 ): Promise<Stock> => {
   const ex = await api.waitForStock(deviceId, expected);
   expect(ex.active).toBe(ex.AVAILABLE + ex.ON_LOAN + ex.DAMAGED + ex.IN_MAINTENANCE);
-  expect(ex.historical).toBe(ex.active + ex.RETIREMENT);
+  expect(ex.historical).toBe(ex.active + ex.RETIRED);
   return ex;
 };
 
@@ -55,7 +55,7 @@ test.describe("Ciclo completo desde la web", () => {
       await loanPage.go();
       await loanPage.assignToDepartment(department.name);
       await loanPage.selectResource(scenario.type.name, name);
-      await loanPage.setQuantity(5);
+      await loanPage.selectUnits(5);
       await loanPage.save();
       await waitForToast(page, "Carta responsiva registrada");
 
@@ -100,7 +100,7 @@ test.describe("Ciclo completo desde la web", () => {
       await verify(api, deviceId, {
         AVAILABLE: 7,
         ON_LOAN: 0,
-        RETIREMENT: 1,
+        RETIRED: 1,
         active: 7,
         historical: 8,
       });
@@ -151,7 +151,7 @@ test.describe("Ciclo completo desde la web", () => {
         ON_LOAN: 0,
         DAMAGED: 1,
         IN_MAINTENANCE: 0,
-        RETIREMENT: 2,
+        RETIRED: 2,
         active: 6,
         historical: 8,
       });

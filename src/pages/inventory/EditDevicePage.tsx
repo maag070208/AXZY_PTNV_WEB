@@ -1,6 +1,7 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaChevronDown, FaChevronRight, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceUnitStatus, type DeviceUnit } from "@entities/inventory";
@@ -122,9 +123,9 @@ export default function EditDevicePage() {
 
   if (loading || !device) {
     return (
-      <ITPage title={t("devices.edit")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("devices.edit")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );

@@ -65,7 +65,7 @@ export class TicketsPage {
   }
 
   async filterTitle(q: string): Promise<void> {
-    await this.page.locator('input[name="filter-titulo"]').fill(q);
+    await this.page.locator('input[name="filter-title"]').fill(q);
   }
 
   async filterStatus(value: string): Promise<void> {
@@ -188,7 +188,7 @@ export class TicketsPage {
 
   async createCategory(name: string): Promise<void> {
     await this.page.getByRole("button", { name: "Nuevo", exact: true }).click();
-    await this.page.locator('input[name="nombre"]').fill(name);
+    await this.page.locator('input[name="name"]').fill(name);
     await this.page.getByRole("button", { name: "Guardar", exact: true }).click();
   }
 

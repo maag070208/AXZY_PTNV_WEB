@@ -1,4 +1,5 @@
-import { ITButton, ITDialog, ITFlex, ITLoader, ITText } from "@axzydev/axzy_ui_system";
+import { LottieLoader } from "@shared/ui/lottie-loader";
+import { ITButton, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaBookmark, FaCalendarAlt, FaComments, FaExternalLinkAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
@@ -56,7 +57,7 @@ export default function TicketDetailModal({
     >
       {loading || !ticket ? (
         <ITFlex justify="center" align="center" className="py-10">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       ) : (
         <div style={{ minWidth: "100%" }}>

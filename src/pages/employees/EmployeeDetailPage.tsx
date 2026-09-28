@@ -1,10 +1,10 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useState } from "react";
 import {
   ITAlert,
   ITButton,
   ITFlex,
   ITGrid,
-  ITLoader,
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
@@ -46,7 +46,7 @@ export default function EmployeeDetailPage() {
           </ITAlert>
         ) : (
           <ITFlex justify="center">
-            <ITLoader variant="spinner" size="lg" color="primary" />
+            <LottieLoader size="lg" />
           </ITFlex>
         )}
       </ITPage>

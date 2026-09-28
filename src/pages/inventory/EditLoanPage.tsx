@@ -1,6 +1,7 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITSearchSelect, ITSegmentedControl, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITSegmentedControl, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaFileSignature, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type Loan, type DeviceType } from "@entities/inventory";
@@ -9,6 +10,7 @@ import { subareaApi, type Subarea } from "@entities/subarea";
 import { usersApi, type User } from "@entities/user";
 import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
+import { UnitPicker, useSelectableUnits } from "@features/inventory/unit-picker";
 
 export default function EditLoanPage() {
   const { id } = useParams<{ id: string }>();
@@ -31,8 +33,7 @@ export default function EditLoanPage() {
   const [subareaId, setSubareaId] = useState("");
   const [typeId, setTypeId] = useState("");
   const [deviceId, setDeviceId] = useState("");
-  const [quantity, setQuantity] = useState("1");
-  const [available, setAvailable] = useState<number | null>(null);
+  const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function EditLoanPage() {
         if (d) {
           setTypeId(d.device?.typeId ?? "");
           setDeviceId(d.deviceId);
-          setQuantity(String(d.quantity));
+          setSelectedUnitIds((d.units ?? []).filter((u) => !u.returned).map((u) => u.deviceUnit.id));
         }
       })
       .finally(() => setLoading(false));
@@ -78,33 +79,40 @@ export default function EditLoanPage() {
     [devices, typeId]
   );
 
-  // Unidades de este préstamo que siguen prestadas (se liberan al editar).
-  const unitsOnLoan = useMemo(() => {
-    const item = loan?.items?.[0];
-    return (item?.units ?? []).filter((u) => !u.returned).length;
-  }, [loan]);
+  // Unidades que la carta tiene prestadas: al cambiar el recurso se liberan,
+  // así que también se pueden volver a elegir.
+  const originalDeviceId = loan?.items?.[0]?.deviceId ?? "";
+  const currentUnitIds = useMemo(
+    () => (loan?.items?.[0]?.units ?? []).filter((u) => !u.returned).map((u) => u.deviceUnit.id),
+    [loan]
+  );
+  const { units, loading: unitsLoading, error: unitsError } = useSelectableUnits(
+    deviceId,
+    deviceId === originalDeviceId ? currentUnitIds : []
+  );
+  const selectedUnits = useMemo(
+    () => units.filter((u) => selectedUnitIds.includes(u.id)),
+    [units, selectedUnitIds]
+  );
 
   const selectDevice = (did: string) => {
     setDeviceId(did);
-    setAvailable(null);
-    setQuantity("1");
-    if (did) {
-      inventoryApi.stock(did).then((ex) => {
-        const bonus = did === loan?.items?.[0]?.deviceId ? unitsOnLoan : 0;
-        setAvailable(ex.AVAILABLE + bonus);
-      }).catch(() => setAvailable(0));
-    }
+    setSelectedUnitIds(did && did === originalDeviceId ? currentUnitIds : []);
   };
 
-  const quantityNum = Number(quantity) || 0;
-  const overStock = available !== null && quantityNum > available;
+  const quantityNum = selectedUnits.length;
+  const lockedResource = (loan?.items?.[0]?.returnedQuantity ?? 0) > 0;
+  // Solo se manda el recurso si cambió: así editar la asignación o las
+  // observaciones no reasigna unidades (y funciona aunque haya devoluciones).
+  const resourceChanged =
+    deviceId !== originalDeviceId ||
+    selectedUnitIds.length !== currentUnitIds.length ||
+    selectedUnitIds.some((u) => !currentUnitIds.includes(u));
 
   const isValid =
     (assignment === "EMPLOYEE" ? !!custodianId : !!departmentId) &&
     !!deviceId &&
-    quantityNum >= 1 &&
-    available !== null &&
-    !overStock;
+    (lockedResource || quantityNum >= 1);
 
   const draftLoan = useMemo<Loan>(
     () => ({
@@ -140,13 +148,15 @@ export default function EditLoanPage() {
               id: "item",
               deviceId,
               device: devices.find((d) => d.id === deviceId),
-              quantity: quantityNum || 1,
+              quantity: lockedResource ? (loan?.items?.[0]?.quantity ?? 1) : quantityNum || 1,
               returnedQuantity: 0,
+              // Con devoluciones el recurso no cambia: la carta muestra todo lo entregado.
+              units: lockedResource ? loan?.items?.[0]?.units : selectedUnits.map((u) => ({ id: u.id, deviceUnit: u })),
             },
           ]
         : [],
     }),
-    [assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, notes, loan]
+    [assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, selectedUnits, lockedResource, notes, loan]
   );
   const draftPreview = useDebouncedValue(draftLoan, 500);
 
@@ -159,8 +169,7 @@ export default function EditLoanPage() {
         departmentId: assignment === "DEPARTMENT" ? departmentId : undefined,
         subareaId: assignment === "DEPARTMENT" ? subareaId || undefined : undefined,
         notes: notes || undefined,
-        deviceId,
-        quantity: quantityNum,
+        ...(resourceChanged && !lockedResource ? { deviceId, unitIds: selectedUnitIds } : {}),
       });
       setToast({ message: t("loans.savedEdit"), type: "success" });
       setTimeout(() => navigate(`/inventory/loans/${id}`), 1000);
@@ -173,15 +182,13 @@ export default function EditLoanPage() {
 
   if (loading || !loan) {
     return (
-      <ITPage title={t("loans.edit")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("loans.edit")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );
   }
-
-  const lockedResource = (loan.items[0]?.returnedQuantity ?? 0) > 0;
 
   return (
     <ITPage
@@ -264,9 +271,9 @@ export default function EditLoanPage() {
                   value={typeId}
                   onChange={(v) => {
                     setTypeId(String(v));
-                    setDeviceId("");
-                    setAvailable(null);
+                    selectDevice("");
                   }}
+                  disabled={lockedResource}
                 />
               </ITGrid>
               <ITGrid item xs={12}>
@@ -276,31 +283,22 @@ export default function EditLoanPage() {
                   options={devicesType.map((d) => ({ value: d.id, label: `${d.name} (${d.brand} ${d.model})` }))}
                   value={deviceId}
                   onChange={(v) => selectDevice(String(v))}
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={5}>
-                <ITInput
-                  name="quantity"
-                  label={t("loans.quantityLabel")}
-                  type="number"
-                  min={1}
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
                   disabled={lockedResource}
-                  required
                 />
               </ITGrid>
-              <ITGrid item xs={12} md={7}>
-                <ITFlex align="center" gap={2} className="h-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-                  <ITText className="text-xs text-slate-500">
-                    {t("loans.available")}{" "}
-                    <strong className="text-slate-700">{available ?? "—"}</strong>
-                  </ITText>
-                </ITFlex>
-              </ITGrid>
+              {deviceId && !lockedResource && (
+                <ITGrid item xs={12}>
+                  <UnitPicker
+                    units={units}
+                    selected={selectedUnitIds}
+                    onChange={setSelectedUnitIds}
+                    loading={unitsLoading}
+                    error={unitsError}
+                    currentIds={deviceId === originalDeviceId ? currentUnitIds : []}
+                  />
+                </ITGrid>
+              )}
             </ITGrid>
-
-            {overStock && <ITAlert variant="error">{t("validation.overStock")}</ITAlert>}
 
             <ITInput name="notes" label={t("loans.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </ITFlex>

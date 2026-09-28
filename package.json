@@ -35,6 +35,7 @@
     "axios": "^1.7.9",
     "file-saver": "^2.0.5",
     "i18next": "^26.4.2",
+    "lottie-react": "^3.1.2",
     "qrcode": "^1.5.4",
     "react": "19.0.0",
     "react-dom": "19.0.0",

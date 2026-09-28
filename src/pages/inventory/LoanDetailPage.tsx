@@ -1,6 +1,7 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITBadget, ITButton, ITFlex, ITGrid, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaCommentDots, FaEdit, FaFilePdf, FaFileSignature, FaUndoAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDate, formatDateTime } from "@shared/utils/dates";
@@ -36,9 +37,9 @@ export default function LoanDetailPage() {
 
   if (loading || !loan) {
     return (
-      <ITPage title={t("loans.detail")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("loans.detail")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );
@@ -197,6 +198,9 @@ export default function LoanDetailPage() {
                                 {dd.units.map((u) => (
                                   <span key={u.id} className="rounded-md bg-slate-200/70 px-2 py-0.5 text-[10px] font-bold text-slate-600">
                                     {u.deviceUnit.assetTag}
+                                    {u.deviceUnit.serialNumber && (
+                                      <span className="font-medium text-slate-500"> · {u.deviceUnit.serialNumber}</span>
+                                    )}
                                   </span>
                                 ))}
                               </ITFlex>

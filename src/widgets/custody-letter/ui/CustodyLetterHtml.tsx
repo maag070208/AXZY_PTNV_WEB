@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { Loan } from "@entities/inventory";
 import { formatDate } from "@shared/utils/dates";
 import { LOGO_PUERTO_NUEVO_BASE64 } from "@shared/assets/logoPuertoNuevo";
-import { resolveAreaName } from "../model/custodyLetter";
+import { letterUnitDetails, resolveAreaName } from "../model/custodyLetter";
 
 /**
  * Vista previa HTML de la carta responsiva (sin PDFViewer para evitar
@@ -26,11 +26,12 @@ export default function CustodyLetterHtml({ loan }: { loan: Loan }) {
     : 0;
   const pieces = `${totalPieces} ${tt(totalPieces === 1 ? "doc.piece" : "doc.pieces")}`;
   const descriptionWithQuantity =
-    (firstItem?.device?.name || tt("doc.sampleDevice")) + (totalPieces > 0 ? ` (${pieces})` : "");
+    (firstItem?.device?.name || tt("doc.pendingAssignment")) + (totalPieces > 0 ? ` (${pieces})` : "");
   const officialDocument = "SIS-001";
-  const assetTag = firstItem?.units?.[0]?.deviceUnit?.assetTag ?? "TBE-0001";
-  const serialNumber = firstItem?.units?.[0]?.deviceUnit?.serialNumber;
-  const hostname = firstItem?.units?.[0]?.deviceUnit?.hostname;
+  const units = letterUnitDetails(loan);
+  const assetTag = units.assetTags || "—";
+  const serialNumber = units.serialNumbers;
+  const hostname = units.hostnames;
 
   const commitments = [
     tt("doc.commitment1"),
@@ -42,12 +43,18 @@ export default function CustodyLetterHtml({ loan }: { loan: Loan }) {
 
   const resourceRows: Array<{ label: string; value: string; testId?: string }> = [
     { label: tt("doc.descriptionGeneral"), value: descriptionWithQuantity },
-    { label: tt("doc.brand"), value: firstItem?.device?.brand || "STEREN" },
-    { label: tt("doc.model"), value: firstItem?.device?.model || "RM-115" },
+    { label: tt("doc.brand"), value: firstItem?.device?.brand || "—" },
+    { label: tt("doc.model"), value: firstItem?.device?.model || "—" },
   ];
-  if (serialNumber) resourceRows.push({ label: tt("doc.serialNumber"), value: serialNumber });
-  if (hostname) resourceRows.push({ label: tt("doc.hostname"), value: hostname });
-  resourceRows.push({ label: tt("doc.assetTag"), value: assetTag });
+  // Con varias piezas, activo fijo / serie / equipo van en la relación de equipos.
+  const multiUnit = units.units.length > 1;
+  if (!multiUnit) {
+    if (serialNumber) resourceRows.push({ label: tt("doc.serialNumber"), value: serialNumber });
+    if (hostname) resourceRows.push({ label: tt("doc.hostname"), value: hostname });
+    resourceRows.push({ label: tt("doc.assetTag"), value: assetTag });
+  } else {
+    resourceRows.push({ label: tt("doc.assetTag"), value: tt("doc.unitsSeeList") });
+  }
   resourceRows.push({ label: tt("doc.area"), value: areaName, testId: "custody-letter-area" });
 
   return (
@@ -110,6 +117,32 @@ export default function CustodyLetterHtml({ loan }: { loan: Loan }) {
               </div>
             ))}
           </div>
+
+          {multiUnit && (
+            <div className="mt-1.5">
+              <p className="font-bold">{tt("doc.unitsTitle")}</p>
+              <table className="mt-0.5 w-full border-collapse text-[9px]">
+                <thead>
+                  <tr className="bg-slate-100">
+                    <th className="border border-black px-1 text-left">{tt("doc.unitsNo")}</th>
+                    <th className="border border-black px-1 text-left">{tt("doc.unitsAssetTag")}</th>
+                    <th className="border border-black px-1 text-left">{tt("doc.unitsSerial")}</th>
+                    {units.anyHostname && <th className="border border-black px-1 text-left">{tt("doc.unitsHostname")}</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {units.units.map((u, i) => (
+                    <tr key={u.id}>
+                      <td className="border border-black px-1">{i + 1}</td>
+                      <td className="border border-black px-1 font-bold">{u.assetTag}</td>
+                      <td className="border border-black px-1 font-bold">{u.serialNumber || "—"}</td>
+                      {units.anyHostname && <td className="border border-black px-1">{u.hostname || "—"}</td>}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <p className="mt-2 text-justify">
             {tt("doc.para2a")}{" "}

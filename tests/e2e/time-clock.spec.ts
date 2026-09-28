@@ -147,6 +147,10 @@ test.describe("Reloj checador — relojes", () => {
     await expect(page.getByText(CLOCK.url, { exact: true })).toBeVisible();
     await expect(page.getByText("Al día", { exact: true })).toBeVisible();
     await expect(page.getByText("Cuenta para entradas/salidas", { exact: true })).toBeVisible();
+
+    // El detalle (configuración leída en vivo) se abre al entrar a la tarjeta.
+    await page.getByText(CLOCK.name, { exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar", exact: true })).toBeVisible();
     // Configuración del reloj, tal como la reporta el equipo.
     await expect(page.getByText("Administracion", { exact: true })).toBeVisible();
     await expect(page.getByText("24/09/2026 13:01:00 (UTC-07:00)")).toBeVisible();
@@ -172,6 +176,8 @@ test.describe("Reloj checador — relojes", () => {
     });
     await goToRoute(page, "/time-clocks");
 
+    // Entrar al detalle del reloj: "Editar" vive ahí, no en la tarjeta.
+    await page.getByText(CLOCK.name, { exact: true }).click();
     await page.getByRole("button", { name: "Editar", exact: true }).click();
     await page.getByText("Cuenta para entradas/salidas", { exact: true }).last().click();
     await page.getByRole("button", { name: "Guardar", exact: true }).click();

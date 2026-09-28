@@ -193,6 +193,7 @@ export default function SchedulesTable() {
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}
+        onRowClick={(row) => navigate(`/schedules/${(row as unknown as Schedule).id}/edit`)}
       />
 
       <ITConfirmDialog

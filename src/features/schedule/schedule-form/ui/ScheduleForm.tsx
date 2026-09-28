@@ -1,3 +1,4 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,7 +10,6 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITLoader,
   ITText,
   ITTimePicker,
   ITToast,
@@ -152,7 +152,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
   if (loading) {
     return (
       <ITFlex justify="center" className="py-10">
-        <ITLoader variant="spinner" size="lg" color="primary" />
+        <LottieLoader size="lg" />
       </ITFlex>
     );
   }

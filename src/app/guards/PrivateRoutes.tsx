@@ -18,6 +18,7 @@ import { APP_SCREENS, isScreenVisible, type AppScreen } from "@entities/permissi
 import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
 import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
+import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
 
 /** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
 const NAV_ICONS: Record<string, ReactNode> = {
@@ -176,7 +177,7 @@ export default function PrivateRoutes() {
   const topBar = {
     logo: (
       <img
-        src="/logo-puerto-nuevo.png"
+        src={logoUrl}
         alt="Puerto Nuevo Hotel y Villas"
         className="h-12 w-auto object-contain"
       />

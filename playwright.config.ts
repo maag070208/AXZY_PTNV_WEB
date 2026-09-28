@@ -27,7 +27,10 @@ export default defineConfig({
     video: "retain-on-failure",
     // La app escribe montos y fechas en español; fijarlo evita diferencias de formato.
     locale: "es-MX",
-    timezoneId: "America/Mazatlan",
+    // Mismo huso que resuelve la API por defecto (`America/Mexico_City`): con el
+    // navegador en otro huso, la fecha local del día difería en el borde de la
+    // medianoche y los eventos recién sembrados quedaban fuera de "hoy".
+    timezoneId: "America/Mexico_City",
   },
 
   projects: [

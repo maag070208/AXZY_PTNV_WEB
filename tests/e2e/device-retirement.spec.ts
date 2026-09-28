@@ -31,13 +31,13 @@ test.describe("BAJA desde la web", () => {
     // La baja sale de la existencia activa pero permanece en la histórica.
     const stock = await api.waitForStock(device.id, {
       AVAILABLE: 4,
-      RETIREMENT: 1,
+      RETIRED: 1,
     });
     expect(stock.active).toBe(4);
     expect(stock.historical).toBe(5);
 
     const units = await api.units(device.id);
-    expect(units.find((u) => u.id === unit.id)?.status).toBe("RETIREMENT");
+    expect(units.find((u) => u.id === unit.id)?.status).toBe("RETIRED");
   });
 
   test("exige motivo para dar de baja", async ({ movementPage, scenario, api }) => {
@@ -103,7 +103,7 @@ test.describe("BAJA desde la web", () => {
     await movementPage.writeReason("Robo");
     await movementPage.register();
     await waitForToast(page, "Movimiento registrado");
-    await api.waitForStock(device.id, { RETIREMENT: 1, AVAILABLE: 1 });
+    await api.waitForStock(device.id, { RETIRED: 1, AVAILABLE: 1 });
 
     await movementPage.go();
     await movementPage.selectDevice(device.nameVisible);
@@ -140,8 +140,8 @@ test.describe("BAJA desde la web", () => {
     await movementPage.register();
     await waitForToast(page, "Movimiento registrado");
 
-    await api.waitForStock(one.id, { AVAILABLE: 2, RETIREMENT: 1 });
-    await api.waitForStock(other.id, { AVAILABLE: 2, RETIREMENT: 1 });
+    await api.waitForStock(one.id, { AVAILABLE: 2, RETIRED: 1 });
+    await api.waitForStock(other.id, { AVAILABLE: 2, RETIRED: 1 });
 
     // Los dos renglones viajaron en un solo movimiento de BAJA.
     const retirements = await api.movements({ deviceId: one.id, type: "RETIREMENT" });

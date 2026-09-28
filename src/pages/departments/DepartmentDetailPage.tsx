@@ -1,3 +1,4 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import {
   ITAlert,
   ITButton,
@@ -6,7 +7,6 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITLoader,
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
@@ -45,7 +45,7 @@ export default function DepartmentDetailPage() {
           </ITAlert>
         ) : (
           <ITFlex justify="center">
-            <ITLoader variant="spinner" size="lg" color="primary" />
+            <LottieLoader size="lg" />
           </ITFlex>
         )}
       </ITPage>

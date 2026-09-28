@@ -8,11 +8,13 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaExclamationTriangle, FaFilePdf, FaSync, FaUndo } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { DeviceReportRow } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
 
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
+  const navigate = useNavigate();
   const {
     t,
     error,
@@ -317,6 +319,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}
+        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as DeviceReportRow).deviceId}`)}
       />
     </ITFlex>
   );

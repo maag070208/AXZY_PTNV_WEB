@@ -9,9 +9,9 @@ import { LoginPage } from "./support/pages/LoginPage";
  * Tiempo extra (`/horarios/horas-extra/aprobacion`) — pantalla única.
  *
  * El escenario se siembra con checadas + vínculo (paquete `api/`): dos personas
- * con 120 min de tiempo extra PENDIENTE del día de hoy. ADMIN/GERENTE aprueban o
- * rechazan y exportan solo lo aprobado; RH entra en solo lectura (el servidor le
- * devuelve únicamente lo aprobado) y JEFE no accede a la ruta.
+ * con 120 min de tiempo extra PENDIENTE del día de hoy. ADMIN/MANAGER aprueban o
+ * rechazan y exportan solo lo aprobado; HUMAN_RESOURCES entra en solo lectura (el
+ * servidor le devuelve únicamente lo aprobado) y AREA_HEAD no accede a la ruta.
  */
 
 const RUN = newRunId();
@@ -28,11 +28,23 @@ const contextOf = async (browser: Browser, user: string) => {
   const context = await browser.newContext({
     baseURL: E2E.webUrl,
     locale: "es-MX",
-    timezoneId: "America/Mazatlan",
+    timezoneId: "America/Mexico_City",
     storageState: { cookies: [], origins: [] },
   });
   const page = await context.newPage();
   await new LoginPage(page).enterAs(user);
+  // El login devuelve el usuario SIN permisos; `meThunk` los carga enseguida y
+  // los persiste. Se espera a que existan antes de navegar para que el guard de
+  // la ruta no redirija a inicio con la sesión todavía sin permisos.
+  await page.waitForFunction(
+    (key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) return false;
+      const state = JSON.parse(raw) as { user?: { permissions?: Record<string, string> } };
+      return Object.keys(state.user?.permissions ?? {}).length > 0;
+    },
+    E2E.storageKey
+  );
   return { context, page };
 };
 
@@ -82,7 +94,7 @@ test.describe("Tiempo extra", () => {
     // RH: entra, ve lo aprobado y ningún control de decisión.
     const { context, page } = await contextOf(browser, rh.username);
     await goToRoute(page, "/schedules/overtime/approval");
-    await expect(page).toHaveURL(/aprobacion/);
+    await expect(page).toHaveURL(/approval/);
 
     await expect(button(page, /Aprobar/)).toHaveCount(0);
     await expect(button(page, /Rechazar/)).toHaveCount(0);
@@ -95,11 +107,11 @@ test.describe("Tiempo extra", () => {
     await expect(rowOf(page, personB.name)).toHaveCount(0);
     await context.close();
 
-    // JEFE: RoleGuard lo redirige a inicio.
+    // AREA_HEAD no tiene `overtime.view`: el guard lo redirige a inicio.
     const headCtx = await contextOf(browser, head.username);
     await headCtx.page.goto("/#/schedules/overtime/approval");
     await headCtx.page.reload();
-    await expect(headCtx.page).not.toHaveURL(/aprobacion/);
+    await expect(headCtx.page).not.toHaveURL(/approval/);
     await headCtx.context.close();
   });
 

@@ -1,12 +1,24 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITCheckbox, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaCheckCircle, FaFileSignature, FaInfoCircle, FaSave, FaTimesCircle, FaUndoAlt, FaUserTie } from "react-icons/fa";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import { inventoryApi, type Condition, type Loan } from "@entities/inventory";
 import { i18n } from "@shared/i18n";
+import { useRequestKey } from "@shared/lib/useRequestKey";
+
+/** Una pieza pendiente de devolver: se decide pieza por pieza. */
+interface UnitRow {
+  unitId: string;
+  assetTag: string;
+  serialNumber: string | null;
+  selected: boolean;
+  condition: Condition;
+  notes: string;
+}
 
 interface Row {
   key: string;
@@ -15,11 +27,10 @@ interface Row {
   loaned: number;
   returnedQuantity: number;
   pending: number;
-  quantity: string;
-  condition: Condition;
-  notes: string;
-  active: string[];
+  units: UnitRow[];
 }
+
+const needsNotes = (c: Condition) => c === "POOR" || c === "BROKEN";
 
 // Presets de condición (estilo "Urgencia" del ticket).
 const CONDITION_PRESETS: Record<string, { icon: ReactNode; ring: string; text: string; dot: string }> = {
@@ -35,6 +46,7 @@ export default function NewLoanReturnPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const requestKey = useRequestKey();
   const loanIdParam = searchParams.get("loanId");
   const [loans, setLoans] = useState<Loan[]>([]);
   const [loan, setLoan] = useState<Loan | null>(null);
@@ -51,59 +63,69 @@ export default function NewLoanReturnPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // La lista de préstamos no trae las unidades: se lee el préstamo completo.
   const select = (id: string) => {
-    const p = loans.find((x) => x.id === id);
-    setLoan(p ?? null);
-    if (p) {
-      setRows(
-        p.items
-          .filter((d) => d.quantity - d.returnedQuantity > 0)
-          .map((d) => ({
-            key: d.id,
-            loanItemId: d.id,
-            deviceName: d.device?.name ?? "",
-            loaned: d.quantity,
-            returnedQuantity: d.returnedQuantity,
-            pending: d.quantity - d.returnedQuantity,
-            quantity: String(d.quantity - d.returnedQuantity),
-            condition: "GOOD",
-            notes: "",
-            active: (d.units ?? [])
-              .filter((u) => !u.returned)
-              .map((u) => u.deviceUnit?.assetTag ?? "")
-              .filter(Boolean),
-          }))
-      );
-    }
+    setLoan(null);
+    setRows([]);
+    setErrors({});
+    if (!id) return;
+    inventoryApi
+      .getLoan(id)
+      .then((p) => {
+        setLoan(p);
+        setRows(
+          p.items
+            .filter((d) => d.quantity - d.returnedQuantity > 0)
+            .map((d) => ({
+              key: d.id,
+              loanItemId: d.id,
+              deviceName: d.device?.name ?? "",
+              loaned: d.quantity,
+              returnedQuantity: d.returnedQuantity,
+              pending: d.quantity - d.returnedQuantity,
+              units: (d.units ?? [])
+                .filter((u) => !u.returned)
+                .map((u) => ({
+                  unitId: u.deviceUnit.id,
+                  assetTag: u.deviceUnit.assetTag,
+                  serialNumber: u.deviceUnit.serialNumber ?? null,
+                  selected: true,
+                  condition: "GOOD" as Condition,
+                  notes: "",
+                }))
+                .sort((a, b) => a.assetTag.localeCompare(b.assetTag)),
+            }))
+        );
+      })
+      .catch((e: unknown) => setToast({ message: e instanceof Error ? e.message : String(e), type: "error" }));
   };
 
   useEffect(() => {
-    if (loanIdParam && loans.length > 0) select(loanIdParam);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loanIdParam, loans.length]);
+    if (loanIdParam) select(loanIdParam);
+  }, [loanIdParam]);
 
-  const updateRow = (key: string, patch: Partial<Row>) => setRows((r) => r.map((x) => (x.key === key ? { ...x, ...patch } : x)));
+  const updateUnit = (key: string, unitId: string, patch: Partial<UnitRow>) =>
+    setRows((rs) =>
+      rs.map((r) => (r.key === key ? { ...r, units: r.units.map((u) => (u.unitId === unitId ? { ...u, ...patch } : u)) } : r))
+    );
 
-  const totalToReturn = rows.reduce((sum, r) => sum + (Number(r.quantity) || 0), 0);
+  const selectedUnits = rows.flatMap((r) => r.units.filter((u) => u.selected).map((u) => ({ row: r, unit: u })));
+  const totalToReturn = selectedUnits.length;
   const pendingTotal = rows.reduce((sum, r) => sum + r.pending, 0);
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     // observación requerida si MALO/ROTO, mínimo 3 caracteres
-    rows.forEach((r, idx) => {
-      if ((r.condition === "POOR" || r.condition === "BROKEN") && r.notes.trim().length < 3) {
-        e[`notes-${idx}`] = i18n.t("inventory:validation.notesMin", { min: 3 });
+    for (const { unit } of selectedUnits) {
+      if (needsNotes(unit.condition) && unit.notes.trim().length < 3) {
+        e[`notes-${unit.unitId}`] = i18n.t("inventory:validation.notesMin", { min: 3 });
       }
-    });
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const isValid =
-    !!loan &&
-    rows.length > 0 &&
-    rows.every((r) => Number(r.quantity) >= 0 && Number(r.quantity) <= r.pending && !!r.condition) &&
-    totalToReturn > 0;
+  const isValid = !!loan && totalToReturn > 0;
 
   const handleSubmit = async () => {
     if (!validate()) {
@@ -112,17 +134,23 @@ export default function NewLoanReturnPage() {
     }
     setSaving(true);
     try {
-      await inventoryApi.createLoanReturn({
+      const payload = {
         loanId: loan!.id,
-        items: rows
-          .filter((r) => Number(r.quantity) > 0)
-          .map((r) => ({
-            loanItemId: r.loanItemId,
-            quantity: Number(r.quantity),
-            condition: r.condition,
-            notes: (r.condition === "POOR" || r.condition === "BROKEN") && r.notes.trim() ? r.notes : undefined,
-          })),
-      });
+        // Un renglón por (detalle, condición, nota) con sus unidades exactas.
+        items: Object.values(
+          selectedUnits.reduce<Record<string, { loanItemId: string; unitIds: string[]; condition: Condition; notes?: string }>>(
+            (acc, { row, unit }) => {
+              const notes = needsNotes(unit.condition) ? unit.notes.trim() : "";
+              const key = `${row.loanItemId}|${unit.condition}|${notes}`;
+              acc[key] ??= { loanItemId: row.loanItemId, unitIds: [], condition: unit.condition, notes: notes || undefined };
+              acc[key].unitIds.push(unit.unitId);
+              return acc;
+            },
+            {}
+          )
+        ),
+      };
+      await inventoryApi.createLoanReturn(payload, requestKey(payload));
       setToast({ message: t("loanReturn.saved"), type: "success" });
       setTimeout(() => navigate("/inventory/loans"), 1000);
     } catch (e: any) {
@@ -134,9 +162,9 @@ export default function NewLoanReturnPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("loanReturn.new")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("loanReturn.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );
@@ -191,78 +219,77 @@ export default function NewLoanReturnPage() {
                           </ITFlex>
                         </ITFlex>
 
-                        {r.active.length > 0 && (
-                          <ITFlex gap={1} wrap="wrap">
-                            {r.active.map((a) => (
-                              <span key={a} className="rounded-md bg-slate-200/70 px-2 py-0.5 text-[10px] font-bold text-slate-600">
-                                {a}
-                              </span>
-                            ))}
-                          </ITFlex>
-                        )}
+                        <ITText className="text-[11px] text-slate-500">{t("loanReturn.unitsHint")}</ITText>
 
-                        <ITGrid container columns={12} spacing={4}>
-                          <ITGrid item xs={12} md={3}>
-                            <ITInput
-                              name={`return-${r.key}`}
-                              label={t("loanReturn.returnLoan")}
-                              type="number"
-                              min={0}
-                              max={r.pending}
-                              value={r.quantity}
-                              onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
-                            />
-                          </ITGrid>
-                          <ITGrid item xs={12} md={9}>
-                            <ITFlex as="fieldset" direction="column" gap={2}>
-                              <ITText as="legend" className="text-sm font-semibold text-slate-700">
-                                {t("loanReturn.condition")}
-                              </ITText>
-                              <ITFlex gap={2} wrap="wrap">
-                                {CONDITIONS.map((c) => {
-                                  const p = CONDITION_PRESETS[c];
-                                  const isActive = r.condition === c;
-                                  return (
-                                    <button
-                                      key={c}
-                                      type="button"
-                                      onClick={() => updateRow(r.key, { condition: c })}
-                                      className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-all ${
-                                        isActive
-                                          ? `border-transparent bg-slate-50 ring-2 ${p.ring} ${p.text}`
-                                          : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
-                                      }`}
-                                    >
-                                      {p.icon}
-                                      <span>{t(`loanReturn.conditionLabels.${c}`)}</span>
-                                    </button>
-                                  );
-                                })}
+                        <ITFlex direction="column" gap={2}>
+                          {r.units.map((u) => (
+                            <ITFlex
+                              key={u.unitId}
+                              direction="column"
+                              gap={2}
+                              className={`rounded-lg border px-3 py-2 ${u.selected ? "border-slate-200 bg-white" : "border-dashed border-slate-200 bg-slate-50 opacity-70"}`}
+                            >
+                              <ITFlex align="center" gap={3} wrap="wrap">
+                                <ITCheckbox
+                                  name={`return-${u.unitId}`}
+                                  checked={u.selected}
+                                  onChange={(checked) => updateUnit(r.key, u.unitId, { selected: checked })}
+                                  label={<span className="sr-only">{t("loanReturn.returnUnit", { assetTag: u.assetTag })}</span>}
+                                />
+                                <ITFlex direction="column" className="min-w-0">
+                                  <ITText className="text-[12px] font-bold text-slate-800">{u.assetTag}</ITText>
+                                  <ITText className={`text-[11px] ${u.serialNumber ? "text-slate-600" : "italic text-slate-400"}`}>
+                                    {u.serialNumber ? t("units.serial", { value: u.serialNumber }) : t("units.noSerial")}
+                                  </ITText>
+                                </ITFlex>
+                                {u.selected && (
+                                  <ITFlex gap={1.5} wrap="wrap" className="ml-auto">
+                                    {CONDITIONS.map((c) => {
+                                      const p = CONDITION_PRESETS[c];
+                                      const isActive = u.condition === c;
+                                      return (
+                                        <button
+                                          key={c}
+                                          type="button"
+                                          onClick={() => updateUnit(r.key, u.unitId, { condition: c })}
+                                          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition-all ${
+                                            isActive
+                                              ? `border-transparent bg-slate-50 ring-2 ${p.ring} ${p.text}`
+                                              : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+                                          }`}
+                                        >
+                                          {p.icon}
+                                          <span>{t(`loanReturn.conditionLabels.${c}`)}</span>
+                                        </button>
+                                      );
+                                    })}
+                                  </ITFlex>
+                                )}
                               </ITFlex>
-                            </ITFlex>
-                          </ITGrid>
-                        </ITGrid>
 
-                        {r.condition === "BROKEN" && (
-                          <ITText className="text-[11px] font-semibold text-red-600">{t("loanReturn.brokenRetirementHint")}</ITText>
-                        )}
-                        {(r.condition === "POOR" || r.condition === "BROKEN") && (
-                          <div>
-                            <ITInput
-                              name={`notes-${r.key}`}
-                              label={t("new.comment")}
-                              placeholder={t("loanReturn.commentPlaceholder")}
-                              value={r.notes}
-                              onChange={(e) => updateRow(r.key, { notes: e.target.value })}
-                              aria-invalid={!!errors[`notes-${rows.indexOf(r)}`]}
-                            />
-                            {errors[`notes-${rows.indexOf(r)}`] && (
-                              <span role="alert" className="text-red-500 text-xs mt-1 block">
-                                {errors[`notes-${rows.indexOf(r)}`]}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                              {u.selected && u.condition === "BROKEN" && (
+                                <ITText className="text-[11px] font-semibold text-red-600">{t("loanReturn.brokenRetirementHint")}</ITText>
+                              )}
+                              {u.selected && needsNotes(u.condition) && (
+                                <div>
+                                  <ITInput
+                                    name={`notes-${u.unitId}`}
+                                    label={t("new.comment")}
+                                    placeholder={t("loanReturn.commentPlaceholder")}
+                                    value={u.notes}
+                                    onChange={(e) => updateUnit(r.key, u.unitId, { notes: e.target.value })}
+                                    aria-invalid={!!errors[`notes-${u.unitId}`]}
+                                  />
+                                  {errors[`notes-${u.unitId}`] && (
+                                    <span role="alert" className="text-red-500 text-xs mt-1 block">
+                                      {errors[`notes-${u.unitId}`]}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </ITFlex>
+                          ))}
+                        </ITFlex>
                       </ITFlex>
                     );
                   })}

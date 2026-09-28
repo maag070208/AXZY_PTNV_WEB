@@ -26,6 +26,7 @@ export const E2E = {
   admin: { username: "e2e_admin", name: "E2E Admin" },
   employee: { username: "e2e_empleado", name: "E2E Empleado" },
   guard: { username: "e2e_guard", name: "E2E Guard" },
+  manager: { username: "e2e_manager", name: "E2E Manager" },
   /** Sitio demo persistente del módulo de acceso (mismo que provisiona `api/`). */
   demoSite: { name: "E2E Portería Principal", code: "E2E-SITE" },
   /** Dónde el store de la app persiste la sesión. */

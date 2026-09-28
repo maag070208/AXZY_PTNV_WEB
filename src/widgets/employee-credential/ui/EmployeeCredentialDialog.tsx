@@ -1,4 +1,5 @@
-import { ITAlert, ITButton, ITDialog, ITFlex, ITLoader, ITText } from "@axzydev/axzy_ui_system";
+import { LottieLoader } from "@shared/ui/lottie-loader";
+import { ITAlert, ITButton, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaDownload } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PersonalProfile } from "@entities/hr";
@@ -32,7 +33,7 @@ export default function EmployeeCredentialDialog({ isOpen, onClose, profile }: P
       <div className="max-h-[75vh] overflow-y-auto">
         {loading ? (
           <ITFlex justify="center" className="py-12">
-            <ITLoader variant="spinner" size="lg" color="primary" />
+            <LottieLoader size="lg" />
           </ITFlex>
         ) : error ? (
           <ITAlert variant="error">{error}</ITAlert>

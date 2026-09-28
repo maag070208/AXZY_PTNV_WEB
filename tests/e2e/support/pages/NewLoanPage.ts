@@ -30,17 +30,26 @@ export class NewLoanPage {
     await selectInSearch(this.page, "Seleccionar dispositivo...", device);
   }
 
-  async setQuantity(quantity: number): Promise<void> {
-    await field(this.page, "Cantidad de piezas").fill(String(quantity));
+  /** Las piezas físicas que ofrece el selector (solo las disponibles). */
+  get unitOptions() {
+    return this.page.getByTestId("unit-option");
+  }
+
+  /** Contador "N de M seleccionada(s)" del selector de unidades. */
+  get unitsCounter() {
+    return this.page.getByText(/seleccionada\(s\)/);
+  }
+
+  /** Marca las primeras `count` unidades disponibles. */
+  async selectUnits(count: number): Promise<void> {
+    await expect(this.unitOptions.first()).toBeVisible();
+    for (let i = 0; i < count; i++) {
+      await this.unitOptions.nth(i).click();
+    }
   }
 
   async writeNotes(text: string): Promise<void> {
     await field(this.page, "Observaciones").fill(text);
-  }
-
-  /** El indicador "Disponible: N" que la pantalla consulta a la API. */
-  get available() {
-    return this.page.getByText(/Disponible:/).first();
   }
 
   /**
@@ -51,10 +60,6 @@ export class NewLoanPage {
    */
   get areaPreview() {
     return this.page.getByTestId("custody-letter-area");
-  }
-
-  get overstockAlert() {
-    return this.page.getByText("La cantidad no puede superar el disponible");
   }
 
   get saveButton() {

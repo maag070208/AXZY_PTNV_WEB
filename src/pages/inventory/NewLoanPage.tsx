@@ -1,6 +1,7 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITAlert, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITSearchSelect, ITSegmentedControl, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITSegmentedControl, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaFileSignature, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceType } from "@entities/inventory";
@@ -9,10 +10,13 @@ import { subareaApi, type Subarea } from "@entities/subarea";
 import { usersApi, type User } from "@entities/user";
 import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
+import { UnitPicker, useSelectableUnits } from "@features/inventory/unit-picker";
+import { useRequestKey } from "@shared/lib/useRequestKey";
 
 export default function NewLoanPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const requestKey = useRequestKey();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
@@ -29,8 +33,7 @@ export default function NewLoanPage() {
   const [subareaId, setSubareaId] = useState("");
   const [typeId, setTypeId] = useState("");
   const [deviceId, setDeviceId] = useState("");
-  const [quantity, setQuantity] = useState("1");
-  const [available, setAvailable] = useState<number | null>(null);
+  const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -56,24 +59,24 @@ export default function NewLoanPage() {
     [devices, typeId]
   );
 
+  // Piezas exactas que se entregan: la carta imprime su activo fijo y serie.
+  const { units, loading: unitsLoading, error: unitsError } = useSelectableUnits(deviceId);
+  const selectedUnits = useMemo(
+    () => units.filter((u) => selectedUnitIds.includes(u.id)),
+    [units, selectedUnitIds]
+  );
+
   const selectDevice = (id: string) => {
     setDeviceId(id);
-    setAvailable(null);
-    setQuantity("1");
-    if (id) {
-      inventoryApi.stock(id).then((ex) => setAvailable(ex.AVAILABLE)).catch(() => setAvailable(0));
-    }
+    setSelectedUnitIds([]);
   };
 
-  const quantityNum = Number(quantity) || 0;
-  const overStock = available !== null && quantityNum > available;
+  const quantityNum = selectedUnits.length;
 
   const isValid =
     (assignment === "EMPLOYEE" ? !!custodianId : !!departmentId) &&
     !!deviceId &&
-    quantityNum >= 1 &&
-    available !== null &&
-    !overStock;
+    quantityNum >= 1;
 
   const draftLoan = useMemo(
     () => ({
@@ -111,11 +114,12 @@ export default function NewLoanPage() {
               device: devices.find((d) => d.id === deviceId),
               quantity: quantityNum || 1,
               returnedQuantity: 0,
+              units: selectedUnits.map((u) => ({ id: u.id, deviceUnit: u })),
             },
           ]
         : [],
     }),
-    [assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, notes]
+    [assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, selectedUnits, notes]
   );
 
   // El preview se actualiza con debounce para no parpadear en cada tecla.
@@ -124,13 +128,14 @@ export default function NewLoanPage() {
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      await inventoryApi.createLoan({
+      const payload = {
         custodianId: assignment === "EMPLOYEE" ? custodianId : undefined,
         departmentId: assignment === "DEPARTMENT" ? departmentId : undefined,
         subareaId: assignment === "DEPARTMENT" ? subareaId || undefined : undefined,
         notes: notes || undefined,
-        items: [{ deviceId, quantity: quantityNum }],
-      });
+        items: [{ deviceId, unitIds: selectedUnits.map((u) => u.id) }],
+      };
+      await inventoryApi.createLoan(payload, requestKey(payload));
       setToast({ message: t("loans.saved"), type: "success" });
       setTimeout(() => navigate("/inventory/loans"), 1000);
     } catch (e: any) {
@@ -142,9 +147,9 @@ export default function NewLoanPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("loans.new")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("loans.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );
@@ -225,8 +230,7 @@ export default function NewLoanPage() {
                   value={typeId}
                   onChange={(v) => {
                     setTypeId(String(v));
-                    setDeviceId("");
-                    setAvailable(null);
+                    selectDevice("");
                   }}
                 />
               </ITGrid>
@@ -239,28 +243,18 @@ export default function NewLoanPage() {
                   onChange={(v) => selectDevice(String(v))}
                 />
               </ITGrid>
-              <ITGrid item xs={12} md={5}>
-                <ITInput
-                  name="quantity"
-                  label={t("loans.quantityLabel")}
-                  type="number"
-                  min={1}
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  required
-                />
-              </ITGrid>
-              <ITGrid item xs={12} md={7}>
-                <ITFlex align="center" gap={2} className="h-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-                  <ITText className="text-xs text-slate-500">
-                    {t("loans.available")}{" "}
-                    <strong className="text-slate-700">{available ?? "—"}</strong>
-                  </ITText>
-                </ITFlex>
-              </ITGrid>
+              {deviceId && (
+                <ITGrid item xs={12}>
+                  <UnitPicker
+                    units={units}
+                    selected={selectedUnitIds}
+                    onChange={setSelectedUnitIds}
+                    loading={unitsLoading}
+                    error={unitsError}
+                  />
+                </ITGrid>
+              )}
             </ITGrid>
-
-            {overStock && <ITAlert variant="error">{t("validation.overStock")}</ITAlert>}
 
             <ITInput name="notes" label={t("loans.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </ITFlex>
