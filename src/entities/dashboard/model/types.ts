@@ -55,6 +55,10 @@ export interface RecordGapsRow {
   missingDocuments: Array<{ id: string; name: string }>;
   /** Claves de datos personales vacíos (`dashboard:profileFields.*`). */
   missingFields: string[];
+  /** Catálogo completo con lo entregado (detalle del expediente). */
+  requiredDocuments: Array<{ id: string; name: string; delivered: boolean }>;
+  otherDocuments: Array<{ id: string; name: string; delivered: boolean }>;
+  filledFields: string[];
 }
 
 export interface HrRecordsWidget {

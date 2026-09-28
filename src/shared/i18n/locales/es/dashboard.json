@@ -63,7 +63,8 @@
     "chartFields": "Datos personales que más faltan",
     "chartDepartments": "Sin obligatorios por departamento",
     "peopleUnit": "personas",
-    "noDepartment": "Sin departamento"
+    "noDepartment": "Sin departamento",
+    "chartsTitle": "Pendientes de expedientes"
   },
   "profileFields": {
     "curp": "CURP",

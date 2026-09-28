@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import { usePermissions, useCurrentRole } from "@entities/user";
 import AccessTodayWidget from "./widgets/AccessTodayWidget";
 import AttendanceTodayWidget from "./widgets/AttendanceTodayWidget";
-import HrRecordsWidget from "./widgets/HrRecordsWidget";
 import MyEquipmentWidget from "./widgets/MyEquipmentWidget";
 import OvertimeWeekWidget from "./widgets/OvertimeWeekWidget";
 import PeopleWidget from "./widgets/PeopleWidget";
+import RecordsChartsWidget from "./widgets/RecordsChartsWidget";
 import SetupGapsWidget from "./widgets/SetupGapsWidget";
 import SystemHealthWidget from "./widgets/SystemHealthWidget";
 import TasksWidget from "./widgets/TasksWidget";
@@ -16,6 +16,7 @@ export type WidgetId =
   | "operations"
   | "attendanceToday"
   | "hrRecords"
+  | "recordsCharts"
   | "people"
   | "overtimeWeek"
   | "setupGaps"
@@ -32,7 +33,9 @@ const WIDGETS: Record<WidgetId, { permission: string | null; render?: () => Reac
   systemHealth: { permission: "system.configure", render: () => <SystemHealthWidget /> },
   operations: { permission: "dashboard.view" },
   attendanceToday: { permission: "attendance.view", render: () => <AttendanceTodayWidget /> },
-  hrRecords: { permission: "hr.records", render: () => <HrRecordsWidget /> },
+  // El tablero de expedientes lo arma la página (vive en `features/hr`).
+  hrRecords: { permission: "hr.records" },
+  recordsCharts: { permission: "hr.records", render: () => <RecordsChartsWidget /> },
   people: { permission: "hr.records", render: () => <PeopleWidget /> },
   overtimeWeek: { permission: "overtime.view", render: () => <OvertimeWeekWidget /> },
   setupGaps: { permission: "time_clock.link", render: () => <SetupGapsWidget /> },
@@ -51,7 +54,7 @@ const ROLE_LAYOUTS: Record<string, WidgetId[]> = {
   // El admin conserva su tablero de siempre arriba; lo nuevo va debajo.
   ADMIN: ["operations", "systemHealth", "attendanceToday", "overtimeWeek", "tickets", "setupGaps"],
   MANAGER: ["attendanceToday", "overtimeWeek", "tickets", "tasks", "operations"],
-  HUMAN_RESOURCES: ["hrRecords", "attendanceToday", "people", "overtimeWeek", "setupGaps"],
+  HUMAN_RESOURCES: ["hrRecords", "recordsCharts", "attendanceToday", "people", "overtimeWeek", "setupGaps"],
   AREA_HEAD: ["tickets", "tasks", "attendanceToday", "myEquipment"],
   EMPLOYEE: ["attendanceToday", "tickets", "tasks", "myEquipment"],
   GUARD: ["accessToday", "tickets", "myEquipment"],
@@ -60,6 +63,7 @@ const ROLE_LAYOUTS: Record<string, WidgetId[]> = {
 const DEFAULT_ORDER: WidgetId[] = [
   "attendanceToday",
   "hrRecords",
+  "recordsCharts",
   "tickets",
   "tasks",
   "overtimeWeek",

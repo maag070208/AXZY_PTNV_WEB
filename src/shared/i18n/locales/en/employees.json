@@ -146,5 +146,82 @@
     "footer": "employee-badge · {{year}}",
     "renderError": "Could not get the 2D context to draw the badge",
     "generateError": "Could not generate the badge"
+  },
+  "records": {
+    "title": "Employee records",
+    "description": "Required documents, record and personal data per employee",
+    "menu": "Records",
+    "notifyPending": "Notify pending",
+    "notifyPendingConfirmTitle": "Notify pending",
+    "notifyPendingConfirm": "A notification (and email, if they have one) will be sent to {{count}} person(s) with pending documents or data. Continue?",
+    "notifyPendingDone": "{{notified}} person(s) notified ({{emailed}} by email)",
+    "kpis": {
+      "active": "Active staff",
+      "complete": "Complete record",
+      "missingRequired": "Missing required",
+      "incomplete": "Incomplete record"
+    },
+    "filters": {
+      "search": "Search by name, number or area",
+      "all": "All",
+      "REQUIRED": "Missing required",
+      "INCOMPLETE": "Incomplete",
+      "COMPLETE": "Complete",
+      "department": "Area",
+      "allDepartments": "Area: all"
+    },
+    "columns": {
+      "employee": "Employee",
+      "required": "Required",
+      "record": "Record",
+      "personal": "Personal data",
+      "status": "Status"
+    },
+    "status": {
+      "REQUIRED": "Missing required",
+      "INCOMPLETE": "Incomplete",
+      "COMPLETE": "Complete"
+    },
+    "progress": "{{done}} of {{total}}",
+    "detail": {
+      "total": "Total record",
+      "required": "Required · {{done}} of {{total}}",
+      "other": "Other documents · {{done}} of {{total}}",
+      "personal": "Personal data · {{done}} of {{total}}",
+      "view": "View",
+      "upload": "Upload",
+      "uploading": "Uploading…",
+      "uploaded": "Document uploaded",
+      "uploadError": "Could not upload the document",
+      "delivered": "Delivered",
+      "pending": "Pending",
+      "showAll": "View the {{count}} documents",
+      "showLess": "View less",
+      "moreFields": "+{{count}} more",
+      "notify": "Notify missing",
+      "open": "Open record",
+      "select": "Select an employee to see their record"
+    },
+    "notify": "Notify",
+    "notified": "{{name}} was notified",
+    "notifiedEmail": "{{name}} was notified (also by email)",
+    "notifyError": "Could not notify",
+    "complete": "Complete record",
+    "empty": "No one matches the filters",
+    "profileFields": {
+      "curp": "CURP",
+      "rfc": "RFC",
+      "nss": "NSS",
+      "birthDate": "Date of birth",
+      "hireDate": "Hire date",
+      "genderId": "Gender",
+      "bloodTypeId": "Blood type",
+      "personalPhone": "Personal phone",
+      "streetAddress": "Address",
+      "postalCode": "Postal code",
+      "city": "City",
+      "emergencyContactName": "Emergency contact",
+      "emergencyContactPhone": "Emergency phone"
+    }
   }
 }

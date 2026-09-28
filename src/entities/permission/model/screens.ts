@@ -45,6 +45,7 @@ export type NavLabelKey =
   | "nav.hr"
   | "nav.employees"
   | "nav.hrReports"
+  | "nav.employeeRecords"
   | "nav.settings"
   | "nav.catalogs"
   | "nav.users"
@@ -119,7 +120,8 @@ export const APP_SCREENS: readonly AppScreen[] = [
     id: "hr",
     labelKey: "nav.hr",
     children: [
-      { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports"], requirement: { anyOf: ["hr.records"] } },
+      { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] } },
+      { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] } },
       { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] } },
       { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
       { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] } },

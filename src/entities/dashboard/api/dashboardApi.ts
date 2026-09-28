@@ -27,4 +27,7 @@ export const dashboardApi = {
   systemHealth: () => api.get<SystemHealthWidget>(`/dashboard/system-health`),
   /** Le avisa al empleado (notificación + correo) qué le falta de su expediente. */
   notifyMissingRecords: (userId: string) => api.post<{ notified: boolean; emailed: boolean }>(`/hr/${userId}/notify-missing-records`, {}),
+  /** "Avisar a pendientes": aviso masivo; las personas con expediente completo se omiten. */
+  notifyMissingRecordsBulk: (userIds: string[]) =>
+    api.post<{ notified: number; emailed: number; skipped: number }>(`/hr/notify-missing-records`, { userIds }),
 };

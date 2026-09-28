@@ -146,5 +146,82 @@
     "footer": "credencial-empleado · {{year}}",
     "renderError": "No se pudo obtener el contexto 2D para dibujar la credencial",
     "generateError": "No se pudo generar la credencial"
+  },
+  "records": {
+    "title": "Expedientes de empleados",
+    "description": "Documentos obligatorios, expediente y datos personales por empleado",
+    "menu": "Expedientes",
+    "notifyPending": "Avisar a pendientes",
+    "notifyPendingConfirmTitle": "Avisar a pendientes",
+    "notifyPendingConfirm": "Se enviará una notificación (y correo, si lo tienen) a {{count}} persona(s) con documentos o datos pendientes. ¿Continuar?",
+    "notifyPendingDone": "Se avisó a {{notified}} persona(s) ({{emailed}} por correo)",
+    "kpis": {
+      "active": "Plantilla activa",
+      "complete": "Expediente completo",
+      "missingRequired": "Faltan obligatorios",
+      "incomplete": "Expediente incompleto"
+    },
+    "filters": {
+      "search": "Buscar por nombre, número o área",
+      "all": "Todos",
+      "REQUIRED": "Faltan obligatorios",
+      "INCOMPLETE": "Incompletos",
+      "COMPLETE": "Completos",
+      "department": "Área",
+      "allDepartments": "Área: todas"
+    },
+    "columns": {
+      "employee": "Empleado",
+      "required": "Obligatorios",
+      "record": "Expediente",
+      "personal": "Datos personales",
+      "status": "Estado"
+    },
+    "status": {
+      "REQUIRED": "Falta obligatorio",
+      "INCOMPLETE": "Incompleto",
+      "COMPLETE": "Completo"
+    },
+    "progress": "{{done}} de {{total}}",
+    "detail": {
+      "total": "Expediente total",
+      "required": "Obligatorios · {{done}} de {{total}}",
+      "other": "Otros documentos · {{done}} de {{total}}",
+      "personal": "Datos personales · {{done}} de {{total}}",
+      "view": "Ver",
+      "upload": "Subir",
+      "uploading": "Subiendo…",
+      "uploaded": "Documento subido",
+      "uploadError": "No se pudo subir el documento",
+      "delivered": "Entregado",
+      "pending": "Pendiente",
+      "showAll": "Ver los {{count}} documentos",
+      "showLess": "Ver menos",
+      "moreFields": "+{{count}} más",
+      "notify": "Avisar faltantes",
+      "open": "Abrir expediente",
+      "select": "Selecciona un empleado para ver su expediente"
+    },
+    "notify": "Avisar",
+    "notified": "Se avisó a {{name}}",
+    "notifiedEmail": "Se avisó a {{name}} (también por correo)",
+    "notifyError": "No se pudo avisar",
+    "complete": "Expediente completo",
+    "empty": "Nadie coincide con los filtros",
+    "profileFields": {
+      "curp": "CURP",
+      "rfc": "RFC",
+      "nss": "NSS",
+      "birthDate": "Fecha de nacimiento",
+      "hireDate": "Fecha de ingreso",
+      "genderId": "Género",
+      "bloodTypeId": "Tipo de sangre",
+      "personalPhone": "Teléfono personal",
+      "streetAddress": "Domicilio",
+      "postalCode": "Código postal",
+      "city": "Ciudad",
+      "emergencyContactName": "Contacto de emergencia",
+      "emergencyContactPhone": "Teléfono de emergencia"
+    }
   }
 }

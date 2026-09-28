@@ -43,6 +43,7 @@
     "catalogs": "Catalogs",
     "roles": "Roles and permissions",
     "hrReports": "HR Reports",
+    "employeeRecords": "Employee records",
     "access": "Attendance",
     "accessLog": "Access log",
     "accessReport": "Entry/exit report",

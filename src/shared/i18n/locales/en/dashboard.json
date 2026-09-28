@@ -63,7 +63,8 @@
     "chartFields": "Most missing personal data",
     "chartDepartments": "Missing required by department",
     "peopleUnit": "people",
-    "noDepartment": "No department"
+    "noDepartment": "No department",
+    "chartsTitle": "Record gaps"
   },
   "profileFields": {
     "curp": "CURP",
