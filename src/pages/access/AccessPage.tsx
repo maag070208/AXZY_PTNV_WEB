@@ -517,6 +517,7 @@ export default function AccessPage() {
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}
+        onRowClick={(row) => void openDetail(row as unknown as AccessEvent)}
       />
 
       <ITDialog

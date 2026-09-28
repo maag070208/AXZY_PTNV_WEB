@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/i18n";
 import { dyn } from "@shared/i18n/dyn";
 import type { KanbanAssignment } from "@entities/ticket";
+import { useNavigate } from "react-router-dom";
 import { ASSIGNMENT_STATUS_BADGE } from "../model/useAssignmentList";
 import type { UseAssignmentList } from "../model/useAssignmentList";
 
@@ -25,6 +26,7 @@ interface Props {
 
 export default function MyTasksTable({ fx, onOpenBoard }: Props) {
   const { t: tt } = useTranslation("tickets");
+  const navigate = useNavigate();
 
   const columns: Column<KanbanAssignment>[] = [
     {
@@ -127,6 +129,7 @@ export default function MyTasksTable({ fx, onOpenBoard }: Props) {
       virtualized
       virtualizedMaxHeight={420}
       rowHeight={50}
+      onRowClick={(row) => navigate(`/tickets/${(row as unknown as KanbanAssignment).ticketId}`)}
     />
   );
 }

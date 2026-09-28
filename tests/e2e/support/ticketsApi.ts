@@ -13,7 +13,7 @@ import { E2E, apiBase } from "./env";
  */
 
 export type TicketStatus = "OPEN" | "IN_PROGRESS" | "CLOSED";
-export type TicketPriority = "RETIREMENT" | "MEDIUM" | "HIGH" | "URGENT";
+export type TicketPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 export type AssignmentStatus = "PENDING" | "IN_PROGRESS" | "IN_REVIEW" | "COMPLETED";
 
 export interface TicketCategory {

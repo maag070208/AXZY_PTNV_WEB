@@ -43,13 +43,13 @@ test.describe("Reloj checador", () => {
     await expect(page).toHaveURL(/#\/time-clocks$/);
   });
 
-  test("el subitem de menú 'Reloj checador' es visible para ADMIN", async ({ page }) => {
+  test("el subitem de menú 'Checadas del reloj' es visible para ADMIN", async ({ page }) => {
     await goToRoute(page, "/access/time-clock");
 
     // La barra lateral arranca colapsada; al pasar el mouse se expande y el
     // padre (auto-expandido por el subitem activo) muestra sus hijos.
     await page.locator("aside").hover();
-    await expect(page.getByText("Reloj checador", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Checadas del reloj", { exact: true }).first()).toBeVisible();
   });
 });
 
@@ -147,6 +147,10 @@ test.describe("Reloj checador — relojes", () => {
     await expect(page.getByText(CLOCK.url, { exact: true })).toBeVisible();
     await expect(page.getByText("Al día", { exact: true })).toBeVisible();
     await expect(page.getByText("Cuenta para entradas/salidas", { exact: true })).toBeVisible();
+
+    // El detalle (configuración leída en vivo) se abre al entrar a la tarjeta.
+    await page.getByText(CLOCK.name, { exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar", exact: true })).toBeVisible();
     // Configuración del reloj, tal como la reporta el equipo.
     await expect(page.getByText("Administracion", { exact: true })).toBeVisible();
     await expect(page.getByText("24/09/2026 13:01:00 (UTC-07:00)")).toBeVisible();
@@ -172,6 +176,8 @@ test.describe("Reloj checador — relojes", () => {
     });
     await goToRoute(page, "/time-clocks");
 
+    // Entrar al detalle del reloj: "Editar" vive ahí, no en la tarjeta.
+    await page.getByText(CLOCK.name, { exact: true }).click();
     await page.getByRole("button", { name: "Editar", exact: true }).click();
     await page.getByText("Cuenta para entradas/salidas", { exact: true }).last().click();
     await page.getByRole("button", { name: "Guardar", exact: true }).click();
@@ -193,13 +199,13 @@ test.describe("Reloj checador — relojes", () => {
     await expect(page.getByText(/no es una dirección válida/)).toBeVisible();
   });
 
-  test("el subitem 'Relojes checadores' está en Configuración para ADMIN", async ({ page }) => {
+  test("el subitem 'Administrar relojes' está en Configuración para ADMIN", async ({ page }) => {
     await goToRoute(page, "/time-clocks");
     const menu = page.locator("aside");
     await menu.hover();
     // Configuración se auto-expande por el subitem activo.
     await expect(menu.getByText("Configuración", { exact: true })).toBeVisible();
-    await expect(menu.getByText("Relojes checadores", { exact: true })).toBeVisible();
+    await expect(menu.getByText("Administrar relojes", { exact: true })).toBeVisible();
   });
 });
 

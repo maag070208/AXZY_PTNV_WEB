@@ -134,9 +134,15 @@
     "signatureDelivery": "Entrega",
     "piece": "pieza",
     "pieces": "piezas",
-    "sampleDevice": "CONTROL DE TV",
+    "pendingAssignment": "Por asignar",
     "systemsDepartment": "Departamento de Sistemas",
-    "defaultArea": "Sistemas"
+    "defaultArea": "Sistemas",
+    "unitsTitle": "Relación de equipos",
+    "unitsNo": "No.",
+    "unitsAssetTag": "Control de activos",
+    "unitsSerial": "Número de serie",
+    "unitsHostname": "Nombre de equipo",
+    "unitsSeeList": "Ver relación de equipos"
   },
   "card": {
     "folio": "Folio",

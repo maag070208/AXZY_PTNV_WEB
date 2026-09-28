@@ -1,6 +1,7 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITButton, ITFlex, ITGrid, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaFilePdf, FaScroll } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
@@ -31,9 +32,9 @@ export default function DisciplinaryReportDetailPage() {
 
   if (loading) {
     return (
-      <ITPage title={tt("preview.title")} loading backAction={() => navigate("/employees/disciplinary-reports")}>
+      <ITPage title={tt("preview.title")} backAction={() => navigate("/employees/disciplinary-reports")}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );

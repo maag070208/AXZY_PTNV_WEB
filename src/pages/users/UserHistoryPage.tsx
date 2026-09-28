@@ -1,4 +1,5 @@
-import { ITFlex, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { LottieLoader } from "@shared/ui/lottie-loader";
+import { ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaUserShield } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -29,7 +30,7 @@ export default function UserHistoryPage() {
         ]}
       >
         <ITFlex justify="center">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );

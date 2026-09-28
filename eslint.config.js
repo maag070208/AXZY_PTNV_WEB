@@ -6,10 +6,10 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", "dist-electron", "release"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["**/*.{ts,tsx}"],
+    files: ["**/*.{ts,tsx,cts}"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -35,7 +35,7 @@ export default tseslint.config(
     // Tests E2E: corren en Node, no en el navegador, y no son código React.
     // El `use()` de los fixtures de Playwright no es el hook `use` de React, y
     // su firma `async ({}, use) => {}` usa un patrón vacío a propósito.
-    files: ["tests/**/*.ts", "playwright.config.ts"],
+    files: ["tests/**/*.ts", "playwright.config.ts", "electron/**/*.cts"],
     languageOptions: { globals: globals.node },
     rules: {
       "react-hooks/rules-of-hooks": "off",

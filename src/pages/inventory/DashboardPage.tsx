@@ -1,11 +1,14 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITFlex, ITGrid, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaBoxes, FaChartPie, FaCogs, FaLayerGroup, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Dashboard, type DashboardStat, type MovementType } from "@entities/inventory";
 import { TYPE_BADGE_HEX } from "@entities/inventory/model/movementColors";
 import { StatCard } from "@shared/ui/stat-card";
+import { InventoryAuditCard } from "@features/inventory/audit";
+import { useCan } from "@entities/user";
 
 type Distrib = { label: string; value: number; color: string; to: string }[];
 
@@ -61,6 +64,7 @@ export default function DashboardPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const tt = (k: string) => (t as unknown as (key: string) => string)(k);
   const navigate = useNavigate();
+  const canAudit = useCan("inventory.audit");
   const [data, setData] = useState<Dashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const [movements30, setMovements30] = useState<Record<MovementType, number> | null>(null);
@@ -100,9 +104,9 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("dashboard.title")} loading backAction={() => undefined}>
+      <ITPage title={t("dashboard.title")} backAction={() => undefined}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );
@@ -130,6 +134,8 @@ export default function DashboardPage() {
         { label: t("dashboard.title") },
       ]}
     >
+      {canAudit && <InventoryAuditCard />}
+
       <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <ITFlex align="center" gap={2}>
           <FaChartPie className="text-slate-400" size={16} />

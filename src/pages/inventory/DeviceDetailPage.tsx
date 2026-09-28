@@ -1,6 +1,7 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITBadget, ITButton, ITFlex, ITGrid, ITLoader, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaEdit, FaHistory, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
@@ -53,9 +54,9 @@ export default function DeviceDetailPage() {
 
   if (loading || !device) {
     return (
-      <ITPage title={t("devices.detail")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("devices.detail")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );
@@ -147,7 +148,7 @@ export default function DeviceDetailPage() {
                       {!u.serialNumber && !u.macAddress && !u.ip && !u.hostname && <span>—</span>}
                     </ITFlex>
                   </ITFlex>
-                  <ITBadget color={STATUS_COLOR[u.status]} size="lg">{u.status}</ITBadget>
+                  <ITBadget color={STATUS_COLOR[u.status]} size="lg">{t(`unitStatus.${u.status}`)}</ITBadget>
                 </ITFlex>
               ))}
               {units.length === 0 && <ITText className="py-8 text-center text-sm text-slate-400">{t("devices.noUnits")}</ITText>}
@@ -179,7 +180,7 @@ export default function DeviceDetailPage() {
                     <tr key={i} className={`border-b border-slate-100 ${i % 2 === 1 ? "bg-slate-50/40" : ""}`}>
                       <td className="px-3 py-2 text-[11px] text-slate-500 whitespace-nowrap">{formatDateTime(r.date)}</td>
                       <td className="px-3 py-2">
-                        <ITBadget color={TYPE_BADGE_COLOR[r.type]} size="lg">{r.type}</ITBadget>
+                        <ITBadget color={TYPE_BADGE_COLOR[r.type]} size="lg">{t(`typeLabels.${r.type}`)}</ITBadget>
                       </td>
                       <td className="px-3 py-2 text-right text-[12px] font-bold text-emerald-600">{r.stockIn ? `+${r.stockIn}` : ""}</td>
                       <td className="px-3 py-2 text-right text-[12px] font-bold text-red-500">{r.stockOut ? `−${r.stockOut}` : ""}</td>

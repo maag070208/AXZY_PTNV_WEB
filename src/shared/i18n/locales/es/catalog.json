@@ -62,6 +62,19 @@
     "languages": {
       "es": "Español",
       "en": "English"
+    },
+    "weekStartLabel": "Primer día de la semana",
+    "weekStartHelp": "Día en que arrancan los rangos semanales de los filtros Diaria/Semanal/Mensual. El cliente opera de miércoles a miércoles.",
+    "weekStartSaved": "Primer día de la semana actualizado",
+    "weekStartSaveError": "No se pudo guardar el primer día de la semana",
+    "weekdays": {
+      "SUNDAY": "Domingo",
+      "MONDAY": "Lunes",
+      "TUESDAY": "Martes",
+      "WEDNESDAY": "Miércoles",
+      "THURSDAY": "Jueves",
+      "FRIDAY": "Viernes",
+      "SATURDAY": "Sábado"
     }
   }
 }

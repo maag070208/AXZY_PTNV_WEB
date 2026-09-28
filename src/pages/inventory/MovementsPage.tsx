@@ -7,7 +7,7 @@ import { formatDateTime } from "@shared/utils/dates";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type Movement, type MovementType } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
-import { downloadReportMovementsPdf } from "@widgets/movement-pdf";
+import { downloadMovementPdf, downloadReportMovementsPdf } from "@widgets/movement-pdf";
 import { StatCard } from "@shared/ui/stat-card";
 import { i18n } from "@shared/i18n";
 
@@ -154,6 +154,17 @@ export default function MovementsPage() {
 
   const statCardActive = (group: TypeGroup | null) => typeFilter === group;
 
+  /** Abre el PDF del movimiento de la fila (el botón "Reporte" es el global). */
+  const openMovementPdf = async (movementId: string) => {
+    try {
+      const list = await inventoryApi.movements();
+      const movement = list.find((m) => m.id === movementId);
+      if (movement) await downloadMovementPdf(movement);
+    } catch {
+      window.alert(i18n.t("common:errors.report"));
+    }
+  };
+
   const columns: any[] = [
     {
       type: "date",
@@ -171,11 +182,15 @@ export default function MovementsPage() {
       sortable: false,
       filter: "catalog",
       catalogOptions: {
-        data: MOVEMENT_TYPES.map((id) => ({ id, name: id })),
+        data: MOVEMENT_TYPES.map((id) => ({ id, name: t(`typeLabels.${id}`) })),
         loading: false,
         error: false,
       },
-      render: (m: MovementRow) => <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">{m.type}</ITBadget>,
+      render: (m: MovementRow) => (
+        <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">
+          {t(`typeLabels.${m.type}`)}
+        </ITBadget>
+      ),
     },
     {
       type: "string",
@@ -279,6 +294,7 @@ export default function MovementsPage() {
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}
+        onRowClick={(row) => void openMovementPdf((row as unknown as MovementRow).movementId)}
       />
     </ITPage>
   );

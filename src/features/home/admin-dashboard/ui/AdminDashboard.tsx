@@ -190,7 +190,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
                         </ITText>
                         <ITText className="text-[9px] text-slate-400">
                           {formatDate(u.createdAt)} · {u.assigned ?? i18n.t("common:labels.unassigned")} ·{" "}
-                          {u.priority}
+                          {ticketsT(`priorityLabels.${u.priority}`)}
                         </ITText>
                       </ITFlex>
                       <ITFlex align="center" gap={1} className="shrink-0">

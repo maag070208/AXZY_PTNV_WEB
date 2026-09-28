@@ -12,7 +12,11 @@ import type {
   DeviceType,
   MovementType,
   DeviceUnit,
+  InventoryAudit,
 } from "../model/types";
+
+/** Encabezado de idempotencia: la API no repite un alta que ya registró con esa clave. */
+const withIdempotencyKey = (key?: string) => (key ? { headers: { "Idempotency-Key": key } } : undefined);
 
 export interface MovementItemInput {
   deviceId: string;
@@ -83,7 +87,7 @@ export const inventoryApi = {
     notes?: string;
     loanId?: string;
     items: MovementItemInput[];
-  }) => api.post<Movement>(`/inventory/movements`, data),
+  }, idempotencyKey?: string) => api.post<Movement>(`/inventory/movements`, data, withIdempotencyKey(idempotencyKey)),
   revert: (id: string) => api.post<Movement>(`/inventory/movements/${id}/revert`),
 
   // Préstamos
@@ -100,8 +104,9 @@ export const inventoryApi = {
     departmentId?: string;
     subareaId?: string;
     notes?: string;
-    items: { deviceId: string; quantity: number }[];
-  }) => api.post<Movement>(`/inventory/loans`, data),
+    /** `unitIds`: las unidades exactas que se entregan (la carta las imprime). */
+    items: { deviceId: string; quantity?: number; unitIds?: string[] }[];
+  }, idempotencyKey?: string) => api.post<Movement>(`/inventory/loans`, data, withIdempotencyKey(idempotencyKey)),
   cancelLoan: (id: string) => api.post<Loan>(`/inventory/loans/${id}/cancel`),
   updateLoan: (id: string, data: {
     custodianId?: string;
@@ -110,6 +115,7 @@ export const inventoryApi = {
     notes?: string;
     deviceId?: string;
     quantity?: number;
+    unitIds?: string[];
   }) => api.put<Loan>(`/inventory/loans/${id}`, data),
 
   // Devoluciones
@@ -123,8 +129,11 @@ export const inventoryApi = {
     loanId: string;
     custodianId?: string;
     notes?: string;
-    items: { loanItemId: string; quantity: number; condition: Condition }[];
-  }) => api.post<Movement>(`/inventory/returns`, data),
+    items: { loanItemId: string; quantity?: number; unitIds?: string[]; condition: Condition; notes?: string }[];
+  }, idempotencyKey?: string) => api.post<Movement>(`/inventory/returns`, data, withIdempotencyKey(idempotencyKey)),
+
+  /** Auditoría de consistencia del inventario (en vivo). */
+  audit: () => api.get<InventoryAudit>(`/inventory/audit`),
 
   // Dashboard
   dashboard: () => api.get<Dashboard>(`/inventory/dashboard`),

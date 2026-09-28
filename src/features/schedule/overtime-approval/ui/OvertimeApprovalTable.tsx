@@ -30,6 +30,7 @@ import {
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { OvertimeDayRow, OvertimeDayStatus } from "@entities/overtime";
+import { useWeekStartDay } from "@entities/sys-config";
 import { formatDateTime, formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import { dayKeyOf, type Period, type StatusFilter, type UseOvertimeApproval } from "../model/useOvertimeApproval";
@@ -99,11 +100,12 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
   } = fx;
 
   const tz = summary?.range.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const weekStart = useWeekStartDay();
 
   const periodRange = useMemo<[Date, Date]>(() => {
     const d = date ?? new Date();
     if (period === "WEEK") {
-      const offset = (d.getDay() + 6) % 7; // 0 = lunes
+      const offset = (d.getDay() - weekStart + 7) % 7; // 0 = primer día configurado
       const start = new Date(d);
       start.setDate(d.getDate() - offset);
       start.setHours(0, 0, 0, 0);
@@ -120,7 +122,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
     const start = new Date(d);
     start.setHours(0, 0, 0, 0);
     return [start, start];
-  }, [period, date]);
+  }, [period, date, weekStart]);
 
   const rangeLabel = useMemo(() => {
     const [start, end] = periodRange;

@@ -83,6 +83,18 @@ export const useDevicesReport = ({ download }: Options) => {
     };
   }, []);
 
+  /** Traduce valores enum del filtro (Estado) para el pie del PDF. */
+  const valueLabel = useCallback(
+    (key: string, value: string): string => {
+      if (key !== "status") return value;
+      if (value === "ASSIGNED") return t("devices.assignedStatus");
+      if (value === "AVAILABLE") return t("devices.availableStatus");
+      if (value === "RETIRED") return t("devices.retirementStatus");
+      return t("devices.otherStatus");
+    },
+    [t]
+  );
+
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
     setError(null);
@@ -100,7 +112,7 @@ export const useDevicesReport = ({ download }: Options) => {
         truncated: res.truncated,
         meta: {
           generatedAt: new Date().toISOString(),
-          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t)),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t), valueLabel),
         },
       });
     } catch (e) {
@@ -108,7 +120,7 @@ export const useDevicesReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [download, t, externalFilters]);
+  }, [download, t, externalFilters, valueLabel]);
 
   return {
     t,

@@ -17,6 +17,7 @@ import {
   useUpdateSysConfig,
 } from "@features/sys-config";
 import SystemLanguageCard from "./SystemLanguageCard";
+import WeekStartCard from "./WeekStartCard";
 
 const KEY = "EMAIL_NOTIFICATION_RECIPIENTS";
 const SEND_EMAIL_KEY = "ENABLE_SEND_EMAIL";
@@ -329,6 +330,8 @@ export default function SysConfigTab() {
       </ITCard>
 
       <SystemLanguageCard onResult={(message, type) => setToast({ message, type })} />
+
+      <WeekStartCard onResult={(message, type) => setToast({ message, type })} />
 
       {toast && (
         <ITToast

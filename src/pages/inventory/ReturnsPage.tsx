@@ -129,6 +129,7 @@ export default function ReturnsPage() {
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}
+        onRowClick={(row) => navigate(`/inventory/loans/${(row as unknown as LoanReturn).loanId}`)}
       />
     </ITPage>
   );

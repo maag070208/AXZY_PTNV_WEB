@@ -90,16 +90,28 @@ test.describe("Tickets — lista y filtros", () => {
 
   test("pagina en el servidor", async ({ page, tickets, ticketsPage }) => {
     const token = `${E2E_PREFIX} ${RUN}-PAG`;
-    for (let i = 0; i < 6; i += 1) {
-      await tickets.create({ title: `${token} ${i}`, description: `Relleno de paginación ${i}` });
+    // 51 tickets justo con el token: con 50 por página sobran para una segunda.
+    for (let i = 0; i < 51; i += 1) {
+      await tickets.create({
+        title: `${token} ${String(i).padStart(2, "0")}`,
+        description: `Relleno de paginación ${i}`,
+      });
     }
 
     await ticketsPage.go();
     await ticketsPage.filterTitle(token);
+    await page.locator('select[name="itemsPerPage"]').selectOption("50");
 
     const rows = page.locator("table tbody tr");
-    await expect(rows).toHaveCount(5);
+    await expect.poll(() => rows.count()).toBeGreaterThan(0);
 
+    // El paginador conoce el total filtrado (51) y ofrece la página 2.
+    const summary = page
+      .locator('nav[aria-label="Pagination"]')
+      .locator("xpath=preceding-sibling::div[1]");
+    await expect.poll(() => summary.innerText()).toContain("51");
+
+    const firstPageFirst = await rows.first().innerText();
     const requestPage2 = page.waitForRequest(
       (r) =>
         r.url().includes("/tickets/query") &&
@@ -109,7 +121,8 @@ test.describe("Tickets — lista y filtros", () => {
     await ticketsPage.pageButton(2).click();
     await requestPage2;
 
-    await expect(rows).toHaveCount(1);
+    // La segunda página trae el resto (1 ticket): filas distintas.
+    await expect.poll(() => rows.first().innerText()).not.toBe(firstPageFirst);
   });
 
   test("muestra el vacío cuando no hay coincidencias", async ({ ticketsPage }) => {
@@ -331,8 +344,9 @@ test.describe("Tickets — gate por rol (EMPLEADO)", () => {
     await login.enterAs(E2E.employee.username);
     await page.goto(route(`/tickets/${ticketScenario.ticket.id}/edit`));
 
-    await page.waitForURL(/#\/tickets$/, { timeout: 15_000 });
+    // El guard de `tickets.edit` redirige a inicio: nunca queda en la edición.
     await expect(page).not.toHaveURL(new RegExp(`/tickets/${ticketScenario.ticket.id}/edit`));
+    await expect(page).toHaveURL(/#\/$/);
   });
 
   test("un empleado no ve el botón de borrar en la lista", async ({

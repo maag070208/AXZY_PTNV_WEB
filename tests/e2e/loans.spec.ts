@@ -29,7 +29,7 @@ test.describe("PRÉSTAMOS desde la web", () => {
     await loanPage.go();
     await loanPage.assignToDepartment(department.name);
     await loanPage.selectResource(scenario.type.name, device.nameVisible);
-    await loanPage.setQuantity(4);
+    await loanPage.selectUnits(4);
     await loanPage.writeNotes("Entrega para proyecto X");
     await loanPage.save();
 
@@ -57,32 +57,32 @@ test.describe("PRÉSTAMOS desde la web", () => {
     await loanPage.assignToDepartment(department.name);
     await loanPage.selectResource(scenario.type.name, device.nameVisible);
 
-    await expect(loanPage.available).toContainText("7");
+    await expect(loanPage.unitOptions).toHaveCount(7);
+    await expect(loanPage.unitsCounter).toContainText("0 de 7");
   });
 
-  test("no deja prestar más de lo disponible", async ({
+  test("solo ofrece las piezas disponibles y no deja guardar sin selección", async ({
     loanPage,
     scenario,
     department,
     api,
   }) => {
     const device = await scenario.device(3);
+    // Una pieza ya prestada no debe ofrecerse: el selector solo lista AVAILABLE.
+    await api.lend({ departmentId: department.id, items: [{ deviceId: device.id, quantity: 1 }] });
 
     await loanPage.go();
     await loanPage.assignToDepartment(department.name);
     await loanPage.selectResource(scenario.type.name, device.nameVisible);
-    await loanPage.setQuantity(5);
 
-    await expect(loanPage.overstockAlert).toBeVisible();
+    await expect(loanPage.unitOptions).toHaveCount(2);
     await expect(loanPage.saveButton).toBeDisabled();
 
-    // Y al corregir, la pantalla vuelve a habilitar el guardado.
-    await loanPage.setQuantity(3);
-    await expect(loanPage.overstockAlert).toBeHidden();
+    await loanPage.selectUnits(2);
     await expect(loanPage.saveButton).toBeEnabled();
 
-    // Nada se movió por haberlo intentado.
-    expect(await api.stock(device.id)).toMatchObject({ AVAILABLE: 3, ON_LOAN: 0 });
+    // Nada se movió por solo seleccionar.
+    expect(await api.stock(device.id)).toMatchObject({ AVAILABLE: 2, ON_LOAN: 1 });
   });
 
   test("presta a un empleado", async ({ page, loanPage, scenario, api }) => {
@@ -91,7 +91,7 @@ test.describe("PRÉSTAMOS desde la web", () => {
     await loanPage.go();
     await loanPage.assignToEmployee("E2E Empleado");
     await loanPage.selectResource(scenario.type.name, device.nameVisible);
-    await loanPage.setQuantity(2);
+    await loanPage.selectUnits(2);
     await loanPage.save();
 
     await waitForToast(page, "Carta responsiva registrada");
@@ -110,7 +110,7 @@ test.describe("PRÉSTAMOS desde la web", () => {
     await loanPage.go();
     await loanPage.assignToDepartment(department.name);
     await loanPage.selectResource(scenario.type.name, device.nameVisible);
-    await loanPage.setQuantity(1);
+    await loanPage.selectUnits(1);
     await loanPage.save();
     await waitForToast(page, "Carta responsiva registrada");
 
@@ -120,7 +120,7 @@ test.describe("PRÉSTAMOS desde la web", () => {
 
     await page.goto(route("/inventory/loans"));
     await expect(page.getByText(created.number)).toBeVisible();
-    await expect(page.getByText("ACTIVE").first()).toBeVisible();
+    await expect(page.getByText("Activo").first()).toBeVisible();
   });
 
   test("el preview de la carta muestra el departamento elegido en Área", async ({
@@ -251,10 +251,10 @@ test.describe("PRÉSTAMOS desde la web", () => {
       await loanReturnPage.register();
       await waitForToast(page, "Devolución registrada");
 
-      await api.waitForStock(device.id, { AVAILABLE: 3, ON_LOAN: 1, RETIREMENT: 1 });
+      await api.waitForStock(device.id, { AVAILABLE: 3, ON_LOAN: 1, RETIRED: 1 });
       const retirements = await api.movements({ deviceId: device.id, type: "RETIREMENT" });
       expect(retirements).toHaveLength(1);
-      expect(retirements[0].reason).toBe("Baja automática por estado ROTO");
+      expect(retirements[0].reason).toBe("Baja automática por equipo roto");
     });
 
     test("el tope a devolver es lo que queda pendiente", async ({
@@ -272,10 +272,8 @@ test.describe("PRÉSTAMOS desde la web", () => {
       await loanReturnPage.go();
       await loanReturnPage.selectLoan(loan.number);
 
-      const fieldReturn = loanReturnPage
-        .block(device.nameVisible)
-        .getByLabel(/^\s*Devolver\s*\*?\s*$/);
-      await expect(fieldReturn).toHaveAttribute("max", "5");
+      // La pantalla ofrece exactamente las piezas pendientes: 5.
+      await expect(loanReturnPage.units(device.nameVisible)).toHaveCount(5);
     });
   });
 });

@@ -201,7 +201,9 @@ test.describe("Bitácora de accesos", () => {
     const totalE2E = (await access.query({ limit: 1, filters: { q: "E2E" } })).total;
     expect(totalE2E).toBeGreaterThan(10); // hay al menos dos páginas
 
-    // La tabla arranca con 10 renglones por página.
+    // La tabla arranca con 100 renglones por página; se fija en 10 para
+    // ejercitar la paginación server-side con el universo sembrado.
+    await page.locator('select[name="itemsPerPage"]').selectOption("10");
     await expect(table.locator("tbody tr")).toHaveCount(10);
     const firstPage = await table.locator("tbody tr").first().innerText();
 

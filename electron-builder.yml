@@ -1,0 +1,39 @@
+# Empaquetado de la app de escritorio (ver electron/main.cts).
+# URL de la API por defecto para una instalación:
+#   pnpm desktop:dist -c.extraMetadata.desktop.apiUrl=https://servidor/api/v1
+appId: com.axzydev.puertonuevo.erp
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - package.json
+  # Vite ya empaqueta las dependencias del renderer; el proceso principal solo usa Electron.
+  - "!node_modules/**/*"
+mac:
+  category: public.app-category.business
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  # Sin certificado de Apple: firma ad-hoc ("-"). Gatekeeper pide abrirla con
+  # clic derecho la primera vez, pero macOS sí le permite notificaciones (una app
+  # sin firmar no puede mostrarlas).
+  identity: "-"
+  # El hardened runtime solo se necesita para notarizar (con certificado); con
+  # firma ad-hoc impediría cargar el framework de Electron.
+  hardenedRuntime: false
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+  category: Office
+  # Las notificaciones usan el servicio del escritorio (libnotify / D-Bus).
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: Puerto Nuevo

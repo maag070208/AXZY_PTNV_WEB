@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import type { Locator, Page, Response } from "@playwright/test";
 import { test, expect } from "./support/fixtures";
 import { goToRoute } from "./support/pages/components";
 import { E2E } from "./support/env";
@@ -28,26 +28,48 @@ test.describe("REPORTE de dispositivos desde la web", () => {
   const locateRow = async (page: Page, text: string): Promise<Locator> => {
     const row = page.locator("tr", { hasText: text }).first();
     const body = page.locator("table tbody");
-    const paginator = page.locator('nav[aria-label="Pagination"]');
-    const summary = paginator.locator("xpath=preceding-sibling::div[1]");
+    // La tabla es server-side y VIRTUALIZADA: solo monta las filas visibles, con
+    // espaciadores arriba/abajo. Para encontrar la fila hay que recorrer el
+    // scroller interno de la página y, al agotarla, pasar a la siguiente.
+    const scroller = page.locator("table").first().locator("xpath=..");
     const next = page.locator('nav[aria-label="Pagination"] > div > div:last-child');
-    const readSummary = async () => (await summary.innerText()).replace(/\s+/g, " ").trim();
 
-    // El reporte trae TODAS las unidades y pagina en el cliente. Se espera a que
-    // lleguen: el resumen del paginador pasa de "de 0" al total real. Después se
-    // ensancha la página al máximo ofrecido para reducir los saltos.
-    await expect.poll(readSummary).toMatch(/de [1-9]\d*/);
-    const total = Number((await readSummary()).match(/de (\d+)$/)?.[1] ?? 0);
-    await page.locator('select[name="itemsPerPage"]').selectOption("50");
-    await expect.poll(() => body.locator("tr").count()).toBe(Math.min(50, total));
+    const isDevicesFetch = (r: Response): boolean =>
+      r.request().method() === "POST" && r.url().endsWith("/reports/devices") && r.status() === 200;
 
-    for (let page = 0; page < 200; page += 1) {
-      if (await row.isVisible().catch(() => false)) return row;
+    // Página al máximo ofrecido: menos saltos de paginación.
+    const firstFetch = page.waitForResponse(isDevicesFetch);
+    await page.locator('select[name="itemsPerPage"]').selectOption("150");
+    await firstFetch;
+    await expect.poll(() => body.locator("tr").count()).toBeGreaterThan(0);
+
+    const scrollToRow = async (): Promise<boolean> => {
+      const max = await scroller.evaluate((el) => el.scrollHeight);
+      const view = await scroller.evaluate((el) => el.clientHeight);
+      const step = Math.max(80, view - 40);
+      for (let top = 0; top <= max + step; top += step) {
+        await scroller.evaluate((el, t) => {
+          el.scrollTop = t;
+        }, top);
+        // La tabla virtualizada monta la fila de forma asíncrona tras el scroll.
+        await page.waitForTimeout(60);
+        if (await row.isVisible().catch(() => false)) return true;
+      }
+      return false;
+    };
+
+    for (let pageIndex = 0; pageIndex < 100; pageIndex += 1) {
+      await scroller.evaluate((el) => {
+        el.scrollTop = 0;
+      });
+      if (await scrollToRow()) return row;
       if ((await next.getAttribute("aria-disabled")) === "true") break;
-      const before = await body.innerText();
+      // Se espera a la respuesta del servidor de la SIGUIENTE página: comparar
+      // el texto de la fila se confundía con el re-render por el scroll.
+      const nextFetch = page.waitForResponse(isDevicesFetch);
       await next.click();
-      // La tabla re-renderiza la página en el cliente: esperar a que cambie.
-      await expect.poll(() => body.innerText()).not.toBe(before);
+      await nextFetch;
+      await expect.poll(() => body.locator("tr").count()).toBeGreaterThan(0);
     }
     return row;
   };

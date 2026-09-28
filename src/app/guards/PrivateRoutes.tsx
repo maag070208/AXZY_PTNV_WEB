@@ -2,7 +2,6 @@ import { ITLayout, ITSidebarProps, ITToast, type ITNavigationItem } from "@axzyd
 import { useEffect, useState, useCallback, type ReactNode } from "react";
 import {
   FaBoxes,
-  FaChartBar,
   FaDoorOpen,
   FaHouseUser,
   FaTicketAlt,
@@ -16,15 +15,16 @@ import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
 import { logout, meThunk } from "@entities/user";
 import { APP_SCREENS, isScreenVisible, type AppScreen } from "@entities/permission";
-import { fetchUnreadCount } from "@entities/notification";
-import { useAblyNotifications } from "./useAblyNotifications";
+import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
+import { desktop } from "@shared/lib/desktop";
+import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
+import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
 
 /** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
 const NAV_ICONS: Record<string, ReactNode> = {
   start: <FaHouseUser size={14} />,
   tasks: <FaTicketAlt size={14} />,
   inventory: <FaBoxes size={14} />,
-  reports: <FaChartBar size={14} />,
   access: <FaDoorOpen size={14} />,
   schedules: <FaRegClock size={14} />,
   hr: <FaUserTie size={14} />,
@@ -40,10 +40,36 @@ export default function PrivateRoutes() {
   const unreadCount = useSelector((s: RootState) => s.notifications.unreadCount);
   const [toast, setToast] = useState<string | null>(null);
 
-  const handleNewNotification = useCallback((title: string) => {
-    setToast(title);
-    setTimeout(() => setToast(null), 3000);
-  }, []);
+  // En la app de escritorio llega como notificación nativa del sistema; en el
+  // navegador, como aviso dentro de la página.
+  const handleNewNotification = useCallback(
+    (n: LiveNotification) => {
+      const title = n.title ?? i18n.t("notifications:newNotification");
+      if (desktop) {
+        desktop.notify({
+          id: n.id,
+          title,
+          body: n.detail ?? undefined,
+          route: notificationRoute(n) ?? "/notifications",
+        });
+        return;
+      }
+      setToast(title);
+      setTimeout(() => setToast(null), 3000);
+    },
+    [i18n]
+  );
+
+  // Clic en una notificación nativa: la app ya se trajo al frente; se abre su
+  // pantalla y se marca leída.
+  useEffect(
+    () =>
+      desktop?.onNotificationClick(({ id, route }) => {
+        if (id) void dispatch(markNotificationRead(id));
+        if (route) navigate(route);
+      }),
+    [dispatch, navigate]
+  );
 
   // Al abrir la app (o iniciar sesión) se refresca `/auth/me`: el usuario
   // guardado puede traer permisos o idioma viejos. Al volver a la ventana se
@@ -151,7 +177,7 @@ export default function PrivateRoutes() {
   const topBar = {
     logo: (
       <img
-        src="/logo-puerto-nuevo.png"
+        src={logoUrl}
         alt="Puerto Nuevo Hotel y Villas"
         className="h-12 w-auto object-contain"
       />

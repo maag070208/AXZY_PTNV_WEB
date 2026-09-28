@@ -1,3 +1,4 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useRef, useState } from "react";
 import {
   ITAlert,
@@ -5,7 +6,6 @@ import {
   ITDatePicker,
   ITFlex,
   ITInput,
-  ITLoader,
   ITPage,
   ITSelect,
   ITStepper,
@@ -174,7 +174,7 @@ export default function EmployeeProfileEditPage() {
           </ITAlert>
         ) : (
           <ITFlex justify="center">
-            <ITLoader variant="spinner" size="lg" color="primary" />
+            <LottieLoader size="lg" />
           </ITFlex>
         )}
       </ITPage>

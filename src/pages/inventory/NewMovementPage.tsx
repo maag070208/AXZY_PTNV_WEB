@@ -1,11 +1,13 @@
+import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITLoader, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Condition, type Device, type DeviceUnitStatus, type DeviceType, type MovementType, type DeviceUnit } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 import { i18n } from "@shared/i18n";
+import { useRequestKey } from "@shared/lib/useRequestKey";
 
 const STATUS_LABEL_KEY = {
   AVAILABLE: "dashboard.available",
@@ -56,6 +58,7 @@ const UNIT_STATUS: Partial<Record<MovementType, DeviceUnitStatus>> = {
 export default function NewMovementPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const requestKey = useRequestKey();
   const [types, setTypes] = useState<DeviceType[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,7 +121,7 @@ export default function NewMovementPage() {
 
   const unitLabel = (u: DeviceUnit) => {
     const extras = [u.serialNumber, u.hostname, u.macAddress].filter(Boolean).join(" · ");
-    return `${u.assetTag}${extras ? ` · ${extras}` : ""} · ${u.status}`;
+    return `${u.assetTag}${extras ? ` · ${extras}` : ""} · ${t(`unitStatus.${u.status}`)}`;
   };
 
   const validRow = (r: Row) =>
@@ -159,8 +162,10 @@ export default function NewMovementPage() {
         groups.set(r.type, arr);
       });
       await Promise.all(
-        [...groups.entries()].map(([tp, rs]) =>
-          inventoryApi.registerMovement({
+        // Un movimiento por tipo, cada uno con su clave: al reintentar tras un
+        // fallo parcial, los que ya entraron no se duplican.
+        [...groups.entries()].map(([tp, rs]) => {
+          const payload = {
             type: tp,
             reason: rs.find((r) => r.reason.trim())?.reason || undefined,
             items: rs.map((r) => ({
@@ -170,8 +175,9 @@ export default function NewMovementPage() {
               condition: tp === "MAINTENANCE_OUT" ? (r.condition as Condition) : undefined,
               notes: r.notes.trim() ? r.notes : undefined,
             })),
-          })
-        )
+          };
+          return inventoryApi.registerMovement(payload, requestKey(payload));
+        })
       );
       setToast({ message: t("messages.movementRegistered"), type: "success" });
       setTimeout(() => navigate("/inventory/movements"), 1000);
@@ -184,9 +190,9 @@ export default function NewMovementPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("new.title")} loading backAction={() => navigate(-1)}>
+      <ITPage title={t("new.title")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
-          <ITLoader variant="spinner" size="lg" color="primary" />
+          <LottieLoader size="lg" />
         </ITFlex>
       </ITPage>
     );
@@ -318,7 +324,7 @@ export default function NewMovementPage() {
                                 className={`rounded-full p-0 transition-all ${sel ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                               >
                                 <ITBadget color={CONDITION_BADGE_COLOR[c]} variant={sel ? "filled" : "outlined"} size="lg">
-                                  {c}
+                                  {t(`loanReturn.conditionLabels.${c}`)}
                                 </ITBadget>
                               </button>
                             );

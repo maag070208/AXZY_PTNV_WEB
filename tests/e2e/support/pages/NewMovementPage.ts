@@ -12,6 +12,14 @@ import {
 export type MovementTypeUi = "Baja" | "A mantenimiento" | "De mantenimiento";
 export type ConditionUi = "GOOD" | "FAIR" | "POOR" | "BROKEN";
 
+/** Etiqueta en pantalla de cada condición (i18n `inventory:loanReturn.conditionLabels`). */
+const CONDITION_LABELS: Record<ConditionUi, string> = {
+  GOOD: "Bueno",
+  FAIR: "Aceptable",
+  POOR: "Malo",
+  BROKEN: "Roto",
+};
+
 /**
  * BAJA y MOVIMIENTOS DE MANTENIMIENTO — `/inventario/movimientos/nuevo`.
  *
@@ -75,7 +83,7 @@ export class NewMovementPage {
   }
 
   async selectCondition(condition: ConditionUi, index = 1): Promise<void> {
-    await chip(this.row(index), condition).click();
+    await chip(this.row(index), CONDITION_LABELS[condition]).click();
   }
 
   async writeComment(text: string, index = 1): Promise<void> {

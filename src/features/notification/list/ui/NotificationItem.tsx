@@ -3,6 +3,7 @@ import {
   FaCheck,
   FaComment,
   FaFileUpload,
+  FaShieldAlt,
   FaTicketAlt,
   FaTrash,
   FaUserPlus,
@@ -19,6 +20,7 @@ const TYPE_STYLES: Record<string, { icon: React.ReactNode; color: string }> = {
   USER_CREATED: { icon: <FaUserPlus size={12} />, color: "bg-emerald-500" },
   USER_DEACTIVATED: { icon: <FaUserSlash size={12} />, color: "bg-red-500" },
   EMPLOYEE_DOC_UPLOADED: { icon: <FaFileUpload size={12} />, color: "bg-blue-600" },
+  INVENTORY_AUDIT: { icon: <FaShieldAlt size={12} />, color: "bg-amber-600" },
 };
 
 export default function NotificationItem({

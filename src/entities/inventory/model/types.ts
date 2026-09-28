@@ -195,3 +195,19 @@ export interface Dashboard {
   stats: DashboardStat;
   byType: DashboardByType[];
 }
+export type InventoryAuditCheckKey =
+  | "UNIT_IN_MULTIPLE_OPEN_LOANS"
+  | "LOAN_ITEM_PENDING_MISMATCH"
+  | "OPEN_LOAN_UNIT_NOT_ON_LOAN"
+  | "ON_LOAN_UNIT_WITHOUT_LOAN"
+  | "CLOSED_LOAN_WITH_OPEN_UNITS"
+  | "LOAN_STATUS_MISMATCH"
+  | "MOVEMENT_UNITS_MISMATCH"
+  | "LEDGER_MISMATCH";
+
+/** `GET /inventory/audit`: cada regla con cuántos casos la rompen y ejemplos. */
+export interface InventoryAudit {
+  ok: boolean;
+  checkedAt: string;
+  checks: { key: InventoryAuditCheckKey; count: number; samples: string[] }[];
+}

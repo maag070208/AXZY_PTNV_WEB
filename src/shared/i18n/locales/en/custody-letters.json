@@ -133,9 +133,15 @@
     "signatureDelivery": "Delivery",
     "piece": "piece",
     "pieces": "pieces",
-    "sampleDevice": "TV REMOTE",
+    "pendingAssignment": "To be assigned",
     "systemsDepartment": "IT Department",
-    "defaultArea": "IT"
+    "defaultArea": "IT",
+    "unitsTitle": "Equipment list",
+    "unitsNo": "No.",
+    "unitsAssetTag": "Asset tag",
+    "unitsSerial": "Serial number",
+    "unitsHostname": "Hostname",
+    "unitsSeeList": "See equipment list"
   },
   "card": {
     "folio": "Folio",

@@ -12,7 +12,7 @@ import { E2E, apiBase } from "./env";
  * Lo que se prueba es la UI; esto es andamio alrededor.
  */
 
-export type Status = "AVAILABLE" | "ON_LOAN" | "DAMAGED" | "IN_MAINTENANCE" | "RETIREMENT";
+export type Status = "AVAILABLE" | "ON_LOAN" | "DAMAGED" | "IN_MAINTENANCE" | "RETIRED";
 export type Condition = "GOOD" | "FAIR" | "POOR" | "BROKEN";
 
 export interface Stock extends Record<Status, number> {

@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import type { RootState } from "@app/store";
 import { LoginForm, useLogin } from "@features/auth/login";
+import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
+import LottieLoader from "@shared/ui/lottie-loader/ui/LottieLoader";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -25,14 +27,16 @@ export default function LoginPage() {
       className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-white to-slate-50 p-4"
     >
       <ITFlex direction="column" align="center" gap={6} className="w-full max-w-md">
-        <img
-          src="/logo-puerto-nuevo.png"
+        {/* <img
+          src={logoUrl}
           alt="Puerto Nuevo Hotel y Villas"
-          className="h-16 w-auto"
+          className="h-32 w-auto"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = "none";
           }}
-        />
+        /> */}
+        <LottieLoader />
+
         <LoginForm
           username={login.username}
           password={login.password}

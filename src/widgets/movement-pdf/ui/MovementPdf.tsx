@@ -105,7 +105,7 @@ export default function MovementPdf({ movement }: Props) {
                 <View style={styles.colBrand}><Text style={pdfTheme.cell}>{d.device?.brand ?? "—"}</Text></View>
                 <View style={styles.colModel}><Text style={pdfTheme.cell}>{d.device?.model ?? "—"}</Text></View>
                 <View style={styles.colQty}><Text style={[pdfTheme.cellBold, { textAlign: "center" }]}>{d.quantity}</Text></View>
-                <View style={styles.colCond}><Text style={pdfTheme.cell}>{d.condition ?? "—"}</Text></View>
+                <View style={styles.colCond}><Text style={pdfTheme.cell}>{d.condition ? t(`loanReturn.conditionLabels.${d.condition}`) : "—"}</Text></View>
               </View>
             ))}
           </View>

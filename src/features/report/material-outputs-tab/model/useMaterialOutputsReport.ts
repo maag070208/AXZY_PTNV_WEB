@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   materialOutputsApi,
   type MaterialOutputFilters,
+  type MaterialOutputReason,
   type MaterialOutputsPdfPayload,
 } from "@entities/material-output";
 import type { ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
@@ -34,7 +35,7 @@ interface Options {
 }
 
 export const useMaterialOutputsReport = ({ download }: Options) => {
-  const { t } = useTranslation(["reports", "common"]);
+  const { t } = useTranslation(["reports", "material-outputs", "common"]);
   const [total, setTotal] = useState(0);
   const [lastFilters, setLastFilters] = useState<MaterialOutputFilters>({});
   const [reloadKey, setReloadKey] = useState(0);
@@ -79,6 +80,15 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
     [t]
   );
 
+  /** Traduce valores enum del filtro (Motivo) para el pie del PDF. */
+  const valueLabel = useCallback(
+    (key: string, value: string): string =>
+      key === "reason"
+        ? t(`material-outputs:reason.${value as MaterialOutputReason}`)
+        : value,
+    [t]
+  );
+
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
     try {
@@ -94,7 +104,7 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
       await download({
         data: res.data,
         meta: {
-          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t)),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t), valueLabel),
         },
       });
     } catch (e) {
@@ -102,7 +112,7 @@ export const useMaterialOutputsReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [download, lastFilters, t, externalFilters]);
+  }, [download, lastFilters, t, externalFilters, valueLabel]);
 
   return {
     t,

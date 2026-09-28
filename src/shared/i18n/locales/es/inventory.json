@@ -123,6 +123,19 @@
     "MAINTENANCE_OUT": "De mantenimiento",
     "REVERSAL": "Reversión"
   },
+  "unitStatus": {
+    "AVAILABLE": "Disponible",
+    "ON_LOAN": "Prestado",
+    "DAMAGED": "Dañado",
+    "IN_MAINTENANCE": "Mantenimiento",
+    "RETIRED": "Baja"
+  },
+  "loanStatus": {
+    "ACTIVE": "Activo",
+    "PARTIAL": "Parcial",
+    "RETURNED": "Devuelta",
+    "CANCELLED": "Cancelada"
+  },
   "new": {
     "title": "Nuevo movimiento",
     "description": "Registra una operación de inventario",
@@ -303,7 +316,9 @@
     "brokenRetirementHint": "Esta(s) unidad(es) se dará(n) de baja automáticamente",
     "pendingTotal": "Pendiente total",
     "toReturn": "A devolver",
-    "colAssigned": "ASIGNADO A"
+    "colAssigned": "ASIGNADO A",
+    "unitsHint": "Marca las unidades que regresan y la condición de cada una.",
+    "returnUnit": "Devolver {{assetTag}}"
   },
   "messages": {
     "movementRegistered": "Movimiento registrado",
@@ -316,6 +331,46 @@
     "reviewNotes": "Revisa las observaciones marcadas"
   },
   "units": {
-    "loadError": "Error al cargar las unidades"
+    "loadError": "Error al cargar las unidades",
+    "title": "Unidades a entregar",
+    "hint": "Marca las piezas exactas que se entregan: la carta imprime su activo fijo y número de serie.",
+    "search": "Buscar por activo fijo, serie o equipo",
+    "selected": "{{count}} de {{total}} seleccionada(s)",
+    "selectAll": "Seleccionar todas",
+    "clear": "Quitar selección",
+    "empty": "No hay unidades disponibles de este dispositivo",
+    "noMatch": "Ninguna unidad coincide con la búsqueda",
+    "serial": "Serie: {{value}}",
+    "noSerial": "Sin número de serie",
+    "hostname": "Equipo: {{value}}",
+    "inThisLoan": "En esta carta",
+    "selectAtLeastOne": "Selecciona al menos una unidad"
+  },
+  "audit": {
+    "title": "Auditoría de inventario",
+    "hint": "Revisa que préstamos, unidades y kardex cuadren. También corre a diario y avisa si algo cambia.",
+    "run": "Revisar ahora",
+    "ok": "Todo cuadra: préstamos, unidades y kardex son consistentes.",
+    "checkedAt": "Revisado: {{date}}",
+    "checks": {
+      "UNIT_IN_MULTIPLE_OPEN_LOANS": "Unidades en más de un préstamo abierto",
+      "LOAN_ITEM_PENDING_MISMATCH": "Préstamos cuyo pendiente no coincide con sus unidades",
+      "OPEN_LOAN_UNIT_NOT_ON_LOAN": "Unidades en préstamo abierto que no están prestadas",
+      "ON_LOAN_UNIT_WITHOUT_LOAN": "Unidades prestadas sin préstamo abierto",
+      "CLOSED_LOAN_WITH_OPEN_UNITS": "Préstamos cerrados con unidades sin devolver",
+      "LOAN_STATUS_MISMATCH": "Préstamos con estado incorrecto",
+      "MOVEMENT_UNITS_MISMATCH": "Movimientos cuya cantidad no coincide con sus unidades",
+      "LEDGER_MISMATCH": "Dispositivos cuyo kardex no coincide con lo disponible"
+    },
+    "fix": {
+      "UNIT_IN_MULTIPLE_OPEN_LOANS": "Revisa las cartas de esas unidades y devuelve la que sobre.",
+      "LOAN_ITEM_PENDING_MISMATCH": "Revisa el detalle de esas cartas.",
+      "OPEN_LOAN_UNIT_NOT_ON_LOAN": "La unidad cambió de estado sin devolverse: registra su devolución o revisa su historial.",
+      "ON_LOAN_UNIT_WITHOUT_LOAN": "La unidad figura prestada sin carta: revisa su historial.",
+      "CLOSED_LOAN_WITH_OPEN_UNITS": "Revisa esas cartas cerradas.",
+      "LOAN_STATUS_MISMATCH": "El estado de la carta no corresponde a sus devoluciones.",
+      "MOVEMENT_UNITS_MISMATCH": "Revisa esos movimientos.",
+      "LEDGER_MISMATCH": "Cuenta físicamente las piezas y registra el ajuste de entrada o salida que corresponda."
+    }
   }
 }

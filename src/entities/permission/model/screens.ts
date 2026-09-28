@@ -26,6 +26,7 @@ export type NavLabelKey =
   | "nav.adminTasks"
   | "nav.myTasks"
   | "nav.inventory"
+  | "nav.inventoryOverview"
   | "nav.devices"
   | "nav.movements"
   | "nav.loans"
@@ -87,18 +88,13 @@ export const APP_SCREENS: readonly AppScreen[] = [
     id: "inventory",
     labelKey: "nav.inventory",
     children: [
-      { id: "inventoryDashboard", labelKey: "nav.inventory", path: "/inventory", match: "exact", requirement: { anyOf: ["devices.view"] } },
+      { id: "inventoryDashboard", labelKey: "nav.inventoryOverview", path: "/inventory", match: "exact", requirement: { anyOf: ["devices.view"] } },
       { id: "devices", labelKey: "nav.devices", path: "/inventory/devices", requirement: { anyOf: ["devices.view"] } },
+      { id: "reports", labelKey: "nav.reports", path: "/reports", requirement: { anyOf: ["reports.view"] } },
       { id: "movements", labelKey: "nav.movements", path: "/inventory/movements", requirement: { anyOf: ["devices.view"] } },
       { id: "loans", labelKey: "nav.loans", path: "/inventory/loans", requirement: { anyOf: ["loans.view"] } },
       { id: "returns", labelKey: "nav.returns", path: "/inventory/returns", requirement: { anyOf: ["loans.view"] } },
     ],
-  },
-  {
-    id: "reports",
-    labelKey: "nav.reports",
-    path: "/reports",
-    requirement: { anyOf: ["reports.view"] },
   },
   {
     id: "access",

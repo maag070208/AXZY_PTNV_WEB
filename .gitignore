@@ -12,3 +12,7 @@ dist
 /blob-report
 /playwright/.cache
 /tests/e2e/.auth
+
+# Electron
+/dist-electron
+/release
