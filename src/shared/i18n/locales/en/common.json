@@ -66,6 +66,7 @@
     "timeClockPunches": "punches",
     "approvedOvertime": "approved-overtime",
     "approvedOvertimeReport": "approved_overtime_report",
+    "overtimeReport": "overtime_report",
     "weeklyAttendance": "weekly_attendance",
     "payroll": "payroll",
     "disciplinaryReport": "disciplinary-report",

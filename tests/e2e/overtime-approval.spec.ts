@@ -10,8 +10,9 @@ import { LoginPage } from "./support/pages/LoginPage";
  *
  * El escenario se siembra con checadas + vínculo (paquete `api/`): dos personas
  * con 120 min de tiempo extra PENDIENTE del día de hoy. ADMIN/MANAGER aprueban o
- * rechazan y exportan solo lo aprobado; HUMAN_RESOURCES entra en solo lectura (el
- * servidor le devuelve únicamente lo aprobado) y AREA_HEAD no accede a la ruta.
+ * rechazan y exportan la tabla (cada día con su estado); HUMAN_RESOURCES entra en
+ * solo lectura (el servidor le devuelve únicamente lo aprobado) y AREA_HEAD no
+ * accede a la ruta.
  */
 
 const RUN = newRunId();
@@ -115,7 +116,7 @@ test.describe("Tiempo extra", () => {
     await headCtx.context.close();
   });
 
-  test("ADMIN exporta PDF y CSV solo de lo aprobado; sin aprobados quedan deshabilitados", async ({
+  test("ADMIN exporta PDF y CSV de la tabla; sin filas quedan deshabilitados", async ({
     page,
   }) => {
     await goToRoute(page, "/schedules/overtime/approval");
@@ -131,22 +132,22 @@ test.describe("Tiempo extra", () => {
     const downloadPdf = page.waitForEvent("download");
     await pdfButton.click();
     expect((await downloadPdf).suggestedFilename()).toMatch(
-      /^reporte_horas_extra_aprobadas_(day|week|month)_\d{8}\.pdf$/
+      /^reporte_horas_extra_(day|week|month)_\d{8}\.pdf$/
     );
 
     const downloadCsv = page.waitForEvent("download");
     await csvButton.click();
     expect((await downloadCsv).suggestedFilename()).toMatch(
-      /^horas-extra-aprobadas-(day|week|month)-\d{4}-\d{2}-\d{2}\.csv$/
+      /^reporte_horas_extra-(day|week|month)-\d{4}-\d{2}-\d{2}\.csv$/
     );
 
-    // Sin aprobados en el filtro, no hay nada que exportar.
+    // Sin filas en el filtro, no hay nada que exportar.
     await field(page, "Empleado").fill(`E2E Inexistente ${RUN}`);
     await expect(pdfButton).toBeDisabled();
     await expect(csvButton).toBeDisabled();
   });
 
-  test("RH también puede exportar el PDF de lo aprobado", async ({ browser }) => {
+  test("RH también puede exportar el PDF de su vista", async ({ browser }) => {
     const { context, page } = await contextOf(browser, rh.username);
     await goToRoute(page, "/schedules/overtime/approval");
 
@@ -158,7 +159,7 @@ test.describe("Tiempo extra", () => {
     const download = page.waitForEvent("download");
     await pdfButton.click();
     expect((await download).suggestedFilename()).toMatch(
-      /^reporte_horas_extra_aprobadas_(day|week|month)_\d{8}\.pdf$/
+      /^reporte_horas_extra_(day|week|month)_\d{8}\.pdf$/
     );
     await context.close();
   });

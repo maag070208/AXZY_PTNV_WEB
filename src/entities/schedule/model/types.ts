@@ -178,6 +178,31 @@ export interface WeeklyAttendanceReport {
   summary: WeeklyAttendanceTotals & { people: number; unlinked: number; withoutSchedule: number };
 }
 
+/** Una fila de la vista Detallada: una persona en un día concreto. */
+export interface WeeklyAttendanceDetailRow {
+  userId: string;
+  /** Número(s) de reloj, o el número de empleado, o "—". */
+  clock: string;
+  name: string;
+  departmentName: string | null;
+  day: WeeklyAttendanceDay;
+}
+
+/** Vista de la tabla: resumen semanal por persona o detalle por día. */
+export type WeeklyAttendanceMode = "SUMMARY" | "DETAIL";
+
+/**
+ * Carga del PDF de Nómina: el documento replica la tabla tal como se ve. En
+ * RESUMIDA `rows` son `WeeklyAttendanceRow[]`; en DETALLADA, ya filtradas y
+ * ordenadas, `WeeklyAttendanceDetailRow[]`.
+ */
+export interface WeeklyAttendancePdfPayload {
+  report: WeeklyAttendanceReport;
+  mode: WeeklyAttendanceMode;
+  rows: WeeklyAttendanceRow[] | WeeklyAttendanceDetailRow[];
+  meta: { departmentName: string | null };
+}
+
 export interface WeeklyAttendanceQuery {
   /** Cualquier día de la semana (`YYYY-MM-DD`). */
   date: string;

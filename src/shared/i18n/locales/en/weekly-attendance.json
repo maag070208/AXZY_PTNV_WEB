@@ -102,6 +102,7 @@
     "company": "Puerto Nuevo Baja Hotel y Villas",
     "department": "Department",
     "week": "Week",
+    "view": "View",
     "generatedAt": "Generated on {{date}}"
   },
   "sheetName": "Payroll"

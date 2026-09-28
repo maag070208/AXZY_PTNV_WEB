@@ -14,7 +14,8 @@ import type {
   AccessReportSessionRow,
   AccessReportSummary,
 } from "@entities/access";
-import type { OvertimePdfMeta, OvertimeRow, OvertimeSummary, WeeklyAttendanceReport } from "@entities/schedule";
+import type { OvertimePdfPayload } from "@entities/overtime";
+import type { WeeklyAttendancePdfPayload } from "@entities/schedule";
 import ReportPDF from "../ui/ReportPDF";
 import AssignedDevicesPdf from "../ui/AssignedDevicesPdf";
 import DevicePDF from "../ui/DevicePDF";
@@ -110,25 +111,22 @@ export const downloadTimeClockReportPdf = async (
   saveAs(blob, `${fileName("timeClockReport")}_${meta.period}_${meta.date}.pdf`);
 };
 
-export const downloadOvertimePDF = async (
-  rows: OvertimeRow[],
-  summary: OvertimeSummary,
-  meta: OvertimePdfMeta
-): Promise<void> => {
+export const downloadOvertimePDF = async (payload: OvertimePdfPayload): Promise<void> => {
+  const { rows, summary, meta, canApprove } = payload;
   const blob = await pdf(
-    createElement(OvertimePDF, { rows, summary, meta }) as any
+    createElement(OvertimePDF, { rows, summary, meta, canApprove }) as any
   ).toBlob();
   const stamp = meta.date.replace(/-/g, "");
-  saveAs(blob, `${fileName("approvedOvertimeReport")}_${meta.period.toLowerCase()}_${stamp}.pdf`);
+  saveAs(blob, `${fileName("overtimeReport")}_${meta.period.toLowerCase()}_${stamp}.pdf`);
 };
 
-/** Nómina semanal: asistencia de la semana por departamento (una fila por persona). */
+/** Nómina semanal: réplica de la tabla (vista Resumida o Detallada). */
 export const downloadWeeklyAttendancePdf = async (
-  report: WeeklyAttendanceReport,
-  meta: { departmentName: string | null }
+  payload: WeeklyAttendancePdfPayload
 ): Promise<void> => {
+  const { report, mode, rows, meta } = payload;
   const blob = await pdf(
-    createElement(WeeklyAttendancePdf, { report, meta }) as any
+    createElement(WeeklyAttendancePdf, { report, mode, rows, meta }) as any
   ).toBlob();
   saveAs(blob, `${fileName("payroll")}_${report.range.days[0]}.pdf`);
 };

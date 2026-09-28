@@ -198,8 +198,8 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         { key: "approvedDays", value: summary?.approvedDays ?? 0, tint: "bg-sky-50", icon: <FaClock className="text-sky-600" size={15} /> },
       ];
 
-  // El export muestra solo lo aprobado: sin aprobados, no hay nada que exportar.
-  const hasApproved = (summary?.approvedMinutes ?? 0) > 0;
+  // El export replica la tabla: sin filas visibles, no hay nada que exportar.
+  const hasRows = (summary?.totalDays ?? 0) > 0;
 
   // La columna de selección solo existe para quien puede decidir.
   const selectColumn: Column<OvertimeDayRow> = {
@@ -357,7 +357,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
                 color="gray"
                 size="sm"
                 onClick={() => void exportPdf()}
-                disabled={exportingPdf || !hasApproved}
+                disabled={exportingPdf || !hasRows}
               >
                 <ITFlex align="center" gap={1}>
                   <FaFilePdf className="text-red-600" size={13} />
@@ -369,7 +369,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
                 color="gray"
                 size="sm"
                 onClick={() => void exportCsv()}
-                disabled={exportingCsv || !hasApproved}
+                disabled={exportingCsv || !hasRows}
               >
                 <ITFlex align="center" gap={1}>
                   <FaFileCsv className="text-emerald-600" size={13} />

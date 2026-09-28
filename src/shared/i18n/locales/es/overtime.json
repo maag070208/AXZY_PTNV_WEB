@@ -12,7 +12,7 @@
   "exportPdf": "PDF",
   "exportCsv": "CSV",
   "onlyApproved": "Solo aprobado",
-  "exportEmpty": "No hay horas extra aprobadas en el periodo",
+  "exportEmpty": "No hay días de tiempo extra en el periodo",
   "allDepartments": "Todos los departamentos",
   "selected": "{{count}} seleccionado(s) · {{time}}",
   "periods": {
@@ -56,6 +56,10 @@
     "rejected": "Rechazado",
     "people": "Personas con pendientes",
     "approvedDays": "Días aprobados"
+  },
+  "pdf": {
+    "title": "Reporte de tiempo extra",
+    "timezone": "Zona horaria"
   },
   "rangeDay": "Mostrando el día {{date}} · Zona horaria: {{tz}}",
   "rangeRange": "Mostrando del {{start}} al {{end}} · Zona horaria: {{tz}}",

@@ -16,10 +16,10 @@ export default function TimeClockEmployeesPage() {
       icon={<FaLink size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("common:nav.access"), onClick: () => navigate("/access") },
+        { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
         { label: t("employees.title") },
       ]}
-      backAction={() => navigate("/access/time-clock")}
+      backAction={() => navigate("/hr/time-clock")}
     >
       <TimeClockEmployeesTab fx={fx} />
     </ITPage>

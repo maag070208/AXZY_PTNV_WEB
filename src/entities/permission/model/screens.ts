@@ -101,11 +101,8 @@ export const APP_SCREENS: readonly AppScreen[] = [
     id: "access",
     labelKey: "nav.access",
     children: [
-      { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report", "/access/time-clock"], requirement: { anyOf: ["access.log"] } },
+      { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] } },
       { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] } },
-      { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/access/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
-      { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/access/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] } },
-      { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/access/time-clock/employees", requirement: { anyOf: ["time_clock.view"] } },
     ],
   },
   {
@@ -124,6 +121,9 @@ export const APP_SCREENS: readonly AppScreen[] = [
     children: [
       { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports"], requirement: { anyOf: ["hr.records"] } },
       { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] } },
+      { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
+      { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] } },
+      { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] } },
       { id: "payroll", labelKey: "nav.payroll", path: "/schedules/payroll", requirement: { anyOf: ["payroll.view"] } },
     ],
   },

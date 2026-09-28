@@ -294,9 +294,9 @@ export default function App() {
             </RequiresPermission>
           }
         />
-        {/* Reloj checador Hikvision (solo lectura; ver CHECADOR.md). */}
+        {/* Reloj checador Hikvision (solo lectura; ver TIME_CLOCK.md). */}
         <Route
-          path="/access/time-clock"
+          path="/hr/time-clock"
           element={
             <RequiresPermission permission="time_clock.view">
               <TimeClockPage />
@@ -304,7 +304,7 @@ export default function App() {
           }
         />
         <Route
-          path="/access/time-clock/entries-exits"
+          path="/hr/time-clock/entries-exits"
           element={
             <RequiresPermission permission="time_clock.view">
               <TimeClockReportPage />
@@ -312,7 +312,7 @@ export default function App() {
           }
         />
         <Route
-          path="/access/time-clock/employees"
+          path="/hr/time-clock/employees"
           element={
             <RequiresPermission permission="time_clock.view">
               <TimeClockEmployeesPage />

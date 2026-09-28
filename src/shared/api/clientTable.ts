@@ -72,6 +72,43 @@ const compare = (a: unknown, b: unknown): number => {
 };
 
 /**
+ * Aplica los filtros y el orden de ITDataTable a un arreglo **completo** (sin
+ * paginar). Es el corazón de las tablas client-side y lo reutilizan los
+ * exports (PDF/CSV) para respetar lo que se ve en la tabla: filtros de barra
+ * (vía `externalFilters`) y de columna, más el orden vigente.
+ */
+export const applyClientTableParams = <T>(
+  rows: T[],
+  params: Pick<ITDataTableFetchParams, "filters" | "sort"> | null | undefined,
+  fields: ClientFields<T> = {}
+): T[] => {
+  const valueOf = (row: T, key: string) => (fields[key]?.value ? fields[key].value!(row) : byPath(row, key));
+  const sortValueOf = (row: T, key: string) => (fields[key]?.sortValue ? fields[key].sortValue!(row) : valueOf(row, key));
+  let out = rows;
+
+  const active = Object.entries(params?.filters ?? {}).filter(([, v]) => !isEmpty(v));
+  if (active.length > 0) {
+    out = out.filter((row) =>
+      active.every(([key, filter]) => matches(valueOf(row, key), filter, fields[key]?.match))
+    );
+  }
+
+  if (params?.sort?.key) {
+    const { key, direction } = params.sort;
+    const mult = direction === "asc" ? 1 : -1;
+    out = [...out].sort((a, b) => {
+      const av = sortValueOf(a, key);
+      const bv = sortValueOf(b, key);
+      if (av == null || av === "") return 1;
+      if (bv == null || bv === "") return -1;
+      return compare(av, bv) * mult;
+    });
+  }
+
+  return out;
+};
+
+/**
  * Convierte un fetcher que regresa un arreglo completo en un `fetchData`
  * compatible con ITDataTable (paginación/filtro/orden client-side), con la
  * misma semántica de filtros que las tablas server-side.
@@ -82,29 +119,7 @@ export const makeClientTableFetch =
     fields: ClientFields<T> = {}
   ): ((params: ITDataTableFetchParams) => Promise<ITDataTableResponse<T>>) =>
   async (params) => {
-    const valueOf = (row: T, key: string) => (fields[key]?.value ? fields[key].value!(row) : byPath(row, key));
-    const sortValueOf = (row: T, key: string) => (fields[key]?.sortValue ? fields[key].sortValue!(row) : valueOf(row, key));
-    let rows = await fetcher();
-
-    const active = Object.entries(params.filters ?? {}).filter(([, v]) => !isEmpty(v));
-    if (active.length > 0) {
-      rows = rows.filter((row) =>
-        active.every(([key, filter]) => matches(valueOf(row, key), filter, fields[key]?.match))
-      );
-    }
-
-    if (params.sort?.key) {
-      const { key, direction } = params.sort;
-      const mult = direction === "asc" ? 1 : -1;
-      rows = [...rows].sort((a, b) => {
-        const av = sortValueOf(a, key);
-        const bv = sortValueOf(b, key);
-        if (av == null || av === "") return 1;
-        if (bv == null || bv === "") return -1;
-        return compare(av, bv) * mult;
-      });
-    }
-
+    const rows = applyClientTableParams(await fetcher(), params, fields);
     const total = rows.length;
     const start = (params.page - 1) * params.limit;
     return { data: rows.slice(start, start + params.limit), total };

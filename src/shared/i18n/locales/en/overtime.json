@@ -12,7 +12,7 @@
   "exportPdf": "PDF",
   "exportCsv": "CSV",
   "onlyApproved": "Approved only",
-  "exportEmpty": "No approved overtime in the period",
+  "exportEmpty": "No overtime days in the period",
   "allDepartments": "All departments",
   "selected": "{{count}} selected · {{time}}",
   "periods": {
@@ -56,6 +56,10 @@
     "rejected": "Rejected",
     "people": "People with pending",
     "approvedDays": "Approved days"
+  },
+  "pdf": {
+    "title": "Overtime report",
+    "timezone": "Timezone"
   },
   "rangeDay": "Showing {{date}} · Timezone: {{tz}}",
   "rangeRange": "Showing {{start}} to {{end}} · Timezone: {{tz}}",

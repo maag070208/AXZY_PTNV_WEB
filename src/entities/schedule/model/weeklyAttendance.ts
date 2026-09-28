@@ -1,6 +1,11 @@
 import { dateLocale } from "@shared/i18n";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
-import type { WeeklyAttendanceApproval, WeeklyAttendanceDayStatus } from "./types";
+import type {
+  WeeklyAttendanceApproval,
+  WeeklyAttendanceDayStatus,
+  WeeklyAttendanceDetailRow,
+  WeeklyAttendanceReport,
+} from "./types";
 
 /**
  * Formato y colores del reporte semanal de asistencia, compartidos por la
@@ -91,3 +96,18 @@ export const dayLabel = (dayKey: string): string => {
 /** Clave local `YYYY-MM-DD` de un Date del navegador (el día que el usuario eligió). */
 export const toDayKey = (date: Date): string =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+/**
+ * Filas de la vista Detallada: una por persona y día, en el orden del reporte.
+ * La comparten la tabla y el PDF para que el export salga igual que la pantalla.
+ */
+export const buildDetailRows = (report: WeeklyAttendanceReport): WeeklyAttendanceDetailRow[] =>
+  report.rows.flatMap((r) =>
+    r.days.map((day) => ({
+      userId: r.userId,
+      clock: r.clockNumbers.join(", ") || r.employeeNumber || "—",
+      name: r.name,
+      departmentName: r.departmentName,
+      day,
+    }))
+  );

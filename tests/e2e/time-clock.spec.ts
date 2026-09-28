@@ -3,12 +3,12 @@ import { E2E, route } from "./support/env";
 import { goToRoute } from "./support/pages/components";
 
 /**
- * Reloj checador (`/access/checador`): submódulo de Control de acceso con las
- * checadas copiadas de los relojes Hikvision (ver CHECADOR.md en la raíz).
+ * Reloj checador (`/hr/time-clock`): pantalla de Recursos Humanos con las
+ * checadas copiadas de los relojes Hikvision (ver TIME_CLOCK.md en la raíz).
  *
  * Las checadas solo entran por la sincronización con los relojes, así que aquí
  * no se siembran: se prueba la pantalla (estado de la sincronización, filtros y
- * la petición server-side a `POST /checador/query`) sin depender del volumen
+ * la petición server-side a `POST /time-clock/query`) sin depender del volumen
  * real. No se pulsan "Sincronizar todo" ni "Importar de los relojes": leerían de los
  * relojes de verdad.
  */
@@ -19,7 +19,7 @@ test.describe("Reloj checador", () => {
     const query = page.waitForResponse(
       (r) => r.url().includes("/time-clock/query") && r.request().method() === "POST"
     );
-    await goToRoute(page, "/access/time-clock");
+    await goToRoute(page, "/hr/time-clock");
 
     await expect(page.getByRole("heading", { level: 1, name: "Reloj checador" })).toBeVisible();
     await expect(page.getByText("Sincronización con los relojes", { exact: true })).toBeVisible();
@@ -44,7 +44,7 @@ test.describe("Reloj checador", () => {
   });
 
   test("el subitem de menú 'Checadas del reloj' es visible para ADMIN", async ({ page }) => {
-    await goToRoute(page, "/access/time-clock");
+    await goToRoute(page, "/hr/time-clock");
 
     // La barra lateral arranca colapsada; al pasar el mouse se expande y el
     // padre (auto-expandido por el subitem activo) muestra sus hijos.
@@ -61,7 +61,7 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
     const query = page.waitForResponse(
       (r) => r.url().endsWith("/time-clock/report") && r.request().method() === "POST"
     );
-    await goToRoute(page, "/access/time-clock/entries-exits");
+    await goToRoute(page, "/hr/time-clock/entries-exits");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Entradas/salidas del reloj" })
@@ -74,12 +74,12 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
     expect(filters).toMatchObject({ period: "DAY" });
 
     await page.getByRole("button", { name: "Vincular empleados" }).click();
-    await expect(page).toHaveURL(/#\/access\/time-clock\/employees/);
+    await expect(page).toHaveURL(/#\/hr\/time-clock\/employees/);
   });
 
   test("la pantalla de vínculos lista los empleados del reloj con sus sugerencias", async ({ page }) => {
     const query = page.waitForResponse((r) => r.url().includes("/time-clock/employees/query"));
-    await goToRoute(page, "/access/time-clock/employees");
+    await goToRoute(page, "/hr/time-clock/employees");
 
     await expect(page.getByRole("heading", { level: 1, name: "Empleados del reloj" })).toBeVisible();
     expect((await query).status()).toBe(200);
@@ -215,14 +215,14 @@ test.describe("Reloj checador — gate por rol", () => {
   test("un EMPLEADO no accede al checador", async ({ page, login }) => {
     await login.enterAs(E2E.employee.username);
 
-    await page.goto(route("/access/time-clock"));
+    await page.goto(route("/hr/time-clock"));
 
-    await expect(page).not.toHaveURL(/#\/access\/time-clock/);
+    await expect(page).not.toHaveURL(/#\/hr\/time-clock/);
     await expect(page.getByRole("heading", { name: "Reloj checador" })).toHaveCount(0);
 
-    for (const destination of ["/access/time-clock/entries-exits", "/access/time-clock/employees"]) {
+    for (const destination of ["/hr/time-clock/entries-exits", "/hr/time-clock/employees"]) {
       await page.goto(route(destination));
-      await expect(page).not.toHaveURL(/#\/access\/time-clock/);
+      await expect(page).not.toHaveURL(/#\/hr\/time-clock/);
     }
     // Relojes (Configuración) es solo de ADMIN.
     await page.goto(route("/time-clocks"));

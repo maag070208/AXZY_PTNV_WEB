@@ -1,6 +1,7 @@
+import type { OvertimePdfMeta } from "@entities/schedule";
+
 /** Estado de aprobación de un día de tiempo extra. La ausencia de decisión = PENDIENTE. */
 export type OvertimeDayStatus = "PENDING" | "APPROVED" | "REJECTED";
-
 /** Un día de tiempo extra (persona + día) con su estado de aprobación. */
 export interface OvertimeDayRow {
   userId: string;
@@ -61,4 +62,16 @@ export interface OvertimeDecideInput {
 export interface OvertimeDecideResult {
   updated: number;
   skipped: number;
+}
+
+/**
+ * Carga del PDF de tiempo extra: replica la tabla de días de la pantalla
+ * (persona + día) tal como se ve, con sus filtros y su orden.
+ */
+export interface OvertimePdfPayload {
+  rows: OvertimeDayRow[];
+  summary: OvertimeSummary;
+  meta: OvertimePdfMeta;
+  /** ADMIN/GERENTE ven los minutos calculados; RH solo los aprobados. */
+  canApprove: boolean;
 }

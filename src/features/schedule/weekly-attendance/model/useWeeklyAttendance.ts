@@ -1,18 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { scheduleApi, toDayKey, type WeeklyAttendanceReport } from "@entities/schedule";
+import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
+import {
+  buildDetailRows,
+  scheduleApi,
+  toDayKey,
+  type WeeklyAttendanceDetailRow,
+  type WeeklyAttendanceMode,
+  type WeeklyAttendancePdfPayload,
+  type WeeklyAttendanceReport,
+  type WeeklyAttendanceRow,
+} from "@entities/schedule";
+import { applyClientTableParams } from "@shared/api/clientTable";
 import { useDepartmentOptions } from "@entities/department";
 import { useWeekStartDay } from "@entities/sys-config";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
+import { detailFields, summaryFields } from "./fields";
 
 /** Genera el PDF (lo inyecta la página desde el widget de reportes). */
-export type DownloadWeeklyAttendancePdf = (
-  report: WeeklyAttendanceReport,
-  meta: { departmentName: string | null }
-) => Promise<void>;
+export type DownloadWeeklyAttendancePdf = (payload: WeeklyAttendancePdfPayload) => Promise<void>;
 
-/** Vista de la tabla: resumen semanal por persona o detalle por día. */
-export type WeeklyAttendanceMode = "SUMMARY" | "DETAIL";
+export type { WeeklyAttendanceMode } from "@entities/schedule";
 
 const shiftDays = (date: Date, days: number) => {
   const next = new Date(date);
@@ -35,6 +43,14 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [mode, setMode] = useState<WeeklyAttendanceMode>("SUMMARY");
+  /** Filtros/orden vigentes de la tabla (columnas), para que el PDF salga igual. */
+  const [tableParams, setTableParams] = useState<ITDataTableFetchParams | null>(null);
+  /**
+   * Sube con cada reporte cargado. La tabla es client-side y solo refetchea si
+   * cambia alguno de sus disparadores (página/filtros/orden/`reloadTrigger`):
+   * al llegar datos nuevos hay que empujarla con esto o se queda con lo viejo.
+   */
+  const [reportVersion, setReportVersion] = useState(0);
   const departments = useDepartmentOptions();
   const weekStart = useWeekStartDay();
 
@@ -50,13 +66,19 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
   }, [weekDate, weekStart]);
 
   const date = toDayKey(weekDate);
+  /** Firma de los filtros de la barra: reinicia la tabla (página/filtros de columna). */
+  const queryKey = `${date}|${departmentId}|${q}`;
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError(null);
     scheduleApi
       .weeklyAttendance({ date, departmentId: departmentId || undefined, q: q || undefined })
-      .then((res) => active && setReport(res))
+      .then((res) => {
+        if (!active) return;
+        setReport(res);
+        setReportVersion((v) => v + 1);
+      })
       .catch((e: unknown) => active && setError(e instanceof Error ? e.message : t("loadError")))
       .finally(() => active && setLoading(false));
     return () => {
@@ -69,17 +91,29 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     [departments.data, departmentId]
   );
 
+  /** Filas de la vista Detallada (una por persona y día). */
+  const detailRows = useMemo<WeeklyAttendanceDetailRow[]>(
+    () => (report ? buildDetailRows(report) : []),
+    [report]
+  );
+
   const exportPdf = useCallback(async () => {
     if (!report) return;
     setExporting(true);
     try {
-      await downloadPdf(report, { departmentName });
+      // El PDF replica la tabla: la vista vigente (Resumida/Detallada) con sus
+      // filtros de columna y su orden (la barra ya se aplicó al pedir `report`).
+      const detail = mode === "DETAIL";
+      const rows = detail
+        ? applyClientTableParams<WeeklyAttendanceDetailRow>(detailRows, tableParams, detailFields)
+        : applyClientTableParams<WeeklyAttendanceRow>(report.rows, tableParams, summaryFields);
+      await downloadPdf({ report, mode, rows, meta: { departmentName } });
     } catch (e) {
       setError(e instanceof Error ? e.message : t("common:errors.report"));
     } finally {
       setExporting(false);
     }
-  }, [report, downloadPdf, departmentName, t]);
+  }, [report, mode, detailRows, tableParams, downloadPdf, departmentName, t]);
 
   return {
     t,
@@ -97,6 +131,11 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     mode,
     setMode,
     report,
+    detailRows,
+    tableParams,
+    setTableParams,
+    reportVersion,
+    queryKey,
     loading,
     error,
     setError,

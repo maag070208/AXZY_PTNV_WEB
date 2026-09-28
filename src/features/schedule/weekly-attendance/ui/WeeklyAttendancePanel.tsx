@@ -191,7 +191,15 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
         </ITFlex>
       ) : report && report.rows.length > 0 ? (
         <div className={fx.loading ? "opacity-60 transition-opacity" : undefined}>
-          <WeeklyAttendanceTable report={report} mode={fx.mode} groupByDepartment={!fx.departmentId} t={fx.t} />
+          <WeeklyAttendanceTable
+            report={report}
+            mode={fx.mode}
+            groupByDepartment={!fx.departmentId}
+            t={fx.t}
+            onParamsChange={fx.setTableParams}
+            reloadTrigger={fx.reportVersion}
+            queryKey={fx.queryKey}
+          />
         </div>
       ) : (
         !fx.loading && (

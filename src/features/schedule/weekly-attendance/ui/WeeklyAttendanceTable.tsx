@@ -1,22 +1,24 @@
 import { useMemo } from "react";
 import { ITBadget, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
-import type { Column } from "@axzydev/axzy_ui_system";
+import type { Column, ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import type { TFunction } from "i18next";
 import {
+  buildDetailRows,
   WEEKLY_APPROVAL_BADGE,
   WEEKLY_MERGED_STATUSES,
   WEEKLY_STATUS_BADGE,
   dayLabel,
   hoursDecimal,
   punchTime,
-  type WeeklyAttendanceDay,
   type WeeklyAttendanceDayStatus,
+  type WeeklyAttendanceDetailRow,
   type WeeklyAttendanceReport,
   type WeeklyAttendanceRow,
 } from "@entities/schedule";
-import { makeClientTableFetch, type ClientFields } from "@shared/api/clientTable";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 import { dyn } from "@shared/i18n/dyn";
 import { dateLocale } from "@shared/i18n";
+import { detailFields, summaryFields } from "../model/fields";
 import type { WeeklyAttendanceMode } from "../model/useWeeklyAttendance";
 
 interface Props {
@@ -25,15 +27,15 @@ interface Props {
   /** Con un departamento elegido no se repite en el subtexto de la persona. */
   groupByDepartment: boolean;
   t: TFunction<any>;
-}
-
-/** Una fila del detalle: una persona en un día. */
-interface DetailRow {
-  userId: string;
-  clock: string;
-  name: string;
-  departmentName: string | null;
-  day: WeeklyAttendanceDay;
+  /**
+   * Filtros/orden vigentes de la tabla (barra + columnas + orden). Los usa el
+   * export para generar el PDF con lo mismo que se ve.
+   */
+  onParamsChange?: (params: ITDataTableFetchParams) => void;
+  /** Cambia cuando llega un reporte nuevo: obliga a la tabla client-side a re-pedir datos. */
+  reloadTrigger: number;
+  /** Firma de los filtros de la barra: reinicia página y filtros de columna. */
+  queryKey: string;
 }
 
 const STATUSES: WeeklyAttendanceDayStatus[] = [
@@ -77,47 +79,38 @@ const dayTitle = (dayKey: string): string => {
  * - DETALLADA: una fila por persona y día (entrada/salida, horas, tiempo extra).
  * Los estados se muestran con `ITBadget` (colores de la librería, no fondos).
  */
-export default function WeeklyAttendanceTable({ report, mode, groupByDepartment, t: translate }: Props) {
+export default function WeeklyAttendanceTable({
+  report,
+  mode,
+  groupByDepartment,
+  t: translate,
+  onParamsChange,
+  reloadTrigger,
+  queryKey,
+}: Props) {
   const t = dyn(translate);
   const { timezone } = report.range;
 
-  const detailRows = useMemo<DetailRow[]>(
-    () =>
-      report.rows.flatMap((r) =>
-        r.days.map((day) => ({
-          userId: r.userId,
-          clock: r.clockNumbers.join(", ") || r.employeeNumber || "—",
-          name: r.name,
-          departmentName: r.departmentName,
-          day,
-        }))
-      ),
-    [report]
-  );
+  const detailRows = useMemo(() => buildDetailRows(report), [report]);
 
-  const summaryFields: ClientFields<WeeklyAttendanceRow> = {
-    name: { value: (r) => [r.name, r.employeeNumber ?? "", ...r.clockNumbers].join(" ") },
-    scheduleName: { value: (r) => r.scheduleName ?? "" },
-  };
+  const summaryFetch = useMemo(() => {
+    const fetch = makeClientTableFetch<WeeklyAttendanceRow>(() => Promise.resolve(report.rows), summaryFields);
+    return (params: ITDataTableFetchParams) => {
+      onParamsChange?.(params);
+      return fetch(params);
+    };
+  }, [report, onParamsChange]);
 
-  const detailFields: ClientFields<DetailRow> = {
-    name: { value: (r) => [r.name, r.clock].join(" ") },
-    day: { value: (r) => r.day.date, match: "date" },
-    "day.status": { value: (r) => r.day.status, match: "equals" },
-    "day.shift": { value: (r) => r.day.shift ?? "" },
-  };
-
-  const summaryFetch = useMemo(
-    () => makeClientTableFetch<WeeklyAttendanceRow>(() => Promise.resolve(report.rows), summaryFields),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [report]
-  );
-
-  const detailFetch = useMemo(
-    () => makeClientTableFetch<DetailRow>(() => Promise.resolve(detailRows), detailFields),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [detailRows]
-  );
+  const detailFetch = useMemo(() => {
+    const fetch = makeClientTableFetch<WeeklyAttendanceDetailRow>(
+      () => Promise.resolve(detailRows),
+      detailFields
+    );
+    return (params: ITDataTableFetchParams) => {
+      onParamsChange?.(params);
+      return fetch(params);
+    };
+  }, [detailRows, onParamsChange]);
 
   const subOf = (clock: string, departmentName: string | null) =>
     groupByDepartment && departmentName ? `${clock} · ${departmentName}` : clock;
@@ -196,7 +189,7 @@ export default function WeeklyAttendanceTable({ report, mode, groupByDepartment,
     },
   ];
 
-  const detailColumns: Column<DetailRow>[] = [
+  const detailColumns: Column<WeeklyAttendanceDetailRow>[] = [
     {
       key: "name",
       label: t("columns.employee"),
@@ -303,7 +296,7 @@ export default function WeeklyAttendanceTable({ report, mode, groupByDepartment,
   ];
 
   const common = {
-    reloadTrigger: 0,
+    reloadTrigger,
     defaultItemsPerPage: 50,
     itemsPerPageOptions: [10, 25, 50, 100],
     size: "lg" as const,
@@ -314,7 +307,7 @@ export default function WeeklyAttendanceTable({ report, mode, groupByDepartment,
 
   return mode === "DETAIL" ? (
     <ITDataTable
-      key="detail"
+      key={`detail:${queryKey}`}
       columns={detailColumns as unknown as Column<Record<string, unknown>>[]}
       fetchData={detailFetch as never}
       density="compact"
@@ -323,7 +316,7 @@ export default function WeeklyAttendanceTable({ report, mode, groupByDepartment,
     />
   ) : (
     <ITDataTable
-      key="summary"
+      key={`summary:${queryKey}`}
       columns={summaryColumns as unknown as Column<Record<string, unknown>>[]}
       density="compact"
       fetchData={summaryFetch as never}

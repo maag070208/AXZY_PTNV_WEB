@@ -26,13 +26,13 @@ export default function TimeClockReportPage() {
       icon={<FaUserClock size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("common:nav.access"), onClick: () => navigate("/access") },
+        { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
         { label: t("report.title") },
       ]}
-      backAction={() => navigate("/access/time-clock")}
+      backAction={() => navigate("/hr/time-clock")}
     >
       <ITFlex direction="column" gap={4}>
-        <LinksSummary onGoToLink={() => navigate("/access/time-clock/employees")} />
+        <LinksSummary onGoToLink={() => navigate("/hr/time-clock/employees")} />
         <AccessReportTab fx={fx} />
       </ITFlex>
     </ITPage>

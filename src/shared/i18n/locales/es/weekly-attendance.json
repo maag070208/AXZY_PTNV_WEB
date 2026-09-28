@@ -1,7 +1,7 @@
 {
-  "title": "Nómina",
-  "description": "Entradas, salidas, horas trabajadas y tiempo extra de la semana por departamento para nómina",
-  "breadcrumb": "Nómina",
+  "title": "Pre Nómina",
+  "description": "Entradas, salidas, horas trabajadas y tiempo extra de la semana por departamento para pre nómina",
+  "breadcrumb": "Pre Nómina",
   "filters": {
     "week": "Semana",
     "previousWeek": "Semana anterior",
@@ -98,10 +98,11 @@
   "exportExcel": "Excel",
   "exporting": "Generando…",
   "pdf": {
-    "title": "Puerto Nuevo · Nómina semanal",
+    "title": "Puerto Nuevo · Pre Nómina semanal",
     "company": "Puerto Nuevo Baja Hotel y Villas",
     "department": "Departamento",
     "week": "Semana",
+    "view": "Vista",
     "generatedAt": "Generado el {{date}}"
   },
   "sheetName": "Nómina"

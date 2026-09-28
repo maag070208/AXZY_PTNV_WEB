@@ -19,10 +19,10 @@ export default function TimeClockPage() {
       icon={<FaFingerprint size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("common:nav.access"), onClick: () => navigate("/access") },
+        { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
         { label: t("title") },
       ]}
-      backAction={() => navigate("/access")}
+      backAction={() => navigate("/employees")}
     >
       <TimeClockTab
         fx={fx}

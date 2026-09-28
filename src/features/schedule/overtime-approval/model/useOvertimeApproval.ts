@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
@@ -8,8 +8,7 @@ import {
   type OvertimeSummary,
 } from "@entities/overtime";
 import { departmentsApi, type Department } from "@entities/department";
-import { scheduleApi } from "@entities/schedule";
-import { formatMinutesAsHhMm } from "@shared/utils/dates";
+import { formatDateTime, formatMinutesAsHhMm } from "@shared/utils/dates";
 import type { DownloadOvertimePdf } from "./types";
 import { fileName } from "@shared/i18n";
 
@@ -71,6 +70,8 @@ export const useOvertimeApproval = ({
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingCsv, setExportingCsv] = useState(false);
   const [confirm, setConfirm] = useState<{ status: "APPROVED" | "REJECTED" } | null>(null);
+  /** Filtros/orden vigentes de la tabla (barra + columnas), para el export. */
+  const tableParamsRef = useRef<ITDataTableFetchParams | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -104,6 +105,7 @@ export const useOvertimeApproval = ({
   const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
+    tableParamsRef.current = params;
     const res = await overtimeApi.query({
       page: params.page,
       limit: params.limit,
@@ -193,51 +195,99 @@ export const useOvertimeApproval = ({
     [selected]
   );
 
-  /** Exporta a PDF SOLO lo aprobado (el endpoint ya filtra en el servidor). */
+  /**
+   * Todas las filas del filtro vigente de la tabla (barra + columnas), sin
+   * paginar: recorre las páginas de a 200 (tope del API). Lo comparten PDF y CSV
+   * para que exporten exactamente lo que se ve.
+   */
+  const fetchAllForExport = useCallback(async (): Promise<{
+    rows: OvertimeDayRow[];
+    summary: OvertimeSummary;
+  } | null> => {
+    const base = tableParamsRef.current;
+    const filters = base?.filters ?? externalFilters;
+    const sort = base?.sort;
+    const rows: OvertimeDayRow[] = [];
+    let summary: OvertimeSummary | null = null;
+    let page = 1;
+    for (;;) {
+      const res = await overtimeApi.query({
+        page,
+        limit: 200,
+        filters,
+        ...(sort ? { sort } : {}),
+      });
+      summary = res.summary;
+      rows.push(...res.data);
+      if (rows.length >= res.total || res.data.length === 0) break;
+      page += 1;
+    }
+    return summary ? { rows, summary } : null;
+  }, [externalFilters]);
+
+  /** Exporta a PDF la tabla tal cual: los días del filtro vigente con su estado. */
   const exportPdf = useCallback(async () => {
     setExportingPdf(true);
     setError(null);
     try {
-      const res = await scheduleApi.overtimeExport({ page: 1, limit: 1, filters: baseFilters });
-      if (res.data.length === 0) {
+      const data = await fetchAllForExport();
+      if (!data || data.rows.length === 0) {
         setToast({ message: t("exportEmpty"), type: "error" });
         return;
       }
-      await downloadPdf(res.data, res.summary, {
-        period,
-        date: toDateInput(date),
-        timezone: res.summary.range.timezone || BROWSER_TIMEZONE,
+      await downloadPdf({
+        rows: data.rows,
+        summary: data.summary,
+        meta: {
+          period,
+          date: toDateInput(date),
+          timezone: data.summary.range.timezone || BROWSER_TIMEZONE,
+        },
+        canApprove,
       });
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setExportingPdf(false);
     }
-  }, [baseFilters, period, date, downloadPdf, t]);
+  }, [fetchAllForExport, period, date, downloadPdf, t, canApprove]);
 
-  /** Exporta a CSV SOLO lo aprobado (mismas filas que el PDF). */
+  /** Exporta a CSV las mismas filas que el PDF (la tabla tal cual). */
   const exportCsv = useCallback(async () => {
     setExportingCsv(true);
     setError(null);
     try {
-      const res = await scheduleApi.overtimeExport({ page: 1, limit: 1, filters: baseFilters });
-      if (res.data.length === 0) {
+      const data = await fetchAllForExport();
+      if (!data || data.rows.length === 0) {
         setToast({ message: t("exportEmpty"), type: "error" });
         return;
       }
+      const statusKey = {
+        PENDING: "statusPending",
+        APPROVED: "statusApproved",
+        REJECTED: "statusRejected",
+      } as const;
       const header = [
         t("columns.employee"),
         t("columns.department"),
+        t("columns.date"),
         t("columns.schedule"),
-        t("statusApproved"),
-        t("kpis.approvedDays"),
+        canApprove ? t("columns.extra") : t("statusApproved"),
+        t("status"),
+        t("columns.decidedBy"),
+        t("columns.decidedAt"),
+        t("columns.note"),
       ];
-      const lines = res.data.map((r) => [
-        r.employeeName,
+      const lines = data.rows.map((r) => [
+        r.employeeNumber ? `${r.employeeName} (#${r.employeeNumber})` : r.employeeName,
         r.departmentName ?? "",
+        r.date,
         r.scheduleName ?? t("columns.noSchedule"),
-        formatMinutesAsHhMm(r.approvedMin),
-        r.approvedDays,
+        formatMinutesAsHhMm(canApprove ? r.extraMin : r.approvedExtraMin),
+        t(statusKey[r.status]),
+        r.decidedByName ?? "",
+        r.decidedAt ? formatDateTime(r.decidedAt) : "",
+        r.note ?? "",
       ]);
       const escape = (c: unknown) => `"${String(c ?? "").replace(/"/g, '""')}"`;
       const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");
@@ -245,7 +295,7 @@ export const useOvertimeApproval = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${fileName("approvedOvertime")}-${period.toLowerCase()}-${toDateInput(date)}.csv`;
+      a.download = `${fileName("overtimeReport")}-${period.toLowerCase()}-${toDateInput(date)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -253,7 +303,7 @@ export const useOvertimeApproval = ({
     } finally {
       setExportingCsv(false);
     }
-  }, [baseFilters, period, date, t]);
+  }, [fetchAllForExport, period, date, t, canApprove]);
 
   return {
     canApprove,
