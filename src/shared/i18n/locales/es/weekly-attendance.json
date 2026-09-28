@@ -17,6 +17,9 @@
   "columns": {
     "code": "Cód.",
     "employee": "Empleado",
+    "schedule": "Horario",
+    "day": "Día",
+    "status": "Estado",
     "entry": "Entrada",
     "exit": "Salida",
     "workedTime": "T.T",
@@ -24,7 +27,15 @@
     "overtime": "HE",
     "week": "Semana",
     "approved": "HE aprob.",
-    "absences": "Faltas"
+    "absences": "Faltas",
+    "incomplete": "Checadas incompletas",
+    "missing": "Faltante",
+    "shift": "Turno",
+    "total": "Total"
+  },
+  "view": {
+    "summary": "Resumida",
+    "detail": "Detallada"
   },
   "status": {
     "WORKED": "Trabajado",
@@ -35,6 +46,12 @@
     "REST_WORKED": "Descanso trabajado",
     "NO_INFO": "Sin información",
     "FUTURE": "Por venir"
+  },
+  "statusShort": {
+    "ABSENCE": "Falta",
+    "REST": "Descanso",
+    "NO_INFO": "S/I",
+    "FUTURE": ""
   },
   "approval": {
     "APPROVED": "Aprobada",
@@ -51,10 +68,15 @@
     "incomplete": "Checadas incompletas"
   },
   "legend": "Simbología",
-  "withoutSchedule": "Sin horario: se calcula contra 8 h",
+  "withoutSchedule": "Sin horario: no genera tiempo extra",
+  "noExit": "sin salida",
+  "noEntry": "sin entrada",
+  "notices": {
+    "title": "Avisos de la semana"
+  },
   "unlinked": "Sin vínculo al reloj",
   "unlinkedHint": "{{count}} persona(s) sin vínculo al reloj: sus días salen sin información. Vincúlalas en Control de acceso → Empleados del reloj.",
-  "withoutScheduleHint": "{{count}} persona(s) sin horario asignado: su tiempo extra se calcula contra una jornada de 8 h.",
+  "withoutScheduleHint": "{{count}} persona(s) sin horario asignado: no se les calcula tiempo extra.",
   "tooltip": {
     "shift": "Horario: {{shift}}",
     "noShift": "Sin horario ese día",

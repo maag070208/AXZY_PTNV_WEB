@@ -4,13 +4,15 @@ import { scheduleApi, toDayKey, type WeeklyAttendanceReport } from "@entities/sc
 import { useDepartmentOptions } from "@entities/department";
 import { useWeekStartDay } from "@entities/sys-config";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
-import { exportWeeklyAttendanceXlsx } from "./exportXlsx";
 
 /** Genera el PDF (lo inyecta la página desde el widget de reportes). */
 export type DownloadWeeklyAttendancePdf = (
   report: WeeklyAttendanceReport,
   meta: { departmentName: string | null }
 ) => Promise<void>;
+
+/** Vista de la tabla: resumen semanal por persona o detalle por día. */
+export type WeeklyAttendanceMode = "SUMMARY" | "DETAIL";
 
 const shiftDays = (date: Date, days: number) => {
   const next = new Date(date);
@@ -31,7 +33,8 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
   const [report, setReport] = useState<WeeklyAttendanceReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [exporting, setExporting] = useState<"pdf" | "excel" | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [mode, setMode] = useState<WeeklyAttendanceMode>("SUMMARY");
   const departments = useDepartmentOptions();
   const weekStart = useWeekStartDay();
 
@@ -68,27 +71,15 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
 
   const exportPdf = useCallback(async () => {
     if (!report) return;
-    setExporting("pdf");
+    setExporting(true);
     try {
       await downloadPdf(report, { departmentName });
     } catch (e) {
       setError(e instanceof Error ? e.message : t("common:errors.report"));
     } finally {
-      setExporting(null);
+      setExporting(false);
     }
   }, [report, downloadPdf, departmentName, t]);
-
-  const exportExcel = useCallback(async () => {
-    if (!report) return;
-    setExporting("excel");
-    try {
-      await exportWeeklyAttendanceXlsx(report, { departmentName, t });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t("common:errors.report"));
-    } finally {
-      setExporting(null);
-    }
-  }, [report, departmentName, t]);
 
   return {
     t,
@@ -103,13 +94,14 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     departments,
     search,
     setSearch,
+    mode,
+    setMode,
     report,
     loading,
     error,
     setError,
     exporting,
     exportPdf,
-    exportExcel,
   };
 };
 

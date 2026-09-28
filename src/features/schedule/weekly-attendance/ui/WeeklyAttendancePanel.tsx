@@ -1,44 +1,48 @@
+import { useState } from "react";
 import {
   ITAlert,
+  ITBadget,
   ITButton,
   ITCard,
   ITDatePicker,
+  ITDialog,
   ITFlex,
   ITGrid,
   ITInput,
   ITSearchSelect,
+  ITSegmentedControl,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import {
+  FaBell,
   FaBusinessTime,
   FaCheckCircle,
   FaChevronLeft,
   FaChevronRight,
   FaClock,
-  FaExclamationTriangle,
-  FaFileExcel,
   FaFilePdf,
-  FaHourglassHalf,
+  FaInfoCircle,
   FaUserSlash,
   FaUsers,
 } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { dyn } from "@shared/i18n/dyn";
-import {
-  WEEKLY_LEGEND,
-  WEEKLY_OVERTIME_COLOR,
-  WEEKLY_STATUS_COLORS,
-  dayLabel,
-  hoursDecimal,
-} from "@entities/schedule";
-import type { UseWeeklyAttendance } from "../model/useWeeklyAttendance";
-import WeeklyAttendanceGrid from "./WeeklyAttendanceGrid";
+import { WEEKLY_LEGEND, WEEKLY_STATUS_BADGE, dayLabel, hoursDecimal } from "@entities/schedule";
+import type { UseWeeklyAttendance, WeeklyAttendanceMode } from "../model/useWeeklyAttendance";
+import WeeklyAttendanceTable from "./WeeklyAttendanceTable";
 
-/** Filtros, resumen de la semana, simbología y la cuadrícula del reporte. */
+/** Filtros, resumen de la semana, simbología y la tabla del reporte. */
 export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance }) {
   const t = dyn(fx.t);
   const report = fx.report;
   const summaryKpis = report?.summary;
+  const [noticesOpen, setNoticesOpen] = useState(false);
+
+  // Avisos de la semana (antes eran dos bandas fijas): ahora viven en el ícono.
+  const notices: string[] = [];
+  if (summaryKpis?.unlinked) notices.push(t("unlinkedHint", { count: summaryKpis.unlinked }));
+  if (summaryKpis?.withoutSchedule) notices.push(t("withoutScheduleHint", { count: summaryKpis.withoutSchedule }));
+  const noticesCount = (summaryKpis?.unlinked ?? 0) + (summaryKpis?.withoutSchedule ?? 0);
 
   const handleRange = (
     e:
@@ -49,15 +53,14 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
     if (Array.isArray(value) && value[0]) fx.setWeekDate(value[0]);
   };
 
-  const kpis = summaryKpis
+  // Totales clave de la semana (una sola franja, íconos sutiles).
+  const stats = summaryKpis
     ? [
-        { key: "people", value: String(summaryKpis.people), tint: "bg-slate-100", icon: <FaUsers className="text-slate-600" size={15} /> },
-        { key: "worked", value: hoursDecimal(summaryKpis.workedMin), tint: "bg-sky-50", icon: <FaClock className="text-sky-600" size={15} /> },
-        { key: "overtime", value: hoursDecimal(summaryKpis.extraMin), tint: "bg-emerald-50", icon: <FaBusinessTime className="text-emerald-600" size={15} /> },
-        { key: "approved", value: hoursDecimal(summaryKpis.approvedExtraMin), tint: "bg-emerald-50", icon: <FaCheckCircle className="text-emerald-600" size={15} /> },
-        { key: "notApproved", value: hoursDecimal(summaryKpis.pendingExtraMin), tint: "bg-amber-50", icon: <FaHourglassHalf className="text-amber-600" size={15} /> },
-        { key: "absences", value: String(summaryKpis.absences), tint: "bg-orange-50", icon: <FaUserSlash className="text-orange-500" size={15} /> },
-        { key: "incomplete", value: String(summaryKpis.incompleteDays), tint: "bg-red-50", icon: <FaExclamationTriangle className="text-red-500" size={15} /> },
+        { key: "people", value: String(summaryKpis.people), icon: <FaUsers size={16} /> },
+        { key: "worked", value: hoursDecimal(summaryKpis.workedMin), icon: <FaClock size={16} /> },
+        { key: "overtime", value: hoursDecimal(summaryKpis.extraMin), icon: <FaBusinessTime size={16} /> },
+        { key: "approved", value: hoursDecimal(summaryKpis.approvedExtraMin), icon: <FaCheckCircle size={16} /> },
+        { key: "absences", value: String(summaryKpis.absences), icon: <FaUserSlash size={16} /> },
       ]
     : [];
 
@@ -82,9 +85,6 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
               </div>
               <ITButton variant="outlined" color="secondary" onClick={fx.nextWeek} title={t("filters.nextWeek")}>
                 <FaChevronRight size={12} />
-              </ITButton>
-              <ITButton variant="text" color="gray" onClick={fx.thisWeek}>
-                <ITText className="font-bold text-[11px]">{t("filters.thisWeek")}</ITText>
               </ITButton>
             </ITFlex>
           </ITGrid>
@@ -117,20 +117,45 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
               {t("range", { from: dayLabel(report.range.days[0]), to: dayLabel(report.range.days[6]) })}
               <span className="ml-2 text-[10px] font-bold text-slate-400">{t("timezone", { tz: report.range.timezone })}</span>
             </ITText>
-            <ITFlex gap={2}>
-              <ITButton variant="outlined" color="primary" onClick={fx.exportPdf} disabled={!!fx.exporting || report.rows.length === 0}>
+            <ITFlex align="center" gap={2}>
+              {noticesCount > 0 && (
+                <ITButton
+                  variant="raised-text"
+                  color="secondary"
+                  onClick={() => setNoticesOpen(true)}
+                  title={t("notices.title")}
+                >
+                  <ITFlex align="center" gap={1}>
+                    <FaBell className="text-amber-500" size={13} />
+                    <ITBadget color="warning" size="sm">
+                      {noticesCount}
+                    </ITBadget>
+                  </ITFlex>
+                </ITButton>
+              )}
+              <ITButton variant="raised-text" color="primary" onClick={fx.exportPdf} disabled={fx.exporting || report.rows.length === 0}>
                 <ITFlex align="center" gap={1}>
                   <FaFilePdf className="text-red-600" size={13} />
-                  <ITText className="font-bold text-[11px]">{fx.exporting === "pdf" ? t("exporting") : t("exportPdf")}</ITText>
-                </ITFlex>
-              </ITButton>
-              <ITButton variant="outlined" color="primary" onClick={fx.exportExcel} disabled={!!fx.exporting || report.rows.length === 0}>
-                <ITFlex align="center" gap={1}>
-                  <FaFileExcel className="text-emerald-700" size={13} />
-                  <ITText className="font-bold text-[11px]">{fx.exporting === "excel" ? t("exporting") : t("exportExcel")}</ITText>
+                  <ITText className="font-bold text-[11px]">{fx.exporting ? t("exporting") : t("exportPdf")}</ITText>
                 </ITFlex>
               </ITButton>
             </ITFlex>
+          </ITFlex>
+        )}
+
+        {stats.length > 0 && (
+          <ITFlex wrap="wrap" align="center" gap={6} className="mt-4 border-t border-slate-100 pt-4">
+            {stats.map((s) => (
+              <ITFlex key={s.key} align="center" gap={2}>
+                <span className="text-slate-400">{s.icon}</span>
+                <ITFlex direction="column" gap={0}>
+                  <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    {t(`kpis.${s.key}`)}
+                  </ITText>
+                  <ITText className="text-lg font-black leading-none text-slate-800">{s.value}</ITText>
+                </ITFlex>
+              </ITFlex>
+            ))}
           </ITFlex>
         )}
       </ITCard>
@@ -141,56 +166,23 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
         </ITAlert>
       )}
 
-      {kpis.length > 0 && (
-        <ITFlex wrap="wrap" gap={3}>
-          {kpis.map((k) => (
-            <ITFlex
-              key={k.key}
-              grow={1}
-              basis="170px"
-              align="center"
-              gap={3}
-              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-            >
-              <ITFlex
-                align="center"
-                justify="center"
-                className={`h-10 w-10 shrink-0 rounded-xl ${k.tint}`}
-              >
-                {k.icon}
-              </ITFlex>
-              <ITFlex direction="column" gap={0} className="min-w-0">
-                <ITText className="text-xl font-black leading-none text-slate-800">{k.value}</ITText>
-                <ITText className="truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  {t(`kpis.${k.key}`)}
-                </ITText>
-              </ITFlex>
-            </ITFlex>
+      <ITFlex align="center" justify="between" wrap="wrap" gap={3}>
+        <ITSegmentedControl
+          options={[
+            { value: "SUMMARY", label: t("view.summary") },
+            { value: "DETAIL", label: t("view.detail") },
+          ]}
+          value={fx.mode}
+          onChange={(value) => fx.setMode(value as WeeklyAttendanceMode)}
+        />
+        <ITFlex align="center" wrap="wrap" gap={2}>
+          <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("legend")}</ITText>
+          {WEEKLY_LEGEND.map((status) => (
+            <ITBadget key={status} color={WEEKLY_STATUS_BADGE[status]} size="sm">
+              {t(`status.${status}`)}
+            </ITBadget>
           ))}
         </ITFlex>
-      )}
-
-      {summaryKpis && summaryKpis.unlinked > 0 && (
-        <ITAlert variant="warning" dismissible={false}>{t("unlinkedHint", { count: summaryKpis.unlinked })}</ITAlert>
-      )}
-      {summaryKpis && summaryKpis.withoutSchedule > 0 && (
-        <ITAlert variant="info" dismissible={false}>{t("withoutScheduleHint", { count: summaryKpis.withoutSchedule })}</ITAlert>
-      )}
-
-      <ITFlex align="center" wrap="wrap" gap={2}>
-        <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("legend")}</ITText>
-        {WEEKLY_LEGEND.map((status) => (
-          <span
-            key={status}
-            className="rounded border border-slate-300 px-2 py-0.5 text-[10px] font-bold"
-            style={{
-              backgroundColor: status === "OVERTIME" ? WEEKLY_OVERTIME_COLOR : WEEKLY_STATUS_COLORS[status].background,
-              color: WEEKLY_STATUS_COLORS[status].text,
-            }}
-          >
-            {t(`status.${status}`)}
-          </span>
-        ))}
       </ITFlex>
 
       {fx.loading && !report ? (
@@ -199,7 +191,7 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
         </ITFlex>
       ) : report && report.rows.length > 0 ? (
         <div className={fx.loading ? "opacity-60 transition-opacity" : undefined}>
-          <WeeklyAttendanceGrid report={report} groupByDepartment={!fx.departmentId} t={fx.t} />
+          <WeeklyAttendanceTable report={report} mode={fx.mode} groupByDepartment={!fx.departmentId} t={fx.t} />
         </div>
       ) : (
         !fx.loading && (
@@ -208,6 +200,17 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
           </ITCard>
         )
       )}
+
+      <ITDialog isOpen={noticesOpen} onClose={() => setNoticesOpen(false)} title={t("notices.title")}>
+        <ITFlex direction="column" gap={3}>
+          {notices.map((notice, i) => (
+            <ITFlex key={i} align="start" gap={2}>
+              <FaInfoCircle className="mt-0.5 shrink-0 text-amber-500" size={13} />
+              <ITText className="text-[12px] font-bold text-slate-600">{notice}</ITText>
+            </ITFlex>
+          ))}
+        </ITFlex>
+      </ITDialog>
     </ITFlex>
   );
 }

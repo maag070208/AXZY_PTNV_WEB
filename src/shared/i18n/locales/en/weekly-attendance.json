@@ -17,6 +17,9 @@
   "columns": {
     "code": "Code",
     "employee": "Employee",
+    "schedule": "Schedule",
+    "day": "Day",
+    "status": "Status",
     "entry": "In",
     "exit": "Out",
     "workedTime": "W.T",
@@ -24,7 +27,15 @@
     "overtime": "OT",
     "week": "Week",
     "approved": "OT appr.",
-    "absences": "Absences"
+    "absences": "Absences",
+    "incomplete": "Incomplete punches",
+    "missing": "Missing",
+    "shift": "Shift",
+    "total": "Total"
+  },
+  "view": {
+    "summary": "Summary",
+    "detail": "Detailed"
   },
   "status": {
     "WORKED": "Worked",
@@ -35,6 +46,12 @@
     "REST_WORKED": "Day off worked",
     "NO_INFO": "No information",
     "FUTURE": "Upcoming"
+  },
+  "statusShort": {
+    "ABSENCE": "Absence",
+    "REST": "Day off",
+    "NO_INFO": "N/A",
+    "FUTURE": ""
   },
   "approval": {
     "APPROVED": "Approved",
@@ -51,10 +68,15 @@
     "incomplete": "Incomplete punches"
   },
   "legend": "Legend",
-  "withoutSchedule": "No schedule: calculated against 8 h",
+  "withoutSchedule": "No schedule: no overtime",
+  "noExit": "no exit",
+  "noEntry": "no entry",
+  "notices": {
+    "title": "Week notices"
+  },
   "unlinked": "Not linked to the time clock",
   "unlinkedHint": "{{count}} person(s) not linked to the time clock: their days show no information. Link them in Access control → Time clock employees.",
-  "withoutScheduleHint": "{{count}} person(s) without an assigned schedule: their overtime is calculated against an 8 h workday.",
+  "withoutScheduleHint": "{{count}} person(s) without an assigned schedule: no overtime is calculated for them.",
   "tooltip": {
     "shift": "Schedule: {{shift}}",
     "noShift": "No schedule that day",

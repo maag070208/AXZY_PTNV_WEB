@@ -37,6 +37,27 @@ export const WEEKLY_MERGED_STATUSES: WeeklyAttendanceDayStatus[] = ["ABSENCE", "
 /** Orden de la simbología. */
 export const WEEKLY_LEGEND: WeeklyAttendanceDayStatus[] = ["NO_INFO", "OVERTIME", "ABSENCE", "INCOMPLETE", "REST", "REST_WORKED"];
 
+/** Color de `ITBadget` por estado del día (tabla y simbología). */
+export type WeeklyBadgeColor = "success" | "warning" | "danger" | "gray" | "info";
+
+export const WEEKLY_STATUS_BADGE: Record<WeeklyAttendanceDayStatus, WeeklyBadgeColor> = {
+  WORKED: "gray",
+  OVERTIME: "success",
+  ABSENCE: "warning",
+  INCOMPLETE: "danger",
+  REST: "gray",
+  REST_WORKED: "info",
+  NO_INFO: "warning",
+  FUTURE: "gray",
+};
+
+/** Color de `ITBadget` por decisión de tiempo extra. */
+export const WEEKLY_APPROVAL_BADGE: Record<WeeklyAttendanceApproval, WeeklyBadgeColor> = {
+  APPROVED: "success",
+  PENDING: "warning",
+  REJECTED: "danger",
+};
+
 /** Minutos → horas decimales como en el Excel (`8.55`). */
 export const hoursDecimal = (minutes: number): string => (minutes / 60).toFixed(2);
 

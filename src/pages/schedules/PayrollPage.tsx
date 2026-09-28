@@ -20,6 +20,9 @@ export default function PayrollPage() {
       title={t("title")}
       description={t("description")}
       icon={<FaMoneyCheckAlt size={20} />}
+      noPadding
+      horizontalPadding={"px-0"}
+      maxWidth="7xl"
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("common:nav.hr"), onClick: () => navigate("/employees") },

@@ -21,6 +21,9 @@ export default function RequiresPermission({ permission, children }: Props) {
   const scope = usePermission(permission);
 
   if (!user) return null;
+  // Al recargar la página, el usuario persistido puede venir sin permisos hasta
+  // que responde `meThunk`: no se redirige en falso (se espera a que carguen).
+  if (user.permissions === undefined) return null;
   if (scope === "NONE") return <Navigate to="/" replace />;
 
   return <>{children}</>;
