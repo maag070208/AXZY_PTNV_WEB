@@ -5,6 +5,8 @@ import { subareaApi, type Subarea } from "@entities/subarea";
 
 export const useSubareasCrud = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
+  // Filtro de la tabla: incluye departamentos inactivos, que también tienen subáreas.
+  const [allDepartments, setAllDepartments] = useState<Department[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -19,6 +21,7 @@ export const useSubareasCrud = () => {
 
   useEffect(() => {
     departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
+    departmentsApi.list(true).then(setAllDepartments).catch(() => setAllDepartments([]));
   }, []);
 
   const reload = () => setReloadKey((k) => k + 1);
@@ -78,7 +81,7 @@ export const useSubareasCrud = () => {
     const res = await subareaApi.table({
       page: params.page,
       limit: params.limit,
-      filters: params.filters as Record<string, string | number | boolean>,
+      filters: params.filters,
       sort: params.sort,
     });
     return {
@@ -89,6 +92,7 @@ export const useSubareasCrud = () => {
 
   return {
     departments,
+    allDepartments,
     error,
     setError,
     reloadKey,

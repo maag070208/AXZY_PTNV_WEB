@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { ticketsApi, type KanbanAssignment } from "@entities/ticket";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 
 export const ASSIGNMENT_STATUS_BADGE: Record<string, { color: string }> = {
   PENDING: { color: "gray" },
@@ -31,15 +31,17 @@ export const useAssignmentList = (loadErrorKey: string) => {
     load();
   }, [load, reloadKey]);
 
-  const fetchTableData = useCallback(
-    async (params: ITDataTableFetchParams) => {
-      const start = (params.page - 1) * params.limit;
-      const page = rows.slice(start, start + params.limit);
-      return {
-        data: page as unknown as Record<string, unknown>[],
-        total: rows.length,
-      };
-    },
+  // Filtro y orden en memoria sobre las tareas ya cargadas (misma semántica que las tablas server-side).
+  const fetchTableData = useMemo(
+    () =>
+      makeClientTableFetch<KanbanAssignment>(async () => rows, {
+        title: { value: (r) => [r.title, r.description] },
+        employee: { value: (r) => [r.user.name, r.user.employeeNumber], sortValue: (r) => r.user.name },
+        ticket: { value: (r) => r.ticket.title },
+        status: { match: "equals" },
+        // Coincide si el inicio o la entrega caen en el rango; ordena por entrega.
+        dates: { value: (r) => [r.startDate, r.dueDate], match: "date", sortValue: (r) => r.dueDate },
+      }),
     [rows]
   );
 

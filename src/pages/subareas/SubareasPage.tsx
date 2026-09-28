@@ -58,6 +58,7 @@ export default function SubareasPage() {
       )}
 
       <SubareasTable
+        departments={crud.allDepartments}
         fetchData={crud.fetchTableData}
         reloadKey={crud.reloadKey}
         onEdit={crud.openEdit}

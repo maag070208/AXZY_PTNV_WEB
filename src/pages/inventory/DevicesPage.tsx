@@ -16,10 +16,17 @@ export default function DevicesPage() {
   }, []);
 
   const fetchData = useMemo(
-    () => makeClientTableFetch<Device>(() => inventoryApi.devices({ stock: true })),
+    () =>
+      makeClientTableFetch<Device>(() => inventoryApi.devices({ stock: true }), {
+        name: { value: (d) => [d.name, d.brand, d.model] },
+        typeId: { match: "equals", sortValue: (d) => d.type?.name },
+        available: { value: (d) => d.stock?.AVAILABLE ?? 0 },
+        loaned: { value: (d) => d.stock?.ON_LOAN ?? 0 },
+        retirement: { value: (d) => d.stock?.RETIRED ?? 0 },
+        total: { value: (d) => d.stock?.total ?? 0 },
+      }),
     []
   );
-  const activeTypes = useMemo(() => types.filter((x) => x.active), [types]);
 
   const columns: any[] = [
     {
@@ -27,7 +34,7 @@ export default function DevicesPage() {
       key: "name",
       label: t("devices.colName"),
       width: 300,
-      sortable: false,
+      sortable: true,
       filter: true,
       render: (d: Device) => (
         <ITFlex direction="column" gap={0.5}>
@@ -41,9 +48,11 @@ export default function DevicesPage() {
       key: "typeId",
       label: t("devices.colType"),
       width: 160,
+      sortable: true,
       filter: "catalog" as const,
       catalogOptions: {
-        data: activeTypes,
+        // Todos los tipos: también hay dispositivos de tipos inactivos.
+        data: types,
         loading: false,
         error: false,
       },
@@ -54,7 +63,7 @@ export default function DevicesPage() {
       key: "available",
       label: t("devices.colAvail"),
       width: 110,
-      sortable: false,
+      sortable: true,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-emerald-600">{d.stock?.AVAILABLE ?? 0}</ITText>,
     },
     {
@@ -62,7 +71,7 @@ export default function DevicesPage() {
       key: "loaned",
       label: t("devices.colLoaned"),
       width: 110,
-      sortable: false,
+      sortable: true,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-amber-600">{d.stock?.ON_LOAN ?? 0}</ITText>,
     },
     {
@@ -70,7 +79,7 @@ export default function DevicesPage() {
       key: "retirement",
       label: t("devices.colRetirement"),
       width: 110,
-      sortable: false,
+      sortable: true,
       render: (d: Device) => <ITText className="text-[11px] font-bold text-red-500">{d.stock?.RETIRED ?? 0}</ITText>,
     },
     {
@@ -78,7 +87,7 @@ export default function DevicesPage() {
       key: "total",
       label: t("devices.colTotal"),
       width: 110,
-      sortable: false,
+      sortable: true,
       render: (d: Device) => <ITText className="text-[11px] font-black text-slate-800">{d.stock?.total ?? 0}</ITText>,
     },
     {

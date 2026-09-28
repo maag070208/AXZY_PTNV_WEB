@@ -25,6 +25,10 @@ const dayKey = (d: ScheduleDay): string =>
     ? "rest"
     : `${d.startTime}-${d.endTime}${d.splitStartTime && d.splitEndTime ? ` + ${d.splitStartTime}-${d.splitEndTime}` : ""}`;
 
+// Nombre completo del día, para el filtro "trabaja el…".
+const dayName = (weekday: number): string =>
+  new Date(Date.UTC(2024, 0, weekday)).toLocaleDateString(dateLocale(), { weekday: "long", timeZone: "UTC" });
+
 /** "L-V 08:00-16:00 · S 08:00-14:00 · D descansa" */
 function formatDays(days: ScheduleDay[]): string {
   const sorted = [...days].sort((a, b) => a.weekday - b.weekday);
@@ -57,7 +61,18 @@ export default function SchedulesTable() {
   // El fetcher corre en cada refetch; `reloadTrigger` fuerza a ITDataTable a
   // volver a pedir los datos tras un cambio.
   const fetchData = useMemo(
-    () => makeClientTableFetch<Schedule>(() => scheduleApi.list(true)),
+    () =>
+      makeClientTableFetch<Schedule>(() => scheduleApi.list(true), {
+        // Filtra por día laborable (no de descanso); ordena por cuántos trabaja.
+        days: {
+          match: "equals",
+          value: (h) => h.days.filter((d) => !d.restDay).map((d) => d.weekday),
+          sortValue: (h) => h.days.filter((d) => !d.restDay).length,
+        },
+        rules: { value: (h) => h.entryToleranceMin, sortValue: (h) => h.entryToleranceMin },
+        assigned: { value: (h) => h.assigned ?? 0 },
+        active: { match: "equals" },
+      }),
     []
   );
 
@@ -97,9 +112,11 @@ export default function SchedulesTable() {
     {
       key: "days",
       label: t("days"),
-      type: "string",
+      type: "catalog",
       width: 300,
-      sortable: false,
+      sortable: true,
+      filter: "catalog",
+      catalogOptions: { data: [1, 2, 3, 4, 5, 6, 7].map((id) => ({ id: String(id), name: dayName(id) })) },
       render: (h) => (
         <ITText className="text-[11px] text-slate-600">{formatDays(h.days)}</ITText>
       ),
@@ -109,7 +126,7 @@ export default function SchedulesTable() {
       label: t("tolEntry"),
       type: "string",
       width: 300,
-      sortable: false,
+      sortable: true,
       render: (h) => (
         <ITText className="text-[11px] text-slate-500 whitespace-nowrap">
           E{h.entryToleranceMin} / S{h.exitToleranceMin} · {t("meal")} {h.mealBreakMin} · {t("minExtra")} {h.minOvertimeMin}
@@ -121,15 +138,22 @@ export default function SchedulesTable() {
       label: t("assignedLabel"),
       type: "number",
       width: 110,
-      sortable: false,
+      sortable: true,
       render: (h) => <ITText className="text-[12px] font-bold text-slate-700">{h.assigned ?? 0}</ITText>,
     },
     {
       key: "active",
       label: t("active"),
-      type: "boolean",
+      type: "catalog",
       width: 130,
-      sortable: false,
+      sortable: true,
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "true", name: t("active") },
+          { id: "false", name: t("inactive") },
+        ],
+      },
       render: (h) => (
         <ITBadget color={h.active ? "success" : "danger"} size="sm">
           {h.active ? t("active") : t("inactive")}

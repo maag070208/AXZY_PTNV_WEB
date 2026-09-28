@@ -30,8 +30,6 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
-  /** Opciones del filtro Empleado/Responsable (`userId`). */
-  userOptions: Array<{ id: string; name: string }>;
   onView: (disciplinaryReport: DisciplinaryReport) => void;
   onDelete: (disciplinaryReport: DisciplinaryReport) => void;
 }
@@ -48,7 +46,6 @@ const REASONS = [
 export default function DisciplinaryReportsTable({
   fetchData,
   reloadKey,
-  userOptions,
   onView,
   onDelete,
 }: Props) {
@@ -58,10 +55,11 @@ export default function DisciplinaryReportsTable({
     {
       key: "incidentDate",
       label: tt("table.date"),
-      type: "string",
-      width: 140,
-      filter: true,
-      sortable: false,
+      type: "date",
+      width: 190,
+      filter: "date-range",
+      sortable: true,
+      dateFilterOptions: { maxDate: new Date() },
       render: (a) => (
         <ITText className="text-[11px] font-black text-slate-700">{a.incidentDate}</ITText>
       ),
@@ -72,7 +70,7 @@ export default function DisciplinaryReportsTable({
       type: "catalog",
       width: 140,
       filter: "catalog",
-      sortable: false,
+      sortable: true,
       catalogOptions: {
         data: REASONS.map((id) => ({ id, name: tt(`reasons.${id}`) })),
         loading: false,
@@ -85,13 +83,13 @@ export default function DisciplinaryReportsTable({
       ),
     },
     {
-      key: "userId",
+      // Texto (nombre o número): incluye a quien ya no está activo.
+      key: "employee",
       label: tt("table.employee"),
-      type: "catalog",
+      type: "string",
       width: 220,
-      filter: "catalog",
-      sortable: false,
-      catalogOptions: { data: userOptions, loading: false, error: false },
+      filter: true,
+      sortable: true,
       render: (a) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{a.user.name}</ITText>
@@ -106,8 +104,8 @@ export default function DisciplinaryReportsTable({
       label: tt("table.jobTitle"),
       type: "string",
       width: 220,
-      filter: false,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (a) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {a.user.jobTitle ?? "—"}
@@ -119,7 +117,7 @@ export default function DisciplinaryReportsTable({
       label: tt("table.description"),
       type: "string",
       width: 300,
-      filter: false,
+      filter: true,
       sortable: false,
       render: (a) => (
         <ITText className="text-[10px] text-slate-500 line-clamp-2 max-w-[260px]">
@@ -132,7 +130,7 @@ export default function DisciplinaryReportsTable({
       label: tt("table.sanction"),
       type: "string",
       width: 200,
-      filter: false,
+      filter: true,
       sortable: false,
       render: (a) => (
         <ITText className="text-[10px] text-slate-500 line-clamp-2 max-w-[200px]">
@@ -145,8 +143,8 @@ export default function DisciplinaryReportsTable({
       label: tt("table.createdBy"),
       type: "string",
       width: 200,
-      filter: false,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (a) => (
         <ITText className="text-[10px] font-bold text-slate-500">{a.createdBy.name}</ITText>
       ),

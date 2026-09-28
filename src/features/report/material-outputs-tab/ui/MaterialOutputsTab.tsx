@@ -49,8 +49,10 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       key: "date",
       label: t("exits.colDate"),
       type: "date",
-      width: 130,
-      sortable: false,
+      width: 190,
+      filter: "date-range",
+      dateFilterOptions: { maxDate: new Date() },
+      sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">
           {formatDate(r.date)}
@@ -63,6 +65,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       type: "string",
       width: 300,
       filter: true,
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">
@@ -81,7 +84,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       label: t("exits.colQty"),
       type: "number",
       width: 90,
-      sortable: false,
+      sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-700">{r.quantity}</ITText>
       ),
@@ -89,10 +92,11 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
     {
       key: "departmentName",
       label: t("exits.colDept"),
-      type: "string",
+      type: "catalog",
       width: 200,
-      filter: true,
-      sortable: false,
+      filter: "search",
+      catalogOptions: fx.departmentOptions,
+      sortable: true,
       render: (r) => (
         <ITText className="text-[10px] uppercase text-slate-500">{r.departmentName}</ITText>
       ),
@@ -100,10 +104,11 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
     {
       key: "userName",
       label: t("exits.colUser"),
-      type: "string",
+      type: "catalog",
       width: 240,
-      filter: true,
-      sortable: false,
+      filter: "search",
+      catalogOptions: fx.userOptions,
+      sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-600">{r.userName}</ITText>
       ),
@@ -111,8 +116,16 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
     {
       key: "reason",
       label: t("exits.colReason"),
-      type: "string",
+      type: "catalog",
       width: 140,
+      filter: "catalog",
+      sortable: true,
+      catalogOptions: {
+        data: (Object.keys(REASON_COLORS) as MaterialOutputReason[]).map((id) => ({
+          id,
+          name: t(`material-outputs:reason.${id}`),
+        })),
+      },
       render: (r) =>
         r.reason ? (
           <ITBadget color={REASON_COLORS[r.reason]} size="lg">
@@ -127,10 +140,12 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       label: t("exits.colDevice"),
       type: "string",
       width: 150,
+      filter: true,
+      sortable: true,
       render: (r) =>
-        r.device ? (
+        r.deviceUnit ? (
           <ITText className="text-[11px] font-black text-emerald-700">
-            {r.device.assetTag}
+            {r.deviceUnit.assetTag}
           </ITText>
         ) : (
           <ITText className="text-[10px] text-slate-300">—</ITText>
@@ -141,6 +156,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       label: t("exits.colNotes"),
       type: "string",
       width: 260,
+      filter: true,
       render: (r) => (
         <ITText className="text-[10px] text-slate-500 max-w-[220px] truncate">
           {r.notes ?? "—"}

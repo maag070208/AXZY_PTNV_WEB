@@ -30,7 +30,8 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.task"),
       type: "string",
       width: 300,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{row.title}</ITText>
@@ -45,7 +46,8 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.employee"),
       type: "string",
       width: 240,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
@@ -60,7 +62,8 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.ticket"),
       type: "string",
       width: 300,
-      sortable: false,
+      filter: true,
+      sortable: true,
       render: (row) => (
         <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.title}</ITText>
       ),
@@ -68,9 +71,16 @@ export default function AdminTasksTable({ fx }: Props) {
     {
       key: "status",
       label: tt("tasksTable.status"),
-      type: "string",
+      type: "catalog",
       width: 150,
-      sortable: false,
+      filter: "catalog",
+      catalogOptions: {
+        data: Object.keys(ASSIGNMENT_STATUS_BADGE).map((id) => ({
+          id,
+          name: dyn(tt)(`detail.taskStatusOptions.${id}`),
+        })),
+      },
+      sortable: true,
       render: (row) => (
         <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="lg">
           {dyn(tt)(`detail.taskStatusOptions.${row.status}`)}
@@ -80,9 +90,10 @@ export default function AdminTasksTable({ fx }: Props) {
     {
       key: "dates",
       label: tt("tasksTable.dates"),
-      type: "string",
+      type: "date",
       width: 220,
-      sortable: false,
+      filter: "date-range",
+      sortable: true,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
           {row.startDate && (

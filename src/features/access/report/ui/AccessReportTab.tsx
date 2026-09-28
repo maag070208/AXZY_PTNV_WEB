@@ -132,6 +132,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.employee"),
       type: "string",
       width: 300,
+      filter: true,
       sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
@@ -149,6 +150,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.department"),
       type: "string",
       width: 200,
+      filter: true,
       sortable: true,
       render: (r) =>
         r.departmentName ? (
@@ -164,16 +166,19 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       label: t("columns.jobTitle"),
       type: "string",
       width: 200,
+      filter: true,
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700">{r.jobTitle ?? "—"}</ITText>
       ),
     },
     {
-      key: "date",
+      // Días dentro del periodo elegido (semana o mes). "day": `date` es el ancla del periodo.
+      key: "day",
       label: t("columns.date"),
-      type: "string",
-      width: 130,
+      type: "date",
+      width: 190,
+      filter: "date-range",
       sortable: true,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -220,9 +225,16 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
     {
       key: "incident",
       label: t("columns.incident"),
-      type: "string",
+      type: "catalog",
       width: 160,
-      sortable: false,
+      sortable: true,
+      filter: "catalog",
+      catalogOptions: {
+        data: [...(Object.keys(INCIDENT_COLOR) as AccessIncidentCode[]), "NONE" as const].map((id) => ({
+          id,
+          name: t(`incidents.${id}`),
+        })),
+      },
       render: (r) => renderIncident(r.incident),
     },
   ];

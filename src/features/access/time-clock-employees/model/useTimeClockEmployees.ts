@@ -60,7 +60,7 @@ export const useTimeClockEmployees = () => {
     const res = await timeClockApi.employees({
       page: params.page,
       limit: params.limit,
-      filters: params.filters as Record<string, string | number | boolean>,
+      filters: params.filters,
       sort: params.sort,
     });
     setSummary(res.summary);

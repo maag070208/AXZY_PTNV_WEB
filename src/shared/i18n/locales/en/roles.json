@@ -99,6 +99,7 @@
     "createTitle": "New permission",
     "editTitle": "Edit permission",
     "sensitive": "Sensitive",
+    "notSensitive": "Not sensitive",
     "active": "Active",
     "inactive": "Inactive",
     "activate": "Activate",

@@ -8,6 +8,8 @@ import {
 } from "@entities/report";
 import { appliedFilters, type TableQuery } from "@shared/utils/tableFilters";
 import { dyn } from "@shared/i18n/dyn";
+import { usePeopleOptions } from "@entities/user";
+import { useDepartmentOptions } from "@entities/department";
 
 /** Orden vigente de la tabla; la columna ES una unidad física. */
 export type DevicesSort = NonNullable<ITDataTableFetchParams["sort"]>;
@@ -20,8 +22,8 @@ const FILTER_LABELS: Record<string, string> = {
   assetTag: "devices.activeCol",
   description: "devices.colDescription",
   status: "devices.colStatus",
-  custodian: "devices.colCustodian",
-  department: "devices.colDept",
+  custodianId: "devices.colCustodian",
+  departmentId: "devices.colDept",
   area: "devices.colArea",
   start: "pdf.filterFrom",
   end: "pdf.filterTo",
@@ -54,6 +56,9 @@ export const useDevicesReport = ({ download }: Options) => {
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  // Opciones de los filtros Responsable y Departamento (también en el pie del PDF).
+  const peopleOptions = usePeopleOptions();
+  const departmentOptions = useDepartmentOptions();
   // Rango vacío = sin recorte (comportamiento previo). Con rango, el API filtra
   // por la fecha del préstamo VIGENTE: las unidades no prestadas quedan fuera y
   // tabla, KPIs y PDF comparten el mismo recorte.
@@ -71,7 +76,7 @@ export const useDevicesReport = ({ download }: Options) => {
   const lastQuery = useRef<TableQuery>({ filters: {}, sort: DEFAULT_DEVICES_SORT });
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
-    const filters = params.filters as Record<string, string | number | boolean>;
+    const filters = params.filters;
     const sort = params.sort ?? DEFAULT_DEVICES_SORT;
     lastQuery.current = { filters, sort };
 
@@ -90,6 +95,8 @@ export const useDevicesReport = ({ download }: Options) => {
       if (value === "ASSIGNED") return t("devices.assignedStatus");
       if (value === "AVAILABLE") return t("devices.availableStatus");
       if (value === "RETIRED") return t("devices.retirementStatus");
+      if (value === "DAMAGED") return t("devices.damagedStatus");
+      if (value === "IN_MAINTENANCE") return t("devices.maintenanceStatus");
       return t("devices.otherStatus");
     },
     [t]
@@ -112,7 +119,7 @@ export const useDevicesReport = ({ download }: Options) => {
         truncated: res.truncated,
         meta: {
           generatedAt: new Date().toISOString(),
-          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t), valueLabel),
+          appliedFilters: appliedFilters(exportFilters, FILTER_LABELS, dyn(t), { translateValue: valueLabel, catalogs: { custodianId: peopleOptions.data, departmentId: departmentOptions.data } }),
         },
       });
     } catch (e) {
@@ -120,7 +127,7 @@ export const useDevicesReport = ({ download }: Options) => {
     } finally {
       setExporting(false);
     }
-  }, [download, t, externalFilters, valueLabel]);
+  }, [download, t, externalFilters, valueLabel, peopleOptions.data, departmentOptions.data]);
 
   return {
     t,
@@ -135,6 +142,8 @@ export const useDevicesReport = ({ download }: Options) => {
     externalFilters,
     handleDownloadPdf,
     fetchTableData,
+    peopleOptions,
+    departmentOptions,
   };
 };
 

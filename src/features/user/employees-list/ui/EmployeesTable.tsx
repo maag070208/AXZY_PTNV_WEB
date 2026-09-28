@@ -53,15 +53,12 @@ export default function EmployeesTable({
   onEdit,
 }: Props) {
   const { t: tt } = useTranslation(["users"]);
-  const departmentOptions = departments
-    .filter((d) => d.active)
-    .map((d) => ({ id: d.id, name: d.name }));
+  // Todos los departamentos y subáreas: también hay personal en los inactivos.
+  const departmentOptions = departments.map((d) => ({ id: d.id, name: d.name }));
 
-  const subareaOptions = departments
-    .filter((d) => d.active)
-    .flatMap((d) =>
-      d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` }))
-    );
+  const subareaOptions = departments.flatMap((d) =>
+    d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` }))
+  );
 
   // Roles que admite el API para el personal (PERSONAL_ROLES).
   const roleOptions = (["MANAGER", "AREA_HEAD", "EMPLOYEE"] as const).map((id) => ({
@@ -76,7 +73,7 @@ export default function EmployeesTable({
       type: "string",
       width: 110,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (u) => (
         <ITText className="text-[11px] font-black text-slate-700">
           {u.employeeNumber ?? "—"}
@@ -89,7 +86,7 @@ export default function EmployeesTable({
       type: "string",
       width: 300,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (u) => (
         <ITFlex
           direction="column"
@@ -109,14 +106,15 @@ export default function EmployeesTable({
       type: "catalog",
       width: 140,
       filter: "catalog",
-      sortable: false,
+      sortable: true,
       catalogOptions: { data: roleOptions, loading: false, error: false },
       render: (u) => roleBadge(u.role, roleLabel(u.role)),
     },
     {
       key: "active",
       label: tt("table.status"),
-      type: "boolean" as const,
+      type: "catalog" as const,
+      sortable: true,
       width: 140,
       filter: "catalog",
       catalogOptions: {
@@ -139,7 +137,7 @@ export default function EmployeesTable({
       type: "string",
       width: 220,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (u) => (
         <ITText className="text-[11px] font-bold text-slate-600">{u.jobTitle ?? "—"}</ITText>
       ),
@@ -149,7 +147,8 @@ export default function EmployeesTable({
       label: tt("table.departmentFull"),
       type: "catalog",
       width: 200,
-      filter: "catalog",
+      filter: "search",
+      sortable: true,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] font-black text-slate-600 uppercase">
@@ -162,7 +161,8 @@ export default function EmployeesTable({
       label: tt("table.subarea"),
       type: "catalog",
       width: 200,
-      filter: "catalog",
+      filter: "search",
+      sortable: true,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
         <ITText className="text-[10px] font-bold text-slate-500 uppercase">

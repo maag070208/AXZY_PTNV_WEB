@@ -112,7 +112,7 @@ export default function MaterialOutputsPdf({ rows, title, appliedFilters }: Prop
                     <Text style={styles.emptyBadge}>—</Text>
                   )}
                 </View>
-                <View style={{ width: COL.device }}><Text style={pdfTheme.cellMuted}>{r.device?.assetTag ?? "—"}</Text></View>
+                <View style={{ width: COL.device }}><Text style={pdfTheme.cellMuted}>{r.deviceUnit?.assetTag ?? "—"}</Text></View>
               </View>
             ))}
 

@@ -118,18 +118,22 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
   // Sort vigente de la tabla, compartido con los exports. Al cambiar los filtros
   // la tabla se remonta y pierde su orden: el ref vuelve al default.
   const sortRef = useRef<AccessReportSort>(DEFAULT_REPORT_SORT);
+  // Filtros vigentes de la tabla (barra + columnas): los exports muestran lo mismo que la tabla.
+  const filtersRef = useRef<ITDataTableFetchParams["filters"]>(externalFilters);
 
   useEffect(() => {
     sortRef.current = DEFAULT_REPORT_SORT;
+    filtersRef.current = externalFilters;
   }, [externalFilters]);
 
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
     const sort = params.sort ?? DEFAULT_REPORT_SORT;
     sortRef.current = sort;
+    filtersRef.current = params.filters;
     const res = await source.report({
       page: params.page,
       limit: params.limit,
-      filters: params.filters as Record<string, string | number | boolean>,
+      filters: params.filters,
       sort,
     });
     setSummary(res.summary);
@@ -146,7 +150,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
       const res = await source.reportExport({
         page: 1,
         limit: 100,
-        filters: externalFilters,
+        filters: filtersRef.current,
         sort: sortRef.current,
       });
       await download(res.data, res.summary, {
@@ -159,7 +163,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
     } finally {
       setExporting(false);
     }
-  }, [download, source, externalFilters, period, dateKey, t]);
+  }, [download, source, period, dateKey, t]);
 
   const handleDownloadCsv = useCallback(async () => {
     setExporting(true);
@@ -168,7 +172,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
       const res = await source.reportExport({
         page: 1,
         limit: 1000,
-        filters: externalFilters,
+        filters: filtersRef.current,
         sort: sortRef.current,
       });
       const tz = res.summary.range.timezone || BROWSER_TIMEZONE;
@@ -211,7 +215,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
     } finally {
       setExporting(false);
     }
-  }, [source, externalFilters, period, dateKey, t]);
+  }, [source, period, dateKey, t]);
 
   return {
     t,

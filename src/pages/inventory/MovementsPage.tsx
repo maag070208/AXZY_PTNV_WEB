@@ -49,6 +49,8 @@ interface MovementRow {
   type: MovementType;
   name: string;
   unit: string;
+  /** Número de serie de la unidad, para buscar por él. */
+  serial?: string | null;
   reason?: string | null;
   custodian?: { id: string; name: string } | null;
   user?: { id: string; name: string } | null;
@@ -70,6 +72,7 @@ function flattenMovements(list: Movement[]): MovementRow[] {
             type: m.type,
             name,
             unit: u.deviceUnit?.assetTag ?? "—",
+            serial: u.deviceUnit?.serialNumber,
             reason: m.reason,
             custodian: m.custodian,
             user: m.createdBy,
@@ -117,11 +120,19 @@ export default function MovementsPage() {
 
   const fetchData = useMemo(
     () =>
-      makeClientTableFetch<Record<string, unknown>>(async () => {
-        const list = await inventoryApi.movements();
-        const filtered = typeFilter ? list.filter((m) => GROUP_TYPES[typeFilter].includes(m.type)) : list;
-        return flattenMovements(filtered) as unknown as Record<string, unknown>[];
-      }),
+      makeClientTableFetch<MovementRow>(
+        async () => {
+          const list = await inventoryApi.movements();
+          const filtered = typeFilter ? list.filter((m) => GROUP_TYPES[typeFilter].includes(m.type)) : list;
+          return flattenMovements(filtered);
+        },
+        {
+          type: { match: "equals" },
+          name: { value: (m) => [m.name, m.unit, m.serial] },
+          custodian: { value: (m) => m.custodian?.name ?? m.user?.name },
+          status: { match: "equals" },
+        }
+      ),
     [typeFilter]
   );
 
@@ -170,8 +181,10 @@ export default function MovementsPage() {
       type: "date",
       key: "date",
       label: t("stockLedger.date"),
-      width: 160,
-      sortable: false,
+      width: 190,
+      sortable: true,
+      filter: "date-range",
+      dateFilterOptions: { maxDate: new Date() },
       render: (m: MovementRow) => <ITText className="text-[11px] font-bold text-slate-600 whitespace-nowrap">{formatDateTime(m.date)}</ITText>,
     },
     {
@@ -179,7 +192,7 @@ export default function MovementsPage() {
       key: "type",
       label: t("movements.colType"),
       width: 160,
-      sortable: false,
+      sortable: true,
       filter: "catalog",
       catalogOptions: {
         data: MOVEMENT_TYPES.map((id) => ({ id, name: t(`typeLabels.${id}`) })),
@@ -197,6 +210,8 @@ export default function MovementsPage() {
       key: "name",
       label: t("movements.colItem"),
       width: 300,
+      filter: true,
+      sortable: true,
       render: (m: MovementRow) => (
         <ITText className="text-[11px] text-slate-600 truncate">
           {m.name} {m.unit !== "—" && <b className="text-slate-800">· {m.unit}</b>}
@@ -208,6 +223,7 @@ export default function MovementsPage() {
       key: "reason",
       label: t("movements.colComment"),
       width: 300,
+      filter: true,
       render: (m: MovementRow) => <ITText className="text-[11px] text-slate-500">{m.reason || "—"}</ITText>,
     },
     {
@@ -215,6 +231,8 @@ export default function MovementsPage() {
       key: "custodian",
       label: t("movements.colCustodian"),
       width: 200,
+      filter: true,
+      sortable: true,
       render: (m: MovementRow) => <ITText className="text-[11px] text-slate-600">{m.custodian?.name ?? m.user?.name ?? "—"}</ITText>,
     },
     {
@@ -222,6 +240,13 @@ export default function MovementsPage() {
       key: "status",
       label: t("movements.colStatus"),
       width: 130,
+      filter: "catalog",
+      catalogOptions: {
+        data: [
+          { id: "ACTIVE", name: t("movements.activeLabel") },
+          { id: "CANCELLED", name: t("movements.cancelled") },
+        ],
+      },
       render: (m: MovementRow) =>
         m.status === "CANCELLED" ? <ITBadget color="danger" size="lg">{t("movements.cancelled")}</ITBadget> : <ITBadget color="success" size="lg">{t("movements.activeLabel")}</ITBadget>,
     },

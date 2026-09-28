@@ -46,7 +46,8 @@
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entrada sin salida",
     "EXIT_WITHOUT_ENTRY": "Salida sin entrada",
-    "OPEN_ENTRY": "En sitio"
+    "OPEN_ENTRY": "En sitio",
+    "NONE": "Sin incidencia"
   },
   "noDepartment": "Sin departamento",
   "unlinked": "Sin vincular",

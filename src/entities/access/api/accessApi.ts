@@ -1,5 +1,5 @@
-import { api, post } from "@shared/api/client";
-import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
+import { api } from "@shared/api/client";
+import { tableQuery, tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
 import type {
   AccessEvent,
   AccessReportTableResponse,
@@ -13,15 +13,15 @@ export const accessApi = {
     tableRequest<AccessEvent>(`/access/query`, params),
   /** Conteos (eventos, entradas, salidas, anulados) para los mismos filtros. */
   stats: (params: ITDataTableFetchParamsPost) =>
-    post<AccessStats>(`/access/stats`, params),
+    tableQuery<AccessStats>(`/access/stats`, params),
   get: (id: string) => api.get<AccessEvent>(`/access/${id}`),
   sites: () => api.get<Site[]>(`/access/sites`),
   void: (id: string, reason: string) =>
     api.post<AccessEvent>(`/access/${id}/void`, { reason }),
   /** Página del reporte por persona + `summary` global (contrato ITDataTable). */
   report: (params: ITDataTableFetchParamsPost) =>
-    post<AccessReportTableResponse>(`/access/report`, params),
+    tableQuery<AccessReportTableResponse>(`/access/report`, params),
   /** Universo completo sin paginar, para el PDF. Mismos filtros y `summary`. */
   reportExport: (params: ITDataTableFetchParamsPost) =>
-    post<AccessReportTableResponse>(`/access/report/export`, params),
+    tableQuery<AccessReportTableResponse>(`/access/report/export`, params),
 };

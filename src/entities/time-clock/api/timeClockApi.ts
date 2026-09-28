@@ -1,5 +1,5 @@
-import { api, post } from "@shared/api/client";
-import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
+import { api } from "@shared/api/client";
+import { tableQuery, tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
 import type { AccessReportTableResponse } from "@entities/access";
 import type {
   TimeClockPunch,
@@ -54,13 +54,13 @@ export const timeClockApi = {
 
   /** Entradas/salidas del reloj: mismo contrato que `/access/report`. */
   report: (params: ITDataTableFetchParamsPost) =>
-    post<AccessReportTableResponse>(`/time-clock/report`, params),
+    tableQuery<AccessReportTableResponse>(`/time-clock/report`, params),
   reportExport: (params: ITDataTableFetchParamsPost) =>
-    post<AccessReportTableResponse>(`/time-clock/report/export`, params),
+    tableQuery<AccessReportTableResponse>(`/time-clock/report/export`, params),
 
   /** Empleados del reloj con su vínculo o sugerencia (filtros: `q`, `estado`). */
   employees: (params: ITDataTableFetchParamsPost) =>
-    post<TimeClockEmployeesResponse>(`/time-clock/employees/query`, params),
+    tableQuery<TimeClockEmployeesResponse>(`/time-clock/employees/query`, params),
   linkEmployee: (employeeNumber: string, userId: string) =>
     api.put<TimeClockEmployee>(employeePath(employeeNumber), { userId }),
   unlinkEmployee: (employeeNumber: string) =>

@@ -59,7 +59,7 @@ export const useDepartmentsCrud = () => {
       const res = await departmentsApi.table({
         page: params.page,
         limit: params.limit,
-        filters: params.filters as Record<string, string | number | boolean>,
+        filters: params.filters,
         sort: params.sort,
       });
       return {

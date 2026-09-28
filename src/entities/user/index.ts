@@ -3,6 +3,7 @@
 export * from "./model/types";
 export * from "./model/auth.slice";
 export * from "./model/usePermission";
+export * from "./model/usePeopleOptions";
 export { default } from "./model/auth.slice";
 export { authApi } from "./api/userApi";
 export { usersApi } from "./api/userApi";

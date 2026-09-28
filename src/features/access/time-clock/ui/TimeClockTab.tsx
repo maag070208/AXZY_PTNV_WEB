@@ -104,6 +104,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         label: t("columns.employee"),
         type: "string",
         width: 300,
+        filter: true,
         sortable: true,
         render: (c) => (
           <ITFlex direction="column" gap={0.5}>
@@ -117,9 +118,11 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
       {
         key: "method",
         label: t("columns.method"),
-        type: "string",
+        type: "catalog",
         width: 140,
         sortable: true,
+        filter: "catalog",
+        catalogOptions: { data: METHODS.map((m) => ({ id: m, name: t(`methods.${m}`) })) },
         render: (c) => (
           <span title={c.method === "OTHER" ? t("otherHint", { minor: c.minor }) : undefined}>
             <ITBadget color={METHOD_COLOR[c.method]} size="lg">
@@ -131,8 +134,11 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
       {
         key: "clock",
         label: t("columns.clock"),
-        type: "string",
+        type: "catalog",
         width: 200,
+        sortable: true,
+        filter: "catalog",
+        catalogOptions: { data: (status?.devices ?? []).map((d) => ({ id: d.clockSerial, name: d.name })) },
         render: (c) => (
           <span title={c.clockSerial}>
             <ITText className="text-[11px] font-bold text-slate-600">{c.clock ?? c.clockSerial}</ITText>
@@ -144,12 +150,14 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         label: t("columns.serialNo"),
         type: "number",
         width: 100,
+        filter: true,
+        sortable: true,
         render: (c) => (
           <ITText className="text-[10px] font-bold text-slate-400">{c.serialNo}</ITText>
         ),
       },
     ],
-    [t]
+    [t, status?.devices]
   );
 
   const handleDateRange = (

@@ -13,13 +13,16 @@ import type {
 import { FaEye, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
+import { formatDate } from "@shared/utils/dates";
 import {
   STATUS_BADGE,
   PRIORITY_BADGE,
+  UNASSIGNED,
   WAIT_RATING_COLOR,
   daysOnHold,
   waitRating,
   type Ticket,
+  type TicketFilterOptions,
 } from "@entities/ticket";
 
 interface Props {
@@ -28,10 +31,10 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
-  /** Opciones del filtro Categoría (`categoryId`). */
-  categoryOptions: Array<{ id: string; name: string }>;
-  /** Opciones de los filtros Creador/Responsable (`createdById` / `assignedToId`). */
-  userOptions: Array<{ id: string; name: string }>;
+  /** Opciones de Categoría, Creador y Responsable (de los tickets visibles). */
+  filterOptions: TicketFilterOptions;
+  filterOptionsLoading: boolean;
+  filterOptionsError: boolean;
   onView: (t: Ticket) => void;
   onMarkForDelete: (t: Ticket) => void;
 }
@@ -40,12 +43,18 @@ export default function TicketsTable({
   canDelete,
   fetchData,
   reloadKey,
-  categoryOptions,
-  userOptions,
+  filterOptions,
+  filterOptionsLoading,
+  filterOptionsError,
   onView,
   onMarkForDelete,
 }: Props) {
   const { t: tt } = useTranslation("tickets");
+  const catalog = (data: Array<{ id: string; name: string }>) => ({
+    data,
+    loading: filterOptionsLoading,
+    error: filterOptionsError,
+  });
 
   const columns: Column<Ticket>[] = [
     {
@@ -54,6 +63,7 @@ export default function TicketsTable({
       type: "string",
       width: 300,
       filter: true,
+      sortable: true,
       render: (t) => (
         <ITFlex direction="column" gap={0.5}>
           <ITFlex align="center" gap={1}>
@@ -73,8 +83,9 @@ export default function TicketsTable({
       label: tt("list.columns.category"),
       type: "catalog",
       width: 140,
-      filter: "catalog",
-      catalogOptions: { data: categoryOptions, loading: false, error: false },
+      filter: "search",
+      sortable: true,
+      catalogOptions: catalog(filterOptions.categories),
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {t.category?.name ?? "—"}
@@ -87,6 +98,7 @@ export default function TicketsTable({
       type: "catalog",
       width: 100,
       filter: "catalog",
+      sortable: true,
       catalogOptions: {
         data: Object.keys(STATUS_BADGE).map((id) => ({
           id,
@@ -107,6 +119,7 @@ export default function TicketsTable({
       type: "catalog",
       width: 80,
       filter: "catalog",
+      sortable: true,
       catalogOptions: {
         data: Object.keys(PRIORITY_BADGE).map((id) => ({
           id,
@@ -119,6 +132,18 @@ export default function TicketsTable({
         <ITBadget size="lg" color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"}>
           {dyn(tt)(`priorityLabels.${t.priority}`)}
         </ITBadget>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: tt("list.columns.createdAt"),
+      type: "date",
+      width: 190,
+      filter: "date-range",
+      sortable: true,
+      dateFilterOptions: { maxDate: new Date() },
+      render: (t) => (
+        <ITText className="text-[11px] font-bold text-slate-600">{formatDate(t.createdAt)}</ITText>
       ),
     },
     {
@@ -144,8 +169,9 @@ export default function TicketsTable({
       label: tt("list.columns.createdBy"),
       width: 100,
       type: "catalog",
-      filter: "catalog",
-      catalogOptions: { data: userOptions, loading: false, error: false },
+      filter: "search",
+      sortable: true,
+      catalogOptions: catalog(filterOptions.creators),
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {t.createdBy?.name ?? "—"}
@@ -157,8 +183,9 @@ export default function TicketsTable({
       label: tt("list.columns.assignedTo"),
       width: 100,
       type: "catalog",
-      filter: "catalog",
-      catalogOptions: { data: userOptions, loading: false, error: false },
+      filter: "search",
+      sortable: true,
+      catalogOptions: catalog([{ id: UNASSIGNED, name: tt("list.unassigned") }, ...filterOptions.assignees]),
       render: (t) => (
         <ITText className="text-[11px] font-bold text-slate-600">
           {t.assignedTo?.name ?? tt("list.unassigned")}
