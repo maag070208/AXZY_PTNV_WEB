@@ -10,7 +10,6 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITSearchSelect,
   ITSelect,
   ITText,
   ITToast,
@@ -139,24 +138,24 @@ function ItemFormDialog({
             />
           </ITGrid>
           <ITGrid item xs={12} md={6}>
-            <ITSearchSelect
+            <ITSelect
               name="kitchenItemCategory"
               label={t("items.form.category")}
               options={categories.data.map((c) => ({ value: c.id, label: c.name }))}
               value={form.categoryId}
-              onChange={(v) => setForm((f) => ({ ...f, categoryId: String(v) }))}
+              onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
             />
           </ITGrid>
           <ITGrid item xs={6} md={3}>
             {select(form.kind, (v) => setForm((f) => ({ ...f, kind: v })), KITCHEN_ITEM_KINDS, "kinds", t("items.form.kind"))}
           </ITGrid>
           <ITGrid item xs={6} md={3}>
-            <ITSearchSelect
+            <ITSelect
               name="kitchenItemUnit"
               label={t("items.form.unit")}
               options={units.data.map((u) => ({ value: u.id, label: `${u.name} (${u.code})` }))}
               value={form.unitId}
-              onChange={(v) => setForm((f) => ({ ...f, unitId: String(v) }))}
+              onChange={(e) => setForm((f) => ({ ...f, unitId: e.target.value }))}
             />
           </ITGrid>
           <ITGrid item xs={6} md={3}>
