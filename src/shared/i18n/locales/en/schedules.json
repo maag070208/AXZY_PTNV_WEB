@@ -64,6 +64,7 @@
     "apply": "Apply to {{count}}",
     "modeList": "List",
     "modeDrag": "Drag & drop",
+    "mode": "Assignment mode",
     "dropHere": "Drop people here",
     "dragHint": "Drag people onto the schedule on the right",
     "selectAll": "Select all",

@@ -28,6 +28,7 @@ import {
   FaUsers,
   FaUserShield,
   FaUserTie,
+  FaUtensils,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
@@ -53,6 +54,7 @@ const ROLE_VISUALS: Record<string, { icon: ReactNode; className: string }> = {
   AREA_HEAD: { icon: <FaUserCog size={18} />, className: "bg-warning-100 text-warning-600" },
   EMPLOYEE: { icon: <FaUser size={18} />, className: "bg-slate-100 text-slate-600" },
   HUMAN_RESOURCES: { icon: <FaUsers size={18} />, className: "bg-success-100 text-success-600" },
+  CHEF: { icon: <FaUtensils size={18} />, className: "bg-warning-100 text-warning-600" },
   GUARD: { icon: <FaIdBadge size={18} />, className: "bg-danger-100 text-danger-600" },
 };
 

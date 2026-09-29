@@ -6,6 +6,7 @@
     "restDay": "Si checa en un día de descanso, todo lo trabajado cuenta como horas extra, siempre que alcance el mínimo del horario."
   },
   "filters": "Filtros",
+  "period": "Periodo",
   "date": "Fecha",
   "clear": "Limpiar",
   "cancel": "Cancelar",

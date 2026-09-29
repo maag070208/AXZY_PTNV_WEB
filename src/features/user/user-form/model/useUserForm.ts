@@ -48,6 +48,11 @@ export const ROLE_GUIDANCE: Record<
     summary: "form.roles.GUARD.summary",
     actions: ["form.roles.GUARD.actions.0", "form.roles.GUARD.actions.1", "form.roles.GUARD.actions.2"],
   },
+  CHEF: {
+    title: "form.roles.CHEF.title",
+    summary: "form.roles.CHEF.summary",
+    actions: ["form.roles.CHEF.actions.0", "form.roles.CHEF.actions.1", "form.roles.CHEF.actions.2"],
+  },
 };
 
 export interface UserFormValues {

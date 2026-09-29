@@ -12,7 +12,6 @@ import {
   ITGrid,
   ITInput,
   ITSearchSelect,
-  ITSegmentedControl,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
@@ -401,10 +400,13 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       <ITCard title={t("toolbar.title")} className="!p-5 border border-slate-200">
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITSegmentedControl
+            <ITSearchSelect
+              name="accessReportPeriod"
+              label={t("filters.date")}
               options={periodOptions}
               value={period}
-              onChange={(value) => handlePeriodChange(value as AccessReportPeriod)}
+              onChange={(value) => handlePeriodChange(String(value) as AccessReportPeriod)}
+              className="min-w-[200px]"
             />
             <ITButton variant="text" color="gray" size="sm" onClick={clearFilters} className="ml-auto">
               <ITFlex align="center" gap={1}>

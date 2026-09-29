@@ -12,7 +12,6 @@ import {
   ITGrid,
   ITInput,
   ITSearchSelect,
-  ITSegmentedControl,
   ITSelect,
   ITText,
   ITToast,
@@ -346,10 +345,13 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       <ITCard title={t("filters")} className="!p-5 border border-slate-200">
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITSegmentedControl
+            <ITSearchSelect
+              name="overtimeApprovalPeriod"
+              label={t("period")}
               options={periodOptions}
               value={period}
-              onChange={(v) => handlePeriodChange(v as Period)}
+              onChange={(v) => handlePeriodChange(String(v) as Period)}
+              className="min-w-[200px]"
             />
             <ITFlex gap={2} wrap="wrap" className="ml-auto">
               <ITButton

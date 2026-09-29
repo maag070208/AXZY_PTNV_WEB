@@ -10,6 +10,7 @@ import SetupGapsWidget from "./widgets/SetupGapsWidget";
 import SystemHealthWidget from "./widgets/SystemHealthWidget";
 import TasksWidget from "./widgets/TasksWidget";
 import TicketsWidget from "./widgets/TicketsWidget";
+import KitchenWidget from "./widgets/KitchenWidget";
 
 export type WidgetId =
   | "systemHealth"
@@ -23,7 +24,8 @@ export type WidgetId =
   | "tickets"
   | "tasks"
   | "myEquipment"
-  | "accessToday";
+  | "accessToday"
+  | "kitchen";
 
 /**
  * Catálogo de widgets: qué permiso pide cada uno (la API vuelve a validarlo y
@@ -43,6 +45,7 @@ const WIDGETS: Record<WidgetId, { permission: string | null; render?: () => Reac
   tasks: { permission: "tasks.view", render: () => <TasksWidget /> },
   myEquipment: { permission: null, render: () => <MyEquipmentWidget /> },
   accessToday: { permission: "access.scan", render: () => <AccessTodayWidget /> },
+  kitchen: { permission: "kitchen.view", render: () => <KitchenWidget /> },
 };
 
 /**
@@ -57,6 +60,7 @@ const ROLE_LAYOUTS: Record<string, WidgetId[]> = {
   HUMAN_RESOURCES: ["hrRecords", "recordsCharts", "attendanceToday", "people", "overtimeWeek", "setupGaps"],
   AREA_HEAD: ["tickets", "tasks", "attendanceToday", "myEquipment"],
   EMPLOYEE: ["attendanceToday", "tickets", "tasks", "myEquipment"],
+  CHEF: ["kitchen", "tickets", "tasks", "attendanceToday"],
   GUARD: ["accessToday", "tickets", "myEquipment"],
 };
 
@@ -72,6 +76,7 @@ const DEFAULT_ORDER: WidgetId[] = [
   "setupGaps",
   "systemHealth",
   "operations",
+  "kitchen",
 ];
 
 interface Props {

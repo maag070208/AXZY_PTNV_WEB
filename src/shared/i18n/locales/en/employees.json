@@ -162,6 +162,7 @@
       "incomplete": "Incomplete record"
     },
     "filters": {
+      "title": "Filter",
       "search": "Search by name, number or area",
       "all": "All",
       "REQUIRED": "Missing required",

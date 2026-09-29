@@ -53,7 +53,7 @@ export interface PersonalProfile {
   username: string;
   name: string;
   email?: string | null;
-  role: "ADMIN" | "MANAGER" | "AREA_HEAD" | "EMPLOYEE" | "HUMAN_RESOURCES";
+  role: "ADMIN" | "MANAGER" | "AREA_HEAD" | "EMPLOYEE" | "HUMAN_RESOURCES" | "CHEF";
   active: boolean;
   jobTitle?: string | null;
   employeeNumber?: string | null;

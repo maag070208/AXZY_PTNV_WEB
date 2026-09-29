@@ -122,6 +122,15 @@
           "Does not manage tickets, inventory or users"
         ]
       },
+      "CHEF": {
+        "title": "Chef",
+        "summary": "Manages the kitchen store: items, lots, stock in, consumption and waste.",
+        "actions": [
+          "Manages the kitchen store (minimums, maximums and expiry)",
+          "Records stock in, consumption and waste",
+          "Views the tickets of their area"
+        ]
+      },
       "GUARD": {
         "title": "Guard",
         "summary": "Runs the gatehouse from the app: scans staff credentials and records their entry or exit.",

@@ -34,6 +34,7 @@
     "total": "Total"
   },
   "view": {
+    "label": "View",
     "summary": "Summary",
     "detail": "Detailed"
   },

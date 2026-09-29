@@ -9,7 +9,6 @@ import {
   ITInput,
   ITProgress,
   ITSearchSelect,
-  ITSegmentedControl,
   ITStatCard,
   ITToast,
 } from "@axzydev/axzy_ui_system";
@@ -136,11 +135,14 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
                 iconLeft={<FaSearch size={12} />}
               />
             </div>
-            <ITSegmentedControl
+            <ITSearchSelect
+              name="employeeRecordsFilter"
+              label={t("records.filters.title")}
               size="sm"
               options={FILTERS.map((f) => ({ value: f, label: f === "ALL" ? t("records.filters.all") : t(`records.filters.${f}`) }))}
               value={fx.filter}
-              onChange={(value) => fx.setFilter(value as RecordFilter)}
+              onChange={(value) => fx.setFilter(String(value) as RecordFilter)}
+              className="min-w-[200px]"
             />
             <div className="w-[220px]">
               <ITSearchSelect

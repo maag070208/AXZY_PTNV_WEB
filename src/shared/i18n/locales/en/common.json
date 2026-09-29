@@ -31,6 +31,18 @@
     "loans": "Custody letters",
     "returns": "Returns",
     "reports": "Reports",
+    "kitchen": "Kitchen store",
+    "kitchenOverview": "Overview",
+    "kitchenItems": "Items",
+    "kitchenLots": "Stock by lot",
+    "kitchenMovements": "Movements",
+    "kitchenStockIn": "Stock in",
+    "kitchenStockOut": "Consumption and waste",
+    "kitchenLedger": "Ledger",
+    "kitchenCount": "Physical count",
+    "kitchenPurchases": "Purchases",
+    "kitchenRestock": "Restock",
+    "kitchenCatalog": "Catalogs",
     "hr": "Human Resources",
     "employees": "Personnel",
     "documentCatalog": "Document Catalog",
@@ -77,7 +89,8 @@
     "deliveryReport": "delivery_report",
     "assignedDevicesReport": "assigned_devices_report",
     "devicesReport": "devices_report",
-    "materialOutputsReport": "material_outputs_report"
+    "materialOutputsReport": "material_outputs_report",
+    "kitchenLedger": "kitchen_ledger"
   },
   "errors": {
     "network": "Network or server error",

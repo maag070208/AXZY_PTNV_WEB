@@ -31,6 +31,18 @@
     "loans": "Cartas responsivas",
     "returns": "Devoluciones",
     "reports": "Reportes",
+    "kitchen": "Almacén de cocina",
+    "kitchenOverview": "Resumen",
+    "kitchenItems": "Artículos",
+    "kitchenLots": "Existencias por lote",
+    "kitchenMovements": "Movimientos",
+    "kitchenStockIn": "Entradas",
+    "kitchenStockOut": "Consumos y mermas",
+    "kitchenLedger": "Kardex",
+    "kitchenCount": "Conteo físico",
+    "kitchenPurchases": "Compras",
+    "kitchenRestock": "Reabastecimiento",
+    "kitchenCatalog": "Catálogos",
     "hr": "Recursos Humanos",
     "employees": "Personal",
     "documentCatalog": "Catálogo de Documentos",
@@ -77,7 +89,8 @@
     "deliveryReport": "reporte_entregas",
     "assignedDevicesReport": "reporte_asignados",
     "devicesReport": "reporte_dispositivos",
-    "materialOutputsReport": "reporte_salidas"
+    "materialOutputsReport": "reporte_salidas",
+    "kitchenLedger": "kardex_cocina"
   },
   "errors": {
     "network": "Error de red o del servidor",

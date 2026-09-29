@@ -143,12 +143,14 @@ test.describe("Reporte de entradas/salidas", () => {
       );
 
     const pWeek = waitForReport();
-    await page.getByRole("button", { name: "Semanal" }).click();
+    await page.locator('input[name="accessReportPeriod"]').click();
+    await page.getByText("Semanal", { exact: true }).click();
     const reqWeek = await pWeek;
     expect(reqWeek.postDataJSON()).toMatchObject({ filters: { period: "WEEK" } });
 
     const pMonth = waitForReport();
-    await page.getByRole("button", { name: "Mensual" }).click();
+    await page.locator('input[name="accessReportPeriod"]').click();
+    await page.getByText("Mensual", { exact: true }).click();
     const reqMonth = await pMonth;
     expect(reqMonth.postDataJSON()).toMatchObject({ filters: { period: "MONTH" } });
 

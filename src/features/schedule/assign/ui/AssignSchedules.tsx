@@ -8,7 +8,6 @@ import {
   ITGrid,
   ITInput,
   ITSearchSelect,
-  ITSegmentedControl,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
@@ -171,13 +170,16 @@ export default function AssignSchedules() {
           />
         </ITGrid>
         <ITGrid item xs={12} md={3}>
-          <ITSegmentedControl
+          <ITSearchSelect
+            name="assignMode"
+            label={t("assign.mode")}
             options={[
               { value: "list", label: t("assign.modeList") },
               { value: "drag", label: t("assign.modeDrag") },
             ]}
             value={mode}
-            onChange={(v) => setMode(v as "list" | "drag")}
+            onChange={(v) => setMode(String(v) as "list" | "drag")}
+            className="w-full"
           />
         </ITGrid>
         <ITGrid item xs={12} md={2}>

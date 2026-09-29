@@ -29,6 +29,7 @@
     "AREA_HEAD": "AREA LEAD",
     "EMPLOYEE": "EMPLOYEE",
     "HUMAN_RESOURCES": "HUMAN RESOURCES",
+    "CHEF": "CHEF",
     "GUARD": "GUARD"
   },
   "matrix": {

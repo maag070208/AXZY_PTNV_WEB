@@ -122,6 +122,15 @@
           "No administra tickets, inventario ni usuarios"
         ]
       },
+      "CHEF": {
+        "title": "Chef",
+        "summary": "Administra el almacén de cocina: artículos, lotes, entradas, consumos y mermas.",
+        "actions": [
+          "Administra el almacén de cocina (mínimos, máximos y caducidad)",
+          "Registra entradas, consumos y mermas",
+          "Ve los tickets de su área"
+        ]
+      },
       "GUARD": {
         "title": "Guardia",
         "summary": "Opera la portería desde la app: escanea la credencial del personal y registra su entrada o salida.",

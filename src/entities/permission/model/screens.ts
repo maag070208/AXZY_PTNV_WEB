@@ -34,6 +34,18 @@ export type NavLabelKey =
   | "nav.loans"
   | "nav.returns"
   | "nav.reports"
+  | "nav.kitchen"
+  | "nav.kitchenOverview"
+  | "nav.kitchenItems"
+  | "nav.kitchenLots"
+  | "nav.kitchenMovements"
+  | "nav.kitchenStockIn"
+  | "nav.kitchenStockOut"
+  | "nav.kitchenLedger"
+  | "nav.kitchenCount"
+  | "nav.kitchenPurchases"
+  | "nav.kitchenRestock"
+  | "nav.kitchenCatalog"
   | "nav.access"
   | "nav.accessLog"
   | "nav.accessReport"
@@ -99,6 +111,34 @@ export const APP_SCREENS: readonly AppScreen[] = [
       { id: "movements", labelKey: "nav.movements", path: "/inventory/movements", requirement: { anyOf: ["devices.view"] } },
       { id: "loans", labelKey: "nav.loans", path: "/inventory/loans", requirement: { anyOf: ["loans.view"] } },
       { id: "returns", labelKey: "nav.returns", path: "/inventory/returns", requirement: { anyOf: ["loans.view"] } },
+    ],
+  },
+  {
+    id: "kitchen",
+    labelKey: "nav.kitchen",
+    requirement: { anyOf: ["kitchen.view"] },
+    children: [
+      { id: "kitchenOverview", labelKey: "nav.kitchenOverview", path: "/kitchen", match: "exact" },
+      { id: "kitchenItems", labelKey: "nav.kitchenItems", path: "/kitchen/items", excludes: ["/kitchen/items/new"], requirement: { anyOf: ["kitchen.view"] } },
+      { id: "kitchenLots", labelKey: "nav.kitchenLots", path: "/kitchen/lots" },
+      {
+        id: "kitchenMovements",
+        labelKey: "nav.kitchenMovements",
+        children: [
+          { id: "kitchenStockIn", labelKey: "nav.kitchenStockIn", path: "/kitchen/stock-in", requirement: { anyOf: ["kitchen.stock_in"] } },
+          { id: "kitchenStockOut", labelKey: "nav.kitchenStockOut", path: "/kitchen/stock-out", requirement: { anyOf: ["kitchen.stock_out"] } },
+          { id: "kitchenLedger", labelKey: "nav.kitchenLedger", path: "/kitchen/movements" },
+          { id: "kitchenCount", labelKey: "nav.kitchenCount", path: "/kitchen/count", requirement: { anyOf: ["kitchen.adjust"] } },
+        ],
+      },
+      {
+        id: "kitchenPurchases",
+        labelKey: "nav.kitchenPurchases",
+        children: [
+          { id: "kitchenRestock", labelKey: "nav.kitchenRestock", path: "/kitchen/restock" },
+        ],
+      },
+      { id: "kitchenCatalog", labelKey: "nav.kitchenCatalog", path: "/kitchen/catalog", requirement: { anyOf: ["kitchen.manage"] } },
     ],
   },
   {

@@ -53,6 +53,18 @@ import AdminTasksPage from "@pages/tickets/AdminTasksPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
 import CatalogPage from "@pages/catalog/CatalogPage";
 import RolesPage from "@pages/roles/RolesPage";
+import {
+  KitchenOverviewPage,
+  KitchenItemsPage,
+  KitchenItemDetailPage,
+  KitchenLotsPage,
+  KitchenStockInPage,
+  KitchenStockOutPage,
+  KitchenLedgerPage,
+  KitchenCountPage,
+  KitchenRestockPage,
+  KitchenCatalogPage,
+} from "@pages/kitchen";
 
 export default function App() {
   return (
@@ -383,6 +395,87 @@ export default function App() {
           element={
             <RequiresPermission permission="payroll.view">
               <PayrollPage />
+            </RequiresPermission>
+          }
+        />
+
+        <Route
+          path="/kitchen"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenOverviewPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/items"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenItemsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/items/:id"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenItemDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/lots"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenLotsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/stock-in"
+          element={
+            <RequiresPermission permission="kitchen.stock_in">
+              <KitchenStockInPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/stock-out"
+          element={
+            <RequiresPermission permission="kitchen.stock_out">
+              <KitchenStockOutPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/movements"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenLedgerPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/count"
+          element={
+            <RequiresPermission permission="kitchen.adjust">
+              <KitchenCountPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/restock"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenRestockPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/catalog"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenCatalogPage />
             </RequiresPermission>
           }
         />

@@ -7,9 +7,10 @@ export type UserRole =
   | "AREA_HEAD"
   | "EMPLOYEE"
   | "HUMAN_RESOURCES"
+  | "CHEF"
   | "GUARD";
 
-export const USER_ROLES: UserRole[] = ["ADMIN", "MANAGER", "AREA_HEAD", "EMPLOYEE", "HUMAN_RESOURCES", "GUARD"];
+export const USER_ROLES: UserRole[] = ["ADMIN", "MANAGER", "AREA_HEAD", "EMPLOYEE", "HUMAN_RESOURCES", "CHEF", "GUARD"];
 
 /** Etiqueta visible de un rol, en el idioma de la interfaz (`roles:role.*`). */
 export const roleLabel = (role: string): string =>

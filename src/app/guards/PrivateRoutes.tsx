@@ -6,6 +6,7 @@ import {
   FaTicketAlt,
   FaUserTie,
   FaCog,
+  FaUtensils,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -23,6 +24,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   start: <FaHouseUser size={14} />,
   tasks: <FaTicketAlt size={14} />,
   inventory: <FaBoxes size={14} />,
+  kitchen: <FaUtensils size={14} />,
   hr: <FaUserTie size={14} />,
   settings: <FaCog size={14} />,
 };

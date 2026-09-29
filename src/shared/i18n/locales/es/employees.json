@@ -162,6 +162,7 @@
       "incomplete": "Expediente incompleto"
     },
     "filters": {
+      "title": "Filtro",
       "search": "Buscar por nombre, número o área",
       "all": "Todos",
       "REQUIRED": "Faltan obligatorios",

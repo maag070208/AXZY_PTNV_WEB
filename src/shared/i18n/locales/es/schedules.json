@@ -64,6 +64,7 @@
     "apply": "Aplicar a {{count}}",
     "modeList": "Lista",
     "modeDrag": "Arrastrar y soltar",
+    "mode": "Modo de asignación",
     "dropHere": "Suelta aquí a las personas",
     "dragHint": "Arrastra personas al horario de la derecha",
     "selectAll": "Seleccionar todos",
