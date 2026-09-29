@@ -56,7 +56,7 @@ export default function KitchenWidget() {
               <ITFlex key={i.id} justify="between" className="border-b border-slate-100 py-1">
                 <ITText className="text-[11px] font-bold text-slate-800">{i.name}</ITText>
                 <ITText className="text-[11px] text-slate-500">
-                  {fmtQty(i.available)} / {fmtQty(i.minStock)} {t(`units.${i.unit}`)}
+                  {fmtQty(i.available)} / {fmtQty(i.minStock)} {i.unit.name}
                 </ITText>
               </ITFlex>
             ))

@@ -104,7 +104,7 @@ export default function SchedulesTable() {
       key: "name",
       label: t("name"),
       type: "string",
-      width: 300,
+      width: 200,
       filter: true,
       sortable: false,
       render: (h) => <ITText className="text-[12px] font-black text-slate-800">{h.name}</ITText>,
@@ -113,7 +113,7 @@ export default function SchedulesTable() {
       key: "days",
       label: t("days"),
       type: "catalog",
-      width: 300,
+      width: 220,
       sortable: false,
       filter: "catalog",
       catalogOptions: { data: [1, 2, 3, 4, 5, 6, 7].map((id) => ({ id: String(id), name: dayName(id) })) },
@@ -125,7 +125,7 @@ export default function SchedulesTable() {
       key: "rules",
       label: t("tolEntry"),
       type: "string",
-      width: 300,
+      width: 350,
       sortable: false,
       render: (h) => (
         <ITText className="text-[11px] text-slate-500 whitespace-nowrap">
@@ -213,7 +213,8 @@ export default function SchedulesTable() {
         reloadTrigger={reloadKey}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

@@ -47,6 +47,7 @@ export type NavLabelKey =
   | "nav.kitchenRestock"
   | "nav.kitchenPurchaseOrders"
   | "nav.kitchenInvoices"
+  | "nav.kitchenSuppliers"
   | "nav.kitchenCatalog"
   | "nav.access"
   | "nav.accessLog"
@@ -123,16 +124,8 @@ export const APP_SCREENS: readonly AppScreen[] = [
       { id: "kitchenOverview", labelKey: "nav.kitchenOverview", path: "/kitchen", match: "exact" },
       { id: "kitchenItems", labelKey: "nav.kitchenItems", path: "/kitchen/items", excludes: ["/kitchen/items/new"], requirement: { anyOf: ["kitchen.view"] } },
       { id: "kitchenLots", labelKey: "nav.kitchenLots", path: "/kitchen/lots" },
-      {
-        id: "kitchenMovements",
-        labelKey: "nav.kitchenMovements",
-        children: [
-          { id: "kitchenStockIn", labelKey: "nav.kitchenStockIn", path: "/kitchen/stock-in", requirement: { anyOf: ["kitchen.stock_in"] } },
-          { id: "kitchenStockOut", labelKey: "nav.kitchenStockOut", path: "/kitchen/stock-out", requirement: { anyOf: ["kitchen.stock_out"] } },
-          { id: "kitchenLedger", labelKey: "nav.kitchenLedger", path: "/kitchen/movements" },
-          { id: "kitchenCount", labelKey: "nav.kitchenCount", path: "/kitchen/count", requirement: { anyOf: ["kitchen.adjust"] } },
-        ],
-      },
+      // Entradas, salidas/mermas y conteo se abren desde Artículos (botones), no desde el menú.
+      { id: "kitchenLedger", labelKey: "nav.kitchenLedger", path: "/kitchen/movements" },
       {
         id: "kitchenPurchases",
         labelKey: "nav.kitchenPurchases",
@@ -140,6 +133,7 @@ export const APP_SCREENS: readonly AppScreen[] = [
           { id: "kitchenRestock", labelKey: "nav.kitchenRestock", path: "/kitchen/restock" },
           { id: "kitchenPurchaseOrders", labelKey: "nav.kitchenPurchaseOrders", path: "/kitchen/purchase-orders", requirement: { anyOf: ["purchase_orders.view"] } },
           { id: "kitchenInvoices", labelKey: "nav.kitchenInvoices", path: "/kitchen/invoices", requirement: { anyOf: ["invoices.view"] } },
+          { id: "kitchenSuppliers", labelKey: "nav.kitchenSuppliers", path: "/kitchen/suppliers" },
         ],
       },
       { id: "kitchenCatalog", labelKey: "nav.kitchenCatalog", path: "/kitchen/catalog", requirement: { anyOf: ["kitchen.manage"] } },

@@ -136,7 +136,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "employeeId",
       label: t("columns.employee"),
       type: "catalog",
-      width: 300,
+      width: 250,
       filter: "search",
       catalogOptions: peopleOptions,
       sortable: false,
@@ -155,7 +155,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "departmentId",
       label: t("columns.department"),
       type: "catalog",
-      width: 200,
+      width: 170,
       filter: "search",
       catalogOptions: departmentFilterOptions,
       sortable: false,
@@ -172,7 +172,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "jobTitle",
       label: t("columns.jobTitle"),
       type: "string",
-      width: 200,
+      width: 170,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -184,7 +184,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "day",
       label: t("columns.date"),
       type: "date",
-      width: 190,
+      width: 160,
       filter: "date-range",
       sortable: false,
       render: (r) => (
@@ -197,7 +197,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "entryAt",
       label: t("columns.entry"),
       type: "string",
-      width: 150,
+      width: 100,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-emerald-700 whitespace-nowrap">
@@ -209,7 +209,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "exitAt",
       label: t("columns.exit"),
       type: "string",
-      width: 150,
+      width: 100,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -233,7 +233,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "incident",
       label: t("columns.incident"),
       type: "catalog",
-      width: 160,
+      width: 140,
       sortable: false,
       filter: "catalog",
       catalogOptions: {
@@ -522,7 +522,8 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

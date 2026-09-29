@@ -162,7 +162,8 @@ export default function NewLoanReturnPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("loanReturn.new")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("loanReturn.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -172,6 +173,7 @@ export default function NewLoanReturnPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("loanReturn.new")}
       description={t("loanReturn.description")}
       icon={<FaUndoAlt size={20} />}

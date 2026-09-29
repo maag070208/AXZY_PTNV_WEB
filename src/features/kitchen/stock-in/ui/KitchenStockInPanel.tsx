@@ -1,7 +1,6 @@
-import { ITAlert, ITBadget, ITCard, ITFlex, ITToast } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen } from "react-icons/fa";
+import { ITAlert, ITBadget, ITFlex, ITToast } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
-import { SectionHeader } from "@shared/ui/section-header";
+import { PanelCard } from "@shared/ui/panel-card";
 import { useStockIn } from "../model/useStockIn";
 import StockInHeader from "./StockInHeader";
 import StockInGeneralData from "./StockInGeneralData";
@@ -43,20 +42,11 @@ export default function KitchenStockInPanel() {
           onNotesChange={fx.setNotes}
         />
 
-        <ITCard className="!overflow-hidden !p-0 border border-slate-200 shadow-sm">
-          <SectionHeader
-            icon={<FaBoxOpen size={14} />}
-            title={t("stockIn.itemsTitle")}
-            description={t("stockIn.itemsDescription")}
-            right={
-              fx.lines.length > 0 ? (
+        <PanelCard title={t("stockIn.itemsTitle")} description={t("stockIn.itemsDescription")} actions={fx.lines.length > 0 ? (
                 <ITBadget color="gray" size="sm">
                   {t("stockIn.articlesCount", { count: fx.lines.length })}
                 </ITBadget>
-              ) : undefined
-            }
-          />
-          <div className="p-5">
+              ) : undefined}>
             <StockInAddLineForm
               items={fx.items}
               draft={fx.draft}
@@ -71,8 +61,7 @@ export default function KitchenStockInPanel() {
               onPatch={fx.patchLine}
               onRemove={fx.removeLine}
             />
-          </div>
-        </ITCard>
+          </PanelCard>
 
         <div className="h-8 w-full shrink-0" aria-hidden="true" />
       </ITFlex>

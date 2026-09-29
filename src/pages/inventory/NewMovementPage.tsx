@@ -190,7 +190,8 @@ export default function NewMovementPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("new.title")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("new.title")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -200,6 +201,7 @@ export default function NewMovementPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("new.title")}
       description={t("new.description")}
       icon={<FaSave size={20} />}

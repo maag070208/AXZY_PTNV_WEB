@@ -59,7 +59,8 @@ export default function DeviceDetailPage() {
   // Sin dispositivo (no existe o falló la carga): el error, no un cargador infinito.
   if (!loading && !device) {
     return (
-      <ITPage title={t("devices.detail")} backAction={() => navigate("/inventory/devices")}>
+      <ITPage
+        noPadding title={t("devices.detail")} backAction={() => navigate("/inventory/devices")}>
         <ITAlert variant="error" dismissible={false}>
           {error ?? t("common:errors.load")}
         </ITAlert>
@@ -69,7 +70,8 @@ export default function DeviceDetailPage() {
 
   if (loading || !device) {
     return (
-      <ITPage title={t("devices.detail")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("devices.detail")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -81,6 +83,7 @@ export default function DeviceDetailPage() {
 
   return (
     <ITPage
+      noPadding
       title={device.name}
       description={`${device.brand} ${device.model}`}
       icon={<FaBoxOpen size={20} />}

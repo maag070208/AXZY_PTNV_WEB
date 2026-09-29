@@ -5,7 +5,7 @@ import type { Column } from "@axzydev/axzy_ui_system";
 import { FaShoppingCart } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
-import { kitchenApi, fmtQty, stockStatusColor, type RestockRow } from "@entities/kitchen";
+import { KitchenAlertKpis, kitchenApi, fmtQty, stockStatusColor, useKitchenAlerts, type RestockRow } from "@entities/kitchen";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { dyn } from "@shared/i18n/dyn";
 
@@ -14,6 +14,7 @@ export default function KitchenRestockPanel() {
   const { t } = useTranslation("kitchen");
   const navigate = useNavigate();
   const canCreate = useCan("purchase_orders.create");
+  const { alerts } = useKitchenAlerts();
   /** Artículos seleccionados para la orden: itemId → cantidad sugerida. */
   const [selected, setSelected] = useState<Map<string, number>>(new Map());
 
@@ -129,6 +130,7 @@ export default function KitchenRestockPanel() {
 
   return (
     <ITFlex direction="column" gap={3}>
+      <KitchenAlertKpis alerts={alerts} keys={["low", "over"]} />
       {canCreate && (
         <ITFlex justify="end">
           <ITButton variant="filled" color="primary" disabled={selected.size === 0} onClick={createOrder}>

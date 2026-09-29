@@ -61,7 +61,7 @@ export default function TicketsTable({
       key: "title",
       label: tt("list.columns.title"),
       type: "string",
-      width: 300,
+      width: 200,
       filter: true,
       sortable: false,
       render: (t) => (
@@ -82,7 +82,7 @@ export default function TicketsTable({
       key: "categoryId",
       label: tt("list.columns.category"),
       type: "catalog",
-      width: 140,
+      width: 120,
       filter: "search",
       sortable: false,
       catalogOptions: catalog(filterOptions.categories),
@@ -117,7 +117,7 @@ export default function TicketsTable({
       key: "priority",
       label: tt("list.columns.priority"),
       type: "catalog",
-      width: 80,
+      width: 100,
       filter: "catalog",
       sortable: false,
       catalogOptions: {
@@ -138,7 +138,7 @@ export default function TicketsTable({
       key: "createdAt",
       label: tt("list.columns.createdAt"),
       type: "date",
-      width: 190,
+      width: 140,
       filter: "date-range",
       sortable: false,
       dateFilterOptions: { maxDate: new Date() },
@@ -155,7 +155,7 @@ export default function TicketsTable({
         const days = daysOnHold(t.createdAt, t.closedAt);
         const rating = waitRating(days);
         return (
-          <ITFlex align="center" gap={1}>
+          <ITFlex direction="column" align="center" gap={1}>
             <ITText className="text-[11px] font-bold text-slate-700">{days} d</ITText>
             <ITBadget size="lg" color={WAIT_RATING_COLOR[rating] as any}>
               {dyn(tt)(`list.waitLabels.${rating}`)}
@@ -167,7 +167,7 @@ export default function TicketsTable({
     {
       key: "createdById",
       label: tt("list.columns.createdBy"),
-      width: 100,
+      width: 110,
       type: "catalog",
       filter: "search",
       sortable: false,
@@ -181,7 +181,7 @@ export default function TicketsTable({
     {
       key: "assignedToId",
       label: tt("list.columns.assignedTo"),
-      width: 100,
+      width: 110,
       type: "catalog",
       filter: "search",
       sortable: false,
@@ -196,7 +196,7 @@ export default function TicketsTable({
       key: "actions",
       label: "",
       type: "string",
-      width: 120,
+      width: 110,
       render: (t) => (
         <ITFlex gap={1}>
           <ITButton
@@ -232,6 +232,8 @@ export default function TicketsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
+      layout="fixed"
+      density="compact"
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
       debounceMs={350}

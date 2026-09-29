@@ -17,7 +17,8 @@ export default function HomePage() {
   if (showRecords) slots.hrRecords = <RecordsBoardSlot />;
 
   return (
-    <ITPage title={t("title")} description={t("description")} icon={<FaHouseUser size={20} />}>
+    <ITPage
+      noPadding title={t("title")} description={t("description")} icon={<FaHouseUser size={20} />}>
       <RoleDashboard slots={slots} />
     </ITPage>
   );

@@ -2,21 +2,24 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
+  ITBadget,
   ITButton,
-  ITCard,
   ITFlex,
   ITGrid,
-  ITInput,
+  ITInputNumber,
   ITSearchSelect,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { PanelCard } from "@shared/ui/panel-card";
 import {
   kitchenApi,
   fmtQty,
   useKitchenCategoryOptions,
+  numOrNull,
+  numText,
   type KitchenLotRow,
 } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
@@ -88,7 +91,7 @@ export default function KitchenCountPanel() {
         await kitchenApi.adjust(input, requestKey(input));
       }
       setToast(t("count.success"));
-      setTimeout(() => navigate("/kitchen/movements"), 600);
+      setTimeout(() => navigate("/kitchen/items"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -98,22 +101,23 @@ export default function KitchenCountPanel() {
 
   return (
     <ITFlex direction="column" gap={4}>
-      <ITFlex align="end" justify="between" wrap="wrap" gap={3}>
-        <ITSearchSelect
-          name="kitchenCountCategory"
-          label={t("count.category")}
-          options={[{ value: "", label: t("count.allCategories") }, ...categories.data.map((c) => ({ value: c.id, label: c.name }))]}
-          value={categoryId}
-          onChange={(v) => setCategoryId(String(v))}
-          className="min-w-[240px]"
-        />
-        <ITButton variant="filled" color="primary" disabled={saving} onClick={() => void submit()}>
-          <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{t("count.submit")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
+      <PanelCard
+        title={t("count.filtersTitle")}
+        description={t("count.filtersHint")}
+        actions={
+          <ITButton variant="filled" color="primary" icon={<FaSave size={12} />} label={t("count.submit")} disabled={saving} onClick={() => void submit()} />
+        }
+      >
+        <div className="max-w-sm">
+          <ITSearchSelect
+            name="kitchenCountCategory"
+            label={t("count.category")}
+            options={[{ value: "", label: t("count.allCategories") }, ...categories.data.map((c) => ({ value: c.id, label: c.name }))]}
+            value={categoryId}
+            onChange={(v) => setCategoryId(String(v))}
+          />
+        </div>
+      </PanelCard>
 
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -121,7 +125,14 @@ export default function KitchenCountPanel() {
         </ITAlert>
       )}
 
-      <ITCard className="!p-5 border border-slate-200">
+      <PanelCard
+        title={t("count.lotsTitle")}
+        actions={
+          <ITBadget color="gray" size="sm">
+            {t("count.counted", { count: Object.values(counted).filter((v) => v !== "").length })}
+          </ITBadget>
+        }
+      >
         {lots.length === 0 ? (
           <ITText className="text-[11px] text-slate-400">{t("count.empty")}</ITText>
         ) : (
@@ -151,18 +162,17 @@ export default function KitchenCountPanel() {
                   </ITText>
                 </ITGrid>
                 <ITGrid item xs={2}>
-                  <ITInput
+                  <ITInputNumber decimals={2}
                     name={`count-${l.id}`}
-                    type="number"
-                    value={counted[l.id] ?? ""}
-                    onChange={(e) => setCounted((c) => ({ ...c, [l.id]: e.target.value }))}
+                    value={numOrNull(counted[l.id] ?? "")}
+                    onChange={(v) => setCounted((c) => ({ ...c, [l.id]: numText(v) }))}
                   />
                 </ITGrid>
               </ITGrid>
             ))}
           </ITFlex>
         )}
-      </ITCard>
+      </PanelCard>
 
       {toast && <ITToast message={toast} type="success" position="bottom-center" duration={2000} onClose={() => setToast(null)} />}
     </ITFlex>

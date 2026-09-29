@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ITAlert, ITButton, ITCard, ITConfirmDialog, ITFlex, ITGrid, ITText, ITToast } from "@axzydev/axzy_ui_system";
-import { FaArrowLeft, FaUndo } from "react-icons/fa";
+import { ITAlert, ITButton, ITConfirmDialog, ITFlex, ITGrid, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { FaBalanceScale, FaCoins, FaListUl, FaUndo } from "react-icons/fa";
+import { PanelCard } from "@shared/ui/panel-card";
 import { useTranslation } from "react-i18next";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { useCan } from "@entities/user";
 import { fmtQty } from "@entities/kitchen";
 import { useInvoice } from "../model/useInvoice";
@@ -14,7 +15,6 @@ const money = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigi
 /** Detalle de una factura con el cotejo de tres vías (pedido / recibido / facturado). */
 export default function InvoiceDetailPanel({ id }: { id?: string }) {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
   const fx = useInvoice(id);
   const canRegister = useCan("invoices.register");
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -28,6 +28,7 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
   }
 
   const invoice = fx.invoice;
+  const diffs = invoice.lines.filter((l) => l.priceDiff != null && Math.abs(l.priceDiff) > 0.0001).length;
 
   return (
     <ITFlex direction="column" gap={4}>
@@ -39,12 +40,9 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
 
       <ITFlex align="center" justify="between" wrap="wrap" gap={3}>
         <ITFlex align="center" gap={3}>
-          <ITButton variant="text" color="gray" size="sm" onClick={() => navigate("/kitchen/invoices")}>
-            <FaArrowLeft size={12} />
-          </ITButton>
           <ITFlex direction="column" gap={0}>
             <ITFlex align="center" gap={2}>
-              <ITText className="text-[16px] font-black text-slate-800">{invoice.number}</ITText>
+              <ITText className="text-[18px] font-black text-slate-800">{invoice.number}</ITText>
               <InvoiceStatusBadge status={invoice.status} />
             </ITFlex>
             <ITText className="text-[11px] text-slate-500">
@@ -63,7 +61,13 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
         )}
       </ITFlex>
 
-      <ITCard className="!p-5 border border-slate-200">
+      <div className="grid !grid-cols-1 gap-3 md:!grid-cols-3">
+        <KpiTile label={t("invoices.kpi.total")} value={money(invoice.total)} icon={<FaCoins size={15} />} tone="emerald" />
+        <KpiTile label={t("invoices.kpi.lines")} value={invoice.lines.length} icon={<FaListUl size={15} />} tone="violet" />
+        <KpiTile label={t("invoices.kpi.diffs")} value={diffs} icon={<FaBalanceScale size={15} />} tone={diffs > 0 ? "amber" : "neutral"} />
+      </div>
+
+      <PanelCard title={t("invoices.infoTitle")}>
         <ITGrid container columns={12} spacing={4}>
           {[
             { label: t("invoices.columns.total"), value: money(invoice.total) },
@@ -82,10 +86,9 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
             </ITGrid>
           )}
         </ITGrid>
-      </ITCard>
+      </PanelCard>
 
-      <ITCard className="!p-5 border border-slate-200">
-        <ITText className={`${HEAD} block mb-3`}>{t("invoices.match")}</ITText>
+      <PanelCard title={t("invoices.match")}>
         <ITFlex direction="column" gap={2}>
           <ITGrid container columns={12} spacing={2} className="hidden border-b border-slate-100 pb-2 md:grid">
             <ITGrid item md={3}><ITText className={HEAD}>{t("invoices.columns.item")}</ITText></ITGrid>
@@ -117,7 +120,7 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
             </ITGrid>
           ))}
         </ITFlex>
-      </ITCard>
+      </PanelCard>
 
       <ITConfirmDialog
         isOpen={cancelOpen}

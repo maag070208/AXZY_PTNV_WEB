@@ -11,6 +11,7 @@ export default function TimeClocksPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("clocks.title")}
       description={t("clocks.description")}
       icon={<FaClock size={20} />}

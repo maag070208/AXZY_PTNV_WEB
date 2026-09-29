@@ -22,10 +22,10 @@ const roleBadge = (role: string, label: string) => (
       role === "MANAGER"
         ? "danger"
         : role === "AREA_HEAD"
-        ? "warning"
-        : role === "EMPLOYEE"
-        ? "success"
-        : "gray"
+          ? "warning"
+          : role === "EMPLOYEE"
+            ? "success"
+            : "gray"
     }
     size="lg"
   >
@@ -84,7 +84,7 @@ export default function EmployeesTable({
       key: "name",
       label: tt("table.name"),
       type: "string",
-      width: 300,
+      width: 280,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -135,7 +135,7 @@ export default function EmployeesTable({
       key: "jobTitle",
       label: tt("table.position"),
       type: "string",
-      width: 220,
+      width: 180,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -146,7 +146,7 @@ export default function EmployeesTable({
       key: "departmentId",
       label: tt("table.departmentFull"),
       type: "catalog",
-      width: 200,
+      width: 150,
       filter: "search",
       sortable: false,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
@@ -160,7 +160,7 @@ export default function EmployeesTable({
       key: "subareaId",
       label: tt("table.subarea"),
       type: "catalog",
-      width: 200,
+      width: 130,
       filter: "search",
       sortable: false,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
@@ -212,7 +212,8 @@ export default function EmployeesTable({
       reloadTrigger={reloadKey}
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
-      size="lg"
+      layout="fixed"
+      density="compact"
       virtualized
       virtualizedMaxHeight={420}
       rowHeight={50}

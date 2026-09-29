@@ -26,6 +26,7 @@ export default function EmployeesListPage() {
       title={tt("title")}
       description={tt("description", { count: list.total })}
       backAction={() => navigate(-1)}
+      noPadding
       breadcrumbs={[
         { label: tt("common:nav.home"), onClick: () => navigate("/") },
         { label: tt("breadcrumb") },

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ITButton, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaEye, FaPlus } from "react-icons/fa";
+import { FaEdit, FaEye } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import {
   kitchenApi,
@@ -29,7 +29,7 @@ export default function PurchaseOrdersPanel() {
       type: "string",
       width: 110,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (o) => <ITText className="text-[12px] font-mono font-bold text-slate-700">{o.number}</ITText>,
     },
     {
@@ -48,7 +48,7 @@ export default function PurchaseOrdersPanel() {
       type: "catalog",
       width: 150,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: PURCHASE_ORDER_STATUSES.map((s) => ({ id: s, name: dyn(t)(`purchaseOrders.status.${s}`) })),
       },
@@ -60,7 +60,7 @@ export default function PurchaseOrdersPanel() {
       type: "date",
       width: 120,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (o) => <ITText className="text-[11px] text-slate-600">{o.expectedAt ?? "—"}</ITText>,
     },
     {
@@ -126,15 +126,6 @@ export default function PurchaseOrdersPanel() {
 
   return (
     <ITFlex direction="column" gap={3}>
-      <ITFlex justify="end">
-        <ITButton variant="filled" color="primary" onClick={() => navigate("/kitchen/purchase-orders/new")}>
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{t("purchaseOrders.new")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
-
       <ITDataTable
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={kitchenApi.purchaseOrdersTable as never}

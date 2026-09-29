@@ -1,7 +1,7 @@
-import { ITBadget, ITButton, ITFlex, ITGrid, ITInput } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITInputNumber } from "@axzydev/axzy_ui_system";
 import { FaCalendarAlt, FaCheck, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import type { KitchenItemRow } from "@entities/kitchen";
+import { numOrNull, numText, type KitchenItemRow } from "@entities/kitchen";
 import type { StockInLine } from "../model/types";
 import StockInExpiryField from "./StockInExpiryField";
 
@@ -49,12 +49,11 @@ export default function StockInLineRow({ line, item, complete, onPatch, onRemove
         </ITGrid>
 
         <ITGrid item xs={6} md={2}>
-          <ITInput
+          <ITInputNumber decimals={2}
             name={`q-${line.key}`}
-            type="number"
             label={t("stockIn.quantity")}
-            value={line.quantity}
-            onChange={(event) => onPatch({ quantity: event.target.value })}
+            value={numOrNull(line.quantity)}
+            onChange={(v) => onPatch({ quantity: numText(v) })}
           />
         </ITGrid>
 
@@ -72,12 +71,11 @@ export default function StockInLineRow({ line, item, complete, onPatch, onRemove
         </ITGrid>
 
         <ITGrid item xs={6} md={2}>
-          <ITInput
+          <ITInputNumber decimals={2} prefix="$"
             name={`c-${line.key}`}
-            type="number"
             label={t("stockIn.unitCost")}
-            value={line.unitCost}
-            onChange={(event) => onPatch({ unitCost: event.target.value })}
+            value={numOrNull(line.unitCost)}
+            onChange={(v) => onPatch({ unitCost: numText(v) })}
           />
         </ITGrid>
 

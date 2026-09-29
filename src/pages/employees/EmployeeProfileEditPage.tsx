@@ -159,6 +159,7 @@ export default function EmployeeProfileEditPage() {
   if (detail.loading || !detail.profile) {
     return (
       <ITPage
+        noPadding
         title={tt("detail.editInfo")}
         backAction={() => navigate(-1)}
         icon={<FaUserTie size={20} />}
@@ -390,6 +391,7 @@ export default function EmployeeProfileEditPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("detail.editInfo")}
       description={profile.name}
       backAction={() => navigate(-1)}

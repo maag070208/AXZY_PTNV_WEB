@@ -12,7 +12,34 @@
     "useFirst": "Use first",
     "restockList": "Restock",
     "empty": "No alerts: the store is in order.",
-    "lot": "Lot {{lot}} · {{qty}} {{unit}}"
+    "lot": "Lot {{lot}} · {{qty}} {{unit}}",
+    "quickTitle": "Quick actions",
+    "viewAll": "View all",
+    "useFirstHint": "Expired or expiring lots, most urgent first.",
+    "restockHint": "Items below their minimum and how much to order.",
+    "expiredAgo": "Expired {{count}} d ago",
+    "expiresToday": "Expires today",
+    "expiresIn": "Expires in {{count}} d",
+    "order": "Order {{qty}} {{unit}}",
+    "noUrgent": "Nothing about to expire. 👌",
+    "noRestock": "Everything above minimum.",
+    "quick": {
+      "stockIn": "Register stock in",
+      "stockInHint": "What arrived at the store",
+      "stockOut": "Consumption or waste",
+      "stockOutHint": "FEFO outputs",
+      "count": "Physical count",
+      "countHint": "Adjust to reality",
+      "order": "New purchase order",
+      "orderHint": "Order from a supplier"
+    },
+    "hint": {
+      "low": "Items below their minimum",
+      "expiring": "Expire in {{days}} days or less",
+      "expired": "Expired lots with stock",
+      "over": "Above their maximum",
+      "ok": "All good"
+    }
   },
   "items": {
     "title": "Items",
@@ -32,7 +59,9 @@
       "notes": "Notes",
       "active": "Active",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "defaultTaxRate": "VAT when purchased",
+      "noTaxRate": "No default VAT"
     },
     "detail": "Item detail",
     "suggested": "Suggested to order",
@@ -41,7 +70,33 @@
     "lastMovements": "Latest movements",
     "notFound": "Item not found",
     "saved": "Item saved",
-    "unitLocked": "Unit and kind cannot change once stock has been recorded"
+    "unitLocked": "Unit and kind cannot change once stock has been recorded",
+    "expired": "Expired",
+    "limits": "Minimum / maximum",
+    "infoTitle": "Stock",
+    "quick": {
+      "stockIn": "Stock in",
+      "stockOut": "Output / waste",
+      "count": "Physical count",
+      "inTitle": "Stock in: {{item}}",
+      "outTitle": "Output: {{item}}",
+      "inHint": "A new lot is created with what arrived.",
+      "outHint": "Taken from the lot that expires first.",
+      "quantity": "Quantity ({{unit}})",
+      "expiresAt": "Expires on",
+      "lotCode": "Lot (optional)",
+      "unitCost": "Cost per {{unit}} (optional)",
+      "supplier": "Supplier (optional)",
+      "willTake": "Will be taken from:",
+      "noStock": "No stock available.",
+      "available": "{{qty}} {{unit}} available",
+      "saveIn": "Register stock in",
+      "saveOut": "Register output",
+      "savedIn": "Stock in registered",
+      "savedOut": "Output registered",
+      "needExpiry": "Perishable: enter the expiration date.",
+      "multi": "Several items at once"
+    }
   },
   "columns": {
     "code": "Code",
@@ -228,12 +283,15 @@
     "lot": "Lot",
     "item": "Item",
     "system": "On system",
-    "counted": "Counted",
+    "counted": "{{count}} lots entered",
     "difference": "Difference",
     "submit": "Record count",
     "success": "Count recorded",
     "empty": "No lots with stock for this category",
-    "noChanges": "No differences to adjust"
+    "noChanges": "No differences to adjust",
+    "filtersTitle": "What to count",
+    "filtersHint": "Filter by category, enter what each lot has and register the adjustment.",
+    "lotsTitle": "Lots"
   },
   "restock": {
     "title": "Restock",
@@ -293,7 +351,32 @@
       "suggested": "Suggested: {{qty}}",
       "emptyItems": "Add at least one item.",
       "save": "Save order",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "inPurchaseUnit": "Order in {{unit}}",
+      "equivalent": "= {{qty}} {{unit}}",
+      "perPurchaseUnit": "Cost per {{unit}}",
+      "supplierContact": "Contact",
+      "supplierTerms": "Credit: {{credit}} · Delivery: {{lead}}",
+      "headerTitle": "Header",
+      "headerHint": "Order data. The folio is assigned by the system when saved.",
+      "folioPending": "Assigned when saved",
+      "date": "Date",
+      "createdBy": "Prepared by",
+      "status": "Status",
+      "legalName": "Legal name",
+      "rfc": "RFC",
+      "detailTitle": "Detail",
+      "detailHint": "Costs before VAT; VAT is calculated per line.",
+      "tax": "VAT",
+      "subtotal": "Subtotal",
+      "taxAmount": "VAT",
+      "lineTotal": "Amount",
+      "totalsTitle": "Totals",
+      "taxLine": "VAT {{rate}}",
+      "grandTotal": "Total",
+      "noTax": "No VAT",
+      "unitCostShort": "Unit cost",
+      "terms": "Terms"
     },
     "actions": {
       "approve": "Approve",
@@ -317,7 +400,14 @@
     "sent": "Order sent",
     "cancelled": "Order cancelled",
     "received": "Receipt recorded",
-    "cancelConfirm": "Cancel order {{number}}? This cannot be undone."
+    "cancelConfirm": "Cancel order {{number}}? This cannot be undone.",
+    "infoTitle": "Order data",
+    "kpi": {
+      "ordered": "Ordered",
+      "received": "Received",
+      "pending": "Pending",
+      "total": "Total"
+    }
   },
   "invoices": {
     "title": "Invoices",
@@ -374,11 +464,17 @@
     "cancelConfirm": "Cancel invoice {{number}}?",
     "actions": {
       "cancel": "Cancel invoice"
+    },
+    "infoTitle": "Invoice data",
+    "kpi": {
+      "total": "Invoiced total",
+      "lines": "Lines",
+      "diffs": "Price differences"
     }
   },
   "catalog": {
     "title": "Kitchen catalogs",
-    "description": "Store categories and suppliers.",
+    "description": "Warehouse categories and units of measure.",
     "categories": "Categories",
     "suppliers": "Suppliers",
     "units": "Units",
@@ -396,7 +492,17 @@
     "inactive": "Inactive",
     "saved": "Saved",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "categoriesHint": "Meats, dairy, tableware…",
+    "unitsHint": "Kilo, liter, piece…",
+    "wholeHint": "Counted in whole units (piece, pack): suggestions round up",
+    "taxRates": "VAT rates",
+    "taxRatesHint": "0%, 8%, 16%…",
+    "newTaxRate": "New rate",
+    "rate": "Rate",
+    "ratePercent": "Rate (%)"
   },
   "wizard": {
     "next": "Next",
@@ -415,6 +521,118 @@
     "loading": "Loading…",
     "empty": "No records",
     "error": "The operation could not be completed",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "remove": "Remove"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "description": "Tax data, location, contacts and the items each supplier provides.",
+    "new": "New supplier",
+    "edit": "Edit supplier",
+    "detail": "Supplier",
+    "saved": "Supplier saved",
+    "created": "Supplier created",
+    "active": "Active",
+    "inactive": "Inactive",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "columns": {
+      "name": "Supplier",
+      "rfc": "RFC",
+      "city": "City",
+      "state": "State",
+      "contact": "Primary contact",
+      "items": "Items",
+      "active": "Status"
+    },
+    "sections": {
+      "general": "General data",
+      "generalHint": "Trade name, legal name and RFC.",
+      "location": "Location",
+      "locationHint": "Where the supplier is and how to get there.",
+      "terms": "Commercial terms",
+      "termsHint": "Credit and delivery time.",
+      "contacts": "Contacts",
+      "contactsHint": "Who takes orders, who delivers and who collects.",
+      "items": "Items supplied",
+      "itemsHint": "Pack they sell (box, sack) and how many units it holds.",
+      "orders": "Latest purchase orders",
+      "invoices": "Latest invoices"
+    },
+    "fields": {
+      "name": "Trade name",
+      "legalName": "Legal name",
+      "rfc": "RFC",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website",
+      "street": "Street and number",
+      "neighborhood": "Neighborhood",
+      "postalCode": "Postal code",
+      "city": "City",
+      "state": "State",
+      "locationNotes": "Directions",
+      "mapsUrl": "Map link (Google Maps)",
+      "paymentTermsDays": "Credit days",
+      "leadTimeDays": "Delivery days",
+      "notes": "Notes",
+      "contactName": "Name",
+      "position": "Position",
+      "contactNotes": "Notes",
+      "primary": "Primary",
+      "item": "Item",
+      "supplierCode": "Supplier code",
+      "purchaseUnit": "Purchase unit",
+      "factor": "Units per pack",
+      "lastUnitCost": "Last price"
+    },
+    "positions": {
+      "manager": "Manager",
+      "sales": "Sales",
+      "delivery": "Delivery",
+      "billing": "Collections",
+      "invoicing": "Invoicing",
+      "owner": "Owner"
+    },
+    "hints": {
+      "rfc": "12 characters (company) or 13 (individual).",
+      "paymentTerms": "0 = cash",
+      "factor": "1 {{unit}} = {{factor}} {{base}}",
+      "noContacts": "No contacts. Add at least who takes the orders.",
+      "noItems": "No items yet. Add them to order by box or sack in purchase orders.",
+      "cash": "Cash",
+      "days": "{{count}} days",
+      "lastBought": "Last purchase: {{date}}"
+    },
+    "actions": {
+      "addContact": "Add contact",
+      "addItem": "Add item",
+      "save": "Save supplier",
+      "cancel": "Cancel",
+      "call": "Call",
+      "mail": "Email",
+      "map": "View map",
+      "view": "View",
+      "edit": "Edit"
+    },
+    "validation": {
+      "name": "Trade name is required",
+      "rfc": "The RFC format is not valid",
+      "postalCode": "Postal code must have 5 digits",
+      "contact": "Each contact needs a name",
+      "item": "Each item needs a purchase unit and units per pack",
+      "duplicateItem": "An item is repeated",
+      "email": "Invalid email"
+    },
+    "empty": "—"
+  },
+  "pdf": {
+    "poTitle": "Purchase order",
+    "order": "Order",
+    "approvedBy": "Approved by",
+    "prepared": "Prepared by",
+    "authorized": "Authorized by",
+    "footer": "Purchase order · Puerto Nuevo Hotel & Villas",
+    "download": "Download PDF"
   }
 }

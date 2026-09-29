@@ -136,7 +136,8 @@ export default function DeviceFormPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("devices.new")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("devices.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -161,6 +162,7 @@ export default function DeviceFormPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("devices.new")}
       description={t("devices.formSub")}
       icon={<FaBoxOpen size={20} />}

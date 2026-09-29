@@ -19,6 +19,7 @@ export default function AdminTasksPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("admintasks.title")}
       description={tt("admintasks.description", { count: fx.rows.length })}
       backAction={() => navigate(-1)}

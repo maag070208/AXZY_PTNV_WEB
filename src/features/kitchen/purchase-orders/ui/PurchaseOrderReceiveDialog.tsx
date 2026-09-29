@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITDatePicker, ITDialog, ITFlex, ITGrid, ITInput, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITDatePicker, ITDialog, ITFlex, ITGrid, ITInput,
+  ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
-import { fmtQty, type PurchaseOrderDetail, type PurchaseOrderReceiveInput } from "@entities/kitchen";
+import { fmtQty, numOrNull, numText, type PurchaseOrderDetail, type PurchaseOrderReceiveInput } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 
 interface Draft {
@@ -108,12 +109,11 @@ export default function PurchaseOrderReceiveDialog({ open, order, busy, onClose,
                   </ITFlex>
                   <ITGrid container columns={12} spacing={3} className="items-end">
                     <ITGrid item xs={6} md={3}>
-                      <ITInput
+                      <ITInputNumber decimals={2}
                         name={`rcv-q-${line.id}`}
-                        type="number"
                         label={t("purchaseOrders.receiveQuantity")}
-                        value={d.quantity}
-                        onChange={(e) => patch(line.id, { quantity: e.target.value })}
+                        value={numOrNull(d.quantity)}
+                        onChange={(v) => patch(line.id, { quantity: numText(v) })}
                       />
                     </ITGrid>
                     <ITGrid item xs={6} md={3}>
@@ -144,12 +144,11 @@ export default function PurchaseOrderReceiveDialog({ open, order, busy, onClose,
                       )}
                     </ITGrid>
                     <ITGrid item xs={6} md={3}>
-                      <ITInput
+                      <ITInputNumber decimals={2} prefix="$"
                         name={`rcv-cost-${line.id}`}
-                        type="number"
                         label={t("purchaseOrders.form.unitCost")}
-                        value={d.unitCost}
-                        onChange={(e) => patch(line.id, { unitCost: e.target.value })}
+                        value={numOrNull(d.unitCost)}
+                        onChange={(v) => patch(line.id, { unitCost: numText(v) })}
                       />
                     </ITGrid>
                   </ITGrid>

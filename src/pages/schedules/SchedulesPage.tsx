@@ -10,6 +10,7 @@ export default function SchedulesPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("title")}
       description={t("description")}
       icon={<FaRegClock size={20} />}

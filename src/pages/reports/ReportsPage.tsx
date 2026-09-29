@@ -32,6 +32,7 @@ export default function ReportsPage() {
       description={t("description")}
       backAction={() => navigate(-1)}
       icon={<FaChartBar size={20} />}
+      noPadding
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("title") },

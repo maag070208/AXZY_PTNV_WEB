@@ -14,6 +14,7 @@ export default function TimeClockPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("title")}
       description={t("description")}
       icon={<FaFingerprint size={20} />}

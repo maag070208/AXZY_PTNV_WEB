@@ -46,8 +46,8 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
     source === "CUSTODY_LETTER"
       ? t("assigned.sourceCustodyLetter")
       : source === "MOVEMENT"
-      ? t("assigned.sourceMovement")
-      : t("assigned.unknownSource");
+        ? t("assigned.sourceMovement")
+        : t("assigned.unknownSource");
 
   const columns: Column<AssignedDeviceRow>[] = [
     {
@@ -67,7 +67,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "description",
       label: t("assigned.colDescription"),
       type: "string",
-      width: 300,
+      width: 230,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -85,7 +85,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "custodianId",
       label: t("assigned.colCustodian"),
       type: "catalog",
-      width: 240,
+      width: 200,
       filter: "search",
       catalogOptions: fx.peopleOptions,
       sortable: false,
@@ -104,7 +104,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "departmentId",
       label: t("assigned.colDept"),
       type: "catalog",
-      width: 200,
+      width: 150,
       filter: "search",
       catalogOptions: fx.departmentOptions,
       sortable: false,
@@ -118,7 +118,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "folio",
       label: t("assigned.colFolioSource"),
       type: "string",
-      width: 180,
+      width: 170,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -137,7 +137,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "loanDate",
       label: t("assigned.colDate"),
       type: "date",
-      width: 190,
+      width: 170,
       filter: "date-range",
       dateFilterOptions: { maxDate: new Date() },
       sortable: false,
@@ -151,14 +151,13 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       key: "daysAssigned",
       label: t("assigned.colDays"),
       type: "number",
-      width: 100,
+      width: 120,
       filter: true,
       sortable: false,
       render: (r) => (
         <ITText
-          className={`text-[11px] font-black ${
-            (r.daysAssigned ?? 0) > 30 ? "text-red-600" : "text-slate-700"
-          }`}
+          className={`text-[11px] font-black ${(r.daysAssigned ?? 0) > 30 ? "text-red-600" : "text-slate-700"
+            }`}
         >
           {r.daysAssigned ?? "—"}
         </ITText>
@@ -272,7 +271,8 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
         debounceMs={350}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

@@ -43,6 +43,7 @@ export default function EditTicketPage() {
   if (editTicket.loading) {
     return (
       <ITPage
+        noPadding
         title={tt("edit.title")}
         backAction={() => navigate(-1)}
         icon={<FaTicketAlt size={20} />}
@@ -56,6 +57,7 @@ export default function EditTicketPage() {
   if (!editTicket.ticket) {
     return (
       <ITPage
+        noPadding
         title={tt("edit.title")}
         backAction={() => navigate(-1)}
         icon={<FaTicketAlt size={20} />}
@@ -71,6 +73,7 @@ export default function EditTicketPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("edit.title")}
       description={tt("edit.description")}
       backAction={() => navigate(-1)}

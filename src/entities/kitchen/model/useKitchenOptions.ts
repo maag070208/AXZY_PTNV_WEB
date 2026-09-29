@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { kitchenApi } from "../api/kitchenApi";
-import type { KitchenCategory, KitchenItemRow, KitchenUnit, Supplier } from "./types";
+import type { KitchenAlerts, KitchenCategory, KitchenItemRow, KitchenUnit, Supplier, TaxRate } from "./types";
 
 /**
  * Opciones para selects: cargan el catálogo completo (el almacén de cocina es de
@@ -40,5 +40,25 @@ export const useKitchenCategoryOptions = (includeInactive = false) =>
 export const useKitchenUnitOptions = (includeInactive = false) =>
   useList<KitchenUnit>(() => kitchenApi.units(includeInactive));
 
+export const useTaxRateOptions = (includeInactive = false) =>
+  useList<TaxRate>(() => kitchenApi.taxRates(includeInactive));
+
 export const useSupplierOptions = (includeInactive = false) =>
   useList<Supplier>(() => kitchenApi.suppliers(includeInactive));
+
+/** Alertas del almacén (bajo mínimo, por caducar, caducados, sobre stock) para indicadores. */
+export const useKitchenAlerts = (reloadKey = 0) => {
+  const [alerts, setAlerts] = useState<KitchenAlerts | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    kitchenApi
+      .alerts()
+      .then((a) => active && setAlerts(a))
+      .catch((e: Error) => active && setError(e.message));
+    return () => {
+      active = false;
+    };
+  }, [reloadKey]);
+  return { alerts, error };
+};

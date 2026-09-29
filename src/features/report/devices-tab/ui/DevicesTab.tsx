@@ -61,7 +61,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "assetTag",
       label: t("devices.activeCol"),
       type: "string",
-      width: 160,
+      width: 120,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -81,7 +81,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "description",
       label: t("devices.colDescription"),
       type: "string",
-      width: 300,
+      width: 270,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -99,7 +99,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "quantity",
       label: t("devices.colQty"),
       type: "number",
-      width: 90,
+      width: 80,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-black text-slate-700">
@@ -111,7 +111,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "status",
       label: t("devices.colStatus"),
       type: "catalog",
-      width: 140,
+      width: 120,
       filter: "catalog",
       sortable: false,
       catalogOptions: {
@@ -123,7 +123,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "custodianId",
       label: t("devices.colCustodian"),
       type: "catalog",
-      width: 240,
+      width: 180,
       filter: "search",
       catalogOptions: fx.peopleOptions,
       sortable: false,
@@ -147,7 +147,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "departmentId",
       label: t("devices.colDept"),
       type: "catalog",
-      width: 200,
+      width: 120,
       filter: "search",
       catalogOptions: fx.departmentOptions,
       sortable: false,
@@ -168,10 +168,10 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       render: (r) => (
         <ITText
           className={`text-[11px] font-black ${r.status === "ASSIGNED" && (r.daysAssigned ?? 0) > 30
-              ? "text-red-600"
-              : r.status === "ASSIGNED"
-                ? "text-slate-700"
-                : "text-slate-300"
+            ? "text-red-600"
+            : r.status === "ASSIGNED"
+              ? "text-slate-700"
+              : "text-slate-300"
             }`}
         >
           {r.status === "ASSIGNED" ? r.daysAssigned ?? "—" : "—"}
@@ -182,7 +182,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "folio",
       label: t("devices.colFolio"),
       type: "string",
-      width: 150,
+      width: 120,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -195,7 +195,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       key: "area",
       label: t("devices.colArea"),
       type: "string",
-      width: 160,
+      width: 140,
       filter: true,
       sortable: false,
       render: (r) => (
@@ -329,7 +329,8 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         reloadTrigger={reloadKey}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

@@ -15,6 +15,7 @@ export default function MyTasksPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("mytasks.title")}
       description={tt("mytasks.description", { count: fx.rows.length })}
       backAction={() => navigate(-1)}

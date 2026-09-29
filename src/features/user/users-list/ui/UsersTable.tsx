@@ -28,12 +28,12 @@ const roleBadge = (role: string) => (
       role === "ADMIN"
         ? "danger"
         : role === "MANAGER"
-        ? "info"
-        : role === "AREA_HEAD"
-        ? "warning"
-        : role === "GUARD"
-        ? "gray"
-        : "success"
+          ? "info"
+          : role === "AREA_HEAD"
+            ? "warning"
+            : role === "GUARD"
+              ? "gray"
+              : "success"
     }
     size="lg"
   >
@@ -68,7 +68,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "name",
       label: tt("table.name"),
       type: "string",
-      width: 300,
+      width: 250,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -109,7 +109,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "departmentId",
       label: tt("table.department"),
       type: "catalog",
-      width: 200,
+      width: 150,
       filter: "search",
       sortable: false,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
@@ -123,7 +123,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       key: "subareaId",
       label: tt("table.subarea"),
       type: "catalog",
-      width: 200,
+      width: 150,
       filter: "search",
       sortable: false,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
@@ -195,7 +195,8 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       reloadTrigger={fx.reloadKey}
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
-      size="lg"
+      layout="fixed"
+      density="compact"
       virtualized
       virtualizedMaxHeight={420}
       rowHeight={50}

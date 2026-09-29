@@ -72,7 +72,8 @@
     "weeklyAttendance": "Asistencia semanal",
     "payroll": "Pre Nómina",
     "tasks": "Tickets",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "kitchenSuppliers": "Proveedores"
   },
   "files": {
     "access": "accesos",

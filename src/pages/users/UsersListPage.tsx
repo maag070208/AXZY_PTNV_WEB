@@ -30,6 +30,7 @@ export default function UsersListPage() {
       title={tt("list.title")}
       description={tt("list.description", { count: fx.total })}
       backAction={() => navigate(-1)}
+      noPadding
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: tt("list.breadcrumb") },

@@ -72,7 +72,8 @@
     "weeklyAttendance": "Weekly attendance",
     "payroll": "Payroll",
     "tasks": "Tickets",
-    "settings": "Settings"
+    "settings": "Settings",
+    "kitchenSuppliers": "Suppliers"
   },
   "files": {
     "access": "access",

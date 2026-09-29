@@ -32,6 +32,7 @@ export default function EmployeeDetailPage() {
   if (detail.loading || !detail.profile) {
     return (
       <ITPage
+        noPadding
         title={tt("detail.loadingTitle")}
         backAction={() => navigate(-1)}
         icon={<FaUserTie size={20} />}
@@ -57,6 +58,7 @@ export default function EmployeeDetailPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("detail.title")}
       description={profile.name}
       backAction={() => navigate(-1)}

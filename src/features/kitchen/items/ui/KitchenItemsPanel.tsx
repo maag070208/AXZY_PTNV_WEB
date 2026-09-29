@@ -10,19 +10,26 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
+  ITInputNumber,
   ITSelect,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaEye, FaPlus } from "react-icons/fa";
+import { FaArrowDown, FaArrowUp, FaEdit, FaEye } from "react-icons/fa";
+import { useCan } from "@entities/user";
+import QuickMovementDialog, { type QuickMode } from "./QuickMovementDialog";
 import { useTranslation } from "react-i18next";
 import {
+  KitchenAlertKpis,
+  useKitchenAlerts,
   kitchenApi,
   fmtQty,
   stockStatusColor,
   useKitchenCategoryOptions,
   useKitchenUnitOptions,
+  useTaxRateOptions,
+  fmtRate,
   KITCHEN_ITEM_KINDS,
   KITCHEN_STORAGES,
   type KitchenItemInput,
@@ -41,6 +48,7 @@ const emptyForm = (): KitchenItemInput => ({
   minStock: 0,
   maxStock: null,
   notes: null,
+  defaultTaxRateId: null,
 });
 
 /** Alta/edición de un artículo de cocina. */
@@ -58,6 +66,7 @@ function ItemFormDialog({
   const { t } = useTranslation("kitchen");
   const categories = useKitchenCategoryOptions();
   const units = useKitchenUnitOptions();
+  const taxRates = useTaxRateOptions();
   const [form, setForm] = useState<KitchenItemInput>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +86,7 @@ function ItemFormDialog({
             tracksExpiry: item.tracksExpiry,
             minStock: item.minStock,
             maxStock: item.maxStock,
+            defaultTaxRateId: item.defaultTaxRateId,
             notes: null,
             active: item.active,
           }
@@ -162,23 +172,28 @@ function ItemFormDialog({
             {select(form.storage, (v) => setForm((f) => ({ ...f, storage: v })), KITCHEN_STORAGES, "storages", t("items.form.storage"))}
           </ITGrid>
           <ITGrid item xs={6} md={3}>
-            <ITInput
+            <ITInputNumber decimals={2}
               name="kitchenItemMin"
-              type="number"
               label={t("items.form.minStock")}
-              value={String(form.minStock)}
-              onChange={(e) => setForm((f) => ({ ...f, minStock: Number(e.target.value) }))}
+              value={form.minStock}
+              onChange={(v) => setForm((f) => ({ ...f, minStock: v ?? 0 }))}
             />
           </ITGrid>
           <ITGrid item xs={6} md={3}>
-            <ITInput
+            <ITInputNumber decimals={2}
               name="kitchenItemMax"
-              type="number"
               label={t("items.form.maxStock")}
-              value={form.maxStock == null ? "" : String(form.maxStock)}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, maxStock: e.target.value === "" ? null : Number(e.target.value) }))
-              }
+              value={form.maxStock}
+              onChange={(v) => setForm((f) => ({ ...f, maxStock: v ?? null }))}
+            />
+          </ITGrid>
+          <ITGrid item xs={12} md={6}>
+            <ITSelect
+              name="kitchenItemTaxRate"
+              label={t("items.form.defaultTaxRate")}
+              options={[{ value: "", label: t("items.form.noTaxRate") }, ...taxRates.data.map((r) => ({ value: r.id, label: `${r.name} · ${fmtRate(r.rate)}` }))]}
+              value={form.defaultTaxRateId ?? ""}
+              onChange={(e) => setForm((f) => ({ ...f, defaultTaxRateId: e.target.value || null }))}
             />
           </ITGrid>
           <ITGrid item xs={12} md={6}>
@@ -213,7 +228,7 @@ function ItemFormDialog({
   );
 }
 
-export default function KitchenItemsPanel() {
+export default function KitchenItemsPanel({ newSignal = 0 }: { newSignal?: number }) {
   const { t } = useTranslation("kitchen");
   const units = useKitchenUnitOptions(true);
   const navigate = useNavigate();
@@ -224,6 +239,15 @@ export default function KitchenItemsPanel() {
   });
   const [toast, setToast] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { alerts } = useKitchenAlerts(reloadKey);
+  const canIn = useCan("kitchen.stock_in");
+  const canOut = useCan("kitchen.stock_out");
+  const [quick, setQuick] = useState<{ item: KitchenItemRow | null; mode: QuickMode }>({ item: null, mode: "in" });
+
+  // "Nuevo artículo" vive en la cabecera de la página (como en Personal).
+  useEffect(() => {
+    if (newSignal > 0) setDialog({ open: true, item: null });
+  }, [newSignal]);
 
   const columns: Column<KitchenItemRow>[] = [
     {
@@ -232,7 +256,7 @@ export default function KitchenItemsPanel() {
       type: "string",
       width: 100,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => <ITText className="text-[11px] font-mono text-slate-600">{r.code}</ITText>,
     },
     {
@@ -241,7 +265,7 @@ export default function KitchenItemsPanel() {
       type: "string",
       width: 220,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0}>
           <ITText className="text-[12px] font-black text-slate-800">{r.name}</ITText>
@@ -257,7 +281,7 @@ export default function KitchenItemsPanel() {
       type: "catalog",
       width: 120,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: { data: KITCHEN_ITEM_KINDS.map((k) => ({ id: k, name: dyn(t)(`kinds.${k}`) })) },
       render: (r) => <ITText className="text-[11px] text-slate-600">{dyn(t)(`kinds.${r.kind}`)}</ITText>,
     },
@@ -267,7 +291,7 @@ export default function KitchenItemsPanel() {
       type: "catalog",
       width: 110,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: { data: units.data.map((u) => ({ id: u.id, name: u.name })) },
       render: (r) => <ITText className="text-[11px] text-slate-600">{r.unit.name}</ITText>,
     },
@@ -276,7 +300,7 @@ export default function KitchenItemsPanel() {
       label: t("columns.available"),
       type: "number",
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[12px] font-black text-slate-800">
           {fmtQty(r.available)} {r.unit.name}
@@ -288,7 +312,7 @@ export default function KitchenItemsPanel() {
       label: t("columns.minMax"),
       type: "number",
       width: 110,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] text-slate-500">
           {fmtQty(r.minStock)} / {r.maxStock == null ? "—" : fmtQty(r.maxStock)}
@@ -301,7 +325,7 @@ export default function KitchenItemsPanel() {
       type: "catalog",
       width: 130,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: [
           { id: "LOW", name: t("stockStatus.LOW") },
@@ -320,7 +344,7 @@ export default function KitchenItemsPanel() {
       label: t("columns.nextExpiry"),
       type: "date",
       width: 120,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[11px] text-slate-600">{r.nextExpiry ?? "—"}</ITText>
       ),
@@ -329,9 +353,19 @@ export default function KitchenItemsPanel() {
       key: "actions",
       label: "",
       type: "actions",
-      width: 110,
+      width: 190,
       actions: (r) => (
         <ITFlex align="center" gap={1}>
+          {canIn && r.active && (
+            <ITButton variant="outlined" size="lg" color="success" title={t("items.quick.stockIn")} onClick={() => setQuick({ item: r, mode: "in" })}>
+              <FaArrowDown size={12} />
+            </ITButton>
+          )}
+          {canOut && r.active && (
+            <ITButton variant="outlined" size="lg" color="warning" title={t("items.quick.stockOut")} onClick={() => setQuick({ item: r, mode: "out" })}>
+              <FaArrowUp size={12} />
+            </ITButton>
+          )}
           <ITButton
             variant="outlined"
             size="lg"
@@ -362,14 +396,7 @@ export default function KitchenItemsPanel() {
           {error}
         </ITAlert>
       )}
-      <ITFlex justify="end">
-        <ITButton variant="filled" color="primary" onClick={() => setDialog({ open: true, item: null })}>
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{t("items.new")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
+      <KitchenAlertKpis alerts={alerts} />
 
       <ITDataTable
         columns={columns as unknown as Column<Record<string, unknown>>[]}
@@ -390,6 +417,18 @@ export default function KitchenItemsPanel() {
         onSaved={() => {
           setReloadKey((k) => k + 1);
           setToast(t("items.saved"));
+          setTimeout(() => setToast(null), 2000);
+        }}
+      />
+
+      <QuickMovementDialog
+        item={quick.item}
+        mode={quick.mode}
+        onClose={() => setQuick((q) => ({ ...q, item: null }))}
+        onDone={(message) => {
+          setQuick((q) => ({ ...q, item: null }));
+          setReloadKey((k) => k + 1);
+          setToast(message);
           setTimeout(() => setToast(null), 2000);
         }}
       />

@@ -21,6 +21,11 @@ import type {
   PurchaseOrderRow,
   RestockRow,
   Supplier,
+  TaxRate,
+  TaxRateInput,
+  SupplierDetail,
+  SupplierInput,
+  SupplierRow,
   SupplierInvoiceDetail,
   SupplierInvoiceInput,
   SupplierInvoiceRow,
@@ -41,13 +46,19 @@ export const kitchenApi = {
 
   suppliers: (includeInactive?: boolean) =>
     api.get<Supplier[]>(`/kitchen/suppliers${includeInactive ? "?includeInactive=true" : ""}`),
-  createSupplier: (input: Omit<Supplier, "id" | "active">) =>
-    api.post<Supplier>("/kitchen/suppliers", input),
-  updateSupplier: (id: string, input: Partial<Omit<Supplier, "id">>) =>
-    api.patch<Supplier>(`/kitchen/suppliers/${id}`, input),
+suppliersTable: (params: ITDataTableFetchParamsPost) =>
+    tableRequest<SupplierRow>("/kitchen/suppliers/table", params),
+  supplier: (id: string) => api.get<SupplierDetail>(`/kitchen/suppliers/${id}`),
+  createSupplier: (input: SupplierInput) => api.post<SupplierDetail>("/kitchen/suppliers", input),
+  updateSupplier: (id: string, input: Partial<SupplierInput>) =>
+    api.patch<SupplierDetail>(`/kitchen/suppliers/${id}`, input),
 
   units: (includeInactive?: boolean) =>
     api.get<KitchenUnit[]>(`/kitchen/units${includeInactive ? "?includeInactive=true" : ""}`),
+  taxRates: (includeInactive?: boolean) =>
+    api.get<TaxRate[]>(`/kitchen/tax-rates${includeInactive ? "?includeInactive=true" : ""}`),
+  createTaxRate: (input: TaxRateInput) => api.post<TaxRate>("/kitchen/tax-rates", input),
+  updateTaxRate: (id: string, input: Partial<TaxRateInput>) => api.patch<TaxRate>(`/kitchen/tax-rates/${id}`, input),
   createUnit: (input: KitchenUnitInput) => api.post<KitchenUnit>("/kitchen/units", input),
   updateUnit: (id: string, input: Partial<KitchenUnitInput>) =>
     api.patch<KitchenUnit>(`/kitchen/units/${id}`, input),

@@ -31,6 +31,7 @@ export default function DepartmentDetailPage() {
   if (!detail.dept) {
     return (
       <ITPage
+        noPadding
         title={tt("detail.loadingTitle")}
         backAction={() => navigate(-1)}
         icon={<FaBuilding size={20} />}
@@ -56,6 +57,7 @@ export default function DepartmentDetailPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("detail.title")}
       description={dept.name}
       backAction={() => navigate(-1)}

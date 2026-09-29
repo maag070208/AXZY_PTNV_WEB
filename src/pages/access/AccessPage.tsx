@@ -388,6 +388,7 @@ export default function AccessPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("title")}
       description={tt("description")}
       icon={<FaDoorOpen size={20} />}

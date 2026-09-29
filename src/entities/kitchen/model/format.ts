@@ -49,3 +49,16 @@ export const fmtQty = (n: number): string => {
   if (n == null || Number.isNaN(n)) return "—";
   return String(Math.round(n * 1000) / 1000);
 };
+
+/** Texto de un borrador → valor de `ITInputNumber` (vacío = null). */
+export const numOrNull = (v: string | number | null | undefined): number | null =>
+  v === "" || v == null || Number.isNaN(Number(v)) ? null : Number(v);
+
+/** Valor de `ITInputNumber` → texto del borrador (undefined = vacío). */
+export const numText = (v: number | null | undefined): string => (v == null ? "" : String(v));
+
+/** Tasa fracción (0.16 o "0.1600") → "16%". */
+export const fmtRate = (rate: number | string): string => `${Math.round(Number(rate) * 10000) / 100}%`;
+
+/** Pesos mexicanos con 2 decimales. */
+export const fmtMoney = (n: number): string => `$${n.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

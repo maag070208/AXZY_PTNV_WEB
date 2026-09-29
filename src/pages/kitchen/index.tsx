@@ -1,4 +1,6 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { useState } from "react";
+import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { useCan } from "@entities/user";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,8 +12,10 @@ import {
   FaClipboardList,
   FaFileInvoice,
   FaListAlt,
+  FaPlus,
   FaShoppingCart,
   FaTags,
+  FaTruck,
   FaTruckLoading,
   FaUtensils,
 } from "react-icons/fa";
@@ -31,15 +35,25 @@ import {
   PurchaseOrdersPanel,
 } from "@features/kitchen/purchase-orders";
 import { InvoiceDetailPanel, InvoiceFormPanel, InvoicesPanel } from "@features/kitchen/invoices";
+import { downloadPurchaseOrderPdf } from "@widgets/purchase-order-pdf";
+import { SupplierDetailPanel, SupplierFormPanel, SuppliersPanel } from "@features/kitchen/suppliers";
+
+/** Botón principal de la cabecera (mismo estilo que "Nuevo empleado" en Personal). */
+const newButton = (label: string, onClick: () => void) => (
+  <ITButton variant="filled" color="primary" icon={<FaPlus size={12} />} label={label} onClick={onClick} />
+);
 
 const crumbs = (
   navigate: ReturnType<typeof useNavigate>,
   home: string,
   parent: string,
-  leaf: string
+  leaf: string,
+  /** Paso intermedio opcional (p. ej. Artículos para entradas, salidas y conteo). */
+  middle?: { label: string; path: string }
 ) => [
   { label: home, onClick: () => navigate("/") },
   { label: parent, onClick: () => navigate("/kitchen") },
+  ...(middle ? [{ label: middle.label, onClick: () => navigate(middle.path) }] : []),
   { label: leaf },
 ];
 
@@ -48,6 +62,7 @@ export function KitchenOverviewPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("overview.title")}
       description={t("overview.description")}
       icon={<FaUtensils size={20} />}
@@ -62,15 +77,35 @@ export function KitchenOverviewPage() {
 export function KitchenItemsPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const canManage = useCan("kitchen.manage");
+  const canIn = useCan("kitchen.stock_in");
+  const canOut = useCan("kitchen.stock_out");
+  const canCount = useCan("kitchen.adjust");
+  const [newSignal, setNewSignal] = useState(0);
   return (
     <ITPage
+      noPadding
       title={t("items.title")}
       description={t("items.description")}
       icon={<FaBoxes size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("items.title"))}
       backAction={() => navigate("/kitchen")}
+      actions={
+        <div className="flex flex-wrap items-center gap-2">
+          {canIn && (
+            <ITButton variant="outlined" color="success" icon={<FaArrowDown size={11} />} label={t("items.quick.stockIn")} onClick={() => navigate("/kitchen/stock-in")} />
+          )}
+          {canOut && (
+            <ITButton variant="outlined" color="warning" icon={<FaArrowUp size={11} />} label={t("items.quick.stockOut")} onClick={() => navigate("/kitchen/stock-out")} />
+          )}
+          {canCount && (
+            <ITButton variant="outlined" color="secondary" icon={<FaClipboardCheck size={11} />} label={t("items.quick.count")} onClick={() => navigate("/kitchen/count")} />
+          )}
+          {canManage && newButton(t("items.new"), () => setNewSignal((n) => n + 1))}
+        </div>
+      }
     >
-      <KitchenItemsPanel />
+      <KitchenItemsPanel newSignal={newSignal} />
     </ITPage>
   );
 }
@@ -80,6 +115,7 @@ export function KitchenItemDetailPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("items.detail")}
       icon={<FaBoxes size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("items.detail"))}
@@ -95,6 +131,7 @@ export function KitchenLotsPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("lots.title")}
       description={t("lots.description")}
       icon={<FaListAlt size={20} />}
@@ -111,11 +148,12 @@ export function KitchenStockInPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("stockIn.title")}
       description={t("stockIn.description")}
       icon={<FaArrowDown size={20} />}
-      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("stockIn.title"))}
-      backAction={() => navigate("/kitchen")}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("stockIn.title"), { label: t("items.title"), path: "/kitchen/items" })}
+      backAction={() => navigate("/kitchen/items")}
     >
       <KitchenStockInPanel />
     </ITPage>
@@ -127,11 +165,12 @@ export function KitchenStockOutPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("stockOut.title")}
       description={t("stockOut.description")}
       icon={<FaArrowUp size={20} />}
-      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("stockOut.title"))}
-      backAction={() => navigate("/kitchen")}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("stockOut.title"), { label: t("items.title"), path: "/kitchen/items" })}
+      backAction={() => navigate("/kitchen/items")}
     >
       <KitchenStockOutPanel />
     </ITPage>
@@ -143,6 +182,7 @@ export function KitchenLedgerPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("ledger.title")}
       description={t("ledger.description")}
       icon={<FaBook size={20} />}
@@ -159,11 +199,12 @@ export function KitchenCountPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("count.title")}
       description={t("count.description")}
       icon={<FaClipboardCheck size={20} />}
-      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("count.title"))}
-      backAction={() => navigate("/kitchen")}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("count.title"), { label: t("items.title"), path: "/kitchen/items" })}
+      backAction={() => navigate("/kitchen/items")}
     >
       <KitchenCountPanel />
     </ITPage>
@@ -175,6 +216,7 @@ export function KitchenRestockPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("restock.title")}
       description={t("restock.description")}
       icon={<FaTruckLoading size={20} />}
@@ -191,6 +233,7 @@ export function KitchenCatalogPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("catalog.title")}
       description={t("catalog.description")}
       icon={<FaTags size={20} />}
@@ -205,13 +248,16 @@ export function KitchenCatalogPage() {
 export function KitchenPurchaseOrdersPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const canCreate = useCan("purchase_orders.create");
   return (
     <ITPage
+      noPadding
       title={t("purchaseOrders.title")}
       description={t("purchaseOrders.description")}
       icon={<FaShoppingCart size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
       backAction={() => navigate("/kitchen/restock")}
+      actions={canCreate ? newButton(t("purchaseOrders.new"), () => navigate("/kitchen/purchase-orders/new")) : undefined}
     >
       <PurchaseOrdersPanel />
     </ITPage>
@@ -224,6 +270,7 @@ export function KitchenPurchaseOrderFormPage() {
   const { id } = useParams();
   return (
     <ITPage
+      noPadding
       title={id ? t("purchaseOrders.edit") : t("purchaseOrders.new")}
       description={t("purchaseOrders.description")}
       icon={<FaClipboardList size={20} />}
@@ -241,12 +288,13 @@ export function KitchenPurchaseOrderDetailPage() {
   const { id } = useParams();
   return (
     <ITPage
+      noPadding
       title={t("purchaseOrders.detail")}
       icon={<FaShoppingCart size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
       backAction={() => navigate("/kitchen/purchase-orders")}
     >
-      <PurchaseOrderDetailPanel id={id} />
+      <PurchaseOrderDetailPanel id={id} onDownloadPdf={downloadPurchaseOrderPdf} />
     </ITPage>
   );
 }
@@ -254,13 +302,16 @@ export function KitchenPurchaseOrderDetailPage() {
 export function KitchenInvoicesPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const canRegister = useCan("invoices.register");
   return (
     <ITPage
       title={t("invoices.title")}
       description={t("invoices.description")}
       icon={<FaFileInvoice size={20} />}
+      noPadding
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
       backAction={() => navigate("/kitchen/purchase-orders")}
+      actions={canRegister ? newButton(t("invoices.new"), () => navigate("/kitchen/invoices/new")) : undefined}
     >
       <InvoicesPanel />
     </ITPage>
@@ -272,6 +323,7 @@ export function KitchenInvoiceFormPage() {
   const navigate = useNavigate();
   return (
     <ITPage
+      noPadding
       title={t("invoices.new")}
       description={t("invoices.description")}
       icon={<FaFileInvoice size={20} />}
@@ -289,12 +341,67 @@ export function KitchenInvoiceDetailPage() {
   const { id } = useParams();
   return (
     <ITPage
+      noPadding
       title={t("invoices.detail")}
       icon={<FaFileInvoice size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
       backAction={() => navigate("/kitchen/invoices")}
     >
       <InvoiceDetailPanel id={id} />
+    </ITPage>
+  );
+}
+
+export function KitchenSuppliersPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  const canManage = useCan("kitchen.manage");
+  return (
+    <ITPage
+      noPadding
+      title={t("suppliers.title")}
+      description={t("suppliers.description")}
+      icon={<FaTruck size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("suppliers.title"))}
+      backAction={() => navigate("/kitchen")}
+      actions={canManage ? newButton(t("suppliers.new"), () => navigate("/kitchen/suppliers/new")) : undefined}
+    >
+      <SuppliersPanel />
+    </ITPage>
+  );
+}
+
+export function KitchenSupplierFormPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  return (
+    <ITPage
+      noPadding
+      title={id ? t("suppliers.edit") : t("suppliers.new")}
+      description={t("suppliers.description")}
+      icon={<FaTruck size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("suppliers.title"))}
+      backAction={() => navigate(id ? `/kitchen/suppliers/${id}` : "/kitchen/suppliers")}
+    >
+      <SupplierFormPanel id={id} />
+    </ITPage>
+  );
+}
+
+export function KitchenSupplierDetailPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  return (
+    <ITPage
+      noPadding
+      title={t("suppliers.detail")}
+      icon={<FaTruck size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("suppliers.title"))}
+      backAction={() => navigate("/kitchen/suppliers")}
+    >
+      <SupplierDetailPanel id={id} />
     </ITPage>
   );
 }

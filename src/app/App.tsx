@@ -70,6 +70,9 @@ import {
   KitchenInvoicesPage,
   KitchenInvoiceFormPage,
   KitchenInvoiceDetailPage,
+  KitchenSupplierDetailPage,
+  KitchenSupplierFormPage,
+  KitchenSuppliersPage,
 } from "@pages/kitchen";
 
 export default function App() {
@@ -514,6 +517,38 @@ export default function App() {
           element={
             <RequiresPermission permission="purchase_orders.view">
               <KitchenPurchaseOrderDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenSuppliersPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers/new"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenSupplierFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers/:id/edit"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenSupplierFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers/:id"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenSupplierDetailPage />
             </RequiresPermission>
           }
         />

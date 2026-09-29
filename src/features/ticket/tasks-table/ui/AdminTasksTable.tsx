@@ -29,7 +29,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "title",
       label: tt("tasksTable.task"),
       type: "string",
-      width: 300,
+      width: 270,
       filter: true,
       sortable: false,
       render: (row) => (
@@ -61,7 +61,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "ticket",
       label: tt("tasksTable.ticket"),
       type: "string",
-      width: 300,
+      width: 250,
       filter: true,
       sortable: false,
       render: (row) => (
@@ -72,7 +72,7 @@ export default function AdminTasksTable({ fx }: Props) {
       key: "status",
       label: tt("tasksTable.status"),
       type: "catalog",
-      width: 150,
+      width: 180,
       filter: "catalog",
       catalogOptions: {
         data: Object.keys(ASSIGNMENT_STATUS_BADGE).map((id) => ({
@@ -127,7 +127,8 @@ export default function AdminTasksTable({ fx }: Props) {
       reloadTrigger={fx.reloadKey}
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
-      size="lg"
+      layout="fixed"
+      density="compact"
       virtualized
       virtualizedMaxHeight={420}
       rowHeight={50}

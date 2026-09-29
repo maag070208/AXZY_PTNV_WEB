@@ -19,6 +19,7 @@ export default function KanbanPage() {
 
   return (
     <ITPage
+      noPadding
       title={ticketId ? tt("kanban.byTicket") : tt("kanban.board")}
       description={ticketId ? tt("kanban.descByTicket") : tt("kanban.descBoard")}
       backAction={() => navigate(-1)}

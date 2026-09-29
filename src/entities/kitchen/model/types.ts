@@ -56,14 +56,103 @@ export interface KitchenUnitInput {
   active?: boolean;
 }
 
-export interface Supplier {
+// ── Tasas de IVA ────────────────────────────────────────────────────────────
+
+/** Tasa de IVA del catálogo; `rate` es fracción (0.16 = 16%). */
+export interface TaxRate {
   id: string;
   name: string;
-  rfc: string | null;
-  contact: string | null;
+  rate: number | string;
+  active: boolean;
+  sortOrder: number;
+}
+
+export interface TaxRateInput {
+  name: string;
+  rate: number;
+  active?: boolean;
+}
+
+// ── Proveedores ─────────────────────────────────────────────────────────────
+
+export interface SupplierContact {
+  id?: string;
+  name: string;
+  position: string | null;
   phone: string | null;
   email: string | null;
+  isPrimary: boolean;
+  notes: string | null;
+}
+
+/** Datos del proveedor (fiscales, ubicación y condiciones). */
+export interface SupplierFields {
+  name: string;
+  legalName: string | null;
+  rfc: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  street: string | null;
+  neighborhood: string | null;
+  postalCode: string | null;
+  city: string | null;
+  state: string | null;
+  locationNotes: string | null;
+  mapsUrl: string | null;
+  /** Días de crédito (0 = contado). */
+  paymentTermsDays: number | null;
+  /** Días de entrega desde que se envía la OC. */
+  leadTimeDays: number | null;
+  notes: string | null;
+}
+
+export interface Supplier extends SupplierFields {
+  id: string;
   active: boolean;
+  /** Solo el principal (la lista simple y la tabla lo traen). */
+  contacts?: SupplierContact[];
+}
+
+export interface SupplierRow extends Supplier {
+  primaryContact: SupplierContact | null;
+  contactsCount: number;
+  itemsCount: number;
+}
+
+/** Artículo que surte el proveedor: 1 `purchaseUnit` = `factor` unidades base. */
+export interface SupplierItem {
+  id: string;
+  item: KitchenItemRef & { active: boolean; unit: KitchenUnit };
+  supplierCode: string | null;
+  purchaseUnit: string;
+  factor: number;
+  /** Último precio por unidad de compra (lo actualiza la factura). */
+  lastUnitCost: number | null;
+  lastPurchasedAt: string | null;
+}
+
+export interface SupplierDetail extends Supplier {
+  contacts: SupplierContact[];
+  items: SupplierItem[];
+  purchaseOrders: Array<{ id: string; number: string; status: PurchaseOrderStatus; createdAt: string; expectedAt: string | null }>;
+  invoices: Array<{ id: string; number: string; date: string; total: number; status: InvoiceStatus }>;
+  createdAt: string;
+}
+
+export interface SupplierItemInput {
+  itemId: string;
+  supplierCode?: string | null;
+  purchaseUnit: string;
+  factor: number;
+  lastUnitCost?: number | null;
+}
+
+export interface SupplierInput extends Partial<SupplierFields> {
+  name: string;
+  active?: boolean;
+  contacts?: Array<Omit<SupplierContact, "id">>;
+  items?: SupplierItemInput[];
 }
 
 export interface KitchenItemRef {
@@ -82,6 +171,7 @@ export interface KitchenItemRow {
   unit: KitchenUnit;
   storage: KitchenStorage;
   tracksExpiry: boolean;
+  defaultTaxRateId: string | null;
   minStock: number;
   maxStock: number | null;
   active: boolean;
@@ -103,6 +193,7 @@ export interface KitchenItemInput {
   maxStock: number | null;
   notes?: string | null;
   active?: boolean;
+  defaultTaxRateId?: string | null;
 }
 
 export interface KitchenLotRow {
@@ -316,7 +407,12 @@ export interface PurchaseOrderRow {
   linesCount: number;
   orderedUnits: number;
   receivedUnits: number;
+  /** Antes de IVA. */
+  subtotal: number;
+  tax: number;
   total: number;
+  /** IVA desglosado por tasa. */
+  taxes: Array<{ rate: number; base: number; tax: number }>;
 }
 
 export interface PurchaseOrderLine {
@@ -331,9 +427,35 @@ export interface PurchaseOrderLine {
   /** Lo pedido en OTRAS órdenes abiertas (sin contar esta línea). */
   inTransit: number;
   notes: string | null;
+  /** Presentación con que se pidió (null = en unidad base). */
+  purchaseUnit: string | null;
+  purchaseFactor: number | null;
+  purchaseQuantity: number | null;
+  taxRateId: string | null;
+  /** Fracción (0.16). */
+  taxRate: number;
+  subtotal: number;
+  tax: number;
+  total: number;
 }
 
-export interface PurchaseOrderDetail extends PurchaseOrderRow {
+export interface PurchaseOrderDetail extends Omit<PurchaseOrderRow, "supplier"> {
+  supplier: {
+    id: string;
+    name: string;
+    legalName: string | null;
+    rfc: string | null;
+    street: string | null;
+    neighborhood: string | null;
+    postalCode: string | null;
+    city: string | null;
+    state: string | null;
+    phone: string | null;
+    email: string | null;
+    paymentTermsDays: number | null;
+    leadTimeDays: number | null;
+    primaryContact: Omit<SupplierContact, "id" | "isPrimary" | "notes"> | null;
+  };
   approvedBy: { id: string; name: string } | null;
   approvedAt: string | null;
   sentAt: string | null;
@@ -347,6 +469,10 @@ export interface PurchaseOrderLineInput {
   quantity: number;
   unitCost?: number | null;
   notes?: string | null;
+  /** `quantity`/`unitCost` vienen en la unidad de compra del proveedor. */
+  usePurchaseUnit?: boolean;
+  /** Tasa de IVA; null = sin IVA; ausente = la del artículo. */
+  taxRateId?: string | null;
 }
 
 export interface PurchaseOrderInput {

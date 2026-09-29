@@ -11,6 +11,7 @@ export default function TimeClockEmployeesPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("employees.title")}
       description={t("employees.description")}
       icon={<FaLink size={20} />}

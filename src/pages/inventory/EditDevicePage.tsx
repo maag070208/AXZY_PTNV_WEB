@@ -123,7 +123,8 @@ export default function EditDevicePage() {
 
   if (loading || !device) {
     return (
-      <ITPage title={t("devices.edit")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("devices.edit")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -133,6 +134,7 @@ export default function EditDevicePage() {
 
   return (
     <ITPage
+      noPadding
       title={t("devices.edit")}
       description={device.name}
       icon={<FaBoxOpen size={20} />}

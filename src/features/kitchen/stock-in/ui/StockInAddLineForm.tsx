@@ -1,7 +1,7 @@
-import { ITButton, ITFlex, ITGrid, ITInput, ITSearchSelect } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITGrid, ITInput, ITInputNumber, ITSearchSelect } from "@axzydev/axzy_ui_system";
 import { FaCalendarAlt, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import type { KitchenItemRow } from "@entities/kitchen";
+import { numOrNull, numText, type KitchenItemRow } from "@entities/kitchen";
 import type { StockInLine } from "../model/types";
 import StockInExpiryField from "./StockInExpiryField";
 
@@ -37,12 +37,11 @@ export default function StockInAddLineForm({ items, draft, draftItem, draftReady
           />
         </ITGrid>
         <ITGrid item xs={6} md={2}>
-          <ITInput
+          <ITInputNumber decimals={2}
             name="draftQty"
-            type="number"
             label={draftItem ? `${t("stockIn.quantity")} (${draftItem.unit.name})` : t("stockIn.quantity")}
-            value={draft.quantity}
-            onChange={(event) => onDraftChange({ quantity: event.target.value })}
+            value={numOrNull(draft.quantity)}
+            onChange={(v) => onDraftChange({ quantity: numText(v) })}
           />
         </ITGrid>
         <ITGrid item xs={6} md={2}>

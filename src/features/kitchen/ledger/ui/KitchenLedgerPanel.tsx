@@ -134,7 +134,7 @@ export default function KitchenLedgerPanel() {
       label: t("columns.type"),
       type: "catalog",
       width: 130,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: {
         data: KITCHEN_MOVEMENT_TYPES.map((m) => ({ id: m, name: dyn(t)(`movementTypes.${m}`) })),
@@ -150,7 +150,7 @@ export default function KitchenLedgerPanel() {
       label: t("columns.date"),
       type: "date",
       width: 160,
-      sortable: true,
+      sortable: false,
       filter: "date-range",
       render: (m) => (
         <ITText className="text-[11px] text-slate-600 whitespace-nowrap">
@@ -163,7 +163,7 @@ export default function KitchenLedgerPanel() {
       label: t("columns.reference"),
       type: "string",
       width: 140,
-      sortable: true,
+      sortable: false,
       filter: true,
       render: (m) => <ITText className="text-[11px] text-slate-600">{m.reference ?? "—"}</ITText>,
     },
@@ -192,7 +192,7 @@ export default function KitchenLedgerPanel() {
       label: t("columns.createdBy"),
       type: "string",
       width: 150,
-      sortable: true,
+      sortable: false,
       filter: true,
       render: (m) => <ITText className="text-[11px] text-slate-600">{m.createdBy.name}</ITText>,
     },
@@ -201,7 +201,7 @@ export default function KitchenLedgerPanel() {
       label: t("columns.status"),
       type: "catalog",
       width: 110,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: {
         data: [

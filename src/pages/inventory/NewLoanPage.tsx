@@ -147,7 +147,8 @@ export default function NewLoanPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("loans.new")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("loans.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -157,6 +158,7 @@ export default function NewLoanPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("loans.new")}
       description={t("loans.formSub")}
       icon={<FaFileSignature size={20} />}

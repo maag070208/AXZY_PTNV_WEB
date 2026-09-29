@@ -1,8 +1,7 @@
-import { ITCard, ITDatePicker, ITGrid, ITInput, ITSearchSelect } from "@axzydev/axzy_ui_system";
-import { FaClipboardList } from "react-icons/fa";
+import { ITDatePicker, ITGrid, ITInput, ITSearchSelect } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import type { Supplier } from "@entities/kitchen";
-import { SectionHeader } from "@shared/ui/section-header";
+import { PanelCard } from "@shared/ui/panel-card";
 
 interface Props {
   suppliers: Supplier[];
@@ -30,13 +29,7 @@ export default function StockInGeneralData({
 }: Props) {
   const { t } = useTranslation("kitchen");
   return (
-    <ITCard className="!overflow-hidden !p-0 border border-slate-200 shadow-sm">
-      <SectionHeader
-        icon={<FaClipboardList size={14} />}
-        title={t("stockIn.dataTitle")}
-        description={t("stockIn.dataDescription")}
-      />
-      <div className="p-5">
+    <PanelCard title={t("stockIn.dataTitle")} description={t("stockIn.dataDescription")}>
         <ITGrid container columns={12} spacing={4}>
           <ITGrid item xs={12} md={4}>
             <ITSearchSelect
@@ -79,7 +72,6 @@ export default function StockInGeneralData({
             />
           </ITGrid>
         </ITGrid>
-      </div>
-    </ITCard>
+      </PanelCard>
   );
 }

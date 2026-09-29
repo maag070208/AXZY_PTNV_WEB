@@ -33,7 +33,7 @@ export default function DevicesPage() {
       type: "string",
       key: "name",
       label: t("devices.colName"),
-      width: 300,
+      width: 280,
       sortable: false,
       filter: true,
       render: (d: Device) => (
@@ -47,7 +47,7 @@ export default function DevicesPage() {
       type: "string",
       key: "typeId",
       label: t("devices.colType"),
-      width: 160,
+      width: 180,
       sortable: false,
       filter: "catalog" as const,
       catalogOptions: {
@@ -96,15 +96,18 @@ export default function DevicesPage() {
       label: "",
       width: 140,
       render: (d: Device) => (
-        <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/devices/${d.id}`)}>
+        <ITFlex gap={1} justify="center">
+         <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/devices/${d.id}`)}>
           <ITText className="font-bold text-[10px]">{t("common:actions.view")}</ITText>
         </ITButton>
+        </ITFlex>
       ),
     },
   ];
 
   return (
     <ITPage
+      noPadding
       title={t("devices.title")}
       description={t("devices.description")}
       icon={<FaBoxOpen size={20} />}
@@ -124,7 +127,8 @@ export default function DevicesPage() {
         fetchData={fetchData as any}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

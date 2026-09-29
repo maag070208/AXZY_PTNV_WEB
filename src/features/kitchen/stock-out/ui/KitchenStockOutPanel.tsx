@@ -9,6 +9,7 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
+  ITInputNumber,
   ITSearchSelect,
   ITSelect,
   ITText,
@@ -23,6 +24,8 @@ import {
   KITCHEN_WASTE_REASONS,
   type FefoPreview,
   type KitchenStockOutInput,
+  numOrNull,
+  numText,
   type KitchenWasteReason,
 } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
@@ -122,7 +125,7 @@ export default function KitchenStockOutPanel() {
     try {
       await kitchenApi.stockOut(input, requestKey(input));
       setToast(t("stockOut.success"));
-      setTimeout(() => navigate("/kitchen/movements"), 600);
+      setTimeout(() => navigate("/kitchen/items"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -196,12 +199,11 @@ export default function KitchenStockOutPanel() {
                 />
               </ITGrid>
               <ITGrid item xs={6} md={2}>
-                <ITInput
+                <ITInputNumber decimals={2}
                   name="outDraftQty"
-                  type="number"
                   label={draftItem ? `${t("stockOut.quantity")} (${draftItem.unit.name})` : t("stockOut.quantity")}
-                  value={draft.quantity}
-                  onChange={(e) => setDraft((d) => ({ ...d, quantity: e.target.value }))}
+                  value={numOrNull(draft.quantity)}
+                  onChange={(v) => setDraft((d) => ({ ...d, quantity: numText(v) }))}
                 />
               </ITGrid>
               <ITGrid item xs={6} md={2}>
@@ -270,7 +272,7 @@ export default function KitchenStockOutPanel() {
                       </ITFlex>
                     </ITGrid>
                     <ITGrid item xs={9} md={4}>
-                      <ITInput name={`q-${l.key}`} type="number" label={t("stockOut.quantity")} value={l.quantity} onChange={(e) => patchLine(l.key, { quantity: e.target.value })} />
+                      <ITInputNumber decimals={2} name={`q-${l.key}`} label={t("stockOut.quantity")} value={numOrNull(l.quantity)} onChange={(v) => patchLine(l.key, { quantity: numText(v) })} />
                     </ITGrid>
                     <ITGrid item xs={3} md={2}>
                       <ITFlex justify="end">

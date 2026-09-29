@@ -19,6 +19,7 @@ export default function RolesPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("title")}
       description={t("description")}
       backAction={() => navigate(-1)}

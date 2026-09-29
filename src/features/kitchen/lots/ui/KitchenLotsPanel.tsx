@@ -9,6 +9,8 @@ import {
   useSupplierOptions,
   LOT_STATUSES,
   type KitchenLotRow,
+  KitchenAlertKpis,
+  useKitchenAlerts,
 } from "@entities/kitchen";
 import { dyn } from "@shared/i18n/dyn";
 
@@ -17,6 +19,7 @@ export default function KitchenLotsPanel() {
   const { t } = useTranslation("kitchen");
   const categories = useKitchenCategoryOptions(true);
   const suppliers = useSupplierOptions(true);
+  const { alerts } = useKitchenAlerts();
 
   const columns: Column<KitchenLotRow>[] = [
     {
@@ -25,7 +28,7 @@ export default function KitchenLotsPanel() {
       type: "string",
       width: 140,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => <ITText className="text-[11px] font-mono text-slate-700">{r.lotCode}</ITText>,
     },
     {
@@ -34,7 +37,7 @@ export default function KitchenLotsPanel() {
       type: "string",
       width: 220,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITFlex direction="column" gap={0}>
           <ITText className="text-[12px] font-black text-slate-800">{r.item.name}</ITText>
@@ -59,7 +62,7 @@ export default function KitchenLotsPanel() {
       label: t("columns.supplier"),
       type: "catalog",
       width: 140,
-      sortable: true,
+      sortable: false,
       filter: "catalog",
       catalogOptions: { data: suppliers.data.map((s) => ({ id: s.id, name: s.name })) },
       render: (r) => <ITText className="text-[11px] text-slate-600">{r.supplier?.name ?? "—"}</ITText>,
@@ -69,7 +72,7 @@ export default function KitchenLotsPanel() {
       label: t("columns.expiresAt"),
       type: "date",
       width: 120,
-      sortable: true,
+      sortable: false,
       filter: "date-range",
       render: (r) => <ITText className="text-[11px] text-slate-600">{r.expiresAt ?? "—"}</ITText>,
     },
@@ -78,7 +81,7 @@ export default function KitchenLotsPanel() {
       label: t("columns.onHand"),
       type: "number",
       width: 120,
-      sortable: true,
+      sortable: false,
       render: (r) => (
         <ITText className="text-[12px] font-black text-slate-800">
           {fmtQty(r.onHand)} {r.item.unit.name}
@@ -102,7 +105,9 @@ export default function KitchenLotsPanel() {
   ];
 
   return (
-    <ITDataTable
+    <ITFlex direction="column" gap={3}>
+      <KitchenAlertKpis alerts={alerts} keys={["expiring", "expired"]} />
+      <ITDataTable
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={kitchenApi.lotsTable as never}
       defaultItemsPerPage={50}
@@ -111,6 +116,7 @@ export default function KitchenLotsPanel() {
       virtualized
       virtualizedMaxHeight={560}
       rowHeight={54}
-    />
+      />
+    </ITFlex>
   );
 }

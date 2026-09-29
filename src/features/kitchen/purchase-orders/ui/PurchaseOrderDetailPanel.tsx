@@ -3,31 +3,36 @@ import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITButton,
-  ITCard,
   ITConfirmDialog,
   ITFlex,
   ITGrid,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaArrowLeft, FaCheck, FaFileInvoice, FaPaperPlane, FaPen, FaTruckLoading, FaUndo } from "react-icons/fa";
+import { FaCheck, FaClipboardList, FaFilePdf, FaCoins, FaFileInvoice, FaHourglassHalf, FaPaperPlane, FaPen, FaTruckLoading, FaUndo } from "react-icons/fa";
+import { PanelCard } from "@shared/ui/panel-card";
 import { useTranslation } from "react-i18next";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { useCan } from "@entities/user";
-import { fmtQty } from "@entities/kitchen";
+import { fmtMoney, fmtQty, fmtRate, type PurchaseOrderDetail } from "@entities/kitchen";
 import { usePurchaseOrder } from "../model/usePurchaseOrder";
 import PurchaseOrderStatusBadge from "./PurchaseOrderStatusBadge";
 import PurchaseOrderReceiveDialog from "./PurchaseOrderReceiveDialog";
 
 const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
-const money = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
+const money = fmtMoney;
+/** Columnas del detalle: artículo · pedido · recibido · pendiente · costo · IVA · subtotal · importe. */
+const LINE_GRID = "grid grid-cols-[minmax(200px,2.4fr)_1fr_.9fr_.9fr_1fr_.7fr_1fr_1.1fr] items-center gap-3";
 
 /** Detalle de una orden: líneas con existencias, recepciones y acciones por estado. */
-export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
+export default function PurchaseOrderDetailPanel({ id, onDownloadPdf }: { id?: string; onDownloadPdf?: (order: PurchaseOrderDetail) => Promise<void> }) {
   const { t } = useTranslation("kitchen");
   const navigate = useNavigate();
   const fx = usePurchaseOrder(id);
   const canCreate = useCan("purchase_orders.create");
   const canApprove = useCan("purchase_orders.approve");
+  const canCancel = useCan("purchase_orders.cancel");
+  const [pdfBusy, setPdfBusy] = useState(false);
   const canReceive = useCan("kitchen.stock_in");
   const canRegisterInvoice = useCan("invoices.register");
   const [receiveOpen, setReceiveOpen] = useState(false);
@@ -56,12 +61,9 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
 
       <ITFlex align="center" justify="between" wrap="wrap" gap={3}>
         <ITFlex align="center" gap={3}>
-          <ITButton variant="text" color="gray" size="sm" onClick={() => navigate("/kitchen/purchase-orders")}>
-            <FaArrowLeft size={12} />
-          </ITButton>
           <ITFlex direction="column" gap={0}>
             <ITFlex align="center" gap={2}>
-              <ITText className="text-[16px] font-black text-slate-800">{order.number}</ITText>
+              <ITText className="text-[18px] font-black text-slate-800">{order.number}</ITText>
               <PurchaseOrderStatusBadge status={order.status} />
             </ITFlex>
             <ITText className="text-[11px] text-slate-500">
@@ -71,6 +73,19 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
         </ITFlex>
 
         <ITFlex align="center" gap={2} wrap="wrap">
+          {onDownloadPdf && (
+            <ITButton
+              variant="outlined"
+              color="secondary"
+              icon={<FaFilePdf size={11} className="text-rose-600" />}
+              label={pdfBusy ? t("common.loading") : t("pdf.download")}
+              disabled={pdfBusy}
+              onClick={() => {
+                setPdfBusy(true);
+                void onDownloadPdf(order).finally(() => setPdfBusy(false));
+              }}
+            />
+          )}
           {order.status === "DRAFT" && canCreate && (
             <ITButton variant="outlined" color="secondary" onClick={() => navigate(`/kitchen/purchase-orders/${order.id}/edit`)}>
               <ITFlex align="center" gap={1}>
@@ -115,7 +130,7 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
               </ITFlex>
             </ITButton>
           )}
-          {cancellable && canCreate && (
+          {cancellable && canCancel && (
             <ITButton variant="outlined" color="error" disabled={fx.busy} onClick={() => setCancelOpen(true)}>
               <ITFlex align="center" gap={1}>
                 <FaUndo size={11} />
@@ -126,13 +141,31 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
         </ITFlex>
       </ITFlex>
 
-      <ITCard className="!p-5 border border-slate-200">
+      <div className="grid !grid-cols-2 gap-3 md:!grid-cols-4">
+        <KpiTile label={t("purchaseOrders.kpi.ordered")} value={fmtQty(order.orderedUnits)} icon={<FaClipboardList size={15} />} tone="violet" />
+        <KpiTile label={t("purchaseOrders.kpi.received")} value={fmtQty(order.receivedUnits)} icon={<FaTruckLoading size={15} />} tone="emerald" />
+        <KpiTile
+          label={t("purchaseOrders.kpi.pending")}
+          value={fmtQty(Math.max(0, order.orderedUnits - order.receivedUnits))}
+          icon={<FaHourglassHalf size={15} />}
+          tone={order.orderedUnits - order.receivedUnits > 0 && order.status !== "CANCELLED" ? "amber" : "neutral"}
+        />
+        <KpiTile label={t("purchaseOrders.kpi.total")} value={money(order.total)} icon={<FaCoins size={15} />} tone="emerald" />
+      </div>
+
+      <PanelCard title={t("purchaseOrders.infoTitle")}>
         <ITGrid container columns={12} spacing={4}>
           {[
             { label: t("purchaseOrders.columns.createdBy"), value: order.createdBy.name },
             { label: t("purchaseOrders.columns.createdAt"), value: req(order.createdAt) },
             { label: t("purchaseOrders.status.APPROVED"), value: order.approvedBy ? `${order.approvedBy.name} · ${req(order.approvedAt)}` : "—" },
             { label: t("purchaseOrders.status.SENT"), value: req(order.sentAt) },
+            {
+              label: t("purchaseOrders.form.supplierContact"),
+              value: order.supplier.primaryContact
+                ? [order.supplier.primaryContact.name, order.supplier.primaryContact.position, order.supplier.primaryContact.phone].filter(Boolean).join(" · ")
+                : order.supplier.phone ?? "—",
+            },
           ].map((f) => (
             <ITGrid key={f.label} item xs={12} md={3}>
               <ITText className={`${HEAD} block`}>{f.label}</ITText>
@@ -146,43 +179,70 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
             </ITGrid>
           )}
         </ITGrid>
-      </ITCard>
+      </PanelCard>
 
-      <ITCard className="!p-5 border border-slate-200">
-        <ITFlex direction="column" gap={2}>
-          <ITGrid container columns={12} spacing={2} className="hidden border-b border-slate-100 pb-2 md:grid">
-            <ITGrid item md={3}><ITText className={HEAD}>{t("purchaseOrders.columns.item")}</ITText></ITGrid>
-            <ITGrid item md={1}><ITText className={HEAD}>{t("purchaseOrders.columns.quantity")}</ITText></ITGrid>
-            <ITGrid item md={1}><ITText className={HEAD}>{t("purchaseOrders.columns.received")}</ITText></ITGrid>
-            <ITGrid item md={1}><ITText className={HEAD}>{t("purchaseOrders.columns.pending")}</ITText></ITGrid>
-            <ITGrid item md={2}><ITText className={HEAD}>{t("purchaseOrders.columns.available")}</ITText></ITGrid>
-            <ITGrid item md={2}><ITText className={HEAD}>{t("purchaseOrders.columns.inTransit")}</ITText></ITGrid>
-            <ITGrid item md={2}><ITText className={HEAD}>{t("purchaseOrders.columns.unitCost")}</ITText></ITGrid>
-          </ITGrid>
-          {order.lines.map((line) => (
-            <ITGrid key={line.id} container columns={12} spacing={2} className="items-center border-b border-slate-50 pb-2">
-              <ITGrid item xs={12} md={3}>
-                <ITText className="text-[12px] font-bold text-slate-800">{line.item.name}</ITText>
-                <ITText className="text-[10px] uppercase text-slate-400">{line.item.unit.name}</ITText>
-              </ITGrid>
-              <ITGrid item xs={4} md={1}><ITText className="text-[12px] font-bold text-slate-700">{fmtQty(line.quantity)}</ITText></ITGrid>
-              <ITGrid item xs={4} md={1}><ITText className="text-[12px] font-bold text-emerald-700">{fmtQty(line.receivedQuantity)}</ITText></ITGrid>
-              <ITGrid item xs={4} md={1}><ITText className="text-[12px] font-bold text-amber-600">{fmtQty(line.pendingQuantity)}</ITText></ITGrid>
-              <ITGrid item xs={6} md={2}><ITText className="text-[11px] text-slate-600">{fmtQty(line.available)}</ITText></ITGrid>
-              <ITGrid item xs={6} md={2}><ITText className="text-[11px] text-slate-600">{fmtQty(line.inTransit)}</ITText></ITGrid>
-              <ITGrid item xs={12} md={2}>
-                <ITText className="text-[11px] text-slate-600">
-                  {line.unitCost == null ? "—" : money(line.unitCost)}
-                </ITText>
-              </ITGrid>
-            </ITGrid>
-          ))}
-        </ITFlex>
-      </ITCard>
+      <PanelCard title={t("purchaseOrders.form.detailTitle")} description={t("purchaseOrders.form.detailHint")}>
+        <div className="overflow-x-auto">
+          <div className="min-w-[980px]">
+            <div className={`${LINE_GRID} border-b border-slate-100 pb-2`}>
+              <span className={HEAD}>{t("purchaseOrders.columns.item")}</span>
+              <span className={`${HEAD} text-right`}>{t("purchaseOrders.columns.quantity")}</span>
+              <span className={`${HEAD} text-right`}>{t("purchaseOrders.columns.received")}</span>
+              <span className={`${HEAD} text-right`}>{t("purchaseOrders.columns.pending")}</span>
+              <span className={`${HEAD} text-right`}>{t("purchaseOrders.form.unitCostShort")}</span>
+              <span className={`${HEAD} text-right`}>{t("purchaseOrders.form.tax")}</span>
+              <span className={`${HEAD} text-right`}>{t("purchaseOrders.form.subtotal")}</span>
+              <span className={`${HEAD} text-right`}>{t("purchaseOrders.form.lineTotal")}</span>
+            </div>
+            {order.lines.map((line) => (
+              <div key={line.id} className={`${LINE_GRID} border-b border-slate-50 py-2.5 last:border-0`}>
+                <span className="min-w-0">
+                  <span className="block truncate text-[12px] font-bold text-slate-800">{line.item.name}</span>
+                  <span className="block text-[10px] font-mono text-slate-400">{line.item.code}</span>
+                </span>
+                <span className="text-right">
+                  <span className="block text-[12px] font-bold tabular-nums text-slate-700">
+                    {fmtQty(line.quantity)} {line.item.unit.code}
+                  </span>
+                  {line.purchaseUnit && line.purchaseQuantity != null && (
+                    <span className="block text-[10px] text-emerald-700">
+                      {fmtQty(line.purchaseQuantity)} × {line.purchaseUnit}
+                    </span>
+                  )}
+                </span>
+                <span className="text-right text-[12px] font-bold tabular-nums text-emerald-700">{fmtQty(line.receivedQuantity)}</span>
+                <span className="text-right text-[12px] font-bold tabular-nums text-amber-600">{fmtQty(line.pendingQuantity)}</span>
+                <span className="text-right text-[12px] tabular-nums text-slate-600">{line.unitCost == null ? "—" : fmtMoney(line.unitCost)}</span>
+                <span className="text-right text-[12px] tabular-nums text-slate-600">{fmtRate(line.taxRate)}</span>
+                <span className="text-right text-[12px] tabular-nums text-slate-700">{fmtMoney(line.subtotal)}</span>
+                <span className="text-right text-[13px] font-black tabular-nums text-slate-900">{fmtMoney(line.total)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex justify-end">
+          <div className="w-full max-w-xs rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <ITFlex justify="between" className="py-1">
+              <ITText className="text-[12px] text-slate-500">{t("purchaseOrders.form.subtotal")}</ITText>
+              <ITText className="text-[13px] font-bold tabular-nums text-slate-800">{fmtMoney(order.subtotal)}</ITText>
+            </ITFlex>
+            {order.taxes.map((tx) => (
+              <ITFlex key={tx.rate} justify="between" className="py-1">
+                <ITText className="text-[12px] text-slate-500">{t("purchaseOrders.form.taxLine", { rate: fmtRate(tx.rate) })}</ITText>
+                <ITText className="text-[13px] tabular-nums text-slate-700">{fmtMoney(tx.tax)}</ITText>
+              </ITFlex>
+            ))}
+            <ITFlex justify="between" className="mt-2 border-t border-slate-200 pt-2">
+              <ITText className="text-[13px] font-black text-slate-900">{t("purchaseOrders.form.grandTotal")}</ITText>
+              <ITText className="text-[18px] font-black tabular-nums text-slate-900">{fmtMoney(order.total)}</ITText>
+            </ITFlex>
+          </div>
+        </div>
+      </PanelCard>
 
       {order.movements.length > 0 && (
-        <ITCard className="!p-5 border border-slate-200">
-          <ITText className={`${HEAD} block mb-2`}>{t("purchaseOrders.receipts")}</ITText>
+        <PanelCard title={t("purchaseOrders.receipts")}>
           <ITFlex direction="column" gap={1}>
             {order.movements.map((m) => (
               <ITFlex key={m.id} align="center" gap={3}>
@@ -192,7 +252,7 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
               </ITFlex>
             ))}
           </ITFlex>
-        </ITCard>
+        </PanelCard>
       )}
 
       <PurchaseOrderReceiveDialog

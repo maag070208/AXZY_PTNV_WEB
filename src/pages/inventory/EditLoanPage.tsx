@@ -182,7 +182,8 @@ export default function EditLoanPage() {
 
   if (loading || !loan) {
     return (
-      <ITPage title={t("loans.edit")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("loans.edit")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -192,6 +193,7 @@ export default function EditLoanPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("loans.edit")}
       description={`${loan.number}`}
       icon={<FaFileSignature size={20} />}

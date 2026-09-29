@@ -48,6 +48,7 @@ export default function UserFormPage() {
   if (userForm.loading) {
     return (
       <ITPage
+        noPadding
         title={title}
         description={description}
         loading
@@ -111,6 +112,7 @@ export default function UserFormPage() {
 
   return (
     <ITPage
+      noPadding
       title={title}
       description={description}
       backAction={() => navigate(-1)}

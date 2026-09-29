@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ITButton, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaEye, FaPlus } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { useCan } from "@entities/user";
 import {
   kitchenApi,
   INVOICE_STATUSES,
@@ -20,7 +19,6 @@ const money = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigi
 export default function InvoicesPanel() {
   const { t } = useTranslation("kitchen");
   const navigate = useNavigate();
-  const canRegister = useCan("invoices.register");
   const suppliers = useSupplierOptions(true);
   const [reloadKey] = useState(0);
 
@@ -31,7 +29,7 @@ export default function InvoicesPanel() {
       type: "string",
       width: 130,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (i) => <ITText className="text-[12px] font-mono font-bold text-slate-700">{i.number}</ITText>,
     },
     {
@@ -58,7 +56,7 @@ export default function InvoicesPanel() {
       type: "date",
       width: 120,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (i) => <ITText className="text-[11px] text-slate-600">{i.date}</ITText>,
     },
     {
@@ -66,7 +64,7 @@ export default function InvoicesPanel() {
       label: t("invoices.columns.total"),
       type: "number",
       width: 120,
-      sortable: true,
+      sortable: false,
       render: (i) => <ITText className="text-[12px] font-bold text-slate-700">{money(i.total)}</ITText>,
     },
     {
@@ -75,7 +73,7 @@ export default function InvoicesPanel() {
       type: "catalog",
       width: 120,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: { data: INVOICE_STATUSES.map((s) => ({ id: s, name: dyn(t)(`invoices.status.${s}`) })) },
       render: (i) => <InvoiceStatusBadge status={i.status} />,
     },
@@ -103,24 +101,14 @@ export default function InvoicesPanel() {
 
   return (
     <ITFlex direction="column" gap={3}>
-      {canRegister && (
-        <ITFlex justify="end">
-          <ITButton variant="filled" color="primary" onClick={() => navigate("/kitchen/invoices/new")}>
-            <ITFlex align="center" gap={1}>
-              <FaPlus size={12} />
-              <ITText className="font-bold text-[11px]">{t("invoices.new")}</ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
-      )}
-
       <ITDataTable
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={kitchenApi.invoicesTable as never}
         reloadTrigger={reloadKey}
         defaultItemsPerPage={50}
         itemsPerPageOptions={[10, 25, 50, 100]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={560}
         rowHeight={54}

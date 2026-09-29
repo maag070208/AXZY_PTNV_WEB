@@ -20,6 +20,7 @@ export default function UserHistoryPage() {
   if (loading) {
     return (
       <ITPage
+        noPadding
         title={tt("history.title")}
         loading
         backAction={() => navigate(-1)}
@@ -39,6 +40,7 @@ export default function UserHistoryPage() {
   if (!user) {
     return (
       <ITPage
+        noPadding
         title={tt("history.title")}
         backAction={() => navigate(-1)}
         icon={<FaUserShield size={20} />}
@@ -54,6 +56,7 @@ export default function UserHistoryPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("history.historyTitle")}
       description={user.name}
       backAction={() => navigate(-1)}

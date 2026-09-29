@@ -6,5 +6,9 @@ export {
   useKitchenCategoryOptions,
   useKitchenUnitOptions,
   useSupplierOptions,
+  useTaxRateOptions,
+  useKitchenAlerts,
 } from "./model/useKitchenOptions";
 export { kitchenApi } from "./api/kitchenApi";
+export { default as KitchenAlertKpis, type KitchenAlertKey } from "./ui/KitchenAlertKpis";
+export { default as StockBar } from "./ui/StockBar";

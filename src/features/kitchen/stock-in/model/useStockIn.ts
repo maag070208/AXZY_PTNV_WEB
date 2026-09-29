@@ -74,7 +74,7 @@ export const useStockIn = () => {
 
   const removeLine = (key: number) => setLines((current) => current.filter((line) => line.key !== key));
 
-  const cancel = () => navigate("/kitchen/movements");
+  const cancel = () => navigate("/kitchen/items");
 
   const submit = async () => {
     if (!allComplete) {
@@ -99,7 +99,7 @@ export const useStockIn = () => {
     try {
       await kitchenApi.stockIn(input, requestKey(input));
       setToast(t("stockIn.success"));
-      setTimeout(() => navigate("/kitchen/movements"), 600);
+      setTimeout(() => navigate("/kitchen/items"), 600);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("common.error"));
     } finally {

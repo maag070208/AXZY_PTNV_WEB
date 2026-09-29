@@ -25,6 +25,7 @@ export default function HrReportsPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("title")}
       description={tt("description")}
       backAction={() => navigate(-1)}
