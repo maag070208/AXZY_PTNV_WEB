@@ -137,18 +137,20 @@ test.describe("Reporte de entradas/salidas", () => {
     await goToRoute(page, "/access/report");
     await expect(page.locator("table tbody")).toBeVisible();
 
-    const waitForReport = () =>
-      page.waitForRequest(
-        (r) => r.method() === "POST" && r.url().endsWith("/access/report")
-      );
+    const waitForPeriod = (period: "WEEK" | "MONTH") =>
+      page.waitForRequest((r) => {
+        if (r.method() !== "POST" || !r.url().endsWith("/access/report")) return false;
+        const body = r.postDataJSON() as { filters?: { period?: string } } | null;
+        return body?.filters?.period === period;
+      });
 
-    const pWeek = waitForReport();
+    const pWeek = waitForPeriod("WEEK");
     await page.locator('input[name="accessReportPeriod"]').click();
     await page.getByText("Semanal", { exact: true }).click();
     const reqWeek = await pWeek;
     expect(reqWeek.postDataJSON()).toMatchObject({ filters: { period: "WEEK" } });
 
-    const pMonth = waitForReport();
+    const pMonth = waitForPeriod("MONTH");
     await page.locator('input[name="accessReportPeriod"]').click();
     await page.getByText("Mensual", { exact: true }).click();
     const reqMonth = await pMonth;
