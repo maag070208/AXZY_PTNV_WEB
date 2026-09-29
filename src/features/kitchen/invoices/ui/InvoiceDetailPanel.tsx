@@ -5,12 +5,13 @@ import { PanelCard } from "@shared/ui/panel-card";
 import { useTranslation } from "react-i18next";
 import { KpiTile } from "@shared/ui/kpi-tile";
 import { useCan } from "@entities/user";
-import { fmtQty } from "@entities/kitchen";
+import { fmtMoney, fmtQty, fmtRate } from "@entities/kitchen";
 import { useInvoice } from "../model/useInvoice";
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
 
 const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
 const money = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
+const off = (value: number | null) => value != null && Math.abs(value) > 0.005;
 
 /** Detalle de una factura con el cotejo de tres vías (pedido / recibido / facturado). */
 export default function InvoiceDetailPanel({ id }: { id?: string }) {
@@ -116,10 +117,42 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
                 <ITText className={`text-[11px] font-bold ${line.priceDiff && Math.abs(line.priceDiff) > 0.0001 ? "text-amber-600" : "text-slate-400"}`}>
                   {line.priceDiff == null ? "—" : money(line.priceDiff)}
                 </ITText>
+                <ITText className={`block text-[10px] ${off(line.taxDiff) ? "text-amber-600" : "text-slate-400"}`}>
+                  {t("invoices.matchTax", { rate: fmtRate(line.taxRate), diff: money(line.taxDiff ?? 0) })}
+                </ITText>
               </ITGrid>
             </ITGrid>
           ))}
         </ITFlex>
+
+        <div className="mt-5 flex justify-end">
+          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <ITGrid container columns={3} spacing={2} className="border-b border-slate-200 pb-2">
+              <ITGrid item xs={1}><ITText className={HEAD}>{t("invoices.totals.concept")}</ITText></ITGrid>
+              <ITGrid item xs={1}><ITText className={`${HEAD} text-right`}>{t("invoices.totals.invoice")}</ITText></ITGrid>
+              <ITGrid item xs={1}><ITText className={`${HEAD} text-right`}>{t("invoices.totals.order")}</ITText></ITGrid>
+            </ITGrid>
+            {[
+              { label: t("invoices.totals.subtotal"), invoice: invoice.taxTotals.subtotal, order: invoice.taxTotals.order?.subtotal ?? null },
+              { label: t("invoices.totals.tax"), invoice: invoice.taxTotals.tax, order: invoice.taxTotals.order?.tax ?? null },
+              { label: t("invoices.totals.total"), invoice: invoice.taxTotals.total, order: invoice.taxTotals.order?.total ?? null },
+            ].map((row) => (
+              <ITGrid key={row.label} container columns={3} spacing={2} className="items-center py-1">
+                <ITGrid item xs={1}><ITText className="text-[12px] text-slate-500">{row.label}</ITText></ITGrid>
+                <ITGrid item xs={1}><ITText className="text-right text-[12px] font-bold tabular-nums text-slate-800">{fmtMoney(row.invoice)}</ITText></ITGrid>
+                <ITGrid item xs={1}><ITText className="text-right text-[12px] tabular-nums text-slate-600">{row.order == null ? "—" : fmtMoney(row.order)}</ITText></ITGrid>
+              </ITGrid>
+            ))}
+            {invoice.taxTotals.order && (
+              <ITFlex justify="between" className="mt-2 border-t border-slate-200 pt-2">
+                <ITText className="text-[12px] font-bold text-slate-600">{t("invoices.totals.taxDiff")}</ITText>
+                <ITText className={`text-[14px] font-black tabular-nums ${off(invoice.taxTotals.taxDiff) ? "text-amber-600" : "text-emerald-600"}`}>
+                  {fmtMoney(invoice.taxTotals.taxDiff ?? 0)}
+                </ITText>
+              </ITFlex>
+            )}
+          </div>
+        </div>
       </PanelCard>
 
       <ITConfirmDialog

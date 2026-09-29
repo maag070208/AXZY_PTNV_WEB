@@ -6,6 +6,8 @@ export interface InvoiceDraftLine {
   unitCost: string;
   /** Renglón de la OC al que corresponde (para el cotejo); null si es libre. */
   purchaseOrderLineId: string | null;
+  /** Tasa de IVA del catálogo ("" = sin IVA). */
+  taxRateId: string;
 }
 
 export const emptyInvoiceDraftLine = (key: number): InvoiceDraftLine => ({
@@ -14,6 +16,7 @@ export const emptyInvoiceDraftLine = (key: number): InvoiceDraftLine => ({
   quantity: "",
   unitCost: "",
   purchaseOrderLineId: null,
+  taxRateId: "",
 });
 
 /** Clave `YYYY-MM-DD` del navegador. */

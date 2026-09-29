@@ -67,6 +67,7 @@ import {
   KitchenPurchaseOrdersPage,
   KitchenPurchaseOrderFormPage,
   KitchenPurchaseOrderDetailPage,
+  KitchenCostCenterSpendingPage,
   KitchenInvoicesPage,
   KitchenInvoiceFormPage,
   KitchenInvoiceDetailPage,
@@ -517,6 +518,14 @@ export default function App() {
           element={
             <RequiresPermission permission="purchase_orders.view">
               <KitchenPurchaseOrderDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/cost-centers"
+          element={
+            <RequiresPermission permission="purchase_orders.view">
+              <KitchenCostCenterSpendingPage />
             </RequiresPermission>
           }
         />

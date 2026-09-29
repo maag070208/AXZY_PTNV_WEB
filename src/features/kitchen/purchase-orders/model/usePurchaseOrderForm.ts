@@ -8,6 +8,7 @@ import {
   useKitchenItemOptions,
   useSupplierOptions,
   useTaxRateOptions,
+  useCostCenterOptions,
   type PurchaseOrderInput,
   type SupplierDetail,
   type SupplierItem,
@@ -25,6 +26,7 @@ export const usePurchaseOrderForm = (id?: string) => {
   const items = useKitchenItemOptions();
   const suppliers = useSupplierOptions();
   const taxRates = useTaxRateOptions();
+  const costCenters = useCostCenterOptions();
   const currentUser = useSelector((s: RootState) => s.auth.user);
   const [header, setHeader] = useState<{ number: string | null; createdAt: string | null; createdBy: string | null; status: string }>({
     number: null,
@@ -35,6 +37,7 @@ export const usePurchaseOrderForm = (id?: string) => {
   const itemById = useMemo(() => new Map(items.data.map((item) => [item.id, item])), [items.data]);
 
   const [supplierId, setSupplierId] = useState("");
+  const [costCenterId, setCostCenterId] = useState("");
   const [expectedAt, setExpectedAt] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
   const [lines, setLines] = useState<OrderDraftLine[]>([]);
@@ -71,6 +74,7 @@ export const usePurchaseOrderForm = (id?: string) => {
         .purchaseOrder(id)
         .then((order) => {
           setSupplierId(order.supplier.id);
+          setCostCenterId(order.costCenter?.id ?? "");
           setHeader({ number: order.number, createdAt: order.createdAt, createdBy: order.createdBy.name, status: order.status });
           setExpectedAt(order.expectedAt ? new Date(`${order.expectedAt}T12:00:00`) : null);
           setNotes(order.notes ?? "");
@@ -159,6 +163,7 @@ export const usePurchaseOrderForm = (id?: string) => {
     }
     const input: PurchaseOrderInput = {
       supplierId,
+      costCenterId: costCenterId || null,
       expectedAt: expectedAt ? localDay(expectedAt) : null,
       notes: notes || null,
       lines: validLines.map((line) => ({
@@ -190,6 +195,7 @@ export const usePurchaseOrderForm = (id?: string) => {
     itemById,
     suppliers: suppliers.data,
     taxRates: taxRates.data,
+    costCenters: costCenters.data,
     taxOf,
     amountsOf,
     totals,
@@ -199,6 +205,8 @@ export const usePurchaseOrderForm = (id?: string) => {
     presentationOf,
     supplierId,
     setSupplierId,
+    costCenterId,
+    setCostCenterId,
     expectedAt,
     setExpectedAt,
     notes,

@@ -1,1 +1,1 @@
-export { downloadPurchaseOrderPdf } from "./model/pdf";
+export { buildPurchaseOrderPdf, downloadPurchaseOrderPdf } from "./model/pdf";

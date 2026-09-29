@@ -73,7 +73,8 @@
     "payroll": "Pre Nómina",
     "tasks": "Tickets",
     "settings": "Configuración",
-    "kitchenSuppliers": "Proveedores"
+    "kitchenSuppliers": "Proveedores",
+    "kitchenCostCenters": "Gasto por centro de costo"
   },
   "files": {
     "access": "accesos",
@@ -93,7 +94,8 @@
     "assignedDevicesReport": "reporte_asignados",
     "devicesReport": "reporte_dispositivos",
     "materialOutputsReport": "reporte_salidas",
-    "kitchenLedger": "kardex_cocina"
+    "kitchenLedger": "kardex_cocina",
+    "kitchenCostCenterSpending": "gasto_centro_costo"
   },
   "errors": {
     "network": "Error de red o del servidor",

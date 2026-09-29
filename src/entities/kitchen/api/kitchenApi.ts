@@ -15,6 +15,9 @@ import type {
   KitchenStockOutInput,
   KitchenUnit,
   KitchenUnitInput,
+  CostCenter,
+  CostCenterInput,
+  CostCenterSpending,
   PurchaseOrderDetail,
   PurchaseOrderInput,
   PurchaseOrderReceiveInput,
@@ -59,6 +62,17 @@ suppliersTable: (params: ITDataTableFetchParamsPost) =>
     api.get<TaxRate[]>(`/kitchen/tax-rates${includeInactive ? "?includeInactive=true" : ""}`),
   createTaxRate: (input: TaxRateInput) => api.post<TaxRate>("/kitchen/tax-rates", input),
   updateTaxRate: (id: string, input: Partial<TaxRateInput>) => api.patch<TaxRate>(`/kitchen/tax-rates/${id}`, input),
+  costCenters: (includeInactive?: boolean) =>
+    api.get<CostCenter[]>(`/kitchen/cost-centers${includeInactive ? "?includeInactive=true" : ""}`),
+  createCostCenter: (input: CostCenterInput) => api.post<CostCenter>("/kitchen/cost-centers", input),
+  updateCostCenter: (id: string, input: Partial<CostCenterInput>) => api.patch<CostCenter>(`/kitchen/cost-centers/${id}`, input),
+  costCenterSpending: (from?: string | null, to?: string | null) => {
+    const query = new URLSearchParams();
+    if (from) query.set("from", from);
+    if (to) query.set("to", to);
+    const suffix = query.toString();
+    return api.get<CostCenterSpending>(`/kitchen/cost-centers/spending${suffix ? `?${suffix}` : ""}`);
+  },
   createUnit: (input: KitchenUnitInput) => api.post<KitchenUnit>("/kitchen/units", input),
   updateUnit: (id: string, input: Partial<KitchenUnitInput>) =>
     api.patch<KitchenUnit>(`/kitchen/units/${id}`, input),
@@ -105,6 +119,10 @@ suppliersTable: (params: ITDataTableFetchParamsPost) =>
     api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/approve`, {}),
   sendPurchaseOrder: (id: string) =>
     api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/send`, {}),
+  sendPurchaseOrderEmail: (id: string, form: FormData) =>
+    api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/send-email`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
   cancelPurchaseOrder: (id: string, notes: string | null) =>
     api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/cancel`, { notes }),
   receivePurchaseOrder: (id: string, input: PurchaseOrderReceiveInput, key: string) =>

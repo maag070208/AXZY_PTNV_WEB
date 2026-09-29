@@ -400,6 +400,7 @@ export interface PurchaseOrderRow {
   id: string;
   number: string;
   supplier: { id: string; name: string };
+  costCenter: { id: string; name: string; code: string } | null;
   status: PurchaseOrderStatus;
   expectedAt: string | null;
   createdAt: string;
@@ -477,6 +478,7 @@ export interface PurchaseOrderLineInput {
 
 export interface PurchaseOrderInput {
   supplierId: string;
+  costCenterId?: string | null;
   expectedAt?: string | null;
   notes?: string | null;
   lines: PurchaseOrderLineInput[];
@@ -527,6 +529,29 @@ export interface SupplierInvoiceLine {
   invoicedQuantity: number | null;
   /** Diferencia de precio contra lo pactado en la OC. */
   priceDiff: number | null;
+  /** IVA del renglón facturado. */
+  taxRateId: string | null;
+  taxRate: number;
+  tax: number;
+  /** Tasa del renglón de la OC (null si no hay OC). */
+  poTaxRate: number | null;
+  taxRateDiff: number | null;
+  taxDiff: number | null;
+}
+
+/** Totales de IVA de la factura comparados contra la OC. */
+export interface InvoiceTaxTotals {
+  subtotal: number;
+  tax: number;
+  total: number;
+  byRate: Array<{ rate: number; base: number; tax: number }>;
+  order: {
+    subtotal: number;
+    tax: number;
+    total: number;
+    byRate: Array<{ rate: number; base: number; tax: number }>;
+  } | null;
+  taxDiff: number | null;
 }
 
 export interface SupplierInvoiceDetail extends SupplierInvoiceRow {
@@ -534,6 +559,7 @@ export interface SupplierInvoiceDetail extends SupplierInvoiceRow {
   tax: number | null;
   notes: string | null;
   createdAt: string;
+  taxTotals: InvoiceTaxTotals;
   lines: SupplierInvoiceLine[];
 }
 
@@ -542,6 +568,8 @@ export interface SupplierInvoiceLineInput {
   purchaseOrderLineId?: string | null;
   quantity: number;
   unitCost: number;
+  /** Tasa de IVA; null = sin IVA; ausente = la del renglón de la OC. */
+  taxRateId?: string | null;
 }
 
 export interface SupplierInvoiceInput {
@@ -555,4 +583,37 @@ export interface SupplierInvoiceInput {
   total: number;
   notes?: string | null;
   lines: SupplierInvoiceLineInput[];
+}
+
+// ── Centros de costo (NEXT_STEPS_PLAN 1.4) ──────────────────────────────────
+
+export interface CostCenter {
+  id: string;
+  name: string;
+  code: string;
+  department: { id: string; name: string } | null;
+  active: boolean;
+}
+
+export interface CostCenterInput {
+  name: string;
+  code: string;
+  departmentId?: string | null;
+  active?: boolean;
+}
+
+/** Fila del reporte de gasto por centro de costo. */
+export interface CostCenterSpendingRow {
+  costCenter: { id: string; name: string; code: string } | null;
+  orders: number;
+  subtotal: number;
+  tax: number;
+  total: number;
+}
+
+export interface CostCenterSpending {
+  from: string | null;
+  to: string | null;
+  rows: CostCenterSpendingRow[];
+  totals: { orders: number; subtotal: number; tax: number; total: number };
 }

@@ -7,6 +7,7 @@ export {
   useKitchenUnitOptions,
   useSupplierOptions,
   useTaxRateOptions,
+  useCostCenterOptions,
   useKitchenAlerts,
 } from "./model/useKitchenOptions";
 export { kitchenApi } from "./api/kitchenApi";

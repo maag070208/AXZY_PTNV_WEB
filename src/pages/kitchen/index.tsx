@@ -8,6 +8,7 @@ import {
   FaArrowUp,
   FaBook,
   FaBoxes,
+  FaBuilding,
   FaClipboardCheck,
   FaClipboardList,
   FaFileInvoice,
@@ -29,13 +30,14 @@ import KitchenLedgerPanel from "@features/kitchen/ledger/ui/KitchenLedgerPanel";
 import KitchenCountPanel from "@features/kitchen/count/ui/KitchenCountPanel";
 import KitchenRestockPanel from "@features/kitchen/restock/ui/KitchenRestockPanel";
 import KitchenCatalogPanel from "@features/kitchen/catalog/ui/KitchenCatalogPanel";
+import CostCenterSpendingPanel from "@features/kitchen/cost-centers-spending/ui/CostCenterSpendingPanel";
 import {
   PurchaseOrderDetailPanel,
   PurchaseOrderFormPanel,
   PurchaseOrdersPanel,
 } from "@features/kitchen/purchase-orders";
 import { InvoiceDetailPanel, InvoiceFormPanel, InvoicesPanel } from "@features/kitchen/invoices";
-import { downloadPurchaseOrderPdf } from "@widgets/purchase-order-pdf";
+import { downloadPurchaseOrderPdf, buildPurchaseOrderPdf } from "@widgets/purchase-order-pdf";
 import { SupplierDetailPanel, SupplierFormPanel, SuppliersPanel } from "@features/kitchen/suppliers";
 
 /** Botón principal de la cabecera (mismo estilo que "Nuevo empleado" en Personal). */
@@ -294,7 +296,24 @@ export function KitchenPurchaseOrderDetailPage() {
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
       backAction={() => navigate("/kitchen/purchase-orders")}
     >
-      <PurchaseOrderDetailPanel id={id} onDownloadPdf={downloadPurchaseOrderPdf} />
+      <PurchaseOrderDetailPanel id={id} onDownloadPdf={downloadPurchaseOrderPdf} buildPdf={buildPurchaseOrderPdf} />
+    </ITPage>
+  );
+}
+
+export function KitchenCostCenterSpendingPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  return (
+    <ITPage
+      noPadding
+      title={t("costCenterSpending.title")}
+      description={t("costCenterSpending.description")}
+      icon={<FaBuilding size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("costCenterSpending.title"))}
+      backAction={() => navigate("/kitchen/purchase-orders")}
+    >
+      <CostCenterSpendingPanel />
     </ITPage>
   );
 }

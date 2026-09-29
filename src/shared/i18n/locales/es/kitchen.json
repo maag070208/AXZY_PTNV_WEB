@@ -357,6 +357,8 @@
       "perPurchaseUnit": "Costo por {{unit}}",
       "supplierContact": "Contacto",
       "supplierTerms": "Crédito: {{credit}} · Entrega: {{lead}}",
+      "costCenter": "Centro de costo",
+      "noCostCenter": "Sin centro de costo",
       "headerTitle": "Encabezado",
       "headerHint": "Datos de la orden. El folio lo asigna el sistema al guardar.",
       "folioPending": "Se asigna al guardar",
@@ -381,6 +383,7 @@
     "actions": {
       "approve": "Aprobar",
       "send": "Marcar enviada",
+      "sendEmail": "Enviar al proveedor",
       "cancel": "Cancelar orden",
       "receive": "Recibir",
       "edit": "Editar"
@@ -398,10 +401,25 @@
     "saved": "Orden guardada",
     "approved": "Orden aprobada",
     "sent": "Orden enviada",
+    "emailed": "Orden enviada por correo",
     "cancelled": "Orden cancelada",
     "received": "Recepción registrada",
     "cancelConfirm": "¿Cancelar la orden {{number}}? No se puede deshacer.",
     "infoTitle": "Datos de la orden",
+    "email": {
+      "title": "Enviar la orden {{number}}",
+      "to": "Destinatarios",
+      "toHint": "Separa varios correos con coma.",
+      "subject": "Asunto",
+      "message": "Mensaje",
+      "noEmail": "Agrega un correo al proveedor o a su contacto",
+      "pdfAttached": "Se adjunta el PDF de la orden {{number}}.",
+      "preview": "Vista previa del PDF",
+      "send": "Enviar",
+      "sending": "Enviando…",
+      "defaultSubject": "Orden de compra {{number}}",
+      "defaultMessage": "Buen día. Adjunto la orden de compra {{number}} para su atención."
+    },
     "kpi": {
       "ordered": "Pedido",
       "received": "Recibido",
@@ -453,11 +471,30 @@
       "item": "Artículo",
       "quantity": "Cantidad",
       "unitCost": "Costo unitario",
+      "taxRate": "IVA",
+      "noTax": "Sin IVA",
       "emptyItems": "Agrega al menos un concepto.",
       "save": "Registrar factura",
       "cancel": "Cancelar"
     },
     "match": "Cotejo (pedido / recibido / facturado)",
+    "matchTax": "IVA {{rate}} · dif. {{diff}}",
+    "totals": {
+      "title": "Totales de la factura",
+      "hint": "Lo calculado de los conceptos contra lo capturado del CFDI. No bloquea; solo marca diferencias.",
+      "subtotal": "Subtotal",
+      "tax": "IVA",
+      "total": "Total",
+      "taxLine": "IVA {{rate}}",
+      "capturedSubtotal": "Subtotal CFDI",
+      "capturedTax": "IVA CFDI",
+      "capturedTotal": "Total CFDI",
+      "diffHint": "La diferencia se marca en ámbar cuando no cuadra.",
+      "concept": "Concepto",
+      "invoice": "Factura",
+      "order": "OC",
+      "taxDiff": "Diferencia de IVA"
+    },
     "costUpdated": "El costo de los lotes recibidos se actualiza con el de la factura.",
     "registered": "Factura registrada",
     "cancelled": "Factura cancelada",
@@ -502,7 +539,12 @@
     "taxRatesHint": "0%, 8%, 16%…",
     "newTaxRate": "Nueva tasa",
     "rate": "Tasa",
-    "ratePercent": "Tasa (%)"
+    "ratePercent": "Tasa (%)",
+    "costCenters": "Centros de costo",
+    "costCentersHint": "Áreas que absorben el gasto",
+    "newCostCenter": "Nuevo centro de costo",
+    "department": "Departamento",
+    "noDepartment": "Sin departamento"
   },
   "wizard": {
     "next": "Siguiente",
@@ -625,6 +667,25 @@
       "email": "Correo no válido"
     },
     "empty": "—"
+  },
+  "costCenterSpending": {
+    "title": "Gasto por centro de costo",
+    "description": "Suma de órdenes de compra recibidas por periodo.",
+    "hint": "Solo entran las órdenes con recepción en el periodo, agrupadas por centro de costo.",
+    "from": "Desde",
+    "to": "Hasta",
+    "exportCsv": "CSV",
+    "empty": "Sin órdenes recibidas en el periodo.",
+    "unassigned": "Sin centro de costo",
+    "columns": {
+      "center": "Centro de costo",
+      "orders": "OC"
+    },
+    "kpi": {
+      "orders": "Órdenes recibidas",
+      "tax": "IVA",
+      "total": "Gasto total"
+    }
   },
   "pdf": {
     "poTitle": "Orden de compra",

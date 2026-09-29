@@ -48,6 +48,7 @@ export type NavLabelKey =
   | "nav.kitchenPurchaseOrders"
   | "nav.kitchenInvoices"
   | "nav.kitchenSuppliers"
+  | "nav.kitchenCostCenters"
   | "nav.kitchenCatalog"
   | "nav.access"
   | "nav.accessLog"
@@ -132,6 +133,7 @@ export const APP_SCREENS: readonly AppScreen[] = [
         children: [
           { id: "kitchenRestock", labelKey: "nav.kitchenRestock", path: "/kitchen/restock" },
           { id: "kitchenPurchaseOrders", labelKey: "nav.kitchenPurchaseOrders", path: "/kitchen/purchase-orders", requirement: { anyOf: ["purchase_orders.view"] } },
+          { id: "kitchenCostCenters", labelKey: "nav.kitchenCostCenters", path: "/kitchen/cost-centers", requirement: { anyOf: ["purchase_orders.view"] } },
           { id: "kitchenInvoices", labelKey: "nav.kitchenInvoices", path: "/kitchen/invoices", requirement: { anyOf: ["invoices.view"] } },
           { id: "kitchenSuppliers", labelKey: "nav.kitchenSuppliers", path: "/kitchen/suppliers" },
         ],

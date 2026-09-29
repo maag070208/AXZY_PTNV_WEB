@@ -10,19 +10,22 @@ import {
   ITGrid,
   ITInput,
   ITInputNumber,
+  ITSelect,
   ITStack,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaBalanceScale, FaEdit, FaPercent, FaPlus, FaTags, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaBalanceScale, FaBuilding, FaEdit, FaPercent, FaPlus, FaTags, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { fmtRate, kitchenApi, type KitchenCategory, type KitchenUnit, type KitchenUnitInput, type TaxRate } from "@entities/kitchen";
+import { fmtRate, kitchenApi, type CostCenter, type CostCenterInput, type KitchenCategory, type KitchenUnit, type KitchenUnitInput, type TaxRate } from "@entities/kitchen";
+import { useDepartmentOptions } from "@entities/department";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 
-type Tab = "categories" | "units" | "taxRates";
+type Tab = "categories" | "units" | "taxRates" | "costCenters";
 
 const emptyUnit = (): KitchenUnitInput => ({ code: "", name: "", whole: false });
+const emptyCostCenter = (): CostCenterInput => ({ name: "", code: "", departmentId: "" });
 
 /**
  * Catálogos de cocina con el mismo diseño que Catálogos del sistema: tabla con
@@ -48,6 +51,14 @@ export default function KitchenCatalogPanel() {
     name: "",
     percent: null,
   });
+
+  const [costDialog, setCostDialog] = useState<{ open: boolean; item: CostCenter | null; form: CostCenterInput }>({
+    open: false,
+    item: null,
+    form: emptyCostCenter(),
+  });
+
+  const departments = useDepartmentOptions();
 
   useEffect(() => setError(null), [tab]);
 
@@ -94,9 +105,18 @@ export default function KitchenCatalogPanel() {
     if (ok) setTaxDialog({ open: false, item: null, name: "", percent: null });
   };
 
+  const saveCostCenter = async () => {
+    const f = costDialog.form;
+    if (!f.name.trim() || !f.code.trim()) return;
+    const input: CostCenterInput = { name: f.name.trim(), code: f.code.trim(), departmentId: f.departmentId || null };
+    const ok = await run(() => (costDialog.item ? kitchenApi.updateCostCenter(costDialog.item.id, input) : kitchenApi.createCostCenter(input)));
+    if (ok) setCostDialog({ open: false, item: null, form: emptyCostCenter() });
+  };
+
   const openNew = () => {
     if (tab === "categories") setCatDialog({ open: true, item: null, name: "" });
     else if (tab === "units") setUnitDialog({ open: true, item: null, form: emptyUnit() });
+    else if (tab === "costCenters") setCostDialog({ open: true, item: null, form: emptyCostCenter() });
     else setTaxDialog({ open: true, item: null, name: "", percent: null });
   };
 
@@ -254,6 +274,54 @@ export default function KitchenCatalogPanel() {
     [reloadKey]
   );
 
+  const costColumns: Column<CostCenter>[] = [
+    {
+      key: "code",
+      label: t("catalog.code"),
+      type: "string",
+      width: 120,
+      filter: true,
+      sortable: true,
+      render: (c) => <ITText className="font-mono text-[12px] font-bold uppercase text-slate-700">{c.code}</ITText>,
+    },
+    {
+      key: "name",
+      label: t("catalog.name"),
+      type: "string",
+      width: 260,
+      filter: true,
+      sortable: true,
+      render: (c) => <ITText className="text-[12px] font-bold text-slate-800">{c.name}</ITText>,
+    },
+    {
+      key: "department",
+      label: t("catalog.department"),
+      type: "string",
+      width: 200,
+      sortable: false,
+      render: (c) => <ITText className="text-[11px] text-slate-600">{c.department?.name ?? t("catalog.noDepartment")}</ITText>,
+    },
+    statusColumn,
+    {
+      key: "actions",
+      label: "",
+      type: "actions",
+      width: 130,
+      actions: (c) =>
+        actions(
+          c,
+          () => setCostDialog({ open: true, item: c, form: { name: c.name, code: c.code, departmentId: c.department?.id ?? "" } }),
+          () => void run(() => kitchenApi.updateCostCenter(c.id, { active: !c.active }))
+        ),
+    },
+  ];
+
+  const fetchCostCenters = useMemo(
+    () => makeClientTableFetch<CostCenter>(() => kitchenApi.costCenters(true), { active: { match: "equals" } }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [reloadKey]
+  );
+
   const fetchCategories = useMemo(
     () => makeClientTableFetch<KitchenCategory>(() => kitchenApi.categories(true), { active: { match: "equals" } }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -269,6 +337,7 @@ export default function KitchenCatalogPanel() {
     { id: "categories", label: t("catalog.categories"), hint: t("catalog.categoriesHint"), icon: <FaTags size={12} /> },
     { id: "units", label: t("catalog.units"), hint: t("catalog.unitsHint"), icon: <FaBalanceScale size={12} /> },
     { id: "taxRates", label: t("catalog.taxRates"), hint: t("catalog.taxRatesHint"), icon: <FaPercent size={11} /> },
+    { id: "costCenters", label: t("catalog.costCenters"), hint: t("catalog.costCentersHint"), icon: <FaBuilding size={11} /> },
   ];
 
   return (
@@ -297,6 +366,15 @@ export default function KitchenCatalogPanel() {
             itemsPerPageOptions={[10, 25, 50]}
             size="lg"
           />
+        ) : tab === "costCenters" ? (
+          <ITDataTable
+            key="costCenters"
+            columns={costColumns as unknown as Column<Record<string, unknown>>[]}
+            fetchData={fetchCostCenters as never}
+            defaultItemsPerPage={25}
+            itemsPerPageOptions={[10, 25, 50]}
+            size="lg"
+          />
         ) : (
           <ITDataTable
             key="units"
@@ -319,7 +397,7 @@ export default function KitchenCatalogPanel() {
           <ITButton variant="filled" color="primary" size="lg" onClick={openNew} className="mb-1 w-full">
             <ITFlex align="center" justify="center" gap={1}>
               <FaPlus size={11} />
-              <ITText className="font-bold text-[11px]">{tab === "categories" ? t("catalog.newCategory") : tab === "units" ? t("catalog.newUnit") : t("catalog.newTaxRate")}</ITText>
+              <ITText className="font-bold text-[11px]">{tab === "categories" ? t("catalog.newCategory") : tab === "units" ? t("catalog.newUnit") : tab === "costCenters" ? t("catalog.newCostCenter") : t("catalog.newTaxRate")}</ITText>
             </ITFlex>
           </ITButton>
           <ITText as="p" className="px-2.5 pb-1 pt-3 text-[9px] font-black uppercase tracking-widest text-slate-400">
@@ -458,6 +536,54 @@ export default function KitchenCatalogPanel() {
               label={t("catalog.save")}
               disabled={saving || !taxDialog.name.trim() || taxDialog.percent == null}
               onClick={() => void saveTaxRate()}
+            />
+          </ITFlex>
+        </ITFlex>
+      </ITDialog>
+
+      <ITDialog
+        isOpen={costDialog.open}
+        onClose={() => setCostDialog({ open: false, item: null, form: emptyCostCenter() })}
+        title={costDialog.item ? costDialog.item.name : t("catalog.newCostCenter")}
+      >
+        <ITFlex direction="column" gap={3} className="min-w-[320px]">
+          <ITGrid container columns={12} spacing={3}>
+            <ITGrid item xs={12} md={4}>
+              <ITInput
+                name="costCenterCode"
+                label={t("catalog.code")}
+                placeholder="CC-01"
+                value={costDialog.form.code}
+                onChange={(e) => setCostDialog((d) => ({ ...d, form: { ...d.form, code: e.target.value } }))}
+              />
+            </ITGrid>
+            <ITGrid item xs={12} md={8}>
+              <ITInput
+                name="costCenterName"
+                label={t("catalog.name")}
+                value={costDialog.form.name}
+                onChange={(e) => setCostDialog((d) => ({ ...d, form: { ...d.form, name: e.target.value } }))}
+              />
+            </ITGrid>
+          </ITGrid>
+          <ITSelect
+            name="costCenterDepartment"
+            label={t("catalog.department")}
+            options={[
+              { value: "", label: t("catalog.noDepartment") },
+              ...departments.data.map((d) => ({ value: d.id, label: d.name })),
+            ]}
+            value={costDialog.form.departmentId ?? ""}
+            onChange={(e) => setCostDialog((d) => ({ ...d, form: { ...d.form, departmentId: e.target.value } }))}
+          />
+          <ITFlex justify="end" gap={2}>
+            <ITButton variant="outlined" color="secondary" label={t("catalog.cancel")} onClick={() => setCostDialog({ open: false, item: null, form: emptyCostCenter() })} />
+            <ITButton
+              variant="filled"
+              color="primary"
+              label={t("catalog.save")}
+              disabled={saving || !costDialog.form.name.trim() || !costDialog.form.code.trim()}
+              onClick={() => void saveCostCenter()}
             />
           </ITFlex>
         </ITFlex>

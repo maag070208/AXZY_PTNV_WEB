@@ -18,6 +18,7 @@ import { fmtMoney, fmtQty, fmtRate, type PurchaseOrderDetail } from "@entities/k
 import { usePurchaseOrder } from "../model/usePurchaseOrder";
 import PurchaseOrderStatusBadge from "./PurchaseOrderStatusBadge";
 import PurchaseOrderReceiveDialog from "./PurchaseOrderReceiveDialog";
+import PurchaseOrderEmailDialog from "./PurchaseOrderEmailDialog";
 
 const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
 const money = fmtMoney;
@@ -25,7 +26,7 @@ const money = fmtMoney;
 const LINE_GRID = "grid grid-cols-[minmax(200px,2.4fr)_1fr_.9fr_.9fr_1fr_.7fr_1fr_1.1fr] items-center gap-3";
 
 /** Detalle de una orden: líneas con existencias, recepciones y acciones por estado. */
-export default function PurchaseOrderDetailPanel({ id, onDownloadPdf }: { id?: string; onDownloadPdf?: (order: PurchaseOrderDetail) => Promise<void> }) {
+export default function PurchaseOrderDetailPanel({ id, onDownloadPdf, buildPdf }: { id?: string; onDownloadPdf?: (order: PurchaseOrderDetail) => Promise<void>; buildPdf?: (order: PurchaseOrderDetail) => Promise<Blob> }) {
   const { t } = useTranslation("kitchen");
   const navigate = useNavigate();
   const fx = usePurchaseOrder(id);
@@ -36,6 +37,7 @@ export default function PurchaseOrderDetailPanel({ id, onDownloadPdf }: { id?: s
   const canReceive = useCan("kitchen.stock_in");
   const canRegisterInvoice = useCan("invoices.register");
   const [receiveOpen, setReceiveOpen] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
 
   if (fx.loading || !fx.order) {
@@ -102,11 +104,11 @@ export default function PurchaseOrderDetailPanel({ id, onDownloadPdf }: { id?: s
               </ITFlex>
             </ITButton>
           )}
-          {order.status === "APPROVED" && canCreate && (
-            <ITButton variant="filled" color="primary" disabled={fx.busy} onClick={() => void fx.send()}>
+          {["APPROVED", "SENT"].includes(order.status) && canCreate && buildPdf && (
+            <ITButton variant="filled" color="primary" disabled={fx.busy} onClick={() => setEmailOpen(true)}>
               <ITFlex align="center" gap={1}>
                 <FaPaperPlane size={11} />
-                <ITText className="font-bold text-[11px]">{t("purchaseOrders.actions.send")}</ITText>
+                <ITText className="font-bold text-[11px]">{t("purchaseOrders.actions.sendEmail")}</ITText>
               </ITFlex>
             </ITButton>
           )}
@@ -160,6 +162,7 @@ export default function PurchaseOrderDetailPanel({ id, onDownloadPdf }: { id?: s
             { label: t("purchaseOrders.columns.createdAt"), value: req(order.createdAt) },
             { label: t("purchaseOrders.status.APPROVED"), value: order.approvedBy ? `${order.approvedBy.name} · ${req(order.approvedAt)}` : "—" },
             { label: t("purchaseOrders.status.SENT"), value: req(order.sentAt) },
+            { label: t("purchaseOrders.form.costCenter"), value: order.costCenter ? `${order.costCenter.code} · ${order.costCenter.name}` : "—" },
             {
               label: t("purchaseOrders.form.supplierContact"),
               value: order.supplier.primaryContact
@@ -263,6 +266,18 @@ export default function PurchaseOrderDetailPanel({ id, onDownloadPdf }: { id?: s
         onSubmit={(input, key) => {
           void fx.receive(input, key);
           setReceiveOpen(false);
+        }}
+      />
+
+      <PurchaseOrderEmailDialog
+        isOpen={emailOpen}
+        order={order}
+        busy={fx.busy}
+        buildPdf={buildPdf ?? (async () => new Blob())}
+        onClose={() => setEmailOpen(false)}
+        onSubmit={(form) => {
+          void fx.email(form);
+          setEmailOpen(false);
         }}
       />
 

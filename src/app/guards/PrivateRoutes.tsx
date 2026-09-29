@@ -212,7 +212,7 @@ export default function PrivateRoutes() {
 
   return (
     <>
-      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-full! m-0! !px-2">
+      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-screen! m-0! !px-2">
         <Outlet />
       </ITLayout>
       {toast && (

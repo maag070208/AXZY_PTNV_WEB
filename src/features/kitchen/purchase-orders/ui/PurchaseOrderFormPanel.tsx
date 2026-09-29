@@ -82,13 +82,23 @@ export default function PurchaseOrderFormPanel({ id }: { id?: string }) {
           <Field label={t("purchaseOrders.form.status")}>{dyn(t)(`purchaseOrders.status.${fx.header.status}`)}</Field>
         </div>
 
-        <div className="mt-4 grid gap-4 md:!grid-cols-3">
+        <div className="mt-4 grid gap-4 md:!grid-cols-4">
           <ITSearchSelect
             name="poSupplier"
             label={t("purchaseOrders.form.supplier")}
             options={fx.suppliers.map((s) => ({ value: s.id, label: s.name }))}
             value={fx.supplierId}
             onChange={(value) => fx.setSupplierId(String(value))}
+          />
+          <ITSelect
+            name="poCostCenter"
+            label={t("purchaseOrders.form.costCenter")}
+            options={[
+              { value: "", label: t("purchaseOrders.form.noCostCenter") },
+              ...fx.costCenters.map((c) => ({ value: c.id, label: `${c.code} · ${c.name}` })),
+            ]}
+            value={fx.costCenterId}
+            onChange={(e) => fx.setCostCenterId(e.target.value)}
           />
           <ITDatePicker
             name="poExpectedAt"

@@ -67,6 +67,12 @@ export default function PurchaseOrderPdf({ order }: { order: PurchaseOrderDetail
                 <Text style={s.label}>{t("purchaseOrders.form.createdBy")}</Text>
                 <Text style={s.value}>{order.createdBy.name}</Text>
               </View>
+              {order.costCenter && (
+                <View style={s.row}>
+                  <Text style={s.label}>{t("purchaseOrders.form.costCenter")}</Text>
+                  <Text style={s.value}>{`${order.costCenter.code} · ${order.costCenter.name}`}</Text>
+                </View>
+              )}
               {order.approvedBy && (
                 <View style={s.row}>
                   <Text style={s.label}>{t("pdf.approvedBy")}</Text>

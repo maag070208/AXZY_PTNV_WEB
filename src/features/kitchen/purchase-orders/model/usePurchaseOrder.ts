@@ -54,6 +54,7 @@ export const usePurchaseOrder = (id?: string) => {
     reload,
     approve: () => act(() => kitchenApi.approvePurchaseOrder(id!), t("purchaseOrders.approved")),
     send: () => act(() => kitchenApi.sendPurchaseOrder(id!), t("purchaseOrders.sent")),
+    email: (form: FormData) => act(() => kitchenApi.sendPurchaseOrderEmail(id!, form), t("purchaseOrders.emailed")),
     cancel: () => act(() => kitchenApi.cancelPurchaseOrder(id!, null), t("purchaseOrders.cancelled")),
     receive: (input: PurchaseOrderReceiveInput, key: string) =>
       act(() => kitchenApi.receivePurchaseOrder(id!, input, key), t("purchaseOrders.received")),

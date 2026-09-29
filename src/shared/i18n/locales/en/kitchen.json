@@ -357,6 +357,8 @@
       "perPurchaseUnit": "Cost per {{unit}}",
       "supplierContact": "Contact",
       "supplierTerms": "Credit: {{credit}} · Delivery: {{lead}}",
+      "costCenter": "Cost center",
+      "noCostCenter": "No cost center",
       "headerTitle": "Header",
       "headerHint": "Order data. The folio is assigned by the system when saved.",
       "folioPending": "Assigned when saved",
@@ -381,6 +383,7 @@
     "actions": {
       "approve": "Approve",
       "send": "Mark as sent",
+      "sendEmail": "Email the supplier",
       "cancel": "Cancel order",
       "receive": "Receive",
       "edit": "Edit"
@@ -398,10 +401,25 @@
     "saved": "Order saved",
     "approved": "Order approved",
     "sent": "Order sent",
+    "emailed": "Order emailed",
     "cancelled": "Order cancelled",
     "received": "Receipt recorded",
     "cancelConfirm": "Cancel order {{number}}? This cannot be undone.",
     "infoTitle": "Order data",
+    "email": {
+      "title": "Send order {{number}}",
+      "to": "Recipients",
+      "toHint": "Separate several addresses with a comma.",
+      "subject": "Subject",
+      "message": "Message",
+      "noEmail": "Add an email to the supplier or one of its contacts",
+      "pdfAttached": "The PDF of order {{number}} is attached.",
+      "preview": "PDF preview",
+      "send": "Send",
+      "sending": "Sending…",
+      "defaultSubject": "Purchase order {{number}}",
+      "defaultMessage": "Good day. Attached is purchase order {{number}} for your attention."
+    },
     "kpi": {
       "ordered": "Ordered",
       "received": "Received",
@@ -453,11 +471,30 @@
       "item": "Item",
       "quantity": "Quantity",
       "unitCost": "Unit cost",
+      "taxRate": "VAT",
+      "noTax": "No VAT",
       "emptyItems": "Add at least one line.",
       "save": "Register invoice",
       "cancel": "Cancel"
     },
     "match": "Three-way match (ordered / received / invoiced)",
+    "matchTax": "VAT {{rate}} · diff. {{diff}}",
+    "totals": {
+      "title": "Invoice totals",
+      "hint": "Computed from the lines against what was entered from the CFDI. It does not block; it only flags differences.",
+      "subtotal": "Subtotal",
+      "tax": "VAT",
+      "total": "Total",
+      "taxLine": "VAT {{rate}}",
+      "capturedSubtotal": "CFDI subtotal",
+      "capturedTax": "CFDI VAT",
+      "capturedTotal": "CFDI total",
+      "diffHint": "Differences are highlighted in amber when they do not match.",
+      "concept": "Concept",
+      "invoice": "Invoice",
+      "order": "PO",
+      "taxDiff": "VAT difference"
+    },
     "costUpdated": "The cost of received lots is updated with the invoice cost.",
     "registered": "Invoice registered",
     "cancelled": "Invoice cancelled",
@@ -502,7 +539,12 @@
     "taxRatesHint": "0%, 8%, 16%…",
     "newTaxRate": "New rate",
     "rate": "Rate",
-    "ratePercent": "Rate (%)"
+    "ratePercent": "Rate (%)",
+    "costCenters": "Cost centers",
+    "costCentersHint": "Areas that absorb the expense",
+    "newCostCenter": "New cost center",
+    "department": "Department",
+    "noDepartment": "No department"
   },
   "wizard": {
     "next": "Next",
@@ -625,6 +667,25 @@
       "email": "Invalid email"
     },
     "empty": "—"
+  },
+  "costCenterSpending": {
+    "title": "Spending by cost center",
+    "description": "Sum of received purchase orders per period.",
+    "hint": "Only orders with a receipt in the period are included, grouped by cost center.",
+    "from": "From",
+    "to": "To",
+    "exportCsv": "CSV",
+    "empty": "No orders received in the period.",
+    "unassigned": "No cost center",
+    "columns": {
+      "center": "Cost center",
+      "orders": "POs"
+    },
+    "kpi": {
+      "orders": "Received orders",
+      "tax": "VAT",
+      "total": "Total spend"
+    }
   },
   "pdf": {
     "poTitle": "Purchase order",

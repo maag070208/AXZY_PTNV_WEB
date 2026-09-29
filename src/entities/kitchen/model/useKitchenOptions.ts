@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { kitchenApi } from "../api/kitchenApi";
-import type { KitchenAlerts, KitchenCategory, KitchenItemRow, KitchenUnit, Supplier, TaxRate } from "./types";
+import type { CostCenter, KitchenAlerts, KitchenCategory, KitchenItemRow, KitchenUnit, Supplier, TaxRate } from "./types";
 
 /**
  * Opciones para selects: cargan el catálogo completo (el almacén de cocina es de
@@ -45,6 +45,9 @@ export const useTaxRateOptions = (includeInactive = false) =>
 
 export const useSupplierOptions = (includeInactive = false) =>
   useList<Supplier>(() => kitchenApi.suppliers(includeInactive));
+
+export const useCostCenterOptions = (includeInactive = false) =>
+  useList<CostCenter>(() => kitchenApi.costCenters(includeInactive));
 
 /** Alertas del almacén (bajo mínimo, por caducar, caducados, sobre stock) para indicadores. */
 export const useKitchenAlerts = (reloadKey = 0) => {
