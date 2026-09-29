@@ -121,7 +121,7 @@ test.describe("Almacén de cocina — pantallas F1/F2", () => {
     await page.getByRole("button", { name: "Agregar a la entrada" }).click();
     await page.getByRole("button", { name: "Registrar entrada" }).click();
 
-    await expect(page).toHaveURL(/#\/kitchen\/movements/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/#\/kitchen\/items/, { timeout: 15_000 });
 
     // Verificación cruzada: la entrada sumó la existencia.
     const detail = (await (await api.get(`kitchen/items/${itemInId}`)).json()) as { available: number };
@@ -140,7 +140,7 @@ test.describe("Almacén de cocina — pantallas F1/F2", () => {
     await expect(page.getByText(itemOutLot)).toBeVisible({ timeout: 10_000 });
     await page.getByRole("button", { name: "Registrar salida" }).click();
 
-    await expect(page).toHaveURL(/#\/kitchen\/movements/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/#\/kitchen\/items/, { timeout: 15_000 });
 
     // Verificación cruzada: el consumo descontó el lote (10 − 3 = 7).
     const detail = (await (await api.get(`kitchen/items/${itemOutId}`)).json()) as { available: number };
@@ -168,7 +168,7 @@ test.describe("Almacén de cocina — pantallas F1/F2", () => {
     await input.fill("5");
     await page.getByRole("button", { name: "Registrar conteo" }).click();
 
-    await expect(page).toHaveURL(/#\/kitchen\/movements/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/#\/kitchen\/items/, { timeout: 15_000 });
 
     const detail = (await (await api.get(`kitchen/items/${itemOutId}`)).json()) as { available: number };
     expect(detail.available).toBe(5);
