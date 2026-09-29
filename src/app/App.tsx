@@ -64,6 +64,9 @@ import {
   KitchenCountPage,
   KitchenRestockPage,
   KitchenCatalogPage,
+  KitchenPurchaseOrdersPage,
+  KitchenPurchaseOrderFormPage,
+  KitchenPurchaseOrderDetailPage,
 } from "@pages/kitchen";
 
 export default function App() {
@@ -476,6 +479,38 @@ export default function App() {
           element={
             <RequiresPermission permission="kitchen.manage">
               <KitchenCatalogPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders"
+          element={
+            <RequiresPermission permission="purchase_orders.view">
+              <KitchenPurchaseOrdersPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders/new"
+          element={
+            <RequiresPermission permission="purchase_orders.create">
+              <KitchenPurchaseOrderFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders/:id/edit"
+          element={
+            <RequiresPermission permission="purchase_orders.create">
+              <KitchenPurchaseOrderFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders/:id"
+          element={
+            <RequiresPermission permission="purchase_orders.view">
+              <KitchenPurchaseOrderDetailPage />
             </RequiresPermission>
           }
         />

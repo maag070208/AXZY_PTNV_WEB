@@ -2,6 +2,7 @@ import type {
   KitchenMovementType,
   LotStatus,
   MovementStatus,
+  PurchaseOrderStatus,
   StockStatus,
 } from "./types";
 
@@ -25,6 +26,19 @@ export const movementTypeColor = (type: KitchenMovementType): BadgeColor =>
 
 export const movementStatusColor = (status: MovementStatus): BadgeColor =>
   status === "CANCELLED" ? "danger" : "success";
+
+export const purchaseOrderStatusColor = (status: PurchaseOrderStatus): BadgeColor =>
+  status === "DRAFT"
+    ? "gray"
+    : status === "APPROVED"
+      ? "info"
+      : status === "SENT"
+        ? "info"
+        : status === "PARTIALLY_RECEIVED"
+          ? "warning"
+          : status === "RECEIVED"
+            ? "success"
+            : "danger";
 
 /** Cantidad con hasta 3 decimales, sin ceros de sobra (1.250 → 1.25). */
 export const fmtQty = (n: number): string => {

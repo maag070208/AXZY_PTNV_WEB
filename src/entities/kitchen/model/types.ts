@@ -247,6 +247,8 @@ export interface RestockRow {
   category: { id: string; name: string };
   unit: KitchenUnit;
   available: number;
+  /** Lo pedido en órdenes de compra abiertas y aún no recibido. */
+  inTransit: number;
   minStock: number;
   maxStock: number | null;
   stockStatus: StockStatus;
@@ -280,4 +282,89 @@ export interface KitchenAlerts {
   over: KitchenAlertItem[];
   expiring: KitchenAlertLot[];
   expired: KitchenAlertLot[];
+}
+
+// ── Órdenes de compra (F3) ──────────────────────────────────────────────────
+
+export type PurchaseOrderStatus =
+  | "DRAFT"
+  | "APPROVED"
+  | "SENT"
+  | "PARTIALLY_RECEIVED"
+  | "RECEIVED"
+  | "CANCELLED";
+
+export const PURCHASE_ORDER_STATUSES: readonly PurchaseOrderStatus[] = [
+  "DRAFT",
+  "APPROVED",
+  "SENT",
+  "PARTIALLY_RECEIVED",
+  "RECEIVED",
+  "CANCELLED",
+];
+
+export interface PurchaseOrderRow {
+  id: string;
+  number: string;
+  supplier: { id: string; name: string };
+  status: PurchaseOrderStatus;
+  expectedAt: string | null;
+  createdAt: string;
+  createdBy: { id: string; name: string };
+  linesCount: number;
+  orderedUnits: number;
+  receivedUnits: number;
+  total: number;
+}
+
+export interface PurchaseOrderLine {
+  id: string;
+  item: KitchenItemRef & { tracksExpiry: boolean; unit: KitchenUnit };
+  quantity: number;
+  unitCost: number | null;
+  receivedQuantity: number;
+  pendingQuantity: number;
+  /** Disponible hoy del artículo. */
+  available: number;
+  /** Lo pedido en OTRAS órdenes abiertas (sin contar esta línea). */
+  inTransit: number;
+  notes: string | null;
+}
+
+export interface PurchaseOrderDetail extends PurchaseOrderRow {
+  approvedBy: { id: string; name: string } | null;
+  approvedAt: string | null;
+  sentAt: string | null;
+  notes: string | null;
+  lines: PurchaseOrderLine[];
+  movements: Array<{ id: string; date: string; reference: string | null; createdBy: string }>;
+}
+
+export interface PurchaseOrderLineInput {
+  itemId: string;
+  quantity: number;
+  unitCost?: number | null;
+  notes?: string | null;
+}
+
+export interface PurchaseOrderInput {
+  supplierId: string;
+  expectedAt?: string | null;
+  notes?: string | null;
+  lines: PurchaseOrderLineInput[];
+}
+
+export interface PurchaseOrderReceiveLineInput {
+  lineId: string;
+  quantity: number;
+  lotCode?: string;
+  expiresAt?: string | null;
+  unitCost?: number | null;
+}
+
+export interface PurchaseOrderReceiveInput {
+  date?: string;
+  reference?: string | null;
+  notes?: string | null;
+  lines: PurchaseOrderReceiveLineInput[];
 }

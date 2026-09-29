@@ -1,5 +1,5 @@
 import { ITPage } from "@axzydev/axzy_ui_system";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   FaArrowDown,
@@ -7,7 +7,9 @@ import {
   FaBook,
   FaBoxes,
   FaClipboardCheck,
+  FaClipboardList,
   FaListAlt,
+  FaShoppingCart,
   FaTags,
   FaTruckLoading,
   FaUtensils,
@@ -22,6 +24,11 @@ import KitchenLedgerPanel from "@features/kitchen/ledger/ui/KitchenLedgerPanel";
 import KitchenCountPanel from "@features/kitchen/count/ui/KitchenCountPanel";
 import KitchenRestockPanel from "@features/kitchen/restock/ui/KitchenRestockPanel";
 import KitchenCatalogPanel from "@features/kitchen/catalog/ui/KitchenCatalogPanel";
+import {
+  PurchaseOrderDetailPanel,
+  PurchaseOrderFormPanel,
+  PurchaseOrdersPanel,
+} from "@features/kitchen/purchase-orders";
 
 const crumbs = (
   navigate: ReturnType<typeof useNavigate>,
@@ -189,6 +196,55 @@ export function KitchenCatalogPage() {
       backAction={() => navigate("/kitchen")}
     >
       <KitchenCatalogPanel />
+    </ITPage>
+  );
+}
+
+export function KitchenPurchaseOrdersPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  return (
+    <ITPage
+      title={t("purchaseOrders.title")}
+      description={t("purchaseOrders.description")}
+      icon={<FaShoppingCart size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
+      backAction={() => navigate("/kitchen/restock")}
+    >
+      <PurchaseOrdersPanel />
+    </ITPage>
+  );
+}
+
+export function KitchenPurchaseOrderFormPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  return (
+    <ITPage
+      title={id ? t("purchaseOrders.edit") : t("purchaseOrders.new")}
+      description={t("purchaseOrders.description")}
+      icon={<FaClipboardList size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
+      backAction={() => navigate("/kitchen/purchase-orders")}
+    >
+      <PurchaseOrderFormPanel id={id} />
+    </ITPage>
+  );
+}
+
+export function KitchenPurchaseOrderDetailPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  return (
+    <ITPage
+      title={t("purchaseOrders.detail")}
+      icon={<FaShoppingCart size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
+      backAction={() => navigate("/kitchen/purchase-orders")}
+    >
+      <PurchaseOrderDetailPanel id={id} />
     </ITPage>
   );
 }

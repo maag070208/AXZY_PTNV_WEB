@@ -15,6 +15,10 @@ import type {
   KitchenStockOutInput,
   KitchenUnit,
   KitchenUnitInput,
+  PurchaseOrderDetail,
+  PurchaseOrderInput,
+  PurchaseOrderReceiveInput,
+  PurchaseOrderRow,
   RestockRow,
   Supplier,
 } from "../model/types";
@@ -74,4 +78,21 @@ export const kitchenApi = {
   // reabastecimiento y alertas
   restock: () => api.get<RestockRow[]>("/kitchen/restock"),
   alerts: () => api.get<KitchenAlerts>("/kitchen/alerts"),
+
+  // órdenes de compra (F3)
+  purchaseOrdersTable: (params: ITDataTableFetchParamsPost) =>
+    tableRequest<PurchaseOrderRow>("/kitchen/purchase-orders/table", params),
+  purchaseOrder: (id: string) => api.get<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}`),
+  createPurchaseOrder: (input: PurchaseOrderInput) =>
+    api.post<PurchaseOrderDetail>("/kitchen/purchase-orders", input),
+  updatePurchaseOrder: (id: string, input: Partial<PurchaseOrderInput>) =>
+    api.patch<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}`, input),
+  approvePurchaseOrder: (id: string) =>
+    api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/approve`, {}),
+  sendPurchaseOrder: (id: string) =>
+    api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/send`, {}),
+  cancelPurchaseOrder: (id: string, notes: string | null) =>
+    api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/cancel`, { notes }),
+  receivePurchaseOrder: (id: string, input: PurchaseOrderReceiveInput, key: string) =>
+    api.post<KitchenMovement>(`/kitchen/purchase-orders/${id}/receive`, input, withKey(key)),
 };
