@@ -138,6 +138,8 @@ export interface KitchenItemDetail {
   nextExpiry: string | null;
   stockStatus: StockStatus;
   suggested: number;
+  /** Valor del inventario del artículo (saldo de lotes × costo). */
+  stockValue: number;
   lots: Array<{
     id: string;
     lotCode: string;
@@ -367,4 +369,64 @@ export interface PurchaseOrderReceiveInput {
   reference?: string | null;
   notes?: string | null;
   lines: PurchaseOrderReceiveLineInput[];
+}
+
+// ── Facturas de proveedor (F4) ──────────────────────────────────────────────
+
+export type InvoiceStatus = "ACTIVE" | "CANCELLED";
+
+export const INVOICE_STATUSES: readonly InvoiceStatus[] = ["ACTIVE", "CANCELLED"];
+
+export interface SupplierInvoiceRow {
+  id: string;
+  number: string;
+  uuid: string | null;
+  supplier: { id: string; name: string };
+  purchaseOrder: { id: string; number: string } | null;
+  date: string;
+  total: number;
+  status: InvoiceStatus;
+  createdBy: { id: string; name: string };
+}
+
+export interface SupplierInvoiceLine {
+  id: string;
+  item: KitchenItemRef & { unit: KitchenUnit };
+  purchaseOrderLineId: string | null;
+  quantity: number;
+  unitCost: number;
+  /** Cotejo de tres vías (null si el renglón no está ligado a una OC). */
+  ordered: number | null;
+  received: number | null;
+  invoicedQuantity: number | null;
+  /** Diferencia de precio contra lo pactado en la OC. */
+  priceDiff: number | null;
+}
+
+export interface SupplierInvoiceDetail extends SupplierInvoiceRow {
+  subtotal: number | null;
+  tax: number | null;
+  notes: string | null;
+  createdAt: string;
+  lines: SupplierInvoiceLine[];
+}
+
+export interface SupplierInvoiceLineInput {
+  itemId: string;
+  purchaseOrderLineId?: string | null;
+  quantity: number;
+  unitCost: number;
+}
+
+export interface SupplierInvoiceInput {
+  supplierId: string;
+  purchaseOrderId?: string | null;
+  number: string;
+  uuid?: string | null;
+  date: string;
+  subtotal?: number | null;
+  tax?: number | null;
+  total: number;
+  notes?: string | null;
+  lines: SupplierInvoiceLineInput[];
 }

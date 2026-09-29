@@ -36,6 +36,7 @@
     },
     "detail": "Item detail",
     "suggested": "Suggested to order",
+    "stockValue": "Inventory value",
     "lots": "Active lots",
     "lastMovements": "Latest movements",
     "notFound": "Item not found",
@@ -317,6 +318,63 @@
     "cancelled": "Order cancelled",
     "received": "Receipt recorded",
     "cancelConfirm": "Cancel order {{number}}? This cannot be undone."
+  },
+  "invoices": {
+    "title": "Invoices",
+    "description": "Supplier invoices and their three-way match against the purchase order.",
+    "new": "Register invoice",
+    "detail": "Invoice",
+    "notFound": "Invoice not found",
+    "registerFromOrder": "Register invoice",
+    "columns": {
+      "number": "Number",
+      "uuid": "UUID",
+      "supplier": "Supplier",
+      "purchaseOrder": "Order",
+      "date": "Date",
+      "total": "Total",
+      "status": "Status",
+      "createdBy": "Registered by",
+      "item": "Item",
+      "quantity": "Quantity",
+      "unitCost": "Cost",
+      "ordered": "Ordered",
+      "received": "Received",
+      "invoiced": "Invoiced",
+      "priceDiff": "Price diff."
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "CANCELLED": "Cancelled"
+    },
+    "form": {
+      "supplier": "Supplier",
+      "purchaseOrder": "Purchase order (optional)",
+      "noOrder": "No order",
+      "number": "Number",
+      "uuid": "UUID (CFDI)",
+      "date": "Date",
+      "subtotal": "Subtotal (optional)",
+      "tax": "Tax (optional)",
+      "total": "Total",
+      "notes": "Notes",
+      "itemsTitle": "Lines",
+      "addItem": "Add line",
+      "item": "Item",
+      "quantity": "Quantity",
+      "unitCost": "Unit cost",
+      "emptyItems": "Add at least one line.",
+      "save": "Register invoice",
+      "cancel": "Cancel"
+    },
+    "match": "Three-way match (ordered / received / invoiced)",
+    "costUpdated": "The cost of received lots is updated with the invoice cost.",
+    "registered": "Invoice registered",
+    "cancelled": "Invoice cancelled",
+    "cancelConfirm": "Cancel invoice {{number}}?",
+    "actions": {
+      "cancel": "Cancel invoice"
+    }
   },
   "catalog": {
     "title": "Kitchen catalogs",

@@ -1,4 +1,5 @@
 import type {
+  InvoiceStatus,
   KitchenMovementType,
   LotStatus,
   MovementStatus,
@@ -39,6 +40,9 @@ export const purchaseOrderStatusColor = (status: PurchaseOrderStatus): BadgeColo
           : status === "RECEIVED"
             ? "success"
             : "danger";
+
+export const invoiceStatusColor = (status: InvoiceStatus): BadgeColor =>
+  status === "CANCELLED" ? "danger" : "success";
 
 /** Cantidad con hasta 3 decimales, sin ceros de sobra (1.250 → 1.25). */
 export const fmtQty = (n: number): string => {

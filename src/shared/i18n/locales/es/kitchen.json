@@ -36,6 +36,7 @@
     },
     "detail": "Detalle del artículo",
     "suggested": "Sugerido a pedir",
+    "stockValue": "Valor del inventario",
     "lots": "Lotes vigentes",
     "lastMovements": "Últimos movimientos",
     "notFound": "Artículo no encontrado",
@@ -317,6 +318,63 @@
     "cancelled": "Orden cancelada",
     "received": "Recepción registrada",
     "cancelConfirm": "¿Cancelar la orden {{number}}? No se puede deshacer."
+  },
+  "invoices": {
+    "title": "Facturas",
+    "description": "Facturas de proveedor y su cotejo contra la orden de compra.",
+    "new": "Registrar factura",
+    "detail": "Factura",
+    "notFound": "Factura no encontrada",
+    "registerFromOrder": "Registrar factura",
+    "columns": {
+      "number": "Folio",
+      "uuid": "UUID",
+      "supplier": "Proveedor",
+      "purchaseOrder": "Orden",
+      "date": "Fecha",
+      "total": "Total",
+      "status": "Estado",
+      "createdBy": "Registró",
+      "item": "Artículo",
+      "quantity": "Cantidad",
+      "unitCost": "Costo",
+      "ordered": "Pedido",
+      "received": "Recibido",
+      "invoiced": "Facturado",
+      "priceDiff": "Dif. precio"
+    },
+    "status": {
+      "ACTIVE": "Activa",
+      "CANCELLED": "Cancelada"
+    },
+    "form": {
+      "supplier": "Proveedor",
+      "purchaseOrder": "Orden de compra (opcional)",
+      "noOrder": "Sin orden",
+      "number": "Folio",
+      "uuid": "UUID (CFDI)",
+      "date": "Fecha",
+      "subtotal": "Subtotal (opcional)",
+      "tax": "Impuestos (opcional)",
+      "total": "Total",
+      "notes": "Notas",
+      "itemsTitle": "Conceptos",
+      "addItem": "Agregar concepto",
+      "item": "Artículo",
+      "quantity": "Cantidad",
+      "unitCost": "Costo unitario",
+      "emptyItems": "Agrega al menos un concepto.",
+      "save": "Registrar factura",
+      "cancel": "Cancelar"
+    },
+    "match": "Cotejo (pedido / recibido / facturado)",
+    "costUpdated": "El costo de los lotes recibidos se actualiza con el de la factura.",
+    "registered": "Factura registrada",
+    "cancelled": "Factura cancelada",
+    "cancelConfirm": "¿Cancelar la factura {{number}}?",
+    "actions": {
+      "cancel": "Cancelar factura"
+    }
   },
   "catalog": {
     "title": "Catálogos de cocina",

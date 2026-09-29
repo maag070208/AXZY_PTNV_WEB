@@ -47,6 +47,7 @@ export default function KitchenItemDetailPanel() {
   const kpis = [
     { key: "available", value: `${fmtQty(item.available)} ${item.unit.name}` },
     { key: "suggested", value: fmtQty(item.suggested) },
+    { key: "stockValue", value: `$${item.stockValue.toLocaleString("es-MX", { minimumFractionDigits: 2 })}` },
   ];
 
   return (

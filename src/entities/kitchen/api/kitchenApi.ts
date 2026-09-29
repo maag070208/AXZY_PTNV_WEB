@@ -21,6 +21,9 @@ import type {
   PurchaseOrderRow,
   RestockRow,
   Supplier,
+  SupplierInvoiceDetail,
+  SupplierInvoiceInput,
+  SupplierInvoiceRow,
 } from "../model/types";
 
 /** Cabecera de idempotencia (misma petición repetida no se duplica). */
@@ -95,4 +98,13 @@ export const kitchenApi = {
     api.post<PurchaseOrderDetail>(`/kitchen/purchase-orders/${id}/cancel`, { notes }),
   receivePurchaseOrder: (id: string, input: PurchaseOrderReceiveInput, key: string) =>
     api.post<KitchenMovement>(`/kitchen/purchase-orders/${id}/receive`, input, withKey(key)),
+
+  // facturas de proveedor (F4)
+  invoicesTable: (params: ITDataTableFetchParamsPost) =>
+    tableRequest<SupplierInvoiceRow>("/kitchen/invoices/table", params),
+  invoice: (id: string) => api.get<SupplierInvoiceDetail>(`/kitchen/invoices/${id}`),
+  createInvoice: (input: SupplierInvoiceInput) =>
+    api.post<SupplierInvoiceDetail>("/kitchen/invoices", input),
+  cancelInvoice: (id: string, notes: string | null) =>
+    api.post<SupplierInvoiceDetail>(`/kitchen/invoices/${id}/cancel`, { notes }),
 };

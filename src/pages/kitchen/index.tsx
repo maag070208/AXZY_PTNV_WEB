@@ -8,6 +8,7 @@ import {
   FaBoxes,
   FaClipboardCheck,
   FaClipboardList,
+  FaFileInvoice,
   FaListAlt,
   FaShoppingCart,
   FaTags,
@@ -29,6 +30,7 @@ import {
   PurchaseOrderFormPanel,
   PurchaseOrdersPanel,
 } from "@features/kitchen/purchase-orders";
+import { InvoiceDetailPanel, InvoiceFormPanel, InvoicesPanel } from "@features/kitchen/invoices";
 
 const crumbs = (
   navigate: ReturnType<typeof useNavigate>,
@@ -245,6 +247,54 @@ export function KitchenPurchaseOrderDetailPage() {
       backAction={() => navigate("/kitchen/purchase-orders")}
     >
       <PurchaseOrderDetailPanel id={id} />
+    </ITPage>
+  );
+}
+
+export function KitchenInvoicesPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  return (
+    <ITPage
+      title={t("invoices.title")}
+      description={t("invoices.description")}
+      icon={<FaFileInvoice size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
+      backAction={() => navigate("/kitchen/purchase-orders")}
+    >
+      <InvoicesPanel />
+    </ITPage>
+  );
+}
+
+export function KitchenInvoiceFormPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  return (
+    <ITPage
+      title={t("invoices.new")}
+      description={t("invoices.description")}
+      icon={<FaFileInvoice size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
+      backAction={() => navigate("/kitchen/invoices")}
+    >
+      <InvoiceFormPanel />
+    </ITPage>
+  );
+}
+
+export function KitchenInvoiceDetailPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  return (
+    <ITPage
+      title={t("invoices.detail")}
+      icon={<FaFileInvoice size={20} />}
+      breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
+      backAction={() => navigate("/kitchen/invoices")}
+    >
+      <InvoiceDetailPanel id={id} />
     </ITPage>
   );
 }

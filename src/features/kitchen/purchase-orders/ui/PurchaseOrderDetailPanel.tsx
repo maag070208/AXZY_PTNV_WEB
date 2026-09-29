@@ -10,7 +10,7 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaArrowLeft, FaCheck, FaPaperPlane, FaPen, FaTruckLoading, FaUndo } from "react-icons/fa";
+import { FaArrowLeft, FaCheck, FaFileInvoice, FaPaperPlane, FaPen, FaTruckLoading, FaUndo } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import { fmtQty } from "@entities/kitchen";
@@ -29,6 +29,7 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
   const canCreate = useCan("purchase_orders.create");
   const canApprove = useCan("purchase_orders.approve");
   const canReceive = useCan("kitchen.stock_in");
+  const canRegisterInvoice = useCan("invoices.register");
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
 
@@ -99,6 +100,18 @@ export default function PurchaseOrderDetailPanel({ id }: { id?: string }) {
               <ITFlex align="center" gap={1}>
                 <FaTruckLoading size={11} />
                 <ITText className="font-bold text-[11px]">{t("purchaseOrders.actions.receive")}</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
+          {(order.status === "PARTIALLY_RECEIVED" || order.status === "RECEIVED") && canRegisterInvoice && (
+            <ITButton
+              variant="outlined"
+              color="primary"
+              onClick={() => navigate("/kitchen/invoices/new", { state: { purchaseOrderId: order.id } })}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaFileInvoice size={11} />
+                <ITText className="font-bold text-[11px]">{t("invoices.registerFromOrder")}</ITText>
               </ITFlex>
             </ITButton>
           )}
