@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { FaBan, FaCheckCircle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PolicyActionDef, PolicyAdmin, PolicyCondition } from "@entities/permission";
@@ -21,7 +22,7 @@ export default function PolicySentence({ policy, action }: Props) {
   const valueText = useConditionValue();
   const fieldLabel = (field: string) => action?.fields.find((item) => item.key === field)?.label ?? field;
 
-  const parts: JSX.Element[] = [];
+  const parts: ReactNode[] = [];
   if (policy.roles.length > 0) {
     parts.push(
       <span key="roles" className="inline-flex flex-wrap items-center gap-1">

@@ -93,15 +93,19 @@ export default function RolesWorkspace({ workspace }: Props) {
 
       {tab === "access" && (
         <UserAccessExplorer
+          admin={admin}
           members={members}
           catalog={data.catalog}
           roles={data.roles}
+          policies={policies.data?.policies ?? []}
           userId={workspace.accessUserId}
           onSelectUser={workspace.selectAccessUser}
-          onTest={(userId) => workspace.openTester({ userId, permission: workspace.accessPermission })}
+          onTest={(userId, permission) =>
+            workspace.openTester({ userId, permission: permission ?? workspace.accessPermission })
+          }
           refreshKey={workspace.accessVersion}
-          draftDirty={admin.dirty}
           onOpenRole={workspace.openRole}
+          notify={workspace.notify}
         />
       )}
 

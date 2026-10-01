@@ -195,14 +195,11 @@
     }
   },
   "policies": {
-    "subtitle": "Reglas ABAC que se evalúan sobre una acción ya permitida por el rol: condiciones sobre el registro (monto, estado, creador), a quién aplican y si permiten o niegan. La primera que casa por prioridad decide.",
     "new": "Nueva política",
     "newTitle": "Nueva política",
     "editTitle": "Editar política",
     "edit": "Editar",
-    "basePolicy": "Base",
     "inactive": "Inactiva",
-    "priorityShort": "Prioridad {{priority}}",
     "priorityHint": "Menor número = se evalúa antes. La primera regla que casa decide; si ninguna casa, se permite (el permiso ya lo autorizó).",
     "addCondition": "Agregar condición",
     "noConditions": "Sin condiciones: la regla aplica siempre (a quien le toque).",
@@ -239,17 +236,14 @@
       "condition": "Completa el valor de cada condición",
       "roles": "Elige al menos un rol o marca \"A todos\""
     },
-    "if": "SI",
-    "always": "SIEMPRE",
-    "and": "Y",
-    "forEveryone": "para todos",
+    "if": "Si",
+    "always": "Siempre",
+    "and": "y",
     "ref": {
       "userId": "la misma persona",
       "departmentId": "su departamento",
       "role": "su rol"
     },
-    "fallback": "Si ninguna regla casa → se permite (el permiso del rol ya lo autorizó).",
-    "noRulesForAction": "Sin reglas: con el permiso basta.",
     "addRule": "Regla",
     "pickValue": "Elige…",
     "removeCondition": "Quitar condición",
@@ -273,7 +267,23 @@
       "nameHint": "Si lo dejas vacío, se usa el que ves sugerido.",
       "order": "Orden de revisión",
       "activeHint": "Una regla inactiva se conserva pero no se revisa."
-    }
+    },
+    "isRole": "es",
+    "or": "o",
+    "verdict": {
+      "ALLOW": "puede",
+      "DENY": "no puede"
+    },
+    "explainer": "Las reglas ponen condiciones a un permiso que el rol ya tiene. Ejemplo: aunque un gerente pueda aprobar órdenes de compra, no puede aprobar las que él mismo creó. Se revisan de arriba a abajo y la primera que aplica decide.",
+    "story": {
+      "whoCan": "Quien pueda",
+      "otherwise": "En cualquier otro caso → puede (basta con el permiso de su rol).",
+      "noRules": "Sin reglas: basta con el permiso de su rol."
+    },
+    "moveUp": "Revisar antes",
+    "moveDown": "Revisar después",
+    "turnOn": "Activar regla",
+    "turnOff": "Desactivar regla"
   },
   "errors": {
     "load": "Error al cargar los permisos",
@@ -411,15 +421,47 @@
     "emptyTitle": "Elige una persona",
     "emptyBody": "Verás sus roles, lo que puede hacer en cada módulo y de dónde le viene cada permiso, las pantallas que ve y podrás probar cualquier acción.",
     "openProfile": "Abrir ficha",
-    "draftNote": "Hay cambios sin guardar en la matriz: aquí se muestra el acceso guardado.",
     "howResolved": "Acceso efectivo = excepción vigente > el mayor alcance de sus roles > sin permiso. Lo calcula la API con las mismas reglas que aplica en cada petición.",
-    "exception": "Excepción",
-    "removed": "quitado",
     "until": "vence {{date}}",
-    "test": "Probar acceso",
+    "rolesLabel": "Roles:",
+    "addRole": "Agregar rol",
+    "removeRole": "Quitar este rol",
+    "section": {
+      "permissions": "Qué puede hacer",
+      "screens": "Pantallas que ve"
+    },
+    "questionPlaceholder": "¿Qué quieres saber si {{name}} puede hacer? Ej. crear usuarios",
     "view": {
-      "permissions": "Permisos",
-      "screens": "Pantallas"
+      "can": "Puede ({{count}})",
+      "cannot": "No puede ({{count}})",
+      "all": "Todo"
+    },
+    "nothingCan": "Esta persona no tiene ningún permiso.",
+    "nothingCannot": "Esta persona puede hacer todo.",
+    "can": "Puede",
+    "cannot": "No puede",
+    "pending": "Pendiente de guardar",
+    "hasRules": "Con reglas",
+    "hasRulesHint": "Esta acción tiene reglas de contexto: pruébala con un caso.",
+    "source": {
+      "exception": "Excepción solo para esta persona",
+      "exceptionRemoved": "Se le quitó solo a esta persona (excepción)",
+      "none": "Ninguno de sus roles lo tiene",
+      "byRole": "Por su rol"
+    },
+    "fix": {
+      "give": "Dar acceso",
+      "remove": "Quitar",
+      "grantRole": "Dárselo a todo el rol {{role}} (afecta a {{count}} persona(s))",
+      "grantPerson": "Dárselo solo a {{name}}…",
+      "revokeRole": "Quitárselo a todo el rol {{role}} (afecta a {{count}} persona(s))",
+      "revokePerson": "Quitárselo solo a {{name}}…",
+      "scopePerson": "Cambiar el alcance solo para {{name}}…",
+      "clearException": "Quitar la excepción",
+      "clearTitle": "Quitar excepción",
+      "clearConfirm": "\"{{permission}}\" de {{name}} volverá a depender solo de sus roles.",
+      "cleared": "Excepción quitada",
+      "pendingToast": "Cambio pendiente en el rol {{role}}: revísalo y guárdalo en la barra de abajo."
     }
   },
   "simulator": {
@@ -505,6 +547,33 @@
       "USER_ROLE_ADDED": "Rol asignado",
       "USER_ROLE_REMOVED": "Rol retirado",
       "ACCESS_DENIED": "Acceso denegado"
+    }
+  },
+  "exception": {
+    "grantTitle": "Dar acceso solo a {{name}}",
+    "revokeTitle": "Quitar acceso solo a {{name}}",
+    "grantIntro": "Es una excepción: no cambia su rol ni a las demás personas. Útil para cubrir a alguien o para un caso temporal.",
+    "revokeIntro": "Aunque su rol lo tenga, a {{name}} no le aplicará mientras siga la excepción.",
+    "scopeQuestion": "¿Sobre qué datos?",
+    "reasonQuestion": "¿Por qué? (opcional)",
+    "reasonHint": "Queda en la bitácora para que otros entiendan la excepción.",
+    "reasonPlaceholder": "Ej. Cubre las vacaciones del jefe de área",
+    "expiryQuestion": "¿Hasta cuándo?",
+    "expiry": {
+      "default": "Lo que diga la configuración",
+      "defaultHint": "Vence según la vigencia por defecto del sistema.",
+      "date": "Hasta una fecha",
+      "dateHint": "Elige el último día.",
+      "never": "Sin vencimiento",
+      "neverHint": "Hasta que alguien la quite."
+    },
+    "grantConfirm": "Dar acceso",
+    "revokeConfirm": "Quitar acceso",
+    "granted": "Listo: {{name}} ya tiene el acceso.",
+    "revoked": "Listo: a {{name}} se le quitó el acceso.",
+    "errors": {
+      "date": "Elige la fecha de vencimiento",
+      "save": "No se pudo guardar la excepción"
     }
   }
 }

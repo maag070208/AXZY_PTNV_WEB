@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   permissionApi,
+  type PolicyAdmin,
   type PolicyCreateDto,
   type PolicyListData,
   type PolicyUpdateDto,
@@ -20,6 +21,13 @@ export interface PoliciesState {
   create: (dto: PolicyCreateDto) => Promise<RoleResult>;
   update: (id: string, dto: PolicyUpdateDto) => Promise<RoleResult>;
   remove: (id: string) => Promise<RoleResult>;
+  /** Activa o desactiva una regla sin abrir el editor. */
+  setActive: (policy: PolicyAdmin, active: boolean) => Promise<RoleResult>;
+  /**
+   * Sube o baja una regla en el orden de revisión de su acción: intercambia su
+   * prioridad con la vecina (`rules` ya viene ordenada por prioridad).
+   */
+  move: (rules: readonly PolicyAdmin[], index: number, direction: -1 | 1) => Promise<RoleResult>;
 }
 
 /** Políticas ABAC y catálogo de acciones con sus campos (`GET /permissions/policies`). */
@@ -67,5 +75,35 @@ export const usePolicies = (): PoliciesState => {
   );
   const remove = useCallback((id: string) => run(() => permissionApi.deletePolicy(id)), [run]);
 
-  return { data, loading, error, saving, reload, create, update, remove };
+  const setActive = useCallback(
+    (policy: PolicyAdmin, active: boolean) => run(() => permissionApi.updatePolicy(policy.id, { active })),
+    [run]
+  );
+
+  const move = useCallback(
+    (rules: readonly PolicyAdmin[], index: number, direction: -1 | 1) => {
+      const current = rules[index];
+      const neighbor = rules[index + direction];
+      if (!current || !neighbor) return Promise.resolve<RoleResult>({ ok: true });
+      return run(async () => {
+        if (current.priority !== neighbor.priority) {
+          // Intercambio simple de prioridades.
+          await permissionApi.updatePolicy(current.id, { priority: neighbor.priority });
+          await permissionApi.updatePolicy(neighbor.id, { priority: current.priority });
+          return;
+        }
+        // Empatadas: la que se mueve queda una unidad antes o después de la vecina.
+        const target = neighbor.priority + direction;
+        if (target >= 0) {
+          await permissionApi.updatePolicy(current.id, { priority: target });
+        } else {
+          await permissionApi.updatePolicy(current.id, { priority: 0 });
+          await permissionApi.updatePolicy(neighbor.id, { priority: 1 });
+        }
+      });
+    },
+    [run]
+  );
+
+  return { data, loading, error, saving, reload, create, update, remove, setActive, move };
 };

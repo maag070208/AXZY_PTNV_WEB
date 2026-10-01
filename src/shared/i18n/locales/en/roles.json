@@ -195,14 +195,11 @@
     }
   },
   "policies": {
-    "subtitle": "ABAC rules evaluated on an action already allowed by the role: conditions on the record (amount, status, creator), who they apply to, and whether they allow or deny. The first match by priority decides.",
     "new": "New policy",
     "newTitle": "New policy",
     "editTitle": "Edit policy",
     "edit": "Edit",
-    "basePolicy": "Base",
     "inactive": "Inactive",
-    "priorityShort": "Priority {{priority}}",
     "priorityHint": "Lower number = evaluated first. The first matching rule decides; if none matches, it is allowed (the permission already authorized it).",
     "addCondition": "Add condition",
     "noConditions": "No conditions: the rule always applies (to whoever it targets).",
@@ -239,17 +236,14 @@
       "condition": "Fill in the value of every condition",
       "roles": "Pick at least one role or choose \"Everyone\""
     },
-    "if": "IF",
-    "always": "ALWAYS",
-    "and": "AND",
-    "forEveryone": "for everyone",
+    "if": "If",
+    "always": "Always",
+    "and": "and",
     "ref": {
       "userId": "the same person",
       "departmentId": "their department",
       "role": "their role"
     },
-    "fallback": "If no rule matches → allowed (the role permission already authorized it).",
-    "noRulesForAction": "No rules: the permission is enough.",
     "addRule": "Rule",
     "pickValue": "Pick…",
     "removeCondition": "Remove condition",
@@ -273,7 +267,23 @@
       "nameHint": "If left empty, the suggested one is used.",
       "order": "Check order",
       "activeHint": "An inactive rule is kept but not checked."
-    }
+    },
+    "isRole": "is",
+    "or": "or",
+    "verdict": {
+      "ALLOW": "can",
+      "DENY": "cannot"
+    },
+    "explainer": "Rules add conditions to a permission the role already has. Example: even if a manager can approve purchase orders, they cannot approve the ones they created. They are checked top to bottom and the first one that applies decides.",
+    "story": {
+      "whoCan": "Whoever can",
+      "otherwise": "Any other case → can (their role permission is enough).",
+      "noRules": "No rules: their role permission is enough."
+    },
+    "moveUp": "Check earlier",
+    "moveDown": "Check later",
+    "turnOn": "Turn rule on",
+    "turnOff": "Turn rule off"
   },
   "errors": {
     "load": "Error loading the permissions",
@@ -411,15 +421,47 @@
     "emptyTitle": "Pick a person",
     "emptyBody": "You will see their roles, what they can do in each module and where each permission comes from, the screens they see, and you can test any action.",
     "openProfile": "Open profile",
-    "draftNote": "There are unsaved matrix changes: the saved access is shown here.",
     "howResolved": "Effective access = current exception > highest scope among their roles > no permission. Computed by the API with the same rules it applies on every request.",
-    "exception": "Exception",
-    "removed": "removed",
     "until": "until {{date}}",
-    "test": "Test access",
+    "rolesLabel": "Roles:",
+    "addRole": "Add role",
+    "removeRole": "Remove this role",
+    "section": {
+      "permissions": "What they can do",
+      "screens": "Screens they see"
+    },
+    "questionPlaceholder": "What do you want to know if {{name}} can do? E.g. create users",
     "view": {
-      "permissions": "Permissions",
-      "screens": "Screens"
+      "can": "Can ({{count}})",
+      "cannot": "Cannot ({{count}})",
+      "all": "All"
+    },
+    "nothingCan": "This person has no permissions.",
+    "nothingCannot": "This person can do everything.",
+    "can": "Can",
+    "cannot": "Cannot",
+    "pending": "Pending save",
+    "hasRules": "Has rules",
+    "hasRulesHint": "This action has context rules: test it with a case.",
+    "source": {
+      "exception": "Exception for this person only",
+      "exceptionRemoved": "Removed for this person only (exception)",
+      "none": "None of their roles has it",
+      "byRole": "From their role"
+    },
+    "fix": {
+      "give": "Give access",
+      "remove": "Remove",
+      "grantRole": "Give it to the whole {{role}} role (affects {{count}} person(s))",
+      "grantPerson": "Give it only to {{name}}…",
+      "revokeRole": "Remove it from the whole {{role}} role (affects {{count}} person(s))",
+      "revokePerson": "Remove it only from {{name}}…",
+      "scopePerson": "Change the scope only for {{name}}…",
+      "clearException": "Remove the exception",
+      "clearTitle": "Remove exception",
+      "clearConfirm": "\"{{permission}}\" for {{name}} will depend only on their roles again.",
+      "cleared": "Exception removed",
+      "pendingToast": "Pending change in the {{role}} role: review and save it in the bar below."
     }
   },
   "simulator": {
@@ -505,6 +547,33 @@
       "USER_ROLE_ADDED": "Role assigned",
       "USER_ROLE_REMOVED": "Role withdrawn",
       "ACCESS_DENIED": "Access denied"
+    }
+  },
+  "exception": {
+    "grantTitle": "Give access only to {{name}}",
+    "revokeTitle": "Remove access only from {{name}}",
+    "grantIntro": "It's an exception: it doesn't change their role or other people. Useful to cover for someone or a temporary case.",
+    "revokeIntro": "Even if their role has it, it won't apply to {{name}} while the exception lasts.",
+    "scopeQuestion": "On which data?",
+    "reasonQuestion": "Why? (optional)",
+    "reasonHint": "It stays in the log so others understand the exception.",
+    "reasonPlaceholder": "E.g. Covers the area head's vacation",
+    "expiryQuestion": "Until when?",
+    "expiry": {
+      "default": "Per configuration",
+      "defaultHint": "Expires per the system's default validity.",
+      "date": "Until a date",
+      "dateHint": "Pick the last day.",
+      "never": "No expiry",
+      "neverHint": "Until someone removes it."
+    },
+    "grantConfirm": "Give access",
+    "revokeConfirm": "Remove access",
+    "granted": "Done: {{name}} now has access.",
+    "revoked": "Done: access removed from {{name}}.",
+    "errors": {
+      "date": "Pick the expiry date",
+      "save": "Could not save the exception"
     }
   }
 }

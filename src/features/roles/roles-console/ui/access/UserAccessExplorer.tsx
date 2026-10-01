@@ -1,63 +1,86 @@
 import { useMemo, useState } from "react";
-import { ITAlert, ITButton, ITCheckbox, ITInput, ITSegmentedControl, ITSelect } from "@axzydev/axzy_ui_system";
-import { FaChevronDown, FaChevronRight, FaExternalLinkAlt, FaSearch, FaUserSecret, FaVial } from "react-icons/fa";
+import { ITAlert, ITButton, ITCheckbox, ITConfirmDialog, ITDropdownMenu, ITInput, ITSelect } from "@axzydev/axzy_ui_system";
+import type { ITDropdownMenuItem } from "@axzydev/axzy_ui_system";
+import {
+  FaBan,
+  FaCheckCircle,
+  FaChevronDown,
+  FaExternalLinkAlt,
+  FaGavel,
+  FaPlus,
+  FaSearch,
+  FaTimes,
+  FaUserSecret,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { AccessPermissionView, PermissionCatalog, PermissionMap } from "@entities/permission";
-import { roleLabel } from "@entities/user";
+import type { AccessPermissionView, PermissionCatalog, PermissionMap, PolicyAdmin } from "@entities/permission";
+import { roleLabel, useCan, usersApi } from "@entities/user";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { formatDate } from "@shared/i18n/format";
-import { groupByModule, isScopedPermission, moduleCoverage, moduleLevel } from "../../model/access-levels";
+import { groupByModule, isScopedPermission, matchesPermission } from "../../model/access-levels";
 import { initialsOfName, matchesMember, memberRoles, type AccessMembersState } from "../../model/useAccessMembers";
+import { isLockedCell, type RolesAdminState } from "../../model/useRolesAdmin";
 import { useUserAccess } from "../../model/useUserAccess";
-import { AccessLevelBadge, CoverageBar } from "../shared/AccessLevel";
 import { RoleChip } from "../shared/RoleAvatar";
 import { ScopeChip } from "../shared/Scope";
 import ScreensAccessList from "../shared/ScreensAccessList";
 import SidebarPreview from "../shared/SidebarPreview";
-import VerbIcon from "../shared/VerbIcon";
+import TabBar from "../shared/TabBar";
+import ExceptionDialog from "./ExceptionDialog";
 
 interface Props {
+  admin: RolesAdminState;
   members: AccessMembersState;
   catalog: readonly PermissionCatalog[];
   roles: readonly string[];
+  policies: readonly PolicyAdmin[];
   userId: string | null;
   onSelectUser: (userId: string) => void;
-  /** Abre el probador con esta persona. */
-  onTest: (userId: string) => void;
+  /** Abre el probador con esta persona (y la acción, si se da). */
+  onTest: (userId: string, permission?: string) => void;
   /** Cambia cuando se guarda la matriz o los roles de alguien: vuelve a pedir el acceso. */
   refreshKey: number;
-  /** Hay cambios sin guardar en la matriz (el acceso mostrado es el guardado). */
-  draftDirty: boolean;
   onOpenRole: (role: string) => void;
+  notify: (message: string, type: "success" | "error") => void;
 }
 
-type View = "permissions" | "screens";
+type View = "can" | "cannot" | "all";
+type Section = "permissions" | "screens";
 
 /**
- * Visor de acceso por persona: sus roles, lo que puede hacer en cada módulo y
- * de dónde le viene (rol o excepción), y las pantallas que ve. Lo calcula la
- * API con el mismo resolvedor de las rutas.
+ * Visor de acceso por persona, pensado como respuesta a "¿qué puede hacer?" y
+ * "¿por qué no puede?": lista de lo que puede y lo que no, de dónde le viene
+ * (rol o excepción) y cómo arreglarlo ahí mismo (dárselo a su rol, quitárselo
+ * o una excepción solo para esa persona). Lo calcula la API con el mismo
+ * resolvedor que aplican las rutas.
  */
 export default function UserAccessExplorer({
+  admin,
   members,
   catalog,
   roles,
+  policies,
   userId,
   onSelectUser,
   onTest,
   refreshKey,
-  draftDirty,
   onOpenRole,
+  notify,
 }: Props) {
   const { t } = useTranslation("roles");
   const navigate = useNavigate();
+  const canExceptions = useCan("users.permissions");
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [showInactive, setShowInactive] = useState(false);
-  const [view, setView] = useState<View>("permissions");
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const { access, loading, error } = useUserAccess(userId, refreshKey);
+  const [section, setSection] = useState<Section>("permissions");
+  const [view, setView] = useState<View>("can");
+  const [search, setSearch] = useState("");
+  const [exception, setException] = useState<{ permission: PermissionCatalog; mode: "grant" | "revoke" } | null>(null);
+  const [clearing, setClearing] = useState<PermissionCatalog | null>(null);
+  const [removingRole, setRemovingRole] = useState<string | null>(null);
+  const { access, loading, error, reload } = useUserAccess(userId, refreshKey);
 
   const list = members.members.filter(
     (member) =>
@@ -72,41 +95,154 @@ export default function UserAccessExplorer({
     for (const row of access?.permissions ?? []) if (row.effective !== "NONE") map[row.key] = row.effective;
     return map;
   }, [access]);
-  const groups = useMemo(() => groupByModule(catalog.filter((permission) => permission.active)), [catalog]);
+  const active = useMemo(() => catalog.filter((permission) => permission.active), [catalog]);
+  const ruledActions = useMemo(
+    () => new Set(policies.filter((policy) => policy.active).map((policy) => policy.action)),
+    [policies]
+  );
 
-  const toggleModule = (module: string) =>
-    setExpanded((previous) => {
-      const next = new Set(previous);
-      if (next.has(module)) next.delete(module);
-      else next.add(module);
-      return next;
-    });
+  const personRoles = access ? access.roles.filter((role) => role.active).map((role) => role.key) : [];
+  const firstName = access?.user.name.split(/\s+/)[0] ?? "";
+  const peopleIn = (role: string) => admin.rolesMeta.find((item) => item.key === role)?.userCount ?? 0;
+  const canCount = active.filter((permission) => byKey.get(permission.key)?.effective !== "NONE" && byKey.has(permission.key)).length;
+  const searching = search.trim() !== "";
 
-  const sources = (row: AccessPermissionView, permission: PermissionCatalog) => {
+  const groups = useMemo(() => {
+    return groupByModule(active)
+      .map(([module, permissions]) => ({
+        module,
+        rows: permissions.filter((permission) => {
+          const granted = (byKey.get(permission.key)?.effective ?? "NONE") !== "NONE";
+          if (searching) return matchesPermission(permission, search);
+          if (view === "can") return granted;
+          if (view === "cannot") return !granted;
+          return true;
+        }),
+      }))
+      .filter((group) => group.rows.length > 0);
+  }, [active, byKey, view, search, searching]);
+
+  const pendingFor = (key: string) =>
+    personRoles.some((role) => admin.scopeOf(role, key) !== admin.savedScopeOf(role, key));
+
+  /** Opciones para dar o quitar el permiso, en palabras simples. */
+  const fixItems = (row: AccessPermissionView, permission: PermissionCatalog): ITDropdownMenuItem[] => {
+    const granted = row.effective !== "NONE";
+    const items: ITDropdownMenuItem[] = [];
+    if (row.exception) {
+      items.push({
+        id: "clear",
+        label: t("explorer.fix.clearException"),
+        onClick: () => setClearing(permission),
+      });
+    }
+    if (!granted) {
+      for (const role of personRoles) {
+        if (admin.scopeOf(role, permission.key) !== "NONE") continue;
+        items.push({
+          id: `grant-${role}`,
+          label: t("explorer.fix.grantRole", { role: roleLabel(role), count: peopleIn(role) }),
+          divider: items.length > 0 && items.length === (row.exception ? 1 : 0),
+          onClick: () => {
+            admin.toggle(role, permission.key);
+            notify(t("explorer.fix.pendingToast", { role: roleLabel(role) }), "success");
+          },
+        });
+      }
+      if (canExceptions) {
+        items.push({
+          id: "grant-person",
+          label: t("explorer.fix.grantPerson", { name: firstName }),
+          divider: items.length > 0,
+          onClick: () => setException({ permission, mode: "grant" }),
+        });
+      }
+    } else {
+      for (const role of Object.keys(row.byRole)) {
+        if (isLockedCell(role, permission.key) || admin.scopeOf(role, permission.key) === "NONE") continue;
+        items.push({
+          id: `revoke-${role}`,
+          label: t("explorer.fix.revokeRole", { role: roleLabel(role), count: peopleIn(role) }),
+          onClick: () => {
+            admin.toggle(role, permission.key);
+            notify(t("explorer.fix.pendingToast", { role: roleLabel(role) }), "success");
+          },
+        });
+      }
+      if (canExceptions) {
+        if (isScopedPermission(permission)) {
+          items.push({
+            id: "scope-person",
+            label: t("explorer.fix.scopePerson", { name: firstName }),
+            divider: items.length > 0,
+            onClick: () => setException({ permission, mode: "grant" }),
+          });
+        }
+        items.push({
+          id: "revoke-person",
+          label: t("explorer.fix.revokePerson", { name: firstName }),
+          danger: true,
+          divider: !isScopedPermission(permission) && items.length > 0,
+          onClick: () => setException({ permission, mode: "revoke" }),
+        });
+      }
+    }
+    return items;
+  };
+
+  const sourceText = (row: AccessPermissionView, permission: PermissionCatalog) => {
     const scoped = isScopedPermission(permission);
+    if (row.exception) {
+      return (
+        <span className="text-violet-700" title={row.exception.reason ?? undefined}>
+          {row.exception.scope === "NONE" ? t("explorer.source.exceptionRemoved") : t("explorer.source.exception")}
+          {row.exception.expiresAt && ` · ${t("explorer.until", { date: formatDate(row.exception.expiresAt) })}`}
+        </span>
+      );
+    }
     const entries = Object.entries(row.byRole);
+    if (entries.length === 0) return <span className="text-slate-400">{t("explorer.source.none")}</span>;
     return (
-      <div className="flex flex-wrap items-center justify-end gap-1">
-        {row.exception && (
-          <span
-            className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-700"
-            title={row.exception.reason ?? undefined}
-          >
-            {t("explorer.exception")} ·{" "}
-            {row.exception.scope === "NONE"
-              ? t("explorer.removed")
-              : scoped
-                ? t(`scope.${row.exception.scope}`)
-                : t("matrix.granted")}
-            {row.exception.expiresAt && <> · {t("explorer.until", { date: formatDate(row.exception.expiresAt) })}</>}
-          </span>
-        )}
-        {entries.map(([role, scope]) => (
-          <RoleChip key={role} role={role} muted={row.exception !== null} suffix={scoped ? t(`scope.${scope}`) : undefined} />
-        ))}
-      </div>
+      <span className="text-slate-500">
+        {t("explorer.source.byRole")}{" "}
+        {entries
+          .map(([role, scope]) => (scoped ? `${roleLabel(role)} (${t(`scope.${scope}`)})` : roleLabel(role)))
+          .join(", ")}
+      </span>
     );
   };
+
+  const confirmClear = async () => {
+    if (!clearing || !userId) return;
+    try {
+      await usersApi.removePermission(userId, clearing.key);
+      notify(t("explorer.fix.cleared"), "success");
+      void reload();
+      void members.reload();
+    } catch (err) {
+      notify((err as { message?: string })?.message ?? t("exception.errors.save"), "error");
+    }
+    setClearing(null);
+  };
+
+  const confirmRemoveRole = async () => {
+    if (!removingRole || !userId) return;
+    const result = await members.removeFromRole(removingRole, userId);
+    notify(result.ok ? t("members.removed", { name: firstName }) : result.error ?? t("errors.removeMember"), result.ok ? "success" : "error");
+    setRemovingRole(null);
+  };
+
+  const addRoleItems: ITDropdownMenuItem[] = roles
+    .filter((role) => admin.rolesMeta.find((item) => item.key === role)?.active && !access?.roles.some((item) => item.key === role))
+    .map((role) => ({
+      id: role,
+      label: roleLabel(role),
+      onClick: async () => {
+        if (!userId) return;
+        const result = await members.addToRole(role, userId);
+        notify(result.ok ? t("members.added", { role: roleLabel(role) }) : result.error ?? t("errors.addMember"), result.ok ? "success" : "error");
+      },
+    }));
 
   return (
     <div className="grid items-start gap-3 lg:grid-cols-[240px_minmax(0,1fr)]">
@@ -140,7 +276,10 @@ export default function UserAccessExplorer({
               <button
                 key={member.id}
                 type="button"
-                onClick={() => onSelectUser(member.id)}
+                onClick={() => {
+                  onSelectUser(member.id);
+                  setSearch("");
+                }}
                 className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition ${
                   selected ? "border-[#0D5777]/40 !bg-[#0D5777]/5" : "border-transparent !bg-transparent hover:!bg-slate-50"
                 } ${member.active ? "" : "opacity-60"}`}
@@ -155,10 +294,7 @@ export default function UserAccessExplorer({
                   <span className="block truncate text-[10px] text-slate-400">{memberRoles(member).map(roleLabel).join(" · ")}</span>
                 </span>
                 {member.exceptions > 0 && (
-                  <span
-                    className="h-2 w-2 shrink-0 rounded-full bg-violet-500"
-                    title={t("members.exceptions", { count: member.exceptions })}
-                  />
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-violet-500" title={t("members.exceptions", { count: member.exceptions })} />
                 )}
               </button>
             );
@@ -190,6 +326,7 @@ export default function UserAccessExplorer({
 
         {userId && access && (
           <>
+            {/* Quién es y qué roles tiene */}
             <div className="flex flex-wrap items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D5777] text-[12px] font-black text-white">
                 {initialsOfName(access.user.name)}
@@ -198,9 +335,7 @@ export default function UserAccessExplorer({
                 <div className="flex flex-wrap items-center gap-1.5">
                   <h2 className="text-[15px] font-black text-slate-900">{access.user.name}</h2>
                   {!access.user.active && (
-                    <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-rose-600">
-                      {t("members.inactive")}
-                    </span>
+                    <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-rose-600">{t("members.inactive")}</span>
                   )}
                 </div>
                 <p className="truncate text-[11px] text-slate-500">
@@ -209,101 +344,216 @@ export default function UserAccessExplorer({
                   {access.user.department && <> · {access.user.department}</>}
                 </p>
               </div>
-              <div className="flex items-center gap-1.5">
-                <ITButton variant="filled" color="primary" size="sm" onClick={() => onTest(access.user.id)}>
-                  <span className="flex items-center gap-1 text-[11px] font-bold">
-                    <FaVial size={9} /> {t("explorer.test")}
-                  </span>
-                </ITButton>
-                <ITButton variant="outlined" color="primary" size="sm" onClick={() => navigate(`/users/${access.user.id}/edit`)}>
-                  <span className="flex items-center gap-1 text-[11px] font-bold">
-                    <FaExternalLinkAlt size={8} /> {t("explorer.openProfile")}
-                  </span>
-                </ITButton>
-              </div>
+              <ITButton variant="outlined" color="primary" size="sm" onClick={() => navigate(`/users/${access.user.id}/edit`)}>
+                <span className="flex items-center gap-1 text-[11px] font-bold">
+                  <FaExternalLinkAlt size={8} /> {t("explorer.openProfile")}
+                </span>
+              </ITButton>
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5">
+              <span className="mr-1 text-[11px] font-bold text-slate-500">{t("explorer.rolesLabel")}</span>
               {access.roles.map((role) => (
-                <RoleChip
-                  key={role.key}
-                  role={role.key}
-                  muted={!role.active}
-                  suffix={role.primary ? t("members.primary") : !role.active ? t("access.inactiveRole") : undefined}
-                  onClick={() => onOpenRole(role.key)}
-                />
-              ))}
-              {access.user.exceptions > 0 && (
-                <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-700">
-                  {t("members.exceptions", { count: access.user.exceptions })}
+                <span key={role.key} className="inline-flex items-center">
+                  <RoleChip
+                    role={role.key}
+                    muted={!role.active}
+                    suffix={role.primary ? t("members.primary") : !role.active ? t("access.inactiveRole") : undefined}
+                    onClick={() => onOpenRole(role.key)}
+                  />
+                  {!role.primary && (
+                    <button
+                      type="button"
+                      onClick={() => setRemovingRole(role.key)}
+                      title={t("explorer.removeRole")}
+                      className="-ml-1 flex h-5 w-5 items-center justify-center rounded-full !bg-transparent text-slate-400 hover:!bg-rose-50 hover:text-rose-600"
+                    >
+                      <FaTimes size={8} />
+                    </button>
+                  )}
                 </span>
-              )}
-              <span className="ml-auto">
-                <ITSegmentedControl
-                  size="sm"
-                  value={view}
-                  onChange={(value) => setView(value as View)}
-                  options={[
-                    { value: "permissions", label: t("explorer.view.permissions") },
-                    { value: "screens", label: t("explorer.view.screens") },
-                  ]}
+              ))}
+              {addRoleItems.length > 0 && (
+                <ITDropdownMenu
+                  placement="bottom-start"
+                  triggerLabel={t("explorer.addRole")}
+                  trigger={
+                    <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-[11px] font-bold text-slate-500 hover:border-[#0D5777] hover:text-[#0D5777]">
+                      <FaPlus size={8} /> {t("explorer.addRole")}
+                    </span>
+                  }
+                  items={addRoleItems}
                 />
-              </span>
+              )}
             </div>
 
-            {draftDirty && <p className="rounded-lg bg-amber-50 px-3 py-1.5 text-[11px] text-amber-800">{t("explorer.draftNote")}</p>}
+            <TabBar
+              size="sm"
+              value={section}
+              onChange={setSection}
+              items={[
+                { id: "permissions", label: t("explorer.section.permissions") },
+                { id: "screens", label: t("explorer.section.screens") },
+              ]}
+            />
 
-            {view === "permissions" && (
-              <div className="overflow-hidden rounded-lg border border-slate-200">
-                {groups.map(([module, permissions], groupIndex) => {
-                  const scope = (key: string) => byKey.get(key)?.effective ?? "NONE";
-                  const level = moduleLevel(permissions, scope);
-                  const coverage = moduleCoverage(permissions, scope);
-                  const open = expanded.has(module);
-                  return (
-                    <div key={module} className={groupIndex > 0 ? "border-t border-slate-200" : ""}>
-                      <button
-                        type="button"
-                        onClick={() => toggleModule(module)}
-                        className={`flex w-full items-center gap-2 px-3 py-2 text-left ${open ? "!bg-slate-50" : "!bg-white hover:!bg-slate-50/70"}`}
-                      >
-                        {open ? <FaChevronDown size={9} className="text-slate-400" /> : <FaChevronRight size={9} className="text-slate-400" />}
-                        <span className={`flex-1 text-[12px] font-bold ${level === "NONE" ? "text-slate-400" : "text-slate-800"}`}>{module}</span>
-                        <span className="w-28">
-                          <AccessLevelBadge level={level} />
-                        </span>
-                        <CoverageBar granted={coverage.granted} total={coverage.total} level={level} className="w-24" />
-                      </button>
-                      {open &&
-                        permissions.map((permission) => {
+            {section === "permissions" && (
+              <>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="min-w-[240px] flex-1">
+                    <ITInput
+                      name="explorer_question"
+                      size="sm"
+                      placeholder={t("explorer.questionPlaceholder", { name: firstName })}
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      iconLeft={<FaSearch size={11} />}
+                    />
+                  </div>
+                  {!searching && (
+                    <div className="flex items-center gap-1">
+                      {(
+                        [
+                          ["can", t("explorer.view.can", { count: canCount })],
+                          ["cannot", t("explorer.view.cannot", { count: active.length - canCount })],
+                          ["all", t("explorer.view.all")],
+                        ] as const
+                      ).map(([id, label]) => (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setView(id)}
+                          className={`rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
+                            view === id
+                              ? "border-[#0D5777] !bg-[#0D5777] text-white"
+                              : "border-slate-200 !bg-white text-slate-600 hover:border-slate-300"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {groups.length === 0 ? (
+                  <p className="py-8 text-center text-[12px] italic text-slate-400">
+                    {searching ? t("matrix.noResults") : view === "can" ? t("explorer.nothingCan") : t("explorer.nothingCannot")}
+                  </p>
+                ) : (
+                  <div className="overflow-hidden rounded-lg border border-slate-200">
+                    {groups.map(({ module, rows }, groupIndex) => (
+                      <div key={module} className={groupIndex > 0 ? "border-t border-slate-200" : ""}>
+                        <p className="bg-slate-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">{module}</p>
+                        {rows.map((permission) => {
                           const row = byKey.get(permission.key);
                           if (!row) return null;
                           const granted = row.effective !== "NONE";
+                          const items = fixItems(row, permission);
+                          const pending = pendingFor(permission.key);
                           return (
-                            <div key={permission.key} className="flex flex-wrap items-center gap-2 border-t border-slate-100 py-1.5 pl-8 pr-3">
-                              <VerbIcon permissionKey={permission.key} />
-                              <span className={`min-w-[160px] flex-1 text-[12px] font-semibold ${granted ? "text-slate-800" : "text-slate-400"}`}>
-                                {permission.name}
-                              </span>
-                              <ScopeChip scope={row.effective} scoped={isScopedPermission(permission)} />
-                              <div className="min-w-[140px]">{sources(row, permission)}</div>
+                            <div key={permission.key} className="flex flex-wrap items-center gap-2 border-t border-slate-100 px-3 py-1.5">
+                              {granted ? (
+                                <FaCheckCircle size={12} className="shrink-0 text-emerald-500" title={t("explorer.can")} />
+                              ) : (
+                                <FaBan size={12} className="shrink-0 text-slate-300" title={t("explorer.cannot")} />
+                              )}
+                              <div className="min-w-[200px] flex-1">
+                                <p className={`text-[12px] font-semibold ${granted ? "text-slate-800" : "text-slate-500"}`}>
+                                  {permission.name}
+                                  {granted && isScopedPermission(permission) && (
+                                    <span className="ml-1.5 align-middle">
+                                      <ScopeChip scope={row.effective} />
+                                    </span>
+                                  )}
+                                </p>
+                                <p className="text-[10px]">{sourceText(row, permission)}</p>
+                              </div>
+                              {pending && (
+                                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                                  {t("explorer.pending")}
+                                </span>
+                              )}
+                              {ruledActions.has(permission.key) && (
+                                <button
+                                  type="button"
+                                  onClick={() => onTest(access.user.id, permission.key)}
+                                  title={t("explorer.hasRulesHint")}
+                                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 !bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:border-[#0D5777] hover:text-[#0D5777]"
+                                >
+                                  <FaGavel size={8} /> {t("explorer.hasRules")}
+                                </button>
+                              )}
+                              {items.length > 0 && (
+                                <ITDropdownMenu
+                                  placement="bottom-end"
+                                  triggerLabel={granted ? t("explorer.fix.remove") : t("explorer.fix.give")}
+                                  trigger={
+                                    <span
+                                      className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-bold ${
+                                        granted
+                                          ? "border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-600"
+                                          : "border-[#0D5777]/30 text-[#0D5777] hover:border-[#0D5777]"
+                                      }`}
+                                    >
+                                      {granted ? t("explorer.fix.remove") : t("explorer.fix.give")}
+                                      <FaChevronDown size={7} />
+                                    </span>
+                                  }
+                                  items={items}
+                                />
+                              )}
                             </div>
                           );
                         })}
-                    </div>
-                  );
-                })}
-              </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-[10px] text-slate-400">{t("explorer.howResolved")}</p>
+              </>
             )}
 
-            {view === "screens" && (
+            {section === "screens" && (
               <div className="grid items-start gap-3 lg:grid-cols-[230px_minmax(0,1fr)]">
                 <SidebarPreview permissions={effective} role={access.user.role} title={access.user.name} />
                 <ScreensAccessList permissions={effective} role={access.user.role} catalog={catalog} />
               </div>
             )}
 
-            <p className="text-[10px] text-slate-400">{t("explorer.howResolved")}</p>
+            <ExceptionDialog
+              isOpen={exception !== null}
+              userId={access.user.id}
+              personName={access.user.name}
+              permission={exception?.permission ?? null}
+              mode={exception?.mode ?? "grant"}
+              onClose={() => setException(null)}
+              onSaved={(message) => {
+                notify(message, "success");
+                void reload();
+                void members.reload();
+              }}
+            />
+
+            <ITConfirmDialog
+              isOpen={clearing !== null}
+              onClose={() => setClearing(null)}
+              onConfirm={confirmClear}
+              title={t("explorer.fix.clearTitle")}
+              message={t("explorer.fix.clearConfirm", { permission: clearing?.name ?? "", name: firstName })}
+              confirmLabel={t("explorer.fix.clearException")}
+            />
+
+            <ITConfirmDialog
+              isOpen={removingRole !== null}
+              onClose={() => setRemovingRole(null)}
+              onConfirm={confirmRemoveRole}
+              loading={members.busy}
+              variant="danger"
+              title={t("members.removeTitle")}
+              message={t("members.removeConfirm", { name: access.user.name, role: removingRole ? roleLabel(removingRole) : "" })}
+              confirmLabel={t("members.remove")}
+            />
           </>
         )}
       </div>

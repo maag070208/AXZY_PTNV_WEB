@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { ITAlert, ITButton } from "@axzydev/axzy_ui_system";
-import { FaCheckCircle, FaEdit, FaGavel, FaLock, FaPlus, FaVial } from "react-icons/fa";
+import { ITAlert, ITButton, ITSlideToggle } from "@axzydev/axzy_ui_system";
+import { FaArrowDown, FaArrowUp, FaCheckCircle, FaEdit, FaLightbulb, FaLock, FaPlus, FaVial } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PolicyAdmin } from "@entities/permission";
 import { LottieLoader } from "@shared/ui/lottie-loader";
@@ -15,13 +15,14 @@ interface Props {
 }
 
 /**
- * Pestaña "Políticas" (ABAC): por acción, las reglas en el orden en que se
- * evalúan, en lenguaje natural, con el paso final implícito ("si ninguna casa,
- * se permite"). Crear, editar y probar sin tocar código.
+ * Pestaña "Reglas" (ABAC). Cada acción se lee como una historia: "Quien pueda
+ * aprobar órdenes de compra… 1. Si es ADMIN → puede. 2. Si la orden la creó la
+ * misma persona → no puede. En cualquier otro caso → puede". Las reglas se
+ * activan con un interruptor y se reordenan con flechas.
  */
 export default function PoliciesPanel({ policies, onTest, notify }: Props) {
   const { t } = useTranslation("roles");
-  const { data, loading, error, saving, create, update, remove } = policies;
+  const { data, loading, error, saving, create, update, remove, setActive, move } = policies;
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<PolicyAdmin | null>(null);
   const [newForAction, setNewForAction] = useState<string | null>(null);
@@ -35,6 +36,12 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
       rules: data.policies.filter((policy) => policy.action === key).sort((a, b) => a.priority - b.priority),
     }));
   }, [data]);
+
+  const openNew = (action: string | null) => {
+    setEditing(null);
+    setNewForAction(action);
+    setEditorOpen(true);
+  };
 
   const handleSubmit = async (submit: PolicySubmit): Promise<boolean> => {
     const result =
@@ -50,6 +57,11 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
     const result = await remove(id);
     notify(result.ok ? t("policies.deleted") : result.error ?? t("policies.saveError"), result.ok ? "success" : "error");
     return result.ok;
+  };
+
+  const runQuick = async (promise: Promise<{ ok: boolean; error?: string }>) => {
+    const result = await promise;
+    if (!result.ok) notify(result.error ?? t("policies.saveError"), "error");
   };
 
   if (loading && !data) {
@@ -70,115 +82,117 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-3xl text-[11px] text-slate-500">{t("policies.subtitle")}</p>
-        <ITButton
-          variant="filled"
-          color="primary"
-          size="sm"
-          onClick={() => {
-            setEditing(null);
-            setNewForAction(null);
-            setEditorOpen(true);
-          }}
-        >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex max-w-3xl items-start gap-2 rounded-lg bg-amber-50 px-3 py-2">
+          <FaLightbulb size={12} className="mt-0.5 shrink-0 text-amber-500" />
+          <p className="text-[11px] leading-relaxed text-amber-900">{t("policies.explainer")}</p>
+        </div>
+        <ITButton variant="filled" color="primary" size="sm" onClick={() => openNew(null)}>
           <span className="flex items-center gap-1.5 text-[11px] font-bold">
-            <FaPlus size={11} /> {t("policies.new")}
+            <FaPlus size={10} /> {t("policies.new")}
           </span>
         </ITButton>
       </div>
 
-      <div className="grid items-start gap-3 xl:grid-cols-2">
-        {grouped.map(({ key, action, rules }) => (
-          <div key={key} className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-3 py-2">
-              <div className="flex min-w-0 items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0D5777]/10 text-[#0D5777]">
-                  <FaGavel size={11} />
+      {grouped.map(({ key, action, rules }) => (
+        <div key={key} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-3 py-2">
+            <p className="text-[12px] text-slate-600">
+              {t("policies.story.whoCan")} <b className="text-slate-900">{(action?.label ?? key).toLowerCase()}</b>
+              {action && <span className="text-slate-400"> · {action.module}</span>}
+            </p>
+            <span className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => openNew(key)}
+                className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-white px-2 py-1 text-[10px] font-bold text-[#0D5777] hover:border-[#0D5777]"
+              >
+                <FaPlus size={8} /> {t("policies.addRule")}
+              </button>
+              <button
+                type="button"
+                onClick={() => onTest(key)}
+                className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-white px-2 py-1 text-[10px] font-bold text-[#0D5777] hover:border-[#0D5777]"
+              >
+                <FaVial size={9} /> {t("simulator.test")}
+              </button>
+            </span>
+          </div>
+
+          <ol className="divide-y divide-slate-100">
+            {rules.map((policy, index) => (
+              <li
+                key={policy.id}
+                className={`flex flex-wrap items-center gap-2 px-3 py-2 ${policy.active ? "" : "bg-slate-50/60"}`}
+              >
+                <span
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
+                    policy.active ? "bg-[#0D5777] text-white" : "bg-slate-200 text-slate-500"
+                  }`}
+                >
+                  {index + 1}
                 </span>
-                <div className="min-w-0">
-                  <p className="truncate text-[12px] font-black text-slate-800">{action?.label ?? key}</p>
-                  <p className="font-mono text-[10px] text-slate-400">
-                    {key}
-                    {action && <> · {action.module}</>}
+                <div className={`min-w-[260px] flex-1 ${policy.active ? "" : "opacity-50"}`}>
+                  <PolicySentence policy={policy} action={action} />
+                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-slate-400">
+                    {policy.key && <FaLock size={7} />}
+                    {policy.name}
+                    {!policy.active && <span className="font-bold text-amber-600"> · {t("policies.inactive")}</span>}
                   </p>
                 </div>
-              </div>
-              <span className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditing(null);
-                    setNewForAction(key);
-                    setEditorOpen(true);
-                  }}
-                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-white px-2 py-1 text-[10px] font-bold text-[#0D5777] hover:border-[#0D5777]"
-                >
-                  <FaPlus size={8} /> {t("policies.addRule")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onTest(key)}
-                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-white px-2 py-1 text-[10px] font-bold text-[#0D5777] hover:border-[#0D5777]"
-                >
-                  <FaVial size={9} /> {t("simulator.test")}
-                </button>
-              </span>
-            </div>
-            <ol className="flex flex-1 flex-col gap-0 px-3 py-2">
-              {rules.length === 0 && (
-                <li className="py-2 text-[11px] italic text-slate-400">{t("policies.noRulesForAction")}</li>
-              )}
-              {rules.map((policy, index) => (
-                <li key={policy.id} className="relative flex gap-2 pb-2">
-                  <span className="absolute left-[9px] top-5 h-[calc(100%-14px)] w-px bg-slate-200" />
-                  <span
-                    className={`z-10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${
-                      policy.active ? "bg-[#0D5777] text-white" : "bg-slate-200 text-slate-500"
-                    }`}
+                <span className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    disabled={saving || index === 0}
+                    onClick={() => void runQuick(move(rules, index, -1))}
+                    title={t("policies.moveUp")}
+                    className="flex h-6 w-6 items-center justify-center rounded-md !bg-transparent text-slate-400 hover:!bg-slate-100 hover:text-slate-700 disabled:opacity-30"
                   >
-                    {index + 1}
+                    <FaArrowUp size={9} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={saving || index === rules.length - 1}
+                    onClick={() => void runQuick(move(rules, index, 1))}
+                    title={t("policies.moveDown")}
+                    className="flex h-6 w-6 items-center justify-center rounded-md !bg-transparent text-slate-400 hover:!bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                  >
+                    <FaArrowDown size={9} />
+                  </button>
+                  <span title={policy.active ? t("policies.turnOff") : t("policies.turnOn")}>
+                    <ITSlideToggle
+                      size="sm"
+                      activeColor="#0D5777"
+                      isOn={policy.active}
+                      disabled={saving}
+                      onToggle={(active) => void runQuick(setActive(policy, active))}
+                    />
                   </span>
-                  <div className={`min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 ${policy.active ? "" : "opacity-60"}`}>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[11px] font-bold text-slate-800">{policy.name}</span>
-                      <span className="rounded bg-slate-100 px-1.5 text-[9px] font-black text-slate-500">
-                        {t("policies.priorityShort", { priority: policy.priority })}
-                      </span>
-                      {policy.key && (
-                        <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 text-[9px] font-black text-slate-500">
-                          <FaLock size={7} /> {t("policies.basePolicy")}
-                        </span>
-                      )}
-                      {!policy.active && <span className="text-[10px] font-bold text-amber-600">{t("policies.inactive")}</span>}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditing(policy);
-                          setEditorOpen(true);
-                        }}
-                        className="ml-auto inline-flex items-center gap-1 !bg-transparent text-[10px] font-bold text-[#0D5777] hover:underline"
-                      >
-                        <FaEdit size={9} /> {t("policies.edit")}
-                      </button>
-                    </div>
-                    <div className="mt-1">
-                      <PolicySentence policy={policy} action={action} />
-                    </div>
-                    {policy.description && <p className="mt-1 text-[10px] text-slate-400">{policy.description}</p>}
-                  </div>
-                </li>
-              ))}
-              <li className="flex items-center gap-2">
-                <span className="z-10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                  <FaCheckCircle size={11} />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditing(policy);
+                      setEditorOpen(true);
+                    }}
+                    title={t("policies.edit")}
+                    className="flex h-6 w-6 items-center justify-center rounded-md !bg-transparent text-[#0D5777] hover:!bg-[#0D5777]/10"
+                  >
+                    <FaEdit size={10} />
+                  </button>
                 </span>
-                <span className="text-[10px] font-semibold text-slate-500">{t("policies.fallback")}</span>
               </li>
-            </ol>
-          </div>
-        ))}
-      </div>
+            ))}
+            <li className="flex items-center gap-2 px-3 py-2">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <FaCheckCircle size={10} />
+              </span>
+              <span className="text-[11px] text-slate-500">
+                {rules.length === 0 ? t("policies.story.noRules") : t("policies.story.otherwise")}
+              </span>
+            </li>
+          </ol>
+        </div>
+      ))}
 
       <PolicyEditorDialog
         isOpen={editorOpen}
