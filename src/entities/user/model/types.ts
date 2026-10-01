@@ -1,20 +1,7 @@
-import i18n from "@shared/i18n";
 import type { AppLanguage } from "@shared/i18n/config";
 
-export type UserRole =
-  | "ADMIN"
-  | "MANAGER"
-  | "AREA_HEAD"
-  | "EMPLOYEE"
-  | "HUMAN_RESOURCES"
-  | "CHEF"
-  | "GUARD";
-
-export const USER_ROLES: UserRole[] = ["ADMIN", "MANAGER", "AREA_HEAD", "EMPLOYEE", "HUMAN_RESOURCES", "CHEF", "GUARD"];
-
-/** Etiqueta visible de un rol, en el idioma de la interfaz (`roles:role.*`). */
-export const roleLabel = (role: string): string =>
-  i18n.t(`roles:role.${role as UserRole}`, { defaultValue: role });
+/** Clave del rol (dinámico, tabla `roles` de la API). Antes era un union fijo. */
+export type UserRole = string;
 
 export interface AuthUser {
   id: string;
@@ -22,6 +9,8 @@ export interface AuthUser {
   email?: string | null;
   name: string;
   role: UserRole;
+  /** Roles efectivos: principal + adicionales (`GET /auth/me` y login). */
+  roles?: UserRole[];
   departmentId?: string | null;
   /**
    * Permisos efectivos del usuario (`GET /auth/me`): clave → alcance, solo los
@@ -35,6 +24,29 @@ export interface AuthUser {
 
 /** Alcance efectivo de un permiso (ver ROLES_Y_PERMISOS.md §2). */
 export type PermissionScope = "NONE" | "OWN" | "AREA" | "ALL";
+
+/** Excepción de permiso por empleado (Fase 2), tal como la devuelve el API. */
+export interface UserPermissionView {
+  permission: string;
+  module: string;
+  name: string;
+  scopes: PermissionScope[];
+  sensitive: boolean;
+  roleScope: PermissionScope;
+  effective: PermissionScope;
+  exception: {
+    scope: PermissionScope;
+    reason: string | null;
+    expiresAt: string | null;
+    grantedById: string | null;
+  } | null;
+}
+
+export interface SetPermissionExceptionInput {
+  scope: PermissionScope;
+  reason?: string;
+  expiresAt?: string | null;
+}
 
 /**
  * Clave del catálogo dinámico de permisos del API (`GET /permissions/catalog`).
@@ -56,11 +68,14 @@ export interface AuthMe extends AuthUser {
 
 export interface LoginResponse {
   token: string;
+  refreshToken?: string;
   user: AuthUser;
 }
 
 export interface User extends AuthUser {
   active: boolean;
+  /** Roles adicionales (multi-rol). El principal está en `role`. */
+  extraRoles?: Array<{ role: string }>;
   middleName?: string | null;
   paternalSurname?: string | null;
   maternalSurname?: string | null;

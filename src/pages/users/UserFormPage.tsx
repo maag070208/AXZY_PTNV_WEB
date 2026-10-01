@@ -77,6 +77,8 @@ export default function UserFormPage() {
     selectedDept: userForm.selectedDept,
     roleGuidance: userForm.roleGuidance,
     roleOptions: userForm.ROLE_OPTIONS,
+    extraRoleOptions: userForm.EXTRA_ROLE_OPTIONS,
+    onToggleExtraRole: userForm.toggleExtraRole,
     requiredDocs: userForm.requiredDocs,
     docsFiles: userForm.docsFiles,
     onPickDoc: userForm.setDocFile,

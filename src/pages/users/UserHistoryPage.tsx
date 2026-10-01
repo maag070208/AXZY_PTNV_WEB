@@ -8,12 +8,15 @@ import {
   UserHistoryTimeline,
   useUserHistory,
 } from "@features/user/user-history";
+import { UserPermissionsPanel } from "@features/user/user-permissions";
+import { usePermission } from "@entities/user";
 import { i18n } from "@shared/i18n";
 
 export default function UserHistoryPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["users", "common"]);
+  const canManagePermissions = usePermission("users.permissions") !== "NONE";
 
   const { user, history, loading } = useUserHistory(id);
 
@@ -67,6 +70,7 @@ export default function UserHistoryPage() {
       ]}
     >
       <UserHeaderCard user={user} />
+      {canManagePermissions && id && <UserPermissionsPanel userId={id} />}
       <UserHistoryTimeline history={history} />
     </ITPage>
   );

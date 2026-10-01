@@ -18,6 +18,8 @@ export default function EmployeesListPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
   const navigate = useNavigate();
   const canEditEmployees = useCan("hr.records");
+  // El alta crea la cuenta (`POST /users`): la API exige `users.create`.
+  const canCreateEmployees = useCan("users.create");
 
   const list = useEmployeesList();
 
@@ -32,7 +34,7 @@ export default function EmployeesListPage() {
         { label: tt("breadcrumb") },
       ]}
       actions={
-        canEditEmployees ? (
+        canCreateEmployees ? (
           <ITButton
             variant="filled"
             color="primary"

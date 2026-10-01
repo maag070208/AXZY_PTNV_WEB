@@ -86,6 +86,13 @@ export interface AppScreen {
   readonly requirement?: ScreenRequirement;
   /** Regla fija: solo este rol la ve, sin importar permisos. */
   readonly fixedRole?: UserRole;
+  /**
+   * Permisos de las acciones de la pantalla (botones). Si se omite, se derivan
+   * del catálogo: los demás permisos del mismo recurso que el requisito
+   * (`devices.view` → `devices.create/edit/delete`). Se declaran solo cuando la
+   * pantalla usa permisos de otro recurso o no tiene requisito.
+   */
+  readonly actions?: readonly Permission[];
   readonly children?: readonly AppScreen[];
 }
 
@@ -100,7 +107,7 @@ export const APP_SCREENS: readonly AppScreen[] = [
     id: "tasks",
     labelKey: "nav.tasks",
     children: [
-      { id: "tickets", labelKey: "nav.tickets", path: "/tickets", excludes: ["/tickets/tasks", "/tickets/my-tasks"] },
+      { id: "tickets", labelKey: "nav.tickets", path: "/tickets", excludes: ["/tickets/tasks", "/tickets/my-tasks"], actions: ["tickets.create", "tickets.edit", "tickets.close", "tickets.delete"] },
       { id: "adminTasks", labelKey: "nav.adminTasks", path: "/tickets/tasks", requirement: { anyOf: ["tasks.complete"] } },
       { id: "myTasks", labelKey: "nav.myTasks", path: "/tickets/my-tasks", fixedRole: "EMPLOYEE" },
     ],
@@ -109,7 +116,7 @@ export const APP_SCREENS: readonly AppScreen[] = [
     id: "inventory",
     labelKey: "nav.inventory",
     children: [
-      { id: "inventoryDashboard", labelKey: "nav.inventoryOverview", path: "/inventory", match: "exact", requirement: { anyOf: ["devices.view"] } },
+      { id: "inventoryDashboard", labelKey: "nav.inventoryOverview", path: "/inventory", match: "exact", requirement: { anyOf: ["devices.view"] }, actions: ["inventory.audit"] },
       { id: "devices", labelKey: "nav.devices", path: "/inventory/devices", requirement: { anyOf: ["devices.view"] } },
       { id: "reports", labelKey: "nav.reports", path: "/reports", requirement: { anyOf: ["reports.view"] } },
       { id: "movements", labelKey: "nav.movements", path: "/inventory/movements", requirement: { anyOf: ["devices.view"] } },
@@ -138,31 +145,31 @@ export const APP_SCREENS: readonly AppScreen[] = [
           { id: "kitchenSuppliers", labelKey: "nav.kitchenSuppliers", path: "/kitchen/suppliers" },
         ],
       },
-      { id: "kitchenCatalog", labelKey: "nav.kitchenCatalog", path: "/kitchen/catalog", requirement: { anyOf: ["kitchen.manage"] } },
+      { id: "kitchenCatalog", labelKey: "nav.kitchenCatalog", path: "/kitchen/catalog", requirement: { anyOf: ["kitchen.manage"] }, actions: [] },
     ],
   },
   {
     id: "hr",
     labelKey: "nav.hr",
     children: [
-      { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] } },
-      { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] } },
-      { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] } },
+      { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] }, actions: ["users.create"] },
+      { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] }, actions: [] },
+      { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] }, actions: ["hr.disciplinary_reports"] },
       {
         id: "access",
         labelKey: "nav.access",
         children: [
-          { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] } },
-          { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] } },
+          { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] }, actions: ["access.void"] },
+          { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] }, actions: [] },
         ],
       },
       {
         id: "timeClock",
         labelKey: "nav.timeClock",
         children: [
-          { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
-          { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] } },
-          { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] } },
+          { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.sync"] },
+          { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] }, actions: [] },
+          { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.link"] },
         ],
       },
       {
@@ -276,4 +283,25 @@ export const referencedPermissions = (): Set<Permission> => {
   };
   walk(APP_SCREENS);
   return keys;
+};
+
+/**
+ * Permisos de las acciones de una pantalla: los declarados en `actions` o, si
+ * no hay, los demás permisos del mismo recurso que su requisito, tomados del
+ * catálogo (así un permiso nuevo como `devices.export` aparece solo).
+ */
+export const screenActions = (screen: AppScreen, catalogKeys: readonly Permission[]): Permission[] => {
+  if (screen.actions) return [...screen.actions];
+  if (!screen.requirement) return [];
+  const required = "allOf" in screen.requirement ? screen.requirement.allOf : screen.requirement.anyOf;
+  const resources = new Set(required.map((key) => key.slice(0, key.indexOf("."))));
+  return catalogKeys.filter(
+    (key) => !required.includes(key) && resources.has(key.slice(0, key.indexOf(".")))
+  );
+};
+
+/** Permisos que exige ver la pantalla (vacío = cualquier sesión). */
+export const screenRequirementKeys = (screen: AppScreen): Permission[] => {
+  if (!screen.requirement) return [];
+  return [...("allOf" in screen.requirement ? screen.requirement.allOf : screen.requirement.anyOf)];
 };

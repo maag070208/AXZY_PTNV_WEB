@@ -12,8 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
-import { logout, meThunk } from "@entities/user";
-import { APP_SCREENS, isScreenVisible, type AppScreen } from "@entities/permission";
+import { logout, meThunk, setRolesCatalog } from "@entities/user";
+import { APP_SCREENS, isScreenVisible, permissionApi, type AppScreen } from "@entities/permission";
 import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
 import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
@@ -75,6 +75,22 @@ export default function PrivateRoutes() {
   useEffect(() => {
     if (token) dispatch(meThunk());
   }, [token, dispatch]);
+
+  // Catálogo de roles dinámico (nombres, `staff`, activo): la web lo usa para
+  // etiquetas y selectores. Se refresca al volver a la ventana, igual que la
+  // sesión, para que un rol nuevo o renombrado aplique sin relogin.
+  useEffect(() => {
+    if (!token) return undefined;
+    const loadRoles = () => {
+      void permissionApi
+        .listRoles()
+        .then(setRolesCatalog)
+        .catch(() => undefined);
+    };
+    loadRoles();
+    window.addEventListener("focus", loadRoles);
+    return () => window.removeEventListener("focus", loadRoles);
+  }, [token]);
 
   // La interfaz sigue el idioma del sistema que trae la sesión.
   useEffect(() => {

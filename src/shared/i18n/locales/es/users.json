@@ -76,7 +76,33 @@
     "subarea": "Subárea",
     "roleGuide": "Guía del rol",
     "passwordEditHint": "En edición, deja la contraseña vacía para conservarla.",
+    "extraRoles": "Roles adicionales",
+    "extraRolesHint": "Además del rol principal, esta persona puede tener otros roles. Sus permisos son la unión de todos (gana el alcance mayor).",
+    "permissions": {
+      "title": "Permisos de esta persona",
+      "subtitle": "Además de lo que le da su rol, puedes subir, bajar o quitar un permiso solo para esta persona. La excepción reemplaza al rol.",
+      "followRole": "Según su rol",
+      "roleScope": "Rol: {{scope}}",
+      "hasException": "Excepción",
+      "dialogTitle": "Excepción: {{permission}}",
+      "dialogIntro": "Se aplicará el alcance {{scope}} solo para esta persona.",
+      "reason": "Motivo (opcional)",
+      "reasonPlaceholder": "Cubre al jefe, decisión de gerencia…",
+      "expiresAt": "Vence el (opcional)",
+      "saved": "Excepción guardada",
+      "removed": "Excepción eliminada",
+      "loadError": "No se pudieron cargar los permisos",
+      "saveError": "No se pudo guardar la excepción"
+    },
     "roles": {
+      "GENERIC": {
+        "title": "Rol personalizado",
+        "summary": "Rol creado desde la pantalla de Roles y permisos. Lo que puede hacer depende de los permisos que le haya dado el administrador.",
+        "actions": [
+          "Su alcance lo definen los permisos del rol",
+          "El administrador lo ajusta en Roles y permisos"
+        ]
+      },
       "ADMIN": {
         "title": "Administrador del sistema",
         "summary": "Control total de catálogos, usuarios, dispositivos, tickets y reportes.",

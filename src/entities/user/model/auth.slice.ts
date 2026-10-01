@@ -9,6 +9,7 @@ import i18n from "@shared/i18n";
 
 interface State {
   token: string | null;
+  refreshToken: string | null;
   user: AuthUser | null;
   loading: boolean;
   error: string | null;
@@ -29,6 +30,7 @@ const loadInitial = (): State => {
 
 const defaultState = (): State => ({
   token: null,
+  refreshToken: null,
   user: null,
   loading: false,
   error: null,
@@ -71,8 +73,15 @@ const slice = createSlice({
   reducers: {
     logout(state) {
       state.token = null;
+      state.refreshToken = null;
       state.user = null;
       state.error = null;
+      persist(state);
+    },
+    /** Actualiza los tokens (p. ej. tras un refresh) sin tocar al usuario. */
+    setTokens(state, action: PayloadAction<{ token: string; refreshToken?: string }>) {
+      state.token = action.payload.token;
+      if (action.payload.refreshToken) state.refreshToken = action.payload.refreshToken;
       persist(state);
     },
   },
@@ -85,6 +94,7 @@ const slice = createSlice({
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken ?? null;
         state.user = action.payload.user;
         persist(state);
       })
@@ -99,5 +109,5 @@ const slice = createSlice({
   },
 });
 
-export const { logout } = slice.actions;
+export const { logout, setTokens } = slice.actions;
 export default slice.reducer;

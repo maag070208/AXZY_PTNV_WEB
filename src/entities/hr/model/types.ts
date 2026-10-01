@@ -6,7 +6,8 @@ export interface Gender {
   active: boolean;
 }
 
-export type PersonalRole = "MANAGER" | "AREA_HEAD" | "EMPLOYEE";
+/** Claves de los roles de personal (dinámicos, `staff` en `/roles`). */
+export type PersonalRole = string;
 
 export interface PersonalStats {
   total: number;

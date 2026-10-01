@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
-import { USER_ROLES, roleLabel, usersApi, type User, type UserRole } from "@entities/user";
+import { isStaffRole, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
@@ -14,6 +14,11 @@ export const ROLE_GUIDANCE: Record<
   UserRole,
   { title: string; summary: string; actions: string[] }
 > = {
+  GENERIC: {
+    title: "form.roles.GENERIC.title",
+    summary: "form.roles.GENERIC.summary",
+    actions: ["form.roles.GENERIC.actions.0", "form.roles.GENERIC.actions.1"],
+  },
   ADMIN: {
     title: "form.roles.ADMIN.title",
     summary: "form.roles.ADMIN.summary",
@@ -64,6 +69,8 @@ export interface UserFormValues {
   paternalSurname: string;
   maternalSurname: string;
   role: UserRole;
+  /** Roles adicionales (multi-rol). El principal es `role`. */
+  roles: string[];
   employeeNumber: string;
   jobTitle: string;
   departmentId: string;
@@ -127,6 +134,7 @@ export const useUserForm = () => {
   const isEdit = Boolean(id);
   const { t: tt } = useTranslation(["users", "common"]);
   const dispatch = useDispatch<AppDispatch>();
+  const rolesCatalog = useRolesCatalog();
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [form, setForm] = useState<UserFormValues>({
@@ -138,6 +146,7 @@ export const useUserForm = () => {
     paternalSurname: "",
     maternalSurname: "",
     role: "EMPLOYEE",
+    roles: [],
     employeeNumber: "",
     jobTitle: "",
     departmentId: "",
@@ -181,6 +190,7 @@ export const useUserForm = () => {
             paternalSurname: u.paternalSurname ?? nameParts.paternalSurname ?? "",
             maternalSurname: u.maternalSurname ?? nameParts.maternalSurname ?? "",
             role: u.role,
+            roles: (u.extraRoles ?? []).map((extra) => extra.role),
             employeeNumber: u.employeeNumber ?? "",
             jobTitle: u.jobTitle ?? "",
             departmentId: u.departmentId ?? "",
@@ -196,8 +206,8 @@ export const useUserForm = () => {
 
   const selectedDept = departments.find((d) => d.id === form.departmentId);
 
-  /** En el alta de un empleado se exigen los documentos obligatorios. */
-  const requiresDocs = !isEdit && form.role === "EMPLOYEE";
+  /** En el alta de un rol con expediente (personal) se exigen los documentos obligatorios. */
+  const requiresDocs = !isEdit && isStaffRole(form.role);
   // Los obligatorios los marca RH en el catálogo de documentos (`required`).
   const requiredDocs = documentTypes
     .filter((d) => d.required && d.active)
@@ -205,10 +215,11 @@ export const useUserForm = () => {
   const setDocFile = (key: string, file: File | null) =>
     setDocsFiles((prev) => ({ ...prev, [key]: file }));
   const missingDocs = requiredDocs.filter((d) => !docsFiles[d.key]);
+  const guidance = ROLE_GUIDANCE[form.role] ?? ROLE_GUIDANCE.GENERIC;
   const roleGuidance = {
-    title: dyn(tt)(ROLE_GUIDANCE[form.role].title),
-    summary: dyn(tt)(ROLE_GUIDANCE[form.role].summary),
-    actions: ROLE_GUIDANCE[form.role].actions.map((a) => dyn(tt)(a)),
+    title: dyn(tt)(guidance.title),
+    summary: dyn(tt)(guidance.summary),
+    actions: guidance.actions.map((a) => dyn(tt)(a)),
   };
 
   const handleField = (field: keyof UserFormValues, value: string) => {
@@ -275,17 +286,27 @@ export const useUserForm = () => {
   };
 
   const handleBlur = (field: keyof UserFormValues) => {
-    setFieldError(field, validateField(field, form[field] ?? ""));
+    setFieldError(field, validateField(field, String(form[field] ?? "")));
   };
 
   const handleDepartmentChange = (value: string) => {
     setForm((f) => ({ ...f, departmentId: value, subareaId: "" }));
   };
 
+  /** Alterna un rol adicional (multi-rol). El principal no se repite aquí. */
+  const toggleExtraRole = (role: string, checked: boolean) => {
+    setForm((f) => ({
+      ...f,
+      roles: checked
+        ? [...new Set([...f.roles, role])]
+        : f.roles.filter((item) => item !== role),
+    }));
+  };
+
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     for (const field of VALIDATED_FIELDS) {
-      const err = validateField(field, form[field] ?? "");
+      const err = validateField(field, String(form[field] ?? ""));
       if (err) e[field] = err;
     }
     setErrors(e);
@@ -299,7 +320,7 @@ export const useUserForm = () => {
       for (const field of VALIDATED_FIELDS) {
         if (FIELD_STEP[field] !== step) continue;
         if (withErrors.has(field)) return step;
-        if (validateField(field, form[field] ?? "")) return step;
+        if (validateField(field, String(form[field] ?? ""))) return step;
       }
     }
     if (requiresDocs && missingDocs.length > 0) return 3;
@@ -325,6 +346,7 @@ export const useUserForm = () => {
           paternalSurname: form.paternalSurname || null,
           maternalSurname: form.maternalSurname || null,
           role: form.role,
+          roles: form.roles.filter((r) => r !== form.role),
           employeeNumber: form.employeeNumber || undefined,
           jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
@@ -340,6 +362,7 @@ export const useUserForm = () => {
           paternalSurname: form.paternalSurname || undefined,
           maternalSurname: form.maternalSurname || undefined,
           role: form.role,
+          roles: form.roles.filter((r) => r !== form.role),
           employeeNumber: form.employeeNumber || undefined,
           jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
@@ -387,6 +410,7 @@ export const useUserForm = () => {
     handleField,
     handleBlur,
     handleDepartmentChange,
+    toggleExtraRole,
     selectedDept,
     roleGuidance,
     loading,
@@ -403,6 +427,11 @@ export const useUserForm = () => {
     setDocFile,
     docsError,
     tt,
-    ROLE_OPTIONS: USER_ROLES.map((value) => ({ value, label: roleLabel(value) })),
+    ROLE_OPTIONS: rolesCatalog
+      .filter((role) => role.active)
+      .map((role) => ({ value: role.key, label: role.name })),
+    EXTRA_ROLE_OPTIONS: rolesCatalog
+      .filter((role) => role.active && role.key !== form.role)
+      .map((role) => ({ value: role.key, label: role.name })),
   };
 };

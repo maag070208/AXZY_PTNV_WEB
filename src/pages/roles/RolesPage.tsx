@@ -1,21 +1,16 @@
 import { useEffect } from "react";
-import { ITPage } from "@axzydev/axzy_ui_system";
-import { FaUserShield } from "react-icons/fa";
+import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { FaPlus, FaQuestionCircle, FaUserShield } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
-import { RolesPermissionsTabs } from "@features/roles";
+import { RolesWorkspace, useRolesWorkspace } from "@features/roles/roles-console";
 
-export default function RolesPage() {
+/** Consola de control de acceso: roles, matriz, acceso por persona, políticas, catálogo y actividad. */
+function RolesConsole() {
   const navigate = useNavigate();
   const { t } = useTranslation(["roles", "common"]);
-  const canAdminRoles = useCan("roles.manage");
-
-  useEffect(() => {
-    if (!canAdminRoles) navigate("/", { replace: true });
-  }, [canAdminRoles, navigate]);
-
-  if (!canAdminRoles) return null;
+  const workspace = useRolesWorkspace();
 
   return (
     <ITPage
@@ -28,8 +23,34 @@ export default function RolesPage() {
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("title") },
       ]}
+      actions={
+        <div className="flex items-center gap-2">
+          <ITButton variant="outlined" color="secondary" onClick={() => workspace.setHelpOpen(true)}>
+            <span className="flex items-center gap-1.5 text-[11px] font-bold">
+              <FaQuestionCircle size={12} /> {t("help.open")}
+            </span>
+          </ITButton>
+          <ITButton variant="filled" color="primary" onClick={workspace.openCreateRole}>
+            <span className="flex items-center gap-1.5 text-[11px] font-bold">
+              <FaPlus size={11} /> {t("access.newRole")}
+            </span>
+          </ITButton>
+        </div>
+      }
     >
-      <RolesPermissionsTabs />
+      <RolesWorkspace workspace={workspace} />
     </ITPage>
   );
+}
+
+export default function RolesPage() {
+  const navigate = useNavigate();
+  const canAdminRoles = useCan("roles.manage");
+
+  useEffect(() => {
+    if (!canAdminRoles) navigate("/", { replace: true });
+  }, [canAdminRoles, navigate]);
+
+  if (!canAdminRoles) return null;
+  return <RolesConsole />;
 }

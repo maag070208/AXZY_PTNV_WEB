@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer, { logout } from "@entities/user";
+import authReducer, { logout, setTokens } from "@entities/user";
 import ticketsReducer from "@entities/ticket";
 import notificationsReducer from "@entities/notification";
 import toastReducer from "@app/toast/toast.slice";
@@ -16,7 +16,9 @@ export const store = configureStore({
 
 setSessionHooks(
   () => store.getState().auth.token,
-  () => store.dispatch(logout())
+  () => store.dispatch(logout()),
+  () => store.getState().auth.refreshToken,
+  (tokens) => store.dispatch(setTokens(tokens))
 );
 
 export type RootState = ReturnType<typeof store.getState>;

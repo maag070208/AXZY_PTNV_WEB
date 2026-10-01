@@ -12,7 +12,7 @@ import type {
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaEye, FaKey, FaTrash, FaUndo } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { USER_ROLES, roleLabel, type User } from "@entities/user";
+import { roleLabel, useRolesCatalog, type User } from "@entities/user";
 import type { UseUsersList } from "../model/useUsersList";
 import { i18n } from "@shared/i18n";
 
@@ -33,7 +33,9 @@ const roleBadge = (role: string) => (
             ? "warning"
             : role === "GUARD"
               ? "gray"
-              : "success"
+              : role === "EMPLOYEE"
+                ? "success"
+                : "gray"
     }
     size="lg"
   >
@@ -43,6 +45,10 @@ const roleBadge = (role: string) => (
 
 export default function UsersTable({ fx, onView, onEdit }: Props) {
   const { t: tt } = useTranslation(["users", "common"]);
+  const rolesCatalog = useRolesCatalog();
+  const roleFilterOptions = rolesCatalog
+    .filter((role) => role.active)
+    .map((role) => ({ id: role.key, name: role.name }));
 
   const departmentOptions = fx.departments
     .filter((d) => d.active)
@@ -88,7 +94,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       filter: "catalog",
       sortable: false,
       catalogOptions: {
-        data: USER_ROLES.map((id) => ({ id, name: roleLabel(id) })),
+        data: roleFilterOptions,
         loading: false,
         error: false,
       },

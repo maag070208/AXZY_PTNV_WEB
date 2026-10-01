@@ -22,6 +22,8 @@ export default function UsersListPage() {
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["users", "common"]);
   const canManageUsers = useCan("users.view");
+  // Alta e importación crean cuentas (`POST /users`, `/users/import`): la API exige `users.create`.
+  const canCreateUsers = useCan("users.create");
 
   const fx = useUsersList();
 
@@ -36,28 +38,30 @@ export default function UsersListPage() {
         { label: tt("list.breadcrumb") },
       ]}
       actions={
-        <ITFlex gap={2}>
-          <ITButton
-            variant="outlined"
-            color="secondary"
-            onClick={() => navigate("/users/import")}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaFileExcel size={12} />
-              <ITText className="font-bold text-[11px]">{tt("list.importExcel")}</ITText>
-            </ITFlex>
-          </ITButton>
-          <ITButton
-            variant="filled"
-            color="primary"
-            onClick={() => navigate("/users/new")}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaPlus size={12} />
-              <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
+        canCreateUsers ? (
+          <ITFlex gap={2}>
+            <ITButton
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate("/users/import")}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaFileExcel size={12} />
+                <ITText className="font-bold text-[11px]">{tt("list.importExcel")}</ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={() => navigate("/users/new")}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaPlus size={12} />
+                <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
+        ) : undefined
       }
       icon={<FaUserShield size={20} />}
     >

@@ -3,6 +3,7 @@ import {
   FileTypeEnum,
   ITAlert,
   ITButton,
+  ITCheckbox,
   ITDialog,
   ITDropfile,
   ITFlex,
@@ -36,6 +37,9 @@ interface Props {
   selectedDept: Department | undefined;
   roleGuidance: { title: string; summary: string; actions: string[] };
   roleOptions: Array<Record<string, string>>;
+  /** Roles adicionales disponibles (multi-rol), sin el principal. */
+  extraRoleOptions?: Array<{ value: string; label: string }>;
+  onToggleExtraRole?: (role: string, checked: boolean) => void;
   // Documentación del alta
   requiredDocs?: Array<{ key: string; label: string; typeId: string | null }>;
   docsFiles?: Record<string, File | null>;
@@ -79,6 +83,8 @@ export default function UserFormFields({
   selectedDept,
   roleGuidance,
   roleOptions,
+  extraRoleOptions,
+  onToggleExtraRole,
   requiredDocs,
   onPickDoc,
   docsError,
@@ -155,6 +161,27 @@ export default function UserFormFields({
                   <ITText className="text-[10px] text-slate-500">{tt("form.passwordEditHint")}</ITText>
                 </ITFlex>
               )}
+            </ITGrid>
+            <ITGrid item xs={12}>
+              <ITFlex direction="column" gap={2}>
+                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                  {tt("form.extraRoles")}
+                </ITText>
+                <ITText className="text-[10px] text-slate-400">
+                  {tt("form.extraRolesHint")}
+                </ITText>
+                <ITFlex align="center" gap={4} wrap="wrap">
+                  {(extraRoleOptions ?? []).map((opt) => (
+                    <ITCheckbox
+                      key={opt.value}
+                      name={`extra_role_${opt.value}`}
+                      checked={form.roles.includes(opt.value)}
+                      onChange={(checked) => onToggleExtraRole?.(opt.value, checked)}
+                      label={opt.label}
+                    />
+                  ))}
+                </ITFlex>
+              </ITFlex>
             </ITGrid>
           </ITGrid>
         </section>

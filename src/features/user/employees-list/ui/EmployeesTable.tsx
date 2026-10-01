@@ -14,7 +14,7 @@ import { FaEdit, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
 import type { PersonalProfile } from "@entities/hr";
-import { roleLabel } from "@entities/user";
+import { roleLabel, useRolesCatalog } from "@entities/user";
 
 const roleBadge = (role: string, label: string) => (
   <ITBadget
@@ -60,11 +60,10 @@ export default function EmployeesTable({
     d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` }))
   );
 
-  // Roles que admite el API para el personal (PERSONAL_ROLES).
-  const roleOptions = (["MANAGER", "AREA_HEAD", "EMPLOYEE"] as const).map((id) => ({
-    id,
-    name: roleLabel(id),
-  }));
+  // Roles que admite el API para el personal (los marcados `staff` en /roles).
+  const staffRoleOptions = useRolesCatalog()
+    .filter((role) => role.active && role.staff)
+    .map((role) => ({ id: role.key, name: role.name }));
 
   const columns: Column<PersonalProfile>[] = [
     {
@@ -107,7 +106,7 @@ export default function EmployeesTable({
       width: 140,
       filter: "catalog",
       sortable: false,
-      catalogOptions: { data: roleOptions, loading: false, error: false },
+      catalogOptions: { data: staffRoleOptions, loading: false, error: false },
       render: (u) => roleBadge(u.role, roleLabel(u.role)),
     },
     {
