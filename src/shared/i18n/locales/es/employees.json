@@ -94,13 +94,19 @@
       "emergencyRelation": "Parentesco",
       "bloodType": "Tipo de Sangre",
       "condition": "Padecimiento",
-      "allergies": "Alergias"
+      "allergies": "Alergias",
+      "name": "Nombre(s)"
     },
     "subGroups": {
       "identification": "Identificación",
       "fiscal": "Fiscal",
       "contact": "Contacto",
       "address": "Dirección"
+    },
+    "editAccount": "Cuenta y acceso",
+    "validation": {
+      "employeeNoMax": "El número de empleado no puede pasar de {{max}} caracteres",
+      "jobTitleMax": "El puesto no puede pasar de {{max}} caracteres"
     }
   },
   "catalog": {

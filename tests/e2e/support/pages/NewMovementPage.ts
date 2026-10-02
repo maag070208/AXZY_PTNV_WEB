@@ -9,7 +9,7 @@ import {
   searchPanel,
 } from "./components";
 
-export type MovementTypeUi = "Baja" | "A mantenimiento" | "De mantenimiento";
+export type MovementTypeUi = "Entrada" | "Baja" | "A mantenimiento" | "De mantenimiento";
 export type ConditionUi = "GOOD" | "FAIR" | "POOR" | "BROKEN";
 
 /** Etiqueta en pantalla de cada condición (i18n `inventory:loanReturn.conditionLabels`). */
@@ -76,6 +76,14 @@ export class NewMovementPage {
 
   async selectType(type: MovementTypeUi, index = 1): Promise<void> {
     await chip(this.row(index), type).click();
+  }
+
+  /**
+   * Una ENTRADA no elige unidad física: crea piezas nuevas, así que el renglón
+   * pide una cantidad en su lugar.
+   */
+  async writeQuantity(quantity: number, index = 1): Promise<void> {
+    await field(this.row(index), "Cantidad").fill(String(quantity));
   }
 
   async writeReason(reason: string, index = 1): Promise<void> {

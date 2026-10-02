@@ -14,15 +14,17 @@ test.describe("Usuarios — rol Guardia", () => {
     const guard = (await api.users()).find((u) => u.username === E2E.guard.username);
     expect(guard, "el guardia de la suite").toBeDefined();
 
+    // La edición es un diálogo sobre la lista: sin asistente, todo a la vista.
     await page.goto(route(`/users/${guard!.id}/edit`));
-    await expect(page.getByRole("textbox", { name: /Apellido paterno/ })).toHaveValue("Guard");
-    await page.getByRole("button", { name: "Siguiente" }).click();
+    const dialog = page.locator('[data-it-dialog="true"]');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("textbox", { name: /Apellido paterno/ })).toHaveValue("Guard");
 
-    const role = page.locator('select[name="u_role"]');
+    const role = dialog.locator('select[name="u_role"]');
     await expect(role).toHaveValue("GUARD");
     await expect(role.locator("option", { hasText: "GUARDIA" })).toHaveCount(1);
 
-    await page.getByRole("button", { name: "Guía del rol" }).click();
+    await dialog.getByRole("button", { name: "Guía del rol" }).click();
     await expect(page.getByText(/Opera la portería desde la app/)).toBeVisible();
   });
 });

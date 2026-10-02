@@ -188,7 +188,11 @@
       "employeeNumberMax": "El número de empleado debe tener máximo {{max}} caracteres",
       "jobTitleMax": "El puesto debe tener máximo {{max}} caracteres"
     },
-    "emailPlaceholder": "usuario@empresa.com"
+    "emailPlaceholder": "usuario@empresa.com",
+    "personElsewhere": "Los datos de la persona (nombre, correo, domicilio, datos fiscales) se editan en su expediente de personal.",
+    "openRecord": "Abrir expediente",
+    "save": "Guardar cambios",
+    "saved": "Usuario actualizado correctamente"
   },
   "history": {
     "title": "Historial",

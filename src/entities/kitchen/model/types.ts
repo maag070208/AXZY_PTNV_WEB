@@ -617,3 +617,77 @@ export interface CostCenterSpending {
   rows: CostCenterSpendingRow[];
   totals: { orders: number; subtotal: number; tax: number; total: number };
 }
+
+/**
+ * CARGA MASIVA DEL INVENTARIO (Excel). Una fila = un artículo con su
+ * existencia; la previsualización dice exactamente qué va a pasar y no escribe
+ * nada. Si el artículo ya existe, `strategy` decide: `ADD` suma la cantidad del
+ * archivo y `SET` deja el artículo con esa cantidad exacta.
+ */
+export type KitchenImportStrategy = "ADD" | "SET";
+
+export type KitchenImportAction = "CREATE" | "ADD" | "SET_UP" | "SET_DOWN" | "SET_SAME" | "NO_STOCK";
+
+export interface KitchenImportPreviewRow {
+  row: number;
+  code: string;
+  /** El archivo no traía código: se derivó del nombre. */
+  codeDerived: boolean;
+  name: string;
+  categoryName: string;
+  categoryNew: boolean;
+  unitName: string;
+  unitNew: boolean;
+  kind: "CONSUMABLE" | "DURABLE";
+  storage: "DRY" | "REFRIGERATED" | "FROZEN";
+  tracksExpiry: boolean;
+  minStock: number;
+  maxStock: number | null;
+  taxRateId: string | null;
+  taxRateName: string | null;
+  quantity: number;
+  unitCost: number | null;
+  expiresAt: string | null;
+  lotCode: string | null;
+  action: KitchenImportAction;
+  /** Cuánto se moverá el saldo (positivo entra, negativo sale). */
+  delta: number;
+  currentStock: number | null;
+  resultingStock: number | null;
+  warnings: string[];
+  errors: string[];
+}
+
+export interface KitchenImportPreview {
+  strategy: KitchenImportStrategy;
+  rows: KitchenImportPreviewRow[];
+  summary: {
+    rows: number;
+    valid: number;
+    invalid: number;
+    itemsToCreate: number;
+    existingItems: number;
+    lots: number;
+    quantityIn: number;
+    adjustedOut: number;
+    quantityOut: number;
+    withoutStock: number;
+    categoriesToCreate: string[];
+    unitsToCreate: string[];
+  };
+}
+
+export interface KitchenImportResult {
+  /** `null` cuando la carga solo creó artículos (sin existencias que mover). */
+  movementId: string | null;
+  itemsCreated: number;
+  itemsReused: number;
+  categoriesCreated: number;
+  unitsCreated: number;
+  lotsCreated: number;
+  quantityIn: number;
+  quantityOut: number;
+  rows: number;
+  fileName: string | null;
+  repeated: boolean;
+}

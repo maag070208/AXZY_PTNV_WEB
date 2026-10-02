@@ -8,6 +8,9 @@ import type {
   KitchenCategory,
   KitchenItemDetail,
   KitchenItemInput,
+  KitchenImportPreview,
+  KitchenImportResult,
+  KitchenImportStrategy,
   KitchenItemRow,
   KitchenLotRow,
   KitchenMovement,
@@ -78,6 +81,33 @@ suppliersTable: (params: ITDataTableFetchParamsPost) =>
     api.patch<KitchenUnit>(`/kitchen/units/${id}`, input),
 
   // artículos
+  /**
+   * Carga masiva del inventario. Paso 1: qué haría el archivo (no escribe nada).
+   * `strategy` dice qué hacer con los artículos que ya existen.
+   */
+  previewItemImport: (file: File, strategy: KitchenImportStrategy) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("strategy", strategy);
+    return api.post<KitchenImportPreview>(`/kitchen/items/import/preview`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  /** Paso 2: la carga real, en una sola transacción (todo o nada). */
+  importItems: (file: File, strategy: KitchenImportStrategy, idempotencyKey?: string) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("strategy", strategy);
+    return api.post<KitchenImportResult>(`/kitchen/items/import`, form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
+      },
+    });
+  },
+  /** Plantilla Excel con los encabezados y los catálogos vigentes. */
+  itemImportTemplate: () => api.get<Blob>(`/kitchen/items/import/template`, { responseType: "blob" }),
+
   itemsTable: (params: ITDataTableFetchParamsPost) =>
     tableRequest<KitchenItemRow>("/kitchen/items/table", params),
   item: (id: string) => api.get<KitchenItemDetail>(`/kitchen/items/${id}`),

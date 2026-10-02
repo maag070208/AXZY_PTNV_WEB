@@ -30,6 +30,73 @@ export interface DeviceType {
   _count?: { devices: number };
 }
 
+/* ---------------------------------------------------------------------------
+   Carga masiva desde Excel
+   La previsualización devuelve, fila por fila, exactamente lo que haría la
+   carga: alta de un dispositivo nuevo, unidades que se suman a uno existente,
+   filas que caen al tipo genérico y los folios de activo fijo que se consumen.
+--------------------------------------------------------------------------- */
+
+export type DeviceImportAction = "CREATE" | "ADD_UNITS";
+
+/** Motivos por los que una fila no se puede cargar (los traduce la UI). */
+export type DeviceImportRowError =
+  | "MISSING_NAME"
+  | "INVALID_QUANTITY"
+  | "QUANTITY_TOO_LARGE"
+  | "NO_DEVICE_TYPE_AVAILABLE";
+
+/** Avisos: la fila entra, pero con un valor por defecto que conviene revisar. */
+export type DeviceImportRowWarning = "MISSING_BRAND" | "MISSING_MODEL";
+
+export interface DeviceImportPreviewRow {
+  row: number;
+  typeName: string;
+  resolvedTypeName: string;
+  resolvedTypeCode: string;
+  typeUnknown: boolean;
+  typeMissing: boolean;
+  name: string;
+  brand: string;
+  model: string;
+  quantity: number;
+  action: DeviceImportAction;
+  mergedRows: number[];
+  currentUnits: number;
+  assetTagFrom: string | null;
+  assetTagTo: string | null;
+  warnings: DeviceImportRowWarning[];
+  errors: DeviceImportRowError[];
+}
+
+export interface DeviceImportSummary {
+  rows: number;
+  valid: number;
+  invalid: number;
+  units: number;
+  newDevices: number;
+  existingDevices: number;
+  genericRows: number;
+  unknownTypeRows: number;
+  typesToCreate: string[];
+}
+
+export interface DeviceImportPreview {
+  rows: DeviceImportPreviewRow[];
+  summary: DeviceImportSummary;
+}
+
+export interface DeviceImportResult {
+  movementId: string;
+  devicesCreated: number;
+  devicesReused: number;
+  unitsCreated: number;
+  rows: number;
+  fileName: string | null;
+  /** La petición ya se había registrado: no se duplicó nada. */
+  repeated: boolean;
+}
+
 export interface Device {
   id: string;
   typeId: string;

@@ -20,6 +20,7 @@ import DeviceFormPage from "@pages/inventory/DeviceFormPage";
 import EditDevicePage from "@pages/inventory/EditDevicePage";
 import DeviceDetailPage from "@pages/inventory/DeviceDetailPage";
 import DeviceTypesPage from "@pages/inventory/DeviceTypesPage";
+import DeviceImportPage from "@pages/inventory/DeviceImportPage";
 import MovementsPage from "@pages/inventory/MovementsPage";
 import NewMovementPage from "@pages/inventory/NewMovementPage";
 import LoansPage from "@pages/inventory/LoansPage";
@@ -97,6 +98,15 @@ export default function App() {
           element={
             <RequiresPermission permission="devices.view">
               <DevicesPage />
+            </RequiresPermission>
+          }
+        />
+        {/* Carga masiva: el alta exige `devices.create` (la API lo revalida). */}
+        <Route
+          path="/inventory/devices/import"
+          element={
+            <RequiresPermission permission="devices.create">
+              <DeviceImportPage />
             </RequiresPermission>
           }
         />
@@ -288,7 +298,9 @@ export default function App() {
         />
         <Route path="/users" element={<UsersListPage />} />
         <Route path="/users/new" element={<UserFormPage />} />
-        <Route path="/users/:id/edit" element={<UserFormPage />} />
+        {/* La edición es un diálogo sobre la lista; la ruta se conserva para que
+            los enlaces directos (y el atajo del expediente) sigan abriéndolo. */}
+        <Route path="/users/:id/edit" element={<UsersListPage />} />
         <Route path="/users/:id/history" element={<UserHistoryPage />} />
         <Route path="/users/import" element={<UserImportPage />} />
         <Route

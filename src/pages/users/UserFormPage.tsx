@@ -1,11 +1,6 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useState } from "react";
-import {
-  ITAlert,
-  ITFlex,
-  ITPage,
-  ITStepper,
-} from "@axzydev/axzy_ui_system";
+import { ITAlert, ITFlex, ITPage, ITStepper } from "@axzydev/axzy_ui_system";
 import { FaBuilding, FaFileUpload, FaIdCard, FaShieldAlt, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -68,6 +63,7 @@ export default function UserFormPage() {
 
   const fieldsProps = {
     isEdit,
+    personFields: true,
     form: userForm.form,
     errors: userForm.errors,
     onFieldChange: userForm.handleField,

@@ -8,7 +8,7 @@ import {
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaFileAlt, FaIdCard, FaPencilAlt, FaUserSlash, FaUserTie } from "react-icons/fa";
+import { FaFileAlt, FaIdCard, FaPencilAlt, FaUserCog, FaUserSlash, FaUserTie } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -20,12 +20,15 @@ import {
 } from "@features/hr/employee-detail";
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
 import { EmployeeCredentialDialog } from "@widgets/employee-credential";
+import { useCan } from "@entities/user";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["employees", "common"]);
   const [credentialOpen, setCredentialOpen] = useState(false);
+  /** La cuenta (usuario, contraseña, roles) se edita en Usuarios: solo ADMIN. */
+  const canEditUser = useCan("users.edit");
 
   const detail = useEmployeeDetail(id);
 
@@ -93,6 +96,16 @@ export default function EmployeeDetailPage() {
               <ITText className="font-bold text-[11px]">{tt("detail.editInfo")}</ITText>
             </ITFlex>
           </ITButton>
+          {/* El expediente edita a la persona; la cuenta (usuario, contraseña,
+              roles) se edita en Usuarios. El enlace evita tener que buscarla. */}
+          {canEditUser && (
+            <ITButton variant="outlined" color="secondary" size="lg" onClick={() => navigate(`/users/${id}/edit`)}>
+              <ITFlex align="center" gap={1}>
+                <FaUserCog size={11} />
+                <ITText className="font-bold text-[11px]">{tt("detail.editAccount")}</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
         </ITFlex>
       }
     >

@@ -188,7 +188,11 @@
       "employeeNumberMax": "Employee number must have at most {{max}} characters",
       "jobTitleMax": "Job title must have at most {{max}} characters"
     },
-    "emailPlaceholder": "user@company.com"
+    "emailPlaceholder": "user@company.com",
+    "personElsewhere": "The person's data (name, email, address, tax data) is edited in their HR record.",
+    "openRecord": "Open HR record",
+    "save": "Save changes",
+    "saved": "User updated successfully"
   },
   "history": {
     "title": "History",

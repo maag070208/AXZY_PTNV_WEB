@@ -95,16 +95,6 @@ const VALIDATED_FIELDS: (keyof UserFormValues)[] = [
   "jobTitle",
 ];
 
-/** Paso del stepper al que pertenece cada campo validado (0=datos personales, 1=acceso). */
-const FIELD_STEP: Record<string, number> = {
-  username: 1,
-  password: 1,
-  email: 0,
-  name: 0,
-  employeeNumber: 0,
-  jobTitle: 0,
-};
-
 /** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
 export const composeFullName = (v: {
   name?: string;
@@ -129,8 +119,14 @@ const splitStoredName = (full: string): Pick<UserFormValues, "name" | "middleNam
   };
 };
 
-export const useUserForm = () => {
-  const { id } = useParams<{ id: string }>();
+/**
+ * Formulario de cuenta. Sin argumentos toma el id de la ruta (`/users/:id/edit`,
+ * `/users/new`); el diálogo de edición le pasa el id explícito porque vive en la
+ * lista, fuera de esa ruta.
+ */
+export const useUserForm = (userId?: string) => {
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = userId ?? routeId;
   const isEdit = Boolean(id);
   const { t: tt } = useTranslation(["users", "common"]);
   const dispatch = useDispatch<AppDispatch>();
@@ -303,9 +299,19 @@ export const useUserForm = () => {
     }));
   };
 
+  /**
+   * Campos que edita el expediente (`/employees/:id/edit`): identidad y datos
+   * laborales. Este formulario solo los captura al dar de alta o para una cuenta
+   * sin expediente; con expediente ni se validan ni se mandan.
+   */
+  const RECORD_FIELDS: (keyof UserFormValues)[] = ["name", "email", "employeeNumber", "jobTitle"];
+
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     for (const field of VALIDATED_FIELDS) {
+      // Los campos que se editan en el expediente no se validan aquí: si algo
+      // viniera mal del respaldo, el usuario no tendría dónde verlo ni corregirlo.
+      if (!editsPerson && RECORD_FIELDS.includes(field)) continue;
       const err = validateField(field, String(form[field] ?? ""));
       if (err) e[field] = err;
     }
@@ -313,17 +319,27 @@ export const useUserForm = () => {
     return Object.keys(e).length === 0;
   };
 
-  /** Devuelve el paso (0=datos personales, 1=acceso) con el primer campo inválido; -1 si todo es válido. */
+  /**
+   * Índice del paso con el primer campo inválido, contando los pasos que
+   * realmente se muestran: sin expediente no hay paso de datos de la persona, así
+   * que acceso pasa a ser el 0.
+   */
   const firstInvalidStep = (): number => {
     const withErrors = new Set(Object.keys(errors));
-    for (let step = 0; step <= 1; step++) {
-      for (const field of VALIDATED_FIELDS) {
-        if (FIELD_STEP[field] !== step) continue;
-        if (withErrors.has(field)) return step;
-        if (validateField(field, String(form[field] ?? ""))) return step;
+    const invalid = (field: keyof UserFormValues): boolean =>
+      withErrors.has(field) || Boolean(validateField(field, String(form[field] ?? "")));
+
+    // Paso de la persona (nombre, correo y datos laborales): solo si se edita aquí.
+    if (editsPerson) {
+      for (const field of RECORD_FIELDS) {
+        if (VALIDATED_FIELDS.includes(field) && invalid(field)) return 0;
       }
     }
-    if (requiresDocs && missingDocs.length > 0) return 3;
+    // Acceso (usuario y contraseña).
+    for (const field of ["username", "password"] as (keyof UserFormValues)[]) {
+      if (invalid(field)) return editsPerson ? 1 : 0;
+    }
+    if (requiresDocs && missingDocs.length > 0) return editsPerson ? 3 : 2;
     return -1;
   };
 
@@ -338,13 +354,19 @@ export const useUserForm = () => {
     setSaving(true);
     try {
       if (isEdit) {
+        // Con expediente, la identidad y los datos laborales los guarda el
+        // expediente: aquí no se mandan para no pisarlos desde dos lugares.
         await usersApi.update(id!, {
           username: form.username,
-          email: form.email || null,
-          name: fullName,
-          middleName: form.middleName || null,
-          paternalSurname: form.paternalSurname || null,
-          maternalSurname: form.maternalSurname || null,
+          ...(editsPerson
+            ? {
+                email: form.email || null,
+                name: fullName,
+                middleName: form.middleName || null,
+                paternalSurname: form.paternalSurname || null,
+                maternalSurname: form.maternalSurname || null,
+              }
+            : {}),
           role: form.role,
           roles: form.roles.filter((r) => r !== form.role),
           employeeNumber: form.employeeNumber || undefined,
@@ -402,8 +424,28 @@ export const useUserForm = () => {
   const canSubmit =
     !!form.username && !!form.name && (isEdit || !!form.password);
 
+  /**
+   * ¿La cuenta tiene expediente de personal? Lo tiene si alguno de sus roles es
+   * `staff`. Manda en la separación de pantallas: los datos de la persona
+   * (nombre, correo, domicilio…) se editan en el expediente, y aquí solo se
+   * capturan al dar de alta o para las cuentas sin expediente, que no tienen
+   * otro lugar donde editarlos.
+   */
+  const hasRecord = isStaffRole(form.role) || form.roles.some((extra) => isStaffRole(extra));
+
+  /**
+   * ¿Este formulario edita los datos de la persona (nombre, apellidos, correo)?
+   * Sí al dar de alta (se necesitan para crear la persona) y siempre que la
+   * cuenta no tenga expediente, que es su único lugar. Si tiene expediente, esos
+   * campos viven en `/employees/:id/edit` y aquí solo se muestran los laborales.
+   */
+  const editsPerson = !isEdit || !hasRecord;
+
   return {
     isEdit,
+    id,
+    hasRecord,
+    editsPerson,
     departments,
     form,
     errors,

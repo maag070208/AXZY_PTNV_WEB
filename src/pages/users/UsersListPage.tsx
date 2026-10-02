@@ -9,17 +9,21 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaFileExcel, FaPlus, FaUserShield } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import {
   useUsersList,
   UsersTable,
 } from "@features/user/users-list";
+import { UserEditDialog } from "@features/user/user-form";
 import { DeactivateDialog } from "@features/hr/employee-detail";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
+  // La edición es un diálogo sobre la lista: `/users/:id/edit` lo abre, así que
+  // los enlaces directos (y el botón del expediente) siguen funcionando.
+  const { id: editingId } = useParams<{ id: string }>();
   const { t: tt } = useTranslation(["users", "common"]);
   const canManageUsers = useCan("users.view");
   // Alta e importación crean cuentas (`POST /users`, `/users/import`): la API exige `users.create`.
@@ -69,6 +73,12 @@ export default function UsersListPage() {
         fx={fx}
         onView={(u) => navigate(`/employees/${u.id}`)}
         onEdit={(u) => navigate(`/users/${u.id}/edit`)}
+      />
+
+      <UserEditDialog
+        userId={editingId ?? null}
+        onClose={() => navigate("/users")}
+        onSaved={fx.reload}
       />
 
       {/* Para usuarios activos, baja con captura de motivo */}

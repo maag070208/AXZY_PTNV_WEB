@@ -54,7 +54,10 @@ type FormState = PersonalProfileUpdateInput;
 const emptyForm = (): FormState => ({});
 
 const formFromProfile = (p: PersonalProfile): FormState => ({
+  name: p.name ?? "",
   middleName: p.middleName ?? "",
+  employeeNumber: p.employeeNumber ?? "",
+  jobTitle: p.jobTitle ?? "",
   paternalSurname: p.paternalSurname ?? "",
   maternalSurname: p.maternalSurname ?? "",
   email: p.email ?? "",
@@ -121,8 +124,12 @@ export default function EmployeeProfileEditPage() {
       setForm((f) => ({ ...f, [name]: value instanceof Date ? localToDateStr(value) : "" }));
     };
 
-  const validate = (): boolean => {
+  /** Errores por campo, sin tocar el estado (para poder decidir el paso). */
+  const collectErrors = (): Record<string, string> => {
     const e: Record<string, string> = {};
+    // El nombre vive SOLO aquí (el formulario de usuario no lo edita cuando hay
+    // expediente), así que no puede quedar vacío: `name` es obligatorio.
+    if (!form.name?.trim()) e.name = i18n.t("common:validation.required", { label: tt("detail.fields.name") });
     const rfcErr = validateRfc(form.rfc);
     if (rfcErr) e.rfc = rfcErr;
     const curpErr = validateCurp(form.curp);
@@ -139,18 +146,45 @@ export default function EmployeeProfileEditPage() {
     if (emergencyPhoneErr) e.emergencyContactPhone = emergencyPhoneErr;
     const emailErr = validateEmail(form.email);
     if (emailErr) e.email = emailErr;
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    // Los campos laborales tienen el mismo tope que la API.
+    if ((form.employeeNumber ?? "").length > 30) e.employeeNumber = tt("detail.validation.employeeNoMax", { max: 30 });
+    if ((form.jobTitle ?? "").length > 100) e.jobTitle = tt("detail.validation.jobTitleMax", { max: 100 });
+    return e;
+  };
+
+  /** Paso donde vive el primer campo con error, para no dejarlo escondido. */
+  const errorStep = (found: Record<string, string>): number => {
+    const byStep: Array<[number, string[]]> = [
+      [0, ["name"]],
+      [1, ["rfc", "curp", "nss", "employeeNumber", "jobTitle"]],
+      [2, ["email", "postalCode", "personalPhone", "workPhone", "emergencyContactPhone"]],
+    ];
+    for (const [index, fields] of byStep) {
+      if (fields.some((field) => found[field])) return index;
+    }
+    return 0;
   };
 
   const handleFinish = async () => {
-    if (!validate()) {
-      // Surface a generic alert; per-field messages are inline.
+    // El asistente avisa "revisa los campos marcados", pero si el campo con
+    // error está en otro paso hay que llevarlo ahí: si no, no hay nada que ver.
+    const errors = collectErrors();
+    if (Object.keys(errors).length > 0) {
+      setErrors(errors);
+      setStep(errorStep(errors));
       detail.setError(i18n.t("common:validation.reviewFields"));
       return;
     }
     const normalized: FormState = Object.fromEntries(
-      Object.entries(form).map(([key, value]) => [key, typeof value === "string" && value.trim() === "" ? null : value])
+      Object.entries(form).map(([key, value]) => [
+        key,
+        typeof value === "string" && value.trim() === ""
+          ? // `name` es obligatorio en el modelo: vacío se omite, no se manda null.
+            key === "name"
+            ? undefined
+            : null
+          : value,
+      ])
     ) as FormState;
     const ok = await detail.saveProfile(normalized, detail.profile?.discounts ?? []);
     if (ok) navigate(`/employees/${id}`);
@@ -232,6 +266,10 @@ export default function EmployeeProfileEditPage() {
 
           <Row>
             <Cell>
+              <ITInput name="name" label={tt("detail.fields.name")} value={form.name ?? ""} onChange={field("name")} aria-invalid={!!errors.name} required />
+              {errors.name && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.name}</span>}
+            </Cell>
+            <Cell>
               <ITInput name="middleName" label={tt("detail.fields.secondName")} value={form.middleName ?? ""} onChange={field("middleName")} />
             </Cell>
             <Cell>
@@ -291,6 +329,16 @@ export default function EmployeeProfileEditPage() {
       icon: <FaIdCard size={13} />,
       content: (
         <ITFlex direction="column" gap={4}>
+          <Row>
+            <Cell>
+              <ITInput name="employeeNumber" label={tt("detail.fields.employeeNo")} value={form.employeeNumber ?? ""} onChange={field("employeeNumber")} aria-invalid={!!errors.employeeNumber} />
+              {errors.employeeNumber && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.employeeNumber}</span>}
+            </Cell>
+            <Cell>
+              <ITInput name="jobTitle" label={tt("detail.fields.position")} value={form.jobTitle ?? ""} onChange={field("jobTitle")} aria-invalid={!!errors.jobTitle} />
+              {errors.jobTitle && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.jobTitle}</span>}
+            </Cell>
+          </Row>
           <Row>
             <Cell>
               <ITDatePicker

@@ -99,7 +99,12 @@ export interface PersonalProfile {
 }
 
 export interface PersonalProfileUpdateInput {
+  /** Primer nombre. El expediente es su dueño: el formulario de usuario solo lo captura al dar de alta. */
+  name?: string;
   middleName?: string | null;
+  /** Datos laborales: también viven en el expediente. */
+  employeeNumber?: string | null;
+  jobTitle?: string | null;
   paternalSurname?: string | null;
   maternalSurname?: string | null;
   email?: string | null;
