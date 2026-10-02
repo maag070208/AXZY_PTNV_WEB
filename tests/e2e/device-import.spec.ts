@@ -27,7 +27,7 @@ test.describe("Carga masiva de dispositivos por pantalla", () => {
     await expect(page.getByText("Plantilla de Excel")).toBeVisible();
   });
 
-  test("descarga la plantilla como un .xlsx real", async ({ page, deviceImportPage }) => {
+  test("descarga la plantilla como un .xlsx real", async ({ deviceImportPage }) => {
     await deviceImportPage.go();
     const download = await deviceImportPage.downloadTemplate();
 

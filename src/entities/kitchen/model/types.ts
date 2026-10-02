@@ -628,6 +628,40 @@ export type KitchenImportStrategy = "ADD" | "SET";
 
 export type KitchenImportAction = "CREATE" | "ADD" | "SET_UP" | "SET_DOWN" | "SET_SAME" | "NO_STOCK";
 
+/** Errores que impiden cargar el renglón (la carga no escribe nada si hay uno). */
+export type KitchenImportRowError =
+  | "MISSING_NAME"
+  | "NAME_TOO_LONG"
+  | "CODE_TOO_LONG"
+  | "CATEGORY_TOO_LONG"
+  | "UNIT_TOO_LONG"
+  | "INVALID_KIND"
+  | "INVALID_STORAGE"
+  | "INVALID_PERISHABLE"
+  | "INVALID_QUANTITY"
+  | "QUANTITY_TOO_LARGE"
+  | "QUANTITY_DECIMALS"
+  | "INVALID_MIN"
+  | "INVALID_MAX"
+  | "MIN_GREATER_THAN_MAX"
+  | "INVALID_COST"
+  | "INVALID_EXPIRY"
+  | "EXPIRY_REQUIRED"
+  | "INVALID_TAX"
+  | "DUPLICATE_CODE_SET"
+  | "LOT_CODE_TAKEN"
+  | "INSUFFICIENT_STOCK";
+
+/** Avisos: el renglón entra, pero con un valor que conviene revisar. */
+export type KitchenImportRowWarning =
+  | "CODE_DERIVED"
+  | "CATEGORY_DEFAULT"
+  | "UNIT_DEFAULT"
+  | "PERISHABLE_ASSUMED_NO"
+  | "STOCK_ADDED"
+  | "STOCK_REDUCED"
+  | "STOCK_UNCHANGED";
+
 export interface KitchenImportPreviewRow {
   row: number;
   code: string;
@@ -654,8 +688,8 @@ export interface KitchenImportPreviewRow {
   delta: number;
   currentStock: number | null;
   resultingStock: number | null;
-  warnings: string[];
-  errors: string[];
+  warnings: KitchenImportRowWarning[];
+  errors: KitchenImportRowError[];
 }
 
 export interface KitchenImportPreview {

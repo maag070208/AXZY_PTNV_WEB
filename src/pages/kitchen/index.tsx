@@ -11,6 +11,7 @@ import {
   FaBuilding,
   FaClipboardCheck,
   FaClipboardList,
+  FaFileExcel,
   FaFileInvoice,
   FaListAlt,
   FaPlus,
@@ -21,6 +22,7 @@ import {
   FaUtensils,
 } from "react-icons/fa";
 import KitchenOverviewPanel from "@features/kitchen/overview/ui/KitchenOverviewPanel";
+import KitchenImportPanel from "@features/kitchen/import/ui/KitchenImportPanel";
 import KitchenItemsPanel from "@features/kitchen/items/ui/KitchenItemsPanel";
 import KitchenItemDetailPanel from "@features/kitchen/items/ui/KitchenItemDetailPanel";
 import KitchenLotsPanel from "@features/kitchen/lots/ui/KitchenLotsPanel";
@@ -103,6 +105,15 @@ export function KitchenItemsPage() {
           {canCount && (
             <ITButton variant="outlined" color="secondary" icon={<FaClipboardCheck size={11} />} label={t("items.quick.count")} onClick={() => navigate("/kitchen/count")} />
           )}
+          {canManage && (
+            <ITButton
+              variant="outlined"
+              color="primary"
+              icon={<FaFileExcel size={11} />}
+              label={t("import.button")}
+              onClick={() => navigate("/kitchen/items/import")}
+            />
+          )}
           {canManage && newButton(t("items.new"), () => setNewSignal((n) => n + 1))}
         </div>
       }
@@ -124,6 +135,29 @@ export function KitchenItemDetailPage() {
       backAction={() => navigate("/kitchen/items")}
     >
       <KitchenItemDetailPanel />
+    </ITPage>
+  );
+}
+
+export function KitchenItemImportPage() {
+  const { t } = useTranslation(["kitchen", "common"]);
+  const navigate = useNavigate();
+  return (
+    <ITPage
+      noPadding
+      title={t("import.title")}
+      description={t("import.description")}
+      icon={<FaFileExcel size={20} />}
+      breadcrumbs={crumbs(
+        navigate,
+        t("common:breadcrumbs.home"),
+        t("common:nav.kitchen"),
+        t("import.title"),
+        { label: t("items.title"), path: "/kitchen/items" }
+      )}
+      backAction={() => navigate("/kitchen/items")}
+    >
+      <KitchenImportPanel />
     </ITPage>
   );
 }

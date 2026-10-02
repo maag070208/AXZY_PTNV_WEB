@@ -58,6 +58,7 @@ import {
   KitchenOverviewPage,
   KitchenItemsPage,
   KitchenItemDetailPage,
+  KitchenItemImportPage,
   KitchenLotsPage,
   KitchenStockInPage,
   KitchenStockOutPage,
@@ -434,6 +435,14 @@ export default function App() {
           element={
             <RequiresPermission permission="kitchen.view">
               <KitchenItemsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/items/import"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenItemImportPage />
             </RequiresPermission>
           }
         />

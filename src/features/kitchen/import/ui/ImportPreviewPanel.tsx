@@ -8,6 +8,8 @@ import { makeClientTableFetch } from "@shared/api/clientTable";
 import type {
   KitchenImportAction,
   KitchenImportPreviewRow,
+  KitchenImportRowError,
+  KitchenImportRowWarning,
   KitchenImportStrategy,
 } from "@entities/kitchen";
 import type { UseKitchenImport } from "../model/useKitchenImport";
@@ -16,14 +18,18 @@ import type { UseKitchenImport } from "../model/useKitchenImport";
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
 /** Clave i18n de cada acción (el tipo es la fuente: no hay texto suelto). */
-const ACTION_KEY: Record<KitchenImportAction, string> = {
+const ACTION_KEY = {
   CREATE: "actionCreate",
   ADD: "actionAdd",
   SET_UP: "actionSetUp",
   SET_DOWN: "actionSetDown",
   SET_SAME: "actionSetSame",
   NO_STOCK: "actionNoStock",
-};
+} as const satisfies Record<KitchenImportAction, string>;
+
+/** Clave de traducción de una acción, ya como literal (para el `t` tipado). */
+const actionKey = (action: KitchenImportAction): `import.${(typeof ACTION_KEY)[KitchenImportAction]}` =>
+  `import.${ACTION_KEY[action]}`;
 
 const ACTION_COLOR: Record<KitchenImportAction, BadgeColor> = {
   CREATE: "info",
@@ -70,7 +76,7 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
       catalog: { value: (r) => [r.categoryName, r.unitName] },
       quantity: { value: (r) => r.quantity },
       resulting: { value: (r) => r.resultingStock ?? 0 },
-      action: { value: (r) => t(`import.${ACTION_KEY[r.action]}`) },
+      action: { value: (r) => t(actionKey(r.action)) },
       status: { value: (r) => statusOf(r) },
     });
   }, [preview, t]);
@@ -199,7 +205,7 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
       },
       render: (row: KitchenImportPreviewRow) => (
         <ITFlex direction="column" gap={0.5}>
-          {badge(t(`import.${ACTION_KEY[row.action]}`), ACTION_COLOR[row.action])}
+          {badge(t(actionKey(row.action)), ACTION_COLOR[row.action])}
           {row.lotCode && (
             <ITText className="!text-[10px] text-slate-400">{t("import.lot", { code: row.lotCode })}</ITText>
           )}
@@ -230,12 +236,12 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
               : badge(t("import.statusReady"), "success")}
           {row.errors.map((error) => (
             <ITText key={error} className="!text-[10px] text-rose-600">
-              {t(`import.error${error}` as never)}
+              {t(`import.error${error}` as `import.error${KitchenImportRowError}`)}
             </ITText>
           ))}
           {row.warnings.map((warning) => (
             <ITText key={warning} className="!text-[10px] text-amber-600">
-              {t(`import.warning${warning}` as never)}
+              {t(`import.warning${warning}` as `import.warning${KitchenImportRowWarning}`)}
             </ITText>
           ))}
         </ITFlex>
