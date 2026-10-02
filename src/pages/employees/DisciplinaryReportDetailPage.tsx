@@ -32,7 +32,8 @@ export default function DisciplinaryReportDetailPage() {
 
   if (loading) {
     return (
-      <ITPage title={tt("preview.title")} backAction={() => navigate("/employees/disciplinary-reports")}>
+      <ITPage
+        noPadding title={tt("preview.title")} backAction={() => navigate("/employees/disciplinary-reports")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -43,6 +44,7 @@ export default function DisciplinaryReportDetailPage() {
   if (error || !disciplinaryReport) {
     return (
       <ITPage
+        noPadding
         title={tt("preview.title")}
         backAction={() => navigate("/employees/disciplinary-reports")}
         breadcrumbs={[
@@ -64,6 +66,7 @@ export default function DisciplinaryReportDetailPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("preview.title")}
       description={`${disciplinaryReport.user.name} · ${tt(`reasons.${disciplinaryReport.reason}`)}`}
       icon={<FaScroll size={20} />}

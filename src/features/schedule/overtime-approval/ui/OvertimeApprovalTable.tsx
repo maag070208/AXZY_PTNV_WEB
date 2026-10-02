@@ -12,7 +12,6 @@ import {
   ITGrid,
   ITInput,
   ITSearchSelect,
-  ITSegmentedControl,
   ITSelect,
   ITText,
   ITToast,
@@ -188,15 +187,15 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
   // RH solo ve aprobado: KPIs reducidos (minutos y días aprobados).
   const kpis = canApprove
     ? [
-        { key: "pending", value: formatMinutesAsHhMm(summary?.pendingMinutes ?? 0), tint: "bg-amber-50", icon: <FaExclamationTriangle className="text-amber-600" size={15} /> },
-        { key: "approved", value: formatMinutesAsHhMm(summary?.approvedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheck className="text-emerald-600" size={15} /> },
-        { key: "rejected", value: formatMinutesAsHhMm(summary?.rejectedMinutes ?? 0), tint: "bg-rose-50", icon: <FaTimes className="text-rose-600" size={15} /> },
-        { key: "people", value: summary?.peopleWithPending ?? 0, tint: "bg-sky-50", icon: <FaUserCheck className="text-sky-600" size={15} /> },
-      ]
+      { key: "pending", value: formatMinutesAsHhMm(summary?.pendingMinutes ?? 0), tint: "bg-amber-50", icon: <FaExclamationTriangle className="text-amber-600" size={15} /> },
+      { key: "approved", value: formatMinutesAsHhMm(summary?.approvedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheck className="text-emerald-600" size={15} /> },
+      { key: "rejected", value: formatMinutesAsHhMm(summary?.rejectedMinutes ?? 0), tint: "bg-rose-50", icon: <FaTimes className="text-rose-600" size={15} /> },
+      { key: "people", value: summary?.peopleWithPending ?? 0, tint: "bg-sky-50", icon: <FaUserCheck className="text-sky-600" size={15} /> },
+    ]
     : [
-        { key: "approved", value: formatMinutesAsHhMm(summary?.approvedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheck className="text-emerald-600" size={15} /> },
-        { key: "approvedDays", value: summary?.approvedDays ?? 0, tint: "bg-sky-50", icon: <FaClock className="text-sky-600" size={15} /> },
-      ];
+      { key: "approved", value: formatMinutesAsHhMm(summary?.approvedMinutes ?? 0), tint: "bg-emerald-50", icon: <FaCheck className="text-emerald-600" size={15} /> },
+      { key: "approvedDays", value: summary?.approvedDays ?? 0, tint: "bg-sky-50", icon: <FaClock className="text-sky-600" size={15} /> },
+    ];
 
   // El export replica la tabla: sin filas visibles, no hay nada que exportar.
   const hasRows = (summary?.totalDays ?? 0) > 0;
@@ -226,7 +225,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "userId",
       label: t("columns.employee"),
       type: "catalog",
-      width: 300,
+      width: 220,
       filter: "search",
       catalogOptions: peopleOptions,
       sortable: false,
@@ -243,7 +242,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "departmentId",
       label: t("columns.department"),
       type: "catalog",
-      width: 200,
+      width: 180,
       filter: "search",
       catalogOptions: departmentFilterOptions,
       sortable: false,
@@ -269,7 +268,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "scheduleName",
       label: t("columns.schedule"),
       type: "string",
-      width: 220,
+      width: 180,
       filter: true,
       sortable: false,
       render: (r) =>
@@ -297,7 +296,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "status",
       label: t("status"),
       type: "string",
-      width: 140,
+      width: 120,
       sortable: false,
       render: (r) => (
         <ITBadget color={STATUS_COLOR[r.status]} size="sm">
@@ -309,7 +308,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "decidedById",
       label: t("columns.decidedBy"),
       type: "catalog",
-      width: 200,
+      width: 160,
       filter: "search",
       catalogOptions: peopleOptions,
       sortable: false,
@@ -334,7 +333,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       key: "note",
       label: t("columns.note"),
       type: "string",
-      width: 240,
+      width: 180,
       filter: true,
       sortable: false,
       render: (r) => <ITText className="text-[11px] text-slate-500">{r.note ?? "—"}</ITText>,
@@ -346,10 +345,13 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       <ITCard title={t("filters")} className="!p-5 border border-slate-200">
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITSegmentedControl
+            <ITSearchSelect
+              name="overtimeApprovalPeriod"
+              label={t("period")}
               options={periodOptions}
               value={period}
-              onChange={(v) => handlePeriodChange(v as Period)}
+              onChange={(v) => handlePeriodChange(String(v) as Period)}
+              className="min-w-[200px]"
             />
             <ITFlex gap={2} wrap="wrap" className="ml-auto">
               <ITButton
@@ -536,7 +538,8 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         reloadTrigger={reloadKey}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[25, 50, 100]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

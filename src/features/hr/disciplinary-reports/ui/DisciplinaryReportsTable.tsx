@@ -194,7 +194,8 @@ export default function DisciplinaryReportsTable({
       reloadTrigger={reloadKey}
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
-      size="lg"
+      layout="fixed"
+      density="compact"
       virtualized
       virtualizedMaxHeight={420}
       rowHeight={50}

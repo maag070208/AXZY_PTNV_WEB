@@ -29,6 +29,7 @@ export default function NewTicketPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("new.title")}
       description={t("new.description")}
       backAction={() => navigate(-1)}

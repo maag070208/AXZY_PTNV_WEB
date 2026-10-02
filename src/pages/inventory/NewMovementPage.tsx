@@ -1,11 +1,18 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Condition, type Device, type DeviceUnitStatus, type DeviceType, type MovementType, type DeviceUnit } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
+import {
+  UnitIdentityEditor,
+  emptyUnitRow,
+  resizeUnitRows,
+  usesUnitIdentity,
+  type UnitIdentityRow,
+} from "@features/inventory/unit-identities";
 import { i18n } from "@shared/i18n";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 
@@ -18,12 +25,23 @@ const STATUS_LABEL_KEY = {
 } as const;
 
 const MOVEMENT_HINT_KEY = {
+  STOCK_IN: "movementHint.STOCK_IN",
   RETIREMENT: "movementHint.RETIREMENT",
   MAINTENANCE_IN: "movementHint.MAINTENANCE_IN",
   MAINTENANCE_OUT: "movementHint.MAINTENANCE_OUT",
 } as const;
 
-const TYPES: MovementType[] = ["RETIREMENT", "MAINTENANCE_IN", "MAINTENANCE_OUT"];
+const TYPES: MovementType[] = ["STOCK_IN", "RETIREMENT", "MAINTENANCE_IN", "MAINTENANCE_OUT"];
+
+/**
+ * La ENTRADA es distinta al resto: no mueve una pieza que ya existe, crea
+ * piezas NUEVAS (con su folio de activo fijo), así que en su renglón se pide una
+ * cantidad en vez de elegir la unidad física.
+ */
+const isEntry = (type: MovementType | ""): boolean => type === "STOCK_IN";
+
+/** Tope de piezas por entrada, el mismo que valida la API. */
+const MAX_ENTRY_QUANTITY = 5000;
 
 interface Row {
   key: string;
@@ -31,6 +49,10 @@ interface Row {
   deviceId: string;
   unitId: string;
   type: MovementType | "";
+  /** Piezas nuevas que crea una entrada (los demás tipos mueven una). */
+  quantity: number;
+  /** Identificación de cada pieza nueva de la entrada (serie, MAC, IP…). */
+  unitRows: UnitIdentityRow[];
   condition: Condition | "";
   reason: string;
   notes: string;
@@ -58,6 +80,7 @@ const UNIT_STATUS: Partial<Record<MovementType, DeviceUnitStatus>> = {
 export default function NewMovementPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const requestKey = useRequestKey();
   const [types, setTypes] = useState<DeviceType[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
@@ -66,15 +89,27 @@ export default function NewMovementPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
-  const [rows, setRows] = useState<Row[]>([{ key: crypto.randomUUID(), typeFilter: "", deviceId: "", unitId: "", type: "", condition: "", reason: "", notes: "", units: [], unitsLoading: false }]);
+  const [rows, setRows] = useState<Row[]>([]);
 
   useEffect(() => {
     Promise.all([inventoryApi.types(), inventoryApi.devices()])
       .then(([ts, ds]) => {
         setTypes(ts);
         setDevices(ds);
+        // Atajo desde el detalle del dispositivo ("Agregar unidades"): el
+        // renglón llega con el dispositivo —y el tipo— ya elegidos.
+        const deviceId = searchParams.get("deviceId") ?? "";
+        const type = searchParams.get("type");
+        const row = emptyRow({
+          deviceId,
+          type: type === "STOCK_IN" ? "STOCK_IN" : "",
+        });
+        setRows([row]);
+        if (deviceId) void loadUnits(row.key, deviceId);
       })
       .finally(() => setLoading(false));
+    // Sólo al montar: los parámetros de la URL son del atajo, no del formulario.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadUnits = async (key: string, deviceId: string) => {
@@ -90,6 +125,21 @@ export default function NewMovementPage() {
 
   const updateRow = (key: string, patch: Partial<Row>) => setRows((r) => r.map((x) => (x.key === key ? { ...x, ...patch } : x)));
 
+  /** La cantidad manda: se ajustan los renglones de identidad conservando lo ya capturado. */
+  const setQuantity = (key: string, quantity: number) => {
+    setRows((r) =>
+      r.map((x) => (x.key === key ? { ...x, quantity, unitRows: resizeUnitRows(x.unitRows, quantity) } : x))
+    );
+  };
+
+  const updateUnitRow = (key: string, id: number, field: keyof UnitIdentityRow, value: string) => {
+    setRows((r) =>
+      r.map((x) =>
+        x.key === key ? { ...x, unitRows: x.unitRows.map((u) => (u.id === id ? { ...u, [field]: value } : u)) } : x
+      )
+    );
+  };
+
   const selectDevice = (key: string, deviceId: string) => {
     updateRow(key, { deviceId, unitId: "", type: "", units: [] });
     if (deviceId) loadUnits(key, deviceId);
@@ -103,6 +153,8 @@ export default function NewMovementPage() {
     setRows((r) =>
       r.map((x) => {
         if (x.key !== key) return x;
+        // La entrada no toca piezas existentes: se suelta la unidad elegida.
+        if (isEntry(tp)) return { ...x, type: tp, unitId: "" };
         const validStatus = UNIT_STATUS[tp];
         const unitOk = x.unitId && validStatus && x.units.find((u) => u.id === x.unitId)?.status === validStatus;
         return { ...x, type: tp, unitId: unitOk ? x.unitId : "" };
@@ -110,10 +162,28 @@ export default function NewMovementPage() {
     );
   };
 
-  const addRow = () => setRows((r) => [...r, { key: crypto.randomUUID(), typeFilter: "", deviceId: "", unitId: "", type: "", condition: "", reason: "", notes: "", units: [], unitsLoading: false }]);
+  const emptyRow = (patch: Partial<Row> = {}): Row => ({
+    key: crypto.randomUUID(),
+    typeFilter: "",
+    deviceId: "",
+    unitId: "",
+    type: "",
+    quantity: 1,
+    unitRows: [emptyUnitRow()],
+    condition: "",
+    reason: "",
+    notes: "",
+    units: [],
+    unitsLoading: false,
+    ...patch,
+  });
+
+  const addRow = () => setRows((r) => [...r, emptyRow()]);
   const removeRow = (key: string) => setRows((r) => r.filter((x) => x.key !== key));
 
   const visibleUnits = (r: Row) => {
+    // Una entrada crea piezas nuevas: no hay unidad que elegir.
+    if (isEntry(r.type)) return [];
     const base = r.units.filter((u) => OPERABLE_STATUSES.includes(u.status));
     const status = r.type ? UNIT_STATUS[r.type as MovementType] : undefined;
     return status ? base.filter((u) => u.status === status) : base;
@@ -126,8 +196,8 @@ export default function NewMovementPage() {
 
   const validRow = (r: Row) =>
     !!r.deviceId &&
-    !!r.unitId &&
     !!r.type &&
+    (isEntry(r.type) ? r.quantity >= 1 && r.quantity <= MAX_ENTRY_QUANTITY : !!r.unitId) &&
     (r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN" ? !!r.reason.trim() : true) &&
     (r.type !== "MAINTENANCE_OUT" || !!r.condition);
 
@@ -140,12 +210,21 @@ export default function NewMovementPage() {
       if (r.type === "MAINTENANCE_OUT" && r.notes.trim().length > 0 && r.notes.trim().length < 3) {
         e[`notes-${idx}`] = i18n.t("inventory:validation.notesMin", { min: 3 });
       }
+      if (isEntry(r.type) && (r.quantity < 1 || r.quantity > MAX_ENTRY_QUANTITY)) {
+        e[`quantity-${idx}`] = i18n.t("inventory:validation.quantityRange", { max: MAX_ENTRY_QUANTITY });
+      }
     });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
+  /** Dispositivo del renglón (trae su tipo, que decide qué identidad se pide). */
+  const deviceOf = (r: Row) => devices.find((d) => d.id === r.deviceId);
+
   const isValid = rows.length > 0 && rows.every(validRow);
+
+  /** Piezas que toca el movimiento: una por renglón, o la cantidad si es entrada. */
+  const pieceCount = rows.reduce((sum, r) => sum + (isEntry(r.type) ? r.quantity : 1), 0);
 
   const handleSubmit = async () => {
     if (!validate()) {
@@ -170,8 +249,18 @@ export default function NewMovementPage() {
             reason: rs.find((r) => r.reason.trim())?.reason || undefined,
             items: rs.map((r) => ({
               deviceId: r.deviceId,
-              unitId: r.unitId,
-              quantity: 1,
+              ...(isEntry(tp)
+                ? {
+                    quantity: r.quantity,
+                    // Posicional: la pieza i lleva la identidad del renglón i.
+                    units: r.unitRows.map((u) => ({
+                      serialNumber: u.serialNumber || undefined,
+                      macAddress: u.macAddress || undefined,
+                      ip: u.ip || undefined,
+                      hostname: u.hostname || undefined,
+                    })),
+                  }
+                : { unitId: r.unitId, quantity: 1 }),
               condition: tp === "MAINTENANCE_OUT" ? (r.condition as Condition) : undefined,
               notes: r.notes.trim() ? r.notes : undefined,
             })),
@@ -190,7 +279,8 @@ export default function NewMovementPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("new.title")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("new.title")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -200,6 +290,7 @@ export default function NewMovementPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("new.title")}
       description={t("new.description")}
       icon={<FaSave size={20} />}
@@ -219,7 +310,8 @@ export default function NewMovementPage() {
 
         <ITFlex align="center" justify="between" gap={2}>
           <ITText className="text-[11px] font-bold text-slate-500">
-            {rows.length} {rows.length === 1 ? t("new.row") : t("new.rows")} · {rows.length} {rows.length === 1 ? t("new.piece") : t("new.pieces")}
+            {rows.length} {rows.length === 1 ? t("new.row") : t("new.rows")} · {pieceCount}{" "}
+            {pieceCount === 1 ? t("new.piece") : t("new.pieces")}
           </ITText>
         </ITFlex>
 
@@ -261,15 +353,38 @@ export default function NewMovementPage() {
                     />
                   </ITGrid>
                   <ITGrid item xs={12} md={4}>
-                    <ITSearchSelect
-                      label={t("new.unit")}
-                      placeholder={t("new.unitPlaceholder")}
-                      options={visible.map((u) => ({ value: u.id, label: unitLabel(u) }))}
-                      value={r.unitId}
-                      disabled={!r.deviceId}
-                      isLoading={r.unitsLoading}
-                      onChange={(v) => updateRow(r.key, { unitId: String(v) })}
-                    />
+                    {isEntry(r.type) ? (
+                      <div>
+                        <ITInput
+                          name={`quantity-${r.key}`}
+                          type="number"
+                          label={t("new.quantity")}
+                          value={String(r.quantity)}
+                          onChange={(e) =>
+                            setQuantity(
+                              r.key,
+                              Math.min(MAX_ENTRY_QUANTITY, Math.max(1, Number(e.target.value.replace(/[^0-9]/g, "")) || 1))
+                            )
+                          }
+                          aria-invalid={!!errors[`quantity-${idx}`]}
+                        />
+                        {errors[`quantity-${idx}`] && (
+                          <span role="alert" className="text-red-500 text-xs mt-1 block">
+                            {errors[`quantity-${idx}`]}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <ITSearchSelect
+                        label={t("new.unit")}
+                        placeholder={t("new.unitPlaceholder")}
+                        options={visible.map((u) => ({ value: u.id, label: unitLabel(u) }))}
+                        value={r.unitId}
+                        disabled={!r.deviceId}
+                        isLoading={r.unitsLoading}
+                        onChange={(v) => updateRow(r.key, { unitId: String(v) })}
+                      />
+                    )}
                   </ITGrid>
                 </ITGrid>
 
@@ -292,14 +407,14 @@ export default function NewMovementPage() {
                   })}
                 </ITFlex>
 
-                {(r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN") && (
+                {(r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN" || isEntry(r.type)) && (
                   <div>
                     <ITInput
                       name={`reason-${r.key}`}
                       label={t("new.reason")}
                       value={r.reason}
                       onChange={(e) => updateRow(r.key, { reason: e.target.value })}
-                      required
+                      required={!isEntry(r.type)}
                       aria-invalid={!!errors[`reason-${idx}`]}
                     />
                     {errors[`reason-${idx}`] && (
@@ -356,12 +471,31 @@ export default function NewMovementPage() {
                   </ITText>
                 )}
 
-                {r.type && r.deviceId && !r.unitsLoading && visible.length === 0 && (
+                {r.type && r.deviceId && !isEntry(r.type) && !r.unitsLoading && visible.length === 0 && (
                   <ITText className="text-[11px] font-semibold text-amber-600">{t("new.withoutUnitsStatus")}</ITText>
                 )}
 
-                {r.type && r.deviceId && visible.length > 0 && (
+                {r.type && r.deviceId && (isEntry(r.type) || visible.length > 0) && (
                   <ITText className="text-[11px] text-slate-400">{t(MOVEMENT_HINT_KEY[r.type as keyof typeof MOVEMENT_HINT_KEY])}</ITText>
+                )}
+
+                {/* Las piezas nuevas se identifican aquí mismo (serie, MAC, IP):
+                    es opcional y por pieza, y el tipo del dispositivo decide qué
+                    campos se piden. */}
+                {isEntry(r.type) && usesUnitIdentity(deviceOf(r)?.type) && (
+                  <ITFlex direction="column" gap={2} className="rounded-xl border border-slate-100 !bg-slate-50/60 p-3">
+                    <ITText className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                      {t("new.identifyPieces", { count: r.quantity })}
+                    </ITText>
+                    <ITText className="text-[11px] text-slate-400">{t("new.identifyPiecesHint")}</ITText>
+                    <UnitIdentityEditor
+                      type={deviceOf(r)?.type}
+                      units={r.unitRows}
+                      onChange={(id, field, value) => updateUnitRow(r.key, id, field, value)}
+                      label={(index) => `${t("new.pieceRow")} ${index + 1}`}
+                      openFirst={1}
+                    />
+                  </ITFlex>
                 )}
               </ITFlex>
             );

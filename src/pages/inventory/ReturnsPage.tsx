@@ -121,6 +121,7 @@ export default function ReturnsPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("loanReturn.title")}
       description={t("loanReturn.description")}
       icon={<FaUndoAlt size={20} />}

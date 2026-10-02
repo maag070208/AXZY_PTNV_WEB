@@ -9,19 +9,25 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaFileExcel, FaPlus, FaUserShield } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import {
   useUsersList,
   UsersTable,
 } from "@features/user/users-list";
+import { UserEditDialog } from "@features/user/user-form";
 import { DeactivateDialog } from "@features/hr/employee-detail";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
+  // La edición es un diálogo sobre la lista: `/users/:id/edit` lo abre, así que
+  // los enlaces directos (y el botón del expediente) siguen funcionando.
+  const { id: editingId } = useParams<{ id: string }>();
   const { t: tt } = useTranslation(["users", "common"]);
   const canManageUsers = useCan("users.view");
+  // Alta e importación crean cuentas (`POST /users`, `/users/import`): la API exige `users.create`.
+  const canCreateUsers = useCan("users.create");
 
   const fx = useUsersList();
 
@@ -30,33 +36,36 @@ export default function UsersListPage() {
       title={tt("list.title")}
       description={tt("list.description", { count: fx.total })}
       backAction={() => navigate(-1)}
+      noPadding
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: tt("list.breadcrumb") },
       ]}
       actions={
-        <ITFlex gap={2}>
-          <ITButton
-            variant="outlined"
-            color="secondary"
-            onClick={() => navigate("/users/import")}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaFileExcel size={12} />
-              <ITText className="font-bold text-[11px]">{tt("list.importExcel")}</ITText>
-            </ITFlex>
-          </ITButton>
-          <ITButton
-            variant="filled"
-            color="primary"
-            onClick={() => navigate("/users/new")}
-          >
-            <ITFlex align="center" gap={1}>
-              <FaPlus size={12} />
-              <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
+        canCreateUsers ? (
+          <ITFlex gap={2}>
+            <ITButton
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate("/users/import")}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaFileExcel size={12} />
+                <ITText className="font-bold text-[11px]">{tt("list.importExcel")}</ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={() => navigate("/users/new")}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaPlus size={12} />
+                <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
+        ) : undefined
       }
       icon={<FaUserShield size={20} />}
     >
@@ -64,6 +73,12 @@ export default function UsersListPage() {
         fx={fx}
         onView={(u) => navigate(`/employees/${u.id}`)}
         onEdit={(u) => navigate(`/users/${u.id}/edit`)}
+      />
+
+      <UserEditDialog
+        userId={editingId ?? null}
+        onClose={() => navigate("/users")}
+        onSaved={fx.reload}
       />
 
       {/* Para usuarios activos, baja con captura de motivo */}

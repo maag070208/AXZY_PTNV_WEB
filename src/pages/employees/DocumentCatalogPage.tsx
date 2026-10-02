@@ -137,7 +137,7 @@ export default function DocumentCatalogPage() {
       label: tt("catalog.required"),
       width: 170,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: [
           { id: "true", name: tt("catalog.requiredYes") },
@@ -195,6 +195,7 @@ export default function DocumentCatalogPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("catalog.title")}
       description={tt("catalog.description")}
       icon={<FaFileAlt size={20} />}

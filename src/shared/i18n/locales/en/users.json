@@ -76,7 +76,33 @@
     "subarea": "Subarea",
     "roleGuide": "Role guide",
     "passwordEditHint": "When editing, leave the password blank to keep it.",
+    "extraRoles": "Additional roles",
+    "extraRolesHint": "Besides the primary role, this person can have other roles. Their permissions are the union of all of them (the widest scope wins).",
+    "permissions": {
+      "title": "This person's permissions",
+      "subtitle": "Beyond what the role grants, you can raise, lower or remove a permission for this person only. The exception replaces the role.",
+      "followRole": "Follow role",
+      "roleScope": "Role: {{scope}}",
+      "hasException": "Exception",
+      "dialogTitle": "Exception: {{permission}}",
+      "dialogIntro": "The {{scope}} scope will apply to this person only.",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "Covers the manager, management decision…",
+      "expiresAt": "Expires on (optional)",
+      "saved": "Exception saved",
+      "removed": "Exception removed",
+      "loadError": "Could not load the permissions",
+      "saveError": "Could not save the exception"
+    },
     "roles": {
+      "GENERIC": {
+        "title": "Custom role",
+        "summary": "Role created from the Roles and permissions screen. What it can do depends on the permissions the administrator granted.",
+        "actions": [
+          "Its scope is defined by the role's permissions",
+          "The administrator tunes it in Roles and permissions"
+        ]
+      },
       "ADMIN": {
         "title": "System Administrator",
         "summary": "Full control of catalogs, users, devices, tickets and reports.",
@@ -122,6 +148,15 @@
           "Does not manage tickets, inventory or users"
         ]
       },
+      "CHEF": {
+        "title": "Chef",
+        "summary": "Manages the kitchen store: items, lots, stock in, consumption and waste.",
+        "actions": [
+          "Manages the kitchen store (minimums, maximums and expiry)",
+          "Records stock in, consumption and waste",
+          "Views the tickets of their area"
+        ]
+      },
       "GUARD": {
         "title": "Guard",
         "summary": "Runs the gatehouse from the app: scans staff credentials and records their entry or exit.",
@@ -153,7 +188,11 @@
       "employeeNumberMax": "Employee number must have at most {{max}} characters",
       "jobTitleMax": "Job title must have at most {{max}} characters"
     },
-    "emailPlaceholder": "user@company.com"
+    "emailPlaceholder": "user@company.com",
+    "personElsewhere": "The person's data (name, email, address, tax data) is edited in their HR record.",
+    "openRecord": "Open HR record",
+    "save": "Save changes",
+    "saved": "User updated successfully"
   },
   "history": {
     "title": "History",

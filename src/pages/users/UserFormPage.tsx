@@ -1,11 +1,6 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useState } from "react";
-import {
-  ITAlert,
-  ITFlex,
-  ITPage,
-  ITStepper,
-} from "@axzydev/axzy_ui_system";
+import { ITAlert, ITFlex, ITPage, ITStepper } from "@axzydev/axzy_ui_system";
 import { FaBuilding, FaFileUpload, FaIdCard, FaShieldAlt, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -48,6 +43,7 @@ export default function UserFormPage() {
   if (userForm.loading) {
     return (
       <ITPage
+        noPadding
         title={title}
         description={description}
         loading
@@ -67,6 +63,7 @@ export default function UserFormPage() {
 
   const fieldsProps = {
     isEdit,
+    personFields: true,
     form: userForm.form,
     errors: userForm.errors,
     onFieldChange: userForm.handleField,
@@ -76,6 +73,8 @@ export default function UserFormPage() {
     selectedDept: userForm.selectedDept,
     roleGuidance: userForm.roleGuidance,
     roleOptions: userForm.ROLE_OPTIONS,
+    extraRoleOptions: userForm.EXTRA_ROLE_OPTIONS,
+    onToggleExtraRole: userForm.toggleExtraRole,
     requiredDocs: userForm.requiredDocs,
     docsFiles: userForm.docsFiles,
     onPickDoc: userForm.setDocFile,
@@ -111,6 +110,7 @@ export default function UserFormPage() {
 
   return (
     <ITPage
+      noPadding
       title={title}
       description={description}
       backAction={() => navigate(-1)}

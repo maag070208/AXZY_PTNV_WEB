@@ -2,6 +2,7 @@ import { test as base, expect, type APIRequestContext } from "@playwright/test";
 import { E2E_PREFIX, newRunId } from "./env";
 import { ApiInventory, createContextApi, type Device, type DeviceType } from "./api";
 import { ApiTickets, type Ticket, type TicketAssignment } from "./ticketsApi";
+import { DeviceImportPage } from "./pages/DeviceImportPage";
 import { DeviceRegistrationPage } from "./pages/DeviceRegistrationPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NewLoanReturnPage } from "./pages/NewLoanReturnPage";
@@ -73,6 +74,7 @@ export class TicketScenario {
 interface Fixtures {
   login: LoginPage;
   registrationPage: DeviceRegistrationPage;
+  deviceImportPage: DeviceImportPage;
   loanPage: NewLoanPage;
   movementPage: NewMovementPage;
   loanReturnPage: NewLoanReturnPage;
@@ -145,6 +147,9 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   },
   registrationPage: async ({ page }, use) => {
     await use(new DeviceRegistrationPage(page));
+  },
+  deviceImportPage: async ({ page }, use) => {
+    await use(new DeviceImportPage(page));
   },
   loanPage: async ({ page }, use) => {
     await use(new NewLoanPage(page));

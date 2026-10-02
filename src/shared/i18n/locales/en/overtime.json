@@ -6,6 +6,7 @@
     "restDay": "If they clock in on a rest day, all time worked counts as overtime, as long as it reaches the schedule's minimum."
   },
   "filters": "Filters",
+  "period": "Period",
   "date": "Date",
   "clear": "Clear",
   "cancel": "Cancel",

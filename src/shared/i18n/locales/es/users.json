@@ -76,7 +76,33 @@
     "subarea": "Subárea",
     "roleGuide": "Guía del rol",
     "passwordEditHint": "En edición, deja la contraseña vacía para conservarla.",
+    "extraRoles": "Roles adicionales",
+    "extraRolesHint": "Además del rol principal, esta persona puede tener otros roles. Sus permisos son la unión de todos (gana el alcance mayor).",
+    "permissions": {
+      "title": "Permisos de esta persona",
+      "subtitle": "Además de lo que le da su rol, puedes subir, bajar o quitar un permiso solo para esta persona. La excepción reemplaza al rol.",
+      "followRole": "Según su rol",
+      "roleScope": "Rol: {{scope}}",
+      "hasException": "Excepción",
+      "dialogTitle": "Excepción: {{permission}}",
+      "dialogIntro": "Se aplicará el alcance {{scope}} solo para esta persona.",
+      "reason": "Motivo (opcional)",
+      "reasonPlaceholder": "Cubre al jefe, decisión de gerencia…",
+      "expiresAt": "Vence el (opcional)",
+      "saved": "Excepción guardada",
+      "removed": "Excepción eliminada",
+      "loadError": "No se pudieron cargar los permisos",
+      "saveError": "No se pudo guardar la excepción"
+    },
     "roles": {
+      "GENERIC": {
+        "title": "Rol personalizado",
+        "summary": "Rol creado desde la pantalla de Roles y permisos. Lo que puede hacer depende de los permisos que le haya dado el administrador.",
+        "actions": [
+          "Su alcance lo definen los permisos del rol",
+          "El administrador lo ajusta en Roles y permisos"
+        ]
+      },
       "ADMIN": {
         "title": "Administrador del sistema",
         "summary": "Control total de catálogos, usuarios, dispositivos, tickets y reportes.",
@@ -122,6 +148,15 @@
           "No administra tickets, inventario ni usuarios"
         ]
       },
+      "CHEF": {
+        "title": "Chef",
+        "summary": "Administra el almacén de cocina: artículos, lotes, entradas, consumos y mermas.",
+        "actions": [
+          "Administra el almacén de cocina (mínimos, máximos y caducidad)",
+          "Registra entradas, consumos y mermas",
+          "Ve los tickets de su área"
+        ]
+      },
       "GUARD": {
         "title": "Guardia",
         "summary": "Opera la portería desde la app: escanea la credencial del personal y registra su entrada o salida.",
@@ -153,7 +188,11 @@
       "employeeNumberMax": "El número de empleado debe tener máximo {{max}} caracteres",
       "jobTitleMax": "El puesto debe tener máximo {{max}} caracteres"
     },
-    "emailPlaceholder": "usuario@empresa.com"
+    "emailPlaceholder": "usuario@empresa.com",
+    "personElsewhere": "Los datos de la persona (nombre, correo, domicilio, datos fiscales) se editan en su expediente de personal.",
+    "openRecord": "Abrir expediente",
+    "save": "Guardar cambios",
+    "saved": "Usuario actualizado correctamente"
   },
   "history": {
     "title": "Historial",

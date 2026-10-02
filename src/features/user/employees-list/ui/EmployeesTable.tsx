@@ -14,7 +14,7 @@ import { FaEdit, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
 import type { PersonalProfile } from "@entities/hr";
-import { roleLabel } from "@entities/user";
+import { roleLabel, useRolesCatalog } from "@entities/user";
 
 const roleBadge = (role: string, label: string) => (
   <ITBadget
@@ -22,10 +22,10 @@ const roleBadge = (role: string, label: string) => (
       role === "MANAGER"
         ? "danger"
         : role === "AREA_HEAD"
-        ? "warning"
-        : role === "EMPLOYEE"
-        ? "success"
-        : "gray"
+          ? "warning"
+          : role === "EMPLOYEE"
+            ? "success"
+            : "gray"
     }
     size="lg"
   >
@@ -60,11 +60,10 @@ export default function EmployeesTable({
     d.subareas.map((s) => ({ id: s.id, name: `${d.name} · ${s.name}` }))
   );
 
-  // Roles que admite el API para el personal (PERSONAL_ROLES).
-  const roleOptions = (["MANAGER", "AREA_HEAD", "EMPLOYEE"] as const).map((id) => ({
-    id,
-    name: roleLabel(id),
-  }));
+  // Roles que admite el API para el personal (los marcados `staff` en /roles).
+  const staffRoleOptions = useRolesCatalog()
+    .filter((role) => role.active && role.staff)
+    .map((role) => ({ id: role.key, name: role.name }));
 
   const columns: Column<PersonalProfile>[] = [
     {
@@ -84,7 +83,7 @@ export default function EmployeesTable({
       key: "name",
       label: tt("table.name"),
       type: "string",
-      width: 300,
+      width: 280,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -107,7 +106,7 @@ export default function EmployeesTable({
       width: 140,
       filter: "catalog",
       sortable: false,
-      catalogOptions: { data: roleOptions, loading: false, error: false },
+      catalogOptions: { data: staffRoleOptions, loading: false, error: false },
       render: (u) => roleBadge(u.role, roleLabel(u.role)),
     },
     {
@@ -135,7 +134,7 @@ export default function EmployeesTable({
       key: "jobTitle",
       label: tt("table.position"),
       type: "string",
-      width: 220,
+      width: 180,
       filter: true,
       sortable: false,
       render: (u) => (
@@ -146,7 +145,7 @@ export default function EmployeesTable({
       key: "departmentId",
       label: tt("table.departmentFull"),
       type: "catalog",
-      width: 200,
+      width: 150,
       filter: "search",
       sortable: false,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
@@ -160,7 +159,7 @@ export default function EmployeesTable({
       key: "subareaId",
       label: tt("table.subarea"),
       type: "catalog",
-      width: 200,
+      width: 130,
       filter: "search",
       sortable: false,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
@@ -212,7 +211,8 @@ export default function EmployeesTable({
       reloadTrigger={reloadKey}
       defaultItemsPerPage={100}
       itemsPerPageOptions={[50, 100, 150]}
-      size="lg"
+      layout="fixed"
+      density="compact"
       virtualized
       virtualizedMaxHeight={420}
       rowHeight={50}

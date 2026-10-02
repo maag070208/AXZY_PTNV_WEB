@@ -3,7 +3,14 @@ import {
   tableRequest,
   type ITDataTableFetchParamsPost,
 } from "@shared/api/table";
-import type { AuthMe, LoginResponse, User, UserRole } from "../model/types";
+import type {
+  AuthMe,
+  LoginResponse,
+  SetPermissionExceptionInput,
+  User,
+  UserPermissionView,
+  UserRole,
+} from "../model/types";
 
 export const authApi = {
   login: (username: string, password: string) =>
@@ -49,6 +56,8 @@ export const usersApi = {
     paternalSurname?: string;
     maternalSurname?: string;
     role: UserRole;
+    /** Roles adicionales (multi-rol). */
+    roles?: UserRole[];
     jobTitle?: string;
     area?: string;
     employeeNumber?: string;
@@ -65,6 +74,8 @@ export const usersApi = {
       paternalSurname?: string | null;
       maternalSurname?: string | null;
       role?: UserRole;
+      /** Roles adicionales (multi-rol). Si viene, reemplaza los actuales. */
+      roles?: UserRole[];
       active?: boolean;
       jobTitle?: string;
       area?: string;
@@ -101,4 +112,16 @@ export const usersApi = {
       timestamp: string;
       refId?: string;
     }>>(`/users/${id}/history`),
+  /** Excepciones de permiso por empleado (Fase 2). */
+  listPermissions: (id: string) =>
+    api.get<UserPermissionView[]>(`/users/${id}/permissions`),
+  setPermission: (id: string, permission: string, body: SetPermissionExceptionInput) =>
+    api.put<UserPermissionView[]>(
+      `/users/${id}/permissions/${encodeURIComponent(permission)}`,
+      body
+    ),
+  removePermission: (id: string, permission: string) =>
+    api.delete<UserPermissionView[]>(
+      `/users/${id}/permissions/${encodeURIComponent(permission)}`
+    ),
 };

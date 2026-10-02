@@ -1,7 +1,7 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITSegmentedControl, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaFileSignature, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceType } from "@entities/inventory";
@@ -147,7 +147,8 @@ export default function NewLoanPage() {
 
   if (loading) {
     return (
-      <ITPage title={t("loans.new")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("loans.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -157,6 +158,7 @@ export default function NewLoanPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("loans.new")}
       description={t("loans.formSub")}
       icon={<FaFileSignature size={20} />}
@@ -176,15 +178,15 @@ export default function NewLoanPage() {
           <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             {/* Asignación a personal o departamento */}
             <ITFlex as="fieldset" direction="column" gap={2}>
-              <ITText as="legend" className="text-sm font-semibold text-slate-700">{t("loans.assignment")}</ITText>
-              <ITSegmentedControl
+              <ITSearchSelect
+                name="loanAssignment"
+                label={t("loans.assignment")}
                 options={[
-                  { value: "EMPLOYEE", label: t("loans.toEmployee"), icon: <FaFileSignature size={11} /> },
-                  { value: "DEPARTMENT", label: t("loans.toDepartment"), icon: <FaFileSignature size={11} /> },
+                  { value: "EMPLOYEE", label: t("loans.toEmployee") },
+                  { value: "DEPARTMENT", label: t("loans.toDepartment") },
                 ]}
                 value={assignment}
-                onChange={(v) => setAssignment(v as "EMPLOYEE" | "DEPARTMENT")}
-                size="md"
+                onChange={(v) => setAssignment(String(v) as "EMPLOYEE" | "DEPARTMENT")}
               />
             </ITFlex>
 

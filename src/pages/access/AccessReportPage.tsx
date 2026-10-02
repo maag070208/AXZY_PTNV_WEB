@@ -12,6 +12,7 @@ export default function AccessReportPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("title")}
       description={t("description")}
       icon={<FaDoorOpen size={20} />}

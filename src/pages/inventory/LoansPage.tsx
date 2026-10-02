@@ -144,6 +144,7 @@ export default function LoansPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("loans.title")}
       description={t("loans.description")}
       icon={<FaFileSignature size={20} />}
@@ -163,7 +164,8 @@ export default function LoansPage() {
         fetchData={fetchData as any}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

@@ -28,8 +28,8 @@
       "category": "Categoría",
       "status": "Estado",
       "priority": "Prioridad",
-      "createdBy": "Creado por",
-      "assignedTo": "Asignado a",
+      "createdBy": "Creado",
+      "assignedTo": "Asignado",
       "createdAt": "Fecha de alta",
       "wait": "Días en espera"
     },

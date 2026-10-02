@@ -71,6 +71,7 @@ export default function TicketDetailPage() {
   if (!ticket) {
     return (
       <ITPage
+        noPadding
         title={tt("detail.title")}
         backAction={() => navigate(-1)}
         icon={<FaTicketAlt size={20} />}
@@ -88,6 +89,7 @@ export default function TicketDetailPage() {
 
   return (
     <ITPage
+      noPadding
       title={ticket.title}
       description={tt("detail.description", {
         status: dyn(tt)(`statusLabels.${ticket.status}`) ?? ticket.status,

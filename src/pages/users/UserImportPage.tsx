@@ -16,6 +16,7 @@ export default function UserImportPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("import.title")}
       description={tt("import.description")}
       backAction={() => navigate(-1)}

@@ -4,6 +4,8 @@ import type {
   Dashboard,
   LoanReturn,
   Device,
+  DeviceImportPreview,
+  DeviceImportResult,
   DeviceUnitStatus,
   Stock,
   StockLedgerRow,
@@ -137,6 +139,38 @@ export const inventoryApi = {
 
   // Dashboard
   dashboard: () => api.get<Dashboard>(`/inventory/dashboard`),
+
+  /* -------------------------------------------------------------------------
+     Carga masiva desde Excel
+     El archivo se manda DOS veces, en los dos pasos: la API lo vuelve a leer y
+     a resolver en la confirmación en vez de confiar en lo que la pantalla dice
+     que leyó. Así lo que el usuario revisó es exactamente lo que se ejecuta.
+  ------------------------------------------------------------------------- */
+
+  /** Paso 1: qué haría la carga. No escribe nada en el inventario. */
+  previewDeviceImport: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api.post<DeviceImportPreview>(`/inventory/devices/import/preview`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  /** Paso 2: la carga real, en una sola transacción (todo o nada). */
+  importDevices: (file: File, idempotencyKey?: string) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api.post<DeviceImportResult>(`/inventory/devices/import`, form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
+      },
+    });
+  },
+
+  /** Plantilla Excel con los encabezados y el catálogo de tipos vigente. */
+  deviceImportTemplate: () =>
+    api.get<Blob>(`/inventory/devices/import/template`, { responseType: "blob" }),
 };
 
 export type DeviceUnitStatusType = DeviceUnitStatus;

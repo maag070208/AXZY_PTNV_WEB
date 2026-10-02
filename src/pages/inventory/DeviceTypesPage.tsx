@@ -108,6 +108,7 @@ export default function DeviceTypesPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("types.title")}
       description={t("types.description")}
       icon={<FaTag size={20} />}

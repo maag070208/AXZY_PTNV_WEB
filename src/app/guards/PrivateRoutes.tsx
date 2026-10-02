@@ -6,13 +6,14 @@ import {
   FaTicketAlt,
   FaUserTie,
   FaCog,
+  FaUtensils,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@app/store";
-import { logout, meThunk } from "@entities/user";
-import { APP_SCREENS, isScreenVisible, type AppScreen } from "@entities/permission";
+import { logout, meThunk, setRolesCatalog } from "@entities/user";
+import { APP_SCREENS, isScreenVisible, permissionApi, type AppScreen } from "@entities/permission";
 import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
 import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
@@ -23,6 +24,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   start: <FaHouseUser size={14} />,
   tasks: <FaTicketAlt size={14} />,
   inventory: <FaBoxes size={14} />,
+  kitchen: <FaUtensils size={14} />,
   hr: <FaUserTie size={14} />,
   settings: <FaCog size={14} />,
 };
@@ -73,6 +75,22 @@ export default function PrivateRoutes() {
   useEffect(() => {
     if (token) dispatch(meThunk());
   }, [token, dispatch]);
+
+  // Catálogo de roles dinámico (nombres, `staff`, activo): la web lo usa para
+  // etiquetas y selectores. Se refresca al volver a la ventana, igual que la
+  // sesión, para que un rol nuevo o renombrado aplique sin relogin.
+  useEffect(() => {
+    if (!token) return undefined;
+    const loadRoles = () => {
+      void permissionApi
+        .listRoles()
+        .then(setRolesCatalog)
+        .catch(() => undefined);
+    };
+    loadRoles();
+    window.addEventListener("focus", loadRoles);
+    return () => window.removeEventListener("focus", loadRoles);
+  }, [token]);
 
   // La interfaz sigue el idioma del sistema que trae la sesión.
   useEffect(() => {
@@ -210,7 +228,7 @@ export default function PrivateRoutes() {
 
   return (
     <>
-      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-full! m-0! !px-2">
+      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-screen! m-0! !px-2">
         <Outlet />
       </ITLayout>
       {toast && (

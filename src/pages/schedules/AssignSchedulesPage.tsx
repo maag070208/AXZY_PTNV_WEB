@@ -10,6 +10,7 @@ export default function AssignSchedulesPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("assign.title")}
       description={t("assign.description")}
       icon={<FaUserClock size={20} />}

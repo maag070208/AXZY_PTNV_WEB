@@ -37,7 +37,8 @@ export default function LoanDetailPage() {
 
   if (loading || !loan) {
     return (
-      <ITPage title={t("loans.detail")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("loans.detail")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -47,6 +48,7 @@ export default function LoanDetailPage() {
 
   return (
     <ITPage
+      noPadding
       title={loan.number}
       description={`${loan.custodian?.name ?? "—"} · ${formatDate(loan.date)}`}
       icon={<FaFileSignature size={20} />}

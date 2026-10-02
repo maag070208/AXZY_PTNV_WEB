@@ -16,13 +16,19 @@ export class NewLoanPage {
   }
 
   async assignToDepartment(name: string): Promise<void> {
-    await button(this.page, /A un departamento/).click();
+    await this.pickAssignment("A un departamento / subárea");
     await selectInSearch(this.page, "Seleccionar departamento...", name);
   }
 
   async assignToEmployee(name: string): Promise<void> {
-    await button(this.page, /A un empleado/).click();
+    await this.pickAssignment("A un empleado");
     await selectInSearch(this.page, "Buscar responsable...", name);
+  }
+
+  /** El destino es un `ITSearchSelect` (antes era un segmented control). */
+  private async pickAssignment(label: string): Promise<void> {
+    await this.page.locator('input[name="loanAssignment"]').click();
+    await this.page.getByText(label, { exact: true }).last().click();
   }
 
   async selectResource(type: string, device: string): Promise<void> {

@@ -11,6 +11,7 @@ export default function EmployeeRecordsPage() {
   const fx = useEmployeeRecords();
   return (
     <ITPage
+      noPadding
       title={t("records.title")}
       description={t("records.description")}
       icon={<FaIdCard size={20} />}

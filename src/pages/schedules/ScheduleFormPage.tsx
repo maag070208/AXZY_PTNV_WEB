@@ -12,6 +12,7 @@ export default function ScheduleFormPage() {
 
   return (
     <ITPage
+      noPadding
       title={isEdit ? t("edit") : t("new")}
       icon={<FaRegClock size={20} />}
       breadcrumbs={[

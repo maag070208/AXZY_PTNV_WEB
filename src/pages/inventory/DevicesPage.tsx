@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ITBadget, ITButton, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaPlus } from "react-icons/fa";
+import { FaBoxOpen, FaFileExcel, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type Device, type DeviceType } from "@entities/inventory";
+import { useCan } from "@entities/user";
 
 export default function DevicesPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
   const [types, setTypes] = useState<DeviceType[]>([]);
+  const canCreate = useCan("devices.create");
 
   useEffect(() => {
     inventoryApi.types().then(setTypes);
@@ -33,7 +35,7 @@ export default function DevicesPage() {
       type: "string",
       key: "name",
       label: t("devices.colName"),
-      width: 300,
+      width: 280,
       sortable: false,
       filter: true,
       render: (d: Device) => (
@@ -47,7 +49,7 @@ export default function DevicesPage() {
       type: "string",
       key: "typeId",
       label: t("devices.colType"),
-      width: 160,
+      width: 180,
       sortable: false,
       filter: "catalog" as const,
       catalogOptions: {
@@ -96,27 +98,45 @@ export default function DevicesPage() {
       label: "",
       width: 140,
       render: (d: Device) => (
-        <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/devices/${d.id}`)}>
+        <ITFlex gap={1} justify="center">
+         <ITButton variant="outlined" color="primary" size="lg" onClick={() => navigate(`/inventory/devices/${d.id}`)}>
           <ITText className="font-bold text-[10px]">{t("common:actions.view")}</ITText>
         </ITButton>
+        </ITFlex>
       ),
     },
   ];
 
   return (
     <ITPage
+      noPadding
       title={t("devices.title")}
       description={t("devices.description")}
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title") }]}
       backAction={() => navigate("/inventory")}
       actions={
-        <ITButton variant="filled" color="primary" onClick={() => navigate("/inventory/devices/new")}>
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{t("devices.new")}</ITText>
-          </ITFlex>
-        </ITButton>
+        <ITFlex align="center" gap={2} wrap="wrap">
+          {/* Carga masiva: solo para quien puede dar de alta dispositivos. */}
+          {canCreate && (
+            <ITButton
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate("/inventory/devices/import")}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaFileExcel size={12} />
+                <ITText className="font-bold text-[11px]">{t("devices.importExcel")}</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
+          <ITButton variant="filled" color="primary" onClick={() => navigate("/inventory/devices/new")}>
+            <ITFlex align="center" gap={1}>
+              <FaPlus size={12} />
+              <ITText className="font-bold text-[11px]">{t("devices.new")}</ITText>
+            </ITFlex>
+          </ITButton>
+        </ITFlex>
       }
     >
       <ITDataTable
@@ -124,7 +144,8 @@ export default function DevicesPage() {
         fetchData={fetchData as any}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

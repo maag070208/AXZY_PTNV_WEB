@@ -5,7 +5,12 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { API_CONSTANTS } from "./constants/API_CONSTANTS";
-import { getSessionToken, handleUnauthorized } from "./session";
+import {
+  getSessionRefreshToken,
+  getSessionToken,
+  handleUnauthorized,
+  updateSessionTokens,
+} from "./session";
 import i18n from "@shared/i18n/config";
 
 class ApiError extends Error {
@@ -50,13 +55,59 @@ axiosInstance.interceptors.request.use(
 );
 
 /* ---------------------------------------------------------
-   3. RESPONSE Interceptor (401 => logout; 403 ACCOUNT_DEACTIVATED => no logout)
+   3. RESPONSE Interceptor
+      (401 => refresh una vez y reintenta; si no, logout.
+       403 ACCOUNT_DEACTIVATED => no logout)
 --------------------------------------------------------- */
+let refreshPromise: Promise<string | null> | null = null;
+
+/** Renueva el access token; una sola renovación simultánea para todos. */
+const refreshAccessToken = async (): Promise<string | null> => {
+  const refreshToken = getSessionRefreshToken();
+  if (!refreshToken) return null;
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      try {
+        const { data } = await axios.post(`${API_CONSTANTS.BASE_URL}/auth/refresh`, {
+          refreshToken,
+        });
+        updateSessionTokens({ token: data.token, refreshToken: data.refreshToken });
+        return data.token as string;
+      } catch {
+        return null;
+      } finally {
+        refreshPromise = null;
+      }
+    })();
+  }
+  return refreshPromise;
+};
+
+type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
     const status = error.response?.status;
     const code = (error.response?.data as { code?: string } | undefined)?.code;
+    const original = error.config as RetriableConfig | undefined;
+
+    // Un access token vencido se renueva una sola vez por petición.
+    if (
+      status === 401 &&
+      code !== "ACCOUNT_DEACTIVATED" &&
+      original &&
+      !original._retry &&
+      !original.url?.includes("/auth/refresh")
+    ) {
+      original._retry = true;
+      const token = await refreshAccessToken();
+      if (token) {
+        original.headers.Authorization = `Bearer ${token}`;
+        return axiosInstance(original);
+      }
+    }
+
     if (status === 401) {
       // 401 con código explícito (e.g. ACCOUNT_DEACTIVATED) NO debe disparar
       // el logout silencioso: la UI necesita mostrar el motivo.

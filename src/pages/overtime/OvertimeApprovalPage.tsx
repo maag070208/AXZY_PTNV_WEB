@@ -17,6 +17,7 @@ export default function OvertimeApprovalPage() {
       title={t("title")}
       description={t("description")}
       icon={<FaClock size={20} />}
+      noPadding
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("common:nav.schedules"), onClick: () => navigate("/schedules") },

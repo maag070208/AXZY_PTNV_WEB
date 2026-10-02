@@ -31,7 +31,7 @@ test.describe("Tickets — lista y filtros", () => {
     const row = ticketsPage.row(ticketScenario.title);
     await expect(row).toBeVisible();
 
-    for (const column of ["Título", "Estado", "Prioridad", "Creado por", "Asignado a"]) {
+    for (const column of ["Título", "Estado", "Prioridad", "Creado", "Asignado"]) {
       await expect(page.getByText(column, { exact: true }).first()).toBeVisible();
     }
 

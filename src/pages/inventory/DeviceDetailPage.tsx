@@ -2,11 +2,12 @@ import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaCheckCircle, FaEdit, FaHistory, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
+import { FaBoxOpen, FaCheckCircle, FaEdit, FaHistory, FaPlusCircle, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
 import { inventoryApi, type Device, type Stock, type StockLedgerRow, type MovementType, type DeviceUnit } from "@entities/inventory";
 import { StatCard } from "@shared/ui/stat-card";
+import { useCan } from "@entities/user";
 import { i18n } from "@shared/i18n";
 
 const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = {
@@ -34,6 +35,8 @@ export default function DeviceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  /** Mismo permiso que `POST /inventory/movements` (dar entrada/baja). */
+  const canEditUnits = useCan("devices.edit");
   const [device, setDevice] = useState<Device | null>(null);
   const [stock, setStock] = useState<Stock | null>(null);
   const [units, setUnits] = useState<DeviceUnit[]>([]);
@@ -59,7 +62,8 @@ export default function DeviceDetailPage() {
   // Sin dispositivo (no existe o falló la carga): el error, no un cargador infinito.
   if (!loading && !device) {
     return (
-      <ITPage title={t("devices.detail")} backAction={() => navigate("/inventory/devices")}>
+      <ITPage
+        noPadding title={t("devices.detail")} backAction={() => navigate("/inventory/devices")}>
         <ITAlert variant="error" dismissible={false}>
           {error ?? t("common:errors.load")}
         </ITAlert>
@@ -69,7 +73,8 @@ export default function DeviceDetailPage() {
 
   if (loading || !device) {
     return (
-      <ITPage title={t("devices.detail")} backAction={() => navigate(-1)}>
+      <ITPage
+        noPadding title={t("devices.detail")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -81,18 +86,37 @@ export default function DeviceDetailPage() {
 
   return (
     <ITPage
+      noPadding
       title={device.name}
       description={`${device.brand} ${device.model}`}
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title"), onClick: () => navigate("/inventory/devices") }, { label: device.name }]}
       backAction={() => navigate("/inventory/devices")}
       actions={
-        <ITButton variant="outlined" color="primary" onClick={() => navigate(`/inventory/devices/${device.id}/edit`)}>
-          <ITFlex align="center" gap={1}>
-            <FaEdit size={12} />
-            <ITText className="font-bold text-[11px]">{t("devices.edit")}</ITText>
-          </ITFlex>
-        </ITButton>
+        <ITFlex align="center" gap={2} wrap="wrap">
+          {/* "Llegaron más piezas": abre el alta de ENTRADA con este
+              dispositivo y el tipo ya elegidos. */}
+          {canEditUnits && (
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={() =>
+                navigate(`/inventory/movements/new?deviceId=${device.id}&type=STOCK_IN`)
+              }
+            >
+              <ITFlex align="center" gap={1}>
+                <FaPlusCircle size={12} />
+                <ITText className="font-bold text-[11px]">{t("devices.addUnits")}</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
+          <ITButton variant="outlined" color="primary" onClick={() => navigate(`/inventory/devices/${device.id}/edit`)}>
+            <ITFlex align="center" gap={1}>
+              <FaEdit size={12} />
+              <ITText className="font-bold text-[11px]">{t("devices.edit")}</ITText>
+            </ITFlex>
+          </ITButton>
+        </ITFlex>
       }
     >
       {/* Hero */}

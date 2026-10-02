@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
-import { USER_ROLES, roleLabel, usersApi, type User, type UserRole } from "@entities/user";
+import { isStaffRole, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
@@ -14,6 +14,11 @@ export const ROLE_GUIDANCE: Record<
   UserRole,
   { title: string; summary: string; actions: string[] }
 > = {
+  GENERIC: {
+    title: "form.roles.GENERIC.title",
+    summary: "form.roles.GENERIC.summary",
+    actions: ["form.roles.GENERIC.actions.0", "form.roles.GENERIC.actions.1"],
+  },
   ADMIN: {
     title: "form.roles.ADMIN.title",
     summary: "form.roles.ADMIN.summary",
@@ -48,6 +53,11 @@ export const ROLE_GUIDANCE: Record<
     summary: "form.roles.GUARD.summary",
     actions: ["form.roles.GUARD.actions.0", "form.roles.GUARD.actions.1", "form.roles.GUARD.actions.2"],
   },
+  CHEF: {
+    title: "form.roles.CHEF.title",
+    summary: "form.roles.CHEF.summary",
+    actions: ["form.roles.CHEF.actions.0", "form.roles.CHEF.actions.1", "form.roles.CHEF.actions.2"],
+  },
 };
 
 export interface UserFormValues {
@@ -59,6 +69,8 @@ export interface UserFormValues {
   paternalSurname: string;
   maternalSurname: string;
   role: UserRole;
+  /** Roles adicionales (multi-rol). El principal es `role`. */
+  roles: string[];
   employeeNumber: string;
   jobTitle: string;
   departmentId: string;
@@ -82,16 +94,6 @@ const VALIDATED_FIELDS: (keyof UserFormValues)[] = [
   "employeeNumber",
   "jobTitle",
 ];
-
-/** Paso del stepper al que pertenece cada campo validado (0=datos personales, 1=acceso). */
-const FIELD_STEP: Record<string, number> = {
-  username: 1,
-  password: 1,
-  email: 0,
-  name: 0,
-  employeeNumber: 0,
-  jobTitle: 0,
-};
 
 /** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
 export const composeFullName = (v: {
@@ -117,11 +119,18 @@ const splitStoredName = (full: string): Pick<UserFormValues, "name" | "middleNam
   };
 };
 
-export const useUserForm = () => {
-  const { id } = useParams<{ id: string }>();
+/**
+ * Formulario de cuenta. Sin argumentos toma el id de la ruta (`/users/:id/edit`,
+ * `/users/new`); el diálogo de edición le pasa el id explícito porque vive en la
+ * lista, fuera de esa ruta.
+ */
+export const useUserForm = (userId?: string) => {
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = userId ?? routeId;
   const isEdit = Boolean(id);
   const { t: tt } = useTranslation(["users", "common"]);
   const dispatch = useDispatch<AppDispatch>();
+  const rolesCatalog = useRolesCatalog();
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [form, setForm] = useState<UserFormValues>({
@@ -133,6 +142,7 @@ export const useUserForm = () => {
     paternalSurname: "",
     maternalSurname: "",
     role: "EMPLOYEE",
+    roles: [],
     employeeNumber: "",
     jobTitle: "",
     departmentId: "",
@@ -176,6 +186,7 @@ export const useUserForm = () => {
             paternalSurname: u.paternalSurname ?? nameParts.paternalSurname ?? "",
             maternalSurname: u.maternalSurname ?? nameParts.maternalSurname ?? "",
             role: u.role,
+            roles: (u.extraRoles ?? []).map((extra) => extra.role),
             employeeNumber: u.employeeNumber ?? "",
             jobTitle: u.jobTitle ?? "",
             departmentId: u.departmentId ?? "",
@@ -191,8 +202,8 @@ export const useUserForm = () => {
 
   const selectedDept = departments.find((d) => d.id === form.departmentId);
 
-  /** En el alta de un empleado se exigen los documentos obligatorios. */
-  const requiresDocs = !isEdit && form.role === "EMPLOYEE";
+  /** En el alta de un rol con expediente (personal) se exigen los documentos obligatorios. */
+  const requiresDocs = !isEdit && isStaffRole(form.role);
   // Los obligatorios los marca RH en el catálogo de documentos (`required`).
   const requiredDocs = documentTypes
     .filter((d) => d.required && d.active)
@@ -200,10 +211,11 @@ export const useUserForm = () => {
   const setDocFile = (key: string, file: File | null) =>
     setDocsFiles((prev) => ({ ...prev, [key]: file }));
   const missingDocs = requiredDocs.filter((d) => !docsFiles[d.key]);
+  const guidance = ROLE_GUIDANCE[form.role] ?? ROLE_GUIDANCE.GENERIC;
   const roleGuidance = {
-    title: dyn(tt)(ROLE_GUIDANCE[form.role].title),
-    summary: dyn(tt)(ROLE_GUIDANCE[form.role].summary),
-    actions: ROLE_GUIDANCE[form.role].actions.map((a) => dyn(tt)(a)),
+    title: dyn(tt)(guidance.title),
+    summary: dyn(tt)(guidance.summary),
+    actions: guidance.actions.map((a) => dyn(tt)(a)),
   };
 
   const handleField = (field: keyof UserFormValues, value: string) => {
@@ -270,34 +282,64 @@ export const useUserForm = () => {
   };
 
   const handleBlur = (field: keyof UserFormValues) => {
-    setFieldError(field, validateField(field, form[field] ?? ""));
+    setFieldError(field, validateField(field, String(form[field] ?? "")));
   };
 
   const handleDepartmentChange = (value: string) => {
     setForm((f) => ({ ...f, departmentId: value, subareaId: "" }));
   };
 
+  /** Alterna un rol adicional (multi-rol). El principal no se repite aquí. */
+  const toggleExtraRole = (role: string, checked: boolean) => {
+    setForm((f) => ({
+      ...f,
+      roles: checked
+        ? [...new Set([...f.roles, role])]
+        : f.roles.filter((item) => item !== role),
+    }));
+  };
+
+  /**
+   * Campos que edita el expediente (`/employees/:id/edit`): identidad y datos
+   * laborales. Este formulario solo los captura al dar de alta o para una cuenta
+   * sin expediente; con expediente ni se validan ni se mandan.
+   */
+  const RECORD_FIELDS: (keyof UserFormValues)[] = ["name", "email", "employeeNumber", "jobTitle"];
+
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     for (const field of VALIDATED_FIELDS) {
-      const err = validateField(field, form[field] ?? "");
+      // Los campos que se editan en el expediente no se validan aquí: si algo
+      // viniera mal del respaldo, el usuario no tendría dónde verlo ni corregirlo.
+      if (!editsPerson && RECORD_FIELDS.includes(field)) continue;
+      const err = validateField(field, String(form[field] ?? ""));
       if (err) e[field] = err;
     }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  /** Devuelve el paso (0=datos personales, 1=acceso) con el primer campo inválido; -1 si todo es válido. */
+  /**
+   * Índice del paso con el primer campo inválido, contando los pasos que
+   * realmente se muestran: sin expediente no hay paso de datos de la persona, así
+   * que acceso pasa a ser el 0.
+   */
   const firstInvalidStep = (): number => {
     const withErrors = new Set(Object.keys(errors));
-    for (let step = 0; step <= 1; step++) {
-      for (const field of VALIDATED_FIELDS) {
-        if (FIELD_STEP[field] !== step) continue;
-        if (withErrors.has(field)) return step;
-        if (validateField(field, form[field] ?? "")) return step;
+    const invalid = (field: keyof UserFormValues): boolean =>
+      withErrors.has(field) || Boolean(validateField(field, String(form[field] ?? "")));
+
+    // Paso de la persona (nombre, correo y datos laborales): solo si se edita aquí.
+    if (editsPerson) {
+      for (const field of RECORD_FIELDS) {
+        if (VALIDATED_FIELDS.includes(field) && invalid(field)) return 0;
       }
     }
-    if (requiresDocs && missingDocs.length > 0) return 3;
+    // Acceso (usuario y contraseña).
+    for (const field of ["username", "password"] as (keyof UserFormValues)[]) {
+      if (invalid(field)) return editsPerson ? 1 : 0;
+    }
+    if (requiresDocs && missingDocs.length > 0) return editsPerson ? 3 : 2;
     return -1;
   };
 
@@ -312,14 +354,21 @@ export const useUserForm = () => {
     setSaving(true);
     try {
       if (isEdit) {
+        // Con expediente, la identidad y los datos laborales los guarda el
+        // expediente: aquí no se mandan para no pisarlos desde dos lugares.
         await usersApi.update(id!, {
           username: form.username,
-          email: form.email || null,
-          name: fullName,
-          middleName: form.middleName || null,
-          paternalSurname: form.paternalSurname || null,
-          maternalSurname: form.maternalSurname || null,
+          ...(editsPerson
+            ? {
+                email: form.email || null,
+                name: fullName,
+                middleName: form.middleName || null,
+                paternalSurname: form.paternalSurname || null,
+                maternalSurname: form.maternalSurname || null,
+              }
+            : {}),
           role: form.role,
+          roles: form.roles.filter((r) => r !== form.role),
           employeeNumber: form.employeeNumber || undefined,
           jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
@@ -335,6 +384,7 @@ export const useUserForm = () => {
           paternalSurname: form.paternalSurname || undefined,
           maternalSurname: form.maternalSurname || undefined,
           role: form.role,
+          roles: form.roles.filter((r) => r !== form.role),
           employeeNumber: form.employeeNumber || undefined,
           jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
@@ -374,14 +424,35 @@ export const useUserForm = () => {
   const canSubmit =
     !!form.username && !!form.name && (isEdit || !!form.password);
 
+  /**
+   * ¿La cuenta tiene expediente de personal? Lo tiene si alguno de sus roles es
+   * `staff`. Manda en la separación de pantallas: los datos de la persona
+   * (nombre, correo, domicilio…) se editan en el expediente, y aquí solo se
+   * capturan al dar de alta o para las cuentas sin expediente, que no tienen
+   * otro lugar donde editarlos.
+   */
+  const hasRecord = isStaffRole(form.role) || form.roles.some((extra) => isStaffRole(extra));
+
+  /**
+   * ¿Este formulario edita los datos de la persona (nombre, apellidos, correo)?
+   * Sí al dar de alta (se necesitan para crear la persona) y siempre que la
+   * cuenta no tenga expediente, que es su único lugar. Si tiene expediente, esos
+   * campos viven en `/employees/:id/edit` y aquí solo se muestran los laborales.
+   */
+  const editsPerson = !isEdit || !hasRecord;
+
   return {
     isEdit,
+    id,
+    hasRecord,
+    editsPerson,
     departments,
     form,
     errors,
     handleField,
     handleBlur,
     handleDepartmentChange,
+    toggleExtraRole,
     selectedDept,
     roleGuidance,
     loading,
@@ -398,6 +469,11 @@ export const useUserForm = () => {
     setDocFile,
     docsError,
     tt,
-    ROLE_OPTIONS: USER_ROLES.map((value) => ({ value, label: roleLabel(value) })),
+    ROLE_OPTIONS: rolesCatalog
+      .filter((role) => role.active)
+      .map((role) => ({ value: role.key, label: role.name })),
+    EXTRA_ROLE_OPTIONS: rolesCatalog
+      .filter((role) => role.active && role.key !== form.role)
+      .map((role) => ({ value: role.key, label: role.name })),
   };
 };

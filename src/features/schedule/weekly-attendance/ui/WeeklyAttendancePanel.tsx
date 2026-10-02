@@ -10,7 +10,6 @@ import {
   ITGrid,
   ITInput,
   ITSearchSelect,
-  ITSegmentedControl,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import {
@@ -167,13 +166,16 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
       )}
 
       <ITFlex align="center" justify="between" wrap="wrap" gap={3}>
-        <ITSegmentedControl
+        <ITSearchSelect
+          name="weeklyAttendanceMode"
+          label={t("view.label")}
           options={[
             { value: "SUMMARY", label: t("view.summary") },
             { value: "DETAIL", label: t("view.detail") },
           ]}
           value={fx.mode}
-          onChange={(value) => fx.setMode(value as WeeklyAttendanceMode)}
+          onChange={(value) => fx.setMode(String(value) as WeeklyAttendanceMode)}
+          className="min-w-[200px]"
         />
         <ITFlex align="center" wrap="wrap" gap={2}>
           <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("legend")}</ITText>

@@ -18,7 +18,7 @@
     "jobTitle": "Puesto",
     "description": "Descripción",
     "sanction": "Sanción",
-    "createdBy": "Creado por"
+    "createdBy": "Creado"
   },
   "form": {
     "title": "Nueva acta administrativa",

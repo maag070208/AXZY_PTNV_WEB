@@ -6,7 +6,8 @@ export interface Gender {
   active: boolean;
 }
 
-export type PersonalRole = "MANAGER" | "AREA_HEAD" | "EMPLOYEE";
+/** Claves de los roles de personal (dinámicos, `staff` en `/roles`). */
+export type PersonalRole = string;
 
 export interface PersonalStats {
   total: number;
@@ -53,7 +54,7 @@ export interface PersonalProfile {
   username: string;
   name: string;
   email?: string | null;
-  role: "ADMIN" | "MANAGER" | "AREA_HEAD" | "EMPLOYEE" | "HUMAN_RESOURCES";
+  role: "ADMIN" | "MANAGER" | "AREA_HEAD" | "EMPLOYEE" | "HUMAN_RESOURCES" | "CHEF";
   active: boolean;
   jobTitle?: string | null;
   employeeNumber?: string | null;
@@ -98,7 +99,12 @@ export interface PersonalProfile {
 }
 
 export interface PersonalProfileUpdateInput {
+  /** Primer nombre. El expediente es su dueño: el formulario de usuario solo lo captura al dar de alta. */
+  name?: string;
   middleName?: string | null;
+  /** Datos laborales: también viven en el expediente. */
+  employeeNumber?: string | null;
+  jobTitle?: string | null;
   paternalSurname?: string | null;
   maternalSurname?: string | null;
   email?: string | null;

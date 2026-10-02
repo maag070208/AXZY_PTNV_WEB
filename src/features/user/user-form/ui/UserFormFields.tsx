@@ -3,6 +3,7 @@ import {
   FileTypeEnum,
   ITAlert,
   ITButton,
+  ITCheckbox,
   ITDialog,
   ITDropfile,
   ITFlex,
@@ -27,6 +28,12 @@ import type { UserFormValues } from "../model/useUserForm";
 interface Props {
   step: "personal" | "access" | "org" | "docs";
   isEdit: boolean;
+  /**
+   * ¿Se editan aquí los datos de la persona (nombre, apellidos, correo, nº de
+   * empleado y puesto)? `false` cuando la cuenta tiene expediente: esos campos
+   * viven en `/employees/:id/edit` y este paso no se muestra.
+   */
+  personFields?: boolean;
   form: UserFormValues;
   errors?: Record<string, string>;
   onFieldChange: (field: keyof UserFormValues, value: string) => void;
@@ -36,6 +43,9 @@ interface Props {
   selectedDept: Department | undefined;
   roleGuidance: { title: string; summary: string; actions: string[] };
   roleOptions: Array<Record<string, string>>;
+  /** Roles adicionales disponibles (multi-rol), sin el principal. */
+  extraRoleOptions?: Array<{ value: string; label: string }>;
+  onToggleExtraRole?: (role: string, checked: boolean) => void;
   // Documentación del alta
   requiredDocs?: Array<{ key: string; label: string; typeId: string | null }>;
   docsFiles?: Record<string, File | null>;
@@ -70,6 +80,7 @@ function SectionHeader({
 export default function UserFormFields({
   step,
   isEdit,
+  personFields = true,
   form,
   errors,
   onFieldChange,
@@ -79,6 +90,8 @@ export default function UserFormFields({
   selectedDept,
   roleGuidance,
   roleOptions,
+  extraRoleOptions,
+  onToggleExtraRole,
   requiredDocs,
   onPickDoc,
   docsError,
@@ -91,7 +104,7 @@ export default function UserFormFields({
 
   return (
     <>
-      {step === "personal" && (
+      {step === "personal" && personFields && (
         <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
           <SectionHeader
             icon={<FaIdCard size={15} className="text-blue-600" />}
@@ -113,10 +126,10 @@ export default function UserFormFields({
               <ITInput name="u_ama" label={tt("form.maternalSurname")} value={form.maternalSurname} onChange={(e) => onFieldChange("maternalSurname", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_num" label={tt("form.employeeNo")} value={form.employeeNumber} onChange={(e) => onFieldChange("employeeNumber", e.target.value)} onBlur={blob("employeeNumber")} error={fieldError("employeeNumber")} />
+              <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} onBlur={blob("email")} placeholder={tt("form.emailPlaceholder")} error={fieldError("email")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} onBlur={blob("email")} placeholder={tt("form.emailPlaceholder")} error={fieldError("email")} />
+              <ITInput name="u_num" label={tt("form.employeeNo")} value={form.employeeNumber} onChange={(e) => onFieldChange("employeeNumber", e.target.value)} onBlur={blob("employeeNumber")} error={fieldError("employeeNumber")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_jobTitle" label={tt("form.position")} value={form.jobTitle} onChange={(e) => onFieldChange("jobTitle", e.target.value)} onBlur={blob("jobTitle")} error={fieldError("jobTitle")} />
@@ -155,6 +168,27 @@ export default function UserFormFields({
                   <ITText className="text-[10px] text-slate-500">{tt("form.passwordEditHint")}</ITText>
                 </ITFlex>
               )}
+            </ITGrid>
+            <ITGrid item xs={12}>
+              <ITFlex direction="column" gap={2}>
+                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                  {tt("form.extraRoles")}
+                </ITText>
+                <ITText className="text-[10px] text-slate-400">
+                  {tt("form.extraRolesHint")}
+                </ITText>
+                <ITFlex align="center" gap={4} wrap="wrap">
+                  {(extraRoleOptions ?? []).map((opt) => (
+                    <ITCheckbox
+                      key={opt.value}
+                      name={`extra_role_${opt.value}`}
+                      checked={form.roles.includes(opt.value)}
+                      onChange={(checked) => onToggleExtraRole?.(opt.value, checked)}
+                      label={opt.label}
+                    />
+                  ))}
+                </ITFlex>
+              </ITFlex>
             </ITGrid>
           </ITGrid>
         </section>

@@ -24,6 +24,7 @@ export default function TicketsListPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("list.title")}
       description={tt("list.description")}
       backAction={() => navigate(-1)}

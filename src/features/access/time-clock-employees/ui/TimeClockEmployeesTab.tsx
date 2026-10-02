@@ -88,7 +88,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         key: "employeeNumber",
         label: t("employees.columns.number"),
         type: "string",
-        width: 120,
+        width: 160,
         filter: true,
         sortable: false,
         render: (r) => (
@@ -101,7 +101,7 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         key: "name",
         label: t("employees.columns.name"),
         type: "string",
-        width: 300,
+        width: 280,
         filter: true,
         sortable: false,
         render: (r) => <ITText className="text-[12px] font-bold text-slate-700">{r.name}</ITText>,
@@ -167,41 +167,41 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
       },
       ...(canLink
         ? [
-            {
-              key: "actions",
-              label: t("employees.columns.actions"),
-              type: "actions" as const,
-              width: 260,
-              actions: (r: TimeClockEmployee) => (
-                <ITFlex align="center" gap={1}>
-                  {!r.link && r.suggestion && (
-                    <ITButton variant="filled" color="primary" size="sm" onClick={() => acceptSuggestion(r)}>
-                      <ITFlex align="center" gap={1}>
-                        <FaCheck size={10} />
-                        <ITText className="font-bold text-[11px]">{t("employees.actions.accept")}</ITText>
-                      </ITFlex>
-                    </ITButton>
-                  )}
-                  <ITButton variant="outlined" color="secondary" size="sm" onClick={() => openLink(r)}>
+          {
+            key: "actions",
+            label: t("employees.columns.actions"),
+            type: "actions" as const,
+            width: 260,
+            actions: (r: TimeClockEmployee) => (
+              <ITFlex align="center" gap={1}>
+                {!r.link && r.suggestion && (
+                  <ITButton variant="filled" color="primary" size="sm" onClick={() => acceptSuggestion(r)}>
                     <ITFlex align="center" gap={1}>
-                      <FaLink size={10} />
-                      <ITText className="font-bold text-[11px]">
-                        {r.link ? t("employees.actions.change") : t("employees.actions.linkEmployee")}
-                      </ITText>
+                      <FaCheck size={10} />
+                      <ITText className="font-bold text-[11px]">{t("employees.actions.accept")}</ITText>
                     </ITFlex>
                   </ITButton>
-                  {r.link && (
-                    <ITButton variant="text" color="danger" size="sm" onClick={() => void unlinkEmployee(r)}>
-                      <ITFlex align="center" gap={1}>
-                        <FaUnlink size={10} />
-                        <ITText className="font-bold text-[11px]">{t("employees.actions.unlinkEmployee")}</ITText>
-                      </ITFlex>
-                    </ITButton>
-                  )}
-                </ITFlex>
-              ),
-            },
-          ]
+                )}
+                <ITButton variant="outlined" color="secondary" size="sm" onClick={() => openLink(r)}>
+                  <ITFlex align="center" gap={1}>
+                    <FaLink size={10} />
+                    <ITText className="font-bold text-[11px]">
+                      {r.link ? t("employees.actions.change") : t("employees.actions.linkEmployee")}
+                    </ITText>
+                  </ITFlex>
+                </ITButton>
+                {r.link && (
+                  <ITButton variant="text" color="danger" size="sm" onClick={() => void unlinkEmployee(r)}>
+                    <ITFlex align="center" gap={1}>
+                      <FaUnlink size={10} />
+                      <ITText className="font-bold text-[11px]">{t("employees.actions.unlinkEmployee")}</ITText>
+                    </ITFlex>
+                  </ITButton>
+                )}
+              </ITFlex>
+            ),
+          },
+        ]
         : []),
     ],
     [t, canLink, openLink, acceptSuggestion, unlinkEmployee, peopleOptions]
@@ -294,7 +294,8 @@ export default function TimeClockEmployeesTab({ fx }: { fx: UseTimeClockEmployee
         defaultItemsPerPage={100}
         itemsPerPageOptions={[10, 25, 50, 100]}
         debounceMs={350}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

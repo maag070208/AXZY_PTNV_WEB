@@ -20,6 +20,7 @@ import DeviceFormPage from "@pages/inventory/DeviceFormPage";
 import EditDevicePage from "@pages/inventory/EditDevicePage";
 import DeviceDetailPage from "@pages/inventory/DeviceDetailPage";
 import DeviceTypesPage from "@pages/inventory/DeviceTypesPage";
+import DeviceImportPage from "@pages/inventory/DeviceImportPage";
 import MovementsPage from "@pages/inventory/MovementsPage";
 import NewMovementPage from "@pages/inventory/NewMovementPage";
 import LoansPage from "@pages/inventory/LoansPage";
@@ -53,6 +54,29 @@ import AdminTasksPage from "@pages/tickets/AdminTasksPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
 import CatalogPage from "@pages/catalog/CatalogPage";
 import RolesPage from "@pages/roles/RolesPage";
+import {
+  KitchenOverviewPage,
+  KitchenItemsPage,
+  KitchenItemDetailPage,
+  KitchenItemImportPage,
+  KitchenLotsPage,
+  KitchenStockInPage,
+  KitchenStockOutPage,
+  KitchenLedgerPage,
+  KitchenCountPage,
+  KitchenRestockPage,
+  KitchenCatalogPage,
+  KitchenPurchaseOrdersPage,
+  KitchenPurchaseOrderFormPage,
+  KitchenPurchaseOrderDetailPage,
+  KitchenCostCenterSpendingPage,
+  KitchenInvoicesPage,
+  KitchenInvoiceFormPage,
+  KitchenInvoiceDetailPage,
+  KitchenSupplierDetailPage,
+  KitchenSupplierFormPage,
+  KitchenSuppliersPage,
+} from "@pages/kitchen";
 
 export default function App() {
   return (
@@ -75,6 +99,15 @@ export default function App() {
           element={
             <RequiresPermission permission="devices.view">
               <DevicesPage />
+            </RequiresPermission>
+          }
+        />
+        {/* Carga masiva: el alta exige `devices.create` (la API lo revalida). */}
+        <Route
+          path="/inventory/devices/import"
+          element={
+            <RequiresPermission permission="devices.create">
+              <DeviceImportPage />
             </RequiresPermission>
           }
         />
@@ -266,7 +299,9 @@ export default function App() {
         />
         <Route path="/users" element={<UsersListPage />} />
         <Route path="/users/new" element={<UserFormPage />} />
-        <Route path="/users/:id/edit" element={<UserFormPage />} />
+        {/* La edición es un diálogo sobre la lista; la ruta se conserva para que
+            los enlaces directos (y el atajo del expediente) sigan abriéndolo. */}
+        <Route path="/users/:id/edit" element={<UsersListPage />} />
         <Route path="/users/:id/history" element={<UserHistoryPage />} />
         <Route path="/users/import" element={<UserImportPage />} />
         <Route
@@ -383,6 +418,191 @@ export default function App() {
           element={
             <RequiresPermission permission="payroll.view">
               <PayrollPage />
+            </RequiresPermission>
+          }
+        />
+
+        <Route
+          path="/kitchen"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenOverviewPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/items"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenItemsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/items/import"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenItemImportPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/items/:id"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenItemDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/lots"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenLotsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/stock-in"
+          element={
+            <RequiresPermission permission="kitchen.stock_in">
+              <KitchenStockInPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/stock-out"
+          element={
+            <RequiresPermission permission="kitchen.stock_out">
+              <KitchenStockOutPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/movements"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenLedgerPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/count"
+          element={
+            <RequiresPermission permission="kitchen.adjust">
+              <KitchenCountPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/restock"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenRestockPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/catalog"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenCatalogPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders"
+          element={
+            <RequiresPermission permission="purchase_orders.view">
+              <KitchenPurchaseOrdersPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders/new"
+          element={
+            <RequiresPermission permission="purchase_orders.create">
+              <KitchenPurchaseOrderFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders/:id/edit"
+          element={
+            <RequiresPermission permission="purchase_orders.create">
+              <KitchenPurchaseOrderFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/purchase-orders/:id"
+          element={
+            <RequiresPermission permission="purchase_orders.view">
+              <KitchenPurchaseOrderDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/cost-centers"
+          element={
+            <RequiresPermission permission="purchase_orders.view">
+              <KitchenCostCenterSpendingPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenSuppliersPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers/new"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenSupplierFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers/:id/edit"
+          element={
+            <RequiresPermission permission="kitchen.manage">
+              <KitchenSupplierFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/suppliers/:id"
+          element={
+            <RequiresPermission permission="kitchen.view">
+              <KitchenSupplierDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/invoices"
+          element={
+            <RequiresPermission permission="invoices.view">
+              <KitchenInvoicesPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/invoices/new"
+          element={
+            <RequiresPermission permission="invoices.register">
+              <KitchenInvoiceFormPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/kitchen/invoices/:id"
+          element={
+            <RequiresPermission permission="invoices.view">
+              <KitchenInvoiceDetailPage />
             </RequiresPermission>
           }
         />

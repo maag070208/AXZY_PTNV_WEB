@@ -9,6 +9,7 @@ export default function NotificationsPage() {
 
   return (
     <ITPage
+      noPadding
       title={tt("title")}
       description={tt("description")}
       icon={<FaBell size={20} />}

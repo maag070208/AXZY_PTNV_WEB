@@ -181,7 +181,7 @@ export default function MovementsPage() {
       type: "date",
       key: "date",
       label: t("stockLedger.date"),
-      width: 190,
+      width: 170,
       sortable: false,
       filter: "date-range",
       dateFilterOptions: { maxDate: new Date() },
@@ -191,7 +191,7 @@ export default function MovementsPage() {
       type: "catalog",
       key: "type",
       label: t("movements.colType"),
-      width: 160,
+      width: 140,
       sortable: false,
       filter: "catalog",
       catalogOptions: {
@@ -209,7 +209,7 @@ export default function MovementsPage() {
       type: "string",
       key: "name",
       label: t("movements.colItem"),
-      width: 300,
+      width: 270,
       filter: true,
       sortable: false,
       render: (m: MovementRow) => (
@@ -222,7 +222,7 @@ export default function MovementsPage() {
       type: "string",
       key: "reason",
       label: t("movements.colComment"),
-      width: 300,
+      width: 270,
       filter: true,
       render: (m: MovementRow) => <ITText className="text-[11px] text-slate-500">{m.reason || "—"}</ITText>,
     },
@@ -254,6 +254,7 @@ export default function MovementsPage() {
 
   return (
     <ITPage
+      noPadding
       title={t("movements.title")}
       description={t("movements.description")}
       icon={<FaHistory size={20} />}
@@ -315,7 +316,8 @@ export default function MovementsPage() {
         reloadTrigger={reloadKey}
         defaultItemsPerPage={100}
         itemsPerPageOptions={[50, 100, 150]}
-        size="lg"
+        layout="fixed"
+        density="compact"
         virtualized
         virtualizedMaxHeight={420}
         rowHeight={50}

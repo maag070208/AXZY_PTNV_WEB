@@ -24,17 +24,15 @@ test.describe("Nómina (pantalla)", () => {
 
     // Exportaciones (se deshabilitan si la semana no tiene filas, pero existen).
     await expect(page.getByRole("button", { name: /PDF/i })).toBeVisible();
-    // Conmutador Resumida / Detallada.
-    await expect(page.getByText("Resumida")).toBeVisible();
-    await expect(page.getByText("Detallada")).toBeVisible();
 
     // El reporte termina de cargar: la tabla o el estado vacío.
     await expect(
       page.locator("table").or(page.getByText("No hay personal para esta semana y filtros"))
     ).toBeVisible({ timeout: 15_000 });
 
-    // Vista detallada: una fila por persona/día con estado y turno.
-    await page.getByText("Detallada").click();
+    // Vista (select) Resumida / Detallada: en detallada, una fila por persona/día.
+    await page.locator('input[name="weeklyAttendanceMode"]').click();
+    await page.getByText("Detallada", { exact: true }).click();
     await expect(page.getByText("Estado").first()).toBeVisible();
     await expect(page.getByText("Turno").first()).toBeVisible();
 
