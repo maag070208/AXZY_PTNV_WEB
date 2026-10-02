@@ -15,6 +15,7 @@ import {
 } from "@features/inventory/unit-identities";
 import { i18n } from "@shared/i18n";
 import { useRequestKey } from "@shared/lib/useRequestKey";
+import { newId } from "@shared/lib/newId";
 
 const STATUS_LABEL_KEY = {
   AVAILABLE: "dashboard.available",
@@ -163,7 +164,7 @@ export default function NewMovementPage() {
   };
 
   const emptyRow = (patch: Partial<Row> = {}): Row => ({
-    key: crypto.randomUUID(),
+    key: newId(),
     typeFilter: "",
     deviceId: "",
     unitId: "",
