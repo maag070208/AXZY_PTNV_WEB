@@ -73,3 +73,56 @@ test.describe("ENTRADA de unidades desde la web", () => {
     expect(ledger[0].items[0].quantity).toBe(4);
   });
 });
+
+/**
+ * La serie (opcional) se captura EN LA MISMA pantalla de la entrada: es el
+ * momento en que las piezas están a la mano. Lo que se deje vacío se puede
+ * completar después desde el detalle del dispositivo.
+ */
+test.describe("ENTRADA con identificación de las piezas nuevas", () => {
+  test("guarda la serie capturada en cada pieza", async ({ page, movementPage, scenario, api }) => {
+    const device = await scenario.device(1);
+    const serie = `SERIE-${scenario.type.code}-1`;
+    const serie2 = `SERIE-${scenario.type.code}-2`;
+
+    await movementPage.go();
+    await movementPage.selectDevice(device.nameVisible);
+    await movementPage.selectType("Entrada");
+    await movementPage.writeQuantity(3);
+    await movementPage.writePieceSerial(serie, 1);
+    await movementPage.writePieceSerial(serie2, 2);
+    await movementPage.register();
+
+    await waitForToast(page, "Movimiento registrado");
+    await api.waitForStock(device.id, { AVAILABLE: 4 });
+
+    // Cada serie quedó en SU pieza (en orden); la tercera, sin serie.
+    const units = await api.units(device.id);
+    expect(units.map((u) => u.serialNumber)).toEqual([null, serie, serie2, null]);
+
+    // Y se ve en el kardex del dispositivo, sin recargar nada a mano.
+    await goToRoute(page, `/inventory/devices/${device.id}`);
+    await expect(page.getByText(serie)).toBeVisible();
+  });
+
+  test("no pide identificación si el tipo no la usa", async ({ page, movementPage, api }) => {
+    const type = await api.createType({
+      code: `E2ENOSN${Date.now().toString(36).toUpperCase()}`,
+      name: `Tipo sin serie ${Date.now()}`,
+      assetTagPrefix: `E2ENS${Date.now().toString(36).toUpperCase().slice(-5)}`,
+      useSerialNumber: false,
+    });
+    const name = `Equipo sin serie ${Date.now()}`;
+    const device = await api.createDevice({ typeId: type.id, name, brand: "TestBrand", model: "TestModel", initialQuantity: 1 });
+
+    await movementPage.go();
+    await movementPage.selectDevice(name);
+    await movementPage.selectType("Entrada");
+    await movementPage.writeQuantity(2);
+
+    await expect(page.getByText(/Identificación de las 2 piezas/)).toHaveCount(0);
+    await movementPage.register();
+    await waitForToast(page, "Movimiento registrado");
+    await api.waitForStock(device.id, { AVAILABLE: 3 });
+  });
+});

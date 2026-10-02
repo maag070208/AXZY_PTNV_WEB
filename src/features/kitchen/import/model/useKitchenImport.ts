@@ -23,6 +23,13 @@ export const useKitchenImport = () => {
   const [file, setFile] = useState<File | null>(null);
   const [strategy, setStrategy] = useState<KitchenImportStrategy>("ADD");
   const [preview, setPreview] = useState<KitchenImportPreview | null>(null);
+  /**
+   * Cambia con cada previsualización resuelta. La tabla del kit NO vuelve a
+   * consultar cuando cambia su `fetchData`, así que este contador se le pasa como
+   * `reloadTrigger`: al cambiar la estrategia, la tabla se rehace y muestra el
+   * resultado de la nueva decisión.
+   */
+  const [previewToken, setPreviewToken] = useState(0);
   const [result, setResult] = useState<KitchenImportResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -59,6 +66,7 @@ export const useKitchenImport = () => {
         const data = await kitchenApi.previewItemImport(target, nextStrategy);
         setFile(target);
         setPreview(data);
+        setPreviewToken((n) => n + 1);
         setStep("review");
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
@@ -132,6 +140,7 @@ export const useKitchenImport = () => {
     file,
     strategy,
     preview,
+    previewToken,
     result,
     loading,
     confirming,

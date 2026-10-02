@@ -116,7 +116,9 @@ test.describe("Almacén de cocina — carga masiva desde Excel", () => {
     await expect(page.getByText("Lo que va a pasar")).toBeVisible();
     await expect(page.getByText("LECHE ENTERA 1 L")).toBeVisible();
     await expect(page.getByText("PLATO LLANO")).toBeVisible();
-    await expect(page.getByText(/Se van a crear catálogos nuevos/)).toBeVisible();
+    // Se avisa de los catálogos que la carga va a crear.
+    await expect(page.getByText(/Se van a crear categorías nuevas/)).toBeVisible();
+    await expect(page.getByText(/Se van a crear unidades de medida nuevas/)).toBeVisible();
     await expect(page.locator("tbody").getByText("Artículo nuevo").first()).toBeVisible();
     // Todavía no existe nada en la base.
     expect(await itemByCode(perishableCode)).toBeNull();

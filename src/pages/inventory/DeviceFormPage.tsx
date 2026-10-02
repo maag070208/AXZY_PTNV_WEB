@@ -1,20 +1,16 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaBoxes, FaCheck, FaChevronDown, FaChevronRight, FaInfoCircle, FaSave } from "react-icons/fa";
+import { ITAlert, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { FaBoxOpen, FaBoxes, FaInfoCircle, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type DeviceType } from "@entities/inventory";
-
-interface UnitRow {
-  id: number;
-  serialNumber: string;
-  macAddress: string;
-  ip: string;
-  hostname: string;
-}
-
-let rowId = 0;
+import {
+  UnitIdentityEditor,
+  resizeUnitRows,
+  usesUnitIdentity,
+  type UnitIdentityRow,
+} from "@features/inventory/unit-identities";
 
 function SectionHeader({
   icon,
@@ -56,9 +52,7 @@ export default function DeviceFormPage() {
     description: "",
   });
   const [quantity, setQuantity] = useState("3");
-  const [units, setUnits] = useState<UnitRow[]>([]);
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
-  const [allExpanded, setAllExpanded] = useState(false);
+  const [units, setUnits] = useState<UnitIdentityRow[]>([]);
 
   useEffect(() => {
     inventoryApi
@@ -68,21 +62,15 @@ export default function DeviceFormPage() {
   }, []);
 
   const type = types.find((x) => x.id === form.typeId);
-  const anyUnitField = !type || type.useSerialNumber || type.useMac || type.useIp || type.useHostname;
+  const anyUnitField = !type || usesUnitIdentity(type);
 
   const syncQuantity = (n: number) => {
     const clamped = Math.max(1, Math.min(500, n || 1));
     setQuantity(String(clamped));
-    setUnits((prev) => {
-      const next: UnitRow[] = [];
-      for (let i = 0; i < clamped; i++) {
-        next.push(prev[i] ?? { id: (rowId += 1), serialNumber: "", macAddress: "", ip: "", hostname: "" });
-      }
-      return next;
-    });
+    setUnits((prev) => resizeUnitRows(prev, clamped));
   };
 
-  const updateUnit = (id: number, field: keyof UnitRow, value: string) => {
+  const updateUnit = (id: number, field: keyof UnitIdentityRow, value: string) => {
     setUnits((prev) => prev.map((u) => (u.id === id ? { ...u, [field]: value } : u)));
   };
 
@@ -91,11 +79,7 @@ export default function DeviceFormPage() {
     setForm((f) => ({ ...f, typeId: val }));
     const newType = types.find((x) => x.id === val);
     setUnits((prev) => {
-      if (prev.length === 0) {
-        const rows: UnitRow[] = [];
-        for (let i = 0; i < quantityNum; i++) rows.push({ id: (rowId += 1), serialNumber: "", macAddress: "", ip: "", hostname: "" });
-        return rows;
-      }
+      if (prev.length === 0) return resizeUnitRows([], quantityNum);
       return prev.map((u) => ({
         ...u,
         serialNumber: newType?.useSerialNumber ? u.serialNumber : "",
@@ -151,14 +135,6 @@ export default function DeviceFormPage() {
     { key: "ip", label: t("devices.ip"), active: type?.useIp },
     { key: "hostname", label: t("devices.hostname"), active: type?.useHostname },
   ].filter((f) => f.active);
-
-  const toggleAll = () => {
-    const next = !allExpanded;
-    setAllExpanded(next);
-    const map: Record<number, boolean> = {};
-    for (const u of units) map[u.id] = next;
-    setExpanded(map);
-  };
 
   return (
     <ITPage
@@ -261,11 +237,6 @@ export default function DeviceFormPage() {
                 onChange={(e) => syncQuantity(Number(e.target.value))}
                 className="flex-1"
               />
-              {units.length > 0 && (
-                <ITButton variant="text" color="primary" size="lg" onClick={toggleAll} className="mt-5">
-                  <ITText className="text-[10px] font-bold uppercase">{allExpanded ? t("devices.collapseAll") : t("devices.expandAll")}</ITText>
-                </ITButton>
-              )}
             </ITFlex>
 
             {!type ? (
@@ -277,77 +248,12 @@ export default function DeviceFormPage() {
                 {t("devices.unitsNoFields", { type: type.name })}
               </ITAlert>
             ) : (
-              <div className="flex flex-col gap-2">
-                {units.map((u) => {
-                  const isOpen = !!expanded[u.id];
-                  const filled = u.serialNumber || u.macAddress || u.ip || u.hostname;
-                  return (
-                    <ITFlex key={u.id} direction="column" className="rounded-xl border border-slate-100 bg-slate-50/60">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setExpanded((prev) => ({ ...prev, [u.id]: !prev[u.id] }));
-                          setAllExpanded(false);
-                        }}
-                        className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
-                      >
-                        <ITFlex align="center" gap={2} className="min-w-0">
-                          {isOpen ? <FaChevronDown className="shrink-0 text-slate-400" size={11} /> : <FaChevronRight className="shrink-0 text-slate-400" size={11} />}
-                          <ITText className="truncate text-[11px] font-bold uppercase tracking-tight text-slate-700">
-                            {t("devices.unitRow")} {units.indexOf(u) + 1}
-                          </ITText>
-                          {filled && <FaCheck className="shrink-0 text-emerald-500" size={11} />}
-                        </ITFlex>
-                        <ITBadget color="gray" size="lg">{u.serialNumber || "—"}</ITBadget>
-                      </button>
-                      {isOpen && (
-                        <ITFlex direction="column" gap={2} className="border-t border-slate-100 px-3 pb-3 pt-2.5">
-                          {type.useSerialNumber && (
-                            <ITInput
-                              name={`serialNumber-${u.id}`}
-                              label={t("devices.serialNumber")}
-                              value={u.serialNumber}
-                              onChange={(e) => updateUnit(u.id, "serialNumber", e.target.value)}
-                            />
-                          )}
-                          {(type.useMac || type.useIp) && (
-                            <ITGrid container columns={2} spacing={2}>
-                              {type.useMac && (
-                                <ITGrid item xs={type.useIp ? 6 : 12}>
-                                  <ITInput
-                                    name={`mac-${u.id}`}
-                                    label={t("devices.mac")}
-                                    value={u.macAddress}
-                                    onChange={(e) => updateUnit(u.id, "macAddress", e.target.value)}
-                                  />
-                                </ITGrid>
-                              )}
-                              {type.useIp && (
-                                <ITGrid item xs={type.useMac ? 6 : 12}>
-                                  <ITInput
-                                    name={`ip-${u.id}`}
-                                    label={t("devices.ip")}
-                                    value={u.ip}
-                                    onChange={(e) => updateUnit(u.id, "ip", e.target.value)}
-                                  />
-                                </ITGrid>
-                              )}
-                            </ITGrid>
-                          )}
-                          {type.useHostname && (
-                            <ITInput
-                              name={`hostname-${u.id}`}
-                              label={t("devices.hostname")}
-                              value={u.hostname}
-                              onChange={(e) => updateUnit(u.id, "hostname", e.target.value)}
-                            />
-                          )}
-                        </ITFlex>
-                      )}
-                    </ITFlex>
-                  );
-                })}
-              </div>
+              <UnitIdentityEditor
+                type={type}
+                units={units}
+                onChange={updateUnit}
+                label={(index) => `${t("devices.unitRow")} ${index + 1}`}
+              />
             )}
           </section>
         </aside>

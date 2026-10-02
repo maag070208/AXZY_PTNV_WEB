@@ -239,7 +239,10 @@
     "unitPlaceholder": "Search unit...",
     "withoutUnitsStatus": "No units in this state for the selected device",
     "item": "Row",
-    "unitStatusHint": "Select a {{status}} unit"
+    "unitStatusHint": "Select a {{status}} unit",
+    "identifyPieces": "Identification of the {{count}} pieces (optional)",
+    "identifyPiecesHint": "Type the serial number (or MAC/IP) of each new piece. Anything you leave blank can be filled in later from the device detail.",
+    "pieceRow": "Piece"
   },
   "movementHint": {
     "STOCK_IN": "Adds available units to inventory.",

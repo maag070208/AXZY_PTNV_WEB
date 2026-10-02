@@ -86,6 +86,24 @@ export class NewMovementPage {
     await field(this.row(index), "Cantidad").fill(String(quantity));
   }
 
+  /**
+   * Identificación OPCIONAL de una pieza nueva de la entrada: el tipo del
+   * dispositivo decide si se pide (serie, MAC, IP o hostname).
+   */
+  async writePieceSerial(serial: string, piece = 1, index = 1): Promise<void> {
+    const row = this.row(index);
+    // El renglón es un acordeón: se acota a la pieza pedida y, si está cerrada,
+    // se abre con su encabezado antes de escribir.
+    const box = row.locator(
+      `xpath=.//*[normalize-space(text())="Pieza ${piece}"]/ancestor::div[contains(@class,"rounded-xl")][1]`
+    );
+    const input = box.getByLabel("No. serie");
+    if (!(await input.isVisible().catch(() => false))) {
+      await box.getByText(new RegExp(`^Pieza ${piece}$`)).click();
+    }
+    await input.fill(serial);
+  }
+
   async writeReason(reason: string, index = 1): Promise<void> {
     await field(this.row(index), "Motivo").fill(reason);
   }

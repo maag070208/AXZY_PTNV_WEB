@@ -6,6 +6,13 @@ import { FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Condition, type Device, type DeviceUnitStatus, type DeviceType, type MovementType, type DeviceUnit } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
+import {
+  UnitIdentityEditor,
+  emptyUnitRow,
+  resizeUnitRows,
+  usesUnitIdentity,
+  type UnitIdentityRow,
+} from "@features/inventory/unit-identities";
 import { i18n } from "@shared/i18n";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 
@@ -44,6 +51,8 @@ interface Row {
   type: MovementType | "";
   /** Piezas nuevas que crea una entrada (los demás tipos mueven una). */
   quantity: number;
+  /** Identificación de cada pieza nueva de la entrada (serie, MAC, IP…). */
+  unitRows: UnitIdentityRow[];
   condition: Condition | "";
   reason: string;
   notes: string;
@@ -116,6 +125,21 @@ export default function NewMovementPage() {
 
   const updateRow = (key: string, patch: Partial<Row>) => setRows((r) => r.map((x) => (x.key === key ? { ...x, ...patch } : x)));
 
+  /** La cantidad manda: se ajustan los renglones de identidad conservando lo ya capturado. */
+  const setQuantity = (key: string, quantity: number) => {
+    setRows((r) =>
+      r.map((x) => (x.key === key ? { ...x, quantity, unitRows: resizeUnitRows(x.unitRows, quantity) } : x))
+    );
+  };
+
+  const updateUnitRow = (key: string, id: number, field: keyof UnitIdentityRow, value: string) => {
+    setRows((r) =>
+      r.map((x) =>
+        x.key === key ? { ...x, unitRows: x.unitRows.map((u) => (u.id === id ? { ...u, [field]: value } : u)) } : x
+      )
+    );
+  };
+
   const selectDevice = (key: string, deviceId: string) => {
     updateRow(key, { deviceId, unitId: "", type: "", units: [] });
     if (deviceId) loadUnits(key, deviceId);
@@ -145,6 +169,7 @@ export default function NewMovementPage() {
     unitId: "",
     type: "",
     quantity: 1,
+    unitRows: [emptyUnitRow()],
     condition: "",
     reason: "",
     notes: "",
@@ -193,6 +218,9 @@ export default function NewMovementPage() {
     return Object.keys(e).length === 0;
   };
 
+  /** Dispositivo del renglón (trae su tipo, que decide qué identidad se pide). */
+  const deviceOf = (r: Row) => devices.find((d) => d.id === r.deviceId);
+
   const isValid = rows.length > 0 && rows.every(validRow);
 
   /** Piezas que toca el movimiento: una por renglón, o la cantidad si es entrada. */
@@ -222,7 +250,16 @@ export default function NewMovementPage() {
             items: rs.map((r) => ({
               deviceId: r.deviceId,
               ...(isEntry(tp)
-                ? { quantity: r.quantity }
+                ? {
+                    quantity: r.quantity,
+                    // Posicional: la pieza i lleva la identidad del renglón i.
+                    units: r.unitRows.map((u) => ({
+                      serialNumber: u.serialNumber || undefined,
+                      macAddress: u.macAddress || undefined,
+                      ip: u.ip || undefined,
+                      hostname: u.hostname || undefined,
+                    })),
+                  }
                 : { unitId: r.unitId, quantity: 1 }),
               condition: tp === "MAINTENANCE_OUT" ? (r.condition as Condition) : undefined,
               notes: r.notes.trim() ? r.notes : undefined,
@@ -324,12 +361,10 @@ export default function NewMovementPage() {
                           label={t("new.quantity")}
                           value={String(r.quantity)}
                           onChange={(e) =>
-                            updateRow(r.key, {
-                              quantity: Math.min(
-                                MAX_ENTRY_QUANTITY,
-                                Math.max(1, Number(e.target.value.replace(/[^0-9]/g, "")) || 1)
-                              ),
-                            })
+                            setQuantity(
+                              r.key,
+                              Math.min(MAX_ENTRY_QUANTITY, Math.max(1, Number(e.target.value.replace(/[^0-9]/g, "")) || 1))
+                            )
                           }
                           aria-invalid={!!errors[`quantity-${idx}`]}
                         />
@@ -442,6 +477,25 @@ export default function NewMovementPage() {
 
                 {r.type && r.deviceId && (isEntry(r.type) || visible.length > 0) && (
                   <ITText className="text-[11px] text-slate-400">{t(MOVEMENT_HINT_KEY[r.type as keyof typeof MOVEMENT_HINT_KEY])}</ITText>
+                )}
+
+                {/* Las piezas nuevas se identifican aquí mismo (serie, MAC, IP):
+                    es opcional y por pieza, y el tipo del dispositivo decide qué
+                    campos se piden. */}
+                {isEntry(r.type) && usesUnitIdentity(deviceOf(r)?.type) && (
+                  <ITFlex direction="column" gap={2} className="rounded-xl border border-slate-100 !bg-slate-50/60 p-3">
+                    <ITText className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                      {t("new.identifyPieces", { count: r.quantity })}
+                    </ITText>
+                    <ITText className="text-[11px] text-slate-400">{t("new.identifyPiecesHint")}</ITText>
+                    <UnitIdentityEditor
+                      type={deviceOf(r)?.type}
+                      units={r.unitRows}
+                      onChange={(id, field, value) => updateUnitRow(r.key, id, field, value)}
+                      label={(index) => `${t("new.pieceRow")} ${index + 1}`}
+                      openFirst={1}
+                    />
+                  </ITFlex>
                 )}
               </ITFlex>
             );

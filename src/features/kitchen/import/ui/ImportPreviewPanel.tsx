@@ -328,10 +328,17 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
 
       {summary.invalid === 0 && (summary.categoriesToCreate.length > 0 || summary.unitsToCreate.length > 0) && (
         <ITAlert variant="info">
-          {t("import.catalogBanner", {
-            categories: summary.categoriesToCreate.join(", ") || "—",
-            units: summary.unitsToCreate.join(", ") || "—",
-          })}
+          {[
+            summary.categoriesToCreate.length > 0
+              ? t("import.catalogCategories", { categories: summary.categoriesToCreate.join(", ") })
+              : null,
+            summary.unitsToCreate.length > 0
+              ? t("import.catalogUnits", { units: summary.unitsToCreate.join(", ") })
+              : null,
+            t("import.catalogBannerTail"),
+          ]
+            .filter(Boolean)
+            .join(" ")}
         </ITAlert>
       )}
 
@@ -368,6 +375,9 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
         <ITDataTable
           columns={columns}
           fetchData={request as any}
+          // La tabla no reacciona al cambio de `fetchData`: al re-resolver la
+          // previsualización (otra estrategia) hay que empujarla con el token.
+          reloadTrigger={fx.previewToken}
           defaultItemsPerPage={50}
           itemsPerPageOptions={[25, 50, 100]}
           layout="fixed"
