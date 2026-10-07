@@ -10,12 +10,21 @@ import type {
   TimeClockProgress,
   TimeClockConfig,
   TimeClockStatus,
+  TimeClockSyncHistory,
 } from "../model/types";
 
 const employeePath = (number: string) => `/time-clock/employees/${encodeURIComponent(number)}`;
 const clockPath = (serial: string) => `/time-clock/clocks/${encodeURIComponent(serial)}`;
 
 export const timeClockApi = {
+  /**
+   * Timeline de un reloj: sus últimos intentos de sincronización (falló,
+   * reintentó, conectó) con su resumen. Es lo que ve soporte al abrir el
+   * detalle de un reloj.
+   */
+  clockEvents: (serial: string, limit = 50) =>
+    api.get<TimeClockSyncHistory>(`${clockPath(serial)}/events?limit=${limit}`),
+
   /** Tabla server-side (`{ page, limit, filters, sort }` → `{ data, total }`). */
   table: (params: ITDataTableFetchParamsPost) =>
     tableRequest<TimeClockPunch>(`/time-clock/query`, params),

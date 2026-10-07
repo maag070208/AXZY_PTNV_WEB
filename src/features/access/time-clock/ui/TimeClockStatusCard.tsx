@@ -1,5 +1,7 @@
 import { ITBadget, ITButton, ITCard, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
-import { FaCog, FaLock, FaSyncAlt } from "react-icons/fa";
+import { useState } from "react";
+import { FaCog, FaSyncAlt } from "react-icons/fa";
+import { FaCircleInfo, FaLock } from "react-icons/fa6";
 import {
   CLOCK_STATUS_COLOR,
   clockStatus,
@@ -10,6 +12,7 @@ import {
 } from "@entities/time-clock";
 import { formatDateTime } from "@shared/utils/dates";
 import type { UseTimeClock } from "../model/useTimeClock";
+import ClockHistoryDialog from "./ClockHistoryDialog";
 import { dateLocale } from "@shared/i18n";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
@@ -62,6 +65,8 @@ interface Props {
 
 export default function TimeClockStatusCard({ fx, onManageClocks }: Props) {
   const { t, status, inProgress, progress, importing, starting, handleSyncAll } = fx;
+  /** Reloj cuyo historial de sincronización se está viendo (soporte). */
+  const [historial, setHistorial] = useState<TimeClockDevice | null>(null);
   if (!status) return null;
 
   const overallState = statusOf(status);
@@ -225,6 +230,18 @@ export default function TimeClockStatusCard({ fx, onManageClocks }: Props) {
                     <ITText className="text-[10px] font-bold text-slate-500">{t("status.onlyAccess")}</ITText>
                   )}
                   {item && <ITText className="text-[11px] text-slate-600 break-words">{item}</ITText>}
+                  <ITButton
+                    variant="text"
+                    size="sm"
+                    className="!px-0"
+                    title={t("history.open")}
+                    onClick={() => setHistorial(d)}
+                  >
+                    <ITFlex align="center" gap={1}>
+                      <FaCircleInfo size={11} />
+                      <ITText className="text-[10px] font-bold">{t("history.open")}</ITText>
+                    </ITFlex>
+                  </ITButton>
                 </ITFlex>
               </ITGrid>
               <Datum label={t("status.punches")} value={number(d.punches)} />
@@ -245,6 +262,8 @@ export default function TimeClockStatusCard({ fx, onManageClocks }: Props) {
           <ITText className="text-[10px] font-bold text-slate-400">{t("status.readOnly")}</ITText>
         </ITFlex>
       </ITFlex>
+
+      <ClockHistoryDialog device={historial} onClose={() => setHistorial(null)} />
     </ITCard>
   );
 }

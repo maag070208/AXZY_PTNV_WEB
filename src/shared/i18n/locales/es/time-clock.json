@@ -263,5 +263,32 @@
       "retirement": "No se pudo dar de baja el reloj",
       "edit": "No se pudo actualizar el reloj"
     }
+  },
+  "history": {
+    "open": "Ver historial de sincronización",
+    "title": "Historial de {{name}}",
+    "refresh": "Actualizar",
+    "empty": "Todavía no hay intentos registrados para este reloj.",
+    "loadError": "No se pudo leer el historial; vuelve a intentarlo.",
+    "attempts": "Intentos con éxito",
+    "failedCount": "{{count}} fallidos",
+    "failuresInARow": "Fallos seguidos",
+    "healthy": "El último intento conectó",
+    "checking": "Revisar el reloj",
+    "lastOk": "Última conexión",
+    "never": "Nunca",
+    "lastFail": "Último fallo: {{at}}",
+    "lastError": "Último error",
+    "ok": "Conectó",
+    "failed": "Falló",
+    "duration": "{{seconds}} s",
+    "read": "{{new}} checadas nuevas de {{read}} eventos revisados",
+    "hint": "El sistema solo lee de los relojes. Un intento fallido no pierde checadas: el equipo las guarda y la siguiente vuelta las trae.",
+    "triggers": {
+      "AUTO": "Automático",
+      "MANUAL": "Sincronizar todo",
+      "IMPORT": "Importar por rango",
+      "REGISTER": "Alta del reloj"
+    }
   }
 }

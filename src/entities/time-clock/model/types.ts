@@ -184,3 +184,42 @@ export interface TimeClockEmployeesResponse {
   total: number;
   summary: TimeClockEmployeesSummary;
 }
+
+/** Quién disparó un intento de sincronización. */
+export type TimeClockSyncTrigger = "AUTO" | "MANUAL" | "IMPORT" | "REGISTER";
+
+/** Un intento de sincronización con el reloj: un renglón del timeline. */
+export interface TimeClockSyncEvent {
+  id: string;
+  trigger: TimeClockSyncTrigger;
+  ok: boolean;
+  startedAt: string;
+  finishedAt: string;
+  /** Eventos del reloj revisados (por consecutivo); de ellos, las checadas. */
+  readCount: number;
+  /** Checadas nuevas guardadas en este intento. */
+  newCount: number;
+  lastSerialNo: number | null;
+  /** Motivo del fallo tal cual (`null` si conectó). */
+  error: string | null;
+}
+
+/**
+ * Historial de sincronización de un reloj: sus últimos intentos (el más
+ * reciente primero) y el resumen ("¿falla seguido o fue un parpadeo?").
+ */
+export interface TimeClockSyncHistory {
+  clockSerial: string;
+  events: TimeClockSyncEvent[];
+  summary: {
+    attempts: number;
+    okCount: number;
+    failCount: number;
+    /** Fallos consecutivos desde el más reciente (0 = el último conectó). */
+    failuresInARow: number;
+    lastOkAt: string | null;
+    lastFailAt: string | null;
+    lastError: string | null;
+  };
+}
+

@@ -263,5 +263,32 @@
       "retirement": "Could not remove the clock",
       "edit": "Could not update the clock"
     }
+  },
+  "history": {
+    "open": "View sync history",
+    "title": "{{name}} history",
+    "refresh": "Refresh",
+    "empty": "No sync attempts recorded for this clock yet.",
+    "loadError": "The history could not be read; please try again.",
+    "attempts": "Successful attempts",
+    "failedCount": "{{count}} failed",
+    "failuresInARow": "Failures in a row",
+    "healthy": "The last attempt connected",
+    "checking": "Check the clock",
+    "lastOk": "Last connection",
+    "never": "Never",
+    "lastFail": "Last failure: {{at}}",
+    "lastError": "Last error",
+    "ok": "Connected",
+    "failed": "Failed",
+    "duration": "{{seconds}} s",
+    "read": "{{new}} new punches out of {{read}} events checked",
+    "hint": "The system only reads from the clocks. A failed attempt loses nothing: the device keeps the punches and the next round brings them.",
+    "triggers": {
+      "AUTO": "Automatic",
+      "MANUAL": "Sync all",
+      "IMPORT": "Import by range",
+      "REGISTER": "Clock registration"
+    }
   }
 }
