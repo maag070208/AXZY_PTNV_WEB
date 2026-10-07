@@ -83,7 +83,16 @@ export class NewMovementPage {
    * pide una cantidad en su lugar.
    */
   async writeQuantity(quantity: number, index = 1): Promise<void> {
-    await field(this.row(index), "Cantidad").fill(String(quantity));
+    // OJO: `fill` no sirve aquí. El campo es controlado y su `onChange` convierte
+    // el vacío en 1, así que mientras Playwright limpia, React vuelve a poner el
+    // "1" por defecto y lo que se teclea queda pegado: escribir 2 registraba 12
+    // unidades. Se selecciona todo y se teclea, y se VERIFICA el valor para que
+    // un cambio así falle aquí y no en las existencias.
+    const input = field(this.row(index), "Cantidad");
+    await input.click();
+    await input.press("ControlOrMeta+a");
+    await input.pressSequentially(String(quantity));
+    await expect(input).toHaveValue(String(quantity));
   }
 
   /**
