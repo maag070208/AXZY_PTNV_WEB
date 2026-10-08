@@ -117,7 +117,13 @@ export class TicketsPage {
     await button(this.page, "Comentar").click();
   }
 
+  /** Abre el diálogo "Editar ticket" del detalle (estado, categoría, depto, responsable). */
+  async openTicketEditor(): Promise<void> {
+    await this.page.getByTestId("editar-ticket").click();
+  }
+
   async changeStatusTicket(value: string): Promise<void> {
+    await this.openTicketEditor();
     await this.page.locator('select[name="status"]').selectOption(value);
   }
 

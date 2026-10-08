@@ -229,7 +229,7 @@ test.describe("Tickets — detalle", () => {
     expect(ticket.comments.length).toBeGreaterThanOrEqual(1);
   });
 
-  test("cambia el estado del ticket desde el panel de administración", async ({
+  test("cambia el estado del ticket desde el diálogo de edición", async ({
     page,
     tickets,
     ticketsPage,
@@ -272,7 +272,9 @@ test.describe("Tickets — detalle", () => {
     await ticketScenario.tickets.update(ticketScenario.ticket.id, { status: "CLOSED" });
 
     await ticketsPage.goItem(ticketScenario.ticket.id);
-    await expect(page.locator('select[name="status"]')).toBeDisabled();
+    // Cerrado no hay forma de editarlo: el diálogo de edición no se ofrece y el
+    // seguimiento queda deshabilitado.
+    await expect(page.getByTestId("editar-ticket")).toHaveCount(0);
     await expect(page.locator('textarea[name="comment"]')).toBeDisabled();
   });
 });

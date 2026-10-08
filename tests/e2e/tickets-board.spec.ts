@@ -66,7 +66,7 @@ test.describe("Tickets — tablero kanban", () => {
     const assignment = await ticketScenario.assignA(E2E.admin.username, taskTitle);
 
     await ticketsPage.goItem(ticketScenario.ticket.id);
-    await page.getByRole("button", { name: "Abrir", exact: true }).click();
+    await page.getByRole("button", { name: "Detalles", exact: true }).click();
     await ticketsPage.selectTaskStatus(assignment.id).selectOption("IN_PROGRESS");
     await tickets.waitForTicket(
       ticketScenario.ticket.id,
@@ -106,7 +106,7 @@ test.describe("Tickets — tareas (TasksGraph)", () => {
     const assignment = await ticketScenario.assignA(E2E.admin.username, `Tarea ${ticketScenario.title}`);
 
     await ticketsPage.goItem(ticketScenario.ticket.id);
-    await ticketsPage.page.getByRole("button", { name: "Abrir", exact: true }).click();
+    await ticketsPage.page.getByRole("button", { name: "Detalles", exact: true }).click();
 
     const select = () => ticketsPage.selectTaskStatus(assignment.id);
     const status = (s: string) =>
@@ -134,7 +134,7 @@ test.describe("Tickets — tareas (TasksGraph)", () => {
     const taskTitle = `Tarea ${ticketScenario.title}`;
 
     await ticketsPage.goItem(ticketScenario.ticket.id);
-    await page.getByRole("button", { name: "Abrir formulario", exact: true }).click();
+    await page.getByRole("button", { name: "Nueva tarea", exact: true }).click();
     await selectInSearch(
       page,
       "Buscar por nombre o no. empleado...",
@@ -167,7 +167,7 @@ test.describe("Tickets — tareas por rol (EMPLEADO)", () => {
 
     await login.enterAs(E2E.employee.username);
     await ticketsPage.goItem(ticketScenario.ticket.id);
-    await page.getByRole("button", { name: "Abrir", exact: true }).click();
+    await page.getByRole("button", { name: "Detalles", exact: true }).click();
 
     const select = ticketsPage.selectTaskStatus(assignment.id);
     await expect(select.locator('option[value="COMPLETED"]')).toHaveCount(0);

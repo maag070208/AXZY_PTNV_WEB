@@ -1,4 +1,5 @@
-import { ITBadget, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { FaPen } from "react-icons/fa";
 import { formatDateTime } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
@@ -9,9 +10,11 @@ import type { UseTicketDetail } from "../model/useTicketDetail";
 interface Props {
   fx: UseTicketDetail;
   attachments: React.ReactNode;
+  /** Abre el diálogo de edición; sin él (cerrado o sin permiso) no se pinta. */
+  onEdit?: () => void;
 }
 
-export default function TicketInfoCard({ fx, attachments }: Props) {
+export default function TicketInfoCard({ fx, attachments, onEdit }: Props) {
   const { t: tt } = useTranslation("tickets");
   const ticket = fx.ticket;
   if (!ticket) return null;
@@ -21,20 +24,33 @@ export default function TicketInfoCard({ fx, attachments }: Props) {
   return (
     <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
       <ITStack direction="column" spacing={5} className="w-full">
-        <ITFlex gap={2} wrap="wrap">
-          <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="lg">
-            {dyn(tt)(`statusLabels.${ticket.status}`)}
-          </ITBadget>
-          <ITBadget color={(PRIORITY_BADGE[ticket.priority]?.color as any) ?? "default"} size="lg">
-            {dyn(tt)(`priorityLabels.${ticket.priority}`)}
-          </ITBadget>
-          <ITBadget color="primary" size="lg">
-            {ticket.category?.name ?? "—"}
-          </ITBadget>
-          {ticket.deletedAt && (
-            <ITBadget color="gray" size="lg">
-              {tt("detail.deletedBadge")}
+        <ITFlex align="center" justify="between" gap={2} wrap="wrap">
+          <ITFlex gap={2} wrap="wrap">
+            <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="lg">
+              {dyn(tt)(`statusLabels.${ticket.status}`)}
             </ITBadget>
+            <ITBadget color={(PRIORITY_BADGE[ticket.priority]?.color as any) ?? "default"} size="lg">
+              {dyn(tt)(`priorityLabels.${ticket.priority}`)}
+            </ITBadget>
+            <ITBadget color="primary" size="lg">
+              {ticket.category?.name ?? "—"}
+            </ITBadget>
+            {ticket.deletedAt && (
+              <ITBadget color="gray" size="lg">
+                {tt("detail.deletedBadge")}
+              </ITBadget>
+            )}
+          </ITFlex>
+          {onEdit && (
+            // El testid va en el envoltorio: `ITButton` no reenvía props sueltas.
+            <span data-testid="editar-ticket" className="inline-flex">
+              <ITButton variant="outlined" color="secondary" size="sm" onClick={onEdit} title={tt("detail.editTitle")}>
+                <ITFlex align="center" gap={1}>
+                  <FaPen size={10} />
+                  <ITText className="!text-[11px] font-bold">{tt("detail.edit")}</ITText>
+                </ITFlex>
+              </ITButton>
+            </span>
           )}
         </ITFlex>
 

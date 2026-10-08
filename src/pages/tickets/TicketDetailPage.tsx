@@ -15,9 +15,9 @@ import {
   FaTrashRestore,
   FaTrello,
 } from "react-icons/fa";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { dyn } from "@shared/i18n/dyn";
 import { downloadTicketPDF } from "@widgets/tickets/ticket-pdf";
 import TicketAttachments from "@widgets/tickets/ticket-attachments";
 import {
@@ -25,7 +25,7 @@ import {
   buildTimeline,
   TicketHistoryAside,
   TicketInfoCard,
-  TicketManagerPanel,
+  TicketEditDialog,
   TicketComments,
   TasksGraph,
 } from "@features/ticket/ticket-detail";
@@ -35,6 +35,7 @@ export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t: tt } = useTranslation(["tickets", "common"]);
+  const [editOpen, setEditOpen] = useState(false);
 
   const fx = useTicketDetail({
     id,
@@ -91,10 +92,6 @@ export default function TicketDetailPage() {
     <ITPage
       noPadding
       title={ticket.title}
-      description={tt("detail.description", {
-        status: dyn(tt)(`statusLabels.${ticket.status}`) ?? ticket.status,
-        category: ticket.category?.name ?? "—",
-      })}
       backAction={() => navigate(-1)}
       icon={<FaTicketAlt size={20} />}
       breadcrumbs={[
@@ -161,15 +158,19 @@ export default function TicketDetailPage() {
       <ITGrid container columns={12} spacing={5} className="items-start">
         {/* Columna izquierda: contenido principal (2/3) */}
         <ITGrid item xs={12} md={8} className="flex flex-col gap-5 min-w-0">
-          <TicketInfoCard fx={fx} attachments={renderTicketAttachments} />
+          <TicketInfoCard
+            fx={fx}
+            attachments={renderTicketAttachments}
+            onEdit={fx.canEditTicket && !fx.isClosed ? () => setEditOpen(true) : undefined}
+          />
 
-          {(fx.canEditTicket || fx.canCreateTasks) && (
-            <TicketManagerPanel fx={fx} renderAssignmentAttachments={renderAssignmentAttachments} />
-          )}
-
-          {!fx.canEditTicket && !fx.canCreateTasks && fx.isInvolved && (
+          {(fx.canEditTicket || fx.canCreateTasks || fx.isInvolved) && (
             <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
-              <TasksGraph fx={fx} canManage={false} renderAssignmentAttachments={renderAssignmentAttachments} />
+              <TasksGraph
+                fx={fx}
+                canManage={fx.canEditTicket || fx.canCreateTasks}
+                renderAssignmentAttachments={renderAssignmentAttachments}
+              />
             </ITFlex>
           )}
 
@@ -191,6 +192,8 @@ export default function TicketDetailPage() {
           onClose={() => fx.setToast(null)}
         />
       )}
+
+      <TicketEditDialog fx={fx} open={editOpen} onClose={() => setEditOpen(false)} />
 
       <ITConfirmDialog
         isOpen={fx.deleteOpen}
