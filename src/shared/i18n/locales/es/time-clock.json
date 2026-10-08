@@ -1,6 +1,6 @@
 {
-  "title": "Reloj checador",
-  "description": "Checadas de los relojes Hikvision. Se copian solas cada 5 minutos; la API solo lee de los relojes.",
+  "title": "Checadas",
+  "description": "Registros de los relojes Hikvision. Se copian solos cada 5 minutos.",
   "status": {
     "title": "Sincronización con los relojes",
     "readOnly": "Solo lectura: la API nunca modifica la configuración de los relojes.",
@@ -9,7 +9,7 @@
       "withoutClocks": "Sin relojes",
       "paused": "En pausa",
       "running": "Sincronizando",
-      "error": "Con error",
+      "error": "Sin conexión",
       "ok": "Al día",
       "pending": "Sin sincronizar"
     },
@@ -25,8 +25,19 @@
     "device": "Reloj",
     "punches": "Checadas guardadas",
     "lastPunch": "Última checada",
-    "lastSync": "Última sincronización",
+    "lastSync": "Sincronizado",
     "empty": "—",
+    "offlineTitle": "El reloj no responde",
+    "offlineText": "Revise que esté encendido y conectado a la red. Las checadas siguen guardadas en el reloj y se copiarán al reconectar.",
+    "technical": "Detalle técnico",
+    "retry": "Reintentar conexión",
+    "lastRunAt": "Último intento",
+    "readEvents": "Eventos revisados",
+    "newPunches": "Checadas nuevas",
+    "cursor": "Consecutivo leído",
+    "agoSeconds": "hace {{seconds}} s",
+    "agoMinutes": "hace {{minutes}} min",
+    "agoHours": "hace {{hours}} h {{minutes}} min",
     "clock": {
       "running": "{{readCount}} de {{total}} eventos revisados · {{newCount}} checadas nuevas",
       "runningNoTotal": "{{newCount}} checadas nuevas",
@@ -37,7 +48,7 @@
     "onlyAccess": "No cuenta para entradas/salidas"
   },
   "sync": {
-    "button": "Sincronizar todo",
+    "button": "Sincronizar ahora",
     "hint": "Trae de cada reloj todo lo que falte (el rezago completo). Corre en segundo plano; puedes seguir usando el sistema.",
     "alreadyRunning": "Todos los relojes ya están sincronizando; espera a que terminen.",
     "percent": "{{percent}}%",
@@ -63,7 +74,8 @@
     "title": "Rango rápido",
     "today": "Hoy",
     "yesterday": "Ayer",
-    "last7": "Últimos 7 días"
+    "last7": "Últimos 7 días",
+    "custom": "Personalizado"
   },
   "filters": {
     "title": "Filtros",
@@ -71,17 +83,25 @@
     "employee": "Buscar empleado",
     "employeePlaceholder": "Nombre o número de empleado...",
     "method": "Método",
-    "allMethods": "Todos",
+    "allMethods": "Todo método",
     "clock": "Reloj",
-    "allClocks": "Todos",
+    "allClocks": "Todos los relojes",
     "clear": "Limpiar filtros"
   },
   "columns": {
-    "occurredAt": "Fecha y hora",
+    "occurredAt": "Hora",
+    "dateTime": "Fecha y hora",
     "employee": "Empleado",
     "method": "Método",
     "clock": "Reloj",
     "serialNo": "Consecutivo"
+  },
+  "table": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "punches": "{{count}} checadas",
+    "updated": "Actualizado {{ago}}",
+    "range": "{{from}} – {{to}}"
   },
   "methods": {
     "FACE": "Rostro",

@@ -3,7 +3,7 @@ import { FaFingerprint } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
-import { TimeClockTab, useTimeClock } from "@features/access/time-clock";
+import { TimeClockActions, TimeClockTab, useTimeClock } from "@features/access/time-clock";
 
 export default function TimeClockPage() {
   const { t } = useTranslation(["time-clock", "common"]);
@@ -18,6 +18,12 @@ export default function TimeClockPage() {
       title={t("title")}
       description={t("description")}
       icon={<FaFingerprint size={20} />}
+      actions={
+        <TimeClockActions
+          fx={fx}
+          onManageClocks={canManageClocks ? () => navigate("/time-clocks") : undefined}
+        />
+      }
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
@@ -25,10 +31,7 @@ export default function TimeClockPage() {
       ]}
       backAction={() => navigate("/employees")}
     >
-      <TimeClockTab
-        fx={fx}
-        onManageClocks={canManageClocks ? () => navigate("/time-clocks") : undefined}
-      />
+      <TimeClockTab fx={fx} />
     </ITPage>
   );
 }

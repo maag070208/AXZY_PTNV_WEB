@@ -14,7 +14,8 @@ export const clockStatus = (clock: TimeClockDevice): TimeClockState => {
 export const CLOCK_STATUS_COLOR: Record<TimeClockState, "success" | "warning" | "danger" | "gray" | "info"> = {
   paused: "danger",
   running: "info",
-  error: "warning",
+  // `error` es "Sin conexión" (el último intento no conectó): rojo, no ámbar.
+  error: "danger",
   ok: "success",
   pending: "gray",
 };

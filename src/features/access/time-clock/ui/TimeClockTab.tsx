@@ -3,13 +3,11 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITCard,
+  ITChip,
   ITDataTable,
   ITDatePicker,
   ITFlex,
-  ITGrid,
   ITInput,
-  ITSearchSelect,
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
@@ -18,9 +16,11 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaCloudDownloadAlt, FaFileCsv, FaUndo } from "react-icons/fa";
+import { FaLock, FaUndo } from "react-icons/fa";
 import type { TimeClockPunch, PunchMethod } from "@entities/time-clock";
-import { formatDateTime } from "@shared/utils/dates";
+import { formatAgo, formatDate } from "@shared/i18n";
+import { formatDateTime, formatTimeInTZ } from "@shared/utils/dates";
+import { PanelCard } from "@shared/ui/panel-card";
 import type { UseTimeClock } from "../model/useTimeClock";
 import TimeClockStatusCard from "./TimeClockStatusCard";
 
@@ -35,61 +35,66 @@ const METHOD_COLOR: Record<PunchMethod, BadgeColor> = {
   OTHER: "warning",
 };
 
-interface Props {
-  fx: UseTimeClock;
-  /** Solo para quien puede administrar los relojes (ADMIN). */
-  onManageClocks?: () => void;
-}
+const pad = (n: number): string => String(n).padStart(2, "0");
 
-export default function TimeClockTab({ fx, onManageClocks }: Props) {
+/** Clave `YYYY-MM-DD` de un día local, para comparar días sin horas. */
+const dayKey = (d: Date): string =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+/** Iniciales del nombre para el avatar de la columna Empleado ("Mariana Ruiz Ortega" → MR). */
+const initials = (name: string): string =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+
+export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
   const {
     t,
     dateRange,
     setDateRange,
+    rangeMode,
+    applyRange,
+    chooseCustomRange,
     q,
     setQ,
     method,
     setMethod,
     clock,
     setClock,
-    applyRange,
     clearFilters,
     externalFilters,
     fetchTableData,
     reloadKey,
+    tableTotal,
+    tableUpdatedAt,
     status,
-    importing,
-    starting,
-    handleImportRange,
-    exporting,
-    handleExportCsv,
     error,
     setError,
     toast,
     setToast,
   } = fx;
 
-  const methodOptions = useMemo(
-    () => [
-      { value: "", label: t("filters.allMethods") },
-      ...METHODS.map((m) => ({ value: m, label: t(`methods.${m}`) })),
-    ],
-    [t]
-  );
+  const [from, to] = dateRange;
+  /** Un solo día: la columna lleva solo la hora (como el resto de la pantalla). */
+  const singleDay = !!from && !!to && dayKey(from) === dayKey(to);
 
-  const clockOptions = useMemo(
-    () => [
-      { value: "", label: t("filters.allClocks") },
-      ...(status?.devices ?? []).map((d) => ({ value: d.clockSerial, label: d.name })),
-    ],
-    [status?.devices, t]
-  );
+  const handleDateRange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: Date | [Date | null, Date | null] } }
+  ) => {
+    const value = e.target.value;
+    if (Array.isArray(value)) setDateRange(value);
+  };
 
   const columns = useMemo<Column<TimeClockPunch>[]>(
     () => [
       {
         key: "occurredAt",
-        label: t("columns.occurredAt"),
+        label: singleDay ? t("columns.occurredAt") : t("columns.dateTime"),
         type: "date",
         width: 190,
         filter: "date-range",
@@ -97,7 +102,7 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         sortable: false,
         render: (c) => (
           <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
-            {formatDateTime(c.occurredAt)}
+            {singleDay ? formatTimeInTZ(c.occurredAt) : formatDateTime(c.occurredAt)}
           </ITText>
         ),
       },
@@ -110,11 +115,16 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         catalogOptions: fx.employeeOptions,
         sortable: false,
         render: (c) => (
-          <ITFlex direction="column" gap={0.5}>
-            <ITText className="text-[12px] font-black text-slate-800">{c.name || "—"}</ITText>
-            <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-              #{c.employeeNumber}
-            </ITText>
+          <ITFlex align="center" gap={2} className="min-w-0">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-black text-slate-500">
+              {initials(c.name || "")}
+            </span>
+            <ITFlex direction="column" gap={0.5} className="min-w-0">
+              <ITText className="text-[12px] font-black text-slate-800">{c.name || "—"}</ITText>
+              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                #{c.employeeNumber}
+              </ITText>
+            </ITFlex>
           </ITFlex>
         ),
       },
@@ -160,17 +170,31 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         ),
       },
     ],
-    [t, status?.devices, fx.employeeOptions]
+    [t, singleDay, status?.devices, fx.employeeOptions]
   );
 
-  const handleDateRange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } }
-  ) => {
-    const value = e.target.value;
-    if (Array.isArray(value)) setDateRange(value);
-  };
+  /** "Hoy, miércoles 07 oct" para un día; "01 oct – 07 oct" para un rango. */
+  const rangeLabel = useMemo(() => {
+    if (!from) return "";
+    const largo = (d: Date): string =>
+      formatDate(d, { weekday: "long", day: "2-digit", month: "short" }).replace(",", "");
+    const corto = (d: Date): string => formatDate(d, { day: "2-digit", month: "short" });
+    if (!to || dayKey(from) === dayKey(to)) {
+      const hoy = new Date();
+      const ayer = new Date(hoy);
+      ayer.setDate(ayer.getDate() - 1);
+      const key = dayKey(from);
+      if (key === dayKey(hoy)) return `${t("table.today")}, ${largo(from)}`;
+      if (key === dayKey(ayer)) return `${t("table.yesterday")}, ${largo(from)}`;
+      return largo(from);
+    }
+    return t("table.range", { from: corto(from), to: corto(to) });
+  }, [from, to, t]);
+
+  const tableTitle =
+    tableTotal == null ? rangeLabel : `${rangeLabel} · ${t("table.punches", { count: tableTotal })}`;
+
+  const updatedAgo = formatAgo("time-clock:status", new Date(tableUpdatedAt).toISOString());
 
   return (
     <ITFlex direction="column" gap={4}>
@@ -180,60 +204,57 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
         </ITAlert>
       )}
 
-      <TimeClockStatusCard fx={fx} onManageClocks={onManageClocks} />
+      <TimeClockStatusCard fx={fx} />
 
-      {/* Filtros */}
-      <ITCard title={t("filters.title")} className="!p-5 border border-slate-200">
+      {/* Filtros: píldoras del rango, del reloj y del método. */}
+      <PanelCard title={t("filters.title")}>
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              {t("presets.title")}
-            </ITText>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => applyRange("today")}>
-              {t("presets.today")}
-            </ITButton>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => applyRange("yesterday")}>
-              {t("presets.yesterday")}
-            </ITButton>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => applyRange("last7")}>
-              {t("presets.last7")}
-            </ITButton>
-            <ITFlex align="center" gap={2} className="ml-auto">
-              <span title={t("import.hint")}>
-                <ITButton
-                  variant="outlined"
-                  color="primary"
-                  size="sm"
-                  onClick={handleImportRange}
-                  disabled={importing || starting || !dateRange[0] || !status?.configured}
-                >
-                  <ITFlex align="center" gap={1}>
-                    <FaCloudDownloadAlt size={13} />
-                    <ITText className="font-bold text-[11px]">
-                      {importing ? t("import.running") : t("import.button")}
-                    </ITText>
-                  </ITFlex>
-                </ITButton>
-              </span>
-              <ITButton variant="outlined" color="gray" size="sm" onClick={() => void handleExportCsv()} disabled={exporting}>
-                <ITFlex align="center" gap={1}>
-                  <FaFileCsv className="text-emerald-600" size={13} />
-                  <ITText className="font-bold text-[11px]">
-                    {exporting ? t("actions.exporting") : t("actions.exportCsv")}
-                  </ITText>
-                </ITFlex>
-              </ITButton>
-              <ITButton variant="text" color="gray" size="sm" onClick={clearFilters}>
-                <ITFlex align="center" gap={1}>
-                  <FaUndo size={11} />
-                  <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
-                </ITFlex>
-              </ITButton>
-            </ITFlex>
+            <ITChip
+              label={t("presets.today")}
+              selected={rangeMode === "today"}
+              onClick={() => applyRange("today")}
+              color="primary"
+              variant="outlined"
+              size="sm"
+            />
+            <ITChip
+              label={t("presets.yesterday")}
+              selected={rangeMode === "yesterday"}
+              onClick={() => applyRange("yesterday")}
+              color="primary"
+              variant="outlined"
+              size="sm"
+            />
+            <ITChip
+              label={t("presets.last7")}
+              selected={rangeMode === "last7"}
+              onClick={() => applyRange("last7")}
+              color="primary"
+              variant="outlined"
+              size="sm"
+            />
+            <ITChip
+              label={t("presets.custom")}
+              selected={rangeMode === "custom"}
+              onClick={chooseCustomRange}
+              color="primary"
+              variant="outlined"
+              size="sm"
+            />
+            <div className="ml-auto w-full sm:w-72">
+              <ITInput
+                name="checadorEmployee"
+                placeholder={t("filters.employeePlaceholder")}
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className="w-full min-w-0"
+              />
+            </div>
           </ITFlex>
 
-          <ITGrid container columns={12} spacing={4}>
-            <ITGrid item xs={12} md={3}>
+          {rangeMode === "custom" && (
+            <div className="w-full sm:w-72">
               <ITDatePicker
                 name="checadorDateRange"
                 label={t("filters.dateRange")}
@@ -242,58 +263,104 @@ export default function TimeClockTab({ fx, onManageClocks }: Props) {
                 onChange={handleDateRange}
                 className="w-full min-w-0"
               />
-            </ITGrid>
-            <ITGrid item xs={12} md={3}>
-              <ITInput
-                name="checadorEmployee"
-                label={t("filters.employee")}
-                placeholder={t("filters.employeePlaceholder")}
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                className="w-full min-w-0"
-              />
-            </ITGrid>
-            <ITGrid item xs={12} md={3}>
-              <ITSearchSelect
-                name="timeClock"
-                label={t("filters.clock")}
-                options={clockOptions}
-                value={clock}
-                onChange={(value) => setClock(String(value))}
-                className="w-full min-w-0"
-              />
-            </ITGrid>
-            <ITGrid item xs={12} md={3}>
-              <ITSearchSelect
-                name="checadorMetodo"
-                label={t("filters.method")}
-                options={methodOptions}
-                value={method}
-                onChange={(value) => setMethod(String(value) as PunchMethod | "")}
-                className="w-full min-w-0"
-              />
-            </ITGrid>
-          </ITGrid>
-        </ITFlex>
-      </ITCard>
+            </div>
+          )}
 
-      <ITDataTable
-        columns={columns as unknown as Column<Record<string, unknown>>[]}
-        fetchData={
-          fetchTableData as unknown as (
-            p: ITDataTableFetchParams
-          ) => Promise<ITDataTableResponse<Record<string, unknown>>>
+          <ITFlex align="center" wrap="wrap" gap={2}>
+            <ITChip
+              label={t("filters.allClocks")}
+              selected={!clock}
+              onClick={() => setClock("")}
+              color="primary"
+              variant="outlined"
+              size="sm"
+            />
+            {(status?.devices ?? []).map((d) => (
+              <ITChip
+                key={d.clockSerial}
+                label={d.name}
+                selected={clock === d.clockSerial}
+                onClick={() => setClock(d.clockSerial)}
+                color="primary"
+                variant="outlined"
+                size="sm"
+              />
+            ))}
+          </ITFlex>
+
+          <ITFlex align="center" wrap="wrap" gap={2}>
+            <ITChip
+              label={t("filters.allMethods")}
+              selected={!method}
+              onClick={() => setMethod("")}
+              color="primary"
+              variant="outlined"
+              size="sm"
+            />
+            {METHODS.map((m) => (
+              <ITChip
+                key={m}
+                label={t(`methods.${m}`)}
+                selected={method === m}
+                onClick={() => setMethod(m)}
+                color="primary"
+                variant="outlined"
+                size="sm"
+              />
+            ))}
+            <ITButton
+              variant="text"
+              color="gray"
+              size="sm"
+              className="ml-auto"
+              onClick={clearFilters}
+            >
+              <ITFlex align="center" gap={1}>
+                <FaUndo size={11} />
+                <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
+        </ITFlex>
+      </PanelCard>
+
+      {/* Las checadas. */}
+      <PanelCard
+        title={tableTitle}
+        actions={
+          updatedAgo && (
+            <ITFlex align="center" gap={1}>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <ITText className="text-[11px] text-slate-500">
+                {t("table.updated", { ago: updatedAgo })}
+              </ITText>
+            </ITFlex>
+          )
         }
-        externalFilters={externalFilters}
-        reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[10, 25, 50, 100]}
-        debounceMs={350}
-        size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
-        rowHeight={50}
-      />
+      >
+        <ITDataTable
+          columns={columns as unknown as Column<Record<string, unknown>>[]}
+          fetchData={
+            fetchTableData as unknown as (
+              p: ITDataTableFetchParams
+            ) => Promise<ITDataTableResponse<Record<string, unknown>>>
+          }
+          externalFilters={externalFilters}
+          reloadTrigger={reloadKey}
+          defaultItemsPerPage={100}
+          itemsPerPageOptions={[10, 25, 50, 100]}
+          debounceMs={350}
+          size="lg"
+          virtualized
+          virtualizedMaxHeight={420}
+          rowHeight={50}
+        />
+
+        <ITFlex align="center" gap={1} className="mt-3">
+          <FaLock size={10} className="text-slate-400" />
+          <ITText className="text-[10px] font-bold text-slate-400">{t("status.readOnly")}</ITText>
+        </ITFlex>
+      </PanelCard>
 
       {toast && (
         <ITToast

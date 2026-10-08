@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { test, expect } from "./support/fixtures";
 import { API_ROOT, newRunId } from "./support/env";
-import { goToRoute } from "./support/pages/components";
+import { button, goToRoute } from "./support/pages/components";
 
 /**
  * Timeline de sincronización de un reloj: el botón de info de cada reloj en la
@@ -39,12 +39,17 @@ test.describe("Reloj checador — historial de sincronización", () => {
   test("el reloj muestra su último intento y el botón de info abre el timeline", async ({ page }) => {
     await goToRoute(page, "/hr/time-clock");
 
-    // El card del reloj toma el último intento guardado: estado "Con error" y su motivo.
+    // El card del reloj toma el último intento guardado: estado "Sin conexión" y su motivo.
     await expect(page.getByText(reloj.name).first()).toBeVisible(); // también sale en el filtro de reloj
-    await expect(page.getByText("Con error").first()).toBeVisible();
+    await expect(page.getByText("Sin conexión").first()).toBeVisible();
     await expect(page.getByText(CAIDA).first()).toBeVisible();
 
-    await page.getByRole("button", { name: "Ver historial de sincronización" }).first().click();
+    // El historial vive en el detalle técnico de SU tarjeta. Se busca por la
+    // tarjeta y no con `.first()`: el orden de los relojes no es fijo y puede
+    // haber otros dados de alta antes que este.
+    const tarjeta = page.getByTestId("clock-card").filter({ hasText: reloj.name });
+    await button(tarjeta, "Detalle técnico").click();
+    await button(tarjeta, "Ver historial de sincronización").click();
 
     // El diálogo: tres intentos (el más reciente primero) con su resumen.
     await expect(page.getByText(`Historial de ${reloj.name}`)).toBeVisible();

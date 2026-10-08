@@ -21,14 +21,15 @@ test.describe("Reloj checador", () => {
     );
     await goToRoute(page, "/hr/time-clock");
 
-    await expect(page.getByRole("heading", { level: 1, name: "Reloj checador" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Checadas" })).toBeVisible();
     await expect(page.getByText("Sincronización con los relojes", { exact: true })).toBeVisible();
     await expect(
       page.getByText("Solo lectura: la API nunca modifica la configuración de los relojes.")
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Sincronizar todo" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sincronizar ahora" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Importar de los relojes" })).toBeVisible();
-    await expect(page.locator("table thead").getByText("Fecha y hora")).toBeVisible();
+    // El rango por defecto es hoy (un solo día), así que la columna lleva solo la hora.
+    await expect(page.locator("table thead").getByText("Hora", { exact: true })).toBeVisible();
     await expect(page.locator("table thead").getByText("Reloj", { exact: true })).toBeVisible();
 
     // El día lo resuelve la API con su TZ de empresa (la web no manda `tz`).

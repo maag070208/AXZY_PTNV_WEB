@@ -1,19 +1,15 @@
-import { ITBadget, ITButton, ITCard, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
-import { useState } from "react";
-import { FaCog, FaSyncAlt } from "react-icons/fa";
-import { FaCircleInfo, FaLock } from "react-icons/fa6";
+import { ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import {
   CLOCK_STATUS_COLOR,
   clockStatus,
-  type TimeClockDevice,
   type TimeClockImport,
   type TimeClockState,
   type TimeClockStatus,
 } from "@entities/time-clock";
-import { formatDateTime } from "@shared/utils/dates";
-import type { UseTimeClock } from "../model/useTimeClock";
-import ClockHistoryDialog from "./ClockHistoryDialog";
+import { PanelCard } from "@shared/ui/panel-card";
 import { dateLocale } from "@shared/i18n";
+import type { UseTimeClock } from "../model/useTimeClock";
+import TimeClockDeviceCard from "./TimeClockDeviceCard";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 type OverallState = "notConfigured" | "withoutClocks" | TimeClockState;
@@ -57,16 +53,13 @@ const duration = (seconds: number): string => {
   return `${Math.floor(min / 60)} h ${min % 60} min`;
 };
 
-interface Props {
-  fx: UseTimeClock;
-  /** Solo para quien puede administrar los relojes (ADMIN). */
-  onManageClocks?: () => void;
-}
-
-export default function TimeClockStatusCard({ fx, onManageClocks }: Props) {
+/**
+ * Los relojes dados de alta, uno por tarjeta: su estado, cuándo checaron por
+ * última vez, cuándo se sincronizaron y qué traen guardado. Arriba va el estado
+ * general (el del reloj que más atención pide) y la importación por rango.
+ */
+export default function TimeClockStatusCard({ fx }: { fx: UseTimeClock }) {
   const { t, status, inProgress, progress, importing, starting, handleSyncAll } = fx;
-  /** Reloj cuyo historial de sincronización se está viendo (soporte). */
-  const [historial, setHistorial] = useState<TimeClockDevice | null>(null);
   if (!status) return null;
 
   const overallState = statusOf(status);
@@ -130,66 +123,16 @@ export default function TimeClockStatusCard({ fx, onManageClocks }: Props) {
       : t("import.progressNoTotal", range);
   })();
 
-  /** Detalle de un reloj: su avance, su error o por qué está en pausa. */
-  const itemOf = (d: TimeClockDevice): string | null => {
-    switch (clockStatus(d)) {
-      case "running":
-        if (!d.inProgress) return null;
-        return d.inProgress.total != null
-          ? t("status.clock.running", {
-              readCount: number(d.inProgress.readCount),
-              total: number(d.inProgress.total),
-              newCount: number(d.inProgress.newCount),
-            })
-          : t("status.clock.runningNoTotal", {
-              readCount: number(d.inProgress.readCount),
-              newCount: number(d.inProgress.newCount),
-            });
-      case "paused":
-        return t("status.clock.paused");
-      case "error":
-        return d.lastRun?.error ?? null;
-      case "pending":
-        return t("status.clock.pending");
-      default:
-        return null;
-    }
-  };
+  const sincronizando = inProgress || importing || starting;
 
   return (
-    <ITCard title={t("status.title")} className="!p-5 border border-slate-200">
+    <PanelCard title={t("status.title")}>
       <ITFlex direction="column" gap={3}>
         <ITFlex align="center" wrap="wrap" gap={2}>
           <ITBadget color={STATUS_COLOR[overallState]} size="lg">
             {t(`status.states.${overallState}`)}
           </ITBadget>
           {message && <ITText className="text-[12px] text-slate-600">{message}</ITText>}
-          <ITFlex align="center" gap={2} className="ml-auto">
-            {onManageClocks && (
-              <ITButton variant="outlined" color="secondary" size="sm" onClick={onManageClocks}>
-                <ITFlex align="center" gap={1}>
-                  <FaCog size={11} />
-                  <ITText className="font-bold text-[11px]">{t("status.manage")}</ITText>
-                </ITFlex>
-              </ITButton>
-            )}
-            <span title={t("sync.hint")}>
-              <ITButton
-                variant="filled"
-                color="primary"
-                size="sm"
-                disabled={
-                  inProgress || importing || starting || !status.configured || status.devices.length === 0
-                }
-                onClick={handleSyncAll}
-              >
-                <ITFlex align="center" gap={1}>
-                  <FaSyncAlt size={11} className={inProgress || importing ? "animate-spin" : undefined} />
-                  <ITText className="font-bold text-[11px]">{t("sync.button")}</ITText>
-                </ITFlex>
-              </ITButton>
-            </span>
-          </ITFlex>
         </ITFlex>
 
         {importJob && importStatus && (
@@ -197,86 +140,23 @@ export default function TimeClockStatusCard({ fx, onManageClocks }: Props) {
             <ITBadget color={IMPORT_COLOR[importStatus]} size="lg">
               {t(`import.states.${importStatus}`)}
             </ITBadget>
-            {importMessage && (
-              <ITText className="text-[12px] text-slate-600">{importMessage}</ITText>
-            )}
+            {importMessage && <ITText className="text-[12px] text-slate-600">{importMessage}</ITText>}
           </ITFlex>
         )}
 
-        {status.devices.map((d) => {
-          const clockState = clockStatus(d);
-          const item = itemOf(d);
-          return (
-            <ITGrid
-              key={d.clockSerial}
-              container
-              columns={12}
-              spacing={4}
-              className="border-t border-slate-100 pt-3"
-            >
-              <ITGrid item xs={12} md={3}>
-                <ITFlex direction="column" gap={0.5} className="min-w-0">
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    {t("status.device")}
-                  </ITText>
-                  <ITFlex align="center" wrap="wrap" gap={1}>
-                    <ITText className="text-[12px] font-black text-slate-800">{d.name}</ITText>
-                    <ITBadget color={CLOCK_STATUS_COLOR[clockState]} size="sm">
-                      {t(`status.states.${clockState}`)}
-                    </ITBadget>
-                  </ITFlex>
-                  <ITText className="text-[10px] font-bold text-slate-400 break-words">{d.url}</ITText>
-                  {!d.countsAttendance && (
-                    <ITText className="text-[10px] font-bold text-slate-500">{t("status.onlyAccess")}</ITText>
-                  )}
-                  {item && <ITText className="text-[11px] text-slate-600 break-words">{item}</ITText>}
-                  <ITButton
-                    variant="text"
-                    size="sm"
-                    className="!px-0"
-                    title={t("history.open")}
-                    onClick={() => setHistorial(d)}
-                  >
-                    <ITFlex align="center" gap={1}>
-                      <FaCircleInfo size={11} />
-                      <ITText className="text-[10px] font-bold">{t("history.open")}</ITText>
-                    </ITFlex>
-                  </ITButton>
-                </ITFlex>
-              </ITGrid>
-              <Datum label={t("status.punches")} value={number(d.punches)} />
-              <Datum
-                label={t("status.lastPunch")}
-                value={d.lastPunch ? formatDateTime(d.lastPunch) : t("status.empty")}
+        {status.devices.length > 0 && (
+          <div className="!grid gap-4 md:!grid-cols-2">
+            {status.devices.map((d) => (
+              <TimeClockDeviceCard
+                key={d.clockSerial}
+                device={d}
+                onRetry={() => void handleSyncAll()}
+                retrying={sincronizando}
               />
-              <Datum
-                label={t("status.lastSync")}
-                value={d.syncedAt ? formatDateTime(d.syncedAt) : t("status.empty")}
-              />
-            </ITGrid>
-          );
-        })}
-
-        <ITFlex align="center" gap={1}>
-          <FaLock size={10} className="text-slate-400" />
-          <ITText className="text-[10px] font-bold text-slate-400">{t("status.readOnly")}</ITText>
-        </ITFlex>
+            ))}
+          </div>
+        )}
       </ITFlex>
-
-      <ClockHistoryDialog device={historial} onClose={() => setHistorial(null)} />
-    </ITCard>
-  );
-}
-
-function Datum({ label, value }: { label: string; value: string }) {
-  return (
-    <ITGrid item xs={12} md={3}>
-      <ITFlex direction="column" gap={0.5} className="min-w-0">
-        <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-          {label}
-        </ITText>
-        <ITText className="text-[12px] font-bold text-slate-800 break-words">{value}</ITText>
-      </ITFlex>
-    </ITGrid>
+    </PanelCard>
   );
 }

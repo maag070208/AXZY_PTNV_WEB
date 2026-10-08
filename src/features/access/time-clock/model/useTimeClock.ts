@@ -26,6 +26,9 @@ const DEFAULT_PUNCHES_SORT: PunchesSort = { key: "occurredAt", direction: "desc"
 
 export type TimeClockRangePreset = "today" | "yesterday" | "last7";
 
+/** Modo del rango: uno de los presets o el rango elegido a mano. */
+export type TimeClockRangeMode = TimeClockRangePreset | "custom";
+
 const pad = (n: number): string => String(n).padStart(2, "0");
 
 /** Fecha local `YYYY-MM-DD` (la API resuelve el día en `tz`). */
@@ -53,6 +56,12 @@ export const useTimeClock = () => {
     new Date(),
     new Date(),
   ]);
+  /** Píldora activa del rango: `custom` cuando el usuario elige las fechas. */
+  const [rangeMode, setRangeMode] = useState<TimeClockRangeMode>("today");
+  /** Total de checadas que cumplen los filtros (el encabezado de la tabla). */
+  const [tableTotal, setTableTotal] = useState<number | null>(null);
+  /** Cuándo se leyó la tabla por última vez ("Actualizado hace 2 min"). */
+  const [tableUpdatedAt, setTableUpdatedAt] = useState<number>(() => Date.now());
   const [q, setQ] = useState("");
   const [method, setMethod] = useState<PunchMethod | "">("");
   /** Serie del reloj ("" = todos). */
@@ -196,6 +205,8 @@ export const useTimeClock = () => {
       filters: params.filters,
       sort,
     });
+    setTableTotal(res.total);
+    setTableUpdatedAt(Date.now());
     return {
       data: res.data as unknown as Record<string, unknown>[],
       total: res.total,
@@ -203,6 +214,7 @@ export const useTimeClock = () => {
   }, []);
 
   const applyRange = (preset: TimeClockRangePreset) => {
+    setRangeMode(preset);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (preset === "today") {
@@ -220,7 +232,11 @@ export const useTimeClock = () => {
     setDateRange([start, today]);
   };
 
+  /** "Personalizado": deja el rango como está y muestra el selector de fechas. */
+  const chooseCustomRange = () => setRangeMode("custom");
+
   const clearFilters = () => {
+    setRangeMode("today");
     setDateRange([new Date(), new Date()]);
     setQ("");
     setMethod("");
@@ -320,18 +336,22 @@ export const useTimeClock = () => {
     t,
     dateRange,
     setDateRange,
+    rangeMode,
+    applyRange,
+    chooseCustomRange,
     q,
     setQ,
     method,
     setMethod,
     clock,
     setClock,
-    applyRange,
     clearFilters,
     externalFilters,
     employeeOptions: employeeFilterOptions,
     fetchTableData,
     reloadKey,
+    tableTotal,
+    tableUpdatedAt,
     status,
     inProgress,
     progress,
