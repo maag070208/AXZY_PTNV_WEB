@@ -276,5 +276,18 @@ export type InventoryAuditCheckKey =
 export interface InventoryAudit {
   ok: boolean;
   checkedAt: string;
-  checks: { key: InventoryAuditCheckKey; count: number; samples: string[] }[];
+  checks: {
+    key: InventoryAuditCheckKey;
+    count: number;
+    samples: string[];
+    /** El caso en piezas, cuando la regla lo conoce (movimientos: tipo, día, dispositivo y cantidades). */
+    rows?: {
+      movementItemId?: string;
+      movementType?: string;
+      date?: string;
+      device?: string;
+      quantity?: number;
+      linked?: number;
+    }[];
+  }[];
 }

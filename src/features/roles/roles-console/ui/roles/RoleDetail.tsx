@@ -10,7 +10,7 @@ import type { RolesAdminState } from "../../model/useRolesAdmin";
 import RoleAvatar from "../shared/RoleAvatar";
 import ScreensAccessList from "../shared/ScreensAccessList";
 import SidebarPreview from "../shared/SidebarPreview";
-import TabBar from "../shared/TabBar";
+import { TabBar } from "@shared/ui/tab-bar";
 import RoleMembersPanel from "./RoleMembersPanel";
 import RolePermissionsEditor from "./RolePermissionsEditor";
 import RolePoliciesList from "./RolePoliciesList";

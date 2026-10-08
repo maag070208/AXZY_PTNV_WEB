@@ -65,7 +65,7 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
     await goToRoute(page, "/hr/time-clock/entries-exits");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Entradas/salidas del reloj" })
+      page.getByRole("heading", { level: 1, name: "Asistencias" })
     ).toBeVisible();
     await expect(page.getByText(/empleados del reloj vinculados/)).toBeVisible();
 

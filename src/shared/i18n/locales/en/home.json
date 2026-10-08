@@ -1,31 +1,26 @@
 {
   "title": "Home",
   "description": "Cartas Responsivas control panel · Puerto Nuevo Hotel and Villas",
+  "groups": {
+    "ops": "Operations",
+    "people": "People",
+    "clock": "Clock and access",
+    "kitchen": "Kitchen",
+    "system": "System",
+    "mine": "My space"
+  },
   "adminDashboard": {
     "title": "Real-time panel",
     "live": "Live",
     "errorLoad": "Could not load the panel",
     "devices": "Devices",
-    "openTickets": "Open tickets",
     "activeCustodyLetters": "Active letters",
     "damagedExits": "Damaged outputs",
-    "devicesByStatus": "Devices by status",
-    "ticketsByStatus": "Tickets by status",
-    "available": "Available",
-    "assigned": "Assigned",
-    "retired": "Retired",
-    "open": "Open",
-    "following": "Following up",
-    "closed": "Closed",
     "recentActivity": "Recent activity",
     "noActivity": "No activity recorded yet.",
     "resolvedTickets": "Tasks resolved",
     "avgResolution": "Avg resolution",
-    "pendingTasks": "Pending tasks",
     "teamEfficiency": "Team efficiency",
-    "noEfficiency": "No resolution data",
-    "urgentTitle": "Oldest tickets",
-    "noUrgent": "No stale tickets. All caught up!",
-    "urgentTag": "URGENT"
+    "noEfficiency": "No resolution data"
   }
 }

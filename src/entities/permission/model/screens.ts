@@ -56,6 +56,7 @@ export type NavLabelKey =
   | "nav.accessTimeClock"
   | "nav.accessTimeClockReport"
   | "nav.accessTimeClockEmployees"
+  | "nav.clockAttendance"
   | "nav.timeClock"
   | "nav.schedules"
   | "nav.schedulesAdmin"
@@ -155,21 +156,23 @@ export const APP_SCREENS: readonly AppScreen[] = [
       { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] }, actions: ["users.create"] },
       { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] }, actions: [] },
       { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] }, actions: ["hr.disciplinary_reports"] },
+      // Asistencias es del RELOJ (las checadas del personal); la bitácora y el
+      // reporte de entradas/salidas son del GUARDIA (las puertas). Van en
+      // secciones aparte a propósito: con un solo título "Asistencia" no se
+      // sabía cuál era cuál.
+      {
+        id: "clockAttendance",
+        labelKey: "nav.clockAttendance",
+        children: [
+          { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] }, actions: [] },
+        ],
+      },
       {
         id: "access",
         labelKey: "nav.access",
         children: [
           { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] }, actions: ["access.void"] },
           { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] }, actions: [] },
-        ],
-      },
-      {
-        id: "timeClock",
-        labelKey: "nav.timeClock",
-        children: [
-          { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.sync"] },
-          { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] }, actions: [] },
-          { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.link"] },
         ],
       },
       {
@@ -190,7 +193,16 @@ export const APP_SCREENS: readonly AppScreen[] = [
     children: [
       { id: "catalogs", labelKey: "nav.catalogs", path: "/catalogs", requirement: { anyOf: ["catalogs.manage"] } },
       { id: "users", labelKey: "nav.users", path: "/users", requirement: { anyOf: ["users.view"] } },
-      { id: "clocks", labelKey: "nav.clocks", path: "/time-clocks", requirement: { anyOf: ["time_clocks.manage"] } },
+      // Todo lo del checador, junto y con su título.
+      {
+        id: "timeClock",
+        labelKey: "nav.timeClock",
+        children: [
+          { id: "clocks", labelKey: "nav.clocks", path: "/time-clocks", requirement: { anyOf: ["time_clocks.manage"] } },
+          { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.sync"] },
+          { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.link"] },
+        ],
+      },
       { id: "roles", labelKey: "nav.roles", path: "/roles", requirement: { anyOf: ["roles.manage"] } },
     ],
   },

@@ -130,7 +130,7 @@
     "export": "No se pudo generar el CSV"
   },
   "report": {
-    "title": "Entradas/salidas del reloj",
+    "title": "Asistencias",
     "description": "Jornadas armadas con las checadas del reloj y relacionadas con cada empleado por su número en el reloj.",
     "pdfTitle": "Entradas y salidas — Reloj checador",
     "links": "{{linkedCount}} de {{total}} empleados del reloj vinculados",

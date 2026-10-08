@@ -130,7 +130,7 @@
     "export": "Could not generate the CSV"
   },
   "report": {
-    "title": "Time clock entries/exits",
+    "title": "Attendance",
     "description": "Shifts built from the time clock punches and matched to each employee by their time clock number.",
     "pdfTitle": "Entries and exits — Time clock",
     "links": "{{linkedCount}} of {{total}} time clock employees linked",

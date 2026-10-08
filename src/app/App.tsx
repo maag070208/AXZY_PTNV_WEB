@@ -16,6 +16,7 @@ import OvertimeApprovalPage from "@pages/overtime/OvertimeApprovalPage";
 import PayrollPage from "@pages/schedules/PayrollPage";
 import HomePage from "@pages/home/HomePage";
 import DashboardPage from "@pages/inventory/DashboardPage";
+import InventoryMismatchesPage from "@pages/inventory/InventoryMismatchesPage";
 import DevicesPage from "@pages/inventory/DevicesPage";
 import DeviceFormPage from "@pages/inventory/DeviceFormPage";
 import EditDevicePage from "@pages/inventory/EditDevicePage";
@@ -95,6 +96,7 @@ export default function App() {
             </RequiresPermission>
           }
         />
+        <Route path="/inventory/audit/mismatches" element={<RequiresPermission permission="inventory.audit"><InventoryMismatchesPage /></RequiresPermission>} />
         <Route
           path="/inventory/devices"
           element={

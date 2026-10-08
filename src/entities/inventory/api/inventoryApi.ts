@@ -136,6 +136,12 @@ export const inventoryApi = {
 
   /** Auditoría de consistencia del inventario (en vivo). */
   audit: () => api.get<InventoryAudit>(`/inventory/audit`),
+  /** Resuelve un descuadre del auditor: ligar piezas, cuadrar la cantidad o dar por revisado. */
+  resolveMismatch: (movementItemId: string, mode: "link" | "quantity" | "review") =>
+    api.post<{ movementItemId: string; linked: number; remaining: number; quantity: number }>(
+      "/inventory/audit/mismatches/resolve",
+      { movementItemId, mode }
+    ),
 
   // Dashboard
   dashboard: () => api.get<Dashboard>(`/inventory/dashboard`),

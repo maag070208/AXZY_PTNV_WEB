@@ -14,7 +14,7 @@ import RoleList from "./roles/RoleList";
 import RoleEditorDialog from "./RoleEditorDialog";
 import RolesHelpDialog from "./RolesHelpDialog";
 import { ChangesReviewDialog, PendingChangesBar } from "./shared/PendingChanges";
-import TabBar, { type TabBarItem } from "./shared/TabBar";
+import { TabBar, type TabBarItem } from "@shared/ui/tab-bar";
 
 interface Props {
   workspace: RolesWorkspaceState;

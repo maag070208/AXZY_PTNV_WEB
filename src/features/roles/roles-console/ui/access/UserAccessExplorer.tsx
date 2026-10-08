@@ -26,7 +26,7 @@ import { RoleChip } from "../shared/RoleAvatar";
 import { ScopeChip } from "../shared/Scope";
 import ScreensAccessList from "../shared/ScreensAccessList";
 import SidebarPreview from "../shared/SidebarPreview";
-import TabBar from "../shared/TabBar";
+import { TabBar } from "@shared/ui/tab-bar";
 import ExceptionDialog from "./ExceptionDialog";
 
 interface Props {

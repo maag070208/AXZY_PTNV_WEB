@@ -1,31 +1,26 @@
 {
   "title": "Inicio",
   "description": "Panel de control de Cartas Responsivas · Puerto Nuevo Hotel y Villas",
+  "groups": {
+    "ops": "Operación",
+    "people": "Personal",
+    "clock": "Reloj y accesos",
+    "kitchen": "Cocina",
+    "system": "Sistema",
+    "mine": "Mi espacio"
+  },
   "adminDashboard": {
     "title": "Panel en tiempo real",
     "live": "En vivo",
     "errorLoad": "No se pudo cargar el panel",
     "devices": "Dispositivos",
-    "openTickets": "Tickets abiertos",
     "activeCustodyLetters": "Cartas activas",
     "damagedExits": "Salidas dañadas",
-    "devicesByStatus": "Dispositivos por estado",
-    "ticketsByStatus": "Tickets por estado",
-    "available": "Disponible",
-    "assigned": "Asignado",
-    "retired": "Baja",
-    "open": "Abierto",
-    "following": "En seguimiento",
-    "closed": "Cerrado",
     "recentActivity": "Actividad reciente",
     "noActivity": "Aún no hay actividad registrada.",
     "resolvedTickets": "Tareas resueltas",
     "avgResolution": "Resolución promedio",
-    "pendingTasks": "Tareas pendientes",
     "teamEfficiency": "Eficiencia del equipo",
-    "noEfficiency": "Sin datos de resolución",
-    "urgentTitle": "Tickets antiguos",
-    "noUrgent": "Sin tickets antiguos. ¡Todo al día!",
-    "urgentTag": "URGENTE"
+    "noEfficiency": "Sin datos de resolución"
   }
 }
