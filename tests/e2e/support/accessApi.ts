@@ -78,6 +78,63 @@ export interface AccessReportResult {
   };
 }
 
+/** Una fila por PERSONA con cada día del periodo calificado contra su horario. */
+export interface PeopleAttendanceDay {
+  date: string;
+  status: "ATTENDED" | "LATE" | "ABSENCE" | "REST" | "PENDING" | "NO_INFO";
+  entryAt: string | null;
+  exitAt: string | null;
+  workedMinutes: number;
+  lateMinutes: number;
+  onSite: boolean;
+  incident: "ENTRY_WITHOUT_EXIT" | "EXIT_WITHOUT_ENTRY" | null;
+}
+
+export interface PeopleAttendanceRow {
+  employeeId: string;
+  employeeName: string;
+  employeeNumber: string | null;
+  jobTitle: string | null;
+  departmentId: string | null;
+  departmentName: string | null;
+  active: boolean;
+  linked: boolean;
+  days: PeopleAttendanceDay[];
+  workedMinutes: number;
+  onSite: boolean;
+  hasRecords: boolean;
+  lateDays: number;
+  absences: number;
+  withoutExit: number;
+  withoutEntry: number;
+}
+
+export interface PeopleAttendanceResult {
+  page: number;
+  limit: number;
+  total: number;
+  data: PeopleAttendanceRow[];
+  summary: {
+    people: number;
+    withRecords: number;
+    withoutRecords: number;
+    onSite: number;
+    workedMinutes: number;
+    lateDays: number;
+    absences: number;
+    withoutExit: number;
+    withoutEntry: number;
+    range: {
+      start: string;
+      end: string;
+      timezone: string;
+      period: string;
+      days: string[];
+      today: string;
+    };
+  };
+}
+
 /** Payload `v:2` de la credencial (mismo esquema que genera la web). */
 export const qrDe = (id: string): string => JSON.stringify({ v: 2, id });
 
@@ -204,7 +261,7 @@ export class ApiAccess {
     }
   }
 
-  /** Reporte paginado por persona (contrato ITDataTable + `summary` global). */
+  /** Reporte paginado por SESIÓN (contrato ITDataTable + `summary` global). */
   async report(body: {
     page?: number;
     limit?: number;
@@ -214,6 +271,23 @@ export class ApiAccess {
     return this.json(
       await this.api.post("access/report", { data: { page: 1, limit: 10, ...body } }),
       "report",
+      200
+    );
+  }
+
+  /**
+   * Reporte de la pantalla: una fila por persona con cada día del periodo
+   * calificado contra su horario (`POST /schedules/attendance/access`).
+   */
+  async people(body: {
+    page?: number;
+    limit?: number;
+    filters: Record<string, string | number | boolean>;
+    sort?: { key: string; direction: "asc" | "desc" };
+  }): Promise<PeopleAttendanceResult> {
+    return this.json(
+      await this.api.post("schedules/attendance/access", { data: { page: 1, limit: 50, ...body } }),
+      "people",
       200
     );
   }

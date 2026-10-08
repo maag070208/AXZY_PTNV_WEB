@@ -71,8 +71,8 @@ export interface AccessStats {
 // Reporte de entradas/salidas por persona (POST /access/report)
 // ---------------------------------------------------------------------------
 
-/** Granularidad del reporte: define la ventana, no la dimensión de la fila. */
-export type AccessReportPeriod = "DAY" | "WEEK" | "MONTH";
+/** Granularidad del reporte: define la ventana (la quincena es 1–15 y 16–fin de mes). */
+export type AccessReportPeriod = "DAY" | "WEEK" | "FORTNIGHT" | "MONTH";
 
 /**
  * Incidencia de una sesión derivada del emparejamiento ENTRY/EXIT.
@@ -170,4 +170,70 @@ export interface AccessReportPdfMeta {
   period: AccessReportPeriod;
   date: string;
   timezone: string;
+}
+
+// ---------------------------------------------------------------------------
+// Entradas y salidas por persona (POST /schedules/attendance/{access,time-clock})
+// ---------------------------------------------------------------------------
+
+/**
+ * Estado de un día contra el horario de la persona:
+ * `ATTENDED` asistió · `LATE` con retardo · `ABSENCE` falta · `REST` descanso ·
+ * `PENDING` futuro o de hoy antes de su entrada · `NO_INFO` sin horario ni registros.
+ */
+export type AttendanceDayStatus = "ATTENDED" | "LATE" | "ABSENCE" | "REST" | "PENDING" | "NO_INFO";
+
+export interface PeopleAttendanceDay {
+  date: string;
+  status: AttendanceDayStatus;
+  entryAt: string | null;
+  exitAt: string | null;
+  /** Incluye lo que lleva una entrada abierta (en sitio). */
+  workedMinutes: number;
+  lateMinutes: number;
+  onSite: boolean;
+  incident: "ENTRY_WITHOUT_EXIT" | "EXIT_WITHOUT_ENTRY" | null;
+}
+
+/** Una fila por persona; `days` trae cada día del periodo (`summary.range.days`). */
+export interface PeopleAttendanceRow {
+  employeeId: string;
+  employeeName: string;
+  employeeNumber: string | null;
+  jobTitle: string | null;
+  departmentId: string | null;
+  departmentName: string | null;
+  active: boolean;
+  linked: boolean;
+  days: PeopleAttendanceDay[];
+  workedMinutes: number;
+  onSite: boolean;
+  hasRecords: boolean;
+  lateDays: number;
+  absences: number;
+  withoutExit: number;
+  withoutEntry: number;
+}
+
+/** Vistas rápidas de la tabla. */
+export type PeopleAttendanceView = "ALL" | "INCIDENTS" | "ON_SITE" | "WITHOUT_RECORDS";
+
+/** Totales de todas las personas del filtro (no dependen de la vista ni de la página). */
+export interface PeopleAttendanceSummary {
+  people: number;
+  withRecords: number;
+  withoutRecords: number;
+  onSite: number;
+  workedMinutes: number;
+  lateDays: number;
+  absences: number;
+  withoutExit: number;
+  withoutEntry: number;
+  range: AccessReportRange & { days: string[]; today: string };
+}
+
+export interface PeopleAttendanceResponse {
+  data: PeopleAttendanceRow[];
+  total: number;
+  summary: PeopleAttendanceSummary;
 }

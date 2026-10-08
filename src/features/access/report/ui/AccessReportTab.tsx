@@ -4,7 +4,6 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITCard,
   ITCheckbox,
   ITDataTable,
   ITDatePicker,
@@ -18,6 +17,8 @@ import type { Column } from "@axzydev/axzy_ui_system";
 import {
   FaCalendarAlt,
   FaCheckCircle,
+  FaChevronLeft,
+  FaChevronRight,
   FaClock,
   FaDoorOpen,
   FaExclamationTriangle,
@@ -26,29 +27,53 @@ import {
   FaInfoCircle,
   FaRegCircle,
   FaUndo,
+  FaUserSlash,
 } from "react-icons/fa";
 import {
-  type AccessIncidentCode,
   type AccessReportPeriod,
-  type AccessReportSessionRow,
+  type AttendanceDayStatus,
+  type PeopleAttendanceDay,
+  type PeopleAttendanceRow,
+  type PeopleAttendanceView,
 } from "@entities/access";
-import { useWeekStartDay } from "@entities/sys-config";
+import { KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
+import { PanelCard } from "@shared/ui/panel-card";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
-import type { UseAccessReport } from "../model/useAccessReport";
 import { dateLocale } from "@shared/i18n";
-import { usePeopleOptions } from "@entities/user";
-import { useDepartmentOptions } from "@entities/department";
+import type { UseAccessReport } from "../model/useAccessReport";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
-const INCIDENT_COLOR: Record<AccessIncidentCode, BadgeColor> = {
-  OPEN_ENTRY: "info",
-  ENTRY_WITHOUT_EXIT: "warning",
-  EXIT_WITHOUT_ENTRY: "danger",
+/** Estado del día contra el horario → color de la etiqueta. */
+const DAY_STATUS_COLOR: Record<AttendanceDayStatus, BadgeColor> = {
+  ATTENDED: "success",
+  LATE: "warning",
+  ABSENCE: "danger",
+  REST: "gray",
+  PENDING: "gray",
+  NO_INFO: "gray",
 };
 
+/** Estados que ocupan una celda con etiqueta (sin horario que mostrar). */
+const DAY_STATUS_ORDER: AttendanceDayStatus[] = [
+  "ATTENDED",
+  "LATE",
+  "ABSENCE",
+  "REST",
+  "PENDING",
+  "NO_INFO",
+];
+
 /** Día local `YYYY-MM-DD` sin conversión de zona (es una clave, no un instante). */
+const toDayKey = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+/** `YYYY-MM-DD` → `dd/mm/yyyy` (clave de día, sin corrimiento de zona). */
 const formatDayKey = (dayKey: string): string => {
   const [y, m, d] = dayKey.split("-");
   return d && m && y ? `${d}/${m}/${y}` : dayKey;
@@ -58,55 +83,102 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const {
     t,
     period,
-    setPeriod,
+    changePeriod,
     date,
     setDate,
+    periodRange,
+    previousPeriod,
+    nextPeriod,
     departmentId,
     setDepartmentId,
-    q,
-    setQ,
+    departments,
+    search,
+    setSearch,
     includeInactive,
     setIncludeInactive,
+    view,
+    setView,
     summary,
+    total,
     exporting,
     error,
     setError,
-    departments,
     externalFilters,
+    tableKey,
     fetchTableData,
     handleDownloadPdf,
     handleDownloadCsv,
   } = fx;
-
-  /**
-   * Firma de los filtros externos. Se pasa como `key` de ITDataTable: al cambiar
-   * periodo/fecha/departamento/búsqueda/estado, la tabla se remonta y `currentPage`
-   * vuelve a 1 (el estado interno de useTableState no expone reset por prop, y
-   * `reloadTrigger` solo dispara refetch conservando la página).
-   */
-  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
 
   /** Zona horaria resuelta por el servidor en `summary.range`; local antes del 1er fetch. */
   const tz = summary?.range.timezone;
 
   const timeOf = (iso: string): string => formatTimeInTZ(iso, tz);
 
-  /** En DÍA, la hora; en SEMANA/MES, fecha + hora. */
-  const formatStamp = (iso: string | null): string => {
-    if (!iso) return "—";
-    if (period === "DAY") return timeOf(iso);
-    const d = new Date(iso);
-    const dd = String(d.getDate()).padStart(2, "0");
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    return `${dd}/${mm} ${timeOf(iso)}`;
+  /** Días del periodo: los del servidor; antes del primer fetch, los del rango local. */
+  const localDays = useMemo(() => {
+    const [start, end] = periodRange;
+    const day = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    const days: string[] = [];
+    while (day <= last) {
+      days.push(toDayKey(day));
+      day.setDate(day.getDate() + 1);
+    }
+    return days;
+  }, [periodRange]);
+
+  const rangeDays = summary?.range.days?.length ? summary.range.days : localDays;
+
+  /** Encabezado de la columna de un día: "Mié 23" o la fecha completa en DÍA. */
+  const dayTitle = (dayKey: string): string => {
+    if (period === "DAY") return formatDayKey(dayKey);
+    const label = new Date(`${dayKey}T12:00:00Z`).toLocaleDateString(dateLocale(), {
+      weekday: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+    return label.charAt(0).toUpperCase() + label.slice(1);
   };
+
+  /** Rango [inicio, fin] del periodo que contiene `date`, para la barra superior. */
+  const rangeLabel = useMemo(() => {
+    const format = (d: Date, opts: Intl.DateTimeFormatOptions) => d.toLocaleDateString(dateLocale(), opts);
+    if (period === "WEEK" || period === "FORTNIGHT") {
+      const [s, en] = periodRange;
+      return `${dyn(t)(`periods.${period}`)} · ${format(s, { day: "2-digit", month: "short" })} — ${format(en, { day: "2-digit", month: "short" })}`;
+    }
+    if (period === "MONTH") {
+      return format(date, { month: "long", year: "numeric" });
+    }
+    return format(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  }, [period, date, periodRange, t]);
 
   const departmentOptions = useMemo(
     () => [
       { value: "", label: t("filters.allDepartments") },
-      ...departments.map((d) => ({ value: d.id, label: d.name })),
+      ...departments.data.map((d) => ({ value: d.id, label: d.name })),
     ],
     [departments, t]
+  );
+
+  const periodOptions = useMemo(
+    () => [
+      { value: "DAY", label: t("periods.DAY") },
+      { value: "WEEK", label: t("periods.WEEK") },
+      { value: "FORTNIGHT", label: t("periods.FORTNIGHT") },
+      { value: "MONTH", label: t("periods.MONTH") },
+    ],
+    [t]
+  );
+
+  const viewOptions = useMemo(
+    () =>
+      (["ALL", "INCIDENTS", "ON_SITE", "WITHOUT_RECORDS"] as PeopleAttendanceView[]).map((value) => ({
+        value,
+        label: t(`views.${value}`),
+      })),
+    [t]
   );
 
   const handleDate = (
@@ -118,46 +190,81 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
     if (value instanceof Date) setDate(value);
   };
 
-  const renderIncident = (incident: AccessIncidentCode | null) =>
-    incident ? (
-      <ITBadget color={INCIDENT_COLOR[incident]} size="sm">
-        {t(`incidents.${incident}`)}
-      </ITBadget>
-    ) : (
-      <ITText className="text-[11px] text-slate-400">—</ITText>
+  const handleRange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: Date | [Date | null, Date | null] } }
+  ) => {
+    const value = e.target.value;
+    if (Array.isArray(value) && value[0]) setDate(value[0]);
+  };
+
+  const clearFilters = () => {
+    changePeriod("WEEK");
+    setDate(new Date());
+    setDepartmentId("");
+    setSearch("");
+    setIncludeInactive(false);
+    setView("ALL");
+  };
+
+  /** Celda de un día: horario entrada–salida, retardo, en sitio o la etiqueta del estado. */
+  const renderDay = (day: PeopleAttendanceDay | undefined) => {
+    if (!day || day.status === "PENDING") {
+      return <ITText className="text-[11px] text-slate-300">—</ITText>;
+    }
+    if (day.status === "REST" || day.status === "NO_INFO" || day.status === "ABSENCE") {
+      return (
+        <ITBadget color={DAY_STATUS_COLOR[day.status]} size="sm">
+          {t(`dayStatusShort.${day.status}`)}
+        </ITBadget>
+      );
+    }
+    return (
+      <ITFlex direction="column" gap={0}>
+        <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
+          {day.entryAt ? timeOf(day.entryAt) : "?"} - {day.onSite || !day.exitAt ? "?" : timeOf(day.exitAt)}
+        </ITText>
+        {day.onSite ? (
+          <ITText className="text-[9px] font-black uppercase tracking-wide text-sky-600">
+            {t("incidents.OPEN_ENTRY")}
+          </ITText>
+        ) : day.lateMinutes > 0 ? (
+          <ITText className="text-[9px] font-black uppercase tracking-wide text-amber-600">
+            +{day.lateMinutes} min
+          </ITText>
+        ) : day.incident ? (
+          <ITText className="text-[9px] font-black uppercase tracking-wide text-amber-600">
+            {t(`incidents.${day.incident}`)}
+          </ITText>
+        ) : null}
+      </ITFlex>
     );
+  };
 
-  // Opciones de Empleado y Departamento (incluye bajas e inactivos).
-  const peopleOptions = usePeopleOptions();
-  const departmentFilterOptions = useDepartmentOptions();
-
-  const columns: Column<AccessReportSessionRow>[] = [
+  const columns: Column<PeopleAttendanceRow>[] = [
     {
-      key: "employeeId",
+      key: "employeeName",
       label: t("columns.employee"),
-      type: "catalog",
-      width: 250,
-      filter: "search",
-      catalogOptions: peopleOptions,
-      sortable: false,
+      type: "string",
+      width: 220,
+      sortable: true,
       render: (r) => (
         <ITFlex direction="column" gap={0.5}>
           <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
           <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
             {r.employeeNumber ? `#${r.employeeNumber}` : "—"}
             {!r.active && ` · ${t("status.inactive")}`}
-            {r.linked === false && ` · ${t("unlinked")}`}
+            {!r.linked && ` · ${t("unlinked")}`}
           </ITText>
         </ITFlex>
       ),
     },
     {
-      key: "departmentId",
+      key: "departmentName",
       label: t("columns.department"),
-      type: "catalog",
-      width: 170,
-      filter: "search",
-      catalogOptions: departmentFilterOptions,
+      type: "string",
+      width: 160,
       sortable: false,
       render: (r) =>
         r.departmentName ? (
@@ -172,162 +279,95 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "jobTitle",
       label: t("columns.jobTitle"),
       type: "string",
-      width: 170,
-      filter: true,
+      width: 150,
       sortable: false,
       render: (r) => (
         <ITText className="text-[11px] font-bold text-slate-700">{r.jobTitle ?? "—"}</ITText>
       ),
     },
-    {
-      // Días dentro del periodo elegido (semana o mes). "day": `date` es el ancla del periodo.
-      key: "day",
-      label: t("columns.date"),
-      type: "date",
-      width: 160,
-      filter: "date-range",
-      sortable: false,
-      render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
-          {formatDayKey(r.date)}
-        </ITText>
-      ),
-    },
-    {
-      key: "entryAt",
-      label: t("columns.entry"),
-      type: "string",
+    // Una columna por día del periodo: el día calificado contra su horario.
+    ...rangeDays.map((dayKey, i) => ({
+      key: `day:${dayKey}`,
+      label: dayTitle(dayKey),
+      type: "string" as const,
       width: 100,
       sortable: false,
-      render: (r) => (
-        <ITText className="text-[11px] font-bold text-emerald-700 whitespace-nowrap">
-          {formatStamp(r.entryAt)}
-        </ITText>
-      ),
-    },
-    {
-      key: "exitAt",
-      label: t("columns.exit"),
-      type: "string",
-      width: 100,
-      sortable: false,
-      render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
-          {formatStamp(r.exitAt)}
-        </ITText>
-      ),
-    },
+      render: (r: PeopleAttendanceRow) => renderDay(r.days[i]),
+    })),
     {
       key: "workedMinutes",
       label: t("columns.hours"),
       type: "number",
-      width: 100,
-      sortable: false,
+      width: 90,
+      sortable: true,
+      align: "right" as const,
       render: (r) => (
         <ITText className="text-[12px] font-black text-emerald-700">
-          {r.entryAt && r.exitAt ? formatMinutesAsHhMm(r.workedMinutes) : "—"}
+          {r.workedMinutes > 0 ? formatMinutesAsHhMm(r.workedMinutes) : "—"}
         </ITText>
       ),
     },
     {
-      key: "incident",
-      label: t("columns.incident"),
-      type: "catalog",
-      width: 140,
+      key: "lateDays",
+      label: t("columns.lateDays"),
+      type: "number",
+      width: 90,
       sortable: false,
-      filter: "catalog",
-      catalogOptions: {
-        data: [...(Object.keys(INCIDENT_COLOR) as AccessIncidentCode[]), "NONE" as const].map((id) => ({
-          id,
-          name: t(`incidents.${id}`),
-        })),
-      },
-      render: (r) => renderIncident(r.incident),
+      align: "right" as const,
+      render: (r) =>
+        r.lateDays > 0 ? (
+          <ITText className="text-[12px] font-black text-amber-600">{r.lateDays}</ITText>
+        ) : (
+          <ITText className="text-[12px] font-bold text-slate-300">0</ITText>
+        ),
+    },
+    {
+      key: "absences",
+      label: t("columns.absences"),
+      type: "number",
+      width: 80,
+      sortable: false,
+      align: "right" as const,
+      render: (r) =>
+        r.absences > 0 ? (
+          <ITText className="text-[12px] font-black text-rose-600">{r.absences}</ITText>
+        ) : (
+          <ITText className="text-[12px] font-bold text-slate-300">0</ITText>
+        ),
+    },
+    {
+      key: "incidents",
+      label: t("columns.incidents"),
+      type: "string",
+      width: 170,
+      sortable: false,
+      render: (r) =>
+        r.withoutExit + r.withoutEntry > 0 ? (
+          <ITFlex direction="column" gap={0.5}>
+            {r.withoutExit > 0 && (
+              <ITBadget color="warning" size="sm">
+                {t("incidents.ENTRY_WITHOUT_EXIT")}: {r.withoutExit}
+              </ITBadget>
+            )}
+            {r.withoutEntry > 0 && (
+              <ITBadget color="danger" size="sm">
+                {t("incidents.EXIT_WITHOUT_ENTRY")}: {r.withoutEntry}
+              </ITBadget>
+            )}
+          </ITFlex>
+        ) : (
+          <ITText className="text-[11px] text-slate-400">—</ITText>
+        ),
     },
   ];
 
-  const handlePeriodChange = (value: AccessReportPeriod) => {
-    setPeriod(value);
-    // Al cambiar el periodo, la fecha se recoloca al día de hoy (ventana actual).
-    setDate(new Date());
-  };
-
-  const clearFilters = () => {
-    setPeriod("DAY");
-    setDate(new Date());
-    setDepartmentId("");
-    setQ("");
-    setIncludeInactive(false);
-  };
-
-  /** Rango [inicio, fin] de la semana (según `WEEK_START_DAY`) o del mes que contiene `date`. */
-  const weekStart = useWeekStartDay();
-  const periodRange = useMemo<[Date, Date]>(() => {
-    const d = date ?? new Date();
-    if (period === "WEEK") {
-      const offset = (d.getDay() - weekStart + 7) % 7; // 0 = primer día configurado
-      const start = new Date(d);
-      start.setDate(d.getDate() - offset);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(start);
-      end.setDate(start.getDate() + 6);
-      return [start, end];
-    }
-    if (period === "MONTH") {
-      return [
-        new Date(d.getFullYear(), d.getMonth(), 1),
-        new Date(d.getFullYear(), d.getMonth() + 1, 0),
-      ];
-    }
-    const start = new Date(d);
-    start.setHours(0, 0, 0, 0);
-    return [start, start];
-  }, [period, date, weekStart]);
-
-  const handleRange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } }
-  ) => {
-    const value = e.target.value;
-    if (Array.isArray(value) && value[0]) setDate(value[0]);
-  };
-
-  /** Título del rango mostrado en la barra superior. */
-  const rangeLabel = useMemo(() => {
-    if (period === "WEEK") {
-      const [s, en] = periodRange;
-      return `${t("periods.WEEK")} · ${s.toLocaleDateString(dateLocale(), { day: "2-digit", month: "short" })} — ${en.toLocaleDateString(dateLocale(), { day: "2-digit", month: "short" })}`;
-    }
-    if (period === "MONTH") {
-      return (date ?? new Date()).toLocaleDateString(dateLocale(), {
-        month: "long",
-        year: "numeric",
-      });
-    }
-    return (date ?? new Date()).toLocaleDateString(dateLocale(), {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  }, [period, date, periodRange, t]);
-
-  const periodOptions = useMemo(
-    () => [
-      { value: "DAY", label: t("periods.DAY") },
-      { value: "WEEK", label: t("periods.WEEK") },
-      { value: "MONTH", label: t("periods.MONTH") },
-    ],
-    [t]
-  );
-
-  const kpis = [
-    { key: "withRecords", value: summary?.peopleWithRecords ?? 0, tint: "bg-emerald-50", icon: <FaCheckCircle className="text-emerald-600" size={15} /> },
-    { key: "withoutRecords", value: summary?.peopleWithoutRecords ?? 0, tint: "bg-slate-100", icon: <FaRegCircle className="text-slate-400" size={15} /> },
-    { key: "inside", value: summary?.peopleInside ?? 0, tint: "bg-sky-50", icon: <FaDoorOpen className="text-sky-600" size={15} /> },
-    { key: "workedHours", value: formatMinutesAsHhMm(summary?.totalWorkedMinutes ?? 0), tint: "bg-slate-100", icon: <FaClock className="text-slate-500" size={15} /> },
-    { key: "incidents", value: summary?.totalIncidents ?? 0, tint: "bg-amber-50", icon: <FaExclamationTriangle className="text-amber-600" size={15} /> },
+  const kpis: Array<{ key: string; value: number | string; tone: KpiTone; icon: React.ReactNode }> = [
+    { key: "withRecords", value: summary?.withRecords ?? 0, tone: "emerald", icon: <FaCheckCircle size={16} /> },
+    { key: "withoutRecords", value: summary?.withoutRecords ?? 0, tone: "neutral", icon: <FaRegCircle size={16} /> },
+    { key: "inside", value: summary?.onSite ?? 0, tone: "sky", icon: <FaDoorOpen size={16} /> },
+    { key: "workedHours", value: formatMinutesAsHhMm(summary?.workedMinutes ?? 0), tone: "neutral", icon: <FaClock size={16} /> },
+    { key: "lateDays", value: summary?.lateDays ?? 0, tone: "amber", icon: <FaExclamationTriangle size={16} /> },
+    { key: "absences", value: summary?.absences ?? 0, tone: "rose", icon: <FaUserSlash size={16} /> },
   ];
 
   return (
@@ -351,6 +391,10 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
             {dyn(t)(`periods.${period}`)}
           </ITText>
           <ITText className="truncate text-base font-black text-slate-800">{rangeLabel}</ITText>
+          <ITText className="text-[10px] font-bold text-slate-400">
+            {t("peopleCount", { count: total })}
+            {tz ? ` · ${tz}` : ""}
+          </ITText>
         </ITFlex>
         <ITFlex gap={2} wrap="wrap" className="ml-auto">
           <ITButton variant="outlined" color="gray" onClick={handleDownloadPdf} disabled={exporting}>
@@ -371,105 +415,117 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       {/* KPIs */}
       <ITFlex wrap="wrap" gap={3}>
         {kpis.map((k) => (
-          <ITFlex
-            key={k.key}
-            grow={1}
-            basis="180px"
-            align="center"
-            gap={3}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-          >
-            <ITFlex
-              align="center"
-              justify="center"
-              className={`h-10 w-10 shrink-0 rounded-xl ${k.tint}`}
-            >
-              {k.icon}
-            </ITFlex>
-            <ITFlex direction="column" gap={0} className="min-w-0">
-              <ITText className="text-xl font-black leading-none text-slate-800">{k.value}</ITText>
-              <ITText className="truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                {dyn(t)(`kpis.${k.key}`)}
-              </ITText>
-            </ITFlex>
-          </ITFlex>
+          <div key={k.key} className="min-w-[170px] flex-1">
+            <KpiTile
+              label={dyn(t)(`kpis.${k.key}`)}
+              value={k.value}
+              tone={k.tone}
+              icon={k.icon}
+            />
+          </div>
         ))}
       </ITFlex>
 
       {/* Filtros */}
-      <ITCard title={t("toolbar.title")} className="!p-5 border border-slate-200">
-        <ITFlex direction="column" gap={3}>
-          <ITFlex align="center" wrap="wrap" gap={2}>
+      <PanelCard
+        title={t("toolbar.title")}
+        actions={
+          <ITButton variant="text" color="gray" size="sm" onClick={clearFilters}>
+            <ITFlex align="center" gap={1}>
+              <FaUndo size={11} />
+              <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
+            </ITFlex>
+          </ITButton>
+        }
+      >
+        <ITGrid container columns={12} spacing={4}>
+          <ITGrid item xs={12} md={6} lg={3}>
             <ITSearchSelect
               name="accessReportPeriod"
-              label={t("filters.date")}
+              label={t("filters.period")}
               options={periodOptions}
               value={period}
-              onChange={(value) => handlePeriodChange(String(value) as AccessReportPeriod)}
-              className="min-w-[200px]"
+              onChange={(value) => changePeriod(String(value) as AccessReportPeriod)}
+              className="w-full min-w-0"
             />
-            <ITButton variant="text" color="gray" size="sm" onClick={clearFilters} className="ml-auto">
-              <ITFlex align="center" gap={1}>
-                <FaUndo size={11} />
-                <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
-              </ITFlex>
-            </ITButton>
-          </ITFlex>
-
-          <ITGrid container columns={12} spacing={4}>
-            <ITGrid item xs={12} md={4}>
-              {period === "DAY" ? (
-                <ITDatePicker
-                  name="accessReportDate"
-                  label={t("filters.date")}
-                  value={date ?? undefined}
-                  onChange={handleDate}
-                  className="w-full min-w-0"
-                />
-              ) : (
-                <ITDatePicker
-                  name="accessReportDateRange"
-                  label={t("filters.date")}
-                  range
-                  value={periodRange}
-                  onChange={handleRange}
-                  className="w-full min-w-0"
-                />
-              )}
-            </ITGrid>
-            <ITGrid item xs={12} md={4}>
-              <ITSearchSelect
-                name="accessReportDepartment"
-                label={t("filters.department")}
-                options={departmentOptions}
-                value={departmentId}
-                onChange={(value) => setDepartmentId(String(value))}
-                className="w-full min-w-0"
-              />
-            </ITGrid>
-            <ITGrid item xs={12} md={4}>
-              <ITInput
-                name="accessReportEmployee"
-                label={t("filters.employee")}
-                placeholder={t("filters.employeePlaceholder")}
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                className="w-full min-w-0"
-              />
-            </ITGrid>
-            <ITGrid item xs={12} md={4}>
-              <ITFlex align="end" className="h-full pb-2">
-                <ITCheckbox
-                  name="accessReportIncludeInactive"
-                  label={t("filters.includeInactive")}
-                  checked={includeInactive}
-                  onChange={setIncludeInactive}
-                />
-              </ITFlex>
-            </ITGrid>
           </ITGrid>
-        </ITFlex>
-      </ITCard>
+          <ITGrid item xs={12} md={6} lg={3}>
+            <ITSearchSelect
+              name="accessReportView"
+              label={t("filters.view")}
+              options={viewOptions}
+              value={view}
+              onChange={(value) => setView(String(value) as PeopleAttendanceView)}
+              className="w-full min-w-0"
+            />
+          </ITGrid>
+          <ITGrid item xs={12} md={6} lg={3}>
+            <ITSearchSelect
+              name="accessReportDepartment"
+              label={t("filters.department")}
+              options={departmentOptions}
+              value={departmentId}
+              onChange={(value) => setDepartmentId(String(value))}
+              className="w-full min-w-0"
+            />
+          </ITGrid>
+          <ITGrid item xs={12} md={6} lg={3}>
+            <ITInput
+              name="accessReportEmployee"
+              label={t("filters.employee")}
+              placeholder={t("filters.employeePlaceholder")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full min-w-0"
+            />
+          </ITGrid>
+          <ITGrid item xs={12} md={6} lg={4}>
+            <ITFlex align="end" gap={2} className="h-full">
+              <ITButton
+                variant="outlined"
+                color="gray"
+                onClick={previousPeriod}
+                title={t("filters.previous")}
+              >
+                <FaChevronLeft size={11} />
+              </ITButton>
+              <div className="min-w-0 flex-1">
+                {period === "DAY" ? (
+                  <ITDatePicker
+                    name="accessReportDate"
+                    label={t("filters.date")}
+                    value={date}
+                    onChange={handleDate}
+                    className="w-full min-w-0"
+                  />
+                ) : (
+                  <ITDatePicker
+                    name="accessReportDateRange"
+                    label={t("filters.date")}
+                    range
+                    value={periodRange}
+                    onChange={handleRange}
+                    className="w-full min-w-0"
+                  />
+                )}
+              </div>
+              <ITButton variant="outlined" color="gray" onClick={nextPeriod} title={t("filters.next")}>
+                <FaChevronRight size={11} />
+              </ITButton>
+            </ITFlex>
+          </ITGrid>
+          <ITGrid item xs={12} md={6} lg={4}>
+            <ITFlex align="end" className="h-full pb-2">
+              <ITCheckbox
+                name="accessReportIncludeInactive"
+                label={t("filters.includeInactive")}
+                checked={includeInactive}
+                onChange={setIncludeInactive}
+              />
+            </ITFlex>
+          </ITGrid>
+        </ITGrid>
+      </PanelCard>
 
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -487,20 +543,28 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
             content: (
               <ITFlex direction="column" gap={3}>
                 <ITText className="text-[11px] text-slate-600">{t("help.intro")}</ITText>
+                <ITFlex wrap="wrap" align="center" gap={2}>
+                  {DAY_STATUS_ORDER.map((status) => (
+                    <ITBadget key={status} color={DAY_STATUS_COLOR[status]} size="sm">
+                      {t(`dayStatus.${status}`)}
+                    </ITBadget>
+                  ))}
+                </ITFlex>
                 <ITGrid container columns={12} spacing={4}>
                   <ITGrid item xs={12} md={6}>
                     <ITFlex direction="column" gap={2}>
                       <HelpLine term={t("columns.entry")} desc={t("help.entry")} />
                       <HelpLine term={t("columns.exit")} desc={t("help.exit")} />
                       <HelpLine term={t("columns.hours")} desc={t("help.hours")} />
-                      <HelpLine term={t("columns.incident")} desc={t("help.incidents")} />
+                      <HelpLine term={t("columns.lateDays")} desc={t("help.lateDays")} />
                     </ITFlex>
                   </ITGrid>
                   <ITGrid item xs={12} md={6}>
                     <ITFlex direction="column" gap={2}>
-                      <StatusHelp color="info" label={t("incidents.OPEN_ENTRY")} desc={t("help.incidents")} />
-                      <StatusHelp color="warning" label={t("incidents.ENTRY_WITHOUT_EXIT")} desc={t("help.incidents")} />
-                      <StatusHelp color="danger" label={t("incidents.EXIT_WITHOUT_ENTRY")} desc={t("help.incidents")} />
+                      <HelpLine term={t("columns.absences")} desc={t("help.absences")} />
+                      <HelpLine term={t("columns.incidents")} desc={t("help.incidents")} />
+                      <HelpLine term={t("columns.department")} desc={t("help.schedule")} />
+                      <HelpLine term={t("filters.view")} desc={t("help.views")} />
                     </ITFlex>
                   </ITGrid>
                 </ITGrid>
@@ -519,14 +583,14 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           ) => Promise<{ data: Record<string, unknown>[]; total: number }>
         }
         externalFilters={externalFilters}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[10, 25, 50]}
+        defaultItemsPerPage={50}
+        itemsPerPageOptions={[10, 25, 50, 100]}
         debounceMs={350}
         layout="fixed"
         density="compact"
         virtualized
-        virtualizedMaxHeight={420}
-        rowHeight={50}
+        virtualizedMaxHeight={480}
+        rowHeight={52}
       />
     </ITFlex>
   );
@@ -536,25 +600,6 @@ function HelpLine({ term, desc }: { term: string; desc: string }) {
   return (
     <ITFlex direction="column" gap={0.5}>
       <ITText className="text-[11px] font-black text-slate-700">{term}</ITText>
-      <ITText className="text-[11px] text-slate-500">{desc}</ITText>
-    </ITFlex>
-  );
-}
-
-function StatusHelp({
-  color,
-  label,
-  desc,
-}: {
-  color: BadgeColor;
-  label: string;
-  desc: string;
-}) {
-  return (
-    <ITFlex align="center" gap={2}>
-      <ITBadget color={color} size="sm">
-        {label}
-      </ITBadget>
       <ITText className="text-[11px] text-slate-500">{desc}</ITText>
     </ITFlex>
   );

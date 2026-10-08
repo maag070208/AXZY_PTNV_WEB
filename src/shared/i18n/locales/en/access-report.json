@@ -4,10 +4,21 @@
   "periods": {
     "DAY": "Daily",
     "WEEK": "Weekly",
+    "FORTNIGHT": "Fortnightly",
     "MONTH": "Monthly"
   },
+  "views": {
+    "ALL": "All",
+    "INCIDENTS": "Only with incidents",
+    "ON_SITE": "Only on site",
+    "WITHOUT_RECORDS": "Only without records"
+  },
   "filters": {
-    "date": "Period",
+    "period": "Period",
+    "view": "View",
+    "date": "Date",
+    "previous": "Previous period",
+    "next": "Next period",
     "department": "Department",
     "allDepartments": "All departments",
     "employee": "Search employee",
@@ -20,8 +31,25 @@
     "withoutRecords": "People without records",
     "inside": "People on site",
     "workedHours": "Total hours",
+    "lateDays": "Late days",
+    "absences": "Absences",
     "incidents": "Incidents"
   },
+  "dayStatus": {
+    "ATTENDED": "Attended",
+    "LATE": "Late",
+    "ABSENCE": "Absence",
+    "REST": "Rest day",
+    "PENDING": "Pending",
+    "NO_INFO": "No schedule"
+  },
+  "dayStatusShort": {
+    "LATE": "Late",
+    "ABSENCE": "Absence",
+    "REST": "Rest",
+    "NO_INFO": "No schedule"
+  },
+  "peopleCount": "{{count}} people",
   "status": {
     "noRecords": "No records",
     "hasRecords": "With records",
@@ -41,7 +69,9 @@
     "incidents": "Incidents",
     "actions": "",
     "date": "Date",
-    "incident": "Incident"
+    "incident": "Incident",
+    "lateDays": "Late days",
+    "absences": "Absences"
   },
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entry without exit",
@@ -93,17 +123,21 @@
   },
   "help": {
     "title": "How to read this report?",
-    "entry": "Session entry time.",
-    "exit": "Session exit time (— if still inside).",
-    "hours": "Time inside the session (exit − entry).",
+    "intro": "Each row is a person and each column a day of the period. The day is graded against the assigned schedule: attended, late, absence, rest (non-working day) or no schedule. The first time is the entry and the last one the exit.",
+    "entry": "First entry time of the day.",
+    "exit": "Last exit time of the day (— if there is no exit yet).",
+    "hours": "Time worked in the period (includes what an open entry has accumulated).",
     "sessions": "How many entry/exit pairs were matched in the period (one per visit).",
     "days": "Days in the period with at least one record.",
-    "incidents": "Session incident: entry without exit, exit without entry, or open entry.",
+    "incidents": "Days without a registered exit or with an exit without entry.",
+    "lateDays": "Days whose first entry exceeded the schedule tolerance.",
+    "absences": "Working days with no record.",
+    "schedule": "Department the person belongs to.",
+    "views": "Filters the table: all, only with incidents, only those on site, or only without records.",
     "status": "Status summarizes the person's activity in the period:",
     "statusHasRecords": "Has records: at least one entry or exit.",
     "statusInside": "On site: entered and has not registered an exit yet.",
     "statusNoRecords": "No records: no activity in the period.",
-    "multiple": "A person can register multiple entries and exits in the period. Here we show the first entry and the last exit; the day-by-day breakdown is under \"View detail\".",
-    "intro": "Each row is a session: an entry and its exit. A person can have several sessions in the period."
+    "multiple": "A person can register several entries and exits in a day; the cell shows the first and the last."
   }
 }

@@ -21,6 +21,8 @@ export interface KpiTileProps {
   tone?: KpiTone;
   /** Línea de contexto bajo el número (con punto de color). */
   hint?: string;
+  /** Contenido bajo el número (p. ej. una barra de progreso); reemplaza al `hint`. */
+  footer?: ReactNode;
   onClick?: () => void;
 }
 
@@ -28,7 +30,7 @@ export interface KpiTileProps {
  * Indicador de tablero: tarjeta blanca, número grande y el color solo en el
  * ícono y el punto de estado (sin fondos de color completos).
  */
-export default function KpiTile({ label, value, icon, tone = "neutral", hint, onClick }: KpiTileProps) {
+export default function KpiTile({ label, value, icon, tone = "neutral", hint, footer, onClick }: KpiTileProps) {
   const style = TONES[tone];
   const Tag = onClick ? "button" : "div";
   return (
@@ -45,11 +47,15 @@ export default function KpiTile({ label, value, icon, tone = "neutral", hint, on
         </div>
         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${style.icon}`}>{icon}</span>
       </div>
-      {hint && (
-        <p className="mt-3 flex items-center gap-1.5 !text-[11px] text-slate-500">
-          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${style.dot}`} />
-          <span className="truncate">{hint}</span>
-        </p>
+      {footer ? (
+        <div className="mt-3 w-full">{footer}</div>
+      ) : (
+        hint && (
+          <p className="mt-3 flex items-center gap-1.5 !text-[11px] text-slate-500">
+            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${style.dot}`} />
+            <span className="truncate">{hint}</span>
+          </p>
+        )
       )}
     </Tag>
   );

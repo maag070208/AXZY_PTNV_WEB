@@ -8,6 +8,12 @@ import { field, goToRoute } from "./support/pages/components";
 /**
  * Reporte de entradas/salidas por persona (`/access/report`).
  *
+ * La pantalla lista **personas**: una fila con cada día del periodo calificado
+ * contra su horario (asistió, retardo, falta, descanso, sin horario), más sus
+ * horas e incidencias. La petición es
+ * `POST /schedules/attendance/access`; los exports siguen trayendo el detalle por
+ * sesión (`POST /access/report/export`).
+ *
  * Lo que se prueba es la **pantalla**; el escenario se siembra por API. La web
  * ya NO envía `tz`: la API resuelve el corte del día con su TZ de empresa
  * (`ACCESS_REPORT_TIMEZONE` → env → `America/Mexico_City`), así que las
@@ -34,6 +40,9 @@ const USERNAME_WITHOUT_EVENTS = "e2e_report_sin";
 const NAME_WITH_EVENTS = "E2E Reporte Con Eventos";
 const NAME_WITH_EVENTS_2 = "E2E Reporte Con Eventos 2";
 const NAME_WITHOUT_EVENTS = "E2E Reporte Sin Eventos";
+
+/** El periodo por defecto de la pantalla: la semana que contiene hoy. */
+const DEFAULT_PERIOD = "WEEK";
 
 /** Día de referencia local (el mismo que resuelve el navegador por defecto). */
 const localToday = (): string =>
@@ -98,48 +107,51 @@ test.describe("Reporte de entradas/salidas", () => {
   test.afterAll(async () => {
     // El usuario sin eventos no tiene historial ligado: se borra y la próxima
     // corrida lo vuelve a asegurar. El usuario con eventos queda (FK Restrict),
-    // pero se reutiliza por `username`; sin eventos tras la limpieza no vuelve a
-    // aparecer en el universo del reporte ni se acumula.
+    // pero se reutiliza por `username`; sin eventos tras la limpieza tampoco
+    // acumula registros.
     if (withoutEventsId) await access.deleteUser(withoutEventsId).catch(() => undefined);
     await ctx.dispose();
   });
 
-  test("ADMIN ve KPIs y tabla, y la persona con eventos muestra sus horas", async ({ page }) => {
+  test("ADMIN ve KPIs y la persona con eventos muestra sus horas", async ({ page }) => {
     await goToRoute(page, "/access/report");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Reporte de entradas y salidas" })
     ).toBeVisible();
 
-    // KPIs (labels exactos; no confundir con los badges de la tabla).
+    // KPIs (labels exactos; no confundir con las etiquetas de la tabla).
     await expect(page.getByText("Personas con registros", { exact: true })).toBeVisible();
     await expect(page.getByText("Personas sin registros", { exact: true })).toBeVisible();
     await expect(page.getByText("Horas totales", { exact: true })).toBeVisible();
+    await expect(page.getByText("Retardos", { exact: true }).first()).toBeVisible();
 
     const body = page.locator("table tbody");
     await field(page, "Buscar empleado").fill(NAME_WITH_EVENTS);
     await expect(body.getByText(NAME_WITH_EVENTS).first()).toBeVisible();
 
-    // Verificación cruzada: la UI muestra las MISMAS horas que calcula la API.
-    // La tabla lista SESIONES (una fila por entrada/salida), no personas.
-    const rep = await access.report({
-      filters: { period: "DAY", date: localToday(), q: NAME_WITH_EVENTS },
+    // Verificación cruzada: la tabla lista PERSONAS (una fila con cada día del
+    // periodo) y sus horas totales son las que calcula la API.
+    const rep = await access.people({
+      filters: { period: DEFAULT_PERIOD, date: localToday(), q: NAME_WITH_EVENTS },
     });
     const row = rep.data.find((r) => r.employeeId === withEventsId);
-    expect(row, "la API debe devolver la sesión de la persona sembrada").toBeTruthy();
-    expect(rep.summary.peopleWithRecords).toBeGreaterThanOrEqual(1);
+    expect(row, "la API debe devolver la persona sembrada").toBeTruthy();
+    expect(row!.hasRecords).toBe(true);
+    expect(rep.summary.withRecords).toBeGreaterThanOrEqual(1);
     await expect(body.getByText(formatMinutes(row!.workedMinutes)).first()).toBeVisible();
   });
 
-  test("cambiar la granularidad (DÍA→SEMANA→MES) dispara la petición con el period correcto", async ({
+  test("cambiar la granularidad (SEMANA→QUINCENA→MES) dispara la petición con el period correcto", async ({
     page,
   }) => {
     await goToRoute(page, "/access/report");
     await expect(page.locator("table tbody")).toBeVisible();
 
-    const waitForPeriod = (period: "WEEK" | "MONTH") =>
+    // La petición de la tabla es la del reporte por persona (no la de export).
+    const waitForPeriod = (period: "WEEK" | "FORTNIGHT" | "MONTH") =>
       page.waitForRequest((r) => {
-        if (r.method() !== "POST" || !r.url().endsWith("/access/report")) return false;
+        if (r.method() !== "POST" || !r.url().endsWith("/schedules/attendance/access")) return false;
         const body = r.postDataJSON() as { filters?: { period?: string } } | null;
         return body?.filters?.period === period;
       });
@@ -149,6 +161,12 @@ test.describe("Reporte de entradas/salidas", () => {
     await page.getByText("Semanal", { exact: true }).click();
     const reqWeek = await pWeek;
     expect(reqWeek.postDataJSON()).toMatchObject({ filters: { period: "WEEK" } });
+
+    const pFortnight = waitForPeriod("FORTNIGHT");
+    await page.locator('input[name="accessReportPeriod"]').click();
+    await page.getByText("Quincenal", { exact: true }).click();
+    const reqFortnight = await pFortnight;
+    expect(reqFortnight.postDataJSON()).toMatchObject({ filters: { period: "FORTNIGHT" } });
 
     const pMonth = waitForPeriod("MONTH");
     await page.locator('input[name="accessReportPeriod"]').click();
@@ -162,48 +180,62 @@ test.describe("Reporte de entradas/salidas", () => {
     await expect(body.getByText(NAME_WITH_EVENTS).first()).toBeVisible();
   });
 
-  test("una persona sin eventos no genera fila y el reporte la cuenta sin registros", async ({
-    page,
-  }) => {
+  test("una persona sin eventos aparece sin registros y las vistas la aíslan", async ({ page }) => {
     await goToRoute(page, "/access/report");
 
     const body = page.locator("table tbody");
     await field(page, "Buscar empleado").fill(NAME_WITHOUT_EVENTS);
-    // La tabla lista sesiones: sin eventos, la búsqueda no devuelve filas.
-    await expect(body.getByText("No se encontraron resultados").first()).toBeVisible();
+    // El universo incluye a quien no tiene actividad: sale como fila sin registros.
+    await expect(body.getByText(NAME_WITHOUT_EVENTS).first()).toBeVisible();
 
-    // Verificación cruzada: la API la incluye en el universo del periodo pero
-    // sin registros (la cuenta vive en el resumen, no como fila de la tabla).
-    const rep = await access.report({
-      filters: { period: "DAY", date: localToday(), q: NAME_WITHOUT_EVENTS },
+    // Verificación cruzada: la API la cuenta sin registros.
+    const rep = await access.people({
+      filters: { period: DEFAULT_PERIOD, date: localToday(), q: NAME_WITHOUT_EVENTS },
     });
-    expect(rep.summary.peopleTotal).toBe(1);
-    expect(rep.summary.peopleWithRecords).toBe(0);
-    expect(rep.summary.peopleWithoutRecords).toBe(1);
-    expect(rep.data).toHaveLength(0);
+    const row = rep.data.find((r) => r.employeeId === withoutEventsId);
+    expect(row, "la API debe devolver a la persona sin eventos").toBeTruthy();
+    expect(row!.hasRecords).toBe(false);
+    expect(rep.summary.withoutRecords).toBe(1);
+
+    // Vista "Solo sin registros": sigue visible.
+    await page.locator('input[name="accessReportView"]').click();
+    await page.getByText("Solo sin registros", { exact: true }).click();
+    await expect(body.getByText(NAME_WITHOUT_EVENTS).first()).toBeVisible();
+
+    // Vista "Solo en sitio": no está en sitio, la tabla queda vacía.
+    await page.locator('input[name="accessReportView"]').click();
+    await page.getByText("Solo en sitio", { exact: true }).click();
+    await expect(body.getByText("No se encontraron resultados").first()).toBeVisible();
   });
 
-  test("la tabla ordena por entryAt desc por defecto", async ({ page }) => {
+  test("la primera petición trae el periodo vigente y no ordena por sesión", async ({ page }) => {
     const firstReport = page.waitForRequest(
-      (r) => r.method() === "POST" && r.url().endsWith("/access/report")
+      (r) => r.method() === "POST" && r.url().endsWith("/schedules/attendance/access")
     );
 
     await goToRoute(page, "/access/report");
 
     const body = (await firstReport).postDataJSON() as {
-      sort?: { key: string; direction: string };
+      page?: number;
+      filters?: Record<string, unknown>;
+      sort?: { key?: string };
     };
-    expect(body.sort).toEqual({ key: "entryAt", direction: "desc" });
+    expect(body.page).toBe(1);
+    expect(body.filters).toMatchObject({ period: DEFAULT_PERIOD, includeInactive: false });
+    expect(body.filters?.date).toBe(localToday());
+    // La tabla no arranca ordenada por la sesión: la pantalla ya no lista sesiones.
+    expect(body.sort?.key).not.toBe("entryAt");
   });
 
   test("el export comparte los filtros vigentes de la tabla", async ({ page }) => {
     await goToRoute(page, "/access/report");
     await expect(page.locator("table tbody")).toBeVisible();
 
-    // Al filtrar, la tabla pide con ese filtro (el reporte lista sesiones y sus
-    // columnas no son ordenables; lo que el export debe respetar son los filtros).
+    // Al filtrar, la tabla pide con ese filtro (el reporte lista personas y sus
+    // columnas de día no son ordenables; lo que el export debe respetar son los
+    // filtros de la barra).
     const filtered = page.waitForRequest((r) => {
-      if (r.method() !== "POST" || !r.url().endsWith("/access/report")) return false;
+      if (r.method() !== "POST" || !r.url().endsWith("/schedules/attendance/access")) return false;
       const data = r.postDataJSON() as { filters?: { q?: string } };
       return data?.filters?.q === NAME_WITH_EVENTS;
     });

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
@@ -8,10 +8,15 @@ import {
   type AccessReportSessionRow,
   type AccessReportSummary,
   type AccessReportTableResponse,
+  type PeopleAttendanceResponse,
+  type PeopleAttendanceSummary,
+  type PeopleAttendanceView,
 } from "@entities/access";
-import { departmentsApi, type Department } from "@entities/department";
+import { useDepartmentOptions } from "@entities/department";
+import { useWeekStartDay } from "@entities/sys-config";
 import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
+import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 import { fileName, type FileNameKey, dateLocale } from "@shared/i18n";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
@@ -22,29 +27,23 @@ export type DownloadAccessReportPdf = (
 ) => Promise<void>;
 
 /**
- * De dónde salen las sesiones. Por defecto, la bitácora de accesos; el reloj
- * checador inyecta la suya (`/checador/report`), con el mismo contrato.
+ * De dónde salen las entradas/salidas. Por defecto, la bitácora de accesos; el
+ * reloj checador inyecta la suya, con el mismo contrato.
  */
 export interface AccessReportSource {
-  report: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
+  /** Una fila por persona con cada día del periodo contra su horario (la pantalla). */
+  people: (params: ITDataTableFetchParamsPost) => Promise<PeopleAttendanceResponse>;
+  /** Todas las sesiones del periodo (PDF y CSV). */
   reportExport: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
   /** Prefijo del nombre del CSV. */
   csvFile: FileNameKey;
 }
 
-/** Llave de orden del reporte: la columna ES una sesión; su ancla es `entryAt`. */
-export type AccessReportSort = NonNullable<ITDataTableFetchParams["sort"]>;
-
-/**
- * Orden por defecto: sesión más reciente primero. Un solo lugar para la tabla,
- * el PDF y el CSV. `entryAt desc` implica `date desc` + hora desc para las
- * sesiones normales; las huérfanas (`EXIT_WITHOUT_ENTRY`, `entryAt: null`)
- * quedan al final (el backend ordena asc con "" y luego invierte).
- */
-export const DEFAULT_REPORT_SORT: AccessReportSort = { key: "entryAt", direction: "desc" };
+/** Orden de los exports: sesión más reciente primero. */
+const EXPORT_SORT = { key: "entryAt", direction: "desc" } as const;
 
 const ACCESS_SOURCE: AccessReportSource = {
-  report: accessApi.report,
+  people: accessApi.people,
   reportExport: accessApi.reportExport,
   csvFile: "access",
 };
@@ -67,92 +66,118 @@ const toDateInput = (date: Date): string => {
   return `${y}-${m}-${d}`;
 };
 
+/** Día de referencia del periodo anterior (`step` = -1) o siguiente (`step` = 1). */
+const shiftPeriod = (date: Date, period: AccessReportPeriod, step: 1 | -1): Date => {
+  const d = new Date(date);
+  if (period === "DAY") d.setDate(d.getDate() + step);
+  else if (period === "WEEK") d.setDate(d.getDate() + 7 * step);
+  else if (period === "MONTH") d.setMonth(d.getMonth() + step, 1);
+  // Quincena: 1–15 ↔ 16–fin de mes.
+  else if (d.getDate() <= 15) d.setMonth(d.getMonth() + (step > 0 ? 0 : -1), step > 0 ? 16 : 16);
+  else d.setMonth(d.getMonth() + (step > 0 ? 1 : 0), 1);
+  return d;
+};
+
+/** `[inicio, fin]` del periodo que contiene `date` (la semana empieza en `WEEK_START_DAY`). */
+const periodRangeOf = (date: Date, period: AccessReportPeriod, weekStart: number): [Date, Date] => {
+  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  if (period === "DAY") return [start, start];
+  if (period === "WEEK") {
+    start.setDate(start.getDate() - ((start.getDay() - weekStart + 7) % 7));
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    return [start, end];
+  }
+  const lastOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  if (period === "MONTH") return [new Date(date.getFullYear(), date.getMonth(), 1), lastOfMonth];
+  return date.getDate() <= 15
+    ? [new Date(date.getFullYear(), date.getMonth(), 1), new Date(date.getFullYear(), date.getMonth(), 15)]
+    : [new Date(date.getFullYear(), date.getMonth(), 16), lastOfMonth];
+};
+
 /**
- * Estado del reporte de entradas/salidas por persona. La fila ES la persona;
- * `period` define la ventana (DÍA/SEMANA/MES), no la dimensión de la fila.
+ * Estado de la pantalla de Entradas y salidas: una fila por persona con cada
+ * día del periodo, KPIs y vistas rápidas. Los exports conservan el detalle por
+ * sesión con los mismos filtros de la barra.
  */
 export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) => {
   const { t } = useTranslation(["access-report", "common"]);
 
-  const [period, setPeriod] = useState<AccessReportPeriod>("DAY");
-  const [date, setDate] = useState<Date | null>(new Date());
+  const [period, setPeriod] = useState<AccessReportPeriod>("WEEK");
+  const [date, setDate] = useState<Date>(() => new Date());
   const [departmentId, setDepartmentId] = useState("");
-  const [q, setQ] = useState("");
+  const [search, setSearch] = useState("");
+  const q = useDebouncedValue(search.trim(), 350);
   const [includeInactive, setIncludeInactive] = useState(false);
+  const [view, setView] = useState<PeopleAttendanceView>("ALL");
 
-  const [summary, setSummary] = useState<AccessReportSummary | null>(null);
+  const [summary, setSummary] = useState<PeopleAttendanceSummary | null>(null);
+  const [total, setTotal] = useState(0);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const departments = useDepartmentOptions();
+  const weekStart = useWeekStartDay();
 
-  useEffect(() => {
-    let active = true;
-    departmentsApi
-      .list()
-      .then((list) => {
-        if (active) setDepartments(list);
-      })
-      .catch(() => {
-        if (active) setDepartments([]);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const dateKey = useMemo(() => toDateInput(date ?? new Date()), [date]);
+  const dateKey = toDateInput(date);
+  const periodRange = useMemo(() => periodRangeOf(date, period, weekStart), [date, period, weekStart]);
 
   // `includeInactive` viaja como BOOLEANO (el contrato de tablas no acepta "false").
-  const externalFilters = useMemo<Record<string, string | number | boolean>>(() => {
-    const filters: Record<string, string | number | boolean> = {
+  const barFilters = useMemo<Record<string, string | boolean>>(
+    () => ({
       period,
       date: dateKey,
       includeInactive,
-    };
-    if (departmentId) filters.departmentId = departmentId;
-    const query = q.trim();
-    if (query) filters.q = query;
-    return filters;
-  }, [period, dateKey, departmentId, q, includeInactive]);
+      ...(departmentId && { departmentId }),
+      ...(q && { q }),
+    }),
+    [period, dateKey, departmentId, q, includeInactive]
+  );
+  const externalFilters = useMemo(() => ({ ...barFilters, view }), [barFilters, view]);
 
-  // Sort vigente de la tabla, compartido con los exports. Al cambiar los filtros
-  // la tabla se remonta y pierde su orden: el ref vuelve al default.
-  const sortRef = useRef<AccessReportSort>(DEFAULT_REPORT_SORT);
-  // Filtros vigentes de la tabla (barra + columnas): los exports muestran lo mismo que la tabla.
-  const filtersRef = useRef<ITDataTableFetchParams["filters"]>(externalFilters);
+  /**
+   * Firma de los filtros: se pasa como `key` de la tabla para que vuelva a la
+   * página 1 al cambiarlos (`reloadTrigger` conservaría la página).
+   */
+  const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
 
-  useEffect(() => {
-    sortRef.current = DEFAULT_REPORT_SORT;
-    filtersRef.current = externalFilters;
-  }, [externalFilters]);
+  const fetchTableData = useCallback(
+    async (params: ITDataTableFetchParams) => {
+      try {
+        const res = await source.people({
+          page: params.page,
+          limit: params.limit,
+          filters: params.filters,
+          sort: params.sort,
+        });
+        setSummary(res.summary);
+        setTotal(res.total);
+        setError(null);
+        return { data: res.data as unknown as Record<string, unknown>[], total: res.total };
+      } catch (e) {
+        setError(e instanceof Error ? e.message : t("errors.load"));
+        return { data: [], total: 0 };
+      }
+    },
+    [source, t]
+  );
 
-  const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
-    const sort = params.sort ?? DEFAULT_REPORT_SORT;
-    sortRef.current = sort;
-    filtersRef.current = params.filters;
-    const res = await source.report({
-      page: params.page,
-      limit: params.limit,
-      filters: params.filters,
-      sort,
-    });
-    setSummary(res.summary);
-    return {
-      data: res.data as unknown as Record<string, unknown>[],
-      total: res.total,
-    };
-  }, [source]);
+  const changePeriod = (value: AccessReportPeriod) => {
+    setPeriod(value);
+    // Cada periodo arranca en el que contiene hoy.
+    setDate(new Date());
+  };
+
+  const exportSessions = useCallback(
+    (limit: number) =>
+      source.reportExport({ page: 1, limit, filters: barFilters, sort: EXPORT_SORT }),
+    [source, barFilters]
+  );
 
   const handleDownloadPdf = useCallback(async () => {
     setExporting(true);
     setError(null);
     try {
-      const res = await source.reportExport({
-        page: 1,
-        limit: 100,
-        filters: filtersRef.current,
-        sort: sortRef.current,
-      });
+      const res = await exportSessions(100);
       await download(res.data, res.summary, {
         period,
         date: dateKey,
@@ -163,18 +188,13 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
     } finally {
       setExporting(false);
     }
-  }, [download, source, period, dateKey, t]);
+  }, [download, exportSessions, period, dateKey, t]);
 
   const handleDownloadCsv = useCallback(async () => {
     setExporting(true);
     setError(null);
     try {
-      const res = await source.reportExport({
-        page: 1,
-        limit: 1000,
-        filters: filtersRef.current,
-        sort: sortRef.current,
-      });
+      const res = await exportSessions(1000);
       const tz = res.summary.range.timezone || BROWSER_TIMEZONE;
       const stamp = (iso: string | null): string => {
         if (!iso) return "";
@@ -203,7 +223,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
       ]);
       const escape = (cell: unknown) => `"${String(cell ?? "").replace(/"/g, '""')}"`;
       const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");
-      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -215,26 +235,33 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
     } finally {
       setExporting(false);
     }
-  }, [source, period, dateKey, t]);
+  }, [exportSessions, source, period, dateKey, t]);
 
   return {
     t,
     period,
-    setPeriod,
+    changePeriod,
     date,
     setDate,
+    periodRange,
+    previousPeriod: () => setDate((d) => shiftPeriod(d, period, -1)),
+    nextPeriod: () => setDate((d) => shiftPeriod(d, period, 1)),
     departmentId,
     setDepartmentId,
-    q,
-    setQ,
+    departments,
+    search,
+    setSearch,
     includeInactive,
     setIncludeInactive,
+    view,
+    setView,
     summary,
+    total,
     exporting,
     error,
     setError,
-    departments,
     externalFilters,
+    tableKey,
     fetchTableData,
     handleDownloadPdf,
     handleDownloadCsv,

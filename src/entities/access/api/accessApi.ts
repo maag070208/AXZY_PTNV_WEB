@@ -4,6 +4,7 @@ import type {
   AccessEvent,
   AccessReportTableResponse,
   AccessStats,
+  PeopleAttendanceResponse,
   Site,
 } from "../model/types";
 
@@ -24,4 +25,7 @@ export const accessApi = {
   /** Universo completo sin paginar, para el PDF. Mismos filtros y `summary`. */
   reportExport: (params: ITDataTableFetchParamsPost) =>
     tableQuery<AccessReportTableResponse>(`/access/report/export`, params),
+  /** Una fila por persona con cada día contra su horario (lo calcula el módulo de horarios). */
+  people: (params: ITDataTableFetchParamsPost) =>
+    tableQuery<PeopleAttendanceResponse>(`/schedules/attendance/access`, params),
 };

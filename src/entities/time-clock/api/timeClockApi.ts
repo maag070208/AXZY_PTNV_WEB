@@ -1,6 +1,6 @@
 import { api } from "@shared/api/client";
 import { tableQuery, tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
-import type { AccessReportTableResponse } from "@entities/access";
+import type { AccessReportTableResponse, PeopleAttendanceResponse } from "@entities/access";
 import type {
   TimeClockPunch,
   TimeClockEmployee,
@@ -66,6 +66,9 @@ export const timeClockApi = {
     tableQuery<AccessReportTableResponse>(`/time-clock/report`, params),
   reportExport: (params: ITDataTableFetchParamsPost) =>
     tableQuery<AccessReportTableResponse>(`/time-clock/report/export`, params),
+  /** Entradas/salidas por persona con cada día contra su horario (módulo de horarios). */
+  people: (params: ITDataTableFetchParamsPost) =>
+    tableQuery<PeopleAttendanceResponse>(`/schedules/attendance/time-clock`, params),
 
   /** Empleados del reloj con su vínculo o sugerencia (filtros: `q`, `estado`). */
   employees: (params: ITDataTableFetchParamsPost) =>

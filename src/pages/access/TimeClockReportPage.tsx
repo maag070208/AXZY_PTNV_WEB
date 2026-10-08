@@ -9,7 +9,7 @@ import { downloadTimeClockReportPdf } from "@widgets/reports";
 
 /** El mismo reporte de entradas/salidas, alimentado por las checadas del reloj. */
 const TIME_CLOCK_SOURCE: AccessReportSource = {
-  report: timeClockApi.report,
+  people: timeClockApi.people,
   reportExport: timeClockApi.reportExport,
   csvFile: "timeClock",
 };

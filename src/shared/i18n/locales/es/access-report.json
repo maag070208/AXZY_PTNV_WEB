@@ -4,10 +4,21 @@
   "periods": {
     "DAY": "Diaria",
     "WEEK": "Semanal",
+    "FORTNIGHT": "Quincenal",
     "MONTH": "Mensual"
   },
+  "views": {
+    "ALL": "Todas",
+    "INCIDENTS": "Solo con incidencias",
+    "ON_SITE": "Solo en sitio",
+    "WITHOUT_RECORDS": "Solo sin registros"
+  },
   "filters": {
-    "date": "Periodo",
+    "period": "Periodo",
+    "view": "Vista",
+    "date": "Fecha",
+    "previous": "Periodo anterior",
+    "next": "Periodo siguiente",
     "department": "Departamento",
     "allDepartments": "Todos los departamentos",
     "employee": "Buscar empleado",
@@ -20,8 +31,25 @@
     "withoutRecords": "Personas sin registros",
     "inside": "Personas en sitio",
     "workedHours": "Horas totales",
+    "lateDays": "Retardos",
+    "absences": "Faltas",
     "incidents": "Incidencias"
   },
+  "dayStatus": {
+    "ATTENDED": "Asistió",
+    "LATE": "Retardo",
+    "ABSENCE": "Falta",
+    "REST": "Descanso",
+    "PENDING": "Pendiente",
+    "NO_INFO": "Sin horario"
+  },
+  "dayStatusShort": {
+    "LATE": "Retardo",
+    "ABSENCE": "Falta",
+    "REST": "Descanso",
+    "NO_INFO": "Sin horario"
+  },
+  "peopleCount": "{{count}} personas",
   "status": {
     "noRecords": "Sin registros",
     "hasRecords": "Con registros",
@@ -41,7 +69,9 @@
     "incidents": "Incidencias",
     "actions": "",
     "date": "Fecha",
-    "incident": "Incidencia"
+    "incident": "Incidencia",
+    "lateDays": "Retardos",
+    "absences": "Faltas"
   },
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entrada sin salida",
@@ -93,17 +123,21 @@
   },
   "help": {
     "title": "¿Cómo leer este reporte?",
-    "entry": "Hora de entrada de la sesión.",
-    "exit": "Hora de salida de la sesión (— si aún no ha salido).",
-    "hours": "Tiempo dentro de la sesión (salida − entrada).",
+    "intro": "Cada fila es una persona y cada columna un día del periodo. El día se califica contra el horario asignado: asistió, retardo, falta, descanso (día no laborable) o sin horario. La primera hora es la entrada y la última la salida.",
+    "entry": "Hora de la primera entrada del día.",
+    "exit": "Hora de la última salida del día (— si aún no ha salido).",
+    "hours": "Tiempo trabajado en el periodo (incluye lo que lleva una entrada abierta).",
     "sessions": "Cuántas entradas/salidas se emparejaron en el periodo (una por cada visita).",
     "days": "Días del periodo con al menos un registro.",
-    "incidents": "Incidencia de la sesión: entrada sin salida, salida sin entrada o en sitio.",
+    "incidents": "Días sin salida registrada o con salida sin entrada.",
+    "lateDays": "Días en que la primera entrada superó la tolerancia de su horario.",
+    "absences": "Días laborables sin ningún registro.",
+    "schedule": "Departamento al que pertenece la persona.",
+    "views": "Filtra la tabla: todas, solo con incidencias, solo quienes están en sitio, o solo sin registros.",
     "status": "El estado resume la actividad de la persona en el periodo:",
     "statusHasRecords": "Con registros: tuvo al menos una entrada o salida.",
     "statusInside": "En sitio: entró y todavía no registra salida.",
     "statusNoRecords": "Sin registros: no tuvo actividad en el periodo.",
-    "multiple": "Una persona puede registrar varias entradas y salidas en el periodo. Aquí se muestra la primera entrada y la última salida; el desglose día por día está en \"Ver detalle\".",
-    "intro": "Cada fila es una sesión: una entrada y su salida. Una persona puede tener varias sesiones en el periodo."
+    "multiple": "Una persona puede registrar varias entradas y salidas en un día; la celda muestra la primera y la última."
   }
 }
