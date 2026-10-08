@@ -133,7 +133,7 @@ export default function AccessActivityPanel({
       type: "date",
       width: 150,
       filter: "date-range",
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <span className="text-[11px] tabular-nums text-slate-600">
           {new Date(row.createdAt).toLocaleString(dateLocale(), { dateStyle: "short", timeStyle: "short" })}
@@ -146,7 +146,7 @@ export default function AccessActivityPanel({
       type: "catalog",
       width: 190,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: ACCESS_ACTIVITY_ACTIONS.map((action) => ({ id: action, name: tt(`activity.action.${action}`) })),
       },
@@ -162,7 +162,7 @@ export default function AccessActivityPanel({
       type: "string",
       width: 180,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <span className="flex flex-col">
           <span className="text-[12px] font-bold text-slate-700">{row.actor.name ?? row.actor.username ?? "—"}</span>
@@ -175,7 +175,7 @@ export default function AccessActivityPanel({
       label: t("activity.columns.detail"),
       type: "string",
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (row) => <span className="text-[12px] text-slate-600">{describe(row)}</span>,
     },
     {

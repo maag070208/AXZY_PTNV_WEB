@@ -164,7 +164,7 @@ export default function KitchenCatalogPanel() {
       type: "string",
       width: 320,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (c) => <ITText className="text-[12px] font-bold text-slate-800">{c.name}</ITText>,
     },
     statusColumn,
@@ -189,7 +189,7 @@ export default function KitchenCatalogPanel() {
       type: "string",
       width: 120,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (u) => <ITText className="font-mono text-[12px] font-bold uppercase text-slate-700">{u.code}</ITText>,
     },
     {
@@ -198,7 +198,7 @@ export default function KitchenCatalogPanel() {
       type: "string",
       width: 240,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (u) => <ITText className="text-[12px] font-bold text-slate-800">{u.name}</ITText>,
     },
     {
@@ -242,7 +242,7 @@ export default function KitchenCatalogPanel() {
       type: "string",
       width: 260,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (r) => <ITText className="text-[12px] font-bold text-slate-800">{r.name}</ITText>,
     },
     {
@@ -250,7 +250,7 @@ export default function KitchenCatalogPanel() {
       label: t("catalog.rate"),
       type: "number",
       width: 130,
-      sortable: true,
+      sortable: false,
       render: (r) => <ITText className="text-[13px] font-black tabular-nums text-slate-800">{fmtRate(r.rate)}</ITText>,
     },
     statusColumn,
@@ -281,7 +281,7 @@ export default function KitchenCatalogPanel() {
       type: "string",
       width: 120,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (c) => <ITText className="font-mono text-[12px] font-bold uppercase text-slate-700">{c.code}</ITText>,
     },
     {
@@ -290,7 +290,7 @@ export default function KitchenCatalogPanel() {
       type: "string",
       width: 260,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (c) => <ITText className="text-[12px] font-bold text-slate-800">{c.name}</ITText>,
     },
     {

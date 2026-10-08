@@ -59,7 +59,7 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
     page,
   }) => {
     const query = page.waitForResponse(
-      (r) => r.url().endsWith("/time-clock/report") && r.request().method() === "POST"
+      (r) => r.url().endsWith("/schedules/attendance/time-clock") && r.request().method() === "POST"
     );
     await goToRoute(page, "/hr/time-clock/entries-exits");
 
@@ -71,7 +71,7 @@ test.describe("Reloj checador — entradas/salidas y vínculos", () => {
     const res = await query;
     expect(res.status()).toBe(200);
     const { filters } = res.request().postDataJSON() as { filters: Record<string, unknown> };
-    expect(filters).toMatchObject({ period: "DAY" });
+    expect(filters).toMatchObject({ period: "WEEK" });
 
     await page.getByRole("button", { name: "Vincular empleados" }).click();
     await expect(page).toHaveURL(/#\/hr\/time-clock\/employees/);

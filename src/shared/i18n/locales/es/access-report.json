@@ -7,32 +7,61 @@
     "FORTNIGHT": "Quincenal",
     "MONTH": "Mensual"
   },
+  "periodTabs": {
+    "DAY": "Hoy",
+    "WEEK": "Semanal",
+    "FORTNIGHT": "Quincenal",
+    "MONTH": "Mensual"
+  },
+  "dayColumn": {
+    "WEEK": "Semana",
+    "FORTNIGHT": "Quincena",
+    "MONTH": "Mes"
+  },
   "views": {
-    "ALL": "Todas",
-    "INCIDENTS": "Solo con incidencias",
-    "ON_SITE": "Solo en sitio",
-    "WITHOUT_RECORDS": "Solo sin registros"
+    "ALL": "Todos",
+    "INCIDENTS": "Con incidencia",
+    "ON_SITE": "En sitio",
+    "WITHOUT_RECORDS": "Sin registros"
   },
   "filters": {
-    "period": "Periodo",
-    "view": "Vista",
     "date": "Fecha",
     "previous": "Periodo anterior",
     "next": "Periodo siguiente",
     "department": "Departamento",
     "allDepartments": "Todos los departamentos",
     "employee": "Buscar empleado",
-    "employeePlaceholder": "Nombre o número de empleado...",
-    "includeInactive": "Incluir bajas",
-    "clear": "Limpiar filtros"
+    "employeePlaceholder": "Nombre o número de empleado",
+    "includeInactive": "Incluir bajas"
+  },
+  "tiles": {
+    "onSite": "En sitio ahora",
+    "onSiteHint": "en turno",
+    "withRecords": "Con registros",
+    "ofTotal": "de {{total}}",
+    "withoutRecords": "Sin registros",
+    "viewWho": "Ver quiénes",
+    "allRecorded": "Todos registraron",
+    "hours": "Horas totales",
+    "hoursHint": "del periodo",
+    "incidents": "Incidencias",
+    "allClear": "Todo en orden"
+  },
+  "counts": {
+    "late_one": "{{count}} retardo",
+    "late_other": "{{count}} retardos",
+    "absences_one": "{{count}} falta",
+    "absences_other": "{{count}} faltas",
+    "withoutExit_one": "{{count}} sin salida",
+    "withoutExit_other": "{{count}} sin salida",
+    "withoutEntry_one": "{{count}} sin entrada",
+    "withoutEntry_other": "{{count}} sin entrada"
   },
   "kpis": {
     "withRecords": "Personas con registros",
     "withoutRecords": "Personas sin registros",
     "inside": "Personas en sitio",
     "workedHours": "Horas totales",
-    "lateDays": "Retardos",
-    "absences": "Faltas",
     "incidents": "Incidencias"
   },
   "dayStatus": {
@@ -43,17 +72,32 @@
     "PENDING": "Pendiente",
     "NO_INFO": "Sin horario"
   },
-  "dayStatusShort": {
-    "LATE": "Retardo",
-    "ABSENCE": "Falta",
-    "REST": "Descanso",
-    "NO_INFO": "Sin horario"
+  "legend": {
+    "neutral": "Pendiente / descanso"
   },
-  "peopleCount": "{{count}} personas",
+  "focus": {
+    "entry": "Entrada",
+    "exit": "Salida",
+    "entryToday": "Entrada hoy",
+    "exitToday": "Salida hoy"
+  },
+  "state": {
+    "withoutExit": "Sin salida",
+    "withoutEntry": "Sin entrada",
+    "late": "Retardo {{minutes}} min",
+    "onSite": "En sitio",
+    "closed": "Turno cerrado",
+    "absence": "Falta",
+    "rest": "Descanso",
+    "pending": "Pendiente",
+    "noInfo": "Sin registro",
+    "noIncidents": "Sin incidencias",
+    "noRecords": "Sin registros"
+  },
+  "table": {
+    "title": "Empleados · {{count}}"
+  },
   "status": {
-    "noRecords": "Sin registros",
-    "hasRecords": "Con registros",
-    "inside": "En sitio",
     "inactive": "Baja"
   },
   "columns": {
@@ -64,14 +108,8 @@
     "entry": "Primera entrada",
     "exit": "Última salida",
     "hours": "Horas",
-    "sessions": "Sesiones",
-    "days": "Días con registro",
-    "incidents": "Incidencias",
-    "actions": "",
     "date": "Fecha",
-    "incident": "Incidencia",
-    "lateDays": "Retardos",
-    "absences": "Faltas"
+    "incident": "Incidencia"
   },
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entrada sin salida",
@@ -82,62 +120,17 @@
   "noDepartment": "Sin departamento",
   "unlinked": "Sin vincular",
   "actions": {
-    "viewDetail": "Ver detalle",
-    "export": "Descargar PDF",
-    "exporting": "Generando…",
     "exportPdf": "PDF",
-    "exportCsv": "CSV"
-  },
-  "detail": {
-    "title": "Detalle por día",
-    "date": "Fecha",
-    "entry": "Entrada",
-    "exit": "Salida",
-    "hours": "Horas",
-    "sessions": "Sesiones",
-    "incidents": "Incidencias",
-    "crossesMidnight": "Turno nocturno",
-    "crossesMidnightBadge": "Cruza medianoche",
-    "noDays": "Sin registros en el periodo."
+    "exportCsv": "Exportar CSV"
   },
   "errors": {
     "load": "No se pudo generar el reporte"
   },
   "pdf": {
     "title": "Reporte de Entradas y Salidas",
-    "rangeTitle": "Periodo del reporte",
     "timezone": "Zona horaria",
     "totalPeople": "Personas",
     "totalHours": "Horas",
     "totalIncidents": "Incidencias"
-  },
-  "presets": {
-    "title": "Accesos rápidos",
-    "today": "Hoy",
-    "yesterday": "Ayer",
-    "week": "Esta semana",
-    "month": "Este mes"
-  },
-  "toolbar": {
-    "title": "Filtros del reporte"
-  },
-  "help": {
-    "title": "¿Cómo leer este reporte?",
-    "intro": "Cada fila es una persona y cada columna un día del periodo. El día se califica contra el horario asignado: asistió, retardo, falta, descanso (día no laborable) o sin horario. La primera hora es la entrada y la última la salida.",
-    "entry": "Hora de la primera entrada del día.",
-    "exit": "Hora de la última salida del día (— si aún no ha salido).",
-    "hours": "Tiempo trabajado en el periodo (incluye lo que lleva una entrada abierta).",
-    "sessions": "Cuántas entradas/salidas se emparejaron en el periodo (una por cada visita).",
-    "days": "Días del periodo con al menos un registro.",
-    "incidents": "Días sin salida registrada o con salida sin entrada.",
-    "lateDays": "Días en que la primera entrada superó la tolerancia de su horario.",
-    "absences": "Días laborables sin ningún registro.",
-    "schedule": "Departamento al que pertenece la persona.",
-    "views": "Filtra la tabla: todas, solo con incidencias, solo quienes están en sitio, o solo sin registros.",
-    "status": "El estado resume la actividad de la persona en el periodo:",
-    "statusHasRecords": "Con registros: tuvo al menos una entrada o salida.",
-    "statusInside": "En sitio: entró y todavía no registra salida.",
-    "statusNoRecords": "Sin registros: no tuvo actividad en el periodo.",
-    "multiple": "Una persona puede registrar varias entradas y salidas en un día; la celda muestra la primera y la última."
   }
 }

@@ -1,33 +1,29 @@
 import { useMemo } from "react";
 import {
-  ITAccordion,
   ITAlert,
   ITBadget,
   ITButton,
+  ITCard,
   ITCheckbox,
+  ITChip,
   ITDataTable,
   ITDatePicker,
   ITFlex,
-  ITGrid,
   ITInput,
+  ITProgress,
   ITSearchSelect,
+  ITSegmentedControl,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
 import {
-  FaCalendarAlt,
   FaCheckCircle,
   FaChevronLeft,
   FaChevronRight,
   FaClock,
   FaDoorOpen,
   FaExclamationTriangle,
-  FaFileCsv,
-  FaFilePdf,
-  FaInfoCircle,
   FaRegCircle,
-  FaUndo,
-  FaUserSlash,
 } from "react-icons/fa";
 import {
   type AccessReportPeriod,
@@ -36,149 +32,77 @@ import {
   type PeopleAttendanceRow,
   type PeopleAttendanceView,
 } from "@entities/access";
-import { KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
+import { punchTime, workedTime } from "@entities/schedule";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
-import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { dyn } from "@shared/i18n/dyn";
 import { dateLocale } from "@shared/i18n";
 import type { UseAccessReport } from "../model/useAccessReport";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
-/** Estado del día contra el horario → color de la etiqueta. */
-const DAY_STATUS_COLOR: Record<AttendanceDayStatus, BadgeColor> = {
-  ATTENDED: "success",
-  LATE: "warning",
-  ABSENCE: "danger",
-  REST: "gray",
-  PENDING: "gray",
-  NO_INFO: "gray",
+const PERIODS: AccessReportPeriod[] = ["DAY", "WEEK", "FORTNIGHT", "MONTH"];
+const VIEWS: PeopleAttendanceView[] = ["ALL", "INCIDENTS", "ON_SITE", "WITHOUT_RECORDS"];
+
+/** Zona del navegador mientras llega la del servidor en `summary.range`. */
+const BROWSER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+/** Ancho de la columna de días según el periodo. */
+const DAYS_COLUMN_WIDTH: Record<"WEEK" | "FORTNIGHT" | "MONTH", number> = {
+  WEEK: 210,
+  FORTNIGHT: 250,
+  MONTH: 380,
 };
 
-/** Estados que ocupan una celda con etiqueta (sin horario que mostrar). */
-const DAY_STATUS_ORDER: AttendanceDayStatus[] = [
-  "ATTENDED",
-  "LATE",
-  "ABSENCE",
-  "REST",
-  "PENDING",
-  "NO_INFO",
-];
-
-/** Día local `YYYY-MM-DD` sin conversión de zona (es una clave, no un instante). */
-const toDayKey = (date: Date): string => {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+/** Color del marcador de cada día (hex exactos: el tema redefine las paletas de Tailwind). */
+const DAY_STYLE: Record<AttendanceDayStatus, string> = {
+  ATTENDED: "!bg-[#0D5777] text-white",
+  LATE: "!bg-[#f97316] text-white",
+  ABSENCE: "border-[1.5px] border-dashed border-slate-400 !bg-white text-slate-500",
+  REST: "!bg-slate-100 text-slate-400",
+  PENDING: "!bg-slate-100 text-slate-400",
+  NO_INFO: "!bg-slate-100 text-slate-400",
 };
 
-/** `YYYY-MM-DD` → `dd/mm/yyyy` (clave de día, sin corrimiento de zona). */
-const formatDayKey = (dayKey: string): string => {
-  const [y, m, d] = dayKey.split("-");
-  return d && m && y ? `${d}/${m}/${y}` : dayKey;
+/** Anillo del día de hoy. */
+const TODAY_RING = "ring-2 ring-[#0D5777]/30 ring-offset-1";
+
+/** Iniciales para el avatar: primera letra de la primera y de la última palabra. */
+const initialsOf = (name: string): string => {
+  const words = name.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  const first = words[0].charAt(0);
+  return words.length === 1 ? first : first + words[words.length - 1].charAt(0);
 };
+
+/** Fecha de una clave de día (`YYYY-MM-DD`) con las opciones dadas, sin corrimiento de zona. */
+const formatDay = (dayKey: string, options: Intl.DateTimeFormatOptions): string =>
+  new Date(`${dayKey}T12:00:00Z`).toLocaleDateString(dateLocale(), { ...options, timeZone: "UTC" });
 
 export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
-  const {
-    t,
-    period,
-    changePeriod,
-    date,
-    setDate,
-    periodRange,
-    previousPeriod,
-    nextPeriod,
-    departmentId,
-    setDepartmentId,
-    departments,
-    search,
-    setSearch,
-    includeInactive,
-    setIncludeInactive,
-    view,
-    setView,
-    summary,
-    total,
-    exporting,
-    error,
-    setError,
-    externalFilters,
-    tableKey,
-    fetchTableData,
-    handleDownloadPdf,
-    handleDownloadCsv,
-  } = fx;
+  const { t, period, summary, view, setView } = fx;
+  const tt = dyn(t);
 
-  /** Zona horaria resuelta por el servidor en `summary.range`; local antes del 1er fetch. */
-  const tz = summary?.range.timezone;
+  const days = summary?.range.days ?? [];
+  const today = summary?.range.today;
+  const tz = summary?.range.timezone || BROWSER_TIMEZONE;
+  const multiDay = period !== "DAY";
+  // Día "foco": el de hoy dentro del periodo (o el único día en la vista diaria).
+  const focusIndex = !summary ? -1 : period === "DAY" ? 0 : days.indexOf(today ?? "");
+  const focusIsToday = focusIndex >= 0 && days[focusIndex] === today;
 
-  const timeOf = (iso: string): string => formatTimeInTZ(iso, tz);
-
-  /** Días del periodo: los del servidor; antes del primer fetch, los del rango local. */
-  const localDays = useMemo(() => {
-    const [start, end] = periodRange;
-    const day = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-    const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-    const days: string[] = [];
-    while (day <= last) {
-      days.push(toDayKey(day));
-      day.setDate(day.getDate() + 1);
-    }
-    return days;
-  }, [periodRange]);
-
-  const rangeDays = summary?.range.days?.length ? summary.range.days : localDays;
-
-  /** Encabezado de la columna de un día: "Mié 23" o la fecha completa en DÍA. */
-  const dayTitle = (dayKey: string): string => {
-    if (period === "DAY") return formatDayKey(dayKey);
-    const label = new Date(`${dayKey}T12:00:00Z`).toLocaleDateString(dateLocale(), {
-      weekday: "short",
-      day: "numeric",
-      timeZone: "UTC",
-    });
-    return label.charAt(0).toUpperCase() + label.slice(1);
-  };
-
-  /** Rango [inicio, fin] del periodo que contiene `date`, para la barra superior. */
-  const rangeLabel = useMemo(() => {
-    const format = (d: Date, opts: Intl.DateTimeFormatOptions) => d.toLocaleDateString(dateLocale(), opts);
-    if (period === "WEEK" || period === "FORTNIGHT") {
-      const [s, en] = periodRange;
-      return `${dyn(t)(`periods.${period}`)} · ${format(s, { day: "2-digit", month: "short" })} — ${format(en, { day: "2-digit", month: "short" })}`;
-    }
-    if (period === "MONTH") {
-      return format(date, { month: "long", year: "numeric" });
-    }
-    return format(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  }, [period, date, periodRange, t]);
+  const periodOptions = useMemo(
+    () => PERIODS.map((value) => ({ value, label: dyn(t)(`periodTabs.${value}`) })),
+    [t]
+  );
 
   const departmentOptions = useMemo(
     () => [
       { value: "", label: t("filters.allDepartments") },
-      ...departments.data.map((d) => ({ value: d.id, label: d.name })),
+      ...fx.departments.data.map((d) => ({ value: d.id, label: d.name })),
     ],
-    [departments, t]
-  );
-
-  const periodOptions = useMemo(
-    () => [
-      { value: "DAY", label: t("periods.DAY") },
-      { value: "WEEK", label: t("periods.WEEK") },
-      { value: "FORTNIGHT", label: t("periods.FORTNIGHT") },
-      { value: "MONTH", label: t("periods.MONTH") },
-    ],
-    [t]
-  );
-
-  const viewOptions = useMemo(
-    () =>
-      (["ALL", "INCIDENTS", "ON_SITE", "WITHOUT_RECORDS"] as PeopleAttendanceView[]).map((value) => ({
-        value,
-        label: t(`views.${value}`),
-      })),
-    [t]
+    [fx.departments, t]
   );
 
   const handleDate = (
@@ -187,7 +111,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       | { target: { name: string; value: Date | [Date | null, Date | null] } }
   ) => {
     const value = e.target.value;
-    if (value instanceof Date) setDate(value);
+    if (value instanceof Date) fx.setDate(value);
   };
 
   const handleRange = (
@@ -196,48 +120,93 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       | { target: { name: string; value: Date | [Date | null, Date | null] } }
   ) => {
     const value = e.target.value;
-    if (Array.isArray(value) && value[0]) setDate(value[0]);
+    if (Array.isArray(value) && value[0]) fx.setDate(value[0]);
   };
 
-  const clearFilters = () => {
-    changePeriod("WEEK");
-    setDate(new Date());
-    setDepartmentId("");
-    setSearch("");
-    setIncludeInactive(false);
-    setView("ALL");
+  /** Texto flotante de un día: "mié 07 oct · Asistió · 07:58–16:10 · 8:12". */
+  const dayTooltip = (day: PeopleAttendanceDay): string => {
+    const parts = [
+      formatDay(day.date, { weekday: "short", day: "2-digit", month: "short" }).replace(/[.,]/g, ""),
+      tt(`dayStatus.${day.status}`),
+    ];
+    if (day.entryAt) {
+      parts.push(`${punchTime(day.entryAt, day.date, tz)}–${punchTime(day.exitAt, day.date, tz)}`);
+    }
+    if (day.workedMinutes > 0) parts.push(workedTime(day.workedMinutes));
+    return parts.join(" · ");
   };
 
-  /** Celda de un día: horario entrada–salida, retardo, en sitio o la etiqueta del estado. */
-  const renderDay = (day: PeopleAttendanceDay | undefined) => {
-    if (!day || day.status === "PENDING") {
-      return <ITText className="text-[11px] text-slate-300">—</ITText>;
+  /** Una marca por día del periodo: letra en semana, barra delgada en quincena y mes. */
+  const renderDays = (r: PeopleAttendanceRow) => (
+    <div className={`flex items-center ${period === "WEEK" ? "gap-1" : "gap-0.5"}`}>
+      {r.days.map((day) => (
+        <span
+          key={day.date}
+          title={dayTooltip(day)}
+          className={`inline-flex shrink-0 items-center justify-center ${
+            period === "WEEK" ? "h-6 w-6 rounded-md text-[10px] font-bold" : "h-5 w-2 rounded-sm"
+          } ${DAY_STYLE[day.status]} ${day.date === today ? TODAY_RING : ""}`}
+        >
+          {period === "WEEK"
+            ? formatDay(day.date, { weekday: "narrow" }).toUpperCase()
+            : null}
+        </span>
+      ))}
+    </div>
+  );
+
+  const renderPunch = (iso: string | null | undefined, day: PeopleAttendanceDay | undefined) =>
+    iso && day ? (
+      <ITText className="text-[12px] font-semibold tabular-nums text-slate-700">
+        {punchTime(iso, day.date, tz)}
+      </ITText>
+    ) : (
+      <ITText className="text-[12px] text-slate-300">—</ITText>
+    );
+
+  /** Estado del día foco, la primera condición que aplique. */
+  const focusState = (r: PeopleAttendanceRow, d: PeopleAttendanceDay): { color: BadgeColor; text: string } => {
+    if (d.incident === "ENTRY_WITHOUT_EXIT") return { color: "warning", text: t("state.withoutExit") };
+    if (d.incident === "EXIT_WITHOUT_ENTRY") return { color: "danger", text: t("state.withoutEntry") };
+    if (d.status === "LATE") return { color: "warning", text: t("state.late", { minutes: d.lateMinutes }) };
+    if (r.onSite) return { color: "success", text: t("state.onSite") };
+    switch (d.status) {
+      case "ATTENDED":
+        return { color: "gray", text: t("state.closed") };
+      case "ABSENCE":
+        return { color: "danger", text: t("state.absence") };
+      case "REST":
+        return { color: "gray", text: t("state.rest") };
+      case "PENDING":
+        return { color: "gray", text: t("state.pending") };
+      default:
+        return { color: "gray", text: t("state.noInfo") };
     }
-    if (day.status === "REST" || day.status === "NO_INFO" || day.status === "ABSENCE") {
-      return (
-        <ITBadget color={DAY_STATUS_COLOR[day.status]} size="sm">
-          {t(`dayStatusShort.${day.status}`)}
-        </ITBadget>
-      );
-    }
+  };
+
+  /** Sin día foco (periodos pasados): un badge por cada contador con incidencias. */
+  const counterStates = (r: PeopleAttendanceRow): Array<{ color: BadgeColor; text: string }> => {
+    const list: Array<{ color: BadgeColor; text: string }> = [];
+    if (r.absences > 0) list.push({ color: "danger", text: t("counts.absences", { count: r.absences }) });
+    if (r.lateDays > 0) list.push({ color: "warning", text: t("counts.late", { count: r.lateDays }) });
+    if (r.withoutExit > 0) list.push({ color: "warning", text: t("counts.withoutExit", { count: r.withoutExit }) });
+    if (r.withoutEntry > 0) list.push({ color: "danger", text: t("counts.withoutEntry", { count: r.withoutEntry }) });
+    if (list.length > 0) return list;
+    return r.hasRecords
+      ? [{ color: "success", text: t("state.noIncidents") }]
+      : [{ color: "gray", text: t("state.noRecords") }];
+  };
+
+  const renderState = (r: PeopleAttendanceRow) => {
+    const focusDay = focusIndex >= 0 ? r.days[focusIndex] : undefined;
+    const badges = focusDay ? [focusState(r, focusDay)] : counterStates(r);
     return (
-      <ITFlex direction="column" gap={0}>
-        <ITText className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
-          {day.entryAt ? timeOf(day.entryAt) : "?"} - {day.onSite || !day.exitAt ? "?" : timeOf(day.exitAt)}
-        </ITText>
-        {day.onSite ? (
-          <ITText className="text-[9px] font-black uppercase tracking-wide text-sky-600">
-            {t("incidents.OPEN_ENTRY")}
-          </ITText>
-        ) : day.lateMinutes > 0 ? (
-          <ITText className="text-[9px] font-black uppercase tracking-wide text-amber-600">
-            +{day.lateMinutes} min
-          </ITText>
-        ) : day.incident ? (
-          <ITText className="text-[9px] font-black uppercase tracking-wide text-amber-600">
-            {t(`incidents.${day.incident}`)}
-          </ITText>
-        ) : null}
+      <ITFlex wrap="wrap" gap={1}>
+        {badges.map((b) => (
+          <ITBadget key={b.text} color={b.color} size="sm">
+            {b.text}
+          </ITBadget>
+        ))}
       </ITFlex>
     );
   };
@@ -247,246 +216,121 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "employeeName",
       label: t("columns.employee"),
       type: "string",
-      width: 220,
-      sortable: true,
-      render: (r) => (
-        <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[12px] font-black text-slate-800">{r.employeeName}</ITText>
-          <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            {r.employeeNumber ? `#${r.employeeNumber}` : "—"}
-            {!r.active && ` · ${t("status.inactive")}`}
-            {!r.linked && ` · ${t("unlinked")}`}
-          </ITText>
-        </ITFlex>
-      ),
-    },
-    {
-      key: "departmentName",
-      label: t("columns.department"),
-      type: "string",
-      width: 160,
+      width: 280,
       sortable: false,
-      render: (r) =>
-        r.departmentName ? (
-          <ITText className="text-[11px] font-bold text-slate-600">{r.departmentName}</ITText>
-        ) : (
-          <ITBadget color="gray" size="sm">
-            {t("noDepartment")}
-          </ITBadget>
-        ),
+      render: (r) => {
+        const subtitle = [
+          r.employeeNumber ? `#${r.employeeNumber}` : null,
+          r.departmentName ?? t("noDepartment"),
+          r.jobTitle,
+          !r.active ? t("status.inactive") : null,
+          !r.linked ? t("unlinked") : null,
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        return (
+          <ITFlex align="center" gap={3}>
+            <ProfileAvatar
+              initials={initialsOf(r.employeeName)}
+              size="md"
+              className="!bg-slate-100 !text-slate-600"
+            />
+            <div className="min-w-0">
+              <ITText className="truncate text-[13px] font-bold text-slate-800">{r.employeeName}</ITText>
+              <ITText className="truncate text-[11px] text-slate-500">{subtitle}</ITText>
+            </div>
+          </ITFlex>
+        );
+      },
     },
-    {
-      key: "jobTitle",
-      label: t("columns.jobTitle"),
-      type: "string",
-      width: 150,
-      sortable: false,
-      render: (r) => (
-        <ITText className="text-[11px] font-bold text-slate-700">{r.jobTitle ?? "—"}</ITText>
-      ),
-    },
-    // Una columna por día del periodo: el día calificado contra su horario.
-    ...rangeDays.map((dayKey, i) => ({
-      key: `day:${dayKey}`,
-      label: dayTitle(dayKey),
-      type: "string" as const,
-      width: 100,
-      sortable: false,
-      render: (r: PeopleAttendanceRow) => renderDay(r.days[i]),
-    })),
+    ...(multiDay
+      ? [
+          {
+            key: "days",
+            label: dyn(t)(`dayColumn.${period}`),
+            type: "string" as const,
+            width: DAYS_COLUMN_WIDTH[period as "WEEK" | "FORTNIGHT" | "MONTH"],
+            sortable: false,
+            render: renderDays,
+          },
+        ]
+      : []),
+    ...(focusIndex >= 0
+      ? [
+          {
+            key: "focusEntry",
+            label: focusIsToday ? t("focus.entryToday") : t("focus.entry"),
+            type: "string" as const,
+            width: 110,
+            sortable: false,
+            render: (r: PeopleAttendanceRow) => renderPunch(r.days[focusIndex]?.entryAt, r.days[focusIndex]),
+          },
+          {
+            key: "focusExit",
+            label: focusIsToday ? t("focus.exitToday") : t("focus.exit"),
+            type: "string" as const,
+            width: 110,
+            sortable: false,
+            render: (r: PeopleAttendanceRow) => renderPunch(r.days[focusIndex]?.exitAt, r.days[focusIndex]),
+          },
+        ]
+      : []),
     {
       key: "workedMinutes",
       label: t("columns.hours"),
       type: "number",
       width: 90,
-      sortable: true,
-      align: "right" as const,
+      sortable: false,
       render: (r) => (
-        <ITText className="text-[12px] font-black text-emerald-700">
-          {r.workedMinutes > 0 ? formatMinutesAsHhMm(r.workedMinutes) : "—"}
+        <ITText className="text-[12px] font-bold tabular-nums text-slate-700">
+          {r.workedMinutes > 0 ? workedTime(r.workedMinutes) : "—"}
         </ITText>
       ),
     },
     {
-      key: "lateDays",
-      label: t("columns.lateDays"),
-      type: "number",
-      width: 90,
-      sortable: false,
-      align: "right" as const,
-      render: (r) =>
-        r.lateDays > 0 ? (
-          <ITText className="text-[12px] font-black text-amber-600">{r.lateDays}</ITText>
-        ) : (
-          <ITText className="text-[12px] font-bold text-slate-300">0</ITText>
-        ),
-    },
-    {
-      key: "absences",
-      label: t("columns.absences"),
-      type: "number",
-      width: 80,
-      sortable: false,
-      align: "right" as const,
-      render: (r) =>
-        r.absences > 0 ? (
-          <ITText className="text-[12px] font-black text-rose-600">{r.absences}</ITText>
-        ) : (
-          <ITText className="text-[12px] font-bold text-slate-300">0</ITText>
-        ),
-    },
-    {
-      key: "incidents",
-      label: t("columns.incidents"),
+      key: "state",
+      label: t("columns.status"),
       type: "string",
-      width: 170,
+      width: 200,
       sortable: false,
-      render: (r) =>
-        r.withoutExit + r.withoutEntry > 0 ? (
-          <ITFlex direction="column" gap={0.5}>
-            {r.withoutExit > 0 && (
-              <ITBadget color="warning" size="sm">
-                {t("incidents.ENTRY_WITHOUT_EXIT")}: {r.withoutExit}
-              </ITBadget>
-            )}
-            {r.withoutEntry > 0 && (
-              <ITBadget color="danger" size="sm">
-                {t("incidents.EXIT_WITHOUT_ENTRY")}: {r.withoutEntry}
-              </ITBadget>
-            )}
-          </ITFlex>
-        ) : (
-          <ITText className="text-[11px] text-slate-400">—</ITText>
-        ),
+      render: renderState,
     },
   ];
 
-  const kpis: Array<{ key: string; value: number | string; tone: KpiTone; icon: React.ReactNode }> = [
-    { key: "withRecords", value: summary?.withRecords ?? 0, tone: "emerald", icon: <FaCheckCircle size={16} /> },
-    { key: "withoutRecords", value: summary?.withoutRecords ?? 0, tone: "neutral", icon: <FaRegCircle size={16} /> },
-    { key: "inside", value: summary?.onSite ?? 0, tone: "sky", icon: <FaDoorOpen size={16} /> },
-    { key: "workedHours", value: formatMinutesAsHhMm(summary?.workedMinutes ?? 0), tone: "neutral", icon: <FaClock size={16} /> },
-    { key: "lateDays", value: summary?.lateDays ?? 0, tone: "amber", icon: <FaExclamationTriangle size={16} /> },
-    { key: "absences", value: summary?.absences ?? 0, tone: "rose", icon: <FaUserSlash size={16} /> },
-  ];
+  // Indicadores del periodo (sobre todas las personas del filtro, no solo la página).
+  const people = summary?.people ?? 0;
+  const withRecords = summary?.withRecords ?? 0;
+  const withoutRecords = summary?.withoutRecords ?? 0;
+  const workedMinutes = summary?.workedMinutes ?? 0;
+  const recordsPercent = people > 0 ? Math.round((withRecords * 100) / people) : 0;
+  const hoursValue = `${Math.floor(workedMinutes / 60).toLocaleString(dateLocale())}:${String(
+    workedMinutes % 60
+  ).padStart(2, "0")}`;
+
+  const incidentParts: string[] = [];
+  const lateDays = summary?.lateDays ?? 0;
+  const absences = summary?.absences ?? 0;
+  const withoutExit = summary?.withoutExit ?? 0;
+  const withoutEntry = summary?.withoutEntry ?? 0;
+  if (lateDays > 0) incidentParts.push(t("counts.late", { count: lateDays }));
+  if (absences > 0) incidentParts.push(t("counts.absences", { count: absences }));
+  if (withoutExit > 0) incidentParts.push(t("counts.withoutExit", { count: withoutExit }));
+  if (withoutEntry > 0) incidentParts.push(t("counts.withoutEntry", { count: withoutEntry }));
+  const incidentsTotal = lateDays + absences + withoutExit + withoutEntry;
 
   return (
     <ITFlex direction="column" gap={4}>
-      {/* Rango + exportar */}
-      <ITFlex
-        align="center"
-        wrap="wrap"
-        gap={3}
-        className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-      >
-        <ITFlex
-          align="center"
-          justify="center"
-          className="h-10 w-10 shrink-0 rounded-xl bg-[#0D5777]/10 text-[#0D5777]"
-        >
-          <FaCalendarAlt size={15} />
-        </ITFlex>
-        <ITFlex direction="column" gap={0} className="min-w-0">
-          <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            {dyn(t)(`periods.${period}`)}
-          </ITText>
-          <ITText className="truncate text-base font-black text-slate-800">{rangeLabel}</ITText>
-          <ITText className="text-[10px] font-bold text-slate-400">
-            {t("peopleCount", { count: total })}
-            {tz ? ` · ${tz}` : ""}
-          </ITText>
-        </ITFlex>
-        <ITFlex gap={2} wrap="wrap" className="ml-auto">
-          <ITButton variant="outlined" color="gray" onClick={handleDownloadPdf} disabled={exporting}>
-            <ITFlex align="center" gap={1}>
-              <FaFilePdf className="text-red-600" size={13} />
-              <ITText className="font-bold text-[11px]">{t("actions.exportPdf")}</ITText>
-            </ITFlex>
-          </ITButton>
-          <ITButton variant="filled" color="primary" onClick={handleDownloadCsv} disabled={exporting}>
-            <ITFlex align="center" gap={1}>
-              <FaFileCsv size={13} />
-              <ITText className="font-bold text-[11px]">{t("actions.exportCsv")}</ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
-      </ITFlex>
-
-      {/* KPIs */}
-      <ITFlex wrap="wrap" gap={3}>
-        {kpis.map((k) => (
-          <div key={k.key} className="min-w-[170px] flex-1">
-            <KpiTile
-              label={dyn(t)(`kpis.${k.key}`)}
-              value={k.value}
-              tone={k.tone}
-              icon={k.icon}
-            />
-          </div>
-        ))}
-      </ITFlex>
-
       {/* Filtros */}
-      <PanelCard
-        title={t("toolbar.title")}
-        actions={
-          <ITButton variant="text" color="gray" size="sm" onClick={clearFilters}>
-            <ITFlex align="center" gap={1}>
-              <FaUndo size={11} />
-              <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
-            </ITFlex>
-          </ITButton>
-        }
-      >
-        <ITGrid container columns={12} spacing={4}>
-          <ITGrid item xs={12} md={6} lg={3}>
-            <ITSearchSelect
-              name="accessReportPeriod"
-              label={t("filters.period")}
+      <ITCard className="!p-5 border border-slate-200">
+        <ITFlex direction="column" gap={4}>
+          <ITFlex align="end" wrap="wrap" gap={3}>
+            <ITSegmentedControl
               options={periodOptions}
               value={period}
-              onChange={(value) => changePeriod(String(value) as AccessReportPeriod)}
-              className="w-full min-w-0"
+              onChange={(value) => fx.changePeriod(value as AccessReportPeriod)}
             />
-          </ITGrid>
-          <ITGrid item xs={12} md={6} lg={3}>
-            <ITSearchSelect
-              name="accessReportView"
-              label={t("filters.view")}
-              options={viewOptions}
-              value={view}
-              onChange={(value) => setView(String(value) as PeopleAttendanceView)}
-              className="w-full min-w-0"
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={6} lg={3}>
-            <ITSearchSelect
-              name="accessReportDepartment"
-              label={t("filters.department")}
-              options={departmentOptions}
-              value={departmentId}
-              onChange={(value) => setDepartmentId(String(value))}
-              className="w-full min-w-0"
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={6} lg={3}>
-            <ITInput
-              name="accessReportEmployee"
-              label={t("filters.employee")}
-              placeholder={t("filters.employeePlaceholder")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full min-w-0"
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={6} lg={4}>
-            <ITFlex align="end" gap={2} className="h-full">
-              <ITButton
-                variant="outlined"
-                color="gray"
-                onClick={previousPeriod}
-                title={t("filters.previous")}
-              >
+            <ITFlex align="end" gap={2} className="min-w-[280px] flex-1">
+              <ITButton variant="outlined" color="gray" onClick={fx.previousPeriod} title={t("filters.previous")}>
                 <FaChevronLeft size={11} />
               </ITButton>
               <div className="min-w-0 flex-1">
@@ -494,7 +338,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
                   <ITDatePicker
                     name="accessReportDate"
                     label={t("filters.date")}
-                    value={date}
+                    value={fx.date}
                     onChange={handleDate}
                     className="w-full min-w-0"
                   />
@@ -503,104 +347,148 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
                     name="accessReportDateRange"
                     label={t("filters.date")}
                     range
-                    value={periodRange}
+                    value={fx.periodRange}
                     onChange={handleRange}
                     className="w-full min-w-0"
                   />
                 )}
               </div>
-              <ITButton variant="outlined" color="gray" onClick={nextPeriod} title={t("filters.next")}>
+              <ITButton variant="outlined" color="gray" onClick={fx.nextPeriod} title={t("filters.next")}>
                 <FaChevronRight size={11} />
               </ITButton>
             </ITFlex>
-          </ITGrid>
-          <ITGrid item xs={12} md={6} lg={4}>
-            <ITFlex align="end" className="h-full pb-2">
-              <ITCheckbox
-                name="accessReportIncludeInactive"
-                label={t("filters.includeInactive")}
-                checked={includeInactive}
-                onChange={setIncludeInactive}
+            <div className="min-w-[200px] flex-1">
+              <ITSearchSelect
+                name="accessReportDepartment"
+                label={t("filters.department")}
+                options={departmentOptions}
+                value={fx.departmentId}
+                onChange={(value) => fx.setDepartmentId(String(value))}
+                className="w-full min-w-0"
               />
-            </ITFlex>
-          </ITGrid>
-        </ITGrid>
-      </PanelCard>
+            </div>
+            <div className="min-w-[220px] flex-1">
+              <ITInput
+                name="accessReportEmployee"
+                label={t("filters.employee")}
+                placeholder={t("filters.employeePlaceholder")}
+                value={fx.search}
+                onChange={(e) => fx.setSearch(e.target.value)}
+                className="w-full min-w-0"
+              />
+            </div>
+          </ITFlex>
+          <ITCheckbox
+            name="accessReportIncludeInactive"
+            label={t("filters.includeInactive")}
+            checked={fx.includeInactive}
+            onChange={fx.setIncludeInactive}
+          />
+        </ITFlex>
+      </ITCard>
 
-      {error && (
-        <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
-          {error}
+      {/* Indicadores */}
+      <div className="grid !grid-cols-1 gap-3 sm:!grid-cols-2 lg:!grid-cols-5">
+        <KpiTile
+          label={t("tiles.onSite")}
+          value={summary?.onSite ?? 0}
+          hint={t("tiles.onSiteHint")}
+          tone="emerald"
+          icon={<FaDoorOpen size={16} />}
+          onClick={() => setView("ON_SITE")}
+        />
+        <KpiTile
+          label={t("tiles.withRecords")}
+          value={
+            <>
+              {withRecords}
+              <span className="ml-1.5 !text-[12px] font-semibold text-slate-400">
+                {t("tiles.ofTotal", { total: people })}
+              </span>
+            </>
+          }
+          footer={<ITProgress value={recordsPercent} size="sm" color="info" />}
+          tone="sky"
+          icon={<FaCheckCircle size={16} />}
+        />
+        <KpiTile
+          label={t("tiles.withoutRecords")}
+          value={withoutRecords}
+          hint={withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded")}
+          tone="neutral"
+          icon={<FaRegCircle size={16} />}
+          onClick={() => setView("WITHOUT_RECORDS")}
+        />
+        <KpiTile
+          label={t("tiles.hours")}
+          value={hoursValue}
+          hint={t("tiles.hoursHint")}
+          tone="neutral"
+          icon={<FaClock size={16} />}
+        />
+        <KpiTile
+          label={t("tiles.incidents")}
+          value={incidentsTotal}
+          hint={incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear")}
+          tone={incidentsTotal > 0 ? "amber" : "neutral"}
+          icon={<FaExclamationTriangle size={16} />}
+          onClick={() => setView("INCIDENTS")}
+        />
+      </div>
+
+      {fx.error && (
+        <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
+          {fx.error}
         </ITAlert>
       )}
 
-      <ITAccordion
-        variant="bordered"
-        items={[
-          {
-            id: "help",
-            title: t("help.title"),
-            icon: <FaInfoCircle size={12} />,
-            content: (
-              <ITFlex direction="column" gap={3}>
-                <ITText className="text-[11px] text-slate-600">{t("help.intro")}</ITText>
-                <ITFlex wrap="wrap" align="center" gap={2}>
-                  {DAY_STATUS_ORDER.map((status) => (
-                    <ITBadget key={status} color={DAY_STATUS_COLOR[status]} size="sm">
-                      {t(`dayStatus.${status}`)}
-                    </ITBadget>
-                  ))}
-                </ITFlex>
-                <ITGrid container columns={12} spacing={4}>
-                  <ITGrid item xs={12} md={6}>
-                    <ITFlex direction="column" gap={2}>
-                      <HelpLine term={t("columns.entry")} desc={t("help.entry")} />
-                      <HelpLine term={t("columns.exit")} desc={t("help.exit")} />
-                      <HelpLine term={t("columns.hours")} desc={t("help.hours")} />
-                      <HelpLine term={t("columns.lateDays")} desc={t("help.lateDays")} />
-                    </ITFlex>
-                  </ITGrid>
-                  <ITGrid item xs={12} md={6}>
-                    <ITFlex direction="column" gap={2}>
-                      <HelpLine term={t("columns.absences")} desc={t("help.absences")} />
-                      <HelpLine term={t("columns.incidents")} desc={t("help.incidents")} />
-                      <HelpLine term={t("columns.department")} desc={t("help.schedule")} />
-                      <HelpLine term={t("filters.view")} desc={t("help.views")} />
-                    </ITFlex>
-                  </ITGrid>
-                </ITGrid>
-              </ITFlex>
-            ),
-          },
-        ]}
-      />
+      <PanelCard
+        title={t("table.title", { count: fx.total })}
+        actions={VIEWS.map((value) => (
+          <ITChip
+            key={value}
+            label={tt(`views.${value}`)}
+            selected={view === value}
+            onClick={() => setView(value)}
+            color="primary"
+            variant="outlined"
+            size="sm"
+          />
+        ))}
+      >
+        <ITDataTable
+          key={fx.tableKey}
+          columns={columns as unknown as Column<Record<string, unknown>>[]}
+          fetchData={
+            fx.fetchTableData as unknown as (
+              p: Parameters<typeof fx.fetchTableData>[0]
+            ) => Promise<{ data: Record<string, unknown>[]; total: number }>
+          }
+          externalFilters={fx.externalFilters}
+          defaultItemsPerPage={25}
+          itemsPerPageOptions={[25, 50, 100]}
+          layout="fixed"
+        />
 
-      <ITDataTable
-        key={tableKey}
-        columns={columns as unknown as Column<Record<string, unknown>>[]}
-        fetchData={
-          fetchTableData as unknown as (
-            p: Parameters<typeof fetchTableData>[0]
-          ) => Promise<{ data: Record<string, unknown>[]; total: number }>
-        }
-        externalFilters={externalFilters}
-        defaultItemsPerPage={50}
-        itemsPerPageOptions={[10, 25, 50, 100]}
-        debounceMs={350}
-        layout="fixed"
-        density="compact"
-        virtualized
-        virtualizedMaxHeight={480}
-        rowHeight={52}
-      />
+        {multiDay && (
+          <ITFlex wrap="wrap" align="center" gap={4} className="mt-4">
+            <LegendSwatch style={DAY_STYLE.ATTENDED} label={tt("dayStatus.ATTENDED")} />
+            <LegendSwatch style={DAY_STYLE.LATE} label={tt("dayStatus.LATE")} />
+            <LegendSwatch style={DAY_STYLE.ABSENCE} label={tt("dayStatus.ABSENCE")} />
+            <LegendSwatch style={DAY_STYLE.PENDING} label={t("legend.neutral")} />
+          </ITFlex>
+        )}
+      </PanelCard>
     </ITFlex>
   );
 }
 
-function HelpLine({ term, desc }: { term: string; desc: string }) {
+/** Muestra de la simbología, con el mismo estilo que la marca de un día. */
+function LegendSwatch({ style, label }: { style: string; label: string }) {
   return (
-    <ITFlex direction="column" gap={0.5}>
-      <ITText className="text-[11px] font-black text-slate-700">{term}</ITText>
-      <ITText className="text-[11px] text-slate-500">{desc}</ITText>
+    <ITFlex align="center" gap={1.5}>
+      <span className={`h-3.5 w-3.5 shrink-0 rounded-md ${style}`} />
+      <ITText className="text-[11px] text-slate-500">{label}</ITText>
     </ITFlex>
   );
 }

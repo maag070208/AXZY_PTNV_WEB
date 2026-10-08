@@ -1,9 +1,9 @@
-import type { APIRequestContext } from "@playwright/test";
+import type { APIRequestContext, Page } from "@playwright/test";
 import { test, expect } from "./support/fixtures";
 import { E2E, E2E_PREFIX, newRunId, route } from "./support/env";
 import { createContextApi } from "./support/api";
 import { ApiAccess, DEMO_SITE_CODE, type AccessSite } from "./support/accessApi";
-import { field, goToRoute } from "./support/pages/components";
+import { button, goToRoute } from "./support/pages/components";
 
 /**
  * Reporte de entradas/salidas por persona (`/access/report`).
@@ -48,11 +48,14 @@ const DEFAULT_PERIOD = "WEEK";
 const localToday = (): string =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
 
-/** `workedMinutes` → `hh:mm`, igual que la pantalla. */
+/** `workedMinutes` → `h:mm`, igual que la pantalla (`workedTime`: sin cero a la izquierda). */
 const formatMinutes = (minutes: number): string => {
   const total = Math.max(0, Math.round(minutes));
-  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
 };
+
+/** Caja de búsqueda por nombre o número de empleado (sin etiqueta propia en la barra). */
+const searchBox = (page: Page) => page.getByPlaceholder("Nombre o número de empleado");
 
 test.describe("Reporte de entradas/salidas", () => {
   let ctx: APIRequestContext;
@@ -120,14 +123,15 @@ test.describe("Reporte de entradas/salidas", () => {
       page.getByRole("heading", { level: 1, name: "Reporte de entradas y salidas" })
     ).toBeVisible();
 
-    // KPIs (labels exactos; no confundir con las etiquetas de la tabla).
-    await expect(page.getByText("Personas con registros", { exact: true })).toBeVisible();
-    await expect(page.getByText("Personas sin registros", { exact: true })).toBeVisible();
+    // KPIs (labels exactos; "Sin registros" también es una vista y un estado de la tabla).
+    await expect(page.getByText("En sitio ahora", { exact: true })).toBeVisible();
+    await expect(page.getByText("Con registros", { exact: true })).toBeVisible();
+    await expect(page.getByText("Sin registros", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Horas totales", { exact: true })).toBeVisible();
-    await expect(page.getByText("Retardos", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Incidencias", { exact: true })).toBeVisible();
 
     const body = page.locator("table tbody");
-    await field(page, "Buscar empleado").fill(NAME_WITH_EVENTS);
+    await searchBox(page).fill(NAME_WITH_EVENTS);
     await expect(body.getByText(NAME_WITH_EVENTS).first()).toBeVisible();
 
     // Verificación cruzada: la tabla lista PERSONAS (una fila con cada día del
@@ -142,7 +146,7 @@ test.describe("Reporte de entradas/salidas", () => {
     await expect(body.getByText(formatMinutes(row!.workedMinutes)).first()).toBeVisible();
   });
 
-  test("cambiar la granularidad (SEMANA→QUINCENA→MES) dispara la petición con el period correcto", async ({
+  test("cambiar la granularidad (QUINCENA→MES→SEMANA) dispara la petición con el period correcto", async ({
     page,
   }) => {
     await goToRoute(page, "/access/report");
@@ -156,27 +160,26 @@ test.describe("Reporte de entradas/salidas", () => {
         return body?.filters?.period === period;
       });
 
-    const pWeek = waitForPeriod("WEEK");
-    await page.locator('input[name="accessReportPeriod"]').click();
-    await page.getByText("Semanal", { exact: true }).click();
-    const reqWeek = await pWeek;
-    expect(reqWeek.postDataJSON()).toMatchObject({ filters: { period: "WEEK" } });
-
+    // La semana es el periodo por defecto: se parte de ella para que cada
+    // selección sea un cambio real (y dispare su petición).
     const pFortnight = waitForPeriod("FORTNIGHT");
-    await page.locator('input[name="accessReportPeriod"]').click();
-    await page.getByText("Quincenal", { exact: true }).click();
+    await button(page, "Quincenal").click();
     const reqFortnight = await pFortnight;
     expect(reqFortnight.postDataJSON()).toMatchObject({ filters: { period: "FORTNIGHT" } });
 
     const pMonth = waitForPeriod("MONTH");
-    await page.locator('input[name="accessReportPeriod"]').click();
-    await page.getByText("Mensual", { exact: true }).click();
+    await button(page, "Mensual").click();
     const reqMonth = await pMonth;
     expect(reqMonth.postDataJSON()).toMatchObject({ filters: { period: "MONTH" } });
 
+    const pWeek = waitForPeriod("WEEK");
+    await button(page, "Semanal").click();
+    const reqWeek = await pWeek;
+    expect(reqWeek.postDataJSON()).toMatchObject({ filters: { period: "WEEK" } });
+
     // Re-renderizó: la tabla sigue mostrando la persona sembrada.
     const body = page.locator("table tbody");
-    await field(page, "Buscar empleado").fill(NAME_WITH_EVENTS);
+    await searchBox(page).fill(NAME_WITH_EVENTS);
     await expect(body.getByText(NAME_WITH_EVENTS).first()).toBeVisible();
   });
 
@@ -184,7 +187,7 @@ test.describe("Reporte de entradas/salidas", () => {
     await goToRoute(page, "/access/report");
 
     const body = page.locator("table tbody");
-    await field(page, "Buscar empleado").fill(NAME_WITHOUT_EVENTS);
+    await searchBox(page).fill(NAME_WITHOUT_EVENTS);
     // El universo incluye a quien no tiene actividad: sale como fila sin registros.
     await expect(body.getByText(NAME_WITHOUT_EVENTS).first()).toBeVisible();
 
@@ -197,14 +200,12 @@ test.describe("Reporte de entradas/salidas", () => {
     expect(row!.hasRecords).toBe(false);
     expect(rep.summary.withoutRecords).toBe(1);
 
-    // Vista "Solo sin registros": sigue visible.
-    await page.locator('input[name="accessReportView"]').click();
-    await page.getByText("Solo sin registros", { exact: true }).click();
+    // Vista "Sin registros" (chip de la tabla; el KPI homónimo no es exacto): sigue visible.
+    await button(page, /^Sin registros$/).click();
     await expect(body.getByText(NAME_WITHOUT_EVENTS).first()).toBeVisible();
 
-    // Vista "Solo en sitio": no está en sitio, la tabla queda vacía.
-    await page.locator('input[name="accessReportView"]').click();
-    await page.getByText("Solo en sitio", { exact: true }).click();
+    // Vista "En sitio": no está en sitio, la tabla queda vacía.
+    await button(page, /^En sitio$/).click();
     await expect(body.getByText("No se encontraron resultados").first()).toBeVisible();
   });
 
@@ -239,7 +240,7 @@ test.describe("Reporte de entradas/salidas", () => {
       const data = r.postDataJSON() as { filters?: { q?: string } };
       return data?.filters?.q === NAME_WITH_EVENTS;
     });
-    await field(page, "Buscar empleado").fill(NAME_WITH_EVENTS);
+    await searchBox(page).fill(NAME_WITH_EVENTS);
     await filtered;
 
     // El export comparte los filtros vigentes de la tabla.

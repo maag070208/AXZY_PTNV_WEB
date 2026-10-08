@@ -19,7 +19,7 @@ export default function SuppliersPanel() {
       type: "string",
       width: 240,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (s) => (
         <ITFlex direction="column" gap={0}>
           <ITText className="text-[12px] font-bold text-slate-800">{s.name}</ITText>
@@ -33,7 +33,7 @@ export default function SuppliersPanel() {
       type: "string",
       width: 140,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (s) => <ITText className="font-mono text-[11px] text-slate-600">{s.rfc ?? t("suppliers.empty")}</ITText>,
     },
     {
@@ -42,7 +42,7 @@ export default function SuppliersPanel() {
       type: "string",
       width: 130,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (s) => <ITText className="text-[11px] text-slate-600">{s.city ?? t("suppliers.empty")}</ITText>,
     },
     {
@@ -51,7 +51,7 @@ export default function SuppliersPanel() {
       type: "string",
       width: 130,
       filter: true,
-      sortable: true,
+      sortable: false,
       render: (s) => <ITText className="text-[11px] text-slate-600">{s.state ?? t("suppliers.empty")}</ITText>,
     },
     {
@@ -88,7 +88,7 @@ export default function SuppliersPanel() {
       type: "catalog",
       width: 110,
       filter: "catalog",
-      sortable: true,
+      sortable: false,
       catalogOptions: {
         data: [
           { id: "true", name: t("suppliers.active") },

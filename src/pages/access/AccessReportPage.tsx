@@ -2,7 +2,7 @@ import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaDoorOpen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AccessReportTab, useAccessReport } from "@features/access/report";
+import { AccessReportExportActions, AccessReportTab, useAccessReport } from "@features/access/report";
 import { downloadAccessReportPDF } from "@widgets/reports";
 
 export default function AccessReportPage() {
@@ -22,6 +22,7 @@ export default function AccessReportPage() {
         { label: t("title") },
       ]}
       backAction={() => navigate("/access")}
+      actions={<AccessReportExportActions fx={fx} />}
     >
       <AccessReportTab fx={fx} />
     </ITPage>
