@@ -495,7 +495,7 @@
     "resolvedQuantity": "El movimiento quedó con {{n}} piezas registradas.",
     "resolvedReview": "Quedó anotado quién lo revisó. No se cambió nada más.",
     "confirmQuantityTitle": "Dejar la cantidad en lo que hay",
-    "confirmQuantityMessage": "El movimiento «{{device}}» quedará con {{n}} piezas registradas en vez de {{quantity}}. Esto CAMBIA las existencias del inventario y no se puede deshacer.",
+    "confirmQuantityMessage": "El movimiento «{{device}}» quedará con {{n}} piezas registradas en vez de {{quantity}}, y el disponible del dispositivo pasará de {{from}} a {{to}}. Esto mueve las existencias y no se puede deshacer.",
     "confirmQuantityConfirm": "Sí, corregir la cantidad",
     "whatToDo": "¿Qué quieres hacer?",
     "compareTitle": "Cómo está y cómo queda",
@@ -504,7 +504,7 @@
     "rowSays": "El movimiento dice",
     "rowRegistered": "Piezas registradas",
     "rowAvailable": "Disponible en inventario",
-    "afterPick": "Marca una opción para ver cómo queda.",
+    "afterPick": "Marca una opción para ver el «Después».",
     "diagFree": "Hay {{n}} piezas libres en el dispositivo que se le pueden ligar.",
     "diagNone": "No hay piezas libres que ligar: las que existen ya están en otro movimiento.",
     "diagExtra": "Tiene más piezas registradas que las que dice: hay que cuadrar la cantidad.",
@@ -514,6 +514,12 @@
     "drop": "baja {{n}}",
     "sayLink": "Queda con {{total}} piezas registradas (se ligan {{n}}). El inventario del dispositivo no cambia.",
     "sayQuantity": "Queda con {{n}} piezas registradas, así que el disponible del dispositivo pasa de {{from}} a {{to}}.",
-    "sayReview": "No se cambia nada: solo queda anotado que lo revisaste."
+    "sayReview": "No se cambia nada: solo queda anotado que lo revisaste.",
+    "optLinkWhy": "Las {{n}} piezas ya están en el dispositivo: solo se registran en este movimiento, no se agregan al inventario.",
+    "optQuantityWhyDown": "El movimiento declara {{quantity}} piezas y queda en {{n}}: al bajar lo declarado, el disponible del dispositivo baja de {{from}} a {{to}}.",
+    "optQuantityWhyUp": "El movimiento tiene más piezas registradas que las que declara: al dejarlo en {{n}}, el disponible del dispositivo sube de {{from}} a {{to}}.",
+    "optReviewWhy": "No toca el movimiento ni el inventario: solo queda anotado quién lo revisó.",
+    "compareHint": "«Hoy» es lo que hay registrado; «Después», cómo queda con la opción marcada.",
+    "sayQuantityNext": "Después cuenta las piezas físicas del dispositivo y registra el ajuste de entrada que las devuelva al inventario."
   }
 }

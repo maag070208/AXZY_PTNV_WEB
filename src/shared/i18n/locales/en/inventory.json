@@ -495,7 +495,7 @@
     "resolvedQuantity": "The movement now has {{n}} registered pieces.",
     "resolvedReview": "It was recorded that you reviewed it. Nothing else changed.",
     "confirmQuantityTitle": "Set the quantity to what exists",
-    "confirmQuantityMessage": "Movement “{{device}}” will keep {{n}} registered pieces instead of {{quantity}}. This CHANGES the inventory stock and cannot be undone.",
+    "confirmQuantityMessage": "Movement “{{device}}” will keep {{n}} registered pieces instead of {{quantity}}, and the device stock will go from {{from}} to {{to}}. This moves stock and cannot be undone.",
     "confirmQuantityConfirm": "Yes, fix the quantity",
     "whatToDo": "What do you want to do?",
     "compareTitle": "How it is and how it ends up",
@@ -504,7 +504,7 @@
     "rowSays": "The movement says",
     "rowRegistered": "Registered pieces",
     "rowAvailable": "Available in inventory",
-    "afterPick": "Pick an option to see how it ends up.",
+    "afterPick": "Pick an option to see the “After”.",
     "diagFree": "There are {{n}} free pieces in the device that can be linked.",
     "diagNone": "There are no free pieces to link: the existing ones are already in another movement.",
     "diagExtra": "It has more registered pieces than it claims: the quantity must be balanced.",
@@ -514,6 +514,12 @@
     "drop": "down {{n}}",
     "sayLink": "It ends with {{total}} registered pieces ({{n}} are linked). The device stock does not change.",
     "sayQuantity": "It ends with {{n}} registered pieces, so the device stock goes from {{from}} to {{to}}.",
-    "sayReview": "Nothing changes: it is only recorded that you reviewed it."
+    "sayReview": "Nothing changes: it is only recorded that you reviewed it.",
+    "optLinkWhy": "The {{n}} pieces are already in the device: they are only registered in this movement, they are not added to the inventory.",
+    "optQuantityWhyDown": "The movement claims {{quantity}} pieces and ends with {{n}}: lowering what it claims lowers the device stock from {{from}} to {{to}}.",
+    "optQuantityWhyUp": "The movement has more registered pieces than it claims: setting it to {{n}} raises the device stock from {{from}} to {{to}}.",
+    "optReviewWhy": "It touches neither the movement nor the inventory: it only records who reviewed it.",
+    "compareHint": "“Today” is what is registered; “After” is how it ends up with the selected option.",
+    "sayQuantityNext": "Then count the physical pieces of the device and register the incoming adjustment that brings them back into the inventory."
   }
 }

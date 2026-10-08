@@ -127,24 +127,37 @@ export default function InventoryMismatchesBoard() {
   /**
    * Salidas que SÍ sirven para este renglón: ligar (solo si hay piezas libres),
    * cuadrar la cantidad (solo si de verdad cambia) y darlo por revisado. Así no
-   * se ofrecen dos botones que hacen lo mismo.
+   * se ofrecen dos botones que hacen lo mismo. Cada una lleva su "por qué".
    */
-  const opciones: { mode: Mode; icono: ReactNode; titulo: string; etiqueta: string; tono: "emerald" | "amber" | "slate" }[] =
-    [];
+  const opciones: {
+    mode: Mode;
+    icono: ReactNode;
+    titulo: string;
+    detalle: string;
+    etiqueta: string;
+    tono: "emerald" | "amber" | "slate";
+  }[] = [];
   if (ligables > 0) {
     opciones.push({
       mode: "link",
       icono: <FaLink size={13} />,
       titulo: t("audit.optLink", { n: ligables }),
+      detalle: t("audit.optLinkWhy", { n: ligables }),
       etiqueta: t("audit.tagNoStock"),
       tono: "emerald",
     });
   }
   if (quedanRegistradas !== dice) {
+    // Cuadrar la cantidad mueve el kardex: sube o baja lo declarado por el
+    // renglón, así que el disponible del dispositivo se mueve en el mismo sentido.
+    const baja = (sel?.ledgerIfQuantity ?? disponible) < disponible;
     opciones.push({
       mode: "quantity",
       icono: <FaBalanceScale size={13} />,
       titulo: t("audit.optQuantity", { n: quedanRegistradas }),
+      detalle: baja
+        ? t("audit.optQuantityWhyDown", { quantity: dice, n: quedanRegistradas, from: disponible, to: sel?.ledgerIfQuantity ?? disponible })
+        : t("audit.optQuantityWhyUp", { quantity: dice, n: quedanRegistradas, from: disponible, to: sel?.ledgerIfQuantity ?? disponible }),
       etiqueta: t("audit.tagStock"),
       tono: "amber",
     });
@@ -153,6 +166,7 @@ export default function InventoryMismatchesBoard() {
     mode: "review",
     icono: <FaClipboardCheck size={13} />,
     titulo: t("audit.optReview"),
+    detalle: t("audit.optReviewWhy"),
     etiqueta: t("audit.tagNothing"),
     tono: "slate",
   });
@@ -379,26 +393,31 @@ export default function InventoryMismatchesBoard() {
                         disabled={guardando}
                         aria-pressed={activo}
                         onClick={() => setModo(o.mode)}
-                        className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                        className={`flex w-full flex-col gap-1.5 rounded-xl border px-3 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
                           activo
                             ? "border-[#0D5777] !bg-[#0D5777]/5 ring-1 ring-[#0D5777]/30"
                             : "border-slate-200 !bg-white hover:border-slate-300 hover:!bg-slate-50"
                         }`}
                       >
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tonos[o.tono].icono}`}>
-                          {o.icono}
+                        <span className="flex w-full items-center gap-3">
+                          <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tonos[o.tono].icono}`}>
+                            {o.icono}
+                          </span>
+                          <span className="!text-[12px] font-bold text-slate-800">{o.titulo}</span>
+                          <span
+                            className={`ml-auto shrink-0 rounded-full px-2 py-0.5 !text-[9px] font-bold uppercase ${tonos[o.tono].tag}`}
+                          >
+                            {o.etiqueta}
+                          </span>
+                          <span
+                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                              activo ? "border-[#0D5777] bg-[#0D5777]" : "border-slate-300 bg-white"
+                            }`}
+                          >
+                            {activo && <FaCheckCircle className="text-white" size={9} />}
+                          </span>
                         </span>
-                        <span className="!text-[12px] font-bold text-slate-800">{o.titulo}</span>
-                        <span className={`ml-auto shrink-0 rounded-full px-2 py-0.5 !text-[9px] font-bold uppercase ${tonos[o.tono].tag}`}>
-                          {o.etiqueta}
-                        </span>
-                        <span
-                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                            activo ? "border-[#0D5777] bg-[#0D5777]" : "border-slate-300 bg-white"
-                          }`}
-                        >
-                          {activo && <FaCheckCircle className="text-white" size={9} />}
-                        </span>
+                        <span className="!text-[11px] leading-snug text-slate-500 pl-11">{o.detalle}</span>
                       </button>
                     );
                   })}
@@ -408,38 +427,46 @@ export default function InventoryMismatchesBoard() {
                 </ITFlex>
 
                 {/* Una sola comparación: cómo está hoy y cómo queda. */}
-                <ITFlex direction="column" gap={0} className="overflow-hidden rounded-xl border border-slate-200">
-                  <div className="flex items-center bg-slate-50 px-3 py-2">
-                    <span className="min-w-0 flex-1 !text-[11px] font-bold uppercase tracking-wide text-slate-500">
-                      {t("audit.compareTitle")}
-                    </span>
-                    <span className="w-14 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
-                      {t("audit.colToday")}
-                    </span>
-                    <span className="w-28 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
-                      {t("audit.colAfter")}
-                    </span>
-                  </div>
-                  <Comparacion label={t("audit.rowSays")} hoy={dice} luego={despues?.dice} />
-                  <Comparacion label={t("audit.rowRegistered")} hoy={registradas} luego={despues?.registradas} />
-                  <Comparacion label={t("audit.rowAvailable")} hoy={disponible} luego={despues?.disponible} />
+                <ITFlex direction="column" gap={2}>
+                  <ITFlex direction="column" gap={0} className="overflow-hidden rounded-xl border border-slate-200">
+                    <div className="flex items-center bg-slate-50 px-3 py-2">
+                      <span className="min-w-0 flex-1 !text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                        {t("audit.compareTitle")}
+                      </span>
+                      <span className="w-14 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                        {t("audit.colToday")}
+                      </span>
+                      <span className="w-28 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                        {t("audit.colAfter")}
+                      </span>
+                    </div>
+                    <Comparacion label={t("audit.rowSays")} hoy={dice} luego={despues?.dice} />
+                    <Comparacion label={t("audit.rowRegistered")} hoy={registradas} luego={despues?.registradas} />
+                    <Comparacion label={t("audit.rowAvailable")} hoy={disponible} luego={despues?.disponible} />
+                  </ITFlex>
+                  <ITText className="!text-[10px] text-slate-400">{t("audit.compareHint")}</ITText>
                 </ITFlex>
 
-                {/* Qué pasa con la salida marcada, en una frase. */}
+                {/* Qué pasa con la salida marcada, en una frase, y qué sigue. */}
                 {resultado ? (
                   <ITFlex
-                    align="center"
-                    gap={2}
+                    direction="column"
+                    gap={1}
                     className={`rounded-xl border px-3 py-2 ${
                       modo === "quantity" ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-slate-50"
                     }`}
                   >
-                    <FaCheckCircle className={modo === "quantity" ? "shrink-0 text-amber-600" : "shrink-0 text-slate-400"} size={12} />
-                    <ITText
-                      className={`!text-[11px] font-semibold ${modo === "quantity" ? "text-amber-900" : "text-slate-600"}`}
-                    >
-                      {resultado}
-                    </ITText>
+                    <ITFlex align="center" gap={2}>
+                      <FaCheckCircle className={modo === "quantity" ? "shrink-0 text-amber-600" : "shrink-0 text-slate-400"} size={12} />
+                      <ITText
+                        className={`!text-[11px] font-semibold ${modo === "quantity" ? "text-amber-900" : "text-slate-600"}`}
+                      >
+                        {resultado}
+                      </ITText>
+                    </ITFlex>
+                    {modo === "quantity" && (
+                      <ITText className="!text-[11px] text-amber-800 pl-5">{t("audit.sayQuantityNext")}</ITText>
+                    )}
                   </ITFlex>
                 ) : (
                   <ITText className="!text-[11px] text-slate-400">{t("audit.afterPick")}</ITText>
@@ -474,7 +501,20 @@ export default function InventoryMismatchesBoard() {
         }}
         onConfirm={() => void resolver("quantity")}
         title={t("audit.confirmQuantityTitle")}
-        message={t("audit.confirmQuantityMessage", { device: sel?.device ?? "", quantity: dice, n: quedanRegistradas })}
+        message={
+          <span className="flex flex-col gap-2">
+            <span>
+              {t("audit.confirmQuantityMessage", {
+                device: sel?.device ?? "",
+                quantity: dice,
+                n: quedanRegistradas,
+                from: disponible,
+                to: sel?.ledgerIfQuantity ?? disponible,
+              })}
+            </span>
+            <span>{t("audit.sayQuantityNext")}</span>
+          </span>
+        }
         confirmLabel={t("audit.confirmQuantityConfirm")}
         cancelLabel={t("common:actions.cancel")}
         variant="danger"

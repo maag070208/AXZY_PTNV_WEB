@@ -32,7 +32,7 @@ test.describe("Descuadres de inventario", () => {
       await expect(page.getByText("El movimiento dice", { exact: true })).toBeVisible();
       await expect(page.getByText("Piezas registradas", { exact: true })).toBeVisible();
       await expect(page.getByText("Disponible en inventario", { exact: true })).toBeVisible();
-      await expect(page.getByText("Marca una opción para ver cómo queda.", { exact: true })).toBeVisible();
+      await expect(page.getByText("Marca una opción para ver el «Después».", { exact: true })).toBeVisible();
 
       // Al menos una salida aplicable (darlo por revisado siempre está) y sin
       // marcar ninguna no se puede aplicar.
@@ -45,7 +45,7 @@ test.describe("Descuadres de inventario", () => {
 
       await salidas.first().click();
       await expect(page.getByText("Se aplicará la opción marcada.", { exact: true })).toBeVisible();
-      await expect(page.getByText("Marca una opción para ver cómo queda.", { exact: true })).toHaveCount(0);
+      await expect(page.getByText("Marca una opción para ver el «Después».", { exact: true })).toHaveCount(0);
       await expect(aplicar).toBeEnabled();
     }
   });
