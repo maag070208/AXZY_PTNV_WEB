@@ -2,31 +2,25 @@ import { useMemo } from "react";
 import {
   ITAlert,
   ITBadget,
-  ITButton,
   ITCard,
   ITCheckbox,
   ITChip,
   ITDataTable,
-  ITDatePicker,
   ITFlex,
   ITInput,
   ITProgress,
   ITSearchSelect,
-  ITSegmentedControl,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
 import {
   FaCheckCircle,
-  FaChevronLeft,
-  FaChevronRight,
   FaClock,
   FaDoorOpen,
   FaExclamationTriangle,
   FaRegCircle,
 } from "react-icons/fa";
 import {
-  type AccessReportPeriod,
   type AttendanceDayStatus,
   type PeopleAttendanceDay,
   type PeopleAttendanceRow,
@@ -34,6 +28,7 @@ import {
 } from "@entities/access";
 import { punchTime, workedTime } from "@entities/schedule";
 import { KpiTile } from "@shared/ui/kpi-tile";
+import { PeriodPicker } from "@shared/ui/period-picker";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { dyn } from "@shared/i18n/dyn";
@@ -42,7 +37,6 @@ import type { UseAccessReport } from "../model/useAccessReport";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
-const PERIODS: AccessReportPeriod[] = ["DAY", "WEEK", "FORTNIGHT", "MONTH"];
 const VIEWS: PeopleAttendanceView[] = ["ALL", "INCIDENTS", "ON_SITE", "WITHOUT_RECORDS"];
 
 /** Zona del navegador mientras llega la del servidor en `summary.range`. */
@@ -92,8 +86,18 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const focusIndex = !summary ? -1 : period === "DAY" ? 0 : days.indexOf(today ?? "");
   const focusIsToday = focusIndex >= 0 && days[focusIndex] === today;
 
-  const periodOptions = useMemo(
-    () => PERIODS.map((value) => ({ value, label: dyn(t)(`periodTabs.${value}`) })),
+  const periodLabels = useMemo(
+    () => ({
+      periods: {
+        DAY: t("periodTabs.DAY"),
+        WEEK: t("periodTabs.WEEK"),
+        FORTNIGHT: t("periodTabs.FORTNIGHT"),
+        MONTH: t("periodTabs.MONTH"),
+      },
+      date: t("filters.date"),
+      previous: t("filters.previous"),
+      next: t("filters.next"),
+    }),
     [t]
   );
 
@@ -104,24 +108,6 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
     ],
     [fx.departments, t]
   );
-
-  const handleDate = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } }
-  ) => {
-    const value = e.target.value;
-    if (value instanceof Date) fx.setDate(value);
-  };
-
-  const handleRange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } }
-  ) => {
-    const value = e.target.value;
-    if (Array.isArray(value) && value[0]) fx.setDate(value[0]);
-  };
 
   /** Texto flotante de un día: "mié 07 oct · Asistió · 07:58–16:10 · 8:12". */
   const dayTooltip = (day: PeopleAttendanceDay): string => {
@@ -324,39 +310,17 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       <ITCard className="!p-5 border border-slate-200">
         <ITFlex direction="column" gap={4}>
           <ITFlex align="end" wrap="wrap" gap={3}>
-            <ITSegmentedControl
-              options={periodOptions}
-              value={period}
-              onChange={(value) => fx.changePeriod(value as AccessReportPeriod)}
+            <PeriodPicker
+              name="accessReport"
+              period={period}
+              onPeriodChange={fx.changePeriod}
+              date={fx.date}
+              range={fx.periodRange}
+              onDateChange={fx.setDate}
+              onPrevious={fx.previousPeriod}
+              onNext={fx.nextPeriod}
+              labels={periodLabels}
             />
-            <ITFlex align="end" gap={2} className="min-w-[280px] flex-1">
-              <ITButton variant="outlined" color="gray" onClick={fx.previousPeriod} title={t("filters.previous")}>
-                <FaChevronLeft size={11} />
-              </ITButton>
-              <div className="min-w-0 flex-1">
-                {period === "DAY" ? (
-                  <ITDatePicker
-                    name="accessReportDate"
-                    label={t("filters.date")}
-                    value={fx.date}
-                    onChange={handleDate}
-                    className="w-full min-w-0"
-                  />
-                ) : (
-                  <ITDatePicker
-                    name="accessReportDateRange"
-                    label={t("filters.date")}
-                    range
-                    value={fx.periodRange}
-                    onChange={handleRange}
-                    className="w-full min-w-0"
-                  />
-                )}
-              </div>
-              <ITButton variant="outlined" color="gray" onClick={fx.nextPeriod} title={t("filters.next")}>
-                <FaChevronRight size={11} />
-              </ITButton>
-            </ITFlex>
             <div className="min-w-[200px] flex-1">
               <ITSearchSelect
                 name="accessReportDepartment"

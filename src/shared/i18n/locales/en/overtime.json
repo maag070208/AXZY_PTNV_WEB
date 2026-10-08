@@ -1,56 +1,90 @@
 {
   "title": "Overtime",
   "description": "View and approve staff overtime.",
-  "help": {
-    "extra": "Time worked after the scheduled exit, minus the exit tolerance. It only counts if it reaches the minimum configured in the schedule (60 min by default); above the minimum, exact minutes are counted.",
-    "restDay": "If they clock in on a rest day, all time worked counts as overtime, as long as it reaches the schedule's minimum."
+  "periodTabs": {
+    "DAY": "Today",
+    "WEEK": "Weekly",
+    "FORTNIGHT": "Fortnightly",
+    "MONTH": "Monthly"
   },
-  "filters": "Filters",
-  "period": "Period",
-  "date": "Date",
-  "clear": "Clear",
-  "cancel": "Cancel",
-  "exportPdf": "PDF",
-  "exportCsv": "CSV",
-  "onlyApproved": "Approved only",
-  "exportEmpty": "No overtime days in the period",
-  "allDepartments": "All departments",
-  "selected": "{{count}} selected · {{time}}",
   "periods": {
     "DAY": "Daily",
     "WEEK": "Weekly",
+    "FORTNIGHT": "Fortnightly",
     "MONTH": "Monthly"
   },
-  "status": "Status",
-  "statusAll": "All",
-  "statusPending": "Pending",
-  "statusApproved": "Approved",
-  "statusRejected": "Rejected",
+  "filters": {
+    "date": "Date",
+    "previous": "Previous period",
+    "next": "Next period",
+    "department": "Department",
+    "allDepartments": "All departments",
+    "employee": "Employee",
+    "employeePlaceholder": "Employee name or number"
+  },
+  "timezone": "{{city}} time",
+  "noDepartment": "No department",
+  "tiles": {
+    "pending": "To approve",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "byDepartment": "By department",
+    "noOvertime": "No overtime",
+    "requests_one": "{{count}} request",
+    "requests_other": "{{count}} requests",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people"
+  },
+  "tabs": {
+    "PENDING": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "ALL": "All"
+  },
   "columns": {
     "employee": "Employee",
     "department": "Department",
     "date": "Day",
+    "shiftExit": "Shift → exit",
     "schedule": "Schedule",
     "noSchedule": "No schedule",
-    "extra": "Overtime",
+    "restDay": "Rest day",
+    "extra": "Extra",
+    "reason": "Reason",
     "decidedBy": "Decided by",
     "decidedAt": "Decision date",
     "note": "Note"
   },
+  "status": "Status",
+  "statusPending": "Pending",
+  "statusApproved": "Approved",
+  "statusRejected": "Rejected",
+  "badge": {
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "decidedByName": "by {{name}}",
+  "bulk": {
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected"
+  },
   "actions": {
     "approve": "Approve",
     "reject": "Reject",
-    "approveSelected": "Approve ({{count}})",
-    "rejectSelected": "Reject ({{count}})",
-    "selectPending": "Select pending",
     "clearSelection": "Clear selection"
   },
   "dialog": {
-    "approveTitle": "Approve overtime",
-    "approveMessage": "Approve {{count}} day(s) with {{time}} of overtime? They will be counted.",
     "rejectTitle": "Reject overtime",
-    "rejectMessage": "Reject {{count}} day(s) with {{time}} of overtime? They will not be counted."
+    "rejectMessage_one": "{{count}} request will be rejected. It will not be counted.",
+    "rejectMessage_other": "{{count}} requests will be rejected. They will not be counted.",
+    "noteLabel": "Reason (optional)",
+    "notePlaceholder": "Why it is rejected"
   },
+  "cancel": "Cancel",
+  "exportPdf": "PDF",
+  "exportCsv": "CSV",
+  "exportEmpty": "No overtime days in the period",
+  "footnote": "Overtime is calculated against the shift assigned for the day.",
   "kpis": {
     "pending": "Pending approval",
     "approved": "Approved",
@@ -62,9 +96,6 @@
     "title": "Overtime report",
     "timezone": "Timezone"
   },
-  "rangeDay": "Showing {{date}} · Timezone: {{tz}}",
-  "rangeRange": "Showing {{start}} to {{end}} · Timezone: {{tz}}",
-  "empty": "No overtime days",
   "toast": {
     "approved": "{{count}} day(s) approved",
     "rejected": "{{count}} day(s) rejected",

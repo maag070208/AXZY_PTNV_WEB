@@ -108,7 +108,7 @@ export interface OvertimeResponse {
 
 /** Metadatos de la exportación a PDF (periodo de referencia, fecha y zona horaria). */
 export interface OvertimePdfMeta {
-  period: "DAY" | "WEEK" | "MONTH";
+  period: "DAY" | "WEEK" | "FORTNIGHT" | "MONTH";
   date: string;
   timezone: string;
 }

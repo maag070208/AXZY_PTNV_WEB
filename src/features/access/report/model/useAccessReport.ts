@@ -17,6 +17,7 @@ import { useWeekStartDay } from "@entities/sys-config";
 import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
+import { periodRangeOf, shiftPeriod, toDateInput } from "@shared/lib/reportPeriod";
 import { fileName, type FileNameKey, dateLocale } from "@shared/i18n";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
@@ -57,43 +58,6 @@ interface Options {
 /** Zona horaria del navegador; el reporte la usa para resolver los límites del día. */
 const BROWSER_TIMEZONE =
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Mexico_City";
-
-/** Fecha local `YYYY-MM-DD` (día de referencia del periodo). */
-const toDateInput = (date: Date): string => {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-};
-
-/** Día de referencia del periodo anterior (`step` = -1) o siguiente (`step` = 1). */
-const shiftPeriod = (date: Date, period: AccessReportPeriod, step: 1 | -1): Date => {
-  const d = new Date(date);
-  if (period === "DAY") d.setDate(d.getDate() + step);
-  else if (period === "WEEK") d.setDate(d.getDate() + 7 * step);
-  else if (period === "MONTH") d.setMonth(d.getMonth() + step, 1);
-  // Quincena: 1–15 ↔ 16–fin de mes.
-  else if (d.getDate() <= 15) d.setMonth(d.getMonth() + (step > 0 ? 0 : -1), step > 0 ? 16 : 16);
-  else d.setMonth(d.getMonth() + (step > 0 ? 1 : 0), 1);
-  return d;
-};
-
-/** `[inicio, fin]` del periodo que contiene `date` (la semana empieza en `WEEK_START_DAY`). */
-const periodRangeOf = (date: Date, period: AccessReportPeriod, weekStart: number): [Date, Date] => {
-  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  if (period === "DAY") return [start, start];
-  if (period === "WEEK") {
-    start.setDate(start.getDate() - ((start.getDay() - weekStart + 7) % 7));
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    return [start, end];
-  }
-  const lastOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  if (period === "MONTH") return [new Date(date.getFullYear(), date.getMonth(), 1), lastOfMonth];
-  return date.getDate() <= 15
-    ? [new Date(date.getFullYear(), date.getMonth(), 1), new Date(date.getFullYear(), date.getMonth(), 15)]
-    : [new Date(date.getFullYear(), date.getMonth(), 16), lastOfMonth];
-};
 
 /**
  * Estado de la pantalla de Entradas y salidas: una fila por persona con cada

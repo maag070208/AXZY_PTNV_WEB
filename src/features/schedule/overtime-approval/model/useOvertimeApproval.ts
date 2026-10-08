@@ -4,29 +4,28 @@ import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
   overtimeApi,
   type OvertimeDayRow,
-  type OvertimeDayStatus,
   type OvertimeSummary,
 } from "@entities/overtime";
-import { departmentsApi, type Department } from "@entities/department";
+import { useDepartmentOptions } from "@entities/department";
+import { useWeekStartDay } from "@entities/sys-config";
+import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
+import { periodRangeOf, shiftPeriod, toDateInput, type ReportPeriod } from "@shared/lib/reportPeriod";
 import { formatDateTime, formatMinutesAsHhMm } from "@shared/utils/dates";
-import type { DownloadOvertimePdf } from "./types";
 import { fileName } from "@shared/i18n";
+import type { DownloadOvertimePdf } from "./types";
 
-export type Period = "DAY" | "WEEK" | "MONTH";
-export type StatusFilter = "" | OvertimeDayStatus;
+export type Period = ReportPeriod;
+/** Pestaña de la tabla = filtro de estatus (`ALL` = todas). */
+export type StatusTab = "PENDING" | "APPROVED" | "REJECTED" | "ALL";
 
 /** Día seleccionado para aprobar/rechazar. */
 export interface SelectedDay {
   userId: string;
   date: string;
-  extraMin: number;
 }
 
 /** Llave estable de un día (persona + fecha). */
 export const dayKeyOf = (r: { userId: string; date: string }): string => `${r.userId}|${r.date}`;
-
-const toDateInput = (d: Date): string =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 const BROWSER_TIMEZONE =
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Mexico_City";
@@ -34,6 +33,12 @@ const BROWSER_TIMEZONE =
 interface Toast {
   message: string;
   type: "success" | "error";
+}
+
+/** Rechazo en curso: los días y el motivo opcional que se captura en el diálogo. */
+export interface RejectDraft {
+  items: SelectedDay[];
+  note: string;
 }
 
 interface UseOvertimeApprovalOptions {
@@ -44,10 +49,11 @@ interface UseOvertimeApprovalOptions {
 }
 
 /**
- * Estado de la pantalla de tiempo extra: filtros, resumen, selección múltiple,
- * aprobar/rechazar y exportación. El cálculo de los pendientes lo hace la API al
- * vuelo; aquí solo se guardan las decisiones. Quien no puede aprobar (RH) queda
- * en modo solo lectura: el servidor además le devuelve únicamente lo aprobado.
+ * Estado de la pantalla de tiempo extra: periodo, filtros, pestañas por
+ * estatus, selección múltiple, aprobar/rechazar y exportación. El cálculo de
+ * los pendientes lo hace la API al vuelo; aquí solo se guardan las decisiones.
+ * Quien no puede aprobar (RH) queda en modo solo lectura: el servidor además le
+ * devuelve únicamente lo aprobado.
  */
 export const useOvertimeApproval = ({
   canApprove,
@@ -55,34 +61,29 @@ export const useOvertimeApproval = ({
 }: UseOvertimeApprovalOptions) => {
   const { t } = useTranslation("overtime");
   const [period, setPeriod] = useState<Period>("WEEK");
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(() => new Date());
   const [departmentId, setDepartmentId] = useState("");
-  const [q, setQ] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("");
+  const [search, setSearch] = useState("");
+  const q = useDebouncedValue(search.trim(), 350);
+  const [tab, setTab] = useState<StatusTab>("PENDING");
 
   const [summary, setSummary] = useState<OvertimeSummary | null>(null);
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const [rows, setRows] = useState<OvertimeDayRow[]>([]);
+  const [total, setTotal] = useState(0);
   const [selected, setSelected] = useState<Map<string, SelectedDay>>(new Map());
   const [reloadKey, setReloadKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
   const [saving, setSaving] = useState(false);
+  const [rejectDraft, setRejectDraft] = useState<RejectDraft | null>(null);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingCsv, setExportingCsv] = useState(false);
-  const [confirm, setConfirm] = useState<{ status: "APPROVED" | "REJECTED" } | null>(null);
+  const departments = useDepartmentOptions();
+  const weekStart = useWeekStartDay();
   /** Filtros/orden vigentes de la tabla (barra + columnas), para el export. */
   const tableParamsRef = useRef<ITDataTableFetchParams | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    departmentsApi
-      .list()
-      .then((list) => active && setDepartments(list))
-      .catch(() => active && setDepartments([]));
-    return () => {
-      active = false;
-    };
-  }, []);
+  const periodRange = useMemo(() => periodRangeOf(date, period, weekStart), [date, period, weekStart]);
 
   /** Filtros base (sin `status`): los que se usan para recalcular los días al decidir. */
   const baseFilters = useMemo<Record<string, string | number | boolean>>(() => {
@@ -91,109 +92,143 @@ export const useOvertimeApproval = ({
       date: toDateInput(date),
     };
     if (departmentId) f.departmentId = departmentId;
-    if (q.trim()) f.q = q.trim();
+    if (q) f.q = q;
     return f;
   }, [period, date, departmentId, q]);
 
   /** Filtros externos de la tabla. Quien no aprueba queda fijo en APROBADO. */
-  const effectiveStatus = canApprove ? status : "APPROVED";
+  const effectiveTab: StatusTab = canApprove ? tab : "APPROVED";
   const externalFilters = useMemo<Record<string, string | number | boolean>>(
-    () => (effectiveStatus ? { ...baseFilters, status: effectiveStatus } : baseFilters),
-    [baseFilters, effectiveStatus]
+    () => ({ ...baseFilters, status: effectiveTab }),
+    [baseFilters, effectiveTab]
   );
 
   const tableKey = useMemo(() => JSON.stringify(externalFilters), [externalFilters]);
 
-  const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
-    tableParamsRef.current = params;
-    const res = await overtimeApi.query({
-      page: params.page,
-      limit: params.limit,
-      filters: params.filters,
-      ...(params.sort ? { sort: params.sort } : {}),
-    });
-    setSummary(res.summary);
-    return { data: res.data as unknown as Record<string, unknown>[], total: res.total };
+  // Otro filtro u otra pestaña = otra lista: la selección no se arrastra.
+  useEffect(() => {
+    setSelected(new Map());
+  }, [tableKey]);
+
+  const fetchTableData = useCallback(
+    async (params: ITDataTableFetchParams) => {
+      tableParamsRef.current = params;
+      try {
+        const res = await overtimeApi.query({
+          page: params.page,
+          limit: params.limit,
+          filters: params.filters,
+          ...(params.sort ? { sort: params.sort } : {}),
+        });
+        setSummary(res.summary);
+        setRows(res.data);
+        setTotal(res.total);
+        setError(null);
+        return { data: res.data as unknown as Record<string, unknown>[], total: res.total };
+      } catch (e) {
+        setError(e instanceof Error ? e.message : t("toast.error"));
+        return { data: [], total: 0 };
+      }
+    },
+    [t]
+  );
+
+  const changePeriod = useCallback((value: Period) => {
+    setPeriod(value);
+    // Cada periodo arranca en el que contiene hoy.
+    setDate(new Date());
   }, []);
+
+  const previousPeriod = useCallback(() => setDate((d) => shiftPeriod(d, period, -1)), [period]);
+  const nextPeriod = useCallback(() => setDate((d) => shiftPeriod(d, period, 1)), [period]);
 
   const toggleRow = useCallback((row: OvertimeDayRow) => {
     setSelected((prev) => {
       const next = new Map(prev);
       const key = dayKeyOf(row);
       if (next.has(key)) next.delete(key);
-      else next.set(key, { userId: row.userId, date: row.date, extraMin: row.extraMin });
+      else next.set(key, { userId: row.userId, date: row.date });
       return next;
     });
   }, []);
 
   const clearSelection = useCallback(() => setSelected(new Map()), []);
 
-  /** Selecciona TODOS los pendientes del filtro (recorre las páginas). */
-  const selectPending = useCallback(async () => {
-    if (!canApprove) return;
-    setError(null);
-    try {
-      const next = new Map<string, SelectedDay>();
-      let page = 1;
-      for (;;) {
-        const res = await overtimeApi.query({
-          page,
-          limit: 100,
-          filters: { ...baseFilters, status: "PENDING" },
-        });
-        for (const r of res.data) {
-          next.set(dayKeyOf(r), { userId: r.userId, date: r.date, extraMin: r.extraMin });
-        }
-        if (res.data.length === 0 || next.size >= res.total) break;
-        page += 1;
+  /** Pendientes de la página visible (los únicos que se pueden seleccionar). */
+  const visiblePending = useMemo(() => rows.filter((r) => r.status === "PENDING"), [rows]);
+  const allVisibleSelected =
+    visiblePending.length > 0 && visiblePending.every((r) => selected.has(dayKeyOf(r)));
+
+  /** Casilla de la cabecera: selecciona (o quita) los pendientes visibles. */
+  const toggleVisiblePending = useCallback(() => {
+    setSelected((prev) => {
+      const next = new Map(prev);
+      if (visiblePending.every((r) => next.has(dayKeyOf(r)))) {
+        for (const r of visiblePending) next.delete(dayKeyOf(r));
+      } else {
+        for (const r of visiblePending) next.set(dayKeyOf(r), { userId: r.userId, date: r.date });
       }
-      setSelected(next);
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }, [baseFilters, canApprove]);
+      return next;
+    });
+  }, [visiblePending]);
 
-  const requestDecision = useCallback(
-    (next: "APPROVED" | "REJECTED") => {
-      if (!canApprove || selected.size === 0) return;
-      setConfirm({ status: next });
+  /** Guarda la decisión sobre los días indicados y refresca la lista. */
+  const decide = useCallback(
+    async (items: SelectedDay[], status: "APPROVED" | "REJECTED", note?: string): Promise<boolean> => {
+      if (!canApprove || items.length === 0) return false;
+      setSaving(true);
+      setError(null);
+      try {
+        const res = await overtimeApi.decide({
+          filters: baseFilters,
+          items: items.map((i) => ({ userId: i.userId, date: i.date })),
+          status,
+          ...(note ? { note } : {}),
+        });
+        setToast({
+          message:
+            status === "APPROVED"
+              ? t("toast.approved", { count: res.updated })
+              : t("toast.rejected", { count: res.updated }),
+          type: "success",
+        });
+        setSelected(new Map());
+        setReloadKey((k) => k + 1);
+        return true;
+      } catch (e) {
+        setToast({ message: (e as Error).message || t("toast.error"), type: "error" });
+        return false;
+      } finally {
+        setSaving(false);
+      }
     },
-    [canApprove, selected]
+    [canApprove, baseFilters, t]
   );
 
-  const confirmDecision = useCallback(async () => {
-    if (!canApprove || !confirm) return;
-    setSaving(true);
-    setError(null);
-    try {
-      const items = [...selected.values()].map((s) => ({ userId: s.userId, date: s.date }));
-      if (items.length === 0) return;
-      const res = await overtimeApi.decide({
-        filters: baseFilters,
-        items,
-        status: confirm.status,
-      });
-      setToast({
-        message:
-          confirm.status === "APPROVED"
-            ? t("toast.approved", { count: res.updated })
-            : t("toast.rejected", { count: res.updated }),
-        type: "success",
-      });
-      setSelected(new Map());
-      setReloadKey((k) => k + 1);
-    } catch (e) {
-      setToast({ message: (e as Error).message || t("toast.error"), type: "error" });
-    } finally {
-      setSaving(false);
-      setConfirm(null);
-    }
-  }, [canApprove, confirm, selected, baseFilters, t]);
+  const approveItems = useCallback((items: SelectedDay[]) => decide(items, "APPROVED"), [decide]);
+  const approveSelected = useCallback(() => decide([...selected.values()], "APPROVED"), [decide, selected]);
 
-  const selectedMinutes = useMemo(
-    () => [...selected.values()].reduce((acc, s) => acc + s.extraMin, 0),
-    [selected]
+  /** Abre el diálogo de rechazo (motivo opcional) para los días dados. */
+  const startReject = useCallback(
+    (items: SelectedDay[]) => {
+      if (!canApprove || items.length === 0) return;
+      setRejectDraft({ items, note: "" });
+    },
+    [canApprove]
   );
+  const startRejectSelected = useCallback(() => startReject([...selected.values()]), [startReject, selected]);
+  const setRejectNote = useCallback(
+    (note: string) => setRejectDraft((d) => (d ? { ...d, note } : d)),
+    []
+  );
+  const cancelReject = useCallback(() => {
+    if (!saving) setRejectDraft(null);
+  }, [saving]);
+  const confirmReject = useCallback(async () => {
+    if (!rejectDraft) return;
+    const ok = await decide(rejectDraft.items, "REJECTED", rejectDraft.note.trim());
+    if (ok) setRejectDraft(null);
+  }, [decide, rejectDraft]);
 
   /**
    * Todas las filas del filtro vigente de la tabla (barra + columnas), sin
@@ -306,33 +341,43 @@ export const useOvertimeApproval = ({
   }, [fetchAllForExport, period, date, t, canApprove]);
 
   return {
+    t,
     canApprove,
     period,
-    setPeriod,
+    changePeriod,
     date,
     setDate,
+    periodRange,
+    previousPeriod,
+    nextPeriod,
     departmentId,
     setDepartmentId,
-    q,
-    setQ,
-    status,
-    setStatus,
-    summary,
     departments,
+    search,
+    setSearch,
+    tab: effectiveTab,
+    setTab,
+    summary,
+    total,
     externalFilters,
     tableKey,
     fetchTableData,
     selected,
     selectedCount: selected.size,
-    selectedMinutes,
     toggleRow,
     clearSelection,
-    selectPending,
-    requestDecision,
-    confirm,
-    setConfirm,
-    confirmDecision,
+    allVisibleSelected,
+    hasVisiblePending: visiblePending.length > 0,
+    toggleVisiblePending,
     saving,
+    approveItems,
+    approveSelected,
+    startReject,
+    startRejectSelected,
+    rejectDraft,
+    setRejectNote,
+    cancelReject,
+    confirmReject,
     exportPdf,
     exportCsv,
     exportingPdf,

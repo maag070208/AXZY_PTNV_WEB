@@ -1,56 +1,90 @@
 {
   "title": "Tiempo extra",
   "description": "Consulta y aprobación de horas extra del personal.",
-  "help": {
-    "extra": "Tiempo trabajado después de la hora de salida de su horario, menos la tolerancia de salida. Solo cuenta si alcanza el mínimo configurado en el horario (por defecto 60 min); por encima del mínimo se cuentan los minutos exactos.",
-    "restDay": "Si checa en un día de descanso, todo lo trabajado cuenta como horas extra, siempre que alcance el mínimo del horario."
+  "periodTabs": {
+    "DAY": "Hoy",
+    "WEEK": "Semanal",
+    "FORTNIGHT": "Quincenal",
+    "MONTH": "Mensual"
   },
-  "filters": "Filtros",
-  "period": "Periodo",
-  "date": "Fecha",
-  "clear": "Limpiar",
-  "cancel": "Cancelar",
-  "exportPdf": "PDF",
-  "exportCsv": "CSV",
-  "onlyApproved": "Solo aprobado",
-  "exportEmpty": "No hay días de tiempo extra en el periodo",
-  "allDepartments": "Todos los departamentos",
-  "selected": "{{count}} seleccionado(s) · {{time}}",
   "periods": {
     "DAY": "Diaria",
     "WEEK": "Semanal",
+    "FORTNIGHT": "Quincenal",
     "MONTH": "Mensual"
   },
-  "status": "Estatus",
-  "statusAll": "Todos",
-  "statusPending": "Pendiente",
-  "statusApproved": "Aprobado",
-  "statusRejected": "Rechazado",
+  "filters": {
+    "date": "Fecha",
+    "previous": "Periodo anterior",
+    "next": "Periodo siguiente",
+    "department": "Departamento",
+    "allDepartments": "Todos los departamentos",
+    "employee": "Empleado",
+    "employeePlaceholder": "Nombre o número de empleado"
+  },
+  "timezone": "Hora de {{city}}",
+  "noDepartment": "Sin departamento",
+  "tiles": {
+    "pending": "Por aprobar",
+    "approved": "Aprobado",
+    "rejected": "Rechazado",
+    "byDepartment": "Por departamento",
+    "noOvertime": "Sin horas extra",
+    "requests_one": "{{count}} solicitud",
+    "requests_other": "{{count}} solicitudes",
+    "people_one": "{{count}} persona",
+    "people_other": "{{count}} personas"
+  },
+  "tabs": {
+    "PENDING": "Pendientes",
+    "APPROVED": "Aprobadas",
+    "REJECTED": "Rechazadas",
+    "ALL": "Todas"
+  },
   "columns": {
     "employee": "Empleado",
     "department": "Departamento",
     "date": "Día",
+    "shiftExit": "Turno → salida",
     "schedule": "Horario",
     "noSchedule": "Sin horario",
-    "extra": "Horas extra",
+    "restDay": "Descanso",
+    "extra": "Extra",
+    "reason": "Motivo",
     "decidedBy": "Aprobó",
     "decidedAt": "Fecha de decisión",
     "note": "Nota"
   },
+  "status": "Estatus",
+  "statusPending": "Pendiente",
+  "statusApproved": "Aprobado",
+  "statusRejected": "Rechazado",
+  "badge": {
+    "approved": "Aprobada",
+    "rejected": "Rechazada"
+  },
+  "decidedByName": "por {{name}}",
+  "bulk": {
+    "selected_one": "{{count}} seleccionada",
+    "selected_other": "{{count}} seleccionadas"
+  },
   "actions": {
     "approve": "Aprobar",
     "reject": "Rechazar",
-    "approveSelected": "Aprobar ({{count}})",
-    "rejectSelected": "Rechazar ({{count}})",
-    "selectPending": "Seleccionar pendientes",
     "clearSelection": "Limpiar selección"
   },
   "dialog": {
-    "approveTitle": "Aprobar tiempo extra",
-    "approveMessage": "¿Aprobar {{count}} día(s) con {{time}} de tiempo extra? Se contabilizarán.",
     "rejectTitle": "Rechazar tiempo extra",
-    "rejectMessage": "¿Rechazar {{count}} día(s) con {{time}} de tiempo extra? No se contabilizarán."
+    "rejectMessage_one": "Se rechazará {{count}} solicitud. No se contabilizará.",
+    "rejectMessage_other": "Se rechazarán {{count}} solicitudes. No se contabilizarán.",
+    "noteLabel": "Motivo (opcional)",
+    "notePlaceholder": "Por qué se rechaza"
   },
+  "cancel": "Cancelar",
+  "exportPdf": "PDF",
+  "exportCsv": "CSV",
+  "exportEmpty": "No hay días de tiempo extra en el periodo",
+  "footnote": "Las horas extra se calculan contra el turno asignado del día.",
   "kpis": {
     "pending": "Pendiente de aprobar",
     "approved": "Aprobado",
@@ -62,9 +96,6 @@
     "title": "Reporte de tiempo extra",
     "timezone": "Zona horaria"
   },
-  "rangeDay": "Mostrando el día {{date}} · Zona horaria: {{tz}}",
-  "rangeRange": "Mostrando del {{start}} al {{end}} · Zona horaria: {{tz}}",
-  "empty": "Sin días de tiempo extra",
   "toast": {
     "approved": "{{count}} día(s) aprobado(s)",
     "rejected": "{{count}} día(s) rechazado(s)",

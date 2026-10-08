@@ -18,6 +18,10 @@ export interface OvertimeDayRow {
   scheduleName: string | null;
   restDay: boolean;
   withoutSchedule: boolean;
+  /** Turno programado del día ("14:00-22:00"); null en descanso o sin horario. */
+  shift: string | null;
+  /** Última salida del día (ISO) según el reloj. */
+  exitAt: string | null;
   status: OvertimeDayStatus;
   /** Minutos contabilizados (snapshot aprobado). */
   approvedExtraMin: number;
@@ -25,6 +29,12 @@ export interface OvertimeDayRow {
   decidedById: string | null;
   decidedByName: string | null;
   decidedAt: string | null;
+}
+
+export interface OvertimeDepartmentMinutes {
+  departmentId: string | null;
+  departmentName: string | null;
+  minutes: number;
 }
 
 export interface OvertimeSummary {
@@ -36,6 +46,8 @@ export interface OvertimeSummary {
   approvedMinutes: number;
   rejectedMinutes: number;
   peopleWithPending: number;
+  /** Minutos de extra (no rechazados) por departamento, de mayor a menor. */
+  byDepartment: OvertimeDepartmentMinutes[];
   range: { start: string; end: string; timezone: string; period: string };
 }
 

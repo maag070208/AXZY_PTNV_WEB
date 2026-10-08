@@ -3,7 +3,7 @@ import { FaClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
-import { OvertimeApprovalTable, useOvertimeApproval } from "@features/schedule";
+import { OvertimeApprovalTable, OvertimeExportActions, useOvertimeApproval } from "@features/schedule";
 import { downloadOvertimePDF } from "@widgets/reports";
 
 export default function OvertimeApprovalPage() {
@@ -24,6 +24,7 @@ export default function OvertimeApprovalPage() {
         { label: t("title") },
       ]}
       backAction={() => navigate("/schedules")}
+      actions={<OvertimeExportActions fx={fx} />}
     >
       <OvertimeApprovalTable fx={fx} />
     </ITPage>
