@@ -455,7 +455,6 @@
     },
     "resolve": "Resolver",
     "resolveTitle": "Resolver el descuadre",
-    "resolveHint": "Este movimiento dice {{quantity}} piezas y tiene {{linked}} registradas.",
     "optLink": "Ligar las {{n}} piezas que ya existen",
     "optQuantity": "Cuadrar el movimiento a lo que hay ({{n}})",
     "optReview": "Marcarlo como revisado",
@@ -509,6 +508,12 @@
     "diagFree": "Hay {{n}} piezas libres en el dispositivo que se le pueden ligar.",
     "diagNone": "No hay piezas libres que ligar: las que existen ya están en otro movimiento.",
     "diagExtra": "Tiene más piezas registradas que las que dice: hay que cuadrar la cantidad.",
-    "onlyReview": "Este descuadre no se puede cuadrar desde aquí: registra la entrada de las piezas que faltan o revisa el dispositivo."
+    "onlyReview": "Este descuadre no se puede cuadrar desde aquí: registra la entrada de las piezas que faltan o revisa el dispositivo.",
+    "diagPartial": "Solo hay {{n}} piezas libres en el dispositivo: las otras {{rest}} que faltan no están en él.",
+    "rise": "sube {{n}}",
+    "drop": "baja {{n}}",
+    "sayLink": "Queda con {{total}} piezas registradas (se ligan {{n}}). El inventario del dispositivo no cambia.",
+    "sayQuantity": "Queda con {{n}} piezas registradas, así que el disponible del dispositivo pasa de {{from}} a {{to}}.",
+    "sayReview": "No se cambia nada: solo queda anotado que lo revisaste."
   }
 }

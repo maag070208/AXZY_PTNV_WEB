@@ -80,6 +80,7 @@ export default function InventoryMismatchesBoard() {
   const quedanRegistradas = sel?.linkedAfter ?? registradas;
   /** Piezas que existen libres y se le pueden ligar (nunca más de las que faltan). */
   const ligables = Math.max(0, quedanRegistradas - registradas);
+  const faltan = Math.max(0, dice - registradas);
   const sobran = Math.max(0, registradas - dice);
 
   const elegir = (fila: Row) => {
@@ -157,7 +158,14 @@ export default function InventoryMismatchesBoard() {
   });
 
   // Diagnóstico en una línea: por qué no cuadra y con qué se arregla.
-  const diagnostico = sobran > 0 ? t("audit.diagExtra") : ligables > 0 ? t("audit.diagFree", { n: ligables }) : t("audit.diagNone");
+  const diagnostico =
+    sobran > 0 || faltan === 0
+      ? t("audit.diagExtra")
+      : ligables >= faltan
+        ? t("audit.diagFree", { n: ligables })
+        : ligables > 0
+          ? t("audit.diagPartial", { n: ligables, rest: faltan - ligables })
+          : t("audit.diagNone");
 
   // Cómo queda con la salida marcada (sin marcar, todavía no hay "después").
   const despues =
@@ -169,6 +177,16 @@ export default function InventoryMismatchesBoard() {
           disponible: modo === "quantity" ? (sel?.ledgerIfQuantity ?? disponible) : disponible,
         };
 
+  // Qué pasa, en una frase, con la salida marcada.
+  const resultado =
+    modo === "link"
+      ? t("audit.sayLink", { n: ligables, total: quedanRegistradas })
+      : modo === "quantity"
+        ? t("audit.sayQuantity", { n: quedanRegistradas, from: disponible, to: despues?.disponible ?? disponible })
+        : modo === "review"
+          ? t("audit.sayReview")
+          : null;
+
   /** Renglón de la comparación: cómo está hoy y cómo queda (con su cambio). */
   const Comparacion = ({ label, hoy, luego }: { label: string; hoy: number; luego?: number }) => {
     const delta = luego === undefined ? 0 : luego - hoy;
@@ -176,7 +194,7 @@ export default function InventoryMismatchesBoard() {
       <div className="flex items-center border-t border-slate-100 px-3 py-2">
         <span className="min-w-0 flex-1 !text-[11px] text-slate-600">{label}</span>
         <span className="w-14 shrink-0 text-center !text-[13px] font-bold tabular-nums text-slate-700">{hoy}</span>
-        <span className="w-20 shrink-0 text-center">
+        <span className="flex w-28 shrink-0 items-center justify-center gap-1.5">
           {luego === undefined ? (
             <span className="!text-[12px] text-slate-300">—</span>
           ) : (
@@ -187,8 +205,12 @@ export default function InventoryMismatchesBoard() {
                 {luego}
               </span>
               {delta !== 0 && (
-                <span className={`ml-1 !text-[10px] font-bold tabular-nums ${delta > 0 ? "text-emerald-600" : "text-amber-600"}`}>
-                  {delta > 0 ? `+${delta}` : delta}
+                <span
+                  className={`rounded-full px-1.5 py-0.5 !text-[9px] font-bold ${
+                    delta > 0 ? "bg-emerald-50 text-emerald-700" : "bg-amber-100 text-amber-800"
+                  }`}
+                >
+                  {delta > 0 ? t("audit.rise", { n: delta }) : t("audit.drop", { n: Math.abs(delta) })}
                 </span>
               )}
             </>
@@ -335,9 +357,6 @@ export default function InventoryMismatchesBoard() {
                     <ITText className="!text-[11px] text-slate-500">{formatDay(sel.date)}</ITText>
                   </ITFlex>
                   <ITText className="!text-[15px] font-bold text-slate-800">{sel.device}</ITText>
-                  <ITText className="!text-[11px] text-slate-500">
-                    {t("audit.resolveHint", { quantity: dice, linked: registradas })}
-                  </ITText>
                   <ITText className="!text-[11px] font-semibold text-slate-600">{diagnostico}</ITText>
                 </ITFlex>
 
@@ -397,7 +416,7 @@ export default function InventoryMismatchesBoard() {
                     <span className="w-14 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
                       {t("audit.colToday")}
                     </span>
-                    <span className="w-20 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    <span className="w-28 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
                       {t("audit.colAfter")}
                     </span>
                   </div>
@@ -405,7 +424,26 @@ export default function InventoryMismatchesBoard() {
                   <Comparacion label={t("audit.rowRegistered")} hoy={registradas} luego={despues?.registradas} />
                   <Comparacion label={t("audit.rowAvailable")} hoy={disponible} luego={despues?.disponible} />
                 </ITFlex>
-                {!despues && <ITText className="!text-[11px] text-slate-400">{t("audit.afterPick")}</ITText>}
+
+                {/* Qué pasa con la salida marcada, en una frase. */}
+                {resultado ? (
+                  <ITFlex
+                    align="center"
+                    gap={2}
+                    className={`rounded-xl border px-3 py-2 ${
+                      modo === "quantity" ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-slate-50"
+                    }`}
+                  >
+                    <FaCheckCircle className={modo === "quantity" ? "shrink-0 text-amber-600" : "shrink-0 text-slate-400"} size={12} />
+                    <ITText
+                      className={`!text-[11px] font-semibold ${modo === "quantity" ? "text-amber-900" : "text-slate-600"}`}
+                    >
+                      {resultado}
+                    </ITText>
+                  </ITFlex>
+                ) : (
+                  <ITText className="!text-[11px] text-slate-400">{t("audit.afterPick")}</ITText>
+                )}
 
                 {fallo && (
                   <ITText className="!text-[11px] font-bold text-red-600">
