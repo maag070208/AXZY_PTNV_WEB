@@ -145,13 +145,19 @@
       "total": "In the clock",
       "linkedCount": "Linked",
       "withoutLink": "Not linked",
-      "registrationSuggestions": "Safe suggestions"
+      "registrationSuggestions": "Safe suggestions",
+      "hintTotal": "Numbers seen in their punches",
+      "hintLinked": "{{percent}}% of the clock's numbers",
+      "hintWithoutLink": "Their punches come out with no person",
+      "hintSuggestions": "They can be linked in one go",
+      "allGood": "All good"
     },
     "filters": {
       "q": "Search",
       "qPlaceholder": "Number or name (clock or system)...",
       "status": "Status",
-      "all": "All"
+      "all": "All",
+      "clear": "Clear filters"
     },
     "statuses": {
       "LINKED": "Linked",
@@ -161,10 +167,20 @@
     "columns": {
       "number": "Clock number",
       "name": "Name in the clock",
+      "status": "Status",
       "punches": "Punches",
       "lastPunch": "Last punch",
-      "user": "System user",
+      "user": "Linked to",
       "actions": ""
+    },
+    "table": {
+      "title": "{{count}} numbers in the clock",
+      "titleUnknown": "Numbers in the clock"
+    },
+    "risk": {
+      "title": "{{count}} not linked",
+      "text": "Unlinked numbers do not build workdays: in the report they show up with the clock number and the \"Not linked\" mark. Review them so everyone has their entries and exits.",
+      "action": "See entries/exits"
     },
     "confidence": {
       "HIGH": "Name and number match",
@@ -195,6 +211,45 @@
     },
     "errors": {
       "users": "Could not load the users",
+      "save": "Could not save the link"
+    }
+  },
+  "differences": {
+    "title": "Differences",
+    "open": "See differences",
+    "description": "Reconcile the clock numbers with the system's people. Pick a number and then who it belongs to; nothing is saved until you confirm.",
+    "readOnly": "Read-only: you lack the permission to link. You can see the differences, but not assign.",
+    "summary": "{{missing}} not linked · {{free}} people with no number in the clock",
+    "clock": {
+      "title": "From the clock",
+      "search": "Clock number or name",
+      "onlyMissing": "Only unlinked",
+      "empty": "No number left to link.",
+      "punches": "{{count}} punches"
+    },
+    "people": {
+      "title": "From the system",
+      "search": "Name or payroll number",
+      "onlyFree": "Only without a number",
+      "empty": "Everyone already has a number in the clock.",
+      "assigned": "Already on {{number}}"
+    },
+    "action": {
+      "assign": "Assign",
+      "change": "Change",
+      "unlink": "Unlink",
+      "cancel": "Cancel",
+      "pickClock": "Pick a clock number",
+      "pickPerson": "and then the person it belongs to",
+      "assignedWarning": "{{name}} is already assigned to {{number}}; it can also be assigned to this number."
+    },
+    "toasts": {
+      "linked": "{{number}} assigned to {{name}}",
+      "unlinked": "{{number}} unlinked"
+    },
+    "errors": {
+      "load": "Could not read the clock employees",
+      "people": "Could not load the system's people",
       "save": "Could not save the link"
     }
   },

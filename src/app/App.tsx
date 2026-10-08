@@ -7,6 +7,7 @@ import AccessReportPage from "@pages/access/AccessReportPage";
 import TimeClockPage from "@pages/access/TimeClockPage";
 import TimeClockReportPage from "@pages/access/TimeClockReportPage";
 import TimeClockEmployeesPage from "@pages/access/TimeClockEmployeesPage";
+import TimeClockDifferencesPage from "@pages/access/TimeClockDifferencesPage";
 import TimeClocksPage from "@pages/access/TimeClocksPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
 import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
@@ -360,6 +361,15 @@ export default function App() {
           element={
             <RequiresPermission permission="time_clock.view">
               <TimeClockEmployeesPage />
+            </RequiresPermission>
+          }
+        />
+        {/* Conciliación en dos columnas: números del reloj contra personas del sistema. */}
+        <Route
+          path="/hr/time-clock/employees/differences"
+          element={
+            <RequiresPermission permission="time_clock.view">
+              <TimeClockDifferencesPage />
             </RequiresPermission>
           }
         />

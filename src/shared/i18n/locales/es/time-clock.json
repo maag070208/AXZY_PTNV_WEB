@@ -145,13 +145,19 @@
       "total": "En el reloj",
       "linkedCount": "Vinculados",
       "withoutLink": "Sin vincular",
-      "registrationSuggestions": "Sugerencias seguras"
+      "registrationSuggestions": "Sugerencias seguras",
+      "hintTotal": "Números vistos en sus checadas",
+      "hintLinked": "{{percent}}% de los números del reloj",
+      "hintWithoutLink": "Sus checadas salen sin persona",
+      "hintSuggestions": "Se pueden vincular de un jalón",
+      "allGood": "Todo en orden"
     },
     "filters": {
       "q": "Buscar",
       "qPlaceholder": "Número o nombre (reloj o sistema)...",
       "status": "Estado",
-      "all": "Todos"
+      "all": "Todos",
+      "clear": "Limpiar filtros"
     },
     "statuses": {
       "LINKED": "Vinculados",
@@ -161,10 +167,20 @@
     "columns": {
       "number": "Número en el reloj",
       "name": "Nombre en el reloj",
+      "status": "Estado",
       "punches": "Checadas",
       "lastPunch": "Última checada",
-      "user": "Usuario del sistema",
+      "user": "Vinculado a",
       "actions": ""
+    },
+    "table": {
+      "title": "{{count}} números en el reloj",
+      "titleUnknown": "Números en el reloj"
+    },
+    "risk": {
+      "title": "{{count}} sin vincular",
+      "text": "Los números sin vincular no arman jornadas: en el reporte salen con el número del reloj y la marca «Sin vincular». Revísalos para que cada quien tenga sus entradas y salidas.",
+      "action": "Ver entradas/salidas"
     },
     "confidence": {
       "HIGH": "Coincide nombre y número",
@@ -195,6 +211,45 @@
     },
     "errors": {
       "users": "No se pudieron cargar los usuarios",
+      "save": "No se pudo guardar el vínculo"
+    }
+  },
+  "differences": {
+    "title": "Diferencias",
+    "open": "Ver diferencias",
+    "description": "Concilia los números del reloj con las personas del sistema. Elige un número y luego a quién pertenece; no se guarda nada hasta que confirmas.",
+    "readOnly": "Solo lectura: te falta el permiso para vincular. Puedes ver las diferencias, pero no asignar.",
+    "summary": "{{missing}} sin vincular · {{free}} personas sin número en el reloj",
+    "clock": {
+      "title": "Del reloj",
+      "search": "Número o nombre del reloj",
+      "onlyMissing": "Solo sin vincular",
+      "empty": "No queda ningún número por vincular.",
+      "punches": "{{count}} checadas"
+    },
+    "people": {
+      "title": "Del sistema",
+      "search": "Nombre o número de nómina",
+      "onlyFree": "Solo sin número",
+      "empty": "Todas las personas ya tienen número en el reloj.",
+      "assigned": "Ya en {{number}}"
+    },
+    "action": {
+      "assign": "Asignar",
+      "change": "Cambiar",
+      "unlink": "Desvincular",
+      "cancel": "Cancelar",
+      "pickClock": "Elige un número del reloj",
+      "pickPerson": "y luego la persona a la que pertenece",
+      "assignedWarning": "{{name}} ya está asignado a {{number}}; se puede asignar también a este número."
+    },
+    "toasts": {
+      "linked": "{{number}} asignado a {{name}}",
+      "unlinked": "{{number}} desvinculado"
+    },
+    "errors": {
+      "load": "No se pudieron leer los empleados del reloj",
+      "people": "No se pudieron cargar las personas del sistema",
       "save": "No se pudo guardar el vínculo"
     }
   },

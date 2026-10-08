@@ -28,6 +28,14 @@ export const useTimeClockEmployees = () => {
   const [target, setTarget] = useState<TimeClockEmployee | null>(null);
   const [userId, setUserId] = useState("");
   const [saving, setSaving] = useState(false);
+  /**
+   * Número del reloj cuya fila se está guardando. Es aparte de `saving` (el del
+   * diálogo y el del botón masivo) para no deshabilitar TODA la tabla mientras
+   * se vincula una fila.
+   */
+  const [savingNumber, setSavingNumber] = useState<string | null>(null);
+  /** Total de números que cumplen los filtros (encabezado de la tabla). */
+  const [tableTotal, setTableTotal] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -64,6 +72,7 @@ export const useTimeClockEmployees = () => {
       sort: params.sort,
     });
     setSummary(res.summary);
+    setTableTotal(res.total);
     return {
       data: res.data as unknown as Record<string, unknown>[],
       total: res.total,
@@ -73,6 +82,7 @@ export const useTimeClockEmployees = () => {
   const save = useCallback(
     async (row: TimeClockEmployee, uid: string) => {
       setSaving(true);
+      setSavingNumber(row.employeeNumber);
       setError(null);
       try {
         const res = await timeClockApi.linkEmployee(row.employeeNumber, uid);
@@ -85,6 +95,7 @@ export const useTimeClockEmployees = () => {
         setError(e instanceof Error ? e.message : t("employees.errors.save"));
       } finally {
         setSaving(false);
+        setSavingNumber(null);
       }
     },
     [t]
@@ -110,12 +121,15 @@ export const useTimeClockEmployees = () => {
   const unlinkEmployee = useCallback(
     async (row: TimeClockEmployee) => {
       setError(null);
+      setSavingNumber(row.employeeNumber);
       try {
         await timeClockApi.unlinkEmployee(row.employeeNumber);
         setToast(t("employees.toasts.unlinked", { number: row.employeeNumber }));
         setReloadKey((k) => k + 1);
       } catch (e) {
         setError(e instanceof Error ? e.message : t("employees.errors.save"));
+      } finally {
+        setSavingNumber(null);
       }
     },
     [t]
@@ -146,12 +160,14 @@ export const useTimeClockEmployees = () => {
     fetchTableData,
     reloadKey,
     summary,
+    tableTotal,
     users,
     target,
     setTarget,
     userId,
     setUserId,
     saving,
+    savingNumber,
     openLink,
     confirm,
     acceptSuggestion,
