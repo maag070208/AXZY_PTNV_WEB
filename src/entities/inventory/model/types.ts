@@ -291,6 +291,8 @@ export interface InventoryAudit {
       linked?: number;
       /** Existencia (kardex) del dispositivo hoy. */
       ledger?: number;
+      /** Unidades físicas DISPONIBLES del dispositivo (regla del kardex). */
+      available?: number;
       /** Piezas que quedarían ligadas al renglón al resolverlo. */
       linkedAfter?: number;
       /** Existencia del dispositivo si la cantidad del renglón queda en `linkedAfter`. */

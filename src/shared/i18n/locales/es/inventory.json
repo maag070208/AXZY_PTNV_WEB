@@ -520,6 +520,10 @@
     "optQuantityWhyUp": "El movimiento tiene más piezas registradas que las que declara: al dejarlo en {{n}}, el disponible del dispositivo sube de {{from}} a {{to}}.",
     "optReviewWhy": "No toca el movimiento ni el inventario: solo queda anotado quién lo revisó.",
     "compareHint": "«Hoy» es lo que hay registrado; «Después», cómo queda con la opción marcada.",
-    "sayQuantityNext": "Después cuenta las piezas físicas del dispositivo y registra el ajuste de entrada que las devuelva al inventario."
+    "sayQuantityNext": "Después cuenta las piezas físicas del dispositivo y registra el ajuste de entrada que las devuelva al inventario.",
+    "chipLedger": "Kardex {{n}}",
+    "chipAvailable": "Disponibles {{n}}",
+    "viewDevice": "Ver dispositivo",
+    "noMismatchesShort": "Sin movimientos descuadrados"
   }
 }

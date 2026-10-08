@@ -253,7 +253,7 @@ export default function InventoryMismatchesBoard() {
           </span>
           <ITFlex direction="column" gap={0}>
             <ITText className="!text-[13px] font-bold text-slate-800">
-              {total ? t("audit.summary", { count: total }) : t("audit.noMismatches")}
+              {total ? t("audit.summary", { count: total }) : t("audit.noMismatchesShort")}
             </ITText>
             <ITText className="!text-[11px] text-slate-500">
               {total

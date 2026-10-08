@@ -18,6 +18,9 @@ export default function InventoryAuditCard() {
   const { audit, loading, error, reload } = useInventoryAudit(true);
   const navigate = useNavigate();
   const failing = audit?.checks.filter((c) => c.count > 0) ?? [];
+  // Solo los movimientos descuadrados se resuelven en su pantalla; las otras
+  // reglas (kardex, préstamos) se corrigen en el dispositivo o en la carta.
+  const resolubles = audit?.checks.find((c) => c.key === "MOVEMENT_UNITS_MISMATCH")?.count ?? 0;
 
   /** Abre la pantalla de descuadres con ese renglón ya elegido. */
   const abrirDescuadre = (movementItemId?: string) =>
@@ -45,7 +48,7 @@ export default function InventoryAuditCard() {
               <ITText className="text-[11px] font-bold">{t("audit.run")}</ITText>
             </ITFlex>
           </ITButton>
-          {failing.length > 0 && (
+          {resolubles > 0 && (
             <ITButton variant="filled" color="primary" size="sm" onClick={() => abrirDescuadre()}>
               <ITText className="text-[11px] font-bold">{t("audit.resolveScreen")}</ITText>
             </ITButton>
@@ -111,6 +114,16 @@ export default function InventoryAuditCard() {
                             )}
                           </ITFlex>
                         )}
+                        {row.available !== undefined && row.ledger !== undefined && (
+                          <ITFlex align="center" gap={1} wrap="wrap">
+                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                              {t("audit.chipLedger", { n: row.ledger })}
+                            </span>
+                            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+                              {t("audit.chipAvailable", { n: row.available })}
+                            </span>
+                          </ITFlex>
+                        )}
                         {row.movementItemId && (
                           <ITButton
                             variant="outlined"
@@ -120,6 +133,17 @@ export default function InventoryAuditCard() {
                             onClick={() => abrirDescuadre(row.movementItemId)}
                           >
                             <ITText className="text-[10px] font-bold">{t("audit.resolve")}</ITText>
+                          </ITButton>
+                        )}
+                        {row.deviceId && !row.movementItemId && (
+                          <ITButton
+                            variant="outlined"
+                            color="secondary"
+                            size="sm"
+                            className="!ml-auto"
+                            onClick={() => navigate(`/inventory/devices/${row.deviceId}`)}
+                          >
+                            <ITText className="text-[10px] font-bold">{t("audit.viewDevice")}</ITText>
                           </ITButton>
                         )}
                       </ITFlex>

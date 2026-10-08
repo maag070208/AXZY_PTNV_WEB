@@ -520,6 +520,10 @@
     "optQuantityWhyUp": "The movement has more registered pieces than it claims: setting it to {{n}} raises the device stock from {{from}} to {{to}}.",
     "optReviewWhy": "It touches neither the movement nor the inventory: it only records who reviewed it.",
     "compareHint": "“Today” is what is registered; “After” is how it ends up with the selected option.",
-    "sayQuantityNext": "Then count the physical pieces of the device and register the incoming adjustment that brings them back into the inventory."
+    "sayQuantityNext": "Then count the physical pieces of the device and register the incoming adjustment that brings them back into the inventory.",
+    "chipLedger": "Ledger {{n}}",
+    "chipAvailable": "Available {{n}}",
+    "viewDevice": "View device",
+    "noMismatchesShort": "No mismatched movements"
   }
 }
