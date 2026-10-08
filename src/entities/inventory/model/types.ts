@@ -286,8 +286,15 @@ export interface InventoryAudit {
       movementType?: string;
       date?: string;
       device?: string;
+      deviceId?: string;
       quantity?: number;
       linked?: number;
+      /** Existencia (kardex) del dispositivo hoy. */
+      ledger?: number;
+      /** Piezas que quedarían ligadas al renglón al resolverlo. */
+      linkedAfter?: number;
+      /** Existencia del dispositivo si la cantidad del renglón queda en `linkedAfter`. */
+      ledgerIfQuantity?: number;
     }[];
   }[];
 }

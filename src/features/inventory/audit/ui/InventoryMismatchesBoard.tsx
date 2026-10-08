@@ -21,8 +21,12 @@ type Row = {
   movementType?: string;
   date?: string;
   device?: string;
+  deviceId?: string;
   quantity?: number;
   linked?: number;
+  ledger?: number;
+  linkedAfter?: number;
+  ledgerIfQuantity?: number;
 };
 
 type Mode = "link" | "quantity" | "review";
@@ -30,37 +34,12 @@ type Mode = "link" | "quantity" | "review";
 /** `YYYY-MM-DD` → `DD/MM/AAAA` sin pasar por `Date`. */
 const formatDay = (day?: string): string => (day ? day.split("-").reverse().join("/") : "");
 
-/** Etiqueta compacta de conteo (dice / registradas / faltan). */
-const Chip = ({ children, tone = "slate" }: { children: ReactNode; tone?: "slate" | "amber" | "sky" }) => {
-  const tones = {
-    slate: "bg-slate-100 text-slate-600",
-    sky: "bg-sky-50 text-sky-700",
-    amber: "bg-amber-100 text-amber-800",
-  } as const;
-  return <span className={`rounded-full px-2 py-0.5 !text-[10px] font-bold ${tones[tone]}`}>{children}</span>;
-};
-
-/** Número grande del resumen del descuadre. */
-const Num = ({ label, value, tone }: { label: string; value: number; tone: "slate" | "sky" | "amber" }) => {
-  const tones = {
-    slate: "border-slate-200 bg-slate-50 text-slate-700",
-    sky: "border-sky-200 bg-sky-50 text-sky-700",
-    amber: "border-amber-200 bg-amber-50 text-amber-700",
-  } as const;
-  return (
-    <div className={`flex flex-col items-center rounded-xl border px-2 py-2 ${tones[tone]}`}>
-      <span className="!text-[10px] font-semibold uppercase tracking-wide opacity-80">{label}</span>
-      <span className="!text-[20px] font-black leading-tight tabular-nums">{value}</span>
-    </div>
-  );
-};
-
 /**
- * Pantalla para resolver un descuadre del auditor. A la izquierda la lista de
- * movimientos que no cuadran; a la derecha, el elegido con lo que dice el
- * movimiento, las piezas que tiene y las tres salidas posibles, cada una con
- * lo que le hace al inventario. Se elige una y se aplica: la que mueve las
- * existencias pide confirmación.
+ * Pantalla para resolver un descuadre del auditor. A la izquierda los
+ * movimientos que no cuadran; a la derecha, el elegido con lo que dice, las
+ * salidas que de verdad sirven y UNA comparación —cómo está hoy y cómo queda
+ * con la salida marcada—. Se elige, se ve el resultado y se aplica; la que
+ * mueve las existencias pide confirmación.
  */
 export default function InventoryMismatchesBoard() {
   const { t } = useTranslation(["inventory", "common"]);
@@ -87,10 +66,21 @@ export default function InventoryMismatchesBoard() {
   }, [preseleccionAplicada, sel, preseleccion, filas]);
 
   const total = filas.length;
-  const porRegistrar = filas.reduce((s, f) => s + Math.max(0, (f.quantity ?? 0) - (f.linked ?? 0)), 0);
+  // Lo que de verdad se puede registrar (piezas que existen y están libres),
+  // no la suma de lo que "dice" cada renglón.
+  const porRegistrar = filas.reduce(
+    (s, f) => s + Math.max(0, (f.linkedAfter ?? f.linked ?? 0) - (f.linked ?? 0)),
+    0
+  );
 
-  const faltan = Math.max(0, (sel?.quantity ?? 0) - (sel?.linked ?? 0));
-  const sobran = Math.max(0, (sel?.linked ?? 0) - (sel?.quantity ?? 0));
+  // Cómo está hoy el movimiento y el inventario del dispositivo.
+  const dice = sel?.quantity ?? 0;
+  const registradas = sel?.linked ?? 0;
+  const disponible = sel?.ledger ?? 0;
+  const quedanRegistradas = sel?.linkedAfter ?? registradas;
+  /** Piezas que existen libres y se le pueden ligar (nunca más de las que faltan). */
+  const ligables = Math.max(0, quedanRegistradas - registradas);
+  const sobran = Math.max(0, registradas - dice);
 
   const elegir = (fila: Row) => {
     setListo(null);
@@ -123,7 +113,7 @@ export default function InventoryMismatchesBoard() {
     }
   };
 
-  /** Aplica lo elegido; dejar la cantidad cambia existencias, así que confirma. */
+  /** Aplica lo elegido; cuadrar la cantidad mueve existencias, así que confirma. */
   const aplicar = () => {
     if (!modo) return;
     if (modo === "quantity") {
@@ -133,48 +123,78 @@ export default function InventoryMismatchesBoard() {
     void resolver(modo);
   };
 
-  const opcion = (opts: {
-    mode: Mode;
-    icono: ReactNode;
-    titulo: string;
-    aviso: string;
-    etiqueta: string;
-    tono: "emerald" | "amber" | "slate";
-    enabled?: boolean;
-  }) => {
-    const activo = modo === opts.mode;
-    const deshabilitado = guardando || opts.enabled === false;
-    const tonos = {
-      emerald: { icono: "bg-emerald-50 text-emerald-600", tag: "bg-emerald-50 text-emerald-700" },
-      amber: { icono: "bg-amber-50 text-amber-600", tag: "bg-amber-100 text-amber-800" },
-      slate: { icono: "bg-slate-100 text-slate-500", tag: "bg-slate-100 text-slate-600" },
-    } as const;
+  /**
+   * Salidas que SÍ sirven para este renglón: ligar (solo si hay piezas libres),
+   * cuadrar la cantidad (solo si de verdad cambia) y darlo por revisado. Así no
+   * se ofrecen dos botones que hacen lo mismo.
+   */
+  const opciones: { mode: Mode; icono: ReactNode; titulo: string; etiqueta: string; tono: "emerald" | "amber" | "slate" }[] =
+    [];
+  if (ligables > 0) {
+    opciones.push({
+      mode: "link",
+      icono: <FaLink size={13} />,
+      titulo: t("audit.optLink", { n: ligables }),
+      etiqueta: t("audit.tagNoStock"),
+      tono: "emerald",
+    });
+  }
+  if (quedanRegistradas !== dice) {
+    opciones.push({
+      mode: "quantity",
+      icono: <FaBalanceScale size={13} />,
+      titulo: t("audit.optQuantity", { n: quedanRegistradas }),
+      etiqueta: t("audit.tagStock"),
+      tono: "amber",
+    });
+  }
+  opciones.push({
+    mode: "review",
+    icono: <FaClipboardCheck size={13} />,
+    titulo: t("audit.optReview"),
+    etiqueta: t("audit.tagNothing"),
+    tono: "slate",
+  });
+
+  // Diagnóstico en una línea: por qué no cuadra y con qué se arregla.
+  const diagnostico = sobran > 0 ? t("audit.diagExtra") : ligables > 0 ? t("audit.diagFree", { n: ligables }) : t("audit.diagNone");
+
+  // Cómo queda con la salida marcada (sin marcar, todavía no hay "después").
+  const despues =
+    modo === null
+      ? null
+      : {
+          dice: modo === "quantity" ? quedanRegistradas : dice,
+          registradas: modo === "review" ? registradas : quedanRegistradas,
+          disponible: modo === "quantity" ? (sel?.ledgerIfQuantity ?? disponible) : disponible,
+        };
+
+  /** Renglón de la comparación: cómo está hoy y cómo queda (con su cambio). */
+  const Comparacion = ({ label, hoy, luego }: { label: string; hoy: number; luego?: number }) => {
+    const delta = luego === undefined ? 0 : luego - hoy;
     return (
-      <button
-        type="button"
-        disabled={deshabilitado}
-        aria-pressed={activo}
-        onClick={() => setModo(opts.mode)}
-        className={`flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
-          activo
-            ? "border-[#0D5777] !bg-[#0D5777]/5 ring-1 ring-[#0D5777]/30"
-            : "border-slate-200 !bg-white hover:border-slate-300 hover:!bg-slate-50"
-        }`}
-      >
-        <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tonos[opts.tono].icono}`}>
-          {opts.icono}
+      <div className="flex items-center border-t border-slate-100 px-3 py-2">
+        <span className="min-w-0 flex-1 !text-[11px] text-slate-600">{label}</span>
+        <span className="w-14 shrink-0 text-center !text-[13px] font-bold tabular-nums text-slate-700">{hoy}</span>
+        <span className="w-20 shrink-0 text-center">
+          {luego === undefined ? (
+            <span className="!text-[12px] text-slate-300">—</span>
+          ) : (
+            <>
+              <span
+                className={`!text-[13px] font-black tabular-nums ${delta === 0 ? "text-slate-700" : delta > 0 ? "text-emerald-700" : "text-amber-700"}`}
+              >
+                {luego}
+              </span>
+              {delta !== 0 && (
+                <span className={`ml-1 !text-[10px] font-bold tabular-nums ${delta > 0 ? "text-emerald-600" : "text-amber-600"}`}>
+                  {delta > 0 ? `+${delta}` : delta}
+                </span>
+              )}
+            </>
+          )}
         </span>
-        <span className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="flex flex-wrap items-center gap-2">
-            <span className="!text-[12px] font-bold text-slate-800">{opts.titulo}</span>
-            <span className={`rounded-full px-2 py-0.5 !text-[9px] font-bold uppercase ${tonos[opts.tono].tag}`}>
-              {opts.etiqueta}
-            </span>
-            {activo && <FaCheckCircle className="ml-auto shrink-0 text-[#0D5777]" size={13} />}
-          </span>
-          <span className="!text-[11px] leading-snug text-slate-500">{opts.aviso}</span>
-        </span>
-      </button>
+      </div>
     );
   };
 
@@ -251,14 +271,13 @@ export default function InventoryMismatchesBoard() {
                         {activo && <FaCheckCircle className="ml-auto shrink-0 text-[#0D5777]" size={13} />}
                       </span>
                       <span className="!text-[13px] font-semibold text-slate-800">{f.device}</span>
-                      <span className="flex flex-wrap items-center gap-1.5">
-                        <Chip>{t("audit.chipSays", { n: f.quantity ?? 0 })}</Chip>
-                        <Chip tone="sky">{t("audit.chipLinked", { n: f.linked ?? 0 })}</Chip>
-                        {falta > 0 ? (
-                          <Chip tone="amber">{t("audit.chipMissing", { n: falta })}</Chip>
-                        ) : (
-                          <Chip tone="amber">{t("audit.chipExtra", { n: sobra })}</Chip>
-                        )}
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span className="!text-[11px] text-slate-500">
+                          {t("audit.movementUnits", { quantity: f.quantity ?? 0, linked: f.linked ?? 0 })}
+                        </span>
+                        <span className="rounded-full bg-amber-100 px-2 py-0.5 !text-[10px] font-bold text-amber-800">
+                          {falta > 0 ? t("audit.chipMissing", { n: falta }) : t("audit.chipExtra", { n: sobra })}
+                        </span>
                       </span>
                     </button>
                   );
@@ -306,29 +325,87 @@ export default function InventoryMismatchesBoard() {
                 </ITFlex>
               </ITFlex>
             ) : (
-              <ITFlex direction="column" gap={3}>
-                <ITFlex direction="column" gap={2} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <ITFlex direction="column" gap={4}>
+                {/* Qué movimiento es y por qué no cuadra. */}
+                <ITFlex direction="column" gap={1}>
                   <ITFlex align="center" gap={2} wrap="wrap">
                     <span className="rounded-full bg-amber-200/70 px-2 py-0.5 !text-[10px] font-bold text-amber-900">
                       {sel.movementType}
                     </span>
                     <ITText className="!text-[11px] text-slate-500">{formatDay(sel.date)}</ITText>
                   </ITFlex>
-                  <ITText className="!text-[14px] font-bold text-slate-800">{sel.device}</ITText>
+                  <ITText className="!text-[15px] font-bold text-slate-800">{sel.device}</ITText>
                   <ITText className="!text-[11px] text-slate-500">
-                    {t("audit.resolveHint", { quantity: sel.quantity ?? 0, linked: sel.linked ?? 0 })}
+                    {t("audit.resolveHint", { quantity: dice, linked: registradas })}
                   </ITText>
+                  <ITText className="!text-[11px] font-semibold text-slate-600">{diagnostico}</ITText>
                 </ITFlex>
 
-                <div className="!grid grid-cols-3 gap-2">
-                  <Num label={t("audit.statSays")} value={sel.quantity ?? 0} tone="slate" />
-                  <Num label={t("audit.statLinked")} value={sel.linked ?? 0} tone="sky" />
-                  {faltan > 0 ? (
-                    <Num label={t("audit.statMissing")} value={faltan} tone="amber" />
-                  ) : (
-                    <Num label={t("audit.statExtra")} value={sobran} tone="amber" />
+                {/* Las salidas que sirven, sin repetir lo que hace cada una. */}
+                <ITFlex direction="column" gap={2}>
+                  <ITText className="!text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                    {t("audit.whatToDo")}
+                  </ITText>
+                  {opciones.map((o) => {
+                    const activo = modo === o.mode;
+                    const tonos = {
+                      emerald: { icono: "bg-emerald-50 text-emerald-600", tag: "bg-emerald-50 text-emerald-700" },
+                      amber: { icono: "bg-amber-50 text-amber-600", tag: "bg-amber-100 text-amber-800" },
+                      slate: { icono: "bg-slate-100 text-slate-500", tag: "bg-slate-100 text-slate-600" },
+                    } as const;
+                    return (
+                      <button
+                        key={o.mode}
+                        type="button"
+                        disabled={guardando}
+                        aria-pressed={activo}
+                        onClick={() => setModo(o.mode)}
+                        className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                          activo
+                            ? "border-[#0D5777] !bg-[#0D5777]/5 ring-1 ring-[#0D5777]/30"
+                            : "border-slate-200 !bg-white hover:border-slate-300 hover:!bg-slate-50"
+                        }`}
+                      >
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tonos[o.tono].icono}`}>
+                          {o.icono}
+                        </span>
+                        <span className="!text-[12px] font-bold text-slate-800">{o.titulo}</span>
+                        <span className={`ml-auto shrink-0 rounded-full px-2 py-0.5 !text-[9px] font-bold uppercase ${tonos[o.tono].tag}`}>
+                          {o.etiqueta}
+                        </span>
+                        <span
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                            activo ? "border-[#0D5777] bg-[#0D5777]" : "border-slate-300 bg-white"
+                          }`}
+                        >
+                          {activo && <FaCheckCircle className="text-white" size={9} />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                  {opciones.length === 1 && (
+                    <ITText className="!text-[11px] text-slate-500">{t("audit.onlyReview")}</ITText>
                   )}
-                </div>
+                </ITFlex>
+
+                {/* Una sola comparación: cómo está hoy y cómo queda. */}
+                <ITFlex direction="column" gap={0} className="overflow-hidden rounded-xl border border-slate-200">
+                  <div className="flex items-center bg-slate-50 px-3 py-2">
+                    <span className="min-w-0 flex-1 !text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                      {t("audit.compareTitle")}
+                    </span>
+                    <span className="w-14 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                      {t("audit.colToday")}
+                    </span>
+                    <span className="w-20 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                      {t("audit.colAfter")}
+                    </span>
+                  </div>
+                  <Comparacion label={t("audit.rowSays")} hoy={dice} luego={despues?.dice} />
+                  <Comparacion label={t("audit.rowRegistered")} hoy={registradas} luego={despues?.registradas} />
+                  <Comparacion label={t("audit.rowAvailable")} hoy={disponible} luego={despues?.disponible} />
+                </ITFlex>
+                {!despues && <ITText className="!text-[11px] text-slate-400">{t("audit.afterPick")}</ITText>}
 
                 {fallo && (
                   <ITText className="!text-[11px] font-bold text-red-600">
@@ -336,41 +413,7 @@ export default function InventoryMismatchesBoard() {
                   </ITText>
                 )}
 
-                <ITFlex direction="column" gap={2}>
-                  {opcion({
-                    mode: "link",
-                    icono: <FaLink size={13} />,
-                    titulo: t("audit.optLink", { n: faltan }),
-                    aviso: t("audit.optLinkHint", { n: faltan }),
-                    etiqueta: t("audit.tagNoStock"),
-                    tono: "emerald",
-                    enabled: faltan > 0,
-                  })}
-                  {opcion({
-                    mode: "quantity",
-                    icono: <FaBalanceScale size={13} />,
-                    titulo: t("audit.optQuantity", { n: sel.linked ?? 0 }),
-                    aviso: t("audit.optQuantityHint", { n: sel.linked ?? 0 }),
-                    etiqueta: t("audit.tagStock"),
-                    tono: "amber",
-                  })}
-                  {opcion({
-                    mode: "review",
-                    icono: <FaClipboardCheck size={13} />,
-                    titulo: t("audit.optReview"),
-                    aviso: t("audit.optReviewHint"),
-                    etiqueta: t("audit.tagNothing"),
-                    tono: "slate",
-                  })}
-                </ITFlex>
-
-                <ITFlex
-                  align="center"
-                  justify="between"
-                  wrap="wrap"
-                  gap={2}
-                  className="border-t border-slate-100 pt-3"
-                >
+                <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="border-t border-slate-100 pt-3">
                   <ITText className="!text-[11px] text-slate-500">
                     {modo ? t("audit.applyHint") : t("audit.pickOption")}
                   </ITText>
@@ -393,11 +436,7 @@ export default function InventoryMismatchesBoard() {
         }}
         onConfirm={() => void resolver("quantity")}
         title={t("audit.confirmQuantityTitle")}
-        message={t("audit.confirmQuantityMessage", {
-          device: sel?.device ?? "",
-          quantity: sel?.quantity ?? 0,
-          n: sel?.linked ?? 0,
-        })}
+        message={t("audit.confirmQuantityMessage", { device: sel?.device ?? "", quantity: dice, n: quedanRegistradas })}
         confirmLabel={t("audit.confirmQuantityConfirm")}
         cancelLabel={t("common:actions.cancel")}
         variant="danger"
