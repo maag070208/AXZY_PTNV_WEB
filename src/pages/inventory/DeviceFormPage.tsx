@@ -49,6 +49,7 @@ export default function DeviceFormPage() {
     name: "",
     brand: "",
     model: "",
+    code: "",
     description: "",
   });
   const [quantity, setQuantity] = useState("3");
@@ -101,6 +102,7 @@ export default function DeviceFormPage() {
         name: form.name.trim(),
         brand: form.brand.trim(),
         model: form.model.trim(),
+        code: form.code.trim() || undefined,
         description: form.description || undefined,
         units: units.map((u) => ({
           serialNumber: u.serialNumber || undefined,
@@ -187,6 +189,9 @@ export default function DeviceFormPage() {
                 </ITGrid>
                 <ITGrid item xs={12} md={4}>
                   <ITInput name="model" label={t("devices.model")} value={form.model} onChange={(e) => setForm((f) => ({ ...f, model: e.target.value }))} required />
+                </ITGrid>
+                <ITGrid item xs={12} md={4}>
+                  <ITInput name="code" label={t("devices.barcode")} value={form.code} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))} />
                 </ITGrid>
                 <ITGrid item xs={12} md={4}>
                   <ITInput name="description" label={t("devices.descriptionField")} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />

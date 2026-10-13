@@ -11,10 +11,10 @@ interface Props {
 }
 
 /**
- * Edición del ticket (estado, categoría, departamento y responsable) en un
- * diálogo: la pantalla de detalle enseña los datos y aquí se cambian, en vez de
- * tener cuatro selectores abiertos siempre ocupando media pantalla. Cada campo
- * se guarda al elegirlo (los avisos y el refresco los lleva `useTicketDetail`).
+ * Edición del ticket (estado, categoría y departamento) en un diálogo. El
+ * responsable se elige directo en la tarjeta del detalle (`TicketInfoCard`).
+ * Cada campo se guarda al elegirlo (los avisos y el refresco los lleva
+ * `useTicketDetail`).
  */
 export default function TicketEditDialog({ fx, open, onClose }: Props) {
   const { t: tt } = useTranslation("tickets");
@@ -60,15 +60,6 @@ export default function TicketEditDialog({ fx, open, onClose }: Props) {
               ]}
               value={ticket.departmentId ?? ""}
               onChange={(e) => fx.handleDepartmentChange(e.target.value)}
-            />
-          </ITGrid>
-          <ITGrid item xs={12} sm={6}>
-            <ITSelect
-              name="custodian"
-              label={tt("detail.responsible")}
-              options={[{ value: "", label: tt("detail.noResponsible") }, ...fx.assigneeOptions]}
-              value={ticket.assignedToId ?? ""}
-              onChange={(e) => fx.handleResponsibleChange(e.target.value)}
             />
           </ITGrid>
         </ITGrid>

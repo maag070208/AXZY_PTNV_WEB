@@ -4,6 +4,7 @@ import { API_CONSTANTS } from "@shared/api/constants/API_CONSTANTS";
 import type {
   PersonalProfile,
   PersonalProfileUpdateInput,
+  EmployeeAssignmentInput,
   PersonalStats,
   EmployeeDiscount,
   EmployeeDocument,
@@ -21,6 +22,8 @@ export const personalApi = {
   get: (id: string) => api.get<PersonalProfile>(`/hr/${id}`),
   updateProfile: (id: string, data: PersonalProfileUpdateInput) =>
     api.patch<PersonalProfile>(`/hr/${id}/profile`, data),
+  assignDepartments: (data: EmployeeAssignmentInput) =>
+    api.post<{ updated: number }>(`/hr/assignment`, data),
   setDiscounts: (id: string, discounts: EmployeeDiscount[]) =>
     api.put<PersonalProfile>(`/hr/${id}/discounts`, { discounts }),
 

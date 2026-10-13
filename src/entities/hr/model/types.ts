@@ -105,6 +105,8 @@ export interface PersonalProfileUpdateInput {
   /** Datos laborales: también viven en el expediente. */
   employeeNumber?: string | null;
   jobTitle?: string | null;
+  departmentId?: string | null;
+  subareaId?: string | null;
   paternalSurname?: string | null;
   maternalSurname?: string | null;
   email?: string | null;
@@ -168,4 +170,11 @@ export interface DisciplinaryReportCreateInput {
   incidentDate: string;
   description: string;
   sanction?: string;
+}
+
+/** Asignación en lote de departamento y subárea a varios empleados (RH). */
+export interface EmployeeAssignmentInput {
+  userIds: string[];
+  departmentId: string | null;
+  subareaId?: string | null;
 }

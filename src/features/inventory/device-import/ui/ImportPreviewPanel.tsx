@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ITAlert, ITBadget, ITButton, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITBadget, ITButton, ITDataTable, ITFlex, ITSelect, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaLayerGroup, FaListOl, FaPlus, FaTimesCircle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { KpiTile } from "@shared/ui/kpi-tile";
@@ -81,6 +81,9 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
           <ITText className="!text-[10px] text-slate-400">
             {row.brand} · {row.model}
           </ITText>
+          <ITText className="!text-[10px] text-slate-400">
+            {row.code ? t("import.codeLine", { code: row.code }) : t("import.codeAuto")}
+          </ITText>
         </ITFlex>
       ),
     },
@@ -100,6 +103,23 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
               </ITText>
             )}
           </ITFlex>
+          <ITSelect
+            name={`type-${row.row}`}
+            label=""
+            disabled={fx.loading || fx.confirming}
+            options={[
+              {
+                value: "",
+                label:
+                  row.typeMissing || row.typeUnknown
+                    ? t("import.typeGeneric")
+                    : t("import.typeFromFile"),
+              },
+              ...fx.types.map((type) => ({ value: type.id, label: type.name })),
+            ]}
+            value={fx.typeOverrides[row.row] ?? ""}
+            onChange={(e) => fx.setTypeOverride(row.row, e.target.value)}
+          />
           {row.mergedRows.length > 0 && (
             <ITText className="!text-[10px] text-slate-400">
               {t("import.mergedWith", { row: row.mergedRows[0] })}

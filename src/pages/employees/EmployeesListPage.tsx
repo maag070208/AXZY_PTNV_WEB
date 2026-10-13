@@ -62,6 +62,7 @@ export default function EmployeesListPage() {
         reloadKey={list.reloadKey}
         onView={(u) => navigate(`/employees/${u.id}`)}
         onEdit={(u) => navigate(`/employees/${u.id}/edit`)}
+        onChanged={list.reload}
       />
     </ITPage>
   );

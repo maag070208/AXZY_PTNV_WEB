@@ -1,4 +1,4 @@
-import { ITBadget, ITButton, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITFlex, ITGrid, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaPen } from "react-icons/fa";
 import { formatDateTime } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
@@ -12,9 +12,11 @@ interface Props {
   attachments: React.ReactNode;
   /** Abre el diálogo de edición; sin él (cerrado o sin permiso) no se pinta. */
   onEdit?: () => void;
+  /** Permite elegir el responsable aquí mismo, sin pasar por el diálogo. */
+  canAssign?: boolean;
 }
 
-export default function TicketInfoCard({ fx, attachments, onEdit }: Props) {
+export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: Props) {
   const { t: tt } = useTranslation("tickets");
   const ticket = fx.ticket;
   if (!ticket) return null;
@@ -80,14 +82,24 @@ export default function TicketInfoCard({ fx, attachments, onEdit }: Props) {
             </ITStack>
           </ITGrid>
           <ITGrid item xs={12} sm={6} md={4}>
-            <ITStack direction="column" spacing={1}>
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                {tt("detail.assignedTo")}
-              </ITText>
-              <ITText className="text-[12px] font-bold text-slate-700 truncate">
-                {ticket.assignedTo?.name ?? tt("detail.unassigned")}
-              </ITText>
-            </ITStack>
+            {canAssign ? (
+              <ITSelect
+                name="responsible"
+                label={tt("detail.responsible")}
+                options={[{ value: "", label: tt("detail.noResponsible") }, ...fx.assigneeOptions]}
+                value={ticket.assignedToId ?? ""}
+                onChange={(e) => fx.handleResponsibleChange(e.target.value)}
+              />
+            ) : (
+              <ITStack direction="column" spacing={1}>
+                <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                  {tt("detail.assignedTo")}
+                </ITText>
+                <ITText className="text-[12px] font-bold text-slate-700 truncate">
+                  {ticket.assignedTo?.name ?? tt("detail.unassigned")}
+                </ITText>
+              </ITStack>
+            )}
           </ITGrid>
           <ITGrid item xs={12} sm={6} md={4}>
             <ITStack direction="column" spacing={1}>

@@ -1,19 +1,23 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { inventoryApi } from "@entities/inventory";
-import type { DeviceImportPreview, DeviceImportResult } from "@entities/inventory";
+import type { DeviceImportPreview, DeviceImportResult, DeviceType } from "@entities/inventory";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 
 /** Paso del asistente: subir el archivo, revisar lo que va a pasar, confirmar. */
 export type DeviceImportStep = "upload" | "review" | "done";
+
+/** Tipo elegido a mano por número de fila de Excel. */
+export type TypeOverrides = Record<number, string>;
 
 /**
  * Asistente de carga masiva de dispositivos.
  *
  * El archivo se conserva en memoria entre los dos pasos porque la confirmación
  * lo vuelve a mandar a la API: el servidor revalida el archivo real en vez de
- * confiar en lo que la pantalla revisó. La clave de idempotencia se deriva del
- * archivo, así que un doble clic en "Confirmar" no da de alta las unidades dos
- * veces (la API devuelve el mismo movimiento y lo avisa).
+ * confiar en lo que la pantalla revisó. Los tipos elegidos por fila viajan con
+ * el archivo en ambos pasos, así lo revisado es lo que se carga. La clave de
+ * idempotencia se deriva del archivo y de esas elecciones, así que un doble clic
+ * en "Confirmar" no da de alta las unidades dos veces.
  */
 export const useDeviceImport = () => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -24,10 +28,18 @@ export const useDeviceImport = () => {
   const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [typeOverrides, setTypeOverrides] = useState<TypeOverrides>({});
+  const [types, setTypes] = useState<DeviceType[]>([]);
 
-  // Una clave por archivo+contenido revisado: reenviar el MISMO archivo (doble
-  // clic, reintento tras un corte) no duplica unidades; si el archivo cambia,
-  // la clave cambia y es una carga nueva.
+  useEffect(() => {
+    inventoryApi
+      .types()
+      .then((list) => setTypes(list.filter((type) => type.active)))
+      .catch(() => setTypes([]));
+  }, []);
+
+  // Una clave por archivo+contenido+elecciones revisadas: reenviar lo MISMO no
+  // duplica unidades; si cambia el archivo o un tipo, es una carga distinta.
   const requestKeyOf = useRequestKey();
   const requestKey = useCallback(
     () =>
@@ -36,8 +48,9 @@ export const useDeviceImport = () => {
         size: file?.size ?? 0,
         lastModified: file?.lastModified ?? 0,
         summary: preview?.summary ?? null,
+        typeOverrides,
       }),
-    [file, preview, requestKeyOf]
+    [file, preview, typeOverrides, requestKeyOf]
   );
 
   const reset = useCallback(() => {
@@ -46,19 +59,18 @@ export const useDeviceImport = () => {
     setPreview(null);
     setResult(null);
     setError(null);
+    setTypeOverrides({});
     if (inputRef.current) inputRef.current.value = "";
   }, []);
 
-  /** Paso 1: sube el archivo y trae la previsualización (no crea nada). */
-  const handlePreview = useCallback(
-    async (selected?: File | null) => {
-      const target = selected ?? file;
-      if (!target) return;
+  /** Trae la previsualización (no crea nada) con las elecciones de tipo dadas. */
+  const runPreview = useCallback(
+    async (target: File, overrides: TypeOverrides) => {
       setLoading(true);
       setError(null);
       setResult(null);
       try {
-        const data = await inventoryApi.previewDeviceImport(target);
+        const data = await inventoryApi.previewDeviceImport(target, overrides);
         setFile(target);
         setPreview(data);
         setStep("review");
@@ -70,7 +82,36 @@ export const useDeviceImport = () => {
         setLoading(false);
       }
     },
-    [file]
+    []
+  );
+
+  /** Paso 1: sube el archivo y trae la previsualización. Un archivo nuevo empieza sin elecciones. */
+  const selectFile = useCallback(
+    (selected: File | null) => {
+      setFile(selected);
+      setPreview(null);
+      setResult(null);
+      setError(null);
+      setTypeOverrides({});
+      if (selected) void runPreview(selected, {});
+    },
+    [runPreview]
+  );
+
+  /**
+   * Cambia (o quita, con `typeId` vacío) el tipo de una fila y recalcula la
+   * previsualización. Vacío = el tipo del archivo, y si no hay, el genérico.
+   */
+  const setTypeOverride = useCallback(
+    (row: number, typeId: string) => {
+      if (!file) return;
+      const next = { ...typeOverrides };
+      if (typeId) next[row] = typeId;
+      else delete next[row];
+      setTypeOverrides(next);
+      void runPreview(file, next);
+    },
+    [file, typeOverrides, runPreview]
   );
 
   /** Paso 2: confirma la carga (todo o nada, en una transacción). */
@@ -79,7 +120,7 @@ export const useDeviceImport = () => {
     setConfirming(true);
     setError(null);
     try {
-      const data = await inventoryApi.importDevices(file, requestKey());
+      const data = await inventoryApi.importDevices(file, requestKey(), typeOverrides);
       setResult(data);
       setStep("done");
     } catch (e) {
@@ -87,7 +128,8 @@ export const useDeviceImport = () => {
     } finally {
       setConfirming(false);
     }
-  }, [file, preview, requestKey]);
+  }, [file, preview, typeOverrides, requestKey]);
+
   /** Descarga la plantilla Excel con los encabezados y el catálogo de tipos. */
   const downloadTemplate = useCallback(async () => {
     setError(null);
@@ -106,17 +148,6 @@ export const useDeviceImport = () => {
     }
   }, []);
 
-  const selectFile = useCallback(
-    (selected: File | null) => {
-      setFile(selected);
-      setPreview(null);
-      setResult(null);
-      setError(null);
-      if (selected) void handlePreview(selected);
-    },
-    [handlePreview]
-  );
-
   return {
     inputRef,
     step,
@@ -127,6 +158,9 @@ export const useDeviceImport = () => {
     confirming,
     error,
     setError,
+    types,
+    typeOverrides,
+    setTypeOverride,
     selectFile,
     confirm,
     downloadTemplate,

@@ -29,6 +29,12 @@ export interface MovementItemInput {
   notes?: string;
 }
 
+/** Tipos elegidos a mano por fila de Excel; sin elecciones no se manda el campo. */
+const appendTypeOverrides = (form: FormData, typeOverrides?: Record<number, string>) => {
+  if (!typeOverrides || Object.keys(typeOverrides).length === 0) return;
+  form.append("typeOverrides", JSON.stringify(typeOverrides));
+};
+
 export const inventoryApi = {
   // Tipos
   types: () => api.get<DeviceType[]>(`/inventory/device-types`),
@@ -49,6 +55,7 @@ export const inventoryApi = {
   },
   createDevice: (data: {
     typeId: string;
+    code?: string;
     name: string;
     brand: string;
     model: string;
@@ -60,7 +67,7 @@ export const inventoryApi = {
   getDevice: (id: string) => api.get<Device>(`/inventory/devices/${id}`),
   updateDevice: (
     id: string,
-    data: { name?: string; brand?: string; model?: string; description?: string; notes?: string }
+    data: { code?: string; name?: string; brand?: string; model?: string; description?: string; notes?: string }
   ) => api.put<Device>(`/inventory/devices/${id}`, data),
   deleteDevice: (id: string) => api.delete<Device>(`/inventory/devices/${id}`),
   stock: (id: string) => api.get<Stock>(`/inventory/devices/${id}/stock`),
@@ -154,18 +161,20 @@ export const inventoryApi = {
   ------------------------------------------------------------------------- */
 
   /** Paso 1: qué haría la carga. No escribe nada en el inventario. */
-  previewDeviceImport: (file: File) => {
+  previewDeviceImport: (file: File, typeOverrides?: Record<number, string>) => {
     const form = new FormData();
     form.append("file", file);
+    appendTypeOverrides(form, typeOverrides);
     return api.post<DeviceImportPreview>(`/inventory/devices/import/preview`, form, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
 
   /** Paso 2: la carga real, en una sola transacción (todo o nada). */
-  importDevices: (file: File, idempotencyKey?: string) => {
+  importDevices: (file: File, idempotencyKey?: string, typeOverrides?: Record<number, string>) => {
     const form = new FormData();
     form.append("file", file);
+    appendTypeOverrides(form, typeOverrides);
     return api.post<DeviceImportResult>(`/inventory/devices/import`, form, {
       headers: {
         "Content-Type": "multipart/form-data",

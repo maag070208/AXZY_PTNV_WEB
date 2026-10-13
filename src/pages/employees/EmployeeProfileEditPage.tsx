@@ -17,6 +17,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEmployeeDetail } from "@features/hr/employee-detail";
 import type { PersonalProfile, PersonalProfileUpdateInput } from "@entities/hr";
+import { departmentsApi, type Department } from "@entities/department";
 import { DatePickerPortal } from "@shared/ui/date-picker-portal";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import {
@@ -58,6 +59,8 @@ const formFromProfile = (p: PersonalProfile): FormState => ({
   middleName: p.middleName ?? "",
   employeeNumber: p.employeeNumber ?? "",
   jobTitle: p.jobTitle ?? "",
+  departmentId: p.department?.id ?? "",
+  subareaId: p.subarea?.id ?? "",
   paternalSurname: p.paternalSurname ?? "",
   maternalSurname: p.maternalSurname ?? "",
   email: p.email ?? "",
@@ -104,11 +107,16 @@ export default function EmployeeProfileEditPage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [departments, setDepartments] = useState<Department[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (detail.profile) setForm(formFromProfile(detail.profile));
   }, [detail.profile]);
+
+  useEffect(() => {
+    departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
+  }, []);
 
   const field =
     (name: keyof FormState) =>
@@ -337,6 +345,37 @@ export default function EmployeeProfileEditPage() {
             <Cell>
               <ITInput name="jobTitle" label={tt("detail.fields.position")} value={form.jobTitle ?? ""} onChange={field("jobTitle")} aria-invalid={!!errors.jobTitle} />
               {errors.jobTitle && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.jobTitle}</span>}
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <ITSelect
+                name="departmentId"
+                label={tt("detail.fields.department")}
+                options={[
+                  { value: "", label: tt("common:labels.unassigned") },
+                  ...departments.map((d) => ({ value: d.id, label: d.name })),
+                ]}
+                value={form.departmentId ?? ""}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, departmentId: e.target.value, subareaId: "" }))
+                }
+              />
+            </Cell>
+            <Cell>
+              <ITSelect
+                name="subareaId"
+                label={tt("detail.fields.subarea")}
+                disabled={!form.departmentId}
+                options={[
+                  { value: "", label: tt("common:labels.unassigned") },
+                  ...(departments.find((d) => d.id === form.departmentId)?.subareas ?? []).map(
+                    (s) => ({ value: s.id, label: s.name })
+                  ),
+                ]}
+                value={form.subareaId ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, subareaId: e.target.value }))}
+              />
             </Cell>
           </Row>
           <Row>

@@ -162,6 +162,7 @@ export default function TicketDetailPage() {
             fx={fx}
             attachments={renderTicketAttachments}
             onEdit={fx.canEditTicket && !fx.isClosed ? () => setEditOpen(true) : undefined}
+            canAssign={fx.canEditTicket && !fx.isClosed}
           />
 
           {(fx.canEditTicket || fx.canCreateTasks || fx.isInvolved) && (

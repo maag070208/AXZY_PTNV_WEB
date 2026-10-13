@@ -1,4 +1,13 @@
 {
+  "bulk": {
+    "selected": "{{count}} seleccionados",
+    "department": "Departamento",
+    "noDepartment": "Sin departamento",
+    "subarea": "Subárea",
+    "noSubarea": "Sin subárea",
+    "apply": "Asignar",
+    "clear": "Quitar selección"
+  },
   "list": {
     "title": "Usuarios",
     "description": "{{count}} usuario(s)",

@@ -40,6 +40,7 @@ export default function EditDevicePage() {
     name: "",
     brand: "",
     model: "",
+    code: "",
     description: "",
     notes: "",
   });
@@ -54,6 +55,7 @@ export default function EditDevicePage() {
           name: d.name,
           brand: d.brand,
           model: d.model,
+          code: d.code ?? "",
           description: d.description ?? "",
           notes: d.notes ?? "",
         });
@@ -81,6 +83,7 @@ export default function EditDevicePage() {
         name: form.name.trim(),
         brand: form.brand.trim(),
         model: form.model.trim(),
+        code: form.code.trim() || undefined,
         description: form.description || undefined,
         notes: form.notes || undefined,
       });
@@ -178,6 +181,9 @@ export default function EditDevicePage() {
               <ITGrid item xs={12} md={6}>
                 <ITInput name="model" label={t("devices.model")} value={form.model} onChange={(e) => setForm((f) => ({ ...f, model: e.target.value }))} required />
               </ITGrid>
+                <ITGrid item xs={12} md={4}>
+                  <ITInput name="code" label={t("devices.barcode")} value={form.code} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))} />
+                </ITGrid>
               <ITGrid item xs={12}>
                 <ITInput name="description" label={t("devices.descriptionField")} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
               </ITGrid>

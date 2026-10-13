@@ -139,6 +139,7 @@ export default function DeviceDetailPage() {
               <ITText className="text-sm text-slate-500">
                 {device.brand} · {device.model}
                 {device.description ? ` · ${device.description}` : ""}
+                {device.code ? ` · ${t("devices.codeShort")}: ${device.code}` : ""}
               </ITText>
             </ITFlex>
           </ITFlex>

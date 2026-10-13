@@ -44,13 +44,22 @@ export type DeviceImportRowError =
   | "MISSING_NAME"
   | "INVALID_QUANTITY"
   | "QUANTITY_TOO_LARGE"
-  | "NO_DEVICE_TYPE_AVAILABLE";
+  | "NO_DEVICE_TYPE_AVAILABLE"
+  | "DEVICE_NAME_TAKEN_BY_OTHER_CODE"
+  | "CODE_DUPLICATED_IN_FILE"
+  | "CODE_CONFLICT_IN_FILE";
 
 /** Avisos: la fila entra, pero con un valor por defecto que conviene revisar. */
-export type DeviceImportRowWarning = "MISSING_BRAND" | "MISSING_MODEL";
+export type DeviceImportRowWarning = "MISSING_BRAND" | "MISSING_MODEL" | "CODE_DATA_DIFFERS";
 
 export interface DeviceImportPreviewRow {
   row: number;
+  /** Código del modelo; null = se genera al crear. */
+  code: string | null;
+  /** Tipo al que queda la fila; null = el genérico (se crea si falta). */
+  typeId: string | null;
+  /** El usuario eligió el tipo en la previsualización. */
+  typeOverridden: boolean;
   typeName: string;
   resolvedTypeName: string;
   resolvedTypeCode: string;
@@ -99,6 +108,8 @@ export interface DeviceImportResult {
 
 export interface Device {
   id: string;
+  /** Código de barras o interno del modelo (nulo solo en datos sin migrar). */
+  code?: string | null;
   typeId: string;
   type?: DeviceType;
   name: string;
