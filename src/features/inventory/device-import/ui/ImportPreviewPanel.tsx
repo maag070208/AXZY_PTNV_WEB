@@ -10,7 +10,11 @@ import type {
   DeviceImportRowError,
   DeviceImportRowWarning,
 } from "@entities/inventory";
+import { formatDateTime } from "@shared/utils/dates";
 import type { UseDeviceImport } from "../model/useDeviceImport";
+
+/** Valor del selector de tipo que deja el tipo al que decide el archivo (no es un id). */
+const FROM_FILE = "__from_file__";
 
 /** Color del UI kit para cada estado de la fila. */
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
@@ -109,7 +113,7 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
             disabled={fx.loading || fx.confirming}
             options={[
               {
-                value: "",
+                value: FROM_FILE,
                 label:
                   row.typeMissing || row.typeUnknown
                     ? t("import.typeGeneric")
@@ -117,8 +121,10 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
               },
               ...fx.types.map((type) => ({ value: type.id, label: type.name })),
             ]}
-            value={fx.typeOverrides[row.row] ?? ""}
-            onChange={(e) => fx.setTypeOverride(row.row, e.target.value)}
+            value={fx.typeOverrides[row.row] ?? FROM_FILE}
+            onChange={(e) =>
+              fx.setTypeOverride(row.row, e.target.value === FROM_FILE ? "" : e.target.value)
+            }
           />
           {row.mergedRows.length > 0 && (
             <ITText className="!text-[10px] text-slate-400">
@@ -255,6 +261,14 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
       {summary.invalid === 0 && summary.typesToCreate.length > 0 && (
         <ITAlert variant="info">{t("import.createGenericBanner")}</ITAlert>
       )}
+      {fx.repeatedImport && (
+        <ITAlert variant="warning">
+          {t("import.repeatedBanner", {
+            date: formatDateTime(fx.repeatedImport.importedAt),
+            file: fx.repeatedImport.fileName ?? "—",
+          })}
+        </ITAlert>
+      )}
       {summary.invalid === 0 && summary.existingDevices > 0 && (
         <ITAlert variant="warning">
           {t("import.existingBanner", { count: summary.existingDevices })}
@@ -273,14 +287,16 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
               variant="filled"
               color="primary"
               disabled={fx.hasErrors || fx.confirming || summary.valid === 0}
-              onClick={() => void fx.confirm()}
+              onClick={() => void fx.confirm(Boolean(fx.repeatedImport))}
             >
               <ITFlex align="center" gap={1}>
                 <FaBoxOpen size={11} />
                 <ITText className="!text-[11px] font-bold">
                   {fx.confirming
                     ? t("import.confirming")
-                    : t("import.confirm", { count: summary.valid })}
+                    : fx.repeatedImport
+                      ? t("import.confirmRepeated", { count: summary.valid })
+                      : t("import.confirm", { count: summary.valid })}
                 </ITText>
               </ITFlex>
             </ITButton>

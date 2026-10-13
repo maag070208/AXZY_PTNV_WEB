@@ -114,21 +114,27 @@ export const useDeviceImport = () => {
     [file, typeOverrides, runPreview]
   );
 
-  /** Paso 2: confirma la carga (todo o nada, en una transacción). */
-  const confirm = useCallback(async () => {
-    if (!file || !preview) return;
-    setConfirming(true);
-    setError(null);
-    try {
-      const data = await inventoryApi.importDevices(file, requestKey(), typeOverrides);
-      setResult(data);
-      setStep("done");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setConfirming(false);
-    }
-  }, [file, preview, typeOverrides, requestKey]);
+  /**
+   * Paso 2: confirma la carga (todo o nada, en una transacción). `allowRepeat` solo
+   * lo manda el botón de "cargar de todos modos" tras avisar que el archivo ya se cargó.
+   */
+  const confirm = useCallback(
+    async (allowRepeat = false) => {
+      if (!file || !preview) return;
+      setConfirming(true);
+      setError(null);
+      try {
+        const data = await inventoryApi.importDevices(file, requestKey(), typeOverrides, allowRepeat);
+        setResult(data);
+        setStep("done");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+      } finally {
+        setConfirming(false);
+      }
+    },
+    [file, preview, typeOverrides, requestKey]
+  );
 
   /** Descarga la plantilla Excel con los encabezados y el catálogo de tipos. */
   const downloadTemplate = useCallback(async () => {
@@ -159,6 +165,7 @@ export const useDeviceImport = () => {
     error,
     setError,
     types,
+    repeatedImport: preview?.repeatedImport ?? null,
     typeOverrides,
     setTypeOverride,
     selectFile,

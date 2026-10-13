@@ -47,10 +47,16 @@ export type DeviceImportRowError =
   | "NO_DEVICE_TYPE_AVAILABLE"
   | "DEVICE_NAME_TAKEN_BY_OTHER_CODE"
   | "CODE_DUPLICATED_IN_FILE"
-  | "CODE_CONFLICT_IN_FILE";
+  | "CODE_CONFLICT_IN_FILE"
+  | "MODEL_TAKEN_BY_OTHER_CODE"
+  | "MODEL_AMBIGUOUS";
 
 /** Avisos: la fila entra, pero con un valor por defecto que conviene revisar. */
-export type DeviceImportRowWarning = "MISSING_BRAND" | "MISSING_MODEL" | "CODE_DATA_DIFFERS";
+export type DeviceImportRowWarning =
+  | "MISSING_BRAND"
+  | "MISSING_MODEL"
+  | "CODE_DATA_DIFFERS"
+  | "MODEL_MATCHED_OTHER_NAME";
 
 export interface DeviceImportPreviewRow {
   row: number;
@@ -90,9 +96,17 @@ export interface DeviceImportSummary {
   typesToCreate: string[];
 }
 
+/** Carga anterior con el mismo contenido de archivo. */
+export interface DeviceImportRepeated {
+  movementId: string;
+  importedAt: string;
+  fileName: string | null;
+}
+
 export interface DeviceImportPreview {
   rows: DeviceImportPreviewRow[];
   summary: DeviceImportSummary;
+  repeatedImport: DeviceImportRepeated | null;
 }
 
 export interface DeviceImportResult {

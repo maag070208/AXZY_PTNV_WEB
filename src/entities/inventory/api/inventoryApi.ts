@@ -171,10 +171,17 @@ export const inventoryApi = {
   },
 
   /** Paso 2: la carga real, en una sola transacción (todo o nada). */
-  importDevices: (file: File, idempotencyKey?: string, typeOverrides?: Record<number, string>) => {
+  importDevices: (
+    file: File,
+    idempotencyKey?: string,
+    typeOverrides?: Record<number, string>,
+    allowRepeatFile = false
+  ) => {
     const form = new FormData();
     form.append("file", file);
     appendTypeOverrides(form, typeOverrides);
+    // Solo se manda con confirmación explícita: un archivo ya cargado suma unidades otra vez.
+    if (allowRepeatFile) form.append("allowRepeatFile", "true");
     return api.post<DeviceImportResult>(`/inventory/devices/import`, form, {
       headers: {
         "Content-Type": "multipart/form-data",
