@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { FaArrowLeft, FaRedo } from "react-icons/fa";
-import { Pinzas, type PinzasAnim } from "@shared/ui/pinzas";
+import { Langostin, type LangostinAnim } from "@shared/ui/langostin";
 import type { RootState } from "@app/store";
 import type { TicketCategory } from "@entities/ticket";
 import { dyn } from "@shared/i18n/dyn";
@@ -30,8 +30,8 @@ interface Props {
   onRemoveFile: (index: number) => void;
 }
 
-// Qué hace Pinzas en cada paso: señala las opciones, piensa al escribir la nota.
-const STEP_ANIM: Record<AgentStep, PinzasAnim> = {
+// Qué hace Langostin en cada paso: señala las opciones, piensa al escribir la nota.
+const STEP_ANIM: Record<AgentStep, LangostinAnim> = {
   category: "point",
   detail: "point",
   where: "point",
@@ -49,20 +49,20 @@ const secondaryButton =
 const primaryButton =
   "cursor-pointer rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400";
 
-// Avatar de Pinzas al lado de los mensajes y del bloque de opciones.
-function PinzasAvatar({
+// Avatar de Langostin al lado de los mensajes y del bloque de opciones.
+function LangostinAvatar({
   anim,
   size = 28,
   animated = true,
 }: {
-  anim: PinzasAnim;
+  anim: LangostinAnim;
   size?: number;
   animated?: boolean;
 }) {
   const { t } = useTranslation("tickets");
   return (
     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm">
-      <Pinzas anim={anim} size={size} animated={animated} label={t("new.agent.mascot")} />
+      <Langostin anim={anim} size={size} animated={animated} label={t("new.agent.mascot")} />
     </span>
   );
 }
@@ -89,9 +89,9 @@ export default function TicketAgent({
   const threadEnd = useRef<HTMLDivElement>(null);
   const sent = useRef(false);
   // Envío: "work" mientras se crea el ticket, luego "ok" o "err".
-  const [sendAnim, setSendAnim] = useState<PinzasAnim | null>(null);
+  const [sendAnim, setSendAnim] = useState<LangostinAnim | null>(null);
   // Reacción breve a cada respuesta del usuario (y el saludo inicial).
-  const [reaction, setReaction] = useState<PinzasAnim | null>("wave");
+  const [reaction, setReaction] = useState<LangostinAnim | null>("wave");
 
   useEffect(() => {
     threadEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -128,15 +128,15 @@ export default function TicketAgent({
     return () => window.clearTimeout(id);
   }, [agent.messages.length, lastFrom]);
 
-  const mascot: PinzasAnim =
+  const mascot: LangostinAnim =
     sendAnim ?? reaction ?? (agent.typing ? "think" : STEP_ANIM[agent.step]);
 
-  // El bloque de opciones aparece cuando Pinzas termina de preguntar.
+  // El bloque de opciones aparece cuando Langostin termina de preguntar.
   const showBlock =
     !agent.typing && (agent.step === "done" || sendAnim === null);
   const isOptionStep = agent.step !== "done";
 
-  // Texto de guía del paso actual: Pinzas le dice al usuario qué sigue.
+  // Texto de guía del paso actual: Langostin le dice al usuario qué sigue.
   const guideKey = sendAnim === "err" ? "error" : sendAnim === "ok" ? "sent" : agent.step;
   const stepNumber = Math.min(agent.completed + 1, AGENT_STEPS.length);
 
@@ -144,7 +144,7 @@ export default function TicketAgent({
   const urgencyAnswered = agent.completed > AGENT_STEPS.indexOf("urgency");
   const priorityLabel = urgencyAnswered ? dyn(t)(`priorityLabels.${form.priority}`) : "";
 
-  // Mensajes del agente agrupados por turno. Pinzas se ve en el turno activo
+  // Mensajes del agente agrupados por turno. Langostin se ve en el turno activo
   // (animada, en el bloque de opciones) y en el anterior (avatar estático).
   const groupOf: number[] = [];
   let lastGroup = -1;
@@ -283,7 +283,7 @@ export default function TicketAgent({
         <section className="flex h-[min(72vh,680px)] min-h-[480px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
             <div className="flex items-center gap-3">
-              <PinzasAvatar anim="idle" size={36} animated={false} />
+              <LangostinAvatar anim="idle" size={36} animated={false} />
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-slate-900">{t("new.agent.name")}</span>
                 <span className="text-[11px] text-slate-400">{t("new.agent.helper")}</span>
@@ -318,7 +318,7 @@ export default function TicketAgent({
                   {isAgent &&
                     (groupOf[i] === lastGroup - 1 &&
                     agent.messages[i - 1]?.from !== "agent" ? (
-                      <PinzasAvatar anim="idle" animated={false} />
+                      <LangostinAvatar anim="idle" animated={false} />
                     ) : (
                       <span className="w-9 shrink-0" aria-hidden />
                     ))}
@@ -337,7 +337,7 @@ export default function TicketAgent({
 
             {agent.typing && (
               <div className="agent-bubble flex items-end gap-2">
-                <PinzasAvatar anim="think" />
+                <LangostinAvatar anim="think" />
                 <span className="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3">
                   {[0, 1, 2].map((i) => (
                     <span
@@ -353,7 +353,7 @@ export default function TicketAgent({
 
             {showBlock && (
               <div className="agent-bubble flex items-end gap-2">
-                <PinzasAvatar anim={mascot} />
+                <LangostinAvatar anim={mascot} />
                 <div className="flex max-w-[92%] flex-col gap-3 rounded-2xl rounded-bl-md border border-slate-200 bg-white p-4 shadow-sm">
                   <p key={guideKey} className="agent-pop flex items-center gap-2 text-xs text-slate-500">
                     {isOptionStep && sendAnim === null && (

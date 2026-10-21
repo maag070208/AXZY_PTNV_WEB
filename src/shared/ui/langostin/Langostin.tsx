@@ -1,8 +1,8 @@
 import { useEffect, useRef, type CSSProperties } from "react";
-import { draw, type PinzasAnim } from "./pinzasSprite";
+import { draw, type LangostinAnim } from "./langostinSprite";
 
 interface Props {
-  anim?: PinzasAnim;
+  anim?: LangostinAnim;
   /** Tamaño en px (cuadrado). */
   size?: number;
   /** Milisegundos entre cuadros. */
@@ -15,13 +15,13 @@ interface Props {
 }
 
 // Mascota 8-bit dibujada en canvas 32x32, sin imágenes.
-export default function Pinzas({
+export default function Langostin({
   anim = "idle",
   size = 128,
   speed = 140,
   className,
   style,
-  label = "Pinzas, la mascota de Puerto Nuevo",
+  label = "Langostin, la mascota de Puerto Nuevo",
   animated = true,
 }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);

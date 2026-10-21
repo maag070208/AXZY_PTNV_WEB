@@ -1,4 +1,4 @@
-// Sprite de Pinzas (32x32 px). Animaciones: idle, wave, work, ok, err, think, point
+// Sprite de Langostin (32x32 px). Animaciones: idle, wave, work, ok, err, think, point
 
 var C={o:'#3A2018',b:'#C95B3E',d:'#A8442B',l:'#E58B6B',w:'#FFFFFF',g:'#E2B65C',y:'#EBC770',h:'#D0A044',u:'#0F5C80',k:'#F08A6E',s:'#7FD0EB',r:'#E0342F'};
 function build(a,f){
