@@ -32,7 +32,7 @@ export default function DisciplinaryReportDetailPage() {
 
   if (loading) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding title={tt("preview.title")} backAction={() => navigate("/employees/disciplinary-reports")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
@@ -43,7 +43,7 @@ export default function DisciplinaryReportDetailPage() {
 
   if (error || !disciplinaryReport) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("preview.title")}
         backAction={() => navigate("/employees/disciplinary-reports")}
@@ -65,7 +65,7 @@ export default function DisciplinaryReportDetailPage() {
     : "—";
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("preview.title")}
       description={`${disciplinaryReport.user.name} · ${tt(`reasons.${disciplinaryReport.reason}`)}`}

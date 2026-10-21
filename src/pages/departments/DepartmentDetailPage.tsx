@@ -30,7 +30,7 @@ export default function DepartmentDetailPage() {
 
   if (!detail.dept) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("detail.loadingTitle")}
         backAction={() => navigate(-1)}
@@ -56,7 +56,7 @@ export default function DepartmentDetailPage() {
   const dept = detail.dept;
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("detail.title")}
       description={dept.name}

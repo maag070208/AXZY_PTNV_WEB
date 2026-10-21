@@ -107,7 +107,7 @@ export default function DeviceTypesPage() {
   ];
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("types.title")}
       description={t("types.description")}

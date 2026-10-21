@@ -200,7 +200,7 @@ export default function EmployeeProfileEditPage() {
 
   if (detail.loading || !detail.profile) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("detail.editInfo")}
         backAction={() => navigate(-1)}
@@ -477,7 +477,7 @@ export default function EmployeeProfileEditPage() {
   ];
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("detail.editInfo")}
       description={profile.name}

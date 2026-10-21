@@ -18,7 +18,7 @@ export default function KanbanPage() {
   const fx = useKanban(ticketId);
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={ticketId ? tt("kanban.byTicket") : tt("kanban.board")}
       description={ticketId ? tt("kanban.descByTicket") : tt("kanban.descBoard")}

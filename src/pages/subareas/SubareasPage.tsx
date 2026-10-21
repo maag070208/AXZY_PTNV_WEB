@@ -29,7 +29,7 @@ export default function SubareasPage() {
   }));
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("list.title")}
       description={tt("list.description")}

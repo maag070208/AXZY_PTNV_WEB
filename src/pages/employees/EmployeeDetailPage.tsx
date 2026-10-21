@@ -34,7 +34,7 @@ export default function EmployeeDetailPage() {
 
   if (detail.loading || !detail.profile) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("detail.loadingTitle")}
         backAction={() => navigate(-1)}
@@ -60,7 +60,7 @@ export default function EmployeeDetailPage() {
   const profile = detail.profile;
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("detail.title")}
       description={profile.name}

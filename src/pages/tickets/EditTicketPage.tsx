@@ -42,7 +42,7 @@ export default function EditTicketPage() {
 
   if (editTicket.loading) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("edit.title")}
         backAction={() => navigate(-1)}
@@ -56,7 +56,7 @@ export default function EditTicketPage() {
 
   if (!editTicket.ticket) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("edit.title")}
         backAction={() => navigate(-1)}
@@ -72,7 +72,7 @@ export default function EditTicketPage() {
   }
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("edit.title")}
       description={tt("edit.description")}

@@ -120,7 +120,7 @@ export default function ReturnsPage() {
   ];
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("loanReturn.title")}
       description={t("loanReturn.description")}

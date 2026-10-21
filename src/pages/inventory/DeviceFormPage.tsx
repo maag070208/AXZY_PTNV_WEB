@@ -122,7 +122,7 @@ export default function DeviceFormPage() {
 
   if (loading) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding title={t("devices.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
@@ -139,7 +139,7 @@ export default function DeviceFormPage() {
   ].filter((f) => f.active);
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("devices.new")}
       description={t("devices.formSub")}

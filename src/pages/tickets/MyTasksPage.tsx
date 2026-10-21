@@ -14,7 +14,7 @@ export default function MyTasksPage() {
   const fx = useAssignmentList("mytasks.loadError");
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("mytasks.title")}
       description={tt("mytasks.description", { count: fx.rows.length })}

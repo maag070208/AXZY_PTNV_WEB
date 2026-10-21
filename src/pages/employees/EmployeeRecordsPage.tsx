@@ -10,7 +10,7 @@ export default function EmployeeRecordsPage() {
   const navigate = useNavigate();
   const fx = useEmployeeRecords();
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("records.title")}
       description={t("records.description")}

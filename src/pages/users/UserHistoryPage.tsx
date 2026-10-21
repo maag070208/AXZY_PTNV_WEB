@@ -22,7 +22,7 @@ export default function UserHistoryPage() {
 
   if (loading) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("history.title")}
         loading
@@ -42,7 +42,7 @@ export default function UserHistoryPage() {
 
   if (!user) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("history.title")}
         backAction={() => navigate(-1)}
@@ -58,7 +58,7 @@ export default function UserHistoryPage() {
   }
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("history.historyTitle")}
       description={user.name}

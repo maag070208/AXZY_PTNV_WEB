@@ -16,7 +16,7 @@ export default function PayrollPage() {
   const fx = useWeeklyAttendance({ downloadPdf: downloadWeeklyAttendancePdf });
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       title={t("title")}
       description={t("description")}
       icon={<FaMoneyCheckAlt size={20} />}

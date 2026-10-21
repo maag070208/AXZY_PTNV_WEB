@@ -27,7 +27,7 @@ export default function ReportsPage() {
   const materialOutputsFx = useMaterialOutputsReport({ download: downloadMaterialOutputsPdf });
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       title={t("title")}
       description={t("description")}
       backAction={() => navigate(-1)}

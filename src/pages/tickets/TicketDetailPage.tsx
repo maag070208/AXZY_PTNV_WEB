@@ -71,7 +71,7 @@ export default function TicketDetailPage() {
 
   if (!ticket) {
     return (
-      <ITPage
+      <ITPage className="m-0! p-0! px-8! min-w-full!"
         noPadding
         title={tt("detail.title")}
         backAction={() => navigate(-1)}
@@ -89,7 +89,7 @@ export default function TicketDetailPage() {
   const timelineEvents = buildTimeline(ticket);
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={ticket.title}
       backAction={() => navigate(-1)}

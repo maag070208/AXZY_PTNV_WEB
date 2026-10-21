@@ -11,7 +11,7 @@ export default function ScheduleFormPage() {
   const isEdit = Boolean(id);
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={isEdit ? t("edit") : t("new")}
       icon={<FaRegClock size={20} />}

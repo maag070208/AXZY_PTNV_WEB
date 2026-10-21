@@ -9,7 +9,7 @@ export default function AssignSchedulesPage() {
   const navigate = useNavigate();
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("assign.title")}
       description={t("assign.description")}

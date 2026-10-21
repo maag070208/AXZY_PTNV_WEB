@@ -23,7 +23,7 @@ export default function DeviceImportPage() {
   const fx = useDeviceImport();
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("inventory:import.title")}
       description={t("inventory:import.description")}

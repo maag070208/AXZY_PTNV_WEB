@@ -25,7 +25,7 @@ export default function TimeClockReportPage() {
   const fx = useAccessReport({ download: downloadTimeClockReportPdf, source: TIME_CLOCK_SOURCE });
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("report.title")}
       description={t("report.description")}

@@ -8,7 +8,7 @@ export default function NotificationsPage() {
   const fx = useNotificationsList();
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={tt("title")}
       description={tt("description")}
