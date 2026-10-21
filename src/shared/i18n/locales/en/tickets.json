@@ -42,7 +42,7 @@
   },
   "new": {
     "title": "New Ticket",
-    "description": "Create a new request or report",
+    "description": "Chat with Systems and we build the report together",
     "breadcrumb": "New ticket",
     "button": "Create ticket",
     "created": "Ticket created successfully",
@@ -63,7 +63,63 @@
     "evidenceTitle": "Evidence",
     "evidenceSub": "Images or PDF of the issue",
     "removeFile": "Remove",
-    "summaryTitle": "Request summary"
+    "summaryTitle": "Request summary",
+    "agent": {
+      "name": "Systems Puerto Nuevo",
+      "online": "Online",
+      "restart": "Start over",
+      "greeting": "Hi! I'm Systems.",
+      "greetingNamed": "Hi, {{name}}! I'm Systems.",
+      "askCategory": "What can we help you with?",
+      "askDetail": "What's happening? Pick the option that fits best.",
+      "askWhere": "Which area is it in?",
+      "askUrgency": "How urgent is it?",
+      "askEvidence": "Do you have a photo or PDF? It's optional.",
+      "askNotes": "Anything else we should know? It's optional.",
+      "done": "Done. Sending it to Systems right now.",
+      "doneHint": "Sending your ticket to Systems…",
+      "typing": "Systems is typing…",
+      "loadingCategories": "Loading categories…",
+      "noDepartments": "No areas available",
+      "skip": "Skip",
+      "skipped": "I'd rather skip it",
+      "continue": "Continue",
+      "noEvidence": "I have no evidence",
+      "attached": "Attached: {{name}}",
+      "noNotes": "No note",
+      "sendNote": "Send note",
+      "notesPlaceholder": "Write anything else you'd like to add…"
+    },
+    "suggestions": {
+      "noPower": "Won't turn on",
+      "noConnection": "No connection",
+      "slow": "Very slow",
+      "noResponse": "Not responding",
+      "error": "Shows an error",
+      "stopped": "Stopped working",
+      "noise": "Makes noise",
+      "leak": "There's a leak",
+      "repair": "Needs repair",
+      "review": "Needs review",
+      "other": "Something else"
+    },
+    "summary": {
+      "heading": "Your ticket",
+      "sub": "It fills in as you answer.",
+      "autoTitle": "Automatic title…",
+      "category": "Category",
+      "detail": "Detail",
+      "where": "Where",
+      "urgency": "Urgency",
+      "evidence": "Evidence",
+      "files_one": "{{count}} file",
+      "files_other": "{{count}} files",
+      "notes": "Notes"
+    },
+    "why": {
+      "title": "Why this way?",
+      "body": "Staff already know WhatsApp. Answering step by step is faster than filling a form, and Systems gets a complete, organized ticket."
+    }
   },
   "edit": {
     "title": "Edit Ticket",

@@ -42,7 +42,7 @@
   },
   "new": {
     "title": "Nuevo Ticket",
-    "description": "Crear una nueva solicitud o reporte",
+    "description": "Platica con Sistemas y nosotros armamos el reporte",
     "breadcrumb": "Nuevo ticket",
     "button": "Crear ticket",
     "created": "Ticket creado correctamente",
@@ -63,7 +63,63 @@
     "evidenceTitle": "Evidencias",
     "evidenceSub": "Imágenes o PDF del problema",
     "removeFile": "Quitar",
-    "summaryTitle": "Resumen de la solicitud"
+    "summaryTitle": "Resumen de la solicitud",
+    "agent": {
+      "name": "Sistemas Puerto Nuevo",
+      "online": "En línea",
+      "restart": "Empezar de nuevo",
+      "greeting": "¡Hola! Soy Sistemas.",
+      "greetingNamed": "¡Hola, {{name}}! Soy Sistemas.",
+      "askCategory": "¿Con qué te ayudamos?",
+      "askDetail": "¿Qué es lo que pasa? Elige la opción que más se parezca.",
+      "askWhere": "¿De qué área es?",
+      "askUrgency": "¿Qué tan urgente es?",
+      "askEvidence": "¿Tienes una foto o PDF? Es opcional.",
+      "askNotes": "¿Algo más que debamos saber? Es opcional.",
+      "done": "Listo. Lo mando a Sistemas ahora mismo.",
+      "doneHint": "Enviando tu ticket a Sistemas…",
+      "typing": "Sistemas está escribiendo…",
+      "loadingCategories": "Cargando categorías…",
+      "noDepartments": "No hay áreas disponibles",
+      "skip": "Omitir",
+      "skipped": "Prefiero omitirlo",
+      "continue": "Continuar",
+      "noEvidence": "No tengo evidencia",
+      "attached": "Adjunto: {{name}}",
+      "noNotes": "Sin nota",
+      "sendNote": "Enviar nota",
+      "notesPlaceholder": "Escribe aquí lo que quieras agregar…"
+    },
+    "suggestions": {
+      "noPower": "No enciende",
+      "noConnection": "Sin conexión",
+      "slow": "Va muy lento",
+      "noResponse": "No responde",
+      "error": "Muestra un error",
+      "stopped": "Dejó de funcionar",
+      "noise": "Hace ruido",
+      "leak": "Hay una fuga",
+      "repair": "Necesita reparación",
+      "review": "Necesita revisión",
+      "other": "Otro problema"
+    },
+    "summary": {
+      "heading": "Tu ticket",
+      "sub": "Se va llenando mientras contestas.",
+      "autoTitle": "Título automático…",
+      "category": "Categoría",
+      "detail": "Detalle",
+      "where": "Dónde",
+      "urgency": "Urgencia",
+      "evidence": "Evidencia",
+      "files_one": "{{count}} archivo",
+      "files_other": "{{count}} archivos",
+      "notes": "Notas"
+    },
+    "why": {
+      "title": "¿Por qué así?",
+      "body": "El personal ya sabe usar WhatsApp. Contestar paso a paso es más rápido que llenar un formulario, y Sistemas recibe el ticket completo y ordenado."
+    }
   },
   "edit": {
     "title": "Editar Ticket",

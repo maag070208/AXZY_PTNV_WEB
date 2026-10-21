@@ -5,19 +5,14 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { useState } from "react";
 import { FaSave, FaTicketAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  CreateTicketForm,
-  useCreateTicket,
-} from "@features/ticket/create-ticket";
+import { TicketAgent, useCreateTicket } from "@features/ticket/create-ticket";
 
 export default function NewTicketPage() {
   const navigate = useNavigate();
   const { t } = useTranslation(["tickets", "common"]);
-  const [dropfileKey, setDropfileKey] = useState(0);
 
   const createTicket = useCreateTicket();
 
@@ -28,7 +23,7 @@ export default function NewTicketPage() {
   };
 
   return (
-    <ITPage
+    <ITPage className="m-0! p-0! px-8! min-w-full!"
       noPadding
       title={t("new.title")}
       description={t("new.description")}
@@ -54,18 +49,14 @@ export default function NewTicketPage() {
         </ITButton>
       }
     >
-      <CreateTicketForm
+      <TicketAgent
         form={createTicket.form}
-        errors={createTicket.errors}
-        onFieldChange={createTicket.handleField}
+        onComplete={handleSave}
         categories={createTicket.categories}
         files={createTicket.files}
-        onAddFile={(file) => {
-          createTicket.addFile(file);
-          setDropfileKey((current) => current + 1);
-        }}
+        onFieldChange={createTicket.handleField}
+        onAddFile={createTicket.addFile}
         onRemoveFile={createTicket.removeFile}
-        dropfileKey={dropfileKey}
       />
 
       {createTicket.toast && (

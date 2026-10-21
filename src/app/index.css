@@ -18,3 +18,33 @@ html {
   scroll-behavior: smooth;
   overflow-x: hidden;
 }
+/* Chat de Nuevo Ticket: entradas animadas de mensajes y opciones. */
+@keyframes agent-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes agent-bubble {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.agent-pop {
+  animation: agent-pop 0.28s ease-out both;
+}
+
+.agent-bubble {
+  animation: agent-bubble 0.25s ease-out both;
+}

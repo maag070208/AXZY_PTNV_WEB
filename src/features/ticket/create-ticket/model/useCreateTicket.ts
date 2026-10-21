@@ -10,6 +10,7 @@ export interface TicketDraft {
   description: string;
   priority: string;
   categoryId: string;
+  departmentId: string;
 }
 
 export const useCreateTicket = () => {
@@ -21,6 +22,7 @@ export const useCreateTicket = () => {
     description: "",
     priority: "MEDIUM",
     categoryId: "",
+    departmentId: "",
   });
   const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -34,7 +36,6 @@ export const useCreateTicket = () => {
       .categories()
       .then((cats) => {
         setCategories(cats);
-        setForm((f) => (f.categoryId ? f : { ...f, categoryId: cats[0]?.id ?? "" }));
       })
       .catch(() => setCategories([]));
   }, []);
@@ -78,6 +79,7 @@ export const useCreateTicket = () => {
           description: form.description.trim(),
           priority: form.priority,
           categoryId: form.categoryId || undefined,
+          departmentId: form.departmentId || undefined,
         })
       );
       if (createTicketThunk.fulfilled.match(action)) {
