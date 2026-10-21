@@ -66,6 +66,7 @@
     "clockAttendance": "Clock",
     "timeClock": "Time clock",
     "accessTimeClockEmployees": "Time clock employees",
+    "accessTimeClockRoster": "Clock roster",
     "schedules": "Schedules",
     "schedulesAdmin": "Calendar",
     "schedulesAssign": "Assign schedules",

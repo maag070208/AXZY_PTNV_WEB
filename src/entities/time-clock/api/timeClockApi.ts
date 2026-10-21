@@ -12,11 +12,24 @@ import type {
   TimeClockStatus,
   TimeClockSyncHistory,
 } from "../model/types";
+import type { RemovalCategoryRow, RosterRemovalInput, RosterRunResult, TimeClockRoster } from "../model/roster";
 
 const employeePath = (number: string) => `/time-clock/employees/${encodeURIComponent(number)}`;
 const clockPath = (serial: string) => `/time-clock/clocks/${encodeURIComponent(serial)}`;
 
 export const timeClockApi = {
+  /** Catálogo de motivos de baja (activos). */
+  removalCategories: () => api.get<RemovalCategoryRow[]>(`/time-clock/removal-categories`),
+  /** Padrón del reloj: nuevos, bajas pendientes y reapariciones (solo lee la base). */
+  roster: () => api.get<TimeClockRoster>(`/time-clock/roster`),
+  /** Revisa el padrón contra los relojes que cuentan (solo LEE de los relojes). */
+  runRoster: () => api.post<RosterRunResult>(`/time-clock/roster/run`),
+  /** Aplica la baja pendiente con motivo; da de baja al usuario. */
+  applyRemoval: (number: string, input: RosterRemovalInput) =>
+    api.post<{ employeeNumber: string }>(`/time-clock/roster/employees/${encodeURIComponent(number)}/removal`, input),
+  /** Descarta la baja pendiente sin motivo. */
+  dismissRemoval: (number: string) =>
+    api.post<{ employeeNumber: string }>(`/time-clock/roster/employees/${encodeURIComponent(number)}/dismiss`),
   /**
    * Timeline de un reloj: sus últimos intentos de sincronización (falló,
    * reintentó, conectó) con su resumen. Es lo que ve soporte al abrir el

@@ -365,5 +365,53 @@
       "IMPORT": "Importar por rango",
       "REGISTER": "Alta del reloj"
     }
+  },
+  "roster": {
+    "title": "Padrón del reloj",
+    "description": "Personas de los relojes que cuentan para entradas y salidas. Lo que aparece en el reloj se revisa aquí; nada se da de baja sin motivo.",
+    "lastRun": "Última revisión: {{date}} · {{status}}",
+    "lastRunNone": "Todavía no se ha revisado el padrón.",
+    "suspiciousBadge": "sospechosa: no se generaron bajas",
+    "okBadge": "sin novedades graves",
+    "noReadBadge": "ningún reloj respondió",
+    "run": "Revisar padrón",
+    "running": "Revisando…",
+    "loading": "Cargando padrón…",
+    "sections": {
+      "unlinked": "Nuevos en el reloj",
+      "pending": "Bajas pendientes de motivo",
+      "reappeared": "Reaparecieron después de una baja"
+    },
+    "empty": {
+      "unlinked": "No hay personas nuevas sin vincular.",
+      "pending": "No hay bajas pendientes.",
+      "reappeared": "Nadie reapareció."
+    },
+    "row": {
+      "number": "Nº {{number}}",
+      "link": "Vincular",
+      "missingSince": "sin aparecer desde {{date}}",
+      "reappearedAt": "reapareció el {{date}}",
+      "viewUser": "Ver usuario"
+    },
+    "form": {
+      "category": "Motivo",
+      "reason": "Detalle del motivo",
+      "reasonHint": "Mínimo {{min}} caracteres. Se guarda en la bitácora.",
+      "dismiss": "Descartar",
+      "apply": "Aplicar baja"
+    },
+    "errors": {
+      "load": "No se pudo cargar el padrón.",
+      "run": "No se pudo revisar el padrón. Intenta de nuevo.",
+      "remove": "No se pudo aplicar la baja.",
+      "dismiss": "No se pudo descartar la baja."
+    },
+    "toast": {
+      "ran": "Padrón revisado.",
+      "suspicious": "Revisión sospechosa: un reloj perdió muchas personas. No se generaron bajas.",
+      "removed": "Baja aplicada.",
+      "dismissed": "Baja pendiente descartada."
+    }
   }
 }

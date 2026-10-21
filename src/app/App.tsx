@@ -7,6 +7,7 @@ import AccessReportPage from "@pages/access/AccessReportPage";
 import TimeClockPage from "@pages/access/TimeClockPage";
 import TimeClockReportPage from "@pages/access/TimeClockReportPage";
 import TimeClockEmployeesPage from "@pages/access/TimeClockEmployeesPage";
+import TimeClockRosterPage from "@pages/access/TimeClockRosterPage";
 import TimeClockDifferencesPage from "@pages/access/TimeClockDifferencesPage";
 import TimeClocksPage from "@pages/access/TimeClocksPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
@@ -355,6 +356,14 @@ export default function App() {
           element={
             <RequiresPermission permission="time_clock.view">
               <TimeClockReportPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/hr/time-clock/roster"
+          element={
+            <RequiresPermission permission="time_clock.view">
+              <TimeClockRosterPage />
             </RequiresPermission>
           }
         />

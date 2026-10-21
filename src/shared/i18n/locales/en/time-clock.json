@@ -365,5 +365,53 @@
       "IMPORT": "Import by range",
       "REGISTER": "Clock registration"
     }
+  },
+  "roster": {
+    "title": "Clock roster",
+    "description": "People on the clocks that count for entries and exits. What is on the clock is reviewed here; nobody is removed without a reason.",
+    "lastRun": "Last review: {{date}} · {{status}}",
+    "lastRunNone": "The roster has not been reviewed yet.",
+    "suspiciousBadge": "suspicious: no removals were created",
+    "okBadge": "no serious changes",
+    "noReadBadge": "no clock answered",
+    "run": "Review roster",
+    "running": "Reviewing…",
+    "loading": "Loading roster…",
+    "sections": {
+      "unlinked": "New on the clock",
+      "pending": "Removals waiting for a reason",
+      "reappeared": "Reappeared after a removal"
+    },
+    "empty": {
+      "unlinked": "No new unlinked people.",
+      "pending": "No pending removals.",
+      "reappeared": "Nobody reappeared."
+    },
+    "row": {
+      "number": "No. {{number}}",
+      "link": "Link",
+      "missingSince": "missing since {{date}}",
+      "reappearedAt": "reappeared on {{date}}",
+      "viewUser": "View user"
+    },
+    "form": {
+      "category": "Reason",
+      "reason": "Reason details",
+      "reasonHint": "At least {{min}} characters. Saved in the audit log.",
+      "dismiss": "Dismiss",
+      "apply": "Apply removal"
+    },
+    "errors": {
+      "load": "Could not load the roster.",
+      "run": "Could not review the roster. Try again.",
+      "remove": "Could not apply the removal.",
+      "dismiss": "Could not dismiss the removal."
+    },
+    "toast": {
+      "ran": "Roster reviewed.",
+      "suspicious": "Suspicious review: a clock lost many people. No removals were created.",
+      "removed": "Removal applied.",
+      "dismissed": "Pending removal dismissed."
+    }
   }
 }

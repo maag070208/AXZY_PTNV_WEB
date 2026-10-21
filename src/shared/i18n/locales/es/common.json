@@ -66,6 +66,7 @@
     "clockAttendance": "Reloj",
     "timeClock": "Reloj checador",
     "accessTimeClockEmployees": "Empleados del reloj",
+    "accessTimeClockRoster": "Padrón del reloj",
     "schedules": "Horarios",
     "schedulesAdmin": "Calendario",
     "schedulesAssign": "Asignar horarios",

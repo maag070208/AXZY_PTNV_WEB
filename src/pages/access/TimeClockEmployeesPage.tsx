@@ -1,5 +1,5 @@
 import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { FaExchangeAlt, FaLink, FaMagic } from "react-icons/fa";
+import { FaExchangeAlt, FaLink, FaMagic, FaUsersCog } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { TimeClockEmployeesTab, useTimeClockEmployees } from "@features/access/time-clock-employees";
@@ -18,6 +18,12 @@ export default function TimeClockEmployeesPage() {
       // Las acciones de la pantalla, en el encabezado (como en Checadas).
       actions={
         <ITFlex align="center" wrap="wrap" gap={2}>
+          <ITButton variant="outlined" color="secondary" size="sm" onClick={() => navigate("/hr/time-clock/roster")}>
+            <ITFlex align="center" gap={1}>
+              <FaUsersCog size={11} />
+              <ITText className="font-bold text-[11px]">{t("roster.title")}</ITText>
+            </ITFlex>
+          </ITButton>
           <ITButton
             variant="outlined"
             color="secondary"

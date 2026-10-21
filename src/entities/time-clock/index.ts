@@ -2,4 +2,5 @@
 // carpeta debe importar directo desde model/ o api/ — todo pasa por este barrel.
 export * from "./model/types";
 export * from "./model/status";
+export * from "./model/roster";
 export { timeClockApi } from "./api/timeClockApi";
