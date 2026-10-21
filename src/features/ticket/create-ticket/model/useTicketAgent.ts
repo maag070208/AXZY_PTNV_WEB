@@ -39,12 +39,34 @@ interface Options {
   userName?: string;
 }
 
+type Fields = Pick<TicketDraft, "title" | "description" | "categoryId" | "departmentId" | "priority">;
+
+// Estado antes de responder un paso; sirve para regresar.
+interface Snapshot {
+  step: AgentStep;
+  messages: AgentMessage[];
+  categoryName: string;
+  detail: string;
+  departmentName: string;
+  notes: string;
+  fields: Fields;
+  fileCount: number;
+}
+
+const DEFAULT_FIELDS: Fields = {
+  title: "",
+  description: "",
+  categoryId: "",
+  departmentId: "",
+  priority: "MEDIUM",
+};
+
 const buildTitle = (categoryName: string, detail: string) =>
   [categoryName, detail].filter(Boolean).join(": ").slice(0, MAX_TITLE_LENGTH);
 
 // Conversación guiada: el agente pregunta un dato a la vez con opciones que se
 // tocan. Solo la nota final es texto libre. Los campos viven en el formulario de
-// useCreateTicket; aquí está el avance del chat.
+// useCreateTicket; aquí está el avance del chat y el historial para regresar.
 export const useTicketAgent = ({
   files,
   onFieldChange,
@@ -62,9 +84,11 @@ export const useTicketAgent = ({
   const [departmentName, setDepartmentName] = useState("");
   const [notes, setNotes] = useState("");
   const [dropfileKey, setDropfileKey] = useState(0);
+  const [history, setHistory] = useState<Snapshot[]>([]);
   const nextId = useRef(0);
   const timers = useRef<number[]>([]);
   const pending = useRef(0);
+  const fields = useRef<Fields>(DEFAULT_FIELDS);
 
   const clearTimers = () => {
     timers.current.forEach((id) => window.clearTimeout(id));
@@ -89,6 +113,28 @@ export const useTicketAgent = ({
   const sayUser = (text: string) =>
     setMessages((m) => [...m, { id: nextId.current++, from: "user", text }]);
 
+  // Escribe un campo del ticket y lo recuerda para poder revertirlo.
+  const setField = (field: keyof Fields, value: string) => {
+    fields.current = { ...fields.current, [field]: value };
+    onFieldChange(field, value);
+  };
+
+  // Guarda cómo estaba todo antes de responder el paso actual.
+  const remember = () =>
+    setHistory((h) => [
+      ...h,
+      {
+        step,
+        messages,
+        categoryName,
+        detail,
+        departmentName,
+        notes,
+        fields: fields.current,
+        fileCount: files.length,
+      },
+    ]);
+
   const greet = () => {
     say(
       userName ? t("new.agent.greetingNamed", { name: userName }) : t("new.agent.greeting"),
@@ -109,42 +155,47 @@ export const useTicketAgent = ({
     notesText ? `${detailText}\n\n${notesText}` : detailText;
 
   const pickCategory = (category: TicketCategory) => {
+    remember();
     sayUser(category.name);
     setCategoryName(category.name);
-    onFieldChange("categoryId", category.id);
-    onFieldChange("title", category.name);
+    setField("categoryId", category.id);
+    setField("title", category.name);
     setStep("detail");
     say(t("new.agent.askDetail"), 600);
   };
 
   const pickSymptom = (label: string) => {
+    remember();
     sayUser(label);
     setDetail(label);
-    onFieldChange("title", buildTitle(categoryName, label));
-    onFieldChange("description", composeDescription(label, notes));
+    setField("title", buildTitle(categoryName, label));
+    setField("description", composeDescription(label, notes));
     setStep("where");
     say(t("new.agent.askWhere"), 600);
   };
 
   const pickDepartment = (department: Department) => {
+    remember();
     sayUser(department.name);
     setDepartmentName(department.name);
-    onFieldChange("departmentId", department.id);
+    setField("departmentId", department.id);
     setStep("urgency");
     say(t("new.agent.askUrgency"), 600);
   };
 
   const skipDepartment = () => {
+    remember();
     sayUser(t("new.agent.skipped"));
     setDepartmentName("");
-    onFieldChange("departmentId", "");
+    setField("departmentId", "");
     setStep("urgency");
     say(t("new.agent.askUrgency"), 600);
   };
 
   const pickPriority = (priority: string) => {
+    remember();
     sayUser(dyn(t)(`priorityLabels.${priority}`));
-    onFieldChange("priority", priority);
+    setField("priority", priority);
     setStep("evidence");
     say(t("new.agent.askEvidence"), 600);
   };
@@ -156,6 +207,7 @@ export const useTicketAgent = ({
   };
 
   const finishEvidence = () => {
+    remember();
     sayUser(files.length > 0 ? t("new.agent.continue") : t("new.agent.noEvidence"));
     setStep("notes");
     say(t("new.agent.askNotes"), 600);
@@ -163,27 +215,45 @@ export const useTicketAgent = ({
 
   // Única respuesta de texto libre. Vacía significa "sin nota".
   const sendNotes = (text: string) => {
+    remember();
     const value = text.trim();
     sayUser(value || t("new.agent.noNotes"));
     setNotes(value);
-    onFieldChange("description", composeDescription(detail, value));
+    setField("description", composeDescription(detail, value));
     setStep("done");
     say(t("new.agent.done"), 600);
   };
 
+  // Regresa al paso anterior: vuelve a mostrar su pregunta y revierte sus datos.
+  const goBack = () => {
+    const previous = history[history.length - 1];
+    if (!previous) return;
+    clearTimers();
+    setHistory((h) => h.slice(0, -1));
+    setMessages(previous.messages);
+    setStep(previous.step);
+    setCategoryName(previous.categoryName);
+    setDetail(previous.detail);
+    setDepartmentName(previous.departmentName);
+    setNotes(previous.notes);
+    (Object.keys(previous.fields) as (keyof Fields)[]).forEach((field) =>
+      setField(field, previous.fields[field]),
+    );
+    for (let i = files.length - 1; i >= previous.fileCount; i -= 1) onRemoveFile(i);
+  };
+
   const restart = () => {
     clearTimers();
+    setHistory([]);
     setMessages([]);
     setStep("category");
     setCategoryName("");
     setDetail("");
     setDepartmentName("");
     setNotes("");
-    onFieldChange("title", "");
-    onFieldChange("description", "");
-    onFieldChange("priority", "MEDIUM");
-    onFieldChange("categoryId", "");
-    onFieldChange("departmentId", "");
+    (Object.keys(DEFAULT_FIELDS) as (keyof Fields)[]).forEach((field) =>
+      setField(field, DEFAULT_FIELDS[field]),
+    );
     for (let i = files.length - 1; i >= 0; i -= 1) onRemoveFile(i);
     greet();
   };
@@ -198,6 +268,7 @@ export const useTicketAgent = ({
     departmentName,
     notes,
     dropfileKey,
+    canGoBack: history.length > 0,
     completed: step === "done" ? AGENT_STEPS.length : AGENT_STEPS.indexOf(step),
     pickCategory,
     pickSymptom,
@@ -207,6 +278,7 @@ export const useTicketAgent = ({
     attachFile,
     finishEvidence,
     sendNotes,
+    goBack,
     restart,
   };
 };

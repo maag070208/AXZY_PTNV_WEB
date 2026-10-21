@@ -88,7 +88,10 @@
       "attached": "Adjunto: {{name}}",
       "noNotes": "Sin nota",
       "sendNote": "Enviar nota",
-      "notesPlaceholder": "Escribe aquí lo que quieras agregar…"
+      "notesPlaceholder": "Escribe aquí lo que quieras agregar…",
+      "helper": "Pinzas te ayuda a armar el ticket",
+      "mascot": "Pinzas, la mascota de Puerto Nuevo",
+      "back": "Anterior"
     },
     "suggestions": {
       "noPower": "No enciende",
@@ -119,6 +122,18 @@
     "why": {
       "title": "¿Por qué así?",
       "body": "El personal ya sabe usar WhatsApp. Contestar paso a paso es más rápido que llenar un formulario, y Sistemas recibe el ticket completo y ordenado."
+    },
+    "guide": {
+      "step": "Paso {{current}} de {{total}}",
+      "category": "Elige qué tipo de problema es.",
+      "detail": "Elige el síntoma que más se parezca. Si no aparece, toca Otro problema.",
+      "where": "Elige el área donde pasa, o sáltalo si no sabes.",
+      "urgency": "¿Qué tan urgente es? Así Sistemas sabe por dónde empezar.",
+      "evidence": "Si tienes foto o PDF, súbelo aquí. Si no, sigue.",
+      "notes": "Escribe algo extra si hace falta, o sáltalo.",
+      "done": "¡Listo! Lo estoy mandando a Sistemas.",
+      "sent": "¡Listo! Tu ticket ya está con Sistemas.",
+      "error": "No pude crear el ticket. Revisa tu conexión y vuelve a intentarlo con Crear ticket."
     }
   },
   "edit": {

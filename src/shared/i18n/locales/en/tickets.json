@@ -88,7 +88,10 @@
       "attached": "Attached: {{name}}",
       "noNotes": "No note",
       "sendNote": "Send note",
-      "notesPlaceholder": "Write anything else you'd like to add…"
+      "notesPlaceholder": "Write anything else you'd like to add…",
+      "helper": "Pinzas helps you build the ticket",
+      "mascot": "Pinzas, the Puerto Nuevo mascot",
+      "back": "Back"
     },
     "suggestions": {
       "noPower": "Won't turn on",
@@ -119,6 +122,18 @@
     "why": {
       "title": "Why this way?",
       "body": "Staff already know WhatsApp. Answering step by step is faster than filling a form, and Systems gets a complete, organized ticket."
+    },
+    "guide": {
+      "step": "Step {{current}} of {{total}}",
+      "category": "Pick the kind of problem.",
+      "detail": "Pick the symptom that fits best. If none does, tap Something else.",
+      "where": "Pick the area where it happens, or skip if you're not sure.",
+      "urgency": "How urgent is it? That helps Systems know where to start.",
+      "evidence": "If you have a photo or PDF, upload it here. If not, continue.",
+      "notes": "Add anything extra if needed, or skip it.",
+      "done": "Done! I'm sending it to Systems now.",
+      "sent": "Done! Your ticket is with Systems.",
+      "error": "I couldn't create the ticket. Check your connection and try again with Create ticket."
     }
   },
   "edit": {

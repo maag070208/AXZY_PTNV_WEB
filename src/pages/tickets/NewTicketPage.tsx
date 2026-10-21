@@ -16,10 +16,10 @@ export default function NewTicketPage() {
 
   const createTicket = useCreateTicket();
 
-  const handleSave = () => {
-    createTicket.handleSave().then((ok) => {
-      if (ok) setTimeout(() => navigate("/tickets"), 1000);
-    });
+  const handleSave = async () => {
+    const ok = await createTicket.handleSave();
+    if (ok) setTimeout(() => navigate("/tickets"), 1000);
+    return ok;
   };
 
   return (
