@@ -749,14 +749,45 @@
       "qualityLow": "Low quality (minimum {{min}}). Capture again with a clean, centered finger.",
       "legendRegistered": "Green: already on the clock. Pick a free finger to add another.",
       "legendPick": "Pick a free finger to capture it.",
-      "readyToCapture": "Ready to capture finger {{finger}}. Place the finger on the clock's sensor.",
-      "placeFinger": "Place the finger on the clock's sensor…",
+      "readyToCapture": "Ready to capture finger {{finger}}. Place the finger on the station's sensor.",
+      "placeFinger": "Place the finger on the station's sensor…",
       "readOnly": "Read-only: fingerprints cannot be captured or added on this clock.",
       "steps": {
         "pick": "Pick finger",
         "capture": "Capture",
-        "apply": "Add"
-      }
+        "apply": "Add",
+        "review": "Review"
+      },
+      "capturing": "Capturing finger {{finger}} · {{seconds}} s",
+      "applying": "Sending the fingerprint to the clock and confirming…",
+      "dialogTitle": "Register finger {{finger}} on {{clock}}",
+      "close": "Done",
+      "register": "Register finger {{finger}}",
+      "cancel": "Cancel",
+      "errors": {
+        "details": "View technical detail",
+        "stationRejected": {
+          "title": "The station did not accept the capture",
+          "hint": "Check that the station is on its home screen, with no other capture in progress, and try again."
+        },
+        "stationAuth": {
+          "title": "Could not sign in to the station",
+          "hint": "Check the station user and password in the server configuration."
+        },
+        "qualityLow": {
+          "title": "Quality is low",
+          "hint": "Capture again with a clean, centered finger on the sensor."
+        },
+        "clockRejected": {
+          "title": "The clock rejected the operation",
+          "hint": "Check the connection to the test clock and try again."
+        },
+        "generic": {
+          "title": "The operation could not be completed",
+          "hint": "Try again. If it keeps failing, check the technical detail."
+        }
+      },
+      "waitingFinger": "Waiting for the finger on the station sensor… {{seconds}} s"
     },
     "summary": {
       "loading": "Reading the clock…",

@@ -749,14 +749,45 @@
       "qualityLow": "Calidad baja (mínimo {{min}}). Vuelve a capturar con el dedo limpio y centrado.",
       "legendRegistered": "Verde: ya registrado en el reloj. Elige un dedo libre para agregar otro.",
       "legendPick": "Elige un dedo libre para capturarlo.",
-      "readyToCapture": "Listo para capturar el dedo {{finger}}. Coloca el dedo en el sensor del reloj.",
-      "placeFinger": "Coloca el dedo en el sensor del reloj…",
+      "readyToCapture": "Listo para capturar el dedo {{finger}}. Coloca el dedo en el sensor de la estación.",
+      "placeFinger": "Coloca el dedo en el sensor de la estación…",
       "readOnly": "Solo lectura: en este reloj no se pueden capturar ni dar de alta huellas.",
       "steps": {
         "pick": "Elegir dedo",
         "capture": "Capturar",
-        "apply": "Dar de alta"
-      }
+        "apply": "Dar de alta",
+        "review": "Revisar"
+      },
+      "capturing": "Capturando el dedo {{finger}} · {{seconds}} s",
+      "applying": "Enviando la huella al reloj y confirmando…",
+      "dialogTitle": "Registrar el dedo {{finger}} en {{clock}}",
+      "close": "Listo",
+      "register": "Registrar dedo {{finger}}",
+      "cancel": "Cancelar",
+      "errors": {
+        "details": "Ver detalle técnico",
+        "stationRejected": {
+          "title": "La estación no aceptó la captura",
+          "hint": "Revisa que la estación esté en su pantalla principal, sin otra captura en curso, y vuelve a intentar."
+        },
+        "stationAuth": {
+          "title": "No se pudo entrar a la estación",
+          "hint": "Revisa el usuario y la contraseña de la estación en la configuración del servidor."
+        },
+        "qualityLow": {
+          "title": "La calidad es baja",
+          "hint": "Vuelve a capturar con el dedo limpio y centrado en el sensor."
+        },
+        "clockRejected": {
+          "title": "El reloj rechazó la operación",
+          "hint": "Revisa la conexión con el reloj de prueba y vuelve a intentar."
+        },
+        "generic": {
+          "title": "No se pudo completar la operación",
+          "hint": "Vuelve a intentar. Si sigue igual, revisa el detalle técnico."
+        }
+      },
+      "waitingFinger": "Espera el dedo en el sensor de la estación… {{seconds}} s"
     },
     "summary": {
       "loading": "Leyendo el reloj…",
