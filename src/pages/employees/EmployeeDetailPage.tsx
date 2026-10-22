@@ -8,7 +8,7 @@ import {
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaFileAlt, FaIdCard, FaPencilAlt, FaUserCog, FaUserSlash, FaUserTie } from "react-icons/fa";
+import { FaClock, FaFileAlt, FaIdCard, FaPencilAlt, FaUserCog, FaUserSlash, FaUserTie } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -21,6 +21,7 @@ import {
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
 import { EmployeeCredentialDialog } from "@widgets/employee-credential";
 import { useCan } from "@entities/user";
+import { EmployeeClockCard } from "@features/hr/employee-clock";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +30,7 @@ export default function EmployeeDetailPage() {
   const [credentialOpen, setCredentialOpen] = useState(false);
   /** La cuenta (usuario, contraseña, roles) se edita en Usuarios: solo ADMIN. */
   const canEditUser = useCan("users.edit");
+  const canManageClock = useCan("time_clocks.manage");
 
   const detail = useEmployeeDetail(id);
 
@@ -132,6 +134,15 @@ export default function EmployeeDetailPage() {
               onRemove={detail.removeDocument}
             />
           </CollapsibleCard>
+          {canManageClock && (
+            <CollapsibleCard
+              icon={<FaClock size={14} className="text-emerald-600" />}
+              iconBg="bg-emerald-50"
+              title={tt("employeeClock.title", { ns: "time-clock" })}
+            >
+              <EmployeeClockCard userName={profile.name} userId={profile.id} />
+            </CollapsibleCard>
+          )}
           <CollapsibleCard
             icon={<FaIdCard size={14} className="text-violet-600" />}
             iconBg="bg-violet-50"

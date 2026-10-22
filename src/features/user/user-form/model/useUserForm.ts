@@ -3,10 +3,11 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
-import { isStaffRole, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
+import { isStaffRole, useCan, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
+import { timeClockApi } from "@entities/time-clock";
 import { showToast } from "@app/toast/toast.slice";
 import type { AppDispatch } from "@app/store";
 
@@ -130,6 +131,7 @@ export const useUserForm = (userId?: string) => {
   const isEdit = Boolean(id);
   const { t: tt } = useTranslation(["users", "common"]);
   const dispatch = useDispatch<AppDispatch>();
+  const canWriteClock = useCan("time_clock.write");
   const rolesCatalog = useRolesCatalog();
 
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -400,6 +402,18 @@ export const useUserForm = (userId?: string) => {
           }
           // Correo de alta con los documentos adjuntos (fire-and-forget).
           void personalApi.notifyRegistration(created.id).catch(() => undefined);
+        }
+        // Alta en los relojes que aceptan escritura desde la web (hoy, el de prueba).
+        if (canWriteClock) {
+          void timeClockApi
+            .employeeClockAltaAll(created.id)
+            .then(({ results }) => {
+              const done = results.filter((r) => r.ok).map((r) => r.name);
+              if (done.length > 0) {
+                dispatch(showToast({ message: i18n.t("time-clock:employeeClock.autoDone", { clocks: done.join(", ") }), type: "success" }));
+              }
+            })
+            .catch(() => undefined);
         }
       }
       return true;

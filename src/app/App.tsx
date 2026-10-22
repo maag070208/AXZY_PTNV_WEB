@@ -10,7 +10,6 @@ import TimeClockEmployeesPage from "@pages/access/TimeClockEmployeesPage";
 import TimeClockRosterPage from "@pages/access/TimeClockRosterPage";
 import TimeClockInspectPage from "@pages/access/TimeClockInspectPage";
 import TimeClockPeoplePage from "@pages/access/TimeClockPeoplePage";
-import TimeClockPanelPage from "@pages/access/TimeClockPanelPage";
 import TimeClockDashboardPage from "@pages/access/TimeClockDashboardPage";
 import TimeClockDifferencesPage from "@pages/access/TimeClockDifferencesPage";
 import TimeClocksPage from "@pages/access/TimeClocksPage";
@@ -404,15 +403,6 @@ export default function App() {
           element={
             <RequiresPermission permission="time_clocks.manage">
               <TimeClockDashboardPage />
-            </RequiresPermission>
-          }
-        />
-        {/* Panel integrado del reloj (Configuración): resumen, personas, eventos, cámara y padrón. */}
-        <Route
-          path="/time-clocks/panel"
-          element={
-            <RequiresPermission permission="time_clock.view">
-              <TimeClockPanelPage />
             </RequiresPermission>
           }
         />

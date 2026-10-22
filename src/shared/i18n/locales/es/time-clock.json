@@ -508,7 +508,13 @@
       "name": "Nombre",
       "cards": "Tarjetas",
       "cardsCount": "{{count}} tarjeta(s)",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "faces": "Rostro",
+      "fingerprints": "Huellas",
+      "yes": "Sí",
+      "no": "No",
+      "pending": "Leyendo…",
+      "none": "—"
     },
     "actions": {
       "rename": "Renombrar",
@@ -536,6 +542,17 @@
       "remove": "No se pudo dar de baja.",
       "addCard": "No se pudo registrar la tarjeta.",
       "removeCard": "No se pudo quitar la tarjeta."
+    },
+    "biometrics": {
+      "updated": "Biométricos al {{time}}",
+      "loading": "Leyendo rostros y huellas del reloj…",
+      "refresh": "Actualizar biométricos",
+      "error": "No se pudieron leer rostros y huellas"
+    },
+    "confirm": {
+      "title": "Dar de baja a {{name}}",
+      "body": "Se quitará a {{name}} (número {{number}}) de la memoria del reloj seleccionado, junto con sus tarjetas. La acción escribe en el reloj.",
+      "action": "Dar de baja"
     }
   },
   "panel": {
@@ -626,13 +643,15 @@
       "punches": "Checadas hoy",
       "punchesHint": "que cuentan para asistencia",
       "alerts": "Alertas",
-      "alertsHint": "por resolver"
+      "alertsHint": "por resolver",
+      "allGood": "Todo en orden"
     },
     "sections": {
       "status": "Estado",
       "people": "Personas",
       "events": "Eventos",
-      "camera": "Cámara"
+      "camera": "Cámara",
+      "clocks": "Relojes"
     },
     "clock": "Reloj",
     "personnel": {
@@ -642,7 +661,9 @@
       "seeAll": "Ver todo",
       "loading": "Leyendo el reloj…",
       "empty": "El reloj no tiene personas dadas de alta.",
-      "more": "y {{count}} más"
+      "more": "y {{count}} más",
+      "count": "{{count}} persona(s) en el reloj",
+      "hint": "Lectura bajo demanda del equipo"
     },
     "device": {
       "name": "Nombre",
@@ -656,6 +677,15 @@
     "tooltip": {
       "punches": "{{count}} checada(s)",
       "more": "y {{count}} más"
+    },
+    "chart": {
+      "area": "Área",
+      "bar": "Barras"
+    },
+    "table": {
+      "person": "Persona",
+      "time": "Hora",
+      "method": "Método"
     }
   },
   "person": {
@@ -676,5 +706,24 @@
     "errors": {
       "read": "No se pudo leer la ficha."
     }
+  },
+  "employeeClock": {
+    "title": "Reloj checador",
+    "description": "Alta de la persona en los relojes. Por ahora solo escribe en el reloj de prueba.",
+    "noNumber": "Captura el número de empleado en Personal para poder darla de alta en el reloj.",
+    "empty": "No hay relojes registrados.",
+    "loading": "Consultando los relojes…",
+    "state": {
+      "SIN_ALTA": "Sin alta",
+      "DADA_DE_ALTA": "Dada de alta",
+      "NO_RESPONSE": "Sin respuesta"
+    },
+    "readOnly": "Solo lectura",
+    "alta": "Dar de alta en el reloj",
+    "confirmTitle": "Dar de alta en {{clock}}",
+    "confirmBody": "Se creará a {{name}} con el número {{number}} en el reloj {{clock}}. Solo se escribe en el reloj de prueba.",
+    "done": "{{name}} quedó dada de alta en {{clock}}.",
+    "error": "No se pudo dar de alta en el reloj.",
+    "autoDone": "Dada de alta en el reloj: {{clocks}}."
   }
 }

@@ -11,6 +11,25 @@ export interface TimeClockPeopleList {
   cards: Array<{ cardNo: string; employeeNumber: string; cardType: string | null }>;
 }
 
+/** Conteos de rostros y huellas por número de persona (solo lectura, con caché en la API). */
+export interface TimeClockBiometrics {
+  updatedAt: string;
+  people: Record<string, { faces: number; fingerprints: number }>;
+}
+
+/** Estado del alta de una persona del sistema en cada reloj registrado. Solo lectura. */
+export interface EmployeeClockStatus {
+  employeeNumber: string | null;
+  clocks: Array<{
+    serial: string;
+    name: string;
+    connection: "ONLINE" | "NO_RESPONSE";
+    state: "SIN_ALTA" | "DADA_DE_ALTA" | null;
+    /** El reloj acepta altas desde la web (hoy, solo el de prueba). */
+    canAlta: boolean;
+  }>;
+}
+
 export type ClockGender = "male" | "female" | "unknown";
 
 export interface TimeClockPersonInput {

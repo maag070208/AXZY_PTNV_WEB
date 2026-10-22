@@ -13,7 +13,7 @@ import type {
   TimeClockSyncHistory,
 } from "../model/types";
 import type { RemovalCategoryRow, RosterRemovalInput, RosterRunResult, TimeClockRoster } from "../model/roster";
-import type { TimeClockPeopleList, TimeClockPersonInput } from "../model/people";
+import type { EmployeeClockStatus, TimeClockBiometrics, TimeClockPeopleList, TimeClockPersonInput } from "../model/people";
 import type { TimeClockCamera } from "../model/camera";
 import type { TimeClockSummary } from "../model/summary";
 import type { TimeClockPersonDetail } from "../model/person";
@@ -40,6 +40,16 @@ export const timeClockApi = {
   inspectCamera: (serial: string) => api.get<TimeClockCamera>(`${clockPath(serial)}/inspect/camera`),
   /** Personas del reloj con sus tarjetas (lectura). */
   peopleList: (serial: string) => api.get<TimeClockPeopleList>(`${clockPath(serial)}/people`),
+  employeeClockStatus: (userId: string) => api.get<EmployeeClockStatus>(`/time-clock/employees/${userId}/clock-status`),
+  employeeClockAltaAll: (userId: string) =>
+    api.post<{ results: Array<{ serial: string; name: string; ok: boolean; code?: string }> }>(
+      `/time-clock/employees/${userId}/clock-alta-all`,
+      {}
+    ),
+  employeeClockAlta: (userId: string, serial: string) =>
+    api.post<{ serial: string; employeeNumber: string; name: string }>(`/time-clock/employees/${userId}/clock-alta`, { serial }),
+  peopleBiometrics: (serial: string, refresh = false) =>
+    api.get<TimeClockBiometrics>(`${clockPath(serial)}/people/biometrics${refresh ? "?refresh=true" : ""}`),
   /** Da de alta una persona en el reloj (ESCRIBE en el reloj). */
   peopleCreate: (serial: string, input: TimeClockPersonInput) =>
     api.post<{ employeeNumber: string }>(`${clockPath(serial)}/people`, input),

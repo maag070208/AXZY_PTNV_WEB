@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   timeClockApi,
   type ClockGender,
+  type TimeClockBiometrics,
   type TimeClockDevice,
   type TimeClockPeopleList,
 } from "@entities/time-clock";
@@ -26,6 +27,9 @@ export const useTimeClockPeople = (controlledSerial?: string) => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [biometrics, setBiometrics] = useState<TimeClockBiometrics | null>(null);
+  const [biometricsLoading, setBiometricsLoading] = useState(false);
+  const [biometricsError, setBiometricsError] = useState<string | null>(null);
 
   useEffect(() => {
     timeClockApi
@@ -55,6 +59,26 @@ export const useTimeClockPeople = (controlledSerial?: string) => {
     load();
   }, [load]);
 
+  /** Rostros y huellas: se leen aparte porque el equipo las pide persona por persona. */
+  const loadBiometrics = useCallback(
+    (refresh = false) => {
+      if (!serial) return;
+      setBiometricsLoading(true);
+      setBiometricsError(null);
+      timeClockApi
+        .peopleBiometrics(serial, refresh)
+        .then(setBiometrics)
+        .catch((e: unknown) => setBiometricsError(messageOf(e, t("people.biometrics.error"))))
+        .finally(() => setBiometricsLoading(false));
+    },
+    [serial, t]
+  );
+
+  useEffect(() => {
+    setBiometrics(null);
+    loadBiometrics(false);
+  }, [loadBiometrics]);
+
   /** Ejecuta una escritura y refresca. Devuelve true si salió bien. */
   const write = async (action: () => Promise<unknown>, okMessage: string, failMessage: string): Promise<boolean> => {
     setBusy(true);
@@ -78,6 +102,10 @@ export const useTimeClockPeople = (controlledSerial?: string) => {
     setSerial,
     data,
     version,
+    biometrics,
+    biometricsLoading,
+    biometricsError,
+    reloadBiometrics: () => loadBiometrics(true),
     loading,
     busy,
     error,

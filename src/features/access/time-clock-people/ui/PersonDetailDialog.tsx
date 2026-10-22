@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ITDialog } from "@axzydev/axzy_ui_system";
 import { timeClockApi, type TimeClockPersonDetail } from "@entities/time-clock";
 
 const field = "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-900 focus:outline-none";
@@ -17,8 +18,17 @@ interface Props {
   onChanged?: () => void;
 }
 
-/** Ficha de una persona del reloj: foto, vínculo, tarjetas, huellas (solo tipo y número) y checadas de hoy. */
-export default function PersonDetailCard({ clockSerial, employeeNumber, onClose, editable = false, onChanged }: Props) {
+/** Ficha de una persona del reloj como modal: foto, vínculo, tarjetas, huellas (solo tipo y número) y checadas de hoy. */
+export default function PersonDetailDialog(props: Props) {
+  const { t } = useTranslation("time-clock");
+  return (
+    <ITDialog isOpen onClose={props.onClose} title={t("person.title")} className="max-w-3xl">
+      <PersonDetailBody {...props} />
+    </ITDialog>
+  );
+}
+
+function PersonDetailBody({ clockSerial, employeeNumber, editable = false, onChanged }: Omit<Props, "onClose">) {
   const { t } = useTranslation("time-clock");
   const [detail, setDetail] = useState<TimeClockPersonDetail | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
@@ -70,13 +80,7 @@ export default function PersonDetailCard({ clockSerial, employeeNumber, onClose,
   };
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <header className="flex items-center justify-between gap-3">
-        <span className="text-sm font-bold text-slate-900">{t("person.title")}</span>
-        <button type="button" onClick={onClose} className="rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-600 hover:bg-slate-50">
-          {t("person.close")}
-        </button>
-      </header>
+    <div className="flex flex-col gap-4">
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       {!detail && !error && <p className="text-sm text-slate-400">{t("person.loading")}</p>}
       {detail && (
@@ -183,6 +187,6 @@ export default function PersonDetailCard({ clockSerial, employeeNumber, onClose,
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }

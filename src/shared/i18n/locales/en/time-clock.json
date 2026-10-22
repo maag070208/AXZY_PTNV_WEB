@@ -508,7 +508,13 @@
       "name": "Name",
       "cards": "Cards",
       "cardsCount": "{{count}} card(s)",
-      "actions": "Actions"
+      "actions": "Actions",
+      "faces": "Face",
+      "fingerprints": "Fingerprints",
+      "yes": "Yes",
+      "no": "No",
+      "pending": "Reading…",
+      "none": "—"
     },
     "actions": {
       "rename": "Rename",
@@ -536,6 +542,17 @@
       "remove": "Could not remove.",
       "addCard": "Could not register the card.",
       "removeCard": "Could not remove the card."
+    },
+    "biometrics": {
+      "updated": "Biometrics at {{time}}",
+      "loading": "Reading faces and fingerprints from the clock…",
+      "refresh": "Refresh biometrics",
+      "error": "Could not read faces and fingerprints"
+    },
+    "confirm": {
+      "title": "Remove {{name}}",
+      "body": "{{name}} (number {{number}}) will be removed from the selected clock's memory, along with their cards. This action writes to the clock.",
+      "action": "Remove"
     }
   },
   "panel": {
@@ -626,13 +643,15 @@
       "punches": "Check-ins today",
       "punchesHint": "counting for attendance",
       "alerts": "Alerts",
-      "alertsHint": "to resolve"
+      "alertsHint": "to resolve",
+      "allGood": "All good"
     },
     "sections": {
       "status": "Status",
       "people": "People",
       "events": "Events",
-      "camera": "Camera"
+      "camera": "Camera",
+      "clocks": "Clocks"
     },
     "clock": "Clock",
     "personnel": {
@@ -642,7 +661,9 @@
       "seeAll": "See all",
       "loading": "Reading the clock…",
       "empty": "The clock has no people enrolled.",
-      "more": "and {{count}} more"
+      "more": "and {{count}} more",
+      "count": "{{count}} person(s) on the clock",
+      "hint": "On-demand read from the device"
     },
     "device": {
       "name": "Name",
@@ -656,6 +677,15 @@
     "tooltip": {
       "punches": "{{count}} punch(es)",
       "more": "and {{count}} more"
+    },
+    "chart": {
+      "area": "Area",
+      "bar": "Bars"
+    },
+    "table": {
+      "person": "Person",
+      "time": "Time",
+      "method": "Method"
     }
   },
   "person": {
@@ -676,5 +706,24 @@
     "errors": {
       "read": "Could not read the record."
     }
+  },
+  "employeeClock": {
+    "title": "Time clock",
+    "description": "Add this person to the clocks. For now it only writes to the test clock.",
+    "noNumber": "Add the employee number in Personnel to add this person to the clock.",
+    "empty": "No clocks registered.",
+    "loading": "Checking clocks…",
+    "state": {
+      "SIN_ALTA": "Not added",
+      "DADA_DE_ALTA": "Added",
+      "NO_RESPONSE": "No response"
+    },
+    "readOnly": "Read-only",
+    "alta": "Add to clock",
+    "confirmTitle": "Add to {{clock}}",
+    "confirmBody": "{{name}} (number {{number}}) will be created on the clock {{clock}}. Only the test clock is written.",
+    "done": "{{name}} was added to {{clock}}.",
+    "error": "Could not add to the clock.",
+    "autoDone": "Added to the clock: {{clocks}}."
   }
 }
