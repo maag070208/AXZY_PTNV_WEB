@@ -91,7 +91,12 @@
       "notesPlaceholder": "Escribe aquí lo que quieras agregar…",
       "helper": "Langostín te ayuda a armar el ticket",
       "mascot": "Langostín, la mascota de Puerto Nuevo",
-      "back": "Anterior"
+      "back": "Anterior",
+      "askForWhom": "¿El ticket es a nombre de otra persona?",
+      "forMe": "No, es mío",
+      "forOther": "Sí, lo pidió otra persona",
+      "whoRequested": "¿Quién lo pidió?",
+      "searchPerson": "Busca a la persona…"
     },
     "suggestions": {
       "noPower": "No enciende",
@@ -117,7 +122,8 @@
       "evidence": "Evidencia",
       "files_one": "{{count}} archivo",
       "files_other": "{{count}} archivos",
-      "notes": "Notas"
+      "notes": "Notas",
+      "requester": "A nombre de"
     },
     "why": {
       "title": "¿Por qué así?",
@@ -133,7 +139,8 @@
       "notes": "Escribe algo extra si hace falta, o sáltalo.",
       "done": "¡Listo! Lo estoy mandando a Sistemas.",
       "sent": "¡Listo! Tu ticket ya está con Sistemas.",
-      "error": "No pude crear el ticket. Revisa tu conexión y vuelve a intentarlo con Crear ticket."
+      "error": "No pude crear el ticket. Revisa tu conexión y vuelve a intentarlo con Crear ticket.",
+      "requester": "Si alguien más lo pidió (por teléfono, por ejemplo), dime de quién es."
     }
   },
   "edit": {
@@ -255,7 +262,7 @@
     "tasksCount_one": "{{count}} tarea",
     "tasksCount_other": "{{count}} tareas",
     "taskDetails": "Detalles",
-    "newTaskHint": "Elige a quién le toca y qué tiene que hacer.",
+    "newTaskHint": "Langostín te ayuda a dejarla lista: contesta lo que te pregunte.",
     "noTasksHint": "Usa «Nueva tarea» para asignar la primera.",
     "overdue": "Vencida",
     "cancel": "Cancelar"
@@ -372,6 +379,42 @@
     "validation": {
       "titleRequired": "El título es obligatorio",
       "titleMin": "El título debe tener al menos {{min}} caracteres"
+    }
+  },
+  "taskAgent": {
+    "name": "Langostín · Tareas",
+    "helper": "Langostín te ayuda a dejar la tarea lista",
+    "typing": "Langostín está escribiendo…",
+    "greeting": "¡Va de tarea! Dime cómo la armamos.",
+    "askWho": "¿Quién se encarga de la tarea?",
+    "askWhat": "¿Qué hay que hacer?",
+    "askNotes": "¿Algo más que deba saber? Es opcional.",
+    "askWhen": "¿Para cuándo se necesita?",
+    "done": "Listo. Dejo la tarea asignada.",
+    "searchEmployee": "Busca a la persona…",
+    "titlePlaceholder": "Escribe el título de la tarea…",
+    "notesPlaceholder": "Detalles de la tarea…",
+    "noNotes": "Sin detalles",
+    "send": "Enviar",
+    "back": "Anterior",
+    "restart": "Empezar de nuevo",
+    "when": {
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "in3": "En 3 días",
+      "in7": "En una semana",
+      "none": "Sin fecha"
+    },
+    "guide": {
+      "step": "Paso {{current}} de {{total}}",
+      "who": "Elige a quién le va la tarea.",
+      "what": "Escribe qué hay que hacer, con tus palabras.",
+      "notes": "Agrega el detalle que haga falta, o sáltalo.",
+      "when": "¿Para cuándo la necesitas?",
+      "done": "¡Listo! Dejo la tarea creada.",
+      "working": "Creando la tarea…",
+      "sent": "¡Listo! La tarea ya quedó asignada.",
+      "error": "No pude crear la tarea. Revisa los datos e inténtalo de nuevo."
     }
   }
 }

@@ -8,6 +8,9 @@ import TimeClockPage from "@pages/access/TimeClockPage";
 import TimeClockReportPage from "@pages/access/TimeClockReportPage";
 import TimeClockEmployeesPage from "@pages/access/TimeClockEmployeesPage";
 import TimeClockRosterPage from "@pages/access/TimeClockRosterPage";
+import TimeClockInspectPage from "@pages/access/TimeClockInspectPage";
+import TimeClockPeoplePage from "@pages/access/TimeClockPeoplePage";
+import TimeClockPanelPage from "@pages/access/TimeClockPanelPage";
 import TimeClockDifferencesPage from "@pages/access/TimeClockDifferencesPage";
 import TimeClocksPage from "@pages/access/TimeClocksPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
@@ -391,6 +394,33 @@ export default function App() {
           element={
             <RequiresPermission permission="time_clock.view">
               <TimeClockDifferencesPage />
+            </RequiresPermission>
+          }
+        />
+        {/* Panel integrado del reloj (Configuración): resumen, personas, eventos, cámara y padrón. */}
+        <Route
+          path="/time-clocks/panel"
+          element={
+            <RequiresPermission permission="time_clock.view">
+              <TimeClockPanelPage />
+            </RequiresPermission>
+          }
+        />
+        {/* Personas y tarjetas del reloj (Configuración): CRUD; escribe en el reloj. */}
+        <Route
+          path="/time-clocks/people"
+          element={
+            <RequiresPermission permission="time_clocks.manage">
+              <TimeClockPeoplePage />
+            </RequiresPermission>
+          }
+        />
+        {/* Lo que tiene el reloj (Configuración): personas, tarjetas y eventos del equipo, solo lectura. */}
+        <Route
+          path="/time-clocks/inspect"
+          element={
+            <RequiresPermission permission="time_clocks.manage">
+              <TimeClockInspectPage />
             </RequiresPermission>
           }
         />

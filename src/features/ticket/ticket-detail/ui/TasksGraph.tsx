@@ -5,7 +5,6 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITSearchSelect,
   ITSelect,
   ITStack,
   ITText,
@@ -26,6 +25,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate, formatDateTime } from "@shared/utils/dates";
 import { dyn } from "@shared/i18n/dyn";
 import type { UseTicketDetail } from "../model/useTicketDetail";
+import TaskAgentForm from "./TaskAgentForm";
 
 interface Props {
   fx: UseTicketDetail;
@@ -79,9 +79,6 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
   /** Cierra el formulario y lo deja limpio para la siguiente tarea. */
   const cancelarNueva = () => {
     fx.setNewTaskOpen(false);
-    fx.setSelectedUserId("");
-    fx.setTaskTitle("");
-    fx.setTaskDesc("");
   };
 
   if (!fx.tasksOpen) {
@@ -133,84 +130,17 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
         </ITFlex>
       </ITFlex>
 
-      {/* Tarea nueva: se captura aquí mismo, arriba de la lista. */}
+      {/* Tarea nueva: la arma Langostín en el chat de arriba de la lista. */}
       {fx.newTaskOpen && canAddTask && (
-        <div className="rounded-xl border border-[#0D5777]/25 bg-[#0D5777]/[0.03] p-4">
-          <ITFlex direction="column" gap={1} className="mb-3">
+        <div className="rounded-xl border border-[#0D5777]/25 bg-[#0D5777]/[0.03] p-3">
+          <ITFlex direction="column" gap={1} className="mb-2.5 px-1">
             <ITText className="!text-[11px] font-black uppercase tracking-widest text-[#0D5777]">
               {tt("detail.newTask")}
             </ITText>
             <ITText className="!text-[11px] text-slate-500">{tt("detail.newTaskHint")}</ITText>
           </ITFlex>
 
-          <ITGrid container columns={12} spacing={3}>
-            <ITGrid item xs={12} md={6}>
-              <ITSearchSelect
-                name="newUserId"
-                label={tt("detail.employeeLabel")}
-                placeholder={tt("detail.searchEmployee")}
-                options={fx.employeeOptions}
-                value={fx.selectedUserId}
-                onChange={fx.handleAssign}
-                onSearch={fx.searchEmployees}
-                isLoading={fx.busyEmployees}
-              />
-            </ITGrid>
-            <ITGrid item xs={12} md={6}>
-              <ITInput
-                name="taskTitle"
-                label={tt("detail.taskTitle")}
-                placeholder={tt("detail.taskTitlePlaceholder")}
-                value={fx.taskTitle}
-                onChange={(e) => fx.setTaskTitle(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && fx.handleAddAssignment()}
-              />
-            </ITGrid>
-            <ITGrid item xs={12}>
-              <ITTextarea
-                name="taskDesc"
-                label={tt("detail.taskDescription")}
-                placeholder={tt("detail.taskDescPlaceholder")}
-                rows={2}
-                value={fx.taskDesc}
-                onChange={(v) => fx.setTaskDesc(v)}
-              />
-            </ITGrid>
-            <ITGrid item xs={12} sm={6}>
-              <ITDatePicker
-                name="taskStart"
-                label={tt("detail.startDate")}
-                value={fx.taskStart ? new Date(fx.taskStart) : undefined}
-                onChange={(e: any) => fx.setTaskStart(e.target.value ? e.target.value.toISOString() : "")}
-              />
-            </ITGrid>
-            <ITGrid item xs={12} sm={6}>
-              <ITDatePicker
-                name="taskDue"
-                label={tt("detail.dueDate")}
-                value={fx.taskDue ? new Date(fx.taskDue) : undefined}
-                onChange={(e: any) => fx.setTaskDue(e.target.value ? e.target.value.toISOString() : "")}
-              />
-            </ITGrid>
-          </ITGrid>
-
-          <ITFlex justify="end" align="center" gap={2} className="mt-3">
-            <ITButton variant="text" color="secondary" size="sm" onClick={cancelarNueva}>
-              <ITText className="!text-[11px] font-bold">{tt("detail.cancel")}</ITText>
-            </ITButton>
-            <ITButton
-              variant="filled"
-              color="primary"
-              size="sm"
-              onClick={fx.handleAddAssignment}
-              disabled={fx.savingAssignment || !fx.selectedUserId || !fx.taskTitle.trim()}
-            >
-              <ITFlex align="center" gap={1}>
-                <FaPlus size={10} />
-                <ITText className="!text-[11px] font-bold">{tt("detail.assign")}</ITText>
-              </ITFlex>
-            </ITButton>
-          </ITFlex>
+          <TaskAgentForm fx={fx} onCancel={cancelarNueva} />
         </div>
       )}
 

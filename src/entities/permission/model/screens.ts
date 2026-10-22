@@ -56,7 +56,7 @@ export type NavLabelKey =
   | "nav.accessTimeClock"
   | "nav.accessTimeClockReport"
   | "nav.accessTimeClockEmployees"
-  | "nav.accessTimeClockRoster"
+  | "nav.clockPanel"
   | "nav.clockAttendance"
   | "nav.timeClock"
   | "nav.schedules"
@@ -200,10 +200,7 @@ export const APP_SCREENS: readonly AppScreen[] = [
         id: "timeClock",
         labelKey: "nav.timeClock",
         children: [
-          { id: "clocks", labelKey: "nav.clocks", path: "/time-clocks", requirement: { anyOf: ["time_clocks.manage"] } },
-          { id: "accessTimeClock", labelKey: "nav.accessTimeClock", path: "/hr/time-clock", match: "exact", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.sync"] },
-          { id: "accessTimeClockEmployees", labelKey: "nav.accessTimeClockEmployees", path: "/hr/time-clock/employees", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.link"] },
-          { id: "accessTimeClockRoster", labelKey: "nav.accessTimeClockRoster", path: "/hr/time-clock/roster", requirement: { anyOf: ["time_clock.view"] }, actions: ["time_clock.sync"] },
+          { id: "clockPanel", labelKey: "nav.clockPanel", path: "/time-clocks/panel", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
         ],
       },
       { id: "roles", labelKey: "nav.roles", path: "/roles", requirement: { anyOf: ["roles.manage"] } },

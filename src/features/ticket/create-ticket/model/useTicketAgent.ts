@@ -13,6 +13,7 @@ export type AgentStep =
   | "urgency"
   | "evidence"
   | "notes"
+  | "requester"
   | "done";
 
 // Orden en que el agente pregunta. "done" no es un paso pendiente.
@@ -24,6 +25,14 @@ export const AGENT_STEPS: AgentStep[] = [
   "evidence",
   "notes",
 ];
+
+/**
+ * El ADMIN puede levantar el ticket en nombre de otra persona (p. ej. lo
+ * pidió por teléfono). Solo a él le preguntan; para los demás el flujo es el
+ * de siempre.
+ */
+export const agentSteps = (canCaptureForOthers: boolean): AgentStep[] =>
+  canCaptureForOthers ? [...AGENT_STEPS, "requester"] : AGENT_STEPS;
 
 export interface AgentMessage {
   id: number;
@@ -37,9 +46,14 @@ interface Options {
   onAddFile: (file: File) => void;
   onRemoveFile: (index: number) => void;
   userName?: string;
+  /** ADMIN: puede levantar el ticket en nombre de otra persona. */
+  canCaptureForOthers?: boolean;
 }
 
-type Fields = Pick<TicketDraft, "title" | "description" | "categoryId" | "departmentId" | "priority">;
+type Fields = Pick<
+  TicketDraft,
+  "title" | "description" | "categoryId" | "departmentId" | "priority" | "onBehalfOfId"
+>;
 
 // Estado antes de responder un paso; sirve para regresar.
 interface Snapshot {
@@ -51,6 +65,8 @@ interface Snapshot {
   notes: string;
   fields: Fields;
   fileCount: number;
+  /** El ADMIN ya dijo que el ticket es de otra persona. */
+  forOthers: boolean;
 }
 
 const DEFAULT_FIELDS: Fields = {
@@ -59,6 +75,7 @@ const DEFAULT_FIELDS: Fields = {
   categoryId: "",
   departmentId: "",
   priority: "MEDIUM",
+  onBehalfOfId: "",
 };
 
 const buildTitle = (categoryName: string, detail: string) =>
@@ -73,6 +90,7 @@ export const useTicketAgent = ({
   onAddFile,
   onRemoveFile,
   userName,
+  canCaptureForOthers = false,
 }: Options) => {
   const { t } = useTranslation("tickets");
   const [step, setStep] = useState<AgentStep>("category");
@@ -85,10 +103,13 @@ export const useTicketAgent = ({
   const [notes, setNotes] = useState("");
   const [dropfileKey, setDropfileKey] = useState(0);
   const [history, setHistory] = useState<Snapshot[]>([]);
+  // El ADMIN ya dijo que el ticket es de otra persona: se busca quién.
+  const [forOthers, setForOthers] = useState(false);
   const nextId = useRef(0);
   const timers = useRef<number[]>([]);
   const pending = useRef(0);
   const fields = useRef<Fields>(DEFAULT_FIELDS);
+  const steps = agentSteps(canCaptureForOthers);
 
   const clearTimers = () => {
     timers.current.forEach((id) => window.clearTimeout(id));
@@ -132,6 +153,7 @@ export const useTicketAgent = ({
         notes,
         fields: fields.current,
         fileCount: files.length,
+        forOthers,
       },
     ]);
 
@@ -220,6 +242,37 @@ export const useTicketAgent = ({
     sayUser(value || t("new.agent.noNotes"));
     setNotes(value);
     setField("description", composeDescription(detail, value));
+    // Al ADMIN se le pregunta de quién es el ticket antes de mandarlo.
+    if (canCaptureForOthers) {
+      setStep("requester");
+      say(t("new.agent.askForWhom"), 600);
+      return;
+    }
+    setStep("done");
+    say(t("new.agent.done"), 600);
+  };
+
+  // El ticket es del usuario que lo está levantando.
+  const keepAsMine = () => {
+    remember();
+    sayUser(t("new.agent.forMe"));
+    setField("onBehalfOfId", "");
+    setForOthers(false);
+    setStep("done");
+    say(t("new.agent.done"), 600);
+  };
+
+  // El ticket es de otra persona (p. ej. lo pidió por teléfono).
+  const askWhoRequested = () => {
+    remember();
+    sayUser(t("new.agent.forOther"));
+    setForOthers(true);
+  };
+
+  const pickRequester = (id: string, name: string) => {
+    remember();
+    sayUser(name);
+    setField("onBehalfOfId", id);
     setStep("done");
     say(t("new.agent.done"), 600);
   };
@@ -236,6 +289,7 @@ export const useTicketAgent = ({
     setDetail(previous.detail);
     setDepartmentName(previous.departmentName);
     setNotes(previous.notes);
+    setForOthers(previous.forOthers);
     (Object.keys(previous.fields) as (keyof Fields)[]).forEach((field) =>
       setField(field, previous.fields[field]),
     );
@@ -251,6 +305,7 @@ export const useTicketAgent = ({
     setDetail("");
     setDepartmentName("");
     setNotes("");
+    setForOthers(false);
     (Object.keys(DEFAULT_FIELDS) as (keyof Fields)[]).forEach((field) =>
       setField(field, DEFAULT_FIELDS[field]),
     );
@@ -269,7 +324,10 @@ export const useTicketAgent = ({
     notes,
     dropfileKey,
     canGoBack: history.length > 0,
-    completed: step === "done" ? AGENT_STEPS.length : AGENT_STEPS.indexOf(step),
+    /** Pasos del flujo (el último solo aparece para el ADMIN). */
+    steps,
+    forOthers,
+    completed: step === "done" ? steps.length : steps.indexOf(step),
     pickCategory,
     pickSymptom,
     pickDepartment,
@@ -278,6 +336,9 @@ export const useTicketAgent = ({
     attachFile,
     finishEvidence,
     sendNotes,
+    keepAsMine,
+    askWhoRequested,
+    pickRequester,
     goBack,
     restart,
   };

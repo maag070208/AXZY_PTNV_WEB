@@ -16,8 +16,8 @@ import type { PermissionScope, User, UserRole } from "@entities/user";
 import { usersApi, usePermission } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { useAblyChannel } from "@shared/lib/ably";
-import { todayInput } from "./timeline";
 import { i18n } from "@shared/i18n";
+import type { TaskDraft } from "./useTaskAgent";
 
 interface Props {
   id?: string;
@@ -79,11 +79,6 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
   const [sendingComment, setSendingComment] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [taskTitle, setTaskTitle] = useState("");
-  const [taskDesc, setTaskDesc] = useState("");
-  const [taskStart, setTaskStart] = useState(todayInput);
-  const [taskDue, setTaskDue] = useState(todayInput);
   const [tasksOpen, setTasksOpen] = useState(true);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [expandedAssignments, setExpandedAssignments] = useState<
@@ -229,32 +224,29 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     }
   };
 
-  const handleAssign = async (value: string | number) => {
-    setSelectedUserId(String(value));
-  };
-
-  const handleAddAssignment = async () => {
-    if (!ticket || !selectedUserId || !taskTitle.trim()) return;
+  /**
+   * Crea una tarea del ticket. La arma el agente de Langostín: recibe lo que
+   * se conversó y lo manda a la API.
+   */
+  const createTask = async (draft: TaskDraft): Promise<boolean> => {
+    if (!ticket || !draft.userId || !draft.title.trim()) return false;
     setSavingAssignment(true);
     try {
       await ticketsApi.addAssignment(ticket.id, {
-        userId: selectedUserId,
-        title: taskTitle.trim(),
-        description: taskDesc.trim(),
-        startDate: taskStart || null,
-        dueDate: taskDue || null,
+        userId: draft.userId,
+        title: draft.title.trim(),
+        description: draft.description.trim(),
+        startDate: draft.startDate || null,
+        dueDate: draft.dueDate || null,
       });
-      setSelectedUserId("");
-      setTaskTitle("");
-      setTaskDesc("");
-      setTaskStart(todayInput());
-      setTaskDue(todayInput());
       setToastType("success");
       setToast(tt("detail.taskAssigned"));
       refresh();
+      return true;
     } catch (e: any) {
       setToastType("error");
       setToast(e.message);
+      return false;
     } finally {
       setSavingAssignment(false);
     }
@@ -389,16 +381,6 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     downloadingPDF,
     deleteOpen,
     setDeleteOpen,
-    selectedUserId,
-    setSelectedUserId,
-    taskTitle,
-    setTaskTitle,
-    taskDesc,
-    setTaskDesc,
-    taskStart,
-    setTaskStart,
-    taskDue,
-    setTaskDue,
     tasksOpen,
     setTasksOpen,
     newTaskOpen,
@@ -417,8 +399,7 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     handleCategoryChange,
     handleDepartmentChange,
     handleResponsibleChange,
-    handleAssign,
-    handleAddAssignment,
+    createTask,
     handleUpdateAssignment,
     handleRemoveAssignment,
     handleAddAssignmentComment,

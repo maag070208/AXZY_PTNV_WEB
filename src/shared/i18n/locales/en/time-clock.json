@@ -413,5 +413,177 @@
       "removed": "Removal applied.",
       "dismissed": "Pending removal dismissed."
     }
+  },
+  "inspect": {
+    "title": "What the clock holds",
+    "description": "People, cards and events stored on the clock. Read-only: nothing on the device changes.",
+    "clock": "Clock",
+    "days": "Period",
+    "daysOption": "Last {{count}} day(s)",
+    "refresh": "Refresh",
+    "loading": "Reading the clock…",
+    "tabs": {
+      "overview": "Overview",
+      "users": "People",
+      "cards": "Cards",
+      "events": "Events"
+    },
+    "errors": {
+      "devices": "Could not load the clocks.",
+      "read": "Could not read the clock: {{detail}}"
+    },
+    "overview": {
+      "device": "Device",
+      "name": "Name",
+      "model": "Model",
+      "serial": "Serial",
+      "firmware": "Firmware",
+      "mac": "MAC",
+      "url": "Address",
+      "time": "Time",
+      "localTime": "Clock time",
+      "timeMode": "Mode",
+      "timeZone": "Time zone",
+      "counts": "Counts",
+      "people": "People",
+      "withFace": "With face",
+      "withFingerprint": "With fingerprint",
+      "withCard": "With card"
+    },
+    "users": {
+      "caption": "{{shown}} of {{total}} people",
+      "number": "Number",
+      "name": "Name",
+      "empty": "The clock has no people enrolled."
+    },
+    "cards": {
+      "caption": "{{shown}} of {{total}} cards",
+      "card": "Card",
+      "number": "Employee number",
+      "type": "Type",
+      "empty": "The clock has no cards."
+    },
+    "events": {
+      "caption": "{{shown}} of {{total}} events",
+      "time": "Date and time",
+      "type": "Type",
+      "number": "Number",
+      "name": "Name",
+      "empty": "No events in this period."
+    },
+    "minors": {
+      "face": "Face",
+      "fingerprint": "Fingerprint",
+      "card": "Card",
+      "failed": "Failed attempt",
+      "other": "Type {{minor}}"
+    }
+  },
+  "people": {
+    "title": "Clock people",
+    "description": "Enroll, rename and remove people on the clock, and register or remove their cards. Every change WRITES to the clock.",
+    "warning": "Careful: changes are applied directly on the selected clock.",
+    "clock": "Clock",
+    "filter": "Search",
+    "filterPlaceholder": "Number or name",
+    "refresh": "Refresh",
+    "loading": "Reading the clock…",
+    "empty": "No people match.",
+    "noCards": "This person has no cards.",
+    "confirmRemove": "Remove from the clock?",
+    "form": {
+      "number": "Number",
+      "name": "Name",
+      "gender": "Gender",
+      "add": "Enroll",
+      "cardNo": "Card number"
+    },
+    "genders": {
+      "unknown": "Not specified",
+      "male": "Male",
+      "female": "Female"
+    },
+    "table": {
+      "number": "Number",
+      "name": "Name",
+      "cards": "Cards",
+      "cardsCount": "{{count}} card(s)",
+      "actions": "Actions"
+    },
+    "actions": {
+      "rename": "Rename",
+      "remove": "Remove",
+      "save": "Save",
+      "cancel": "Cancel",
+      "yes": "Yes, remove",
+      "no": "No",
+      "addCard": "Register card",
+      "removeCard": "Remove"
+    },
+    "toasts": {
+      "created": "Person enrolled on the clock.",
+      "renamed": "Name updated on the clock.",
+      "removed": "Person removed from the clock.",
+      "cardAdded": "Card registered.",
+      "cardRemoved": "Card removed."
+    },
+    "errors": {
+      "devices": "Could not load the clocks.",
+      "load": "Could not read the clock.",
+      "create": "Could not enroll.",
+      "rename": "Could not rename.",
+      "remove": "Could not remove.",
+      "addCard": "Could not register the card.",
+      "removeCard": "Could not remove the card."
+    }
+  },
+  "panel": {
+    "title": "Clock panel",
+    "description": "Everything about the clock in one place: overview, people, events, camera and roster.",
+    "clock": "Clock",
+    "noClocks": "No clocks registered.",
+    "tabs": {
+      "overview": "Overview",
+      "people": "People",
+      "events": "Events",
+      "camera": "Camera",
+      "roster": "Roster",
+      "employees": "Employees",
+      "checkins": "Check-ins",
+      "clocks": "Manage"
+    },
+    "countsAttendance": "Counts for attendance",
+    "noAttendance": "Does not count for attendance",
+    "readAt": "Read at {{time}}",
+    "noRead": "No reading from the device",
+    "kpi": {
+      "device": "Device",
+      "people": "People",
+      "peopleHint": "enrolled on the clock",
+      "cards": "Cards",
+      "cardsHint": "people with a card",
+      "firmware": "Firmware"
+    }
+  },
+  "camera": {
+    "loading": "Loading camera…",
+    "noBrowser": "Your browser cannot play this video.",
+    "yes": "Yes",
+    "no": "No",
+    "noStreams": "The clock reports no video channels.",
+    "rtsp": {
+      "title": "This clock streams over RTSP",
+      "body": "Browsers do not play RTSP. To watch it here a media server (for example MediaMTX) is needed to convert it. Meanwhile, the path can be opened in VLC with its user."
+    },
+    "table": {
+      "stream": "Channel",
+      "name": "Name",
+      "transport": "Transport",
+      "resolution": "Resolution",
+      "enabled": "Enabled"
+    },
+    "errors": {
+      "read": "Could not read the clock camera."
+    }
   }
 }

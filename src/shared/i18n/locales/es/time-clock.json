@@ -413,5 +413,177 @@
       "removed": "Baja aplicada.",
       "dismissed": "Baja pendiente descartada."
     }
+  },
+  "inspect": {
+    "title": "Lo que tiene el reloj",
+    "description": "Personas, tarjetas y eventos que el reloj tiene guardados. Solo lectura: no cambia nada en el equipo.",
+    "clock": "Reloj",
+    "days": "Período",
+    "daysOption": "Últimos {{count}} día(s)",
+    "refresh": "Actualizar",
+    "loading": "Leyendo el reloj…",
+    "tabs": {
+      "overview": "Resumen",
+      "users": "Personas",
+      "cards": "Tarjetas",
+      "events": "Eventos"
+    },
+    "errors": {
+      "devices": "No se pudieron cargar los relojes.",
+      "read": "No se pudo leer el reloj: {{detail}}"
+    },
+    "overview": {
+      "device": "Equipo",
+      "name": "Nombre",
+      "model": "Modelo",
+      "serial": "Serie",
+      "firmware": "Firmware",
+      "mac": "MAC",
+      "url": "Dirección",
+      "time": "Hora",
+      "localTime": "Hora del reloj",
+      "timeMode": "Modo",
+      "timeZone": "Zona",
+      "counts": "Conteos",
+      "people": "Personas",
+      "withFace": "Con rostro",
+      "withFingerprint": "Con huella",
+      "withCard": "Con tarjeta"
+    },
+    "users": {
+      "caption": "{{shown}} de {{total}} personas",
+      "number": "Número",
+      "name": "Nombre",
+      "empty": "El reloj no tiene personas dadas de alta."
+    },
+    "cards": {
+      "caption": "{{shown}} de {{total}} tarjetas",
+      "card": "Tarjeta",
+      "number": "Número de empleado",
+      "type": "Tipo",
+      "empty": "El reloj no tiene tarjetas."
+    },
+    "events": {
+      "caption": "{{shown}} de {{total}} eventos",
+      "time": "Fecha y hora",
+      "type": "Tipo",
+      "number": "Número",
+      "name": "Nombre",
+      "empty": "No hay eventos en este período."
+    },
+    "minors": {
+      "face": "Rostro",
+      "fingerprint": "Huella",
+      "card": "Tarjeta",
+      "failed": "Intento fallido",
+      "other": "Tipo {{minor}}"
+    }
+  },
+  "people": {
+    "title": "Personas del reloj",
+    "description": "Da de alta, renombra y da de baja personas en el reloj, y registra o quita sus tarjetas. Cada cambio ESCRIBE en el reloj.",
+    "warning": "Cuidado: los cambios se aplican directamente en el reloj seleccionado.",
+    "clock": "Reloj",
+    "filter": "Buscar",
+    "filterPlaceholder": "Número o nombre",
+    "refresh": "Actualizar",
+    "loading": "Leyendo el reloj…",
+    "empty": "No hay personas que coincidan.",
+    "noCards": "Esta persona no tiene tarjetas.",
+    "confirmRemove": "¿Dar de baja del reloj?",
+    "form": {
+      "number": "Número",
+      "name": "Nombre",
+      "gender": "Género",
+      "add": "Dar de alta",
+      "cardNo": "Número de tarjeta"
+    },
+    "genders": {
+      "unknown": "Sin especificar",
+      "male": "Hombre",
+      "female": "Mujer"
+    },
+    "table": {
+      "number": "Número",
+      "name": "Nombre",
+      "cards": "Tarjetas",
+      "cardsCount": "{{count}} tarjeta(s)",
+      "actions": "Acciones"
+    },
+    "actions": {
+      "rename": "Renombrar",
+      "remove": "Dar de baja",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "yes": "Sí, dar de baja",
+      "no": "No",
+      "addCard": "Registrar tarjeta",
+      "removeCard": "Quitar"
+    },
+    "toasts": {
+      "created": "Persona dada de alta en el reloj.",
+      "renamed": "Nombre actualizado en el reloj.",
+      "removed": "Persona dada de baja del reloj.",
+      "cardAdded": "Tarjeta registrada.",
+      "cardRemoved": "Tarjeta quitada."
+    },
+    "errors": {
+      "devices": "No se pudieron cargar los relojes.",
+      "load": "No se pudo leer el reloj.",
+      "create": "No se pudo dar de alta.",
+      "rename": "No se pudo cambiar el nombre.",
+      "remove": "No se pudo dar de baja.",
+      "addCard": "No se pudo registrar la tarjeta.",
+      "removeCard": "No se pudo quitar la tarjeta."
+    }
+  },
+  "panel": {
+    "title": "Panel del reloj",
+    "description": "Todo lo del reloj en un solo lugar: resumen, personas, eventos, cámara y padrón.",
+    "clock": "Reloj",
+    "noClocks": "No hay relojes dados de alta.",
+    "tabs": {
+      "overview": "Resumen",
+      "people": "Personas",
+      "events": "Eventos",
+      "camera": "Cámara",
+      "roster": "Padrón",
+      "employees": "Empleados",
+      "checkins": "Checadas",
+      "clocks": "Administrar"
+    },
+    "countsAttendance": "Cuenta para asistencia",
+    "noAttendance": "No cuenta para asistencia",
+    "readAt": "Leído a las {{time}}",
+    "noRead": "Sin lectura del equipo",
+    "kpi": {
+      "device": "Equipo",
+      "people": "Personas",
+      "peopleHint": "dadas de alta en el reloj",
+      "cards": "Tarjetas",
+      "cardsHint": "personas con tarjeta",
+      "firmware": "Firmware"
+    }
+  },
+  "camera": {
+    "loading": "Cargando cámara…",
+    "noBrowser": "Tu navegador no puede reproducir este video.",
+    "yes": "Sí",
+    "no": "No",
+    "noStreams": "El reloj no reporta canales de video.",
+    "rtsp": {
+      "title": "Este reloj transmite por RTSP",
+      "body": "El navegador no reproduce RTSP. Para verlo aquí hace falta un servidor de medios (por ejemplo MediaMTX) que lo convierta. Mientras tanto, la ruta se puede abrir en VLC con su usuario."
+    },
+    "table": {
+      "stream": "Canal",
+      "name": "Nombre",
+      "transport": "Transporte",
+      "resolution": "Resolución",
+      "enabled": "Activo"
+    },
+    "errors": {
+      "read": "No se pudo leer la cámara del reloj."
+    }
   }
 }

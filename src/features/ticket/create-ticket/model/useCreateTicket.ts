@@ -11,6 +11,8 @@ export interface TicketDraft {
   priority: string;
   categoryId: string;
   departmentId: string;
+  /** ADMIN: el ticket se levanta en nombre de esta persona. */
+  onBehalfOfId: string;
 }
 
 export const useCreateTicket = () => {
@@ -23,6 +25,7 @@ export const useCreateTicket = () => {
     priority: "MEDIUM",
     categoryId: "",
     departmentId: "",
+    onBehalfOfId: "",
   });
   const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -80,6 +83,7 @@ export const useCreateTicket = () => {
           priority: form.priority,
           categoryId: form.categoryId || undefined,
           departmentId: form.departmentId || undefined,
+          onBehalfOfId: form.onBehalfOfId || undefined,
         })
       );
       if (createTicketThunk.fulfilled.match(action)) {

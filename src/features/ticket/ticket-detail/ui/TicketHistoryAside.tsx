@@ -7,6 +7,7 @@ import {
   FaUserPlus,
   FaBuilding,
   FaComment,
+  FaPhoneAlt,
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
@@ -25,6 +26,7 @@ const EVENT_ICON: Record<string, React.ReactNode> = {
   assigned: <FaUserPlus size={12} />,
   department: <FaBuilding size={12} />,
   comment: <FaComment size={12} />,
+  captured: <FaPhoneAlt size={12} />,
   default: <FaClock size={12} />,
 };
 

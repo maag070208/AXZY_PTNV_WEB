@@ -37,6 +37,8 @@ const getHistoryMeta = (h: Ticket["history"][0]) => {
     return { icon: "assigned", bg: "bg-violet-500", color: "text-violet-600" };
   if (h.type === "DEPARTMENT")
     return { icon: "department", bg: "bg-purple-500", color: "text-purple-600" };
+  if (h.type === "CAPTURED")
+    return { icon: "captured", bg: "bg-teal-500", color: "text-teal-600" };
   return { icon: "default", bg: "bg-slate-400", color: "text-slate-500" };
 };
 

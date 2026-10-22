@@ -13,11 +13,45 @@ import type {
   TimeClockSyncHistory,
 } from "../model/types";
 import type { RemovalCategoryRow, RosterRemovalInput, RosterRunResult, TimeClockRoster } from "../model/roster";
+import type { TimeClockPeopleList, TimeClockPersonInput } from "../model/people";
+import type { TimeClockCamera } from "../model/camera";
+import type {
+  TimeClockInspectCards,
+  TimeClockInspectEvents,
+  TimeClockInspectOverview,
+  TimeClockInspectUsers,
+} from "../model/inspect";
 
 const employeePath = (number: string) => `/time-clock/employees/${encodeURIComponent(number)}`;
 const clockPath = (serial: string) => `/time-clock/clocks/${encodeURIComponent(serial)}`;
 
 export const timeClockApi = {
+  /** Cámara de la terminal (solo lectura). */
+  inspectCamera: (serial: string) => api.get<TimeClockCamera>(`${clockPath(serial)}/inspect/camera`),
+  /** Personas del reloj con sus tarjetas (lectura). */
+  peopleList: (serial: string) => api.get<TimeClockPeopleList>(`${clockPath(serial)}/people`),
+  /** Da de alta una persona en el reloj (ESCRIBE en el reloj). */
+  peopleCreate: (serial: string, input: TimeClockPersonInput) =>
+    api.post<{ employeeNumber: string }>(`${clockPath(serial)}/people`, input),
+  /** Cambia el nombre de una persona en el reloj (ESCRIBE). */
+  peopleRename: (serial: string, employeeNumber: string, name: string) =>
+    api.patch<{ employeeNumber: string }>(`${clockPath(serial)}/people/${encodeURIComponent(employeeNumber)}`, { name }),
+  /** Da de baja a una persona del reloj, quitando antes sus tarjetas (ESCRIBE). */
+  peopleRemove: (serial: string, employeeNumber: string) =>
+    api.delete<{ employeeNumber: string }>(`${clockPath(serial)}/people/${encodeURIComponent(employeeNumber)}`),
+  /** Registra una tarjeta a una persona (ESCRIBE). */
+  peopleAddCard: (serial: string, employeeNumber: string, cardNo: string) =>
+    api.post<{ cardNo: string }>(`${clockPath(serial)}/people/${encodeURIComponent(employeeNumber)}/cards`, { cardNo }),
+  /** Quita una tarjeta del reloj (ESCRIBE). */
+  peopleRemoveCard: (serial: string, cardNo: string) =>
+    api.delete<{ cardNo: string }>(`${clockPath(serial)}/cards/${encodeURIComponent(cardNo)}`),
+  /** Lo que tiene el reloj: identidad, hora y conteos (solo lectura del equipo). */
+  inspectOverview: (serial: string) =>
+    api.get<TimeClockInspectOverview>(`${clockPath(serial)}/inspect/overview`),
+  inspectUsers: (serial: string) => api.get<TimeClockInspectUsers>(`${clockPath(serial)}/inspect/users`),
+  inspectCards: (serial: string) => api.get<TimeClockInspectCards>(`${clockPath(serial)}/inspect/cards`),
+  inspectEvents: (serial: string, days = 2) =>
+    api.get<TimeClockInspectEvents>(`${clockPath(serial)}/inspect/events?days=${days}`),
   /** Catálogo de motivos de baja (activos). */
   removalCategories: () => api.get<RemovalCategoryRow[]>(`/time-clock/removal-categories`),
   /** Padrón del reloj: nuevos, bajas pendientes y reapariciones (solo lee la base). */

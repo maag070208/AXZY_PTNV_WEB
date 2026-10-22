@@ -10,6 +10,8 @@ interface Props {
   fileCount: number;
   completed: number;
   total: number;
+  /** Nombre de la persona a nombre de quien se levanta el ticket (ADMIN). */
+  requester?: string;
 }
 
 // Vista en vivo del ticket: se llena conforme el agente recibe cada dato.
@@ -23,6 +25,7 @@ export default function TicketSummaryPanel({
   fileCount,
   completed,
   total,
+  requester = "",
 }: Props) {
   const { t } = useTranslation("tickets");
 
@@ -33,6 +36,7 @@ export default function TicketSummaryPanel({
     { label: t("new.summary.urgency"), value: urgency },
     { label: t("new.summary.evidence"), value: fileCount > 0 ? t("new.summary.files", { count: fileCount }) : "" },
     { label: t("new.summary.notes"), value: notes, clamp: true },
+    { label: t("new.summary.requester"), value: requester },
   ];
 
   return (

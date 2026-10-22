@@ -91,7 +91,12 @@
       "notesPlaceholder": "Write anything else you'd like to add…",
       "helper": "Langostin helps you build the ticket",
       "mascot": "Langostin, the Puerto Nuevo mascot",
-      "back": "Back"
+      "back": "Back",
+      "askForWhom": "Is this ticket for someone else?",
+      "forMe": "No, it's mine",
+      "forOther": "Yes, someone else asked for it",
+      "whoRequested": "Who asked for it?",
+      "searchPerson": "Search the person…"
     },
     "suggestions": {
       "noPower": "Won't turn on",
@@ -117,7 +122,8 @@
       "evidence": "Evidence",
       "files_one": "{{count}} file",
       "files_other": "{{count}} files",
-      "notes": "Notes"
+      "notes": "Notes",
+      "requester": "On behalf of"
     },
     "why": {
       "title": "Why this way?",
@@ -133,7 +139,8 @@
       "notes": "Add anything extra if needed, or skip it.",
       "done": "Done! I'm sending it to Systems now.",
       "sent": "Done! Your ticket is with Systems.",
-      "error": "I couldn't create the ticket. Check your connection and try again with Create ticket."
+      "error": "I couldn't create the ticket. Check your connection and try again with Create ticket.",
+      "requester": "If someone else asked for it (by phone, for example), tell me whose it is."
     }
   },
   "edit": {
@@ -255,7 +262,7 @@
     "tasksCount_one": "{{count}} task",
     "tasksCount_other": "{{count}} tasks",
     "taskDetails": "Details",
-    "newTaskHint": "Pick who does it and what they have to do.",
+    "newTaskHint": "Langostín helps you get it ready: answer what it asks you.",
     "noTasksHint": "Use “New task” to assign the first one.",
     "overdue": "Overdue",
     "cancel": "Cancel"
@@ -372,6 +379,42 @@
     "validation": {
       "titleRequired": "Title is required",
       "titleMin": "Title must have at least {{min}} characters"
+    }
+  },
+  "taskAgent": {
+    "name": "Langostín · Tasks",
+    "helper": "Langostín helps you get the task ready",
+    "typing": "Langostín is typing…",
+    "greeting": "Let’s do a task! Tell me how to set it up.",
+    "askWho": "Who is in charge of the task?",
+    "askWhat": "What needs to be done?",
+    "askNotes": "Anything else I should know? Optional.",
+    "askWhen": "When is it needed by?",
+    "done": "Done. I am assigning the task.",
+    "searchEmployee": "Search the person…",
+    "titlePlaceholder": "Write the task title…",
+    "notesPlaceholder": "Task details…",
+    "noNotes": "No details",
+    "send": "Send",
+    "back": "Back",
+    "restart": "Start over",
+    "when": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "in3": "In 3 days",
+      "in7": "In a week",
+      "none": "No date"
+    },
+    "guide": {
+      "step": "Step {{current}} of {{total}}",
+      "who": "Pick who the task goes to.",
+      "what": "Write what needs to be done, in your own words.",
+      "notes": "Add the detail if you need it, or skip it.",
+      "when": "When do you need it?",
+      "done": "Done! I am creating the task.",
+      "working": "Creating the task…",
+      "sent": "Done! The task is already assigned.",
+      "error": "I could not create the task. Check the data and try again."
     }
   }
 }

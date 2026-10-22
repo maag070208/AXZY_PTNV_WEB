@@ -1,16 +1,17 @@
-import { FileTypeEnum, ITDropfile, ITGrid } from "@axzydev/axzy_ui_system";
+import { FileTypeEnum, ITDropfile, ITGrid, ITSearchSelect } from "@axzydev/axzy_ui_system";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { FaArrowLeft, FaRedo } from "react-icons/fa";
-import { Langostin, type LangostinAnim } from "@shared/ui/langostin";
+import { LangostinAvatar, type LangostinAnim } from "@shared/ui/langostin";
+import OptionChip from "@shared/ui/option-chip/OptionChip";
 import type { RootState } from "@app/store";
 import type { TicketCategory } from "@entities/ticket";
+import { usersApi, personLabel, type User } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import type { TicketDraft } from "../model/useCreateTicket";
 import { PRIORITIES, SYMPTOM_KEYS } from "../model/constants";
-import { AGENT_STEPS, useTicketAgent, type AgentStep } from "../model/useTicketAgent";
-import OptionChip from "./OptionChip";
+import { useTicketAgent, type AgentStep } from "../model/useTicketAgent";
 import TicketSummaryPanel from "./TicketSummaryPanel";
 import {
   areaStyle,
@@ -38,6 +39,7 @@ const STEP_ANIM: Record<AgentStep, LangostinAnim> = {
   urgency: "point",
   evidence: "idle",
   notes: "think",
+  requester: "point",
   done: "idle",
 };
 
@@ -48,24 +50,6 @@ const secondaryButton =
 
 const primaryButton =
   "cursor-pointer rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400";
-
-// Avatar de Langostin al lado de los mensajes y del bloque de opciones.
-function LangostinAvatar({
-  anim,
-  size = 28,
-  animated = true,
-}: {
-  anim: LangostinAnim;
-  size?: number;
-  animated?: boolean;
-}) {
-  const { t } = useTranslation("tickets");
-  return (
-    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm">
-      <Langostin anim={anim} size={size} animated={animated} label={t("new.agent.mascot")} />
-    </span>
-  );
-}
 
 export default function TicketAgent({
   form,
@@ -78,23 +62,42 @@ export default function TicketAgent({
 }: Props) {
   const { t } = useTranslation("tickets");
   const fullName = useSelector((s: RootState) => s.auth.user?.name);
+  const userId = useSelector((s: RootState) => s.auth.user?.id);
+  // Solo el ADMIN puede levantar un ticket en nombre de otra persona.
+  const isAdmin = useSelector(
+    (s: RootState) => s.auth.user?.role === "ADMIN" || (s.auth.user?.roles ?? []).includes("ADMIN")
+  );
   const agent = useTicketAgent({
     files,
     onFieldChange,
     onAddFile,
     onRemoveFile,
     userName: fullName?.split(" ")[0],
+    canCaptureForOthers: isAdmin,
   });
   const [notesDraft, setNotesDraft] = useState("");
-  const threadEnd = useRef<HTMLDivElement>(null);
+  const [people, setPeople] = useState<User[]>([]);
+  const threadRef = useRef<HTMLDivElement>(null);
   const sent = useRef(false);
   // Envío: "work" mientras se crea el ticket, luego "ok" o "err".
   const [sendAnim, setSendAnim] = useState<LangostinAnim | null>(null);
   // Reacción breve a cada respuesta del usuario (y el saludo inicial).
   const [reaction, setReaction] = useState<LangostinAnim | null>("wave");
 
+  // Personas para el caso "me lo pidió otra persona".
   useEffect(() => {
-    threadEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    if (!isAdmin) return;
+    usersApi
+      .employees()
+      .then((list) => setPeople(list.filter((p) => p.id !== userId)))
+      .catch(() => setPeople([]));
+  }, [isAdmin, userId]);
+
+  // El chat se desplaza a sí mismo; con scrollIntoView la página entera se
+  // movía cada vez que Langostín preguntaba algo.
+  useEffect(() => {
+    const el = threadRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [agent.messages.length, agent.typing, agent.step, sendAnim]);
 
   // Al terminar la conversación el ticket se envía solo. "sent" evita dobles
@@ -138,10 +141,10 @@ export default function TicketAgent({
 
   // Texto de guía del paso actual: Langostin le dice al usuario qué sigue.
   const guideKey = sendAnim === "err" ? "error" : sendAnim === "ok" ? "sent" : agent.step;
-  const stepNumber = Math.min(agent.completed + 1, AGENT_STEPS.length);
+  const stepNumber = Math.min(agent.completed + 1, agent.steps.length);
 
   const suggestionsLabel = (key: (typeof SYMPTOM_KEYS)[number]) => t(`new.suggestions.${key}`);
-  const urgencyAnswered = agent.completed > AGENT_STEPS.indexOf("urgency");
+  const urgencyAnswered = agent.completed > agent.steps.indexOf("urgency");
   const priorityLabel = urgencyAnswered ? dyn(t)(`priorityLabels.${form.priority}`) : "";
 
   // Mensajes del agente agrupados por turno. Langostin se ve en el turno activo
@@ -272,6 +275,34 @@ export default function TicketAgent({
             </div>
           </div>
         );
+      case "requester":
+        if (agent.forOthers) {
+          return (
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-slate-500">{t("new.agent.whoRequested")}</p>
+              <ITSearchSelect
+                name="requester"
+                placeholder={t("new.agent.searchPerson")}
+                options={people.map((p) => ({
+                  value: p.id,
+                  label: personLabel(p),
+                }))}
+                onChange={(value) => {
+                  const id = String(value);
+                  const person = people.find((p) => p.id === id);
+                  agent.pickRequester(id, person?.name ?? id);
+                }}
+                className="w-full"
+              />
+            </div>
+          );
+        }
+        return (
+          <div className="flex flex-wrap gap-2">
+            <OptionChip emoji="🙋" label={t("new.agent.forMe")} onClick={agent.keepAsMine} />
+            <OptionChip emoji="📞" label={t("new.agent.forOther")} onClick={agent.askWhoRequested} />
+          </div>
+        );
       default:
         return null;
     }
@@ -307,7 +338,7 @@ export default function TicketAgent({
             </button>
           </header>
 
-          <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 px-5 py-5">
+          <div ref={threadRef} className="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 px-5 py-5">
             {agent.messages.map((m, i) => {
               const isAgent = m.from === "agent";
               return (
@@ -358,7 +389,7 @@ export default function TicketAgent({
                   <p key={guideKey} className="agent-pop flex items-center gap-2 text-xs text-slate-500">
                     {isOptionStep && sendAnim === null && (
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
-                        {t("new.guide.step", { current: stepNumber, total: AGENT_STEPS.length })}
+                        {t("new.guide.step", { current: stepNumber, total: agent.steps.length })}
                       </span>
                     )}
                     <span>{t(`new.guide.${guideKey}`)}</span>
@@ -378,7 +409,6 @@ export default function TicketAgent({
               </div>
             )}
 
-            <div ref={threadEnd} />
           </div>
         </section>
       </ITGrid>
@@ -393,7 +423,8 @@ export default function TicketAgent({
           notes={agent.notes}
           fileCount={files.length}
           completed={agent.completed}
-          total={AGENT_STEPS.length}
+          total={agent.steps.length}
+          requester={people.find((p) => p.id === form.onBehalfOfId)?.name ?? ""}
         />
       </ITGrid>
     </ITGrid>

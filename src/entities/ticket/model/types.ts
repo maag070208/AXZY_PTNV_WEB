@@ -109,6 +109,8 @@ export interface TicketInput {
   categoryId?: string;
   departmentId?: string;
   assignedToId?: string;
+  /** ADMIN: el ticket se levanta en nombre de esta persona. */
+  onBehalfOfId?: string;
 }
 
 export interface KanbanAssignment {
