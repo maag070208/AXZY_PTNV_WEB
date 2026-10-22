@@ -7,4 +7,5 @@ export * from "./model/inspect";
 export * from "./model/people";
 export * from "./model/camera";
 export * from "./model/summary";
+export * from "./model/person";
 export { timeClockApi } from "./api/timeClockApi";

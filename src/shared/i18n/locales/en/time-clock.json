@@ -518,7 +518,8 @@
       "yes": "Yes, remove",
       "no": "No",
       "addCard": "Register card",
-      "removeCard": "Remove"
+      "removeCard": "Remove",
+      "view": "View record"
     },
     "toasts": {
       "created": "Person enrolled on the clock.",
@@ -642,6 +643,38 @@
       "loading": "Reading the clock…",
       "empty": "The clock has no people enrolled.",
       "more": "and {{count}} more"
+    },
+    "device": {
+      "name": "Name",
+      "firmware": "Firmware",
+      "serial": "Serial",
+      "lastRead": "Last read"
+    },
+    "recentPunches": "Latest check-ins today",
+    "unknownPerson": "Unidentified",
+    "allClocks": "All clocks",
+    "tooltip": {
+      "punches": "{{count}} punch(es)",
+      "more": "and {{count}} more"
+    }
+  },
+  "person": {
+    "title": "Person record",
+    "close": "Close",
+    "loading": "Reading the record…",
+    "noPhoto": "No face photo",
+    "number": "Number",
+    "link": "Linked user",
+    "notLinked": "Not linked",
+    "inactive": "(removed)",
+    "punchesToday": "Check-ins today",
+    "faces": "Registered faces",
+    "cards": "Cards",
+    "fingerprints": "Fingerprints (type and number only)",
+    "noFingerprints": "No fingerprints registered",
+    "finger": "Fingerprint {{id}}",
+    "errors": {
+      "read": "Could not read the record."
     }
   }
 }

@@ -28,7 +28,8 @@ export interface SummaryClock {
   device: { deviceName: string | null; model: string | null; firmwareVersion: string | null } | null;
   counts: { people: number; cards: number } | null;
   punchesToday: number;
-  hourly: Array<{ hour: number; count: number }>;
+  hourly: Array<{ hour: number; count: number; people: Array<{ employeeNumber: string; name: string }> }>;
+  recentPunches: Array<{ occurredAt: string; employeeNumber: string; name: string; method: string }>;
   alerts: ClockAlert[];
 }
 

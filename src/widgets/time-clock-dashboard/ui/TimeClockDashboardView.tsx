@@ -1,15 +1,16 @@
-import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { dateLocale } from "@shared/i18n/format";
 import type { ClockAlert, SummaryClock, TimeClockSummary } from "@entities/time-clock";
 import { useState } from "react";
-import { TimeClockPeopleView } from "@features/access/time-clock-people";
+import { PersonDetailCard, TimeClockPeopleView } from "@features/access/time-clock-people";
 import { TimeClockInspectView } from "@features/access/time-clock-inspect";
 import { TimeClockCameraView } from "@features/access/time-clock-camera";
 import { timeClockApi, type TimeClockPerson } from "@entities/time-clock";
 import { useTimeClockDashboard } from "../model/useTimeClockDashboard";
 
 type Section = "status" | "people" | "events" | "camera";
+const ALL_CLOCKS = "all";
 const SECTIONS: Section[] = ["status", "people", "events", "camera"];
 
 const CONNECTION_TONE: Record<SummaryClock["connection"], string> = {
@@ -36,28 +37,87 @@ function Kpi({ label, value, hint }: { label: string; value: string; hint?: stri
   );
 }
 
-/** Barras de checadas por hora (solo entradas y salidas que cuentan para asistencia). */
-function HourlyBars({ hourly, label }: { hourly: Array<{ hour: number; count: number }>; label: string }) {
-  const max = Math.max(1, ...hourly.map((h) => h.count));
+type HourBucket = { hour: number; count: number; people: Array<{ employeeNumber: string; name: string }> };
+
+const MAX_NAMES_IN_TOOLTIP = 6;
+
+/** Gráfica de checadas por hora: barras, línea y área. Al pasar el cursor muestra quién checó. */
+function HourlyChart({ hourly, label }: { hourly: HourBucket[]; label: string }) {
+  const { t } = useTranslation("time-clock");
+  const [hovered, setHovered] = useState<number | null>(null);
+  const W = 640;
+  const H = 150;
+  const padL = 36;
+  const padR = 12;
+  const padT = 12;
+  const padB = 24;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const rawMax = Math.max(1, ...hourly.map((h) => h.count));
+  const step = Math.max(1, Math.ceil(rawMax / 4));
+  const max = step * 4;
+  const colW = plotW / 24;
+  const x = (i: number) => padL + (i + 0.5) * colW;
+  const y = (v: number) => padT + plotH - (v / max) * plotH;
+  const barW = colW - 6;
+  const line = hourly.map((h, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(h.count).toFixed(1)}`).join(" ");
+  const area = `${line} L${x(23).toFixed(1)},${padT + plotH} L${x(0).toFixed(1)},${padT + plotH} Z`;
+  const ticks = [0, 1, 2, 3, 4].map((k) => k * step);
+  const active = hovered === null ? null : hourly[hovered];
+  const hidden = active ? active.people.length - MAX_NAMES_IN_TOOLTIP : 0;
+
   return (
-    <div className="flex flex-col gap-2" role="img" aria-label={label}>
-      <div className="flex h-24 items-end gap-[3px]">
-        {hourly.map((h) => (
-          <div
-            key={h.hour}
-            title={`${String(h.hour).padStart(2, "0")}:00 · ${h.count}`}
-            className={`flex-1 rounded-t ${h.count > 0 ? "bg-slate-900" : "bg-slate-100"}`}
-            style={{ height: `${Math.max(4, (h.count / max) * 100)}%` }}
-          />
+    <div className="relative">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} preserveAspectRatio="xMidYMid meet" className="h-40 w-full" onMouseLeave={() => setHovered(null)}>
+        <defs>
+          <linearGradient id="hourly-area" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {ticks.map((v) => (
+          <g key={v}>
+            <line x1={padL} x2={W - padR} y1={y(v)} y2={y(v)} stroke="#e2e8f0" strokeDasharray="4 4" />
+            <text x={padL - 6} y={y(v) + 4} textAnchor="end" fontSize="10" fill="#94a3b8">{v}</text>
+          </g>
         ))}
-      </div>
-      <div className="flex justify-between text-[10px] text-slate-400">
-        <span>00:00</span>
-        <span>06:00</span>
-        <span>12:00</span>
-        <span>18:00</span>
-        <span>23:00</span>
-      </div>
+        {hourly.map((h, i) => (
+          <rect key={h.hour} x={x(i) - barW / 2} y={y(h.count)} width={barW} height={padT + plotH - y(h.count)} rx="3"
+            fill={hovered === i ? "#334155" : h.count > 0 ? "#0f172a" : "#e2e8f0"} />
+        ))}
+        <path d={area} fill="url(#hourly-area)" />
+        <path d={line} fill="none" stroke="#10b981" strokeWidth="2" strokeLinejoin="round" />
+        {hourly.map((h, i) => (
+          <circle key={`d-${h.hour}`} cx={x(i)} cy={y(h.count)} r={h.count > 0 ? 3 : 0} fill="#fff" stroke="#10b981" strokeWidth="2" />
+        ))}
+        {/* Columnas de captura del cursor: ocupan todo el alto del área de la gráfica. */}
+        {hourly.map((h, i) => (
+          <rect key={`hit-${h.hour}`} x={padL + i * colW} y={padT} width={colW} height={plotH} fill="transparent"
+            onMouseEnter={() => setHovered(i)} />
+        ))}
+        {[0, 3, 6, 9, 12, 15, 18, 21, 23].map((h) => (
+          <text key={`x-${h}`} x={x(h)} y={H - 6} textAnchor="middle" fontSize="10" fill="#94a3b8">
+            {String(h).padStart(2, "0")}:00
+          </text>
+        ))}
+      </svg>
+      {active && active.count > 0 && (
+        <div
+          role="tooltip"
+          className="pointer-events-none absolute top-0 z-10 w-56 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-lg"
+          style={{ left: `${Math.min(86, Math.max(14, ((padL + (active.hour + 0.5) * colW) / W) * 100))}%` }}
+        >
+          <div className="mb-1 font-semibold text-slate-900">
+            {String(active.hour).padStart(2, "0")}:00 · {t("dashboard.tooltip.punches", { count: active.count })}
+          </div>
+          <ul className="flex flex-col gap-0.5 text-slate-600">
+            {active.people.slice(0, MAX_NAMES_IN_TOOLTIP).map((p) => (
+              <li key={p.employeeNumber} className="truncate">{p.name}</li>
+            ))}
+          </ul>
+          {hidden > 0 && <div className="mt-1 text-slate-400">{t("dashboard.tooltip.more", { count: hidden })}</div>}
+        </div>
+      )}
     </div>
   );
 }
@@ -72,7 +132,7 @@ function AlertLine({ alert }: { alert: ClockAlert }) {
   );
 }
 
-function ClockCard({ clock }: { clock: SummaryClock }) {
+function ClockCard({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerson: (serial: string, employeeNumber: string) => void }) {
   const { t } = useTranslation("time-clock");
   const fmt = (iso: string | null) =>
     iso ? new Date(iso).toLocaleString(dateLocale(), { dateStyle: "medium", timeStyle: "short" }) : t("dashboard.never");
@@ -112,7 +172,51 @@ function ClockCard({ clock }: { clock: SummaryClock }) {
       {clock.countsAttendance && (
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold text-slate-500">{t("dashboard.todayByHour")}</span>
-          <HourlyBars hourly={clock.hourly} label={t("dashboard.todayByHour")} />
+          <HourlyChart hourly={clock.hourly} label={t("dashboard.todayByHour")} />
+        </div>
+      )}
+
+      {clock.device && (
+        <dl className="grid grid-cols-2 gap-3 border-t border-dashed border-slate-200 pt-3 text-xs md:grid-cols-4">
+          <div>
+            <dt className="text-slate-500">{t("dashboard.device.name")}</dt>
+            <dd className="text-slate-800">{clock.device.deviceName ?? "—"}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">{t("dashboard.device.firmware")}</dt>
+            <dd className="text-slate-800">{clock.device.firmwareVersion ?? "—"}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">{t("dashboard.device.serial")}</dt>
+            <dd className="break-all font-mono text-slate-800">{clock.serial}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">{t("dashboard.device.lastRead")}</dt>
+            <dd className="text-slate-800">{fmt(clock.lastReadAt)}</dd>
+          </div>
+        </dl>
+      )}
+
+      {clock.recentPunches.length > 0 && (
+        <div className="flex flex-col gap-2 border-t border-dashed border-slate-200 pt-3">
+          <span className="text-xs font-semibold text-slate-500">{t("dashboard.recentPunches")}</span>
+          <ul className="flex flex-col gap-1">
+            {clock.recentPunches.map((p, i) => (
+              <li key={`${p.occurredAt}-${i}`} className="flex items-center justify-between gap-3 text-sm">
+                <span className="text-xs text-slate-500">
+                  {new Date(p.occurredAt).toLocaleTimeString(dateLocale(), { hour: "2-digit", minute: "2-digit" })}
+                </span>
+                {p.employeeNumber ? (
+                  <button type="button" onClick={() => onOpenPerson(clock.serial, p.employeeNumber)}
+                    className="truncate text-left font-medium text-slate-800 underline-offset-2 hover:underline">
+                    {p.name}
+                  </button>
+                ) : (
+                  <span className="text-slate-400">{t("dashboard.unknownPerson")}</span>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -128,7 +232,7 @@ function ClockCard({ clock }: { clock: SummaryClock }) {
 }
 
 /** Vista previa del personal: se pide al reloj solo cuando el usuario lo pide. */
-function PeoplePreview({ serial, onSeeAll }: { serial: string; onSeeAll: () => void }) {
+function PeoplePreview({ serial, onSeeAll, onOpenPerson }: { serial: string; onSeeAll: () => void; onOpenPerson: (serial: string, employeeNumber: string) => void }) {
   const { t } = useTranslation("time-clock");
   const [people, setPeople] = useState<TimeClockPerson[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -165,9 +269,12 @@ function PeoplePreview({ serial, onSeeAll }: { serial: string; onSeeAll: () => v
       {people && people.length > 0 && (
         <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {people.slice(0, 10).map((p) => (
-            <li key={p.employeeNumber} className="flex items-center justify-between rounded-xl border border-slate-100 px-3 py-2 text-sm">
-              <span className="font-medium text-slate-800">{p.name}</span>
-              <span className="font-mono text-xs text-slate-400">{p.employeeNumber}</span>
+            <li key={p.employeeNumber}>
+              <button type="button" onClick={() => onOpenPerson(serial, p.employeeNumber)}
+                className="flex w-full items-center justify-between rounded-xl border border-slate-100 px-3 py-2 text-left text-sm hover:bg-slate-50">
+                <span className="font-medium text-slate-800">{p.name}</span>
+                <span className="font-mono text-xs text-slate-400">{p.employeeNumber}</span>
+              </button>
             </li>
           ))}
         </ul>
@@ -179,7 +286,13 @@ function PeoplePreview({ serial, onSeeAll }: { serial: string; onSeeAll: () => v
   );
 }
 
-function Body({ data, onSeeAll }: { data: TimeClockSummary; onSeeAll: () => void }) {
+function Body({ data, visibleClocks, serial, onSeeAll, onOpenPerson }: {
+  data: TimeClockSummary;
+  visibleClocks: SummaryClock[];
+  serial: string;
+  onSeeAll: () => void;
+  onOpenPerson: (serial: string, employeeNumber: string) => void;
+}) {
   const { t } = useTranslation("time-clock");
   const online = data.clocks.filter((c) => c.connection === "ONLINE").length;
   const people = data.clocks.reduce((sum, c) => sum + (c.counts?.people ?? 0), 0);
@@ -206,13 +319,11 @@ function Body({ data, onSeeAll }: { data: TimeClockSummary; onSeeAll: () => void
         </section>
       )}
 
-      {data.clocks.find((c) => c.countsAttendance) && (
-        <PeoplePreview serial={data.clocks.find((c) => c.countsAttendance)!.serial} onSeeAll={onSeeAll} />
-      )}
+      {serial && <PeoplePreview serial={serial} onSeeAll={onSeeAll} onOpenPerson={onOpenPerson} />}
 
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        {data.clocks.map((c) => (
-          <ClockCard key={c.serial} clock={c} />
+        {visibleClocks.map((c) => (
+          <ClockCard key={c.serial} clock={c} onOpenPerson={onOpenPerson} />
         ))}
         {data.clocks.length === 0 && <p className="text-sm text-slate-400">{t("dashboard.noClocks")}</p>}
       </section>
@@ -225,9 +336,12 @@ export default function TimeClockDashboardView() {
   const { t } = useTranslation("time-clock");
   const fx = useTimeClockDashboard();
   const [section, setSection] = useState<Section>("status");
-  const [picked, setPicked] = useState("");
+  const [picked, setPicked] = useState(ALL_CLOCKS);
+  const [openPerson, setOpenPerson] = useState<{ serial: string; employeeNumber: string } | null>(null);
   const clocks = fx.data?.clocks ?? [];
-  const serial = clocks.some((c) => c.serial === picked) ? picked : (clocks[0]?.serial ?? "");
+  const selected = clocks.find((c) => c.serial === picked);
+  const serial = selected?.serial ?? clocks.find((c) => c.countsAttendance)?.serial ?? clocks[0]?.serial ?? "";
+  const visibleClocks = selected ? [selected] : clocks;
 
   return (
     <ITFlex direction="column" gap={5}>
@@ -249,17 +363,18 @@ export default function TimeClockDashboardView() {
           ))}
         </nav>
         <ITFlex align="center" gap={3}>
-          {section !== "status" && clocks.length > 0 && (
-            <select
-              aria-label={t("dashboard.clock")}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none"
-              value={serial}
-              onChange={(e) => setPicked(e.target.value)}
-            >
-              {clocks.map((c) => (
-                <option key={c.serial} value={c.serial}>{c.name ?? c.serial}</option>
-              ))}
-            </select>
+          {clocks.length > 0 && (
+            <ITSearchSelect
+              name="timeClockDashboardClock"
+              label={t("dashboard.clock")}
+              options={[
+                ...(clocks.length > 1 ? [{ value: ALL_CLOCKS, label: t("dashboard.allClocks") }] : []),
+                ...clocks.map((c) => ({ value: c.serial, label: c.name ?? c.serial })),
+              ]}
+              value={selected ? picked : ALL_CLOCKS}
+              onChange={(value) => setPicked(String(value))}
+              className="min-w-[240px]"
+            />
           )}
           {section === "status" && (
             <ITText className="text-xs text-slate-400">
@@ -275,7 +390,18 @@ export default function TimeClockDashboardView() {
       {fx.error && <ITText role="alert" className="text-sm text-red-600">{fx.error}</ITText>}
       {fx.loading && !fx.data && <ITText className="text-sm text-slate-400">{t("dashboard.loading")}</ITText>}
 
-      {fx.data && section === "status" && <Body data={fx.data} onSeeAll={() => setSection("people")} />}
+      {fx.data && section === "status" && (
+        <Body
+          data={fx.data}
+          visibleClocks={visibleClocks}
+          serial={serial}
+          onSeeAll={() => setSection("people")}
+          onOpenPerson={(serial, employeeNumber) => setOpenPerson({ serial, employeeNumber })}
+        />
+      )}
+      {openPerson && (
+        <PersonDetailCard clockSerial={openPerson.serial} employeeNumber={openPerson.employeeNumber} onClose={() => setOpenPerson(null)} />
+      )}
       {fx.data && section !== "status" && !serial && <ITText className="text-sm text-slate-400">{t("dashboard.noClocks")}</ITText>}
       {serial && section === "people" && <TimeClockPeopleView clockSerial={serial} />}
       {serial && section === "events" && <TimeClockInspectView clockSerial={serial} tabs={["events"]} />}

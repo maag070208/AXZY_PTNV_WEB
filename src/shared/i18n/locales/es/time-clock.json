@@ -518,7 +518,8 @@
       "yes": "Sí, dar de baja",
       "no": "No",
       "addCard": "Registrar tarjeta",
-      "removeCard": "Quitar"
+      "removeCard": "Quitar",
+      "view": "Ver ficha"
     },
     "toasts": {
       "created": "Persona dada de alta en el reloj.",
@@ -642,6 +643,38 @@
       "loading": "Leyendo el reloj…",
       "empty": "El reloj no tiene personas dadas de alta.",
       "more": "y {{count}} más"
+    },
+    "device": {
+      "name": "Nombre",
+      "firmware": "Firmware",
+      "serial": "Serie",
+      "lastRead": "Última lectura"
+    },
+    "recentPunches": "Últimas checadas de hoy",
+    "unknownPerson": "Sin identificar",
+    "allClocks": "Todos los relojes",
+    "tooltip": {
+      "punches": "{{count}} checada(s)",
+      "more": "y {{count}} más"
+    }
+  },
+  "person": {
+    "title": "Ficha de la persona",
+    "close": "Cerrar",
+    "loading": "Leyendo la ficha…",
+    "noPhoto": "Sin foto de rostro",
+    "number": "Número",
+    "link": "Usuario vinculado",
+    "notLinked": "Sin vincular",
+    "inactive": "(dado de baja)",
+    "punchesToday": "Checadas hoy",
+    "faces": "Rostros registrados",
+    "cards": "Tarjetas",
+    "fingerprints": "Huellas (solo tipo y número)",
+    "noFingerprints": "Sin huellas registradas",
+    "finger": "Huella {{id}}",
+    "errors": {
+      "read": "No se pudo leer la ficha."
     }
   }
 }

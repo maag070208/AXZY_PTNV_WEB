@@ -20,6 +20,8 @@ export const useTimeClockPeople = (controlledSerial?: string) => {
   const serial = controlledSerial ?? internalSerial;
   const setSerial = setInternalSerial;
   const [data, setData] = useState<TimeClockPeopleList | null>(null);
+  /** Sube en cada lectura exitosa; la tabla lo usa para recargarse. */
+  const [version, setVersion] = useState(0);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +43,10 @@ export const useTimeClockPeople = (controlledSerial?: string) => {
     setError(null);
     timeClockApi
       .peopleList(serial)
-      .then(setData)
+      .then((list) => {
+        setData(list);
+        setVersion((v) => v + 1);
+      })
       .catch((e: unknown) => setError(messageOf(e, t("people.errors.load"))))
       .finally(() => setLoading(false));
   }, [serial, t]);
@@ -72,6 +77,7 @@ export const useTimeClockPeople = (controlledSerial?: string) => {
     serial,
     setSerial,
     data,
+    version,
     loading,
     busy,
     error,
