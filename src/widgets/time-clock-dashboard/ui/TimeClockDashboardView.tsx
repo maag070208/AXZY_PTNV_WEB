@@ -9,14 +9,16 @@ import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import type { ClockAlert, SummaryClock, TimeClockSummary } from "@entities/time-clock";
 import { timeClockApi, type TimeClockPerson } from "@entities/time-clock";
+import FingerprintReaderPanel from "./FingerprintReaderPanel";
+import UnifiedPeopleView from "./UnifiedPeopleView";
 import { PersonDetailDialog, TimeClockPeopleView } from "@features/access/time-clock-people";
 import { TimeClockInspectView } from "@features/access/time-clock-inspect";
 import { TimeClockCameraView } from "@features/access/time-clock-camera";
 import { TimeClocksTab, useTimeClocks } from "@features/access/time-clocks";
 import { useTimeClockDashboard } from "../model/useTimeClockDashboard";
 
-type Section = "status" | "people" | "events" | "camera" | "clocks";
-const SECTIONS: Section[] = ["status", "people", "events", "camera", "clocks"];
+type Section = "status" | "people" | "events" | "camera" | "reader" | "clocks";
+const SECTIONS: Section[] = ["status", "people", "events", "camera", "reader", "clocks"];
 const ALL_CLOCKS = "all";
 type ChartVariant = "area" | "bar";
 type OpenPerson = { serial: string; employeeNumber: string };
@@ -447,7 +449,7 @@ export default function TimeClockDashboardView() {
           ))}
         </nav>
         <ITFlex align="center" gap={3} wrap="wrap">
-          {section !== "clocks" && clocks.length > 0 && (
+          {section !== "clocks" && section !== "reader" && clocks.length > 0 && (
             <ITSearchSelect
               name="timeClockDashboardClock"
               label={t("dashboard.clock")}
@@ -486,9 +488,11 @@ export default function TimeClockDashboardView() {
           onOpenPerson={setOpenPerson}
         />
       )}
-      {fx.data && section !== "status" && section !== "clocks" && !serial && <ITText className="text-sm text-slate-400">{t("dashboard.noClocks")}</ITText>}
+      {fx.data && section !== "status" && section !== "clocks" && section !== "reader" && !serial && <ITText className="text-sm text-slate-400">{t("dashboard.noClocks")}</ITText>}
+      {section === "reader" && <FingerprintReaderPanel />}
       {section === "clocks" && <ClocksSection />}
-      {serial && section === "people" && <TimeClockPeopleView clockSerial={serial} />}
+      {section === "people" && picked === ALL_CLOCKS && clocks.length > 1 && <UnifiedPeopleView />}
+      {serial && section === "people" && (picked !== ALL_CLOCKS || clocks.length <= 1) && <TimeClockPeopleView clockSerial={serial} />}
       {serial && section === "events" && <TimeClockInspectView clockSerial={serial} tabs={["events"]} />}
       {serial && section === "camera" && <TimeClockCameraView clockSerial={serial} />}
 

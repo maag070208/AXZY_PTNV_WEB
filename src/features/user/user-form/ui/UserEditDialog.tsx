@@ -39,8 +39,8 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
   }, [userId]);
 
   const handleSave = async () => {
-    const ok = await userForm.handleSubmit();
-    if (!ok) return;
+    const result = await userForm.handleSubmit();
+    if (!result.ok) return;
     setSaved(true);
     onSaved?.();
   };

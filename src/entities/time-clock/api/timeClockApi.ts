@@ -17,6 +17,9 @@ import type { ClockSyncResult } from "../model/clockSync";
 import type {
   EmployeeClockStatus,
   FingerprintCapture,
+  FingerprintStationInfo,
+  FingerprintStationTest,
+  UnifiedPeople,
   FingerprintStatus,
   TimeClockBiometrics,
   TimeClockPeopleList,
@@ -49,6 +52,10 @@ export const timeClockApi = {
   /** Personas del reloj con sus tarjetas (lectura). */
   peopleList: (serial: string) => api.get<TimeClockPeopleList>(`${clockPath(serial)}/people`),
   employeeClockStatus: (userId: string) => api.get<EmployeeClockStatus>(`/time-clock/employees/${userId}/clock-status`),
+  peopleUnified: () => api.get<UnifiedPeople>("/time-clock/people/unified"),
+  fingerprintStationInfo: () => api.get<FingerprintStationInfo>("/time-clock/fingerprint-station"),
+  fingerprintStationTest: (fingerNo: number) =>
+    api.post<FingerprintStationTest>("/time-clock/fingerprint-station/test", { fingerNo }),
   fingerprintStatus: (userId: string, serial: string) =>
     api.get<FingerprintStatus>(`/time-clock/employees/${userId}/fingerprint/status?serial=${encodeURIComponent(serial)}`),
   fingerprintCapture: (userId: string, serial: string, fingerNo: number) =>

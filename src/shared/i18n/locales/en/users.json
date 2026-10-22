@@ -194,6 +194,8 @@
       "nameRequired": "Name is required",
       "nameMax": "Name must have at most {{max}} characters",
       "emailMax": "Email must have at most {{max}} characters",
+      "emailRequired": "Email is required",
+      "employeeNumberRequired": "Employee number is required",
       "employeeNumberMax": "Employee number must have at most {{max}} characters",
       "jobTitleMax": "Job title must have at most {{max}} characters"
     },

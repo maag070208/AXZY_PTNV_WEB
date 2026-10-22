@@ -650,11 +650,39 @@
       "alertsHint": "to resolve",
       "allGood": "All good"
     },
+    "unified": {
+      "title": "People on all clocks",
+      "search": "Search by number or name",
+      "refresh": "Refresh",
+      "empty": "Nobody matches the search",
+      "number": "Number",
+      "name": "Name",
+      "clocks": "Clocks",
+      "none": "—",
+      "clockError": "{{clock}} did not respond ({{code}})",
+      "count": "{{count}} of {{total}} people",
+      "hint": "Read-only view: shows on which clock each person is enrolled."
+    },
+    "reader": {
+      "title": "Fingerprint reader",
+      "hint": "Ask the person to place the finger on the reader and press Test. The fingerprint is not saved or applied to any clock.",
+      "finger": "Finger",
+      "test": "Test reader",
+      "testing": "Waiting for the finger…",
+      "notConfigured": "The fingerprint station is not configured. Set FINGERPRINT_STATION_URL, USER and PASS in the API.",
+      "station": "Station: {{url}}",
+      "quality": "Quality",
+      "min": "minimum {{min}}",
+      "acceptable": "Quality is enough to enroll this fingerprint.",
+      "low": "Low quality: ask for the finger again and clean the reader.",
+      "error": "The finger could not be read."
+    },
     "sections": {
       "status": "Status",
       "people": "People",
       "events": "Events",
       "camera": "Camera",
+      "reader": "Fingerprint reader",
       "clocks": "Clocks"
     },
     "clock": "Clock",
@@ -804,6 +832,7 @@
     "bajaPending": "{{clock}} is read-only: the removal stays pending there",
     "altaDone": "Added to {{clock}}",
     "altaPending": "{{clock}} is read-only: the addition stays pending there",
+    "altaRequestFailed": "Could not enroll in the clocks",
     "failed": "Could not update {{clock}}"
   }
 }

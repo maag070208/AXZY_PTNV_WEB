@@ -126,10 +126,10 @@ export default function UserFormFields({
               <ITInput name="u_ama" label={tt("form.maternalSurname")} value={form.maternalSurname} onChange={(e) => onFieldChange("maternalSurname", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} onBlur={blob("email")} placeholder={tt("form.emailPlaceholder")} error={fieldError("email")} />
+              <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} onBlur={blob("email")} placeholder={tt("form.emailPlaceholder")} required={!isEdit} error={fieldError("email")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_num" label={tt("form.employeeNo")} value={form.employeeNumber} onChange={(e) => onFieldChange("employeeNumber", e.target.value)} onBlur={blob("employeeNumber")} error={fieldError("employeeNumber")} />
+              <ITInput name="u_num" label={tt("form.employeeNo")} value={form.employeeNumber} onChange={(e) => onFieldChange("employeeNumber", e.target.value)} onBlur={blob("employeeNumber")} required={!isEdit} error={fieldError("employeeNumber")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_jobTitle" label={tt("form.position")} value={form.jobTitle} onChange={(e) => onFieldChange("jobTitle", e.target.value)} onBlur={blob("jobTitle")} error={fieldError("jobTitle")} />

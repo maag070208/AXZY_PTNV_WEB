@@ -7,7 +7,7 @@ import { isStaffRole, useCan, useRolesCatalog, usersApi, type User, type UserRol
 import { departmentsApi, type Department } from "@entities/department";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
-import { timeClockApi } from "@entities/time-clock";
+import { describeClockSync, timeClockApi } from "@entities/time-clock";
 import { showToast } from "@app/toast/toast.slice";
 import type { AppDispatch } from "@app/store";
 
@@ -119,6 +119,9 @@ const splitStoredName = (full: string): Pick<UserFormValues, "name" | "middleNam
     maternalSurname: "",
   };
 };
+
+/** Resultado de guardar: `step` es el paso a mostrar si falla (`null` si no hay campo que señalar). */
+export type SubmitResult = { ok: true } | { ok: false; step: number | null };
 
 /**
  * Formulario de cuenta. Sin argumentos toma el id de la ruta (`/users/:id/edit`,
@@ -267,10 +270,12 @@ export const useUserForm = (userId?: string) => {
           return i18n.t("users:form.validation.nameMax", { max: LIMITS.name.max });
         return null;
       case "email":
+        if (!isEdit && !trimmed) return i18n.t("users:form.validation.emailRequired");
         if (!trimmed) return null;
         if (trimmed.length > 254) return i18n.t("users:form.validation.emailMax", { max: 254 });
         return validateEmail(trimmed);
       case "employeeNumber":
+        if (!isEdit && !trimmed) return i18n.t("users:form.validation.employeeNumberRequired");
         if (trimmed.length > LIMITS.employeeNumber.max)
           return i18n.t("users:form.validation.employeeNumberMax", { max: LIMITS.employeeNumber.max });
         return null;
@@ -308,7 +313,12 @@ export const useUserForm = (userId?: string) => {
    */
   const RECORD_FIELDS: (keyof UserFormValues)[] = ["name", "email", "employeeNumber", "jobTitle"];
 
-  const validate = (): boolean => {
+  /** Paso del formulario en el que vive un campo (solo cuentan los pasos que se muestran). */
+  const stepOfField = (field: keyof UserFormValues): number =>
+    field === "username" || field === "password" ? (editsPerson ? 1 : 0) : 0;
+
+  /** Valida los campos y devuelve los errores por campo (vacío si todo está bien). */
+  const validate = (): Record<string, string> => {
     const e: Record<string, string> = {};
     for (const field of VALIDATED_FIELDS) {
       // Los campos que se editan en el expediente no se validan aquí: si algo
@@ -318,40 +328,25 @@ export const useUserForm = (userId?: string) => {
       if (err) e[field] = err;
     }
     setErrors(e);
-    return Object.keys(e).length === 0;
+    return e;
   };
 
   /**
-   * Índice del paso con el primer campo inválido, contando los pasos que
-   * realmente se muestran: sin expediente no hay paso de datos de la persona, así
-   * que acceso pasa a ser el 0.
+   * Guarda la cuenta. Si falla, `step` indica el paso que contiene el primer
+   * campo con error (o `null` si el error no es de un campo).
    */
-  const firstInvalidStep = (): number => {
-    const withErrors = new Set(Object.keys(errors));
-    const invalid = (field: keyof UserFormValues): boolean =>
-      withErrors.has(field) || Boolean(validateField(field, String(form[field] ?? "")));
+  const handleSubmit = async (): Promise<SubmitResult> => {
+    const fieldErrors = Object.keys(validate()) as (keyof UserFormValues)[];
+    const docsMissing = requiresDocs && missingDocs.length > 0;
+    setDocsError(
+      docsMissing ? i18n.t("users:form.docsRequired", { docs: requiredDocs.map((d) => d.label).join(", ") }) : null,
+    );
+    const invalidSteps = [
+      ...fieldErrors.map(stepOfField),
+      ...(docsMissing ? [editsPerson ? 3 : 2] : []),
+    ];
+    if (invalidSteps.length > 0) return { ok: false, step: Math.min(...invalidSteps) };
 
-    // Paso de la persona (nombre, correo y datos laborales): solo si se edita aquí.
-    if (editsPerson) {
-      for (const field of RECORD_FIELDS) {
-        if (VALIDATED_FIELDS.includes(field) && invalid(field)) return 0;
-      }
-    }
-    // Acceso (usuario y contraseña).
-    for (const field of ["username", "password"] as (keyof UserFormValues)[]) {
-      if (invalid(field)) return editsPerson ? 1 : 0;
-    }
-    if (requiresDocs && missingDocs.length > 0) return editsPerson ? 3 : 2;
-    return -1;
-  };
-
-  const handleSubmit = async (): Promise<boolean> => {
-    if (requiresDocs && missingDocs.length > 0) {
-      setDocsError(i18n.t("users:form.docsRequired", { docs: requiredDocs.map((d) => d.label).join(", ") }));
-      return false;
-    }
-    if (!validate()) return false;
-    setDocsError(null);
     const fullName = composeFullName(form);
     setSaving(true);
     try {
@@ -408,28 +403,26 @@ export const useUserForm = (userId?: string) => {
           void timeClockApi
             .employeeClockAltaAll(created.id)
             .then(({ results }) => {
-              const done = results.filter((r) => r.ok).map((r) => r.name);
-              if (done.length > 0) {
-                dispatch(showToast({ message: i18n.t("time-clock:employeeClock.autoDone", { clocks: done.join(", ") }), type: "success" }));
-              }
+              const message = describeClockSync(results, "alta");
+              if (message) dispatch(showToast({ message, type: results.every((r) => r.ok) ? "success" : "info" }));
             })
-            .catch(() => undefined);
+            .catch(() => dispatch(showToast({ message: i18n.t("time-clock:clockSync.altaRequestFailed"), type: "error" })));
         }
       }
-      return true;
+      return { ok: true };
     } catch (e: any) {
       const code: unknown = e?.code;
       const msg: string = e?.message ?? i18n.t("common:errors.save");
-      // Duplicados que manda la API → error inline en el campo + toast global.
+      // Duplicados que manda la API → error inline en el campo (en su paso) + toast.
       if (code === "EMAIL_TAKEN" || code === "USERNAME_TAKEN" || code === "EMPLOYEE_NUMBER_TAKEN") {
-        const field =
+        const field: keyof UserFormValues =
           code === "EMAIL_TAKEN" ? "email" : code === "USERNAME_TAKEN" ? "username" : "employeeNumber";
         setFieldError(field, msg);
         dispatch(showToast({ message: msg, type: "error" }));
-      } else {
-        setError(msg);
+        return { ok: false, step: stepOfField(field) };
       }
-      return false;
+      setError(msg);
+      return { ok: false, step: null };
     } finally {
       setSaving(false);
     }
@@ -474,7 +467,6 @@ export const useUserForm = (userId?: string) => {
     error,
     setError,
     handleSubmit,
-    firstInvalidStep,
     canSubmit,
     // Documentación del alta
     requiresDocs,

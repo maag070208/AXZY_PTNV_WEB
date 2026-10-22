@@ -24,12 +24,11 @@ export default function UserFormPage() {
   const { isEdit } = userForm;
 
   const handleFinish = () => {
-    userForm.handleSubmit().then((ok) => {
-      if (ok) {
+    userForm.handleSubmit().then((result) => {
+      if (result.ok) {
         navigate("/users");
-      } else {
-        const invalidStep = userForm.firstInvalidStep();
-        if (invalidStep >= 0) setStep(invalidStep);
+      } else if (result.step !== null) {
+        setStep(result.step);
       }
     });
   };

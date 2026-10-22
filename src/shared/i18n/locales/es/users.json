@@ -194,6 +194,8 @@
       "nameRequired": "El nombre es obligatorio",
       "nameMax": "El nombre debe tener máximo {{max}} caracteres",
       "emailMax": "El correo debe tener máximo {{max}} caracteres",
+      "emailRequired": "El correo es obligatorio",
+      "employeeNumberRequired": "El número de empleado es obligatorio",
       "employeeNumberMax": "El número de empleado debe tener máximo {{max}} caracteres",
       "jobTitleMax": "El puesto debe tener máximo {{max}} caracteres"
     },

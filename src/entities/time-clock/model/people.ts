@@ -55,3 +55,29 @@ export interface TimeClockPersonInput {
   name: string;
   gender: ClockGender;
 }
+
+/** Estado de la estación de huellas (solo si está configurada en la API). */
+export interface FingerprintStationInfo {
+  configured: boolean;
+  url: string | null;
+}
+
+/** Resultado de probar el lector: la plantilla no se devuelve ni se guarda. */
+export interface FingerprintStationTest {
+  fingerNo: number;
+  quality: number;
+  minQuality: number;
+  acceptable: boolean;
+}
+
+/** Persona de todos los relojes, fusionada por número de empleado. `presentIn`: seriales donde está dada de alta. */
+export interface UnifiedPerson {
+  employeeNumber: string;
+  name: string;
+  presentIn: string[];
+}
+
+export interface UnifiedPeople {
+  clocks: Array<{ serial: string; name: string; error: string | null }>;
+  people: UnifiedPerson[];
+}

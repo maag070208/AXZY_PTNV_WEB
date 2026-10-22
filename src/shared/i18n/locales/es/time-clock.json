@@ -650,11 +650,39 @@
       "alertsHint": "por resolver",
       "allGood": "Todo en orden"
     },
+    "unified": {
+      "title": "Personas de todos los relojes",
+      "search": "Buscar por número o nombre",
+      "refresh": "Actualizar",
+      "empty": "Nadie coincide con la búsqueda",
+      "number": "Número",
+      "name": "Nombre",
+      "clocks": "Relojes",
+      "none": "—",
+      "clockError": "{{clock}} no respondió ({{code}})",
+      "count": "{{count}} de {{total}} personas",
+      "hint": "Vista de solo lectura: muestra en qué reloj está dada de alta cada persona."
+    },
+    "reader": {
+      "title": "Lector de huella",
+      "hint": "Pide a la persona que ponga el dedo en el lector y pulsa Probar. La huella no se guarda ni se aplica a ningún reloj.",
+      "finger": "Dedo",
+      "test": "Probar lector",
+      "testing": "Esperando el dedo…",
+      "notConfigured": "La estación de huellas no está configurada. Define FINGERPRINT_STATION_URL, USER y PASS en la API.",
+      "station": "Estación: {{url}}",
+      "quality": "Calidad",
+      "min": "mínimo {{min}}",
+      "acceptable": "Calidad suficiente para dar de alta la huella.",
+      "low": "Calidad baja: vuelve a pedir el dedo y limpia el lector.",
+      "error": "No se pudo leer el dedo."
+    },
     "sections": {
       "status": "Estado",
       "people": "Personas",
       "events": "Eventos",
       "camera": "Cámara",
+      "reader": "Lector de huella",
       "clocks": "Relojes"
     },
     "clock": "Reloj",
@@ -804,6 +832,7 @@
     "bajaPending": "{{clock}} es de solo lectura: la baja queda pendiente ahí",
     "altaDone": "Dada de alta en {{clock}}",
     "altaPending": "{{clock}} es de solo lectura: el alta queda pendiente ahí",
+    "altaRequestFailed": "No se pudo dar de alta en los relojes",
     "failed": "No se pudo actualizar {{clock}}"
   }
 }
