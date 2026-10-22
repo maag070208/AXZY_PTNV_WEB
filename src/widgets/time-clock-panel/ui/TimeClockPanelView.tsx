@@ -9,7 +9,7 @@ import { TimeClockRosterView } from "@features/access/time-clock-roster";
 import ClocksAdminTab from "./tabs/ClocksAdminTab";
 import CheckinsTab from "./tabs/CheckinsTab";
 import EmployeesTab from "./tabs/EmployeesTab";
-import TimeClockCameraView from "./TimeClockCameraView";
+import { TimeClockCameraView } from "@features/access/time-clock-camera";
 import { useTimeClockPanel, type PanelTab } from "../model/useTimeClockPanel";
 
 const TABS: PanelTab[] = ["overview", "people", "events", "camera", "roster", "employees", "checkins", "clocks"];

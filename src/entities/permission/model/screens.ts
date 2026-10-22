@@ -57,6 +57,7 @@ export type NavLabelKey =
   | "nav.accessTimeClockReport"
   | "nav.accessTimeClockEmployees"
   | "nav.clockPanel"
+  | "nav.clockDashboard"
   | "nav.clockAttendance"
   | "nav.timeClock"
   | "nav.schedules"
@@ -200,6 +201,7 @@ export const APP_SCREENS: readonly AppScreen[] = [
         id: "timeClock",
         labelKey: "nav.timeClock",
         children: [
+          { id: "clockDashboard", labelKey: "nav.clockDashboard", path: "/time-clocks/dashboard", match: "exact", requirement: { anyOf: ["time_clocks.manage"] } },
           { id: "clockPanel", labelKey: "nav.clockPanel", path: "/time-clocks/panel", match: "exact", requirement: { anyOf: ["time_clock.view"] } },
         ],
       },

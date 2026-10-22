@@ -68,6 +68,7 @@
     "accessTimeClockEmployees": "Time clock employees",
     "accessTimeClockRoster": "Clock roster",
     "clockPanel": "Clock",
+    "clockDashboard": "Clock dashboard",
     "schedules": "Schedules",
     "schedulesAdmin": "Calendar",
     "schedulesAssign": "Assign schedules",

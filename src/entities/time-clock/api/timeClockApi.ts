@@ -15,6 +15,7 @@ import type {
 import type { RemovalCategoryRow, RosterRemovalInput, RosterRunResult, TimeClockRoster } from "../model/roster";
 import type { TimeClockPeopleList, TimeClockPersonInput } from "../model/people";
 import type { TimeClockCamera } from "../model/camera";
+import type { TimeClockSummary } from "../model/summary";
 import type {
   TimeClockInspectCards,
   TimeClockInspectEvents,
@@ -26,6 +27,8 @@ const employeePath = (number: string) => `/time-clock/employees/${encodeURICompo
 const clockPath = (serial: string) => `/time-clock/clocks/${encodeURIComponent(serial)}`;
 
 export const timeClockApi = {
+  /** Resumen de estado del dashboard (base + lectura del equipo con caché de 60 s). */
+  summary: () => api.get<TimeClockSummary>(`/time-clock/summary`),
   /** Cámara de la terminal (solo lectura). */
   inspectCamera: (serial: string) => api.get<TimeClockCamera>(`${clockPath(serial)}/inspect/camera`),
   /** Personas del reloj con sus tarjetas (lectura). */

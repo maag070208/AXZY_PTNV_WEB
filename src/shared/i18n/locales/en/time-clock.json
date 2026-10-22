@@ -585,5 +585,63 @@
     "errors": {
       "read": "Could not read the clock camera."
     }
+  },
+  "dashboard": {
+    "title": "Clock dashboard",
+    "description": "Status of each clock, alerts and today's check-ins.",
+    "refresh": "Refresh",
+    "loading": "Querying the clocks…",
+    "generatedAt": "Updated at {{time}}",
+    "noClocks": "No clocks registered.",
+    "alertsTitle": "Attention",
+    "never": "Never",
+    "counts": "Counts for attendance",
+    "noCounts": "Does not count for attendance",
+    "people": "People",
+    "cards": "Cards",
+    "punchesToday": "Check-ins today",
+    "lastSync": "Last sync",
+    "todayByHour": "Today's check-ins by hour",
+    "connection": {
+      "ONLINE": "Online",
+      "NO_RESPONSE": "No response",
+      "PAUSED_CREDENTIALS": "Credentials rejected",
+      "NOT_READ": "Not read"
+    },
+    "alerts": {
+      "NO_RESPONSE": "The clock does not respond",
+      "CREDENTIALS": "The clock rejected the credentials",
+      "SUSPICIOUS_ROSTER": "Suspicious roster review: no removals were created",
+      "PENDING_REMOVALS": "Removals waiting for a reason",
+      "REAPPEARED": "People who reappeared after a removal",
+      "UNLINKED": "Clock people not linked",
+      "SYNC_ERROR": "The last sync failed"
+    },
+    "kpi": {
+      "online": "Clocks online",
+      "onlineHint": "responding now",
+      "people": "People",
+      "peopleHint": "enrolled on the clocks",
+      "punches": "Check-ins today",
+      "punchesHint": "counting for attendance",
+      "alerts": "Alerts",
+      "alertsHint": "to resolve"
+    },
+    "sections": {
+      "status": "Status",
+      "people": "People",
+      "events": "Events",
+      "camera": "Camera"
+    },
+    "clock": "Clock",
+    "personnel": {
+      "title": "Clock personnel",
+      "show": "Show personnel",
+      "refresh": "Refresh",
+      "seeAll": "See all",
+      "loading": "Reading the clock…",
+      "empty": "The clock has no people enrolled.",
+      "more": "and {{count}} more"
+    }
   }
 }

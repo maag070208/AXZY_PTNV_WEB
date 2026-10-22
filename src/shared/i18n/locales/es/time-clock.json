@@ -585,5 +585,63 @@
     "errors": {
       "read": "No se pudo leer la cámara del reloj."
     }
+  },
+  "dashboard": {
+    "title": "Dashboard del reloj",
+    "description": "Estado de cada reloj, alertas y checadas de hoy.",
+    "refresh": "Actualizar",
+    "loading": "Consultando los relojes…",
+    "generatedAt": "Actualizado a las {{time}}",
+    "noClocks": "No hay relojes dados de alta.",
+    "alertsTitle": "Atención",
+    "never": "Nunca",
+    "counts": "Cuenta para asistencia",
+    "noCounts": "No cuenta para asistencia",
+    "people": "Personas",
+    "cards": "Tarjetas",
+    "punchesToday": "Checadas hoy",
+    "lastSync": "Última sincronización",
+    "todayByHour": "Checadas de hoy por hora",
+    "connection": {
+      "ONLINE": "En línea",
+      "NO_RESPONSE": "Sin respuesta",
+      "PAUSED_CREDENTIALS": "Credenciales rechazadas",
+      "NOT_READ": "Sin lectura"
+    },
+    "alerts": {
+      "NO_RESPONSE": "El reloj no responde",
+      "CREDENTIALS": "El reloj rechazó las credenciales",
+      "SUSPICIOUS_ROSTER": "Revisión sospechosa del padrón: no se generaron bajas",
+      "PENDING_REMOVALS": "Bajas pendientes de motivo",
+      "REAPPEARED": "Personas que reaparecieron después de una baja",
+      "UNLINKED": "Personas del reloj sin vincular",
+      "SYNC_ERROR": "La última sincronización falló"
+    },
+    "kpi": {
+      "online": "Relojes en línea",
+      "onlineHint": "contestan ahora",
+      "people": "Personas",
+      "peopleHint": "dadas de alta en los relojes",
+      "punches": "Checadas hoy",
+      "punchesHint": "que cuentan para asistencia",
+      "alerts": "Alertas",
+      "alertsHint": "por resolver"
+    },
+    "sections": {
+      "status": "Estado",
+      "people": "Personas",
+      "events": "Eventos",
+      "camera": "Cámara"
+    },
+    "clock": "Reloj",
+    "personnel": {
+      "title": "Personal del reloj",
+      "show": "Mostrar personal",
+      "refresh": "Actualizar",
+      "seeAll": "Ver todo",
+      "loading": "Leyendo el reloj…",
+      "empty": "El reloj no tiene personas dadas de alta.",
+      "more": "y {{count}} más"
+    }
   }
 }

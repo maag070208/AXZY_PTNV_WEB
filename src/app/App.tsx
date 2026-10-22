@@ -11,6 +11,7 @@ import TimeClockRosterPage from "@pages/access/TimeClockRosterPage";
 import TimeClockInspectPage from "@pages/access/TimeClockInspectPage";
 import TimeClockPeoplePage from "@pages/access/TimeClockPeoplePage";
 import TimeClockPanelPage from "@pages/access/TimeClockPanelPage";
+import TimeClockDashboardPage from "@pages/access/TimeClockDashboardPage";
 import TimeClockDifferencesPage from "@pages/access/TimeClockDifferencesPage";
 import TimeClocksPage from "@pages/access/TimeClocksPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
@@ -394,6 +395,15 @@ export default function App() {
           element={
             <RequiresPermission permission="time_clock.view">
               <TimeClockDifferencesPage />
+            </RequiresPermission>
+          }
+        />
+        {/* Dashboard del reloj (Configuración): estado, alertas y checadas de hoy. */}
+        <Route
+          path="/time-clocks/dashboard"
+          element={
+            <RequiresPermission permission="time_clocks.manage">
+              <TimeClockDashboardPage />
             </RequiresPermission>
           }
         />
