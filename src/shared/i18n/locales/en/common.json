@@ -76,7 +76,8 @@
     "tasks": "Tickets",
     "settings": "Settings",
     "kitchenSuppliers": "Suppliers",
-    "kitchenCostCenters": "Spending by cost center"
+    "kitchenCostCenters": "Spending by cost center",
+    "langostin": "Langostin"
   },
   "files": {
     "access": "access",

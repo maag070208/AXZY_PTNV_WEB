@@ -1,0 +1,86 @@
+{
+  "title": "Langostin",
+  "description": "La mascota de Puerto Nuevo: todas sus animaciones y los escenarios donde vive.",
+  "kpis": {
+    "anims": "Animaciones",
+    "animsHint": "Gestos y poses de la mascota",
+    "scenes": "Escenarios",
+    "scenesHint": "Fondos donde vive la mascota",
+    "selected": "Animación elegida"
+  },
+  "stage": {
+    "title": "Escenario",
+    "description": "Elige un escenario y una animación: la mascota se dibuja encima del fondo.",
+    "showMascot": "Mostrar mascota",
+    "sceneLabel": "Escenario",
+    "animLabel": "Animación"
+  },
+  "animsSection": {
+    "title": "Animaciones",
+    "description": "Toca una animación para verla en el escenario de arriba.",
+    "search": "Buscar animación…",
+    "noResults": "Sin resultados"
+  },
+  "scenesSection": {
+    "title": "Escenarios",
+    "description": "Los ocho fondos del hotel, de la isla a la sala de servidores.",
+    "footer": "El fondo y la mascota se dibujan en un canvas de 64x40 px, sin imágenes ni dependencias."
+  },
+  "scenes": {
+    "suggested": "Sugerida",
+    "hotel": { "name": "Hotel", "idea": "Inicio y bienvenida" },
+    "isla": { "name": "Isla", "idea": "Pantalla de espera, vacaciones" },
+    "navidad": { "name": "Navidad", "idea": "Temporada navideña" },
+    "playa": { "name": "Playa", "idea": "Verano" },
+    "alberca": { "name": "Alberca", "idea": "Áreas del hotel" },
+    "cuarto": { "name": "Cuarto", "idea": "Habitaciones, sin actividad" },
+    "sistemas": { "name": "Sistemas", "idea": "Tickets, técnicos y mantenimiento" },
+    "noche": { "name": "Noche", "idea": "Turno nocturno, fogata" }
+  },
+  "groups": {
+    "basics": "Básicas",
+    "help": "Mensajes y ayuda",
+    "states": "Estados",
+    "work": "Trabajo",
+    "fun": "Diversión",
+    "season": "Temporada"
+  },
+  "anims": {
+    "idle": { "name": "Reposo", "hint": "La pose quieta de siempre." },
+    "wave": { "name": "Saludar", "hint": "Levanta la garra para saludar." },
+    "work": { "name": "Trabajar", "hint": "Escribe con elacomputador." },
+    "ok": { "name": "Listo", "hint": "Salto de alegría con confeti." },
+    "err": { "name": "Error", "hint": "Mueca de susto con SSHHS." },
+    "think": { "name": "Pensar", "hint": "Mira arriba, con el globito de ideas." },
+    "point": { "name": "Señalar", "hint": "Apunta a la siguiente opción." },
+    "help": { "name": "Ayuda", "hint": "Muestra el ícono de interrogación." },
+    "info": { "name": "Info", "hint": "Muestra el ícono de información." },
+    "success": { "name": "Éxito", "hint": "Palomita verde de guardado." },
+    "warn": { "name": "Alerta", "hint": "Triángulo amarillo de advertencia." },
+    "notify": { "name": "Aviso", "hint": "Campanita que se mece." },
+    "search": { "name": "Buscar", "hint": "Lupa en la mano." },
+    "idea": { "name": "Idea", "hint": "Foco de ideas encendido." },
+    "loading": { "name": "Cargando", "hint": "Anillo de carga girando." },
+    "empty": { "name": "Vacío", "hint": "Sin resultados: puntos grises." },
+    "sleep": { "name": "Dormir", "hint": "Zzz flotando." },
+    "offline": { "name": "Sin conexión", "hint": "Nube tachada." },
+    "lock": { "name": "Bloqueado", "hint": "Candado cerrado." },
+    "404": { "name": "No encontrado", "hint": "Lupa con un 404." },
+    "assigned": { "name": "Asignado", "hint": "Ticket asignado." },
+    "fixing": { "name": "Reparando", "hint": "Herramienta girando." },
+    "urgent": { "name": "Urgente", "hint": "Se pone rojo y avisa." },
+    "resolved": { "name": "Resuelto", "hint": "Palomita blanca de resuelto." },
+    "upload": { "name": "Subiendo", "hint": "Flecha de subida." },
+    "love": { "name": "Cariño", "hint": "Corazón flotante." },
+    "thanks": { "name": "Gracias", "hint": "Brindis y destellos." },
+    "dance": { "name": "Baile", "hint": "Baila moviéndose de lado." },
+    "birthday": { "name": "Cumpleaños", "hint": "Gorro de fiesta y confeti." },
+    "coffee": { "name": "Café", "hint": "Taza humeante." },
+    "eat": { "name": "Comer", "hint": "Se come el bocadillo." },
+    "key": { "name": "Llave", "hint": "Saca la llave." },
+    "bell": { "name": "Campana", "hint": "Repica la campana." },
+    "beach": { "name": "Playa", "hint": "Gafas de sol y sol de fondo." },
+    "christmas": { "name": "Navidad", "hint": "Gorro de Santa." },
+    "halloween": { "name": "Halloween", "hint": "Calavera de calabaza." }
+  }
+}

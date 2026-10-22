@@ -76,7 +76,8 @@
     "tasks": "Tickets",
     "settings": "Configuración",
     "kitchenSuppliers": "Proveedores",
-    "kitchenCostCenters": "Gasto por centro de costo"
+    "kitchenCostCenters": "Gasto por centro de costo",
+    "langostin": "Langostin"
   },
   "files": {
     "access": "accesos",

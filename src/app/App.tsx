@@ -57,6 +57,7 @@ import AdminTasksPage from "@pages/tickets/AdminTasksPage";
 import NotificationsPage from "@pages/notifications/NotificationsPage";
 import CatalogPage from "@pages/catalog/CatalogPage";
 import RolesPage from "@pages/roles/RolesPage";
+import LangostinPage from "@pages/langostin/LangostinPage";
 import {
   KitchenOverviewPage,
   KitchenItemsPage,
@@ -325,6 +326,15 @@ export default function App() {
           }
         />
         <Route path="/notifications" element={<NotificationsPage />} />
+        {/* Galería de la mascota (animaciones y escenarios): solo ADMIN. */}
+        <Route
+          path="/langostin"
+          element={
+            <RequiresPermission permission="system.configure">
+              <LangostinPage />
+            </RequiresPermission>
+          }
+        />
 
         <Route
           path="/access"

@@ -1,0 +1,86 @@
+{
+  "title": "Langostin",
+  "description": "Puerto Nuevo's mascot: every animation and the scenes where it lives.",
+  "kpis": {
+    "anims": "Animations",
+    "animsHint": "The mascot's gestures and poses",
+    "scenes": "Scenes",
+    "scenesHint": "Backdrops where the mascot lives",
+    "selected": "Picked animation"
+  },
+  "stage": {
+    "title": "Scene",
+    "description": "Pick a scene and an animation: the mascot is drawn on top of the backdrop.",
+    "showMascot": "Show mascot",
+    "sceneLabel": "Scene",
+    "animLabel": "Animation"
+  },
+  "animsSection": {
+    "title": "Animations",
+    "description": "Tap an animation to see it in the scene above.",
+    "search": "Search animation…",
+    "noResults": "No results"
+  },
+  "scenesSection": {
+    "title": "Scenes",
+    "description": "The eight backdrops, from the island to the server room.",
+    "footer": "The backdrop and the mascot are drawn in a 64x40 px canvas, with no images and no dependencies."
+  },
+  "scenes": {
+    "suggested": "Suggested",
+    "hotel": { "name": "Hotel", "idea": "Home and welcome" },
+    "isla": { "name": "Island", "idea": "Waiting screen, vacations" },
+    "navidad": { "name": "Christmas", "idea": "Holiday season" },
+    "playa": { "name": "Beach", "idea": "Summer" },
+    "alberca": { "name": "Pool", "idea": "Hotel areas" },
+    "cuarto": { "name": "Room", "idea": "Guest rooms, nothing happening" },
+    "sistemas": { "name": "Systems", "idea": "Tickets, techs and maintenance" },
+    "noche": { "name": "Night", "idea": "Night shift, campfire" }
+  },
+  "groups": {
+    "basics": "Basics",
+    "help": "Messages and help",
+    "states": "States",
+    "work": "Work",
+    "fun": "Fun",
+    "season": "Season"
+  },
+  "anims": {
+    "idle": { "name": "Idle", "hint": "The usual quiet pose." },
+    "wave": { "name": "Wave", "hint": "Lifts a claw to say hello." },
+    "work": { "name": "Work", "hint": "Types on the computer." },
+    "ok": { "name": "Ok", "hint": "A happy hop with confetti." },
+    "err": { "name": "Error", "hint": "An alarmed wince with SSHHS." },
+    "think": { "name": "Think", "hint": "Looks up, with a thought bubble." },
+    "point": { "name": "Point", "hint": "Points at the next option." },
+    "help": { "name": "Help", "hint": "Shows the question mark icon." },
+    "info": { "name": "Info", "hint": "Shows the information icon." },
+    "success": { "name": "Success", "hint": "Green check bubble." },
+    "warn": { "name": "Warning", "hint": "Yellow warning triangle." },
+    "notify": { "name": "Notify", "hint": "A bell that swings." },
+    "search": { "name": "Search", "hint": "Magnifying glass in hand." },
+    "idea": { "name": "Idea", "hint": "A lit light bulb." },
+    "loading": { "name": "Loading", "hint": "Spinning loader ring." },
+    "empty": { "name": "Empty", "hint": "No results: grey dots." },
+    "sleep": { "name": "Sleep", "hint": "Floating Zzz." },
+    "offline": { "name": "Offline", "hint": "Crossed-out cloud." },
+    "lock": { "name": "Locked", "hint": "A closed padlock." },
+    "404": { "name": "Not found", "hint": "Magnifying glass with a 404." },
+    "assigned": { "name": "Assigned", "hint": "Assigned ticket." },
+    "fixing": { "name": "Fixing", "hint": "Spinning tool." },
+    "urgent": { "name": "Urgent", "hint": "Turns red and warns." },
+    "resolved": { "name": "Resolved", "hint": "White resolved bubble." },
+    "upload": { "name": "Upload", "hint": "Upload arrow." },
+    "love": { "name": "Love", "hint": "Floating heart." },
+    "thanks": { "name": "Thanks", "hint": "A toast and sparkles." },
+    "dance": { "name": "Dance", "hint": "Dances side to side." },
+    "birthday": { "name": "Birthday", "hint": "Party hat and confetti." },
+    "coffee": { "name": "Coffee", "hint": "A steaming cup." },
+    "eat": { "name": "Eat", "hint": "Eats the snack." },
+    "key": { "name": "Key", "hint": "Takes out the key." },
+    "bell": { "name": "Bell", "hint": "Rings the bell." },
+    "beach": { "name": "Beach", "hint": "Sunglasses and sun." },
+    "christmas": { "name": "Christmas", "hint": "Santa hat." },
+    "halloween": { "name": "Halloween", "hint": "Pumpkin skull." }
+  }
+}

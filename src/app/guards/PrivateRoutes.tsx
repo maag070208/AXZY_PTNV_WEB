@@ -7,6 +7,7 @@ import {
   FaUserTie,
   FaCog,
   FaUtensils,
+  FaLaptopCode,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -27,6 +28,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   kitchen: <FaUtensils size={14} />,
   hr: <FaUserTie size={14} />,
   settings: <FaCog size={14} />,
+  langostin: <FaLaptopCode size={14} />,
 };
 
 export default function PrivateRoutes() {

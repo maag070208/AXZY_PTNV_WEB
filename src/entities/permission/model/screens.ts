@@ -72,7 +72,8 @@ export type NavLabelKey =
   | "nav.users"
   | "nav.clocks"
   | "nav.payroll"
-  | "nav.roles";
+  | "nav.roles"
+  | "nav.langostin";
 
 export interface AppScreen {
   readonly id: string;
@@ -207,6 +208,16 @@ export const APP_SCREENS: readonly AppScreen[] = [
       },
       { id: "roles", labelKey: "nav.roles", path: "/roles", requirement: { anyOf: ["roles.manage"] } },
     ],
+  },
+  {
+    // Galería de la mascota: animaciones y escenarios. Solo ADMIN
+    // (`system.configure` no lo tiene nadie más).
+    id: "langostin",
+    labelKey: "nav.langostin",
+    path: "/langostin",
+    match: "exact",
+    requirement: { anyOf: ["system.configure"] },
+    actions: [],
   },
 ];
 
