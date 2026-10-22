@@ -11,6 +11,24 @@ export interface TimeClockPeopleList {
   cards: Array<{ cardNo: string; employeeNumber: string; cardType: string | null }>;
 }
 
+/** Huellas de una persona en un reloj. */
+export interface FingerprintStatus {
+  employeeNumber: string;
+  /** Posiciones de dedo ya registradas en el reloj (1 a 10). */
+  fingerIds: number[];
+  fingerprints: number;
+  max: number;
+}
+
+/** Huella capturada con el sensor del reloj. La plantilla nunca viaja al navegador. */
+export interface FingerprintCapture {
+  captureId: string;
+  fingerNo: number;
+  quality: number;
+  minQuality: number;
+  acceptable: boolean;
+}
+
 /** Conteos de rostros y huellas por número de persona (solo lectura, con caché en la API). */
 export interface TimeClockBiometrics {
   updatedAt: string;

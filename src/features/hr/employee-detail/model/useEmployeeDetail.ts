@@ -10,7 +10,18 @@ import type {
   Gender,
   BloodType,
 } from "@entities/hr";
-import { usersApi } from "@entities/user";
+import { usersApi, useCan } from "@entities/user";
+import { describeClockSync, timeClockApi } from "@entities/time-clock";
+
+/** Baja o alta en los relojes. Un fallo del reloj no revierte la baja o el alta de la persona en el sistema. */
+const clockSync = async (run: () => Promise<{ results: Parameters<typeof describeClockSync>[0] }>, action: "baja" | "alta") => {
+  try {
+    const { results } = await run();
+    return describeClockSync(results, action);
+  } catch {
+    return i18n.t("time-clock:clockSync.failed", { clock: "reloj" });
+  }
+};
 
 export const useEmployeeDetail = (id: string | undefined) => {
   const [profile, setProfile] = useState<PersonalProfile | null>(null);
@@ -21,6 +32,9 @@ export const useEmployeeDetail = (id: string | undefined) => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const canWriteClock = useCan("time_clock.write");
+  /** Qué pasó en los relojes tras dar de baja o de alta a la persona. */
+  const [clockNotice, setClockNotice] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [editOpen, setEditOpen] = useState(false);
@@ -112,6 +126,7 @@ export const useEmployeeDetail = (id: string | undefined) => {
     setError(null);
     try {
       await usersApi.deactivate(id, { reason, notifyUser: true });
+      setClockNotice(canWriteClock ? await clockSync(() => timeClockApi.employeeClockBajaAll(id), "baja") : null);
       setProfile((p) =>
         p
           ? {
@@ -134,6 +149,7 @@ export const useEmployeeDetail = (id: string | undefined) => {
     setError(null);
     try {
       await usersApi.reactivate(id);
+      setClockNotice(canWriteClock ? await clockSync(() => timeClockApi.employeeClockAltaAll(id), "alta") : null);
       setProfile((p) => (p ? { ...p, active: true } : p));
     } catch (e: any) {
       setError(e.message ?? i18n.t("employees:detail.reactivateError"));
@@ -141,6 +157,8 @@ export const useEmployeeDetail = (id: string | undefined) => {
   };
 
   return {
+    clockNotice,
+    dismissClockNotice: () => setClockNotice(null),
     profile,
     documents,
     documentTypes,

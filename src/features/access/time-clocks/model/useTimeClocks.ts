@@ -45,6 +45,7 @@ export const useTimeClocks = () => {
   const [editTarget, setEditTarget] = useState<TimeClockDevice | null>(null);
   const [editName, setEditName] = useState("");
   const [editAttendance, setEditAttendance] = useState(true);
+  const [editWrite, setEditWrite] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
@@ -120,6 +121,7 @@ export const useTimeClocks = () => {
   const openEdit = (clock: TimeClockDevice) => {
     setEditName(clock.name);
     setEditAttendance(clock.countsAttendance);
+    setEditWrite(clock.writeEnabled);
     setEditError(null);
     setEditTarget(clock);
   };
@@ -132,6 +134,7 @@ export const useTimeClocks = () => {
       const clock = await timeClockApi.updateClock(editTarget.clockSerial, {
         name: editName.trim(),
         countsAttendance: editAttendance,
+        writeEnabled: editWrite,
       });
       setEditTarget(null);
       setToast(t("clocks.toasts.edited", { name: clock.name }));
@@ -189,6 +192,8 @@ export const useTimeClocks = () => {
     setEditName,
     editAttendance,
     setEditAttendance,
+    editWrite,
+    setEditWrite,
     saving,
     editError,
     saveEdit,

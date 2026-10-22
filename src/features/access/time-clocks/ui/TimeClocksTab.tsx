@@ -45,6 +45,8 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
     setEditName,
     editAttendance,
     setEditAttendance,
+    editWrite,
+    setEditWrite,
     saving,
     editError,
     saveEdit,
@@ -223,6 +225,15 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
             onChange={setEditAttendance}
             name="checadorRelojEditarAsistencia"
           />
+          <ITFlex direction="column" gap={1} className="rounded-xl border border-amber-200 bg-amber-50/40 p-3">
+            <ITCheckbox
+              name="checadorRelojEditarEscritura"
+              checked={editWrite}
+              onChange={setEditWrite}
+              label={t("clocks.write.label")}
+            />
+            <ITText className="text-[11px] text-slate-600">{t("clocks.write.hint")}</ITText>
+          </ITFlex>
           <ITText className="text-[11px] text-slate-600">{t("clocks.dialog.editNote")}</ITText>
           {editError && <ITAlert variant="error">{editError}</ITAlert>}
           <ITFlex justify="end" gap={2}>

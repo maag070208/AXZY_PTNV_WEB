@@ -337,6 +337,10 @@
       "registration": "Could not add the clock",
       "retirement": "Could not remove the clock",
       "edit": "Could not update the clock"
+    },
+    "write": {
+      "label": "Allow writing to this clock",
+      "hint": "When on, the system can add, remove and register fingerprints on this clock. When off, the clock is read-only for the system."
     }
   },
   "history": {
@@ -724,6 +728,51 @@
     "confirmBody": "{{name}} (number {{number}}) will be created on the clock {{clock}}. Only the test clock is written.",
     "done": "{{name}} was added to {{clock}}.",
     "error": "Could not add to the clock.",
-    "autoDone": "Added to the clock: {{clocks}}."
+    "autoDone": "Added to the clock: {{clocks}}.",
+    "fingerprint": {
+      "title": "Fingerprints",
+      "count": "{{count}} of {{max}} fingers registered",
+      "none": "No fingerprints",
+      "finger": "Finger",
+      "capture": "Capture finger",
+      "captured": "Finger {{finger}} captured",
+      "low": "Quality is low: capture again",
+      "apply": "Add",
+      "applied": "Fingerprint added to {{clock}}",
+      "confirmTitle": "Add finger {{finger}} to {{clock}}",
+      "confirmBody": "Finger {{finger}} of {{name}} (number {{number}}) will be registered on {{clock}}. Only the test clock is written.",
+      "limit": "Already has the maximum fingerprints",
+      "error": "The fingerprint operation could not be completed.",
+      "captureAgain": "Capture again",
+      "qualityValue": "Quality {{quality}}",
+      "qualityOk": "Good quality (minimum {{min}}). You can add it.",
+      "qualityLow": "Low quality (minimum {{min}}). Capture again with a clean, centered finger.",
+      "legendRegistered": "Green: already on the clock. Pick a free finger to add another.",
+      "legendPick": "Pick a free finger to capture it.",
+      "readyToCapture": "Ready to capture finger {{finger}}. Place the finger on the clock's sensor.",
+      "placeFinger": "Place the finger on the clock's sensor…",
+      "readOnly": "Read-only: fingerprints cannot be captured or added on this clock.",
+      "steps": {
+        "pick": "Pick finger",
+        "capture": "Capture",
+        "apply": "Add"
+      }
+    },
+    "summary": {
+      "loading": "Reading the clock…",
+      "error": "Could not read the record on the clock",
+      "faces": "{{count}} face(s)",
+      "fingers": "{{count}} fingerprint(s)",
+      "cards": "{{count}} card(s)",
+      "punches": "{{count}} punch(es) today",
+      "open": "View full record"
+    }
+  },
+  "clockSync": {
+    "bajaDone": "Removed from {{clock}}",
+    "bajaPending": "{{clock}} is read-only: the removal stays pending there",
+    "altaDone": "Added to {{clock}}",
+    "altaPending": "{{clock}} is read-only: the addition stays pending there",
+    "failed": "Could not update {{clock}}"
   }
 }

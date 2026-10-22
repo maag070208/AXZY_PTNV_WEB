@@ -82,6 +82,8 @@ export interface TimeClockDevice {
    * de puertas de oficina, que se checan varias veces por turno, no.
    */
   countsAttendance: boolean;
+  /** Si el sistema puede escribir en este reloj (altas, bajas, huellas). Apagado por defecto. */
+  writeEnabled: boolean;
   model: string | null;
   lastSerialNo: number;
   syncedAt: string | null;

@@ -21,7 +21,7 @@ import {
 import { CollapsibleCard } from "@shared/ui/collapsible-card";
 import { EmployeeCredentialDialog } from "@widgets/employee-credential";
 import { useCan } from "@entities/user";
-import { EmployeeClockCard } from "@features/hr/employee-clock";
+import { EmployeeClockSection } from "@widgets/employee-clock";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -116,6 +116,11 @@ export default function EmployeeDetailPage() {
           {detail.error}
         </ITAlert>
       )}
+      {detail.clockNotice && (
+        <ITAlert variant="info" dismissible onDismiss={detail.dismissClockNotice}>
+          {detail.clockNotice}
+        </ITAlert>
+      )}
 
       <ITGrid container columns={12} spacing={5} className="items-start">
         <ITGrid item xs={12} md={8} className="flex flex-col gap-5 min-w-0">
@@ -140,7 +145,7 @@ export default function EmployeeDetailPage() {
               iconBg="bg-emerald-50"
               title={tt("employeeClock.title", { ns: "time-clock" })}
             >
-              <EmployeeClockCard userName={profile.name} userId={profile.id} />
+              <EmployeeClockSection userName={profile.name} userId={profile.id} />
             </CollapsibleCard>
           )}
           <CollapsibleCard

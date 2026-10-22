@@ -13,7 +13,15 @@ import type {
   TimeClockSyncHistory,
 } from "../model/types";
 import type { RemovalCategoryRow, RosterRemovalInput, RosterRunResult, TimeClockRoster } from "../model/roster";
-import type { EmployeeClockStatus, TimeClockBiometrics, TimeClockPeopleList, TimeClockPersonInput } from "../model/people";
+import type { ClockSyncResult } from "../model/clockSync";
+import type {
+  EmployeeClockStatus,
+  FingerprintCapture,
+  FingerprintStatus,
+  TimeClockBiometrics,
+  TimeClockPeopleList,
+  TimeClockPersonInput,
+} from "../model/people";
 import type { TimeClockCamera } from "../model/camera";
 import type { TimeClockSummary } from "../model/summary";
 import type { TimeClockPersonDetail } from "../model/person";
@@ -41,6 +49,17 @@ export const timeClockApi = {
   /** Personas del reloj con sus tarjetas (lectura). */
   peopleList: (serial: string) => api.get<TimeClockPeopleList>(`${clockPath(serial)}/people`),
   employeeClockStatus: (userId: string) => api.get<EmployeeClockStatus>(`/time-clock/employees/${userId}/clock-status`),
+  fingerprintStatus: (userId: string, serial: string) =>
+    api.get<FingerprintStatus>(`/time-clock/employees/${userId}/fingerprint/status?serial=${encodeURIComponent(serial)}`),
+  fingerprintCapture: (userId: string, serial: string, fingerNo: number) =>
+    api.post<FingerprintCapture>(`/time-clock/employees/${userId}/fingerprint/capture`, { serial, fingerNo }),
+  fingerprintApply: (userId: string, serial: string, captureId: string) =>
+    api.post<{ applied: boolean; fingerNo: number; fingerprints: number }>(`/time-clock/employees/${userId}/fingerprint/apply`, {
+      serial,
+      captureId,
+    }),
+  employeeClockBajaAll: (userId: string) =>
+    api.post<{ results: ClockSyncResult[] }>(`/time-clock/employees/${userId}/clock-baja-all`, {}),
   employeeClockAltaAll: (userId: string) =>
     api.post<{ results: Array<{ serial: string; name: string; ok: boolean; code?: string }> }>(
       `/time-clock/employees/${userId}/clock-alta-all`,

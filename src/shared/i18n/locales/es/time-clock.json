@@ -337,6 +337,10 @@
       "registration": "No se pudo dar de alta el reloj",
       "retirement": "No se pudo dar de baja el reloj",
       "edit": "No se pudo actualizar el reloj"
+    },
+    "write": {
+      "label": "Permitir escribir en este reloj",
+      "hint": "Si está activo, el sistema puede dar de alta, dar de baja y registrar huellas en este reloj. Apagado, el reloj es de solo lectura para el sistema."
     }
   },
   "history": {
@@ -724,6 +728,51 @@
     "confirmBody": "Se creará a {{name}} con el número {{number}} en el reloj {{clock}}. Solo se escribe en el reloj de prueba.",
     "done": "{{name}} quedó dada de alta en {{clock}}.",
     "error": "No se pudo dar de alta en el reloj.",
-    "autoDone": "Dada de alta en el reloj: {{clocks}}."
+    "autoDone": "Dada de alta en el reloj: {{clocks}}.",
+    "fingerprint": {
+      "title": "Huellas",
+      "count": "{{count}} de {{max}} dedos registrados",
+      "none": "Sin huellas",
+      "finger": "Dedo",
+      "capture": "Capturar dedo",
+      "captured": "Dedo {{finger}} capturado",
+      "low": "La calidad es baja: vuelve a capturar",
+      "apply": "Dar de alta",
+      "applied": "Huella dada de alta en {{clock}}",
+      "confirmTitle": "Dar de alta el dedo {{finger}} en {{clock}}",
+      "confirmBody": "Se registrará el dedo {{finger}} de {{name}} (número {{number}}) en {{clock}}. Solo se escribe en el reloj de prueba.",
+      "limit": "Ya tiene el máximo de huellas",
+      "error": "No se pudo completar la operación con la huella.",
+      "captureAgain": "Capturar de nuevo",
+      "qualityValue": "Calidad {{quality}}",
+      "qualityOk": "Calidad suficiente (mínimo {{min}}). Puedes darla de alta.",
+      "qualityLow": "Calidad baja (mínimo {{min}}). Vuelve a capturar con el dedo limpio y centrado.",
+      "legendRegistered": "Verde: ya registrado en el reloj. Elige un dedo libre para agregar otro.",
+      "legendPick": "Elige un dedo libre para capturarlo.",
+      "readyToCapture": "Listo para capturar el dedo {{finger}}. Coloca el dedo en el sensor del reloj.",
+      "placeFinger": "Coloca el dedo en el sensor del reloj…",
+      "readOnly": "Solo lectura: en este reloj no se pueden capturar ni dar de alta huellas.",
+      "steps": {
+        "pick": "Elegir dedo",
+        "capture": "Capturar",
+        "apply": "Dar de alta"
+      }
+    },
+    "summary": {
+      "loading": "Leyendo el reloj…",
+      "error": "No se pudo leer la ficha en el reloj",
+      "faces": "{{count}} rostro(s)",
+      "fingers": "{{count}} huella(s)",
+      "cards": "{{count}} tarjeta(s)",
+      "punches": "{{count}} checada(s) hoy",
+      "open": "Ver ficha completa"
+    }
+  },
+  "clockSync": {
+    "bajaDone": "Dada de baja en {{clock}}",
+    "bajaPending": "{{clock}} es de solo lectura: la baja queda pendiente ahí",
+    "altaDone": "Dada de alta en {{clock}}",
+    "altaPending": "{{clock}} es de solo lectura: el alta queda pendiente ahí",
+    "failed": "No se pudo actualizar {{clock}}"
   }
 }

@@ -5,6 +5,7 @@ export * from "./model/status";
 export * from "./model/roster";
 export * from "./model/inspect";
 export * from "./model/people";
+export * from "./model/clockSync";
 export * from "./model/camera";
 export * from "./model/summary";
 export * from "./model/person";

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ITButton, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useCan } from "@entities/user";
-import type { EmployeeClockStatus } from "@entities/time-clock";
+import { timeClockApi, type EmployeeClockStatus, type TimeClockPersonDetail } from "@entities/time-clock";
 import { useEmployeeClock } from "../model/useEmployeeClock";
+import FingerprintPanel from "./FingerprintPanel";
 
 type ClockRow = EmployeeClockStatus["clocks"][number];
 
@@ -13,8 +14,48 @@ const STATE_TONE: Record<NonNullable<ClockRow["state"]> | "NO_RESPONSE", string>
   NO_RESPONSE: "border-red-200 text-red-700",
 };
 
-/** Alta de la persona en los relojes: estado por reloj y alta con confirmación (hoy, solo el reloj de prueba). */
-export default function EmployeeClockCard({ userName, userId }: { userName: string; userId: string }) {
+/** Resumen de un reloj: rostros, huellas, tarjetas y checadas de hoy (solo lectura). */
+function ClockSummary({ serial, number, onOpen }: { serial: string; number: string; onOpen: () => void }) {
+  const { t } = useTranslation("time-clock");
+  const [detail, setDetail] = useState<TimeClockPersonDetail | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDetail(null);
+    setError(null);
+    timeClockApi
+      .personDetail(serial, number)
+      .then(setDetail)
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : t("employeeClock.summary.error")));
+  }, [serial, number, t]);
+
+  if (error) return <ITText role="alert" className="text-xs text-red-600">{error}</ITText>;
+  if (!detail) return <ITText className="text-xs text-slate-400">{t("employeeClock.summary.loading")}</ITText>;
+  return (
+    <ITFlex align="center" gap={3} wrap="wrap" className="text-xs text-slate-600">
+      <span>{t("employeeClock.summary.faces", { count: detail.faces.count })}</span>
+      <span>{t("employeeClock.summary.fingers", { count: detail.fingerprints.length })}</span>
+      <span>{t("employeeClock.summary.cards", { count: detail.cards.length })}</span>
+      <span>{t("employeeClock.summary.punches", { count: detail.punchesToday })}</span>
+      <ITButton variant="outlined" color="secondary" size="sm" onClick={onOpen}>
+        {t("employeeClock.summary.open")}
+      </ITButton>
+    </ITFlex>
+  );
+}
+
+/** Alta de la persona en los relojes: estado por reloj, resumen, huellas y alta con confirmación. */
+export default function EmployeeClockCard({
+  userName,
+  userId,
+  onOpenFicha,
+  onNumber,
+}: {
+  userName: string;
+  userId: string;
+  onOpenFicha: (serial: string) => void;
+  onNumber?: (number: string | null) => void;
+}) {
   const { t } = useTranslation("time-clock");
   const fx = useEmployeeClock(userId, true);
   const [target, setTarget] = useState<ClockRow | null>(null);
@@ -22,6 +63,9 @@ export default function EmployeeClockCard({ userName, userId }: { userName: stri
   const canWrite = useCan("time_clock.write");
 
   const number = fx.status?.employeeNumber ?? null;
+  useEffect(() => {
+    onNumber?.(number);
+  }, [number, onNumber]);
 
   const confirm = async () => {
     if (!target) return;
@@ -49,6 +93,20 @@ export default function EmployeeClockCard({ userName, userId }: { userName: stri
               <ITText className="text-sm font-semibold text-slate-900">{c.name}</ITText>
               <span className={`w-fit rounded-full border px-2.5 py-0.5 text-xs font-medium ${tone}`}>{label}</span>
             </ITFlex>
+            {c.state === "DADA_DE_ALTA" && c.connection === "ONLINE" && number && (
+              <ClockSummary serial={c.serial} number={number} onOpen={() => onOpenFicha(c.serial)} />
+            )}
+            {c.state === "DADA_DE_ALTA" && c.connection === "ONLINE" && c.canAlta && number && (
+              <FingerprintPanel
+                userId={userId}
+                userName={userName}
+                number={number}
+                serial={c.serial}
+                clockName={c.name}
+                canWrite={canWrite}
+                onApplied={fx.reload}
+              />
+            )}
             {canAdd ? (
               <ITButton variant="filled" color="primary" size="sm" onClick={() => setTarget(c)}>
                 {t("employeeClock.alta")}

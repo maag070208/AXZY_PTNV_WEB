@@ -1,11 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
-import { usersApi, type User } from "@entities/user";
+import { usersApi, useCan, type User } from "@entities/user";
+import { describeClockSync, timeClockApi } from "@entities/time-clock";
 import { departmentsApi, type Department } from "@entities/department";
 import { i18n } from "@shared/i18n";
 
+/** Resumen de baja o alta en los relojes para el aviso. Un fallo del reloj no deshace la acción en el sistema. */
+const clockSyncNotice = async (
+  run: () => Promise<{ results: Parameters<typeof describeClockSync>[0] }>,
+  action: "baja" | "alta"
+): Promise<string | null> => {
+  try {
+    const { results } = await run();
+    return describeClockSync(results, action);
+  } catch {
+    return i18n.t("time-clock:clockSync.failed", { clock: "reloj" });
+  }
+};
+
 export const useUsersList = () => {
+  const canWriteClock = useCan("time_clock.write");
   const { t: tt } = useTranslation("users");
   const [departments, setDepartments] = useState<Department[]>([]);
   const [total, setTotal] = useState(0);
@@ -51,7 +66,8 @@ export const useUsersList = () => {
     try {
       await usersApi.deactivate(target.id, { reason, notifyUser: true });
       setReloadKey((k) => k + 1);
-      setToast({ message: tt("list.toastDeactivated"), type: "success" });
+      const notice = canWriteClock ? await clockSyncNotice(() => timeClockApi.employeeClockBajaAll(target.id), "baja") : null;
+      setToast({ message: [tt("list.toastDeactivated"), notice].filter(Boolean).join(". "), type: "success" });
     } catch (e: any) {
       setToast({ message: e.message || tt("list.errorDeactivate"), type: "error" });
     }
@@ -87,7 +103,8 @@ export const useUsersList = () => {
     try {
       await usersApi.reactivate(target.id);
       setReloadKey((k) => k + 1);
-      setToast({ message: tt("list.toastReactivated"), type: "success" });
+      const notice = canWriteClock ? await clockSyncNotice(() => timeClockApi.employeeClockAltaAll(target.id), "alta") : null;
+      setToast({ message: [tt("list.toastReactivated"), notice].filter(Boolean).join(". "), type: "success" });
     } catch (e: any) {
       setToast({ message: e.message || tt("list.errorReactivate"), type: "error" });
     }
