@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ITButton, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useCan } from "@entities/user";
-import { timeClockApi, type EmployeeClockStatus, type TimeClockPersonDetail } from "@entities/time-clock";
+import type { EmployeeClockStatus } from "@entities/time-clock";
 import { useEmployeeClock } from "../model/useEmployeeClock";
 import FingerprintPanel from "./FingerprintPanel";
 
@@ -14,46 +14,17 @@ const STATE_TONE: Record<NonNullable<ClockRow["state"]> | "NO_RESPONSE", string>
   NO_RESPONSE: "border-red-200 text-red-700",
 };
 
-/** Resumen de un reloj: rostros, huellas, tarjetas y checadas de hoy (solo lectura). */
-function ClockSummary({ serial, number, onOpen }: { serial: string; number: string; onOpen: () => void }) {
-  const { t } = useTranslation("time-clock");
-  const [detail, setDetail] = useState<TimeClockPersonDetail | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setDetail(null);
-    setError(null);
-    timeClockApi
-      .personDetail(serial, number)
-      .then(setDetail)
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : t("employeeClock.summary.error")));
-  }, [serial, number, t]);
-
-  if (error) return <ITText role="alert" className="text-xs text-red-600">{error}</ITText>;
-  if (!detail) return <ITText className="text-xs text-slate-400">{t("employeeClock.summary.loading")}</ITText>;
-  return (
-    <ITFlex align="center" gap={3} wrap="wrap" className="text-xs text-slate-600">
-      <span>{t("employeeClock.summary.faces", { count: detail.faces.count })}</span>
-      <span>{t("employeeClock.summary.fingers", { count: detail.fingerprints.length })}</span>
-      <span>{t("employeeClock.summary.cards", { count: detail.cards.length })}</span>
-      <span>{t("employeeClock.summary.punches", { count: detail.punchesToday })}</span>
-      <ITButton variant="outlined" color="secondary" size="sm" onClick={onOpen}>
-        {t("employeeClock.summary.open")}
-      </ITButton>
-    </ITFlex>
-  );
-}
-
 /** Alta de la persona en los relojes: estado por reloj, resumen, huellas y alta con confirmación. */
 export default function EmployeeClockCard({
   userName,
   userId,
-  onOpenFicha,
+  renderDetail,
   onNumber,
 }: {
   userName: string;
   userId: string;
-  onOpenFicha: (serial: string) => void;
+  /** Datos de la persona en un reloj (los pinta la pantalla que sabe de fichas; las features no se importan entre sí). */
+  renderDetail?: (serial: string, number: string, aside: React.ReactNode) => React.ReactNode;
   onNumber?: (number: string | null) => void;
 }) {
   const { t } = useTranslation("time-clock");
@@ -83,40 +54,54 @@ export default function EmployeeClockCard({
       {done && <ITText role="status" className="text-sm text-emerald-700">{done}</ITText>}
       {fx.status && fx.status.clocks.length === 0 && <ITText className="text-sm text-slate-400">{t("employeeClock.empty")}</ITText>}
 
-      {fx.status?.clocks.map((c) => {
-        const tone = c.connection === "NO_RESPONSE" ? STATE_TONE.NO_RESPONSE : STATE_TONE[c.state ?? "SIN_ALTA"];
-        const label = c.connection === "NO_RESPONSE" ? t("employeeClock.state.NO_RESPONSE") : t(`employeeClock.state.${c.state ?? "SIN_ALTA"}`);
-        const canAdd = canWrite && !!number && c.connection === "ONLINE" && c.state === "SIN_ALTA" && c.canAlta;
-        return (
-          <ITFlex key={c.serial} align="center" justify="between" gap={3} wrap="wrap" className="rounded-xl border border-slate-200 px-4 py-3">
-            <ITFlex direction="column" gap={1}>
-              <ITText className="text-sm font-semibold text-slate-900">{c.name}</ITText>
-              <span className={`w-fit rounded-full border px-2.5 py-0.5 text-xs font-medium ${tone}`}>{label}</span>
-            </ITFlex>
-            {c.state === "DADA_DE_ALTA" && c.connection === "ONLINE" && number && (
-              <ClockSummary serial={c.serial} number={number} onOpen={() => onOpenFicha(c.serial)} />
-            )}
-            {c.state === "DADA_DE_ALTA" && c.connection === "ONLINE" && c.canAlta && number && (
-              <FingerprintPanel
-                userId={userId}
-                userName={userName}
-                number={number}
-                serial={c.serial}
-                clockName={c.name}
-                canWrite={canWrite}
-                onApplied={fx.reload}
-              />
-            )}
-            {canAdd ? (
-              <ITButton variant="filled" color="primary" size="sm" onClick={() => setTarget(c)}>
-                {t("employeeClock.alta")}
-              </ITButton>
-            ) : (
-              <ITText className="text-xs text-slate-400">{c.canAlta ? "" : t("employeeClock.readOnly")}</ITText>
-            )}
-          </ITFlex>
-        );
-      })}
+      <div className="flex flex-col gap-5">
+        {fx.status?.clocks.map((c) => {
+          const tone = c.connection === "NO_RESPONSE" ? STATE_TONE.NO_RESPONSE : STATE_TONE[c.state ?? "SIN_ALTA"];
+          const label = c.connection === "NO_RESPONSE" ? t("employeeClock.state.NO_RESPONSE") : t(`employeeClock.state.${c.state ?? "SIN_ALTA"}`);
+          const canAdd = canWrite && !!number && c.connection === "ONLINE" && c.state === "SIN_ALTA" && c.canAlta;
+          const enrolled = c.state === "DADA_DE_ALTA" && c.connection === "ONLINE" && !!number;
+          return (
+            <section key={c.serial} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <header className="flex items-center justify-between gap-3">
+                <h3 className="truncate text-base font-black text-slate-900">{c.name}</h3>
+                <span className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${tone}`}>{label}</span>
+              </header>
+
+              {enrolled && renderDetail &&
+                renderDetail(
+                  c.serial,
+                  number,
+                  c.canAlta ? (
+                    <FingerprintPanel
+                      userId={userId}
+                      userName={userName}
+                      number={number}
+                      serial={c.serial}
+                      clockName={c.name}
+                      canWrite={canWrite}
+                      onApplied={fx.reload}
+                    />
+                  ) : null
+                )}
+
+              {!enrolled && (
+                <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 px-4 py-6 text-center">
+                  <p className="text-sm text-slate-500">
+                    {c.connection === "NO_RESPONSE" ? t("employeeClock.state.NO_RESPONSE") : t("employeeClock.notEnrolled")}
+                  </p>
+                  {canAdd ? (
+                    <ITButton variant="filled" color="primary" size="sm" onClick={() => setTarget(c)}>
+                      {t("employeeClock.alta")}
+                    </ITButton>
+                  ) : (
+                    !c.canAlta && <p className="text-xs text-slate-400">{t("employeeClock.readOnly")}</p>
+                  )}
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
 
       <ITDialog
         isOpen={!!target}

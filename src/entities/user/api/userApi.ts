@@ -16,6 +16,9 @@ export const authApi = {
   login: (username: string, password: string) =>
     api.post<LoginResponse>(`/auth/login`, { username, password }),
   me: () => api.get<AuthMe>(`/auth/me`),
+  /** Cambio de la propia contraseña (obligatorio si es provisional). */
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post<void>(`/auth/change-password`, { currentPassword, newPassword }),
 };
 
 export const usersApi = {

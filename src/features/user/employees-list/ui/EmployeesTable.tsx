@@ -1,11 +1,8 @@
 import {
-  ITAlert,
   ITBadget,
   ITButton,
-  ITCheckbox,
   ITDataTable,
   ITFlex,
-  ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type {
@@ -14,10 +11,9 @@ import type {
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaUserTie } from "react-icons/fa";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
-import { personalApi, type PersonalProfile } from "@entities/hr";
+import type { PersonalProfile } from "@entities/hr";
 import { roleLabel, useRolesCatalog } from "@entities/user";
 
 const roleBadge = (role: string, label: string) => (
@@ -57,15 +53,8 @@ export default function EmployeesTable({
   reloadKey,
   onView,
   onEdit,
-  onChanged,
 }: Props) {
   const { t: tt } = useTranslation(["users"]);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [bulkDepartment, setBulkDepartment] = useState("");
-  const [bulkSubarea, setBulkSubarea] = useState("");
-  const [bulkChosen, setBulkChosen] = useState(false);
-  const [bulkSaving, setBulkSaving] = useState(false);
-  const [bulkError, setBulkError] = useState<string | null>(null);
   // Todos los departamentos y subáreas: también hay personal en los inactivos.
   const departmentOptions = departments.map((d) => ({ id: d.id, name: d.name }));
 
@@ -77,39 +66,6 @@ export default function EmployeesTable({
   const staffRoleOptions = useRolesCatalog()
     .filter((role) => role.active && role.staff)
     .map((role) => ({ id: role.key, name: role.name }));
-
-  const toggleSelected = (id: string) =>
-    setSelected((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-
-  const bulkSubareaOptions =
-    departments.find((d) => d.id === bulkDepartment)?.subareas.map((s) => ({ value: s.id, label: s.name })) ?? [];
-
-  /** Aplica departamento y subárea a los seleccionados (la subárea se limpia si no se elige una). */
-  const applyBulk = async () => {
-    setBulkSaving(true);
-    setBulkError(null);
-    try {
-      await personalApi.assignDepartments({
-        userIds: [...selected],
-        departmentId: bulkDepartment || null,
-        subareaId: bulkSubarea || null,
-      });
-      setSelected(new Set());
-      setBulkChosen(false);
-      setBulkDepartment("");
-      setBulkSubarea("");
-      onChanged();
-    } catch (e) {
-      setBulkError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBulkSaving(false);
-    }
-  };
 
   const columns: Column<PersonalProfile>[] = [
     {
@@ -246,69 +202,10 @@ export default function EmployeesTable({
     },
   ];
 
-  const selectColumn: Column<PersonalProfile> = {
-    key: "select",
-    label: "",
-    type: "string" as const,
-    width: 44,
-    sortable: false,
-    filter: false,
-    render: (u: PersonalProfile) => (
-      <ITCheckbox
-        name={`employee-${u.id}`}
-        checked={selected.has(u.id)}
-        onChange={() => toggleSelected(u.id)}
-      />
-    ),
-  };
-  const allColumns = canEdit ? [selectColumn, ...columns] : columns;
-
   return (
     <>
-      {canEdit && selected.size > 0 && (
-        <ITFlex align="center" gap={3} wrap="wrap" className="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <ITText className="!text-[11px] font-bold text-slate-700">
-            {tt("bulk.selected", { count: selected.size })}
-          </ITText>
-          <ITSelect
-            name="bulkDepartment"
-            label={tt("bulk.department")}
-            options={[
-              { value: "", label: tt("bulk.noDepartment") },
-              ...departmentOptions.map((d) => ({ value: d.id, label: d.name })),
-            ]}
-            value={bulkDepartment}
-            onChange={(e) => {
-              setBulkDepartment(e.target.value);
-              setBulkSubarea("");
-              setBulkChosen(true);
-            }}
-          />
-          <ITSelect
-            name="bulkSubarea"
-            label={tt("bulk.subarea")}
-            disabled={!bulkDepartment}
-            options={[{ value: "", label: tt("bulk.noSubarea") }, ...bulkSubareaOptions]}
-            value={bulkSubarea}
-            onChange={(e) => setBulkSubarea(e.target.value)}
-          />
-          <ITButton
-            variant="filled"
-            color="primary"
-            size="sm"
-            disabled={!bulkChosen || bulkSaving}
-            onClick={() => void applyBulk()}
-          >
-            <ITText className="!text-[11px] font-bold">{tt("bulk.apply")}</ITText>
-          </ITButton>
-          <ITButton variant="text" color="gray" size="sm" onClick={() => setSelected(new Set())}>
-            <ITText className="!text-[11px] font-bold">{tt("bulk.clear")}</ITText>
-          </ITButton>
-          {bulkError && <ITAlert variant="error">{bulkError}</ITAlert>}
-        </ITFlex>
-      )}
       <ITDataTable
-        columns={allColumns as unknown as Column<Record<string, unknown>>[]}
+        columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fetchData as unknown as (
           p: ITDataTableFetchParams

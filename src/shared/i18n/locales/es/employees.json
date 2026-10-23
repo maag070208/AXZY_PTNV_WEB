@@ -5,6 +5,83 @@
   "breadcrumb": "Personal",
   "newEmployee": "Nuevo empleado",
   "detail": {
+    "save": "Guardar cambios",
+    "guide": {
+      "label": "Langostin, guía del formulario",
+      "start": "Revisa los datos de la persona y corrige lo que haga falta. Con Enter pasas al siguiente campo.",
+      "fix": "Revisa los campos marcados en rojo antes de guardar.",
+      "saving": "Guardando…",
+      "fields": {
+        "name": "Nombre(s) de la persona. Es obligatorio.",
+        "paternalSurname": "Apellido paterno.",
+        "maternalSurname": "Apellido materno, si lo tiene.",
+        "employeeNumber": "Número de empleado. Debe coincidir con el del reloj.",
+        "jobTitle": "Puesto que desempeña.",
+        "rfc": "RFC con homoclave: 13 caracteres.",
+        "curp": "CURP: 18 caracteres.",
+        "nss": "NSS del IMSS: 11 dígitos.",
+        "personalPhone": "Celular personal a 10 dígitos.",
+        "workPhone": "Celular de la empresa a 10 dígitos.",
+        "email": "Correo de la persona.",
+        "postalCode": "Código postal de 5 dígitos.",
+        "emergencyContactPhone": "Teléfono del contacto de emergencia a 10 dígitos."
+      }
+    },
+    "completeness": "Datos capturados",
+    "completenessHint": "Aquí solo aparece lo que no está en el encabezado. Completa lo que falta desde Editar información.",
+    "noData": "Sin dato",
+    "uploadAction": "Subir archivo",
+    "addAnother": "Agregar otro",
+    "filesLabel": "Archivos",
+    "sections": {"activity": "Actividad", "documents": "Documentos", "clock": "Reloj checador", "info": "Datos del empleado"},
+    "activity": {
+      "loading": "Cargando actividad…",
+      "error": "No se pudo cargar la actividad",
+      "kpi": {
+        "units": "Equipo prestado",
+        "unitsHint": "{{count}} carta(s) responsiva(s)",
+        "letters": "Cartas activas",
+        "lettersHint": "a su nombre",
+        "tickets": "Tickets abiertos",
+        "ticketsHint": "creados o asignados",
+        "tasks": "Tareas pendientes",
+        "tasksHint": "sin completar"
+      },
+      "tabs": {
+        "loans": "Equipo prestado",
+        "kardex": "Kardex",
+        "tickets": "Tickets",
+        "tasks": "Tareas"
+      },
+      "status": {
+        "OPEN": "Abierto",
+        "IN_PROGRESS": "En progreso",
+        "IN_REVIEW": "En revisión",
+        "CLOSED": "Cerrado",
+        "COMPLETED": "Completada",
+        "PENDING": "Pendiente",
+        "ACTIVE": "Activa",
+        "PARTIAL": "Parcial",
+        "RETURNED": "Devuelta",
+        "CANCELLED": "Cancelada"
+      },
+      "kardex": {
+        "LOAN": "Préstamo",
+        "RETURN": "Devolución"
+      },
+      "relation": {
+        "CREATED": "Lo creó",
+        "ASSIGNED": "Asignado a esta persona"
+      },
+      "returnedCount": "{{count}} devuelto(s)",
+      "due": "vence {{date}}",
+      "empty": {
+        "loans": "No tiene equipo prestado.",
+        "kardex": "Sin movimientos de equipo.",
+        "tickets": "Sin tickets.",
+        "tasks": "Sin tareas."
+      }
+    },
     "loadingTitle": "Cargando…",
     "loadError": "No se pudo cargar el expediente",
     "title": "Información del Personal",

@@ -753,6 +753,11 @@
     }
   },
   "person": {
+    "punches": "Punches",
+    "punchDate": "Date",
+    "punchTime": "Time",
+    "punchMethod": "Type",
+    "noPunches": "No punches recorded.",
     "title": "Person record",
     "close": "Close",
     "loading": "Reading the record…",
@@ -772,6 +777,8 @@
     }
   },
   "employeeClock": {
+    "tiles": {"faces":"Faces","fingers":"Fingerprints","cards":"Cards","punches":"Punches today"},
+    "notEnrolled": "Not enrolled on this clock yet.",
     "title": "Time clock",
     "description": "Add this person to the clocks. For now it only writes to the test clock.",
     "noNumber": "Add the employee number in Personnel to add this person to the clock.",

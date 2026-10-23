@@ -18,6 +18,7 @@ import { APP_SCREENS, isScreenVisible, permissionApi, type AppScreen } from "@en
 import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
 import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
+import ForcePasswordChange from "./ForcePasswordChange";
 import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
 
 /** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
@@ -122,6 +123,12 @@ export default function PrivateRoutes() {
 
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  // Contraseña provisional: no se monta la app hasta cambiarla (el diálogo no
+  // se puede cerrar). Al guardarla, `/auth/me` refresca y esta marca baja.
+  if (user?.mustChangePassword) {
+    return <ForcePasswordChange />;
   }
 
   // El menú se arma desde el catálogo de pantallas (`APP_SCREENS`) y los

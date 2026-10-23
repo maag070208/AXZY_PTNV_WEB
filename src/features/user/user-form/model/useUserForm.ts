@@ -117,18 +117,6 @@ export type UniqueField = "username" | "email" | "employeeNumber";
 export type UniqueState = "idle" | "checking" | "available" | "taken";
 const UNIQUE_FIELDS: UniqueField[] = ["username", "email", "employeeNumber"];
 
-/** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
-export const composeFullName = (v: {
-  name?: string;
-  middleName?: string;
-  paternalSurname?: string;
-  maternalSurname?: string;
-}): string =>
-  [v.name, v.middleName, v.paternalSurname, v.maternalSurname]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-
 /** Divide un nombre completo almacenado en "name" a sus campos separados (fallback para datos viejos). */
 const splitStoredName = (full: string): Pick<UserFormValues, "name" | "middleName" | "paternalSurname" | "maternalSurname"> => {
   const parts = full.trim().split(/\s+/).filter(Boolean);
@@ -211,7 +199,7 @@ export const useUserForm = (userId?: string) => {
             username: u.username,
             email: u.email ?? "",
             password: "",
-            name: nameParts.name,
+            name: u.firstName ?? nameParts.name,
             middleName: u.middleName ?? nameParts.middleName ?? "",
             paternalSurname: u.paternalSurname ?? nameParts.paternalSurname ?? "",
             maternalSurname: u.maternalSurname ?? nameParts.maternalSurname ?? "",
@@ -412,7 +400,7 @@ export const useUserForm = (userId?: string) => {
     ];
     if (invalidSteps.length > 0) return { ok: false, step: Math.min(...invalidSteps), field: fieldErrors[0] };
 
-    const fullName = composeFullName(form);
+    const firstName = form.name.trim();
     setSaving(true);
     try {
       if (isEdit) {
@@ -423,7 +411,7 @@ export const useUserForm = (userId?: string) => {
           ...(editsPerson
             ? {
                 email: form.email || null,
-                name: fullName,
+                name: firstName,
                 middleName: form.middleName || null,
                 paternalSurname: form.paternalSurname || null,
                 maternalSurname: form.maternalSurname || null,
@@ -441,7 +429,7 @@ export const useUserForm = (userId?: string) => {
           username: form.username,
           email: form.email || undefined,
           password: form.password,
-          name: fullName,
+          name: firstName,
           middleName: form.middleName || undefined,
           paternalSurname: form.paternalSurname || undefined,
           maternalSurname: form.maternalSurname || undefined,

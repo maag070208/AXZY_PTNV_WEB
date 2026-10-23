@@ -753,6 +753,11 @@
     }
   },
   "person": {
+    "punches": "Checadas",
+    "punchDate": "Fecha",
+    "punchTime": "Hora",
+    "punchMethod": "Tipo",
+    "noPunches": "Sin checadas registradas.",
     "title": "Ficha de la persona",
     "close": "Cerrar",
     "loading": "Leyendo la ficha…",
@@ -772,6 +777,8 @@
     }
   },
   "employeeClock": {
+    "tiles": {"faces":"Rostros","fingers":"Huellas","cards":"Tarjetas","punches":"Checadas hoy"},
+    "notEnrolled": "Todavía no está dada de alta en este reloj.",
     "title": "Reloj checador",
     "description": "Alta de la persona en los relojes. Por ahora solo escribe en el reloj de prueba.",
     "noNumber": "Captura el número de empleado en Personal para poder darla de alta en el reloj.",

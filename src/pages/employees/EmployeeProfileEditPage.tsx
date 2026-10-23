@@ -1,5 +1,5 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
 import {
   ITAlert,
   ITButton,
@@ -8,7 +8,6 @@ import {
   ITInput,
   ITPage,
   ITSelect,
-  ITStepper,
   ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
@@ -28,7 +27,8 @@ import {
   validatePostal,
   validateRfc,
 } from "@shared/validation";
-import { i18n } from "@shared/i18n";
+import { dyn, i18n } from "@shared/i18n";
+import Langostin from "@shared/ui/langostin/Langostin";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
 const dateStrToLocal = (value?: string | null): Date | undefined => {
@@ -43,6 +43,9 @@ const localToDateStr = (value: Date): string => {
   const d = String(value.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 };
+
+/** Campos con guía de Langostin (por el `name` del input). */
+const HINT_FIELDS = new Set(["name", "paternalSurname", "maternalSurname", "employeeNumber", "jobTitle", "rfc", "curp", "nss", "personalPhone", "workPhone", "email", "postalCode", "emergencyContactPhone"]);
 
 interface AppStep {
   label: string;
@@ -104,7 +107,8 @@ export default function EmployeeProfileEditPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
 
   const detail = useEmployeeDetail(id);
-  const [step, setStep] = useState(0);
+  // Langostin sigue el campo donde está el cursor.
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -160,27 +164,13 @@ export default function EmployeeProfileEditPage() {
     return e;
   };
 
-  /** Paso donde vive el primer campo con error, para no dejarlo escondido. */
-  const errorStep = (found: Record<string, string>): number => {
-    const byStep: Array<[number, string[]]> = [
-      [0, ["name"]],
-      [1, ["rfc", "curp", "nss", "employeeNumber", "jobTitle"]],
-      [2, ["email", "postalCode", "personalPhone", "workPhone", "emergencyContactPhone"]],
-    ];
-    for (const [index, fields] of byStep) {
-      if (fields.some((field) => found[field])) return index;
-    }
-    return 0;
-  };
-
   const handleFinish = async () => {
-    // El asistente avisa "revisa los campos marcados", pero si el campo con
-    // error está en otro paso hay que llevarlo ahí: si no, no hay nada que ver.
     const errors = collectErrors();
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
-      setStep(errorStep(errors));
       detail.setError(i18n.t("common:validation.reviewFields"));
+      // Se lleva al primer campo con error: en una sola página basta enfocarlo.
+      document.querySelector<HTMLInputElement>(`[name="${Object.keys(errors)[0]}"]`)?.focus();
       return;
     }
     const normalized: FormState = Object.fromEntries(
@@ -476,6 +466,33 @@ export default function EmployeeProfileEditPage() {
     },
   ];
 
+  const hasErrors = Object.keys(errors).length > 0;
+  const hintKey = focusedInput && HINT_FIELDS.has(focusedInput) ? focusedInput : null;
+  const guide = detail.saving
+    ? tt("detail.guide.saving")
+    : hasErrors
+      ? tt("detail.guide.fix")
+      : hintKey
+        ? dyn(tt)(`detail.guide.fields.${hintKey}`)
+        : tt("detail.guide.start");
+
+  // Enter pasa al siguiente campo, como en el alta.
+  const handleEnter = (event: KeyboardEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement;
+    if (event.key !== "Enter" || target.tagName !== "INPUT" || target.getAttribute("role") === "combobox") return;
+    const fields = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("input, select, textarea")).filter(
+      (el) => !(el as HTMLInputElement).disabled && (el as HTMLInputElement).type !== "hidden" && el.tabIndex !== -1
+    );
+    const next = fields[fields.indexOf(target) + 1];
+    if (!next) return;
+    event.preventDefault();
+    next.focus();
+  };
+  const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
+    const name = (event.target as HTMLInputElement).name;
+    if (name) setFocusedInput(name);
+  };
+
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -495,17 +512,40 @@ export default function EmployeeProfileEditPage() {
         </ITAlert>
       )}
 
-      <ITStepper
-        steps={steps}
-        currentStep={step}
-        onStepChange={setStep}
-        onFinish={handleFinish}
-        allowClickToJump
-        useIcons
-        scrollableContent
-        maxContentHeight="60vh"
-        color="primary"
-      />
+      <ITFlex justify="end" align="center" gap={3} className="mb-6">
+        <ITButton variant="outlined" color="secondary" onClick={() => navigate(-1)} disabled={detail.saving}>
+          {tt("common:actions.cancel")}
+        </ITButton>
+        <ITButton variant="raised-text" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>
+          {tt("detail.save")}
+        </ITButton>
+      </ITFlex>
+
+      <div onKeyDown={handleEnter} onFocus={handleFocus}>
+        <ITFlex direction="column" gap={6}>
+          {steps.map((section) => (
+            <Fragment key={section.label}>
+              <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <header className="mb-5 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">{section.icon}</span>
+                  <h3 className="text-sm font-black uppercase tracking-wide text-slate-700">{section.label}</h3>
+                </header>
+                {section.content}
+              </section>
+            </Fragment>
+          ))}
+        </ITFlex>
+      </div>
+
+      {/* Langostin flota abajo a la derecha: guía del campo actual y avisa mientras guarda. */}
+      <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex items-end gap-3">
+        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-lg">
+          {guide}
+        </div>
+        <div className="pointer-events-auto drop-shadow-lg">
+          <Langostin anim={detail.saving ? "work" : "wave"} size={72} label={tt("detail.guide.label")} />
+        </div>
+      </div>
     </ITPage>
   );
 }

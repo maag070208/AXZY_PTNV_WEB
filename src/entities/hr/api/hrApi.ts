@@ -8,6 +8,7 @@ import type {
   PersonalStats,
   EmployeeDiscount,
   EmployeeDocument,
+  EmployeeOverview,
   DocumentType,
   Gender,
   BloodType,
@@ -37,6 +38,7 @@ export const personalApi = {
 
   photoRawUrl: (id: string) => `${API_CONSTANTS.BASE_URL}/hr/${id}/photo/raw`,
 
+  overview: (id: string) => api.get<EmployeeOverview>(`/hr/${id}/overview`),
   documents: (id: string) => api.get<EmployeeDocument[]>(`/hr/${id}/documents`),
   uploadDocument: (id: string, documentTypeId: string, file: File) => {
     const form = new FormData();

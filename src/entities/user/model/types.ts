@@ -12,6 +12,8 @@ export interface AuthUser {
   /** Roles efectivos: principal + adicionales (`GET /auth/me` y login). */
   roles?: UserRole[];
   departmentId?: string | null;
+  /** Contraseña provisional: la app obliga a cambiarla antes de dejar entrar. */
+  mustChangePassword?: boolean;
   /**
    * Permisos efectivos del usuario (`GET /auth/me`): clave → alcance, solo los
    * distintos de NONE. Opcional porque las sesiones persistidas antes del
@@ -83,6 +85,8 @@ export interface User extends AuthUser {
   area?: string;
   employeeNumber?: string;
   company?: string | null;
+  /** Primer nombre crudo; `name` ya viene compuesto con los apellidos. */
+  firstName?: string | null;
   departmentId?: string | null;
   department?: { id: string; name: string } | null;
   subareaId?: string | null;
