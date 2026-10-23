@@ -163,13 +163,14 @@ export default function EmployeeDocumentsCard({
         <ITDropfile
           key={dropfileKey}
           onFileSelect={() => {}}
+          autoUpload
           onSubmit={async (file) => {
             if (!uploadingDocTypeId) return;
             const ok = await onUpload(uploadingDocTypeId, file);
-            if (ok) {
-              setDropfileKey((k) => k + 1);
-              onCloseUpload();
-            }
+            // Un fallo se lanza para que el dropfile muestre el estado de error.
+            if (!ok) throw new Error("document upload failed");
+            setDropfileKey((k) => k + 1);
+            onCloseUpload();
           }}
           acceptedFileTypes={[FileTypeEnum.PNG, FileTypeEnum.JPG, FileTypeEnum.JPEG, FileTypeEnum.PDF]}
           showStatusBadge

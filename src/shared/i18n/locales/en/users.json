@@ -184,6 +184,35 @@
     "changeFile": "Change file",
     "docsRequired": "Upload the required documents: {{docs}}.",
     "docsUploading": "Uploading documents…",
+    "checking": "Checking…",
+    "available": "Available",
+    "saving": "Saving…",
+    "duplicate": {
+      "username": "A user with that username already exists",
+      "email": "A user with that email already exists",
+      "employeeNumber": "A user with that employee number already exists"
+    },
+    "cancel": "Cancel",
+    "create": "Create user",
+    "tabHasErrors": "Has fields to fix",
+    "guideStart": "Fill in the person's details. If the username, email or employee number already exists, I'll tell you right away.",
+    "guideFix": "Review the fields marked in red before saving.",
+    "hints": {
+      "name": "Type the first name. It shows in lists and on the clock.",
+      "secondName": "Middle name, if the person has one. You can leave it empty.",
+      "paternalSurname": "The person's paternal surname.",
+      "maternalSurname": "Maternal surname, if any.",
+      "email": "The person's email. Used for the registration notice; I check it is not already taken.",
+      "employeeNumber": "Employee number. It is unique and the clock uses it to identify the person.",
+      "jobTitle": "Job title, for example: Receptionist.",
+      "username": "Username used to sign in. It must be unique; I check it is free.",
+      "role": "Main role: defines what the person can see and do in the system.",
+      "password": "Initial password. At least 6 characters; the person can change it later."
+    },
+    "guideLabel": "Langostin, form guide",
+    "ready": "All set! Review the details and create the user.",
+    "created": "User saved",
+    "updated": "Changes saved",
     "validation": {
       "usernameRequired": "Username is required",
       "usernameMin": "Username must have at least {{min}} characters",
@@ -195,6 +224,7 @@
       "nameMax": "Name must have at most {{max}} characters",
       "emailMax": "Email must have at most {{max}} characters",
       "emailRequired": "Email is required",
+      "paternalSurnameRequired": "Paternal surname is required",
       "employeeNumberRequired": "Employee number is required",
       "employeeNumberMax": "Employee number must have at most {{max}} characters",
       "jobTitleMax": "Job title must have at most {{max}} characters"

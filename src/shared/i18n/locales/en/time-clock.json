@@ -484,6 +484,35 @@
     }
   },
   "people": {
+
+    "view": {
+      "title": "People on the clock",
+      "connected": "Clock connected",
+      "disconnected": "No response from the clock",
+      "refreshAll": "Refresh all",
+      "search": "Search by name or number…",
+      "empty": "Nobody matches the search.",
+      "progress": "{{done}} of {{total}}",
+      "metrics": {
+        "total": "People on the clock",
+        "face": "With face",
+        "fingerprint": "With fingerprint",
+        "card": "With card",
+        "missing": "{{count}} missing"
+      },
+      "chips": {
+        "face": "Face",
+        "fingerprint": "Fingerprint",
+        "card": "Card"
+      },
+      "filters": {
+        "all": "All",
+        "noFace": "No face",
+        "noFingerprint": "No fingerprint",
+        "noCard": "No card"
+      },
+      "more": "More actions"
+    },
     "title": "Clock people",
     "description": "Enroll, rename and remove people on the clock, and register or remove their cards. Every change WRITES to the clock.",
     "warning": "Careful: changes are applied directly on the selected clock.",

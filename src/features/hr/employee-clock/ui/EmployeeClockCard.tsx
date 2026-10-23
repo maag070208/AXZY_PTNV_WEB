@@ -85,7 +85,7 @@ export default function EmployeeClockCard({
 
       {fx.status?.clocks.map((c) => {
         const tone = c.connection === "NO_RESPONSE" ? STATE_TONE.NO_RESPONSE : STATE_TONE[c.state ?? "SIN_ALTA"];
-        const label = c.connection === "NO_RESPONSE" ? t("employeeClock.state.NO_RESPONSE") : t(`employeeClock.state.${c.state}`);
+        const label = c.connection === "NO_RESPONSE" ? t("employeeClock.state.NO_RESPONSE") : t(`employeeClock.state.${c.state ?? "SIN_ALTA"}`);
         const canAdd = canWrite && !!number && c.connection === "ONLINE" && c.state === "SIN_ALTA" && c.canAlta;
         return (
           <ITFlex key={c.serial} align="center" justify="between" gap={3} wrap="wrap" className="rounded-xl border border-slate-200 px-4 py-3">

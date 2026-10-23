@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaChartArea, FaChartBar, FaClock, FaExclamationTriangle, FaSyncAlt, FaUsers, FaWifi } from "react-icons/fa";
+import { FaChartArea, FaChartBar, FaClock, FaExclamationTriangle, FaFingerprint, FaServer, FaSyncAlt, FaUsers, FaVideo, FaWifi, FaChartLine } from "react-icons/fa";
 import { ITButton, ITDataTable, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
 import type { Column, ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
 import { dateLocale } from "@shared/i18n/format";
@@ -20,6 +20,14 @@ import { useTimeClockDashboard } from "../model/useTimeClockDashboard";
 type Section = "status" | "people" | "events" | "camera" | "reader" | "clocks";
 const SECTIONS: Section[] = ["status", "people", "events", "camera", "reader", "clocks"];
 const ALL_CLOCKS = "all";
+const SECTION_ICON: Record<Section, React.ReactNode> = {
+  status: <FaChartLine size={12} />,
+  people: <FaUsers size={12} />,
+  events: <FaClock size={12} />,
+  camera: <FaVideo size={12} />,
+  reader: <FaFingerprint size={12} />,
+  clocks: <FaServer size={12} />,
+};
 type ChartVariant = "area" | "bar";
 type OpenPerson = { serial: string; employeeNumber: string };
 type Punch = SummaryClock["recentPunches"][number] & { id: string };
@@ -157,9 +165,9 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
   const columns: Column<Punch>[] = [
     {
       key: "name",
+      type: "string",
       label: t("dashboard.table.person"),
       width: "45%",
-      filter: true,
       sortable: true,
       truncate: true,
       render: (row) =>
@@ -174,6 +182,7 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
     },
     {
       key: "occurredAt",
+      type: "string",
       label: t("dashboard.table.time"),
       width: "25%",
       sortable: true,
@@ -185,11 +194,11 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
     },
     {
       key: "method",
+      type: "string",
       label: t("dashboard.table.method"),
       width: "30%",
-      filter: true,
       sortable: true,
-      truncate: true,
+      render: (row) => <span className="text-slate-600">{t(`methods.${row.method}`, { defaultValue: row.method })}</span>,
     },
   ];
   const fetchPunches = useMemo(
@@ -235,24 +244,13 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
       )}
 
       {clock.device && (
-        <dl className="grid grid-cols-2 gap-3 border-t border-dashed border-slate-200 py-4 text-xs md:grid-cols-4">
-          <div>
-            <dt className="text-slate-500">{t("dashboard.device.name")}</dt>
-            <dd className="text-slate-800">{clock.device.deviceName ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">{t("dashboard.device.firmware")}</dt>
-            <dd className="text-slate-800">{clock.device.firmwareVersion ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">{t("dashboard.device.serial")}</dt>
-            <dd className="break-all font-mono text-slate-800">{clock.serial}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">{t("dashboard.device.lastRead")}</dt>
-            <dd className="text-slate-800">{fmt(clock.lastReadAt)}</dd>
-          </div>
-        </dl>
+        <p className="border-t border-dashed border-slate-200 py-3 text-xs text-slate-500">
+          <span className="font-mono text-slate-700">{clock.serial}</span>
+          {" · "}
+          {t("dashboard.device.firmware")} {clock.device.firmwareVersion ?? "—"}
+          {" · "}
+          {t("dashboard.device.lastRead")} {fmt(clock.lastReadAt)}
+        </p>
       )}
 
       {clock.alerts.length > 0 && (
@@ -429,10 +427,12 @@ export default function TimeClockDashboardView() {
   const serial = selected?.serial ?? clocks.find((c) => c.countsAttendance)?.serial ?? clocks[0]?.serial ?? "";
   const visibleClocks = selected ? [selected] : clocks;
 
+  const showClockPicker = section !== "clocks" && section !== "reader" && clocks.length > 0;
+
   return (
     <ITFlex direction="column" gap={5}>
-      <ITFlex align="end" justify="between" gap={3} wrap="wrap">
-        <nav role="tablist" className="flex gap-6 overflow-x-auto border-b border-slate-200">
+      <ITFlex align="center" justify="between" gap={3} wrap="wrap">
+        <nav role="tablist" className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
           {SECTIONS.map((s) => (
             <button
               key={s}
@@ -440,16 +440,17 @@ export default function TimeClockDashboardView() {
               role="tab"
               aria-selected={section === s}
               onClick={() => setSection(s)}
-              className={`-mb-px whitespace-nowrap border-b-2 pb-3 text-sm font-medium transition ${
-                section === s ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-800"
+              className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                section === s ? "bg-slate-900 text-white shadow" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
+              {SECTION_ICON[s]}
               {t(`dashboard.sections.${s}`)}
             </button>
           ))}
         </nav>
         <ITFlex align="center" gap={3} wrap="wrap">
-          {section !== "clocks" && section !== "reader" && clocks.length > 0 && (
+          {showClockPicker && (
             <ITSearchSelect
               name="timeClockDashboardClock"
               label={t("dashboard.clock")}
@@ -459,15 +460,15 @@ export default function TimeClockDashboardView() {
               ]}
               value={selected ? picked : clocks.length > 1 ? ALL_CLOCKS : (clocks[0]?.serial ?? "")}
               onChange={(value) => setPicked(String(value))}
-              className="min-w-[240px]"
+              className="min-w-[220px]"
             />
           )}
-          {section === "status" && fx.data && (
-            <ITText className="text-xs text-slate-400">
+          {fx.data && (
+            <ITText className="hidden text-xs text-slate-400 md:block">
               {t("dashboard.generatedAt", { time: new Date(fx.data.generatedAt).toLocaleTimeString(dateLocale()) })}
             </ITText>
           )}
-          <ITButton variant="outlined" color="secondary" size="sm" disabled={fx.loading} onClick={fx.reload}>
+          <ITButton variant="raised-text" color="primary" size="sm" disabled={fx.loading} onClick={fx.reload}>
             <ITFlex align="center" gap={2}>
               <FaSyncAlt size={11} className={fx.loading ? "animate-spin" : ""} />
               {t("dashboard.refresh")}

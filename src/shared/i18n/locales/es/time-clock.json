@@ -484,6 +484,35 @@
     }
   },
   "people": {
+
+    "view": {
+      "title": "Personas del reloj",
+      "connected": "Reloj conectado",
+      "disconnected": "Sin respuesta del reloj",
+      "refreshAll": "Actualizar todo",
+      "search": "Buscar por nombre o número…",
+      "empty": "Nadie coincide con la búsqueda.",
+      "progress": "{{done}} de {{total}}",
+      "metrics": {
+        "total": "Personas en el reloj",
+        "face": "Con rostro",
+        "fingerprint": "Con huella",
+        "card": "Con tarjeta",
+        "missing": "faltan {{count}}"
+      },
+      "chips": {
+        "face": "Rostro",
+        "fingerprint": "Huella",
+        "card": "Tarjeta"
+      },
+      "filters": {
+        "all": "Todos",
+        "noFace": "Sin rostro",
+        "noFingerprint": "Sin huella",
+        "noCard": "Sin tarjeta"
+      },
+      "more": "Más acciones"
+    },
     "title": "Personas del reloj",
     "description": "Da de alta, renombra y da de baja personas en el reloj, y registra o quita sus tarjetas. Cada cambio ESCRIBE en el reloj.",
     "warning": "Cuidado: los cambios se aplican directamente en el reloj seleccionado.",

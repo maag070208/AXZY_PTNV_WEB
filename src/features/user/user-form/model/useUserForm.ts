@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
@@ -92,9 +92,30 @@ const VALIDATED_FIELDS: (keyof UserFormValues)[] = [
   "password",
   "email",
   "name",
+  "paternalSurname",
   "employeeNumber",
   "jobTitle",
 ];
+
+/** Nombre de usuario sugerido: primernombre.primerapellido, sin acentos ni espacios. */
+const suggestUsername = (name: string, paternal: string): string => {
+  const slug = (value: string) =>
+    value
+      .trim()
+      .split(/\s+/)[0]
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+  const first = slug(name);
+  const last = slug(paternal);
+  return first && last ? `${first}.${last}` : "";
+};
+
+/** Datos que no pueden repetirse entre usuarios. */
+export type UniqueField = "username" | "email" | "employeeNumber";
+export type UniqueState = "idle" | "checking" | "available" | "taken";
+const UNIQUE_FIELDS: UniqueField[] = ["username", "email", "employeeNumber"];
 
 /** Compone el nombre completo "name" (para el modelo User) desde los campos separados. */
 export const composeFullName = (v: {
@@ -121,7 +142,8 @@ const splitStoredName = (full: string): Pick<UserFormValues, "name" | "middleNam
 };
 
 /** Resultado de guardar: `step` es el paso a mostrar si falla (`null` si no hay campo que señalar). */
-export type SubmitResult = { ok: true } | { ok: false; step: number | null };
+/** `field` es el primer campo con error, para enfocarlo en el formulario. */
+export type SubmitResult = { ok: true } | { ok: false; step: number | null; field?: keyof UserFormValues };
 
 /**
  * Formulario de cuenta. Sin argumentos toma el id de la ruta (`/users/:id/edit`,
@@ -154,6 +176,9 @@ export const useUserForm = (userId?: string) => {
     subareaId: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Disponibilidad en vivo de los datos únicos (se consulta a la base con un pequeño retraso).
+  const [uniqueness, setUniqueness] = useState<Record<UniqueField, UniqueState>>({ username: "idle", email: "idle", employeeNumber: "idle" });
+  const uniqueTimers = useRef<Partial<Record<UniqueField, number>>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -223,8 +248,44 @@ export const useUserForm = (userId?: string) => {
     actions: guidance.actions.map((a) => dyn(tt)(a)),
   };
 
+  /**
+   * Pregunta a la base si el dato está libre. Solo cuando el valor es válido y
+   * la cuenta lo edita aquí (si el expediente lo guarda, no se valida en vivo).
+   */
+  const checkUnique = (field: UniqueField, value: string, delay: number) => {
+    window.clearTimeout(uniqueTimers.current[field]);
+    const trimmed = value.trim();
+    const editable = editsPerson || field === "username";
+    if (!editable || !trimmed || validateField(field, value)) {
+      setUniqueness((u) => ({ ...u, [field]: "idle" }));
+      return;
+    }
+    setUniqueness((u) => ({ ...u, [field]: "checking" }));
+    uniqueTimers.current[field] = window.setTimeout(async () => {
+      try {
+        const { available } = await usersApi.availability(field, trimmed, id);
+        setUniqueness((u) => ({ ...u, [field]: available ? "available" : "taken" }));
+        setFieldError(field, available ? null : i18n.t(`users:form.duplicate.${field}`));
+      } catch {
+        setUniqueness((u) => ({ ...u, [field]: "idle" }));
+      }
+    }, delay);
+  };
+
+  // Mientras la persona no escriba su propio usuario, se sugiere primernombre.primerapellido.
+  const usernameTouched = useRef(false);
+
   const handleField = (field: keyof UserFormValues, value: string) => {
-    setForm((f) => ({ ...f, [field]: value }));
+    if (field === "username") usernameTouched.current = true;
+    setForm((f) => {
+      const next = { ...f, [field]: value };
+      if ((field === "name" || field === "paternalSurname") && !usernameTouched.current && !isEdit) {
+        next.username = suggestUsername(next.name, next.paternalSurname);
+        if (next.username) checkUnique("username", next.username, 450);
+      }
+      return next;
+    });
+    if (UNIQUE_FIELDS.includes(field as UniqueField)) checkUnique(field as UniqueField, value, 450);
     // Al escribir se limpia el error del campo; reaparece al salir (blur) o al guardar.
     setErrors((prev) => {
       if (!(field in prev)) return prev;
@@ -264,6 +325,9 @@ export const useUserForm = (userId?: string) => {
         if (value.length > LIMITS.password.max)
           return i18n.t("users:form.validation.passwordMax", { max: LIMITS.password.max });
         return null;
+      case "paternalSurname":
+        if (!isEdit && !trimmed) return i18n.t("users:form.validation.paternalSurnameRequired");
+        return null;
       case "name":
         if (!trimmed) return i18n.t("users:form.validation.nameRequired");
         if (trimmed.length > LIMITS.name.max)
@@ -290,6 +354,7 @@ export const useUserForm = (userId?: string) => {
 
   const handleBlur = (field: keyof UserFormValues) => {
     setFieldError(field, validateField(field, String(form[field] ?? "")));
+    if (UNIQUE_FIELDS.includes(field as UniqueField)) checkUnique(field as UniqueField, String(form[field] ?? ""), 0);
   };
 
   const handleDepartmentChange = (value: string) => {
@@ -311,7 +376,7 @@ export const useUserForm = (userId?: string) => {
    * laborales. Este formulario solo los captura al dar de alta o para una cuenta
    * sin expediente; con expediente ni se validan ni se mandan.
    */
-  const RECORD_FIELDS: (keyof UserFormValues)[] = ["name", "email", "employeeNumber", "jobTitle"];
+  const RECORD_FIELDS: (keyof UserFormValues)[] = ["name", "paternalSurname", "email", "employeeNumber", "jobTitle"];
 
   /** Paso del formulario en el que vive un campo (solo cuentan los pasos que se muestran). */
   const stepOfField = (field: keyof UserFormValues): number =>
@@ -345,7 +410,7 @@ export const useUserForm = (userId?: string) => {
       ...fieldErrors.map(stepOfField),
       ...(docsMissing ? [editsPerson ? 3 : 2] : []),
     ];
-    if (invalidSteps.length > 0) return { ok: false, step: Math.min(...invalidSteps) };
+    if (invalidSteps.length > 0) return { ok: false, step: Math.min(...invalidSteps), field: fieldErrors[0] };
 
     const fullName = composeFullName(form);
     setSaving(true);
@@ -398,17 +463,29 @@ export const useUserForm = (userId?: string) => {
           // Correo de alta con los documentos adjuntos (fire-and-forget).
           void personalApi.notifyRegistration(created.id).catch(() => undefined);
         }
-        // Alta en los relojes que aceptan escritura desde la web (hoy, el de prueba).
+        // Alta en los relojes que aceptan escritura desde la web. Se espera el resultado
+        // para mostrar UN solo toast: la pantalla guarda un único mensaje a la vez.
+        let clockMessage: string | null = null;
+        let clockOk = true;
         if (canWriteClock) {
-          void timeClockApi
-            .employeeClockAltaAll(created.id)
-            .then(({ results }) => {
-              const message = describeClockSync(results, "alta");
-              if (message) dispatch(showToast({ message, type: results.every((r) => r.ok) ? "success" : "info" }));
-            })
-            .catch(() => dispatch(showToast({ message: i18n.t("time-clock:clockSync.altaRequestFailed"), type: "error" })));
+          try {
+            const { results } = await timeClockApi.employeeClockAltaAll(created.id);
+            clockMessage = describeClockSync(results, "alta");
+            clockOk = results.every((r) => r.ok);
+          } catch {
+            clockMessage = i18n.t("time-clock:clockSync.altaRequestFailed");
+            clockOk = false;
+          }
         }
+        const saved = i18n.t("users:form.created");
+        dispatch(
+          showToast({
+            message: clockMessage ? `${saved} · ${clockMessage}` : saved,
+            type: clockOk ? "success" : "warning",
+          })
+        );
       }
+      if (isEdit) dispatch(showToast({ message: i18n.t("users:form.updated"), type: "success" }));
       return { ok: true };
     } catch (e: any) {
       const code: unknown = e?.code;
@@ -419,7 +496,7 @@ export const useUserForm = (userId?: string) => {
           code === "EMAIL_TAKEN" ? "email" : code === "USERNAME_TAKEN" ? "username" : "employeeNumber";
         setFieldError(field, msg);
         dispatch(showToast({ message: msg, type: "error" }));
-        return { ok: false, step: stepOfField(field) };
+        return { ok: false, step: stepOfField(field), field };
       }
       setError(msg);
       return { ok: false, step: null };
@@ -456,6 +533,7 @@ export const useUserForm = (userId?: string) => {
     departments,
     form,
     errors,
+    uniqueness,
     handleField,
     handleBlur,
     handleDepartmentChange,

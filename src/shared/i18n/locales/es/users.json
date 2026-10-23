@@ -184,6 +184,35 @@
     "changeFile": "Cambiar archivo",
     "docsRequired": "Sube los documentos obligatorios: {{docs}}.",
     "docsUploading": "Subiendo documentos…",
+    "checking": "Verificando…",
+    "available": "Disponible",
+    "saving": "Guardando…",
+    "duplicate": {
+      "username": "Ya existe un usuario con ese nombre de usuario",
+      "email": "Ya existe un usuario con ese correo",
+      "employeeNumber": "Ya existe un usuario con ese número de empleado"
+    },
+    "cancel": "Cancelar",
+    "create": "Crear usuario",
+    "tabHasErrors": "Tiene campos por corregir",
+    "guideStart": "Llena los datos de la persona. Si el usuario, el correo o el número de empleado ya existen, te aviso al momento.",
+    "guideFix": "Revisa los campos marcados en rojo antes de guardar.",
+    "hints": {
+      "name": "Escribe el nombre de pila. Así aparece en las listas y en el reloj.",
+      "secondName": "Segundo nombre, si la persona lo tiene. Puedes dejarlo vacío.",
+      "paternalSurname": "Apellido paterno de la persona.",
+      "maternalSurname": "Apellido materno, si lo tiene.",
+      "email": "Correo de la persona. Lo uso para el aviso de alta y se revisa que no esté repetido.",
+      "employeeNumber": "Número de empleado. Es único y lo usa el reloj para identificar a la persona.",
+      "jobTitle": "Puesto que desempeña, por ejemplo: Recepcionista.",
+      "username": "Nombre con el que inicia sesión. Debe ser único; yo reviso que esté libre.",
+      "role": "Rol principal: define lo que puede ver y hacer en el sistema.",
+      "password": "Contraseña inicial. Mínimo 6 caracteres; la persona la puede cambiar después."
+    },
+    "guideLabel": "Langostin, guía del formulario",
+    "ready": "¡Todo listo! Revisa los datos y crea el usuario.",
+    "created": "Usuario guardado",
+    "updated": "Cambios guardados",
     "validation": {
       "usernameRequired": "El usuario es obligatorio",
       "usernameMin": "El usuario debe tener al menos {{min}} caracteres",
@@ -195,6 +224,7 @@
       "nameMax": "El nombre debe tener máximo {{max}} caracteres",
       "emailMax": "El correo debe tener máximo {{max}} caracteres",
       "emailRequired": "El correo es obligatorio",
+      "paternalSurnameRequired": "El apellido paterno es obligatorio",
       "employeeNumberRequired": "El número de empleado es obligatorio",
       "employeeNumberMax": "El número de empleado debe tener máximo {{max}} caracteres",
       "jobTitleMax": "El puesto debe tener máximo {{max}} caracteres"

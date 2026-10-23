@@ -146,7 +146,7 @@ export const timeClockApi = {
   registerClock: (input: { url: string; name?: string; countsAttendance?: boolean }) =>
     api.post<TimeClockDevice>(`/time-clock/clocks`, input),
   /** Cambia cómo lo usa el sistema (nombre, si cuenta para entradas/salidas); no toca el reloj. */
-  updateClock: (serial: string, changes: { name?: string; countsAttendance?: boolean }) =>
+  updateClock: (serial: string, changes: { name?: string; countsAttendance?: boolean; writeEnabled?: boolean }) =>
     api.patch<TimeClockDevice>(clockPath(serial), changes),
   /** Deja de sincronizar el reloj; sus checadas se quedan. */
   retireClock: (serial: string) => api.delete<{ clockSerial: string }>(clockPath(serial)),

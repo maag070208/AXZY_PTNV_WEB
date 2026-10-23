@@ -1,6 +1,7 @@
 # Nada que no sea necesario para `vite build` (el build context pesa de más).
 node_modules
 dist
+dist-landing
 dist-electron
 release
 build

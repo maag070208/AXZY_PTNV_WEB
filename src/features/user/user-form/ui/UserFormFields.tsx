@@ -9,6 +9,7 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
+  ITSearchSelect,
   ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
@@ -24,9 +25,18 @@ import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
 import { roleLabel } from "@entities/user";
 import type { UserFormValues } from "../model/useUserForm";
+import type { UniqueState, UniqueField } from "../model/useUserForm";
+
+/** Aviso debajo de un dato único: "Disponible" cuando está libre. Mientras verifica, Langostin flota abajo a la derecha. */
+function UniqueHint({ state }: { state?: UniqueState }) {
+  const { t: tt } = useTranslation("users");
+  if (state === "available") return <span className="mt-1 block text-[11px] text-emerald-600">{tt("form.available")}</span>;
+  return null;
+}
 
 interface Props {
   step: "personal" | "access" | "org" | "docs";
+  uniqueness?: Record<UniqueField, UniqueState>;
   isEdit: boolean;
   /**
    * ¿Se editan aquí los datos de la persona (nombre, apellidos, correo, nº de
@@ -79,6 +89,7 @@ function SectionHeader({
 
 export default function UserFormFields({
   step,
+  uniqueness,
   isEdit,
   personFields = true,
   form,
@@ -120,16 +131,18 @@ export default function UserFormFields({
               <ITInput name="u_second" label={tt("form.secondName")} value={form.middleName} onChange={(e) => onFieldChange("middleName", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
-              <ITInput name="u_apa" label={tt("form.paternalSurname")} value={form.paternalSurname} onChange={(e) => onFieldChange("paternalSurname", e.target.value)} />
+              <ITInput name="u_apa" label={tt("form.paternalSurname")} value={form.paternalSurname} onChange={(e) => onFieldChange("paternalSurname", e.target.value)} onBlur={blob("paternalSurname")} required={!isEdit} error={fieldError("paternalSurname")} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_ama" label={tt("form.maternalSurname")} value={form.maternalSurname} onChange={(e) => onFieldChange("maternalSurname", e.target.value)} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_email" type="email" label={tt("form.email")} value={form.email} onChange={(e) => onFieldChange("email", e.target.value)} onBlur={blob("email")} placeholder={tt("form.emailPlaceholder")} required={!isEdit} error={fieldError("email")} />
+              <UniqueHint state={uniqueness?.email} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_num" label={tt("form.employeeNo")} value={form.employeeNumber} onChange={(e) => onFieldChange("employeeNumber", e.target.value)} onBlur={blob("employeeNumber")} required={!isEdit} error={fieldError("employeeNumber")} />
+              <UniqueHint state={uniqueness?.employeeNumber} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_jobTitle" label={tt("form.position")} value={form.jobTitle} onChange={(e) => onFieldChange("jobTitle", e.target.value)} onBlur={blob("jobTitle")} error={fieldError("jobTitle")} />
@@ -149,6 +162,7 @@ export default function UserFormFields({
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_username" label={tt("form.username")} value={form.username} onChange={(e) => onFieldChange("username", e.target.value)} onBlur={blob("username")} required error={fieldError("username")} />
+              <UniqueHint state={uniqueness?.username} />
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITFlex align="end" gap={2}>
@@ -204,10 +218,10 @@ export default function UserFormFields({
           />
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={6}>
-              <ITSelect name="u_dept" label={tt("form.department")} options={activeDepartments.map((d) => ({ value: d.id, label: d.name }))} value={form.departmentId} onChange={(e) => onDepartmentChange(e.target.value)} />
+              <ITSearchSelect name="u_dept" label={tt("form.department")} options={activeDepartments.map((d) => ({ value: d.id, label: d.name }))} value={form.departmentId} onChange={(value) => onDepartmentChange(String(value))} />
             </ITGrid>
             <ITGrid item xs={12} md={6}>
-              <ITSelect name="u_sub" label={tt("form.subarea")} options={(selectedDept?.subareas ?? []).map((s) => ({ value: s.id, label: s.name }))} value={form.subareaId} onChange={(e) => onFieldChange("subareaId", e.target.value)} />
+              <ITSearchSelect name="u_sub" label={tt("form.subarea")} options={(selectedDept?.subareas ?? []).map((s) => ({ value: s.id, label: s.name }))} value={form.subareaId} onChange={(value) => onFieldChange("subareaId", String(value))} />
             </ITGrid>
           </ITGrid>
         </section>
@@ -234,6 +248,7 @@ export default function UserFormFields({
                 <ITFlex direction="column" gap={1}>
                   <ITText className="text-[11px] font-bold text-slate-600">{doc.label}</ITText>
                   <ITDropfile
+                    autoUpload
                     onFileSelect={() => undefined}
                     onSubmit={(file) => onPickDoc?.(doc.key, file)}
                     acceptedFileTypes={[

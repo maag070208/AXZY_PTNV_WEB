@@ -10,6 +10,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5006 --strictPort --host 0.0.0.0",
+    "dev:landing": "vite --config vite.landing.config.ts",
+    "build:landing": "tsc -p tsconfig.landing.json && vite build --config vite.landing.config.ts",
+    "preview:landing": "vite preview --config vite.landing.config.ts",
     "server": "vite preview --port 5006 --strictPort --host 127.0.0.1",
     "start": "yarn run build && yarn run server",
     "build": "tsc -b && vite build --mode development",
@@ -29,7 +32,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@axzydev/axzy_ui_system": "1.7.3",
+    "@axzydev/axzy_ui_system": "1.7.4",
     "@react-pdf/renderer": "^4.6.1",
     "@reduxjs/toolkit": "^2.5.1",
     "ably": "^2.27.0",

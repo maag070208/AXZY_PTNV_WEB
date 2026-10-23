@@ -19,6 +19,9 @@ export const authApi = {
 };
 
 export const usersApi = {
+  /** ¿El usuario, correo o número de empleado está libre? (POST para no mandar el dato en la URL). */
+  availability: (field: "username" | "email" | "employeeNumber", value: string, exceptId?: string) =>
+    api.post<{ available: boolean }>("/users/availability", { field, value, exceptId }),
   table: (params: ITDataTableFetchParamsPost) =>
     tableRequest<User>(`/users/query`, params),
   list: (role?: UserRole) => {
