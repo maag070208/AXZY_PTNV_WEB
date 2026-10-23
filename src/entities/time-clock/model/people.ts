@@ -3,6 +3,8 @@
 export interface TimeClockPerson {
   employeeNumber: string;
   name: string;
+  /** Usuario del sistema vinculado a este número (null si no está vinculado). */
+  userId: string | null;
   cards: string[];
 }
 

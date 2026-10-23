@@ -23,7 +23,7 @@ export default function TicketsListPage() {
   const list = useTicketsList();
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("list.title")}
       description={tt("list.description")}

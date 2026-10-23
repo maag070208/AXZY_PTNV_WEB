@@ -69,7 +69,7 @@ export default function UserFormPage() {
 
   if (userForm.loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full!"
+      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={title}
         description={description}
@@ -178,7 +178,7 @@ export default function UserFormPage() {
   ];
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={title}
       description={description}

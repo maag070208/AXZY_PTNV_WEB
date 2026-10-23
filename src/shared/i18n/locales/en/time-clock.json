@@ -486,6 +486,8 @@
   "people": {
 
     "view": {
+      "columns": {"person": "Person", "progress": "Progress"},
+      "count": "{{count}} person(s) on the clock",
       "title": "People on the clock",
       "connected": "Clock connected",
       "disconnected": "No response from the clock",
@@ -660,6 +662,7 @@
       "NOT_READ": "Not read"
     },
     "alerts": {
+      "linkNow": "View and link",
       "NO_RESPONSE": "The clock does not respond",
       "CREDENTIALS": "The clock rejected the credentials",
       "SUSPICIOUS_ROSTER": "Suspicious roster review: no removals were created",

@@ -182,7 +182,7 @@ export default function EditLoanPage() {
 
   if (loading || !loan) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full!"
+      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loans.edit")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
@@ -192,7 +192,7 @@ export default function EditLoanPage() {
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("loans.edit")}
       description={`${loan.number}`}

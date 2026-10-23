@@ -147,7 +147,7 @@ export default function NewLoanPage() {
 
   if (loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full!"
+      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loans.new")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
@@ -157,7 +157,7 @@ export default function NewLoanPage() {
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("loans.new")}
       description={t("loans.formSub")}

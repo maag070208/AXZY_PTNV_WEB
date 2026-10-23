@@ -65,7 +65,7 @@ export function KitchenOverviewPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("overview.title")}
       description={t("overview.description")}
@@ -87,7 +87,7 @@ export function KitchenItemsPage() {
   const canCount = useCan("kitchen.adjust");
   const [newSignal, setNewSignal] = useState(0);
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("items.title")}
       description={t("items.description")}
@@ -127,7 +127,7 @@ export function KitchenItemDetailPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("items.detail")}
       icon={<FaBoxes size={20} />}
@@ -143,7 +143,7 @@ export function KitchenItemImportPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("import.title")}
       description={t("import.description")}
@@ -166,7 +166,7 @@ export function KitchenLotsPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("lots.title")}
       description={t("lots.description")}
@@ -183,7 +183,7 @@ export function KitchenStockInPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("stockIn.title")}
       description={t("stockIn.description")}
@@ -200,7 +200,7 @@ export function KitchenStockOutPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("stockOut.title")}
       description={t("stockOut.description")}
@@ -217,7 +217,7 @@ export function KitchenLedgerPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("ledger.title")}
       description={t("ledger.description")}
@@ -234,7 +234,7 @@ export function KitchenCountPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("count.title")}
       description={t("count.description")}
@@ -251,7 +251,7 @@ export function KitchenRestockPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("restock.title")}
       description={t("restock.description")}
@@ -268,7 +268,7 @@ export function KitchenCatalogPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("catalog.title")}
       description={t("catalog.description")}
@@ -286,7 +286,7 @@ export function KitchenPurchaseOrdersPage() {
   const navigate = useNavigate();
   const canCreate = useCan("purchase_orders.create");
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("purchaseOrders.title")}
       description={t("purchaseOrders.description")}
@@ -305,7 +305,7 @@ export function KitchenPurchaseOrderFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={id ? t("purchaseOrders.edit") : t("purchaseOrders.new")}
       description={t("purchaseOrders.description")}
@@ -323,7 +323,7 @@ export function KitchenPurchaseOrderDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("purchaseOrders.detail")}
       icon={<FaShoppingCart size={20} />}
@@ -339,7 +339,7 @@ export function KitchenCostCenterSpendingPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("costCenterSpending.title")}
       description={t("costCenterSpending.description")}
@@ -357,7 +357,7 @@ export function KitchenInvoicesPage() {
   const navigate = useNavigate();
   const canRegister = useCan("invoices.register");
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("invoices.title")}
       description={t("invoices.description")}
       icon={<FaFileInvoice size={20} />}
@@ -375,7 +375,7 @@ export function KitchenInvoiceFormPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("invoices.new")}
       description={t("invoices.description")}
@@ -393,7 +393,7 @@ export function KitchenInvoiceDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("invoices.detail")}
       icon={<FaFileInvoice size={20} />}
@@ -410,7 +410,7 @@ export function KitchenSuppliersPage() {
   const navigate = useNavigate();
   const canManage = useCan("kitchen.manage");
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("suppliers.title")}
       description={t("suppliers.description")}
@@ -429,7 +429,7 @@ export function KitchenSupplierFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={id ? t("suppliers.edit") : t("suppliers.new")}
       description={t("suppliers.description")}
@@ -447,7 +447,7 @@ export function KitchenSupplierDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("suppliers.detail")}
       icon={<FaTruck size={20} />}

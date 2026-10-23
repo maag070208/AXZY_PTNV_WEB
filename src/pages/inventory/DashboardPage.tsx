@@ -104,7 +104,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full!"
+      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("dashboard.title")} backAction={() => undefined}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
@@ -126,7 +126,7 @@ export default function DashboardPage() {
   const distrib = distribDe(s);
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("dashboard.title")}
       description={t("dashboard.execSummary")}

@@ -486,6 +486,8 @@
   "people": {
 
     "view": {
+      "columns": {"person": "Persona", "progress": "Avance"},
+      "count": "{{count}} persona(s) en el reloj",
       "title": "Personas del reloj",
       "connected": "Reloj conectado",
       "disconnected": "Sin respuesta del reloj",
@@ -660,6 +662,7 @@
       "NOT_READ": "Sin lectura"
     },
     "alerts": {
+      "linkNow": "Ver y vincular",
       "NO_RESPONSE": "El reloj no responde",
       "CREDENTIALS": "El reloj rechazó las credenciales",
       "SUSPICIOUS_ROSTER": "Revisión sospechosa del padrón: no se generaron bajas",

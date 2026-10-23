@@ -172,17 +172,17 @@ export default function PrivateRoutes() {
       isActive: isScreenActive(screen),
       ...(children.length > 0
         ? {
-            // Una sección (hijo con hijos) va como grupo con título del ITSidebar.
-            subitems: children.map((child) =>
-              child.children?.length
-                ? {
-                    id: child.id,
-                    label: tt(child.labelKey),
-                    items: child.children.filter((leaf) => canView(leaf)).map(toSubItem),
-                  }
-                : toSubItem(child)
-            ),
-          }
+          // Una sección (hijo con hijos) va como grupo con título del ITSidebar.
+          subitems: children.map((child) =>
+            child.children?.length
+              ? {
+                id: child.id,
+                label: tt(child.labelKey),
+                items: child.children.filter((leaf) => canView(leaf)).map(toSubItem),
+              }
+              : toSubItem(child)
+          ),
+        }
         : {}),
     };
   };
@@ -212,19 +212,19 @@ export default function PrivateRoutes() {
     logoText: "Puerto Nuevo",
     userMenu: user
       ? {
-          userName: user.name ?? "—",
-          userEmail: user.username,
-          menuItems: [
-            {
-              label:
-                unreadCount > 0
-                  ? tt("nav.notifications", { count: unreadCount })
-                  : tt("nav.notifications"),
-              onClick: () => navigate("/notifications"),
-            },
-            { label: tt("nav.logout"), onClick: handleLogout },
-          ],
-        }
+        userName: user.name ?? "—",
+        userEmail: user.username,
+        menuItems: [
+          {
+            label:
+              unreadCount > 0
+                ? tt("nav.notifications", { count: unreadCount })
+                : tt("nav.notifications"),
+            onClick: () => navigate("/notifications"),
+          },
+          { label: tt("nav.logout"), onClick: handleLogout },
+        ],
+      }
       : undefined,
   };
 

@@ -16,6 +16,7 @@ import { TimeClockInspectView } from "@features/access/time-clock-inspect";
 import { TimeClockCameraView } from "@features/access/time-clock-camera";
 import { TimeClocksTab, useTimeClocks } from "@features/access/time-clocks";
 import { useTimeClockDashboard } from "../model/useTimeClockDashboard";
+import { useNavigate } from "react-router-dom";
 
 type Section = "status" | "people" | "events" | "camera" | "reader" | "clocks";
 const SECTIONS: Section[] = ["status", "people", "events", "camera", "reader", "clocks"];
@@ -144,13 +145,21 @@ function HourlyChart({ hourly, variant, label }: { hourly: HourBucket[]; variant
 
 function AlertLine({ alert }: { alert: ClockAlert }) {
   const { t } = useTranslation("time-clock");
+  const navigate = useNavigate();
   return (
     <li className={`flex items-center justify-between gap-3 rounded-xl border bg-white px-4 py-2.5 text-sm ${SEVERITY_TONE[alert.severity]}`}>
       <span className="flex items-center gap-2.5">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SEVERITY_DOT[alert.severity]}`} />
         {t(`dashboard.alerts.${alert.code}`)}
       </span>
-      {alert.count !== undefined && <span className="font-bold tabular-nums">{alert.count}</span>}
+      <span className="flex items-center gap-3">
+        {alert.code === "UNLINKED" && (
+          <ITButton variant="outlined" color="secondary" size="sm" onClick={() => navigate("/hr/time-clock/employees")}>
+            {t("dashboard.alerts.linkNow")}
+          </ITButton>
+        )}
+        {alert.count !== undefined && <span className="font-bold tabular-nums">{alert.count}</span>}
+      </span>
     </li>
   );
 }

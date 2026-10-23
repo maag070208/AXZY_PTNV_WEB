@@ -18,7 +18,7 @@ export default function AdminTasksPage() {
   if (!canCompleteTasks) return <Navigate to="/" replace />;
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("admintasks.title")}
       description={tt("admintasks.description", { count: fx.rows.length })}

@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaEllipsisH, FaFingerprint, FaIdCard, FaSyncAlt, FaUserCheck, FaUserSlash } from "react-icons/fa";
-import { ITButton, ITDialog, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
+import { useNavigate } from "react-router-dom";
+import { FaFingerprint, FaIdCard, FaSyncAlt, FaUserCheck, FaUserSlash } from "react-icons/fa";
+import { ITButton, ITDataTable, ITDialog, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
+import type { Column, ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 import { useTimeClockPeople } from "../model/useTimeClockPeople";
 import PersonDetailDialog from "./PersonDetailDialog";
 import { timeClockApi, type TimeClockPerson } from "@entities/time-clock";
@@ -9,8 +12,7 @@ import { useCan } from "@entities/user";
 
 /** Persona con su presencia de rostro y huellas (null mientras se leen los conteos). */
 type Row = TimeClockPerson & { faces: number | null; fingerprints: number | null };
-type Filter = "all" | "noFace" | "noFingerprint" | "noCard";
-const FILTERS: Filter[] = ["all", "noFace", "noFingerprint", "noCard"];
+const yesNo = (n: number | null): string | null => (n === null ? null : n > 0 ? "true" : "false");
 const TONES = [
   "bg-blue-100 text-blue-700",
   "bg-orange-100 text-orange-700",
@@ -72,17 +74,17 @@ function Chip({ on, icon, label }: { on: boolean; icon: React.ReactNode; label: 
   );
 }
 
-/** Personas del reloj: lista unificada con presencia de rostro, huella y tarjeta. Las bajas piden confirmación. */
+/** Personas del reloj en tabla: foto, presencia de rostro/huella/tarjeta y avance. Clic en la fila abre la ficha. */
 export default function TimeClockPeopleView({ clockSerial }: Props) {
   const { t } = useTranslation("time-clock");
   const fx = useTimeClockPeople(clockSerial);
   const controlled = clockSerial !== undefined;
   const canWrite = useCan("time_clock.write");
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<Filter>("all");
   const [removing, setRemoving] = useState<TimeClockPerson | null>(null);
   const [viewing, setViewing] = useState<string | null>(null);
-  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const navigate = useNavigate();
+  // Ficha unificada: con usuario vinculado se abre su pantalla de empleado; si no, la ficha del reloj.
+  const openFicha = (row: Row) => (row.userId ? navigate(`/employees/${row.userId}`) : setViewing(row.employeeNumber));
 
   const rows: Row[] = useMemo(() => {
     const bio = fx.biometrics?.people ?? {};
@@ -95,15 +97,108 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
       .sort((a, b) => a.employeeNumber.localeCompare(b.employeeNumber, "es", { numeric: true }));
   }, [fx.data, fx.biometrics]);
 
+  const fetchData = useMemo(
+    () =>
+      makeClientTableFetch<Row>(async () => rows, {
+        faces: { value: (r) => yesNo(r.faces), match: "equals" },
+        fingerprints: { value: (r) => yesNo(r.fingerprints), match: "equals" },
+        cards: { value: (r) => yesNo(r.cards.length), match: "equals" },
+      }),
+    [rows]
+  );
 
-  const visible = rows.filter((r) => {
-    const q = query.trim().toLowerCase();
-    if (q && !r.name.toLowerCase().includes(q) && !r.employeeNumber.toLowerCase().includes(q)) return false;
-    if (filter === "noFace") return (r.faces ?? 0) === 0;
-    if (filter === "noFingerprint") return (r.fingerprints ?? 0) === 0;
-    if (filter === "noCard") return r.cards.length === 0;
-    return true;
-  });
+  const yesNoOptions = [
+    { id: "true", name: t("people.table.yes") },
+    { id: "false", name: t("people.table.no") },
+  ];
+  const progressOf = (r: Row) => [(r.faces ?? 0) > 0, (r.fingerprints ?? 0) > 0, r.cards.length > 0].filter(Boolean).length;
+
+  const columns: Column<Row>[] = [
+    {
+      key: "name",
+      type: "string",
+      label: t("people.view.columns.person"),
+      width: "34%",
+      filter: true,
+      sortable: true,
+      render: (row) => (
+        <div className="flex items-center gap-3">
+          <PersonAvatar clockSerial={fx.serial} employeeNumber={row.employeeNumber} name={row.name} hasFace={(row.faces ?? 0) > 0} />
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-slate-900">{row.name}</p>
+            <p className="font-mono text-xs text-slate-500">#{row.employeeNumber}</p>
+          </div>
+        </div>
+      ),
+    },
+    { key: "employeeNumber", type: "string", label: t("people.table.number"), width: 130, filter: true, sortable: true },
+    {
+      key: "faces",
+      type: "catalog",
+      label: t("people.view.chips.face"),
+      width: 130,
+      filter: "catalog",
+      catalogOptions: { data: yesNoOptions },
+      sortable: true,
+      render: (row) => <Chip on={(row.faces ?? 0) > 0} icon={<FaUserCheck size={10} />} label={t("people.view.chips.face")} />,
+    },
+    {
+      key: "fingerprints",
+      type: "catalog",
+      label: t("people.view.chips.fingerprint"),
+      width: 130,
+      filter: "catalog",
+      catalogOptions: { data: yesNoOptions },
+      sortable: true,
+      render: (row) => <Chip on={(row.fingerprints ?? 0) > 0} icon={<FaFingerprint size={10} />} label={t("people.view.chips.fingerprint")} />,
+    },
+    {
+      key: "cards",
+      type: "catalog",
+      label: t("people.view.chips.card"),
+      width: 130,
+      filter: "catalog",
+      catalogOptions: { data: yesNoOptions },
+      sortable: true,
+      render: (row) => <Chip on={row.cards.length > 0} icon={<FaIdCard size={10} />} label={t("people.view.chips.card")} />,
+    },
+    {
+      key: "progress",
+      type: "number",
+      label: t("people.view.columns.progress"),
+      width: 150,
+      render: (row) => {
+        const done = progressOf(row);
+        return (
+          <div className="w-28">
+            <p className="text-xs text-slate-500">{t("people.view.progress", { done, total: TOTAL_CHECKS })}</p>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-emerald-500" style={{ width: `${(done / TOTAL_CHECKS) * 100}%` }} />
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: "actions",
+      type: "actions",
+      label: "",
+      width: 190,
+      pinned: "right",
+      actions: (row) => (
+        <ITFlex align="center" justify="end" gap={2}>
+          <ITButton variant="raised-text" color="primary" size="sm" onClick={() => openFicha(row)}>
+            {t("people.actions.view")}
+          </ITButton>
+          {canWrite && (
+            <ITButton variant="outlined" color="danger" size="sm" disabled={fx.busy} onClick={() => setRemoving(row)}>
+              {t("people.actions.remove")}
+            </ITButton>
+          )}
+        </ITFlex>
+      ),
+    },
+  ];
 
   const confirmRemove = async () => {
     if (!removing) return;
@@ -111,122 +206,59 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
   };
 
   return (
-    <div className={`flex flex-col gap-5 ${controlled ? "" : "p-6"}`}>
-      <section className="flex flex-wrap items-center gap-3">
-        {!controlled && (
-          <ITSearchSelect
-            name="timeClockPeopleClock"
-            label={t("people.clock")}
-            options={fx.devices.map((d) => ({ value: d.clockSerial, label: d.name }))}
-            value={fx.serial}
-            onChange={(value) => fx.setSerial(String(value))}
-            className="min-w-[220px]"
-          />
-        )}
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("people.view.search")}
-          className="min-w-[240px] flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-slate-400"
-        />
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            type="button"
-            onClick={() => setFilter(f)}
-            className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${
-              filter === f ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-slate-400"
-            }`}
+    <div className={`flex flex-col gap-4 ${controlled ? "" : "p-6"}`}>
+      <ITFlex align="end" justify="between" gap={3} wrap="wrap">
+        <ITText className="text-sm text-slate-500">{t("people.view.count", { count: rows.length })}</ITText>
+        <ITFlex align="end" gap={3} wrap="wrap">
+          {!controlled && (
+            <ITSearchSelect
+              name="timeClockPeopleClock"
+              label={t("people.clock")}
+              options={fx.devices.map((d) => ({ value: d.clockSerial, label: d.name }))}
+              value={fx.serial}
+              onChange={(value) => fx.setSerial(String(value))}
+              className="min-w-[220px]"
+            />
+          )}
+          <ITButton
+            variant="outlined"
+            color="secondary"
+            size="sm"
+            disabled={fx.loading || fx.busy || fx.biometricsLoading}
+            onClick={() => {
+              fx.reload();
+              fx.reloadBiometrics();
+            }}
           >
-            {t(`people.view.filters.${f}`)}
-          </button>
-        ))}
-        <ITButton
-          variant="outlined"
-          color="secondary"
-          size="sm"
-          disabled={fx.loading || fx.busy || fx.biometricsLoading}
-          onClick={() => {
-            fx.reload();
-            fx.reloadBiometrics();
-          }}
-        >
-          <ITFlex align="center" gap={2}>
-            <FaSyncAlt size={11} className={fx.loading || fx.biometricsLoading ? "animate-spin" : ""} />
-            {t("people.view.refreshAll")}
-          </ITFlex>
-        </ITButton>
-      </section>
+            <ITFlex align="center" gap={2}>
+              <FaSyncAlt size={11} className={fx.loading || fx.biometricsLoading ? "animate-spin" : ""} />
+              {t("people.view.refreshAll")}
+            </ITFlex>
+          </ITButton>
+        </ITFlex>
+      </ITFlex>
 
       {fx.error && <p role="alert" className="text-sm text-red-600">{fx.error}</p>}
       {fx.biometricsError && <p role="alert" className="text-sm text-red-600">{fx.biometricsError}</p>}
       {fx.toast && <p role="status" className="text-sm text-emerald-700" onClick={fx.dismissToast}>{fx.toast}</p>}
-      {fx.loading && <p className="text-sm text-slate-400">{t("people.loading")}</p>}
 
-      <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
-        {visible.map((r) => {
-          const done = [(r.faces ?? 0) > 0, (r.fingerprints ?? 0) > 0, r.cards.length > 0].filter(Boolean).length;
-          return (
-            <li
-              key={r.employeeNumber}
-              className="flex cursor-pointer flex-wrap items-center gap-4 px-5 py-4 transition hover:bg-slate-50"
-              onClick={() => setViewing(r.employeeNumber)}
-            >
-              <div className="flex min-w-[220px] flex-1 items-center gap-3">
-                <PersonAvatar clockSerial={fx.serial} employeeNumber={r.employeeNumber} name={r.name} hasFace={(r.faces ?? 0) > 0} />
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-900">{r.name}</p>
-                  <p className="font-mono text-xs text-slate-500">#{r.employeeNumber}</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Chip on={(r.faces ?? 0) > 0} icon={<FaUserCheck size={10} />} label={t("people.view.chips.face")} />
-                <Chip on={(r.fingerprints ?? 0) > 0} icon={<FaFingerprint size={10} />} label={t("people.view.chips.fingerprint")} />
-                <Chip on={r.cards.length > 0} icon={<FaIdCard size={10} />} label={t("people.view.chips.card")} />
-              </div>
-              <div className="w-36">
-                <p className="text-xs text-slate-500">{t("people.view.progress", { done, total: TOTAL_CHECKS })}</p>
-                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full rounded-full bg-emerald-500" style={{ width: `${(done / TOTAL_CHECKS) * 100}%` }} />
-                </div>
-              </div>
-              <div className="ml-auto flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                <ITButton variant="raised-text" color="primary" size="sm" onClick={() => setViewing(r.employeeNumber)}>
-                  {t("people.actions.view")}
-                </ITButton>
-                {canWrite && (
-                  <div className="relative">
-                    <button
-                      type="button"
-                      aria-label={t("people.view.more")}
-                      className="rounded-full p-2 text-slate-500 hover:bg-slate-100"
-                      onClick={() => setMenuFor(menuFor === r.employeeNumber ? null : r.employeeNumber)}
-                    >
-                      <FaEllipsisH size={12} />
-                    </button>
-                    {menuFor === r.employeeNumber && (
-                      <div className="absolute right-0 z-10 mt-1 w-40 rounded-xl border border-slate-200 bg-white p-1 shadow-lg">
-                        <button
-                          type="button"
-                          disabled={fx.busy}
-                          className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
-                          onClick={() => {
-                            setMenuFor(null);
-                            setRemoving(r);
-                          }}
-                        >
-                          {t("people.actions.remove")}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </li>
-          );
-        })}
-        {visible.length === 0 && <li className="px-5 py-10 text-center text-sm text-slate-400">{t("people.view.empty")}</li>}
-      </ul>
+      <ITDataTable
+        columns={columns as unknown as Column<Record<string, unknown>>[]}
+        fetchData={
+          fetchData as unknown as (p: ITDataTableFetchParams) => Promise<ITDataTableResponse<Record<string, unknown>>>
+        }
+        reloadTrigger={`${fx.version}-${fx.biometrics?.updatedAt ?? ""}`}
+        layout="fixed"
+        density="comfortable"
+        defaultItemsPerPage={100}
+        itemsPerPageOptions={[50, 100, 200]}
+        debounceMs={350}
+        variant="bordered"
+        virtualized
+        virtualizedMaxHeight={560}
+        rowHeight={64}
+        onRowClick={(row) => openFicha(row as unknown as Row)}
+      />
 
       {viewing && (
         <PersonDetailDialog

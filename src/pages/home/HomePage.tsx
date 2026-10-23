@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <ITPage
       noPadding
-      className="m-0! p-0! px-8! min-w-full!"
+      className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("title")} description={t("description")} icon={<FaHouseUser size={20} />}>
       <RoleDashboard slots={slots} />
     </ITPage>

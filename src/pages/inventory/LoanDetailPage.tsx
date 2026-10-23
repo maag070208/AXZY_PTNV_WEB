@@ -37,7 +37,7 @@ export default function LoanDetailPage() {
 
   if (loading || !loan) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full!"
+      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loans.detail")} backAction={() => navigate(-1)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
@@ -47,7 +47,7 @@ export default function LoanDetailPage() {
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full!"
+    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={loan.number}
       description={`${loan.custodian?.name ?? "—"} · ${formatDate(loan.date)}`}
