@@ -248,7 +248,13 @@ export default function MovementsPage() {
         ],
       },
       render: (m: MovementRow) =>
-        m.status === "CANCELLED" ? <ITBadget color="danger" size="lg">{t("movements.cancelled")}</ITBadget> : <ITBadget color="success" size="lg">{t("movements.activeLabel")}</ITBadget>,
+        m.status === "CANCELLED" ? (
+          <ITBadget color="danger" size="lg">{t("movements.cancelled")}</ITBadget>
+        ) : m.type === "RETIREMENT" ? (
+          <ITBadget color="warning" size="lg">{t("movements.retiredLabel")}</ITBadget>
+        ) : (
+          <ITBadget color="success" size="lg">{t("movements.activeLabel")}</ITBadget>
+        ),
     },
   ];
 

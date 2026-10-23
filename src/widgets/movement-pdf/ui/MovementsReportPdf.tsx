@@ -92,8 +92,8 @@ export default function MovementsReportPdf({ movements }: Props) {
                 <View style={styles.colQty}><Text style={[pdfTheme.cellBold, { textAlign: "center" }]}>{m.items.reduce((s, d) => s + d.quantity, 0)}</Text></View>
                 <View style={styles.colResp}><Text style={pdfTheme.cell}>{m.custodian?.name ?? m.createdBy?.name ?? "—"}</Text></View>
                 <View style={styles.colStatus}>
-                  <Text style={m.status === "CANCELLED" ? badgeStyleFor("danger") : badgeStyleFor("success")}>
-                    {m.status === "CANCELLED" ? doc.d_cancelled : doc.d_active}
+                  <Text style={m.status === "CANCELLED" ? badgeStyleFor("danger") : m.type === "RETIREMENT" ? badgeStyleFor("warning") : badgeStyleFor("success")}>
+                    {m.status === "CANCELLED" ? doc.d_cancelled : m.type === "RETIREMENT" ? doc.d_retired : doc.d_active}
                   </Text>
                 </View>
               </View>

@@ -280,7 +280,7 @@
     "colComment": "COMENTARIO",
     "colCustodian": "RESPONSABLE",
     "colStatus": "ESTADO",
-    "activeLabel": "Activo",
+    "activeLabel": "Vigente",
     "confirmRevert": "¿Revertir este movimiento? Se cancelará y se corregirá el inventario.",
     "doc": {
       "title": "Comprobante de Movimiento",
@@ -292,7 +292,7 @@
       "custodian": "RESPONSABLE",
       "reason": "MOTIVO",
       "notes": "OBSERVACIONES",
-      "activeStatus": "ACTIVO",
+      "activeStatus": "VIGENTE",
       "cancelledStatus": "CANCELADO",
       "itemTitle": "DETALLE DE MOVIMIENTO",
       "itemProduct": "DISPOSITIVO",
@@ -303,7 +303,8 @@
       "signaturePreparedBy": "ELABORÓ",
       "signatureReceived": "RECIBIÓ",
       "signatureAuthorized": "AUTORIZÓ",
-      "pieces": "PIEZAS"
+      "pieces": "PIEZAS",
+      "retiredStatus": "BAJA"
     },
     "stats": {
       "total": "Movimientos",
@@ -328,11 +329,13 @@
       "c_qty": "CANT",
       "c_resp": "RESPONSABLE / REGISTRÓ",
       "c_status": "ESTADO",
-      "d_active": "ACTIVO",
+      "d_active": "VIGENTE",
       "d_cancelled": "CANCELADO",
       "signaturePreparedBy": "ELABORÓ",
-      "signatureAuthorized": "AUTORIZÓ"
-    }
+      "signatureAuthorized": "AUTORIZÓ",
+      "d_retired": "BAJA"
+    },
+    "retiredLabel": "Baja"
   },
   "loans": {
     "title": "Cartas responsivas",

@@ -1,7 +1,7 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { useTranslation } from "react-i18next";
 import type { Movement } from "@entities/inventory";
-import { PDF_COLORS, pdfTheme, badgeStyleFor } from "@shared/pdf/theme";
+import { PDF_COLORS, pdfTheme } from "@shared/pdf/theme";
 import PdfLetterhead from "@shared/pdf/PdfLetterhead";
 import PdfFooter from "@shared/pdf/PdfFooter";
 import { dateLocale } from "@shared/i18n";
@@ -27,7 +27,10 @@ export default function MovementPdf({ movement }: Props) {
   const doc = t("movements.doc", { returnObjects: true }) as Record<string, string>;
   const today = new Date().toLocaleDateString(dateLocale());
   const folio = `MV-${movement.id.slice(0, 8).toUpperCase()}`;
-  const statusBadge = movement.status === "CANCELLED" ? badgeStyleFor("danger") : badgeStyleFor("success");
+  // Una baja se lee como baja: el estatus del registro no debe decir "activo".
+  const statusKey = movement.status === "CANCELLED" ? "cancelled" : movement.type === "RETIREMENT" ? "retired" : "active";
+  const statusText = statusKey === "cancelled" ? doc.cancelledStatus : statusKey === "retired" ? doc.retiredStatus : doc.activeStatus;
+  const statusColor = statusKey === "active" ? PDF_COLORS.success : statusKey === "retired" ? PDF_COLORS.warning : PDF_COLORS.danger;
   const custodian = movement.custodian?.name ?? "—";
   const preparedBy = movement.createdBy?.name ?? "—";
 
@@ -48,9 +51,9 @@ export default function MovementPdf({ movement }: Props) {
             {pageIdx === 0 && (
               <>
                 <View style={{ flexDirection: "row", gap: 8, marginBottom: 14 }}>
-                  <View style={[pdfTheme.summaryCard, { borderTopColor: PDF_COLORS.band }]}>
-                    <Text style={pdfTheme.summaryValue}>{doc.status}</Text>
-                    <Text style={pdfTheme.summaryLabel}>{movement.status === "CANCELLED" ? doc.cancelledStatus : doc.activeStatus}</Text>
+                  <View style={[pdfTheme.summaryCard, { borderTopColor: statusColor }]}>
+                    <Text style={pdfTheme.summaryValue}>{statusText}</Text>
+                    <Text style={pdfTheme.summaryLabel}>{doc.status}</Text>
                   </View>
                   <View style={[pdfTheme.summaryCard, { borderTopColor: PDF_COLORS.bandAccent }]}>
                     <Text style={pdfTheme.summaryValue}>{folio}</Text>

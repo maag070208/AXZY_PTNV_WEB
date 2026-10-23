@@ -303,7 +303,8 @@
       "signaturePreparedBy": "PREPARED BY",
       "signatureReceived": "RECEIVED BY",
       "signatureAuthorized": "AUTHORIZED BY",
-      "pieces": "PIECES"
+      "pieces": "PIECES",
+      "retiredStatus": "RETIRED"
     },
     "stats": {
       "total": "Movements",
@@ -331,8 +332,10 @@
       "d_active": "ACTIVE",
       "d_cancelled": "CANCELLED",
       "signaturePreparedBy": "PREPARED BY",
-      "signatureAuthorized": "AUTHORIZED BY"
-    }
+      "signatureAuthorized": "AUTHORIZED BY",
+      "d_retired": "RETIRED"
+    },
+    "retiredLabel": "Retired"
   },
   "loans": {
     "title": "Responsibility letters",
