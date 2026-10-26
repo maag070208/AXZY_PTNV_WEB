@@ -181,21 +181,25 @@ export interface EmployeeAssignmentInput {
 
 /** Actividad de una persona en el sistema: equipo prestado, kardex, tickets y tareas. */
 export interface EmployeeOverview {
-  summary: { activeLoans: number; borrowedUnits: number; openTickets: number; pendingTasks: number };
-  loans: Array<{
-    id: string;
-    number: string;
-    date: string;
-    status: "ACTIVE" | "PARTIAL" | "RETURNED" | "CANCELLED";
-    items: Array<{ device: string; quantity: number; returned: number }>;
-  }>;
-  kardex: Array<{
-    type: "LOAN" | "RETURN";
-    date: string;
-    number: string;
-    loanNumber?: string;
-    items: Array<{ device: string; quantity: number; condition?: string }>;
-  }>;
+  summary: { openTickets: number; pendingTasks: number };
+  /** Equipo prestado y kardex: `null` si la sesión no tiene `loans.view` (RH no lo ve). */
+  inventory: {
+    summary: { activeLoans: number; borrowedUnits: number };
+    loans: Array<{
+      id: string;
+      number: string;
+      date: string;
+      status: "ACTIVE" | "PARTIAL" | "RETURNED" | "CANCELLED";
+      items: Array<{ device: string; quantity: number; returned: number }>;
+    }>;
+    kardex: Array<{
+      type: "LOAN" | "RETURN";
+      date: string;
+      number: string;
+      loanNumber?: string;
+      items: Array<{ device: string; quantity: number; condition?: string }>;
+    }>;
+  } | null;
   tickets: Array<{ id: string; title: string; status: "OPEN" | "IN_PROGRESS" | "CLOSED"; priority: string; createdAt: string; relation: "CREATED" | "ASSIGNED" }>;
   tasks: Array<{ id: string; title: string; status: "PENDING" | "IN_PROGRESS" | "IN_REVIEW" | "COMPLETED"; dueDate: string | null; ticketId: string; ticketTitle: string }>;
 }

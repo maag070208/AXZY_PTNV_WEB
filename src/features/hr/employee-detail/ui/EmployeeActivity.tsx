@@ -74,8 +74,8 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
 
   if (error) return <p role="alert" className="text-sm text-red-600">{error}</p>;
   if (!data) return <ITText className="text-sm text-slate-400">{t("detail.activity.loading")}</ITText>;
-  const { summary } = data;
-  const openLoans = data.loans.filter((l) => l.status === "ACTIVE" || l.status === "PARTIAL");
+  const { summary, inventory } = data;
+  const openLoans = inventory ? inventory.loans.filter((l) => l.status === "ACTIVE" || l.status === "PARTIAL") : [];
   const label = (key: string) => dyn(t)(`detail.activity.status.${key}`);
   // Abiertos primero: lo que requiere atención no se pierde entre el historial.
   const tickets = [...data.tickets].sort((a, b) => Number(a.status === "CLOSED") - Number(b.status === "CLOSED"));
@@ -84,13 +84,18 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <KpiTile icon={<FaBoxOpen size={14} />} tone="sky" label={t("detail.activity.kpi.units")} value={summary.borrowedUnits} hint={t("detail.activity.kpi.unitsHint", { count: summary.activeLoans })} />
-        <KpiTile icon={<FaClipboardCheck size={14} />} tone="violet" label={t("detail.activity.kpi.letters")} value={summary.activeLoans} hint={t("detail.activity.kpi.lettersHint")} />
+        {inventory && (
+          <>
+            <KpiTile icon={<FaBoxOpen size={14} />} tone="sky" label={t("detail.activity.kpi.units")} value={inventory.summary.borrowedUnits} hint={t("detail.activity.kpi.unitsHint", { count: inventory.summary.activeLoans })} />
+            <KpiTile icon={<FaClipboardCheck size={14} />} tone="violet" label={t("detail.activity.kpi.letters")} value={inventory.summary.activeLoans} hint={t("detail.activity.kpi.lettersHint")} />
+          </>
+        )}
         <KpiTile icon={<FaTicketAlt size={14} />} tone={summary.openTickets ? "amber" : "neutral"} label={t("detail.activity.kpi.tickets")} value={summary.openTickets} hint={t("detail.activity.kpi.ticketsHint")} />
         <KpiTile icon={<FaTools size={14} />} tone={summary.pendingTasks ? "orange" : "neutral"} label={t("detail.activity.kpi.tasks")} value={summary.pendingTasks} hint={t("detail.activity.kpi.tasksHint")} />
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        {inventory && (
         <Card icon={<FaBoxOpen size={14} />} tone="bg-sky-50 text-sky-600" title={t("detail.activity.tabs.loans")} count={openLoans.length}>
           <ul className="divide-y divide-slate-100">
             {openLoans.map((l) => (
@@ -114,6 +119,7 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
             {openLoans.length === 0 && <Empty icon={<FaBoxOpen />} text={t("detail.activity.empty.loans")} />}
           </ul>
         </Card>
+        )}
 
         <Card icon={<FaTicketAlt size={14} />} tone="bg-amber-50 text-amber-600" title={t("detail.activity.tabs.tickets")} count={tickets.length}>
           <ul className="divide-y divide-slate-100">
@@ -147,9 +153,10 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
           </ul>
         </Card>
 
-        <Card icon={<FaHistory size={14} />} tone="bg-violet-50 text-violet-600" title={t("detail.activity.tabs.kardex")} count={data.kardex.length}>
+        {inventory && (
+        <Card icon={<FaHistory size={14} />} tone="bg-violet-50 text-violet-600" title={t("detail.activity.tabs.kardex")} count={inventory.kardex.length}>
           <ul className="relative ml-4 border-l border-slate-200 py-2">
-            {data.kardex.map((k, idx) => (
+            {inventory.kardex.map((k, idx) => (
               <li key={`${k.number}-${idx}`} className="relative py-3 pl-6">
                 <span className={`absolute -left-3.5 top-3.5 flex h-7 w-7 items-center justify-center rounded-full ring-4 ring-white ${k.type === "LOAN" ? "bg-sky-100 text-sky-600" : "bg-emerald-100 text-emerald-600"}`}>
                   <FaExchangeAlt size={11} />
@@ -165,8 +172,9 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
               </li>
             ))}
           </ul>
-          {data.kardex.length === 0 && <Empty icon={<FaHistory />} text={t("detail.activity.empty.kardex")} />}
+          {inventory.kardex.length === 0 && <Empty icon={<FaHistory />} text={t("detail.activity.empty.kardex")} />}
         </Card>
+        )}
       </div>
     </div>
   );

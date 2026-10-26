@@ -32,7 +32,10 @@ export default function EmployeeDetailPage() {
   const [section, setSection] = useState<Section>("activity");
   /** La cuenta (usuario, contraseña, roles) se edita en Usuarios: solo ADMIN. */
   const canEditUser = useCan("users.edit");
-  const canManageClock = useCan("time_clocks.manage");
+  // El reloj lo ve quien lo administra o quien da de alta/baja personas en él (RH).
+  const canManageClockDevices = useCan("time_clocks.manage");
+  const canWriteClock = useCan("time_clock.write");
+  const canManageClock = canManageClockDevices || canWriteClock;
 
   const detail = useEmployeeDetail(id);
 
