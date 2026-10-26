@@ -18,7 +18,10 @@ export const useTimeClockRoster = () => {
   // Mismos permisos que la API: ver, revisar, dar de baja usuarios, descartar.
   const canView = useCan("time_clock.view");
   const canRun = useCan("time_clock.sync");
-  const canRemove = useCan("users.edit");
+  // Las bajas del padrón las aplica RH (hr.records) o quien da de baja usuarios.
+  const canEditAccounts = useCan("users.edit");
+  const canHr = useCan("hr.records");
+  const canRemove = canEditAccounts || canHr;
   const canLink = useCan("time_clock.link");
 
   const [data, setData] = useState<TimeClockRoster | null>(null);
