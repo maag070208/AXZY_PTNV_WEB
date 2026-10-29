@@ -1,10 +1,9 @@
-import { ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import type { RootState } from "@app/store";
 import { LoginForm, useLogin } from "@features/auth/login";
-import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
-import LottieLoader from "@shared/ui/lottie-loader/ui/LottieLoader";
+import LoginBrandPanel from "@features/auth/login/ui/LoginBrandPanel";
+import "@features/auth/login/ui/login.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -19,24 +18,9 @@ export default function LoginPage() {
   };
 
   return (
-    <ITFlex
-      as="div"
-      align="center"
-      justify="center"
-      grow
-      className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-white to-slate-50 p-4"
-    >
-      <ITFlex direction="column" align="center" gap={6} className="w-full max-w-md">
-        {/* <img
-          src={logoUrl}
-          alt="Puerto Nuevo Hotel y Villas"
-          className="h-32 w-auto"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = "none";
-          }}
-        /> */}
-        <LottieLoader />
-
+    <div className="login-canvas flex min-h-screen items-center justify-center p-0 sm:p-6 lg:p-10">
+      <div className="login-card flex w-full max-w-6xl flex-col overflow-hidden bg-white sm:rounded-[28px] lg:flex-row dark:bg-slate-900">
+        <LoginBrandPanel />
         <LoginForm
           username={login.username}
           password={login.password}
@@ -50,14 +34,7 @@ export default function LoginPage() {
           dismissToast={login.dismissToast}
           onSubmit={handleSubmit}
         />
-      </ITFlex>
-
-      <ITText
-        as="p"
-        className="absolute bottom-4 text-xs font-medium text-slate-400"
-      >
-        v{__APP_VERSION__}
-      </ITText>
-    </ITFlex>
+      </div>
+    </div>
   );
 }

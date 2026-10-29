@@ -1,6 +1,8 @@
 {
   "title": "Home",
   "description": "Cartas Responsivas control panel · Puerto Nuevo Hotel and Villas",
+  "greeting": "Hello, {{name}}",
+  "hotel": "Puerto Nuevo Hotel and Villas",
   "groups": {
     "ops": "Operations",
     "people": "People",
@@ -11,9 +13,16 @@
   },
   "adminDashboard": {
     "title": "Real-time panel",
+    "resolvedCaption": "resolved",
+    "today": "Today",
+    "yesterday": "Yesterday",
     "live": "Live",
     "errorLoad": "Could not load the panel",
     "devices": "Devices",
+    "devicesAvailable": "{{available}} available",
+    "custodyOfTotal": "of {{total}} letters",
+    "damagedOfTotal": "of {{total}} exits",
+    "resolvedPending": "{{pending}} pending",
     "activeCustodyLetters": "Active letters",
     "damagedExits": "Damaged outputs",
     "recentActivity": "Recent activity",

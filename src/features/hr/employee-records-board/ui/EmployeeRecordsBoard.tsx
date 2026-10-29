@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ITAvatar,
   ITBadget,
   ITButton,
   ITChip,
@@ -14,6 +13,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaBell, FaCheck, FaChevronRight, FaSearch, FaTimes } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import type { RecordGapsRow } from "@entities/dashboard";
 import { recordStatus, type RecordFilter, type RecordStatus, type UseEmployeeRecords } from "../model/useEmployeeRecords";
 
@@ -22,15 +22,6 @@ const OTHER_DOCS_PREVIEW = 4;
 const FIELDS_PREVIEW = 4;
 
 const STATUS_COLOR = { REQUIRED: "warning", INCOMPLETE: "gray", COMPLETE: "success" } as const satisfies Record<RecordStatus, string>;
-
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
 
 const percent = (done: number, total: number) => (total ? Math.round((done / total) * 100) : 0);
 
@@ -193,7 +184,7 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
                     >
                       <td className="px-4 py-2">
                         <div className="flex items-center gap-3">
-                          <ITAvatar initials={initials(r.name)} size="sm" />
+                          <ProfileAvatar name={r.name} size="sm" />
                           <div className="min-w-0 max-w-[200px]">
                             <div className="line-clamp-2 text-[12px] font-bold leading-tight text-slate-900">{r.name}</div>
                             <div className="text-[10px] text-slate-500">
@@ -267,7 +258,7 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
             <>
               <div className="border-b border-slate-100 p-4">
                 <div className="flex items-center gap-3">
-                  <ITAvatar initials={initials(sel.name)} size="md" />
+                  <ProfileAvatar name={sel.name} size="md" />
                   <div className="min-w-0">
                     <div className="truncate text-[13px] font-bold text-slate-900">{sel.name}</div>
                     <div className="text-[11px] text-slate-500">

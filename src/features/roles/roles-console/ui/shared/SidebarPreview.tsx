@@ -20,9 +20,9 @@ export default function SidebarPreview({ permissions, role, title }: Props) {
   const groups = APP_SCREENS.filter(visible);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-      <div className="flex items-center gap-2 bg-[#0D5777] px-3 py-2">
-        <span className="h-2.5 w-2.5 rounded-full bg-white/40" />
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-[var(--it-card-bg)]">
+      <div className="flex items-center gap-2 bg-primary-500 px-3 py-2">
+        <span className="h-2.5 w-2.5 rounded-full bg-[var(--it-card-bg)]/40" />
         <span className="truncate text-[11px] font-bold text-white">{title}</span>
       </div>
       <div className="max-h-[460px] overflow-y-auto px-2 py-2">
@@ -32,13 +32,13 @@ export default function SidebarPreview({ permissions, role, title }: Props) {
           groups.map((group) => (
             <div key={group.id} className="mb-1">
               <div className="flex items-center gap-2 rounded-md px-2 py-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#0D5777]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />
                 <span className="text-[11px] font-bold text-slate-800">{tc(group.labelKey)}</span>
               </div>
               {group.children?.filter(visible).map((child) =>
                 child.children?.length ? (
                   <div key={child.id} className="ml-4 mt-1">
-                    <p className="px-2 pb-0.5 pt-1 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                    <p className="px-2 pb-0.5 pt-1 text-[12px] font-semibold text-slate-400">
                       {tc(child.labelKey)}
                     </p>
                     {child.children.filter(visible).map((leaf) => (

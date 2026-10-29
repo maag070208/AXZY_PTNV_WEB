@@ -43,7 +43,7 @@ export default function RolePoliciesList({ role, policies, hasPermission, onTest
           .filter((policy) => policy.action === actionKey)
           .sort((a, b) => a.priority - b.priority);
         return (
-          <div key={actionKey} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          <div key={actionKey} className="overflow-hidden rounded-lg border border-slate-200 bg-[var(--it-card-bg)]">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-3 py-1.5">
               <div className="min-w-0">
                 <p className="text-[12px] font-bold text-slate-800">{action?.label ?? actionKey}</p>
@@ -60,7 +60,7 @@ export default function RolePoliciesList({ role, policies, hasPermission, onTest
                 <button
                   type="button"
                   onClick={() => onTest(actionKey)}
-                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-white px-2 py-1 text-[10px] font-bold text-[#0D5777] hover:border-[#0D5777]"
+                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-[var(--it-card-bg)] px-2 py-1 text-[10px] font-bold text-primary-500 hover:border-primary-500"
                 >
                   <FaVial size={9} /> {t("simulator.test")}
                 </button>

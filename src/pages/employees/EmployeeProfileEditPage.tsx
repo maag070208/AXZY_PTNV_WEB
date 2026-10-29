@@ -217,13 +217,6 @@ export default function EmployeeProfileEditPage() {
   }
 
   const profile = detail.profile;
-  const initials = profile.name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase();
 
   const steps: AppStep[] = [
     {
@@ -233,7 +226,7 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={5}>
           <ITFlex align="center" gap={4}>
             <div className="relative inline-block shrink-0">
-              <ProfileAvatar photoUrl={profile.photoUrl} initials={initials} alt={profile.name} size="xl" />
+              <ProfileAvatar photoUrl={profile.photoUrl} name={profile.name} size="xl" />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}

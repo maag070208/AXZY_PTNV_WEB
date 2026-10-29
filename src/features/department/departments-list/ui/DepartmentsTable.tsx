@@ -44,11 +44,11 @@ export default function DepartmentsTable({
       filter: true,
       render: (d: Department) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="font-black text-slate-800 uppercase text-[12px] tracking-tight">
+          <ITText className="font-semibold text-slate-800 text-[12px]">
             {d.name}
           </ITText>
           {!d.active && (
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
+            <ITText className="text-[12px] font-bold text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
               {tt("list.inactive")}
             </ITText>
           )}
@@ -63,7 +63,7 @@ export default function DepartmentsTable({
       filter: true,
       render: (d: Department) =>
         d.subareas.length === 0 ? (
-          <ITText className="text-[10px] font-bold text-slate-400 uppercase">
+          <ITText className="text-[12px] font-bold text-slate-400">
             {tt("list.noAreas")}
           </ITText>
         ) : (

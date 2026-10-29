@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { FaChartBar } from "react-icons/fa";
+import { LuChartColumn } from "react-icons/lu";
 import { dashboardApi } from "@entities/dashboard";
 import { dyn } from "@shared/i18n/dyn";
 import { CHART_STATUS, DonutChart, HBarChart } from "@shared/ui/charts";
@@ -42,15 +42,14 @@ export default function RecordsChartsWidget() {
   return (
     <WidgetCard
       title={t("records.chartsTitle")}
-      icon={<FaChartBar size={13} />}
-      iconClass="bg-rose-600"
+      icon={<LuChartColumn size={16} />}
       to="/employees/records"
       loading={loading}
       error={error}
       onRetry={reload}
       wide
     >
-      <div className="grid gap-x-6 gap-y-2 md:grid-cols-2">
+      <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
         <div>
           <SectionLabel>{t("records.chartStatus")}</SectionLabel>
           <DonutChart segments={charts.status} size={120} />

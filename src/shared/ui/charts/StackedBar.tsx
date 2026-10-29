@@ -14,7 +14,7 @@ export default function StackedBar({ segments }: { segments: Segment[] }) {
   const total = segments.reduce((s, x) => s + x.value, 0);
   return (
     <div>
-      <div className="flex h-3 w-full gap-[2px] overflow-hidden rounded bg-slate-100">
+      <div className="flex h-3 w-full gap-[2px] overflow-hidden rounded" style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 15%, transparent)" }}>
         {total > 0 &&
           segments
             .filter((s) => s.value > 0)

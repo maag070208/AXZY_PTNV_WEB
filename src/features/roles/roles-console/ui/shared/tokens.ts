@@ -55,7 +55,7 @@ export const scopeGlyph = (scope: PermissionScope, scoped: boolean): string => {
 
 export const scopeCellClass = (scope: PermissionScope): string =>
   ({
-    NONE: "!bg-white text-slate-300 hover:!bg-slate-50",
+    NONE: "!bg-[var(--it-card-bg)] text-slate-300 hover:!bg-slate-50",
     OWN: "!bg-sky-100 text-sky-700 hover:!bg-sky-200",
     AREA: "!bg-violet-100 text-violet-700 hover:!bg-violet-200",
     ALL: "!bg-emerald-100 text-emerald-700 hover:!bg-emerald-200",

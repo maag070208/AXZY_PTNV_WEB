@@ -1,6 +1,8 @@
 {
   "title": "Inicio",
   "description": "Panel de control de Cartas Responsivas · Puerto Nuevo Hotel y Villas",
+  "greeting": "Hola, {{name}}",
+  "hotel": "Puerto Nuevo Hotel y Villas",
   "groups": {
     "ops": "Operación",
     "people": "Personal",
@@ -11,9 +13,16 @@
   },
   "adminDashboard": {
     "title": "Panel en tiempo real",
+    "resolvedCaption": "resueltos",
+    "today": "Hoy",
+    "yesterday": "Ayer",
     "live": "En vivo",
     "errorLoad": "No se pudo cargar el panel",
     "devices": "Dispositivos",
+    "devicesAvailable": "{{available}} disponibles",
+    "custodyOfTotal": "de {{total}} cartas",
+    "damagedOfTotal": "de {{total}} salidas",
+    "resolvedPending": "{{pending}} pendientes",
     "activeCustodyLetters": "Cartas activas",
     "damagedExits": "Salidas dañadas",
     "recentActivity": "Actividad reciente",

@@ -81,7 +81,7 @@ export default function KanbanBoard({ fx }: Props) {
                         : "opacity-80 hover:opacity-100"
                     }`}
                   >
-                    <Avatar name={u.name} seed={u.id} />
+                    <Avatar name={u.name} />
                   </button>
                 );
               })}
@@ -267,7 +267,7 @@ export default function KanbanBoard({ fx }: Props) {
                           <span className="text-[10px] text-slate-400 truncate">
                             #{a.ticketId.slice(0, 6).toUpperCase()}
                           </span>
-                          <Avatar name={a.user.name} seed={a.userId} />
+                          <Avatar name={a.user.name} />
                         </ITFlex>
                       </div>
                     );

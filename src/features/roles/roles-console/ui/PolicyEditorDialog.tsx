@@ -346,7 +346,7 @@ export default function PolicyEditorDialog({
             <button
               type="button"
               onClick={addCondition}
-              className="flex w-fit items-center gap-1.5 !bg-transparent text-[11px] font-bold text-[#0D5777] hover:underline"
+              className="flex w-fit items-center gap-1.5 !bg-transparent text-[11px] font-bold text-primary-500 hover:underline"
             >
               <FaPlus size={9} /> {t("policies.addCondition")}
             </button>
@@ -381,10 +381,10 @@ export default function PolicyEditorDialog({
                       type="button"
                       onClick={() => toggleRole(role.key)}
                       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
-                        selected ? "border-[#0D5777] !bg-[#0D5777] text-white" : "border-slate-200 !bg-white text-slate-600 hover:border-slate-300"
+                        selected ? "border-primary-500 !bg-primary-500 text-white" : "border-slate-200 !bg-[var(--it-card-bg)] text-slate-600 hover:border-slate-300"
                       }`}
                     >
-                      <span className={`h-2 w-2 rounded-full ${selected ? "bg-white" : ROLE_TONES[roleTone(role.key)].dot}`} />
+                      <span className={`h-2 w-2 rounded-full ${selected ? "bg-[var(--it-card-bg)]" : ROLE_TONES[roleTone(role.key)].dot}`} />
                       {role.name}
                     </button>
                   );
@@ -393,8 +393,8 @@ export default function PolicyEditorDialog({
           )}
         </DialogSection>
 
-        <div className="rounded-xl border border-[#0D5777]/20 bg-[#0D5777]/5 px-3 py-2">
-          <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-[#0D5777]">{t("policies.wizard.preview")}</p>
+        <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 px-3 py-2">
+          <p className="mb-1 text-[12px] font-semibold text-primary-500">{t("policies.wizard.preview")}</p>
           <PolicySentence policy={{ effect: form.effect, roles, conditions: form.conditions }} action={action} />
         </div>
 

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaFingerprint, FaIdCard, FaSyncAlt, FaUserCheck, FaUserSlash } from "react-icons/fa";
 import { ITButton, ITDataTable, ITDialog, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
 import type { Column, ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { useTimeClockPeople } from "../model/useTimeClockPeople";
 import PersonDetailDialog from "./PersonDetailDialog";
@@ -13,14 +14,6 @@ import { useCan } from "@entities/user";
 /** Persona con su presencia de rostro y huellas (null mientras se leen los conteos). */
 type Row = TimeClockPerson & { faces: number | null; fingerprints: number | null };
 const yesNo = (n: number | null): string | null => (n === null ? null : n > 0 ? "true" : "false");
-const TONES = [
-  "bg-blue-100 text-blue-700",
-  "bg-orange-100 text-orange-700",
-  "bg-emerald-100 text-emerald-700",
-  "bg-violet-100 text-violet-700",
-  "bg-pink-100 text-pink-700",
-  "bg-cyan-100 text-cyan-700",
-];
 const TOTAL_CHECKS = 3;
 
 interface Props {
@@ -28,11 +21,7 @@ interface Props {
   clockSerial?: string;
 }
 
-const initials = (name: string): string =>
-  name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
-const toneOf = (key: string): string => TONES[[...key].reduce((sum, c) => sum + c.charCodeAt(0), 0) % TONES.length];
-
-/** Foto de la persona si tiene rostro registrado; si no, sus iniciales. Libera la URL al salir. */
+/** Foto de la persona si tiene rostro registrado; si no, un Blobatar. Libera la URL al salir. */
 function PersonAvatar({ clockSerial, employeeNumber, name, hasFace }: { clockSerial: string; employeeNumber: string; name: string; hasFace: boolean }) {
   const [src, setSrc] = useState<string | null>(null);
   useEffect(() => {
@@ -53,12 +42,7 @@ function PersonAvatar({ clockSerial, employeeNumber, name, hasFace }: { clockSer
       setSrc(null);
     };
   }, [clockSerial, employeeNumber, hasFace]);
-  if (src) return <img src={src} alt={name} className="h-10 w-10 shrink-0 rounded-full border border-slate-200 object-cover" />;
-  return (
-    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${toneOf(employeeNumber)}`}>
-      {initials(name)}
-    </span>
-  );
+  return <ProfileAvatar photoUrl={src} name={name} size="md" alt={name} />;
 }
 
 function Chip({ on, icon, label }: { on: boolean; icon: React.ReactNode; label: string }) {

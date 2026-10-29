@@ -48,16 +48,20 @@ export default function StepWizard({
     [
       "flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors",
       state === "active"
-        ? "!border-[#0D5777] !bg-[#0D5777] !text-white"
+        ? "!border-[color:var(--color-primary)] !bg-[color:var(--color-primary)] !text-white"
         : state === "done"
-          ? "!border-emerald-200 !bg-emerald-50 !text-emerald-700 cursor-pointer"
-          : "!border-slate-200 !bg-white !text-slate-400",
+          ? "!border-[color:var(--color-success-soft-border)] !bg-[color:var(--color-success-soft)] !text-[color:var(--color-success)] cursor-pointer"
+          : "!border-[color:var(--it-card-border,#e2e8f0)] !bg-[color:var(--it-card-bg,#ffffff)] !text-[color:var(--color-text-muted)]",
     ].join(" ");
 
   const circle = (state: "done" | "active" | "todo") =>
     [
       "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black",
-      state === "active" ? "!bg-white !text-[#0D5777]" : state === "done" ? "!bg-emerald-600 !text-white" : "!bg-slate-100 !text-slate-400",
+      state === "active"
+        ? "!bg-white !text-[color:var(--color-primary)]"
+        : state === "done"
+          ? "!bg-[color:var(--color-success)] !text-white"
+          : "!bg-[color:var(--it-bento-control-bg,#f1f5f9)] !text-[color:var(--color-text-muted)]",
     ].join(" ");
 
   return (
@@ -79,13 +83,13 @@ export default function StepWizard({
                   as="span"
                   className={[
                     "text-[11px] font-bold whitespace-nowrap",
-                    state === "active" ? "!text-white" : state === "done" ? "!text-emerald-700" : "!text-slate-400",
+                    state === "active" ? "!text-white" : state === "done" ? "!text-[color:var(--color-success)]" : "!text-[color:var(--color-text-muted)]",
                   ].join(" ")}
                 >
                   {s.label}
                 </ITText>
               </button>
-              {i < steps.length - 1 && <div className="h-0.5 min-w-[14px] flex-1 rounded-full !bg-slate-200" />}
+              {i < steps.length - 1 && <div className="h-0.5 min-w-[14px] flex-1 rounded-full !bg-[color:var(--it-bento-control-bg-hover,#e2e8f0)]" />}
             </Fragment>
           );
         })}
@@ -102,7 +106,7 @@ export default function StepWizard({
         </ITButton>
 
         <ITFlex align="center" gap={3}>
-          <ITText className="hidden text-[11px] text-slate-400 sm:block">{stepCounter}</ITText>
+          <ITText className="hidden text-[11px] text-[color:var(--color-text-muted)] sm:block">{stepCounter}</ITText>
           <ITButton
             variant="filled"
             color="primary"

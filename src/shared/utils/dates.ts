@@ -41,3 +41,13 @@ export const formatMinutesAsHhMm = (minutes: number): string => {
   const m = total % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
+
+/**
+ * Fecha larga con día de la semana según el idioma de la interfaz
+ * (es: `miércoles 29 de octubre`; en: `Wednesday, October 29`).
+ */
+export const formatLongDate = (date: Date, locale: string): string => {
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: "long" }).format(date);
+  const rest = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(date);
+  return locale.startsWith("es") ? `${weekday} ${rest}` : `${weekday}, ${rest}`;
+};

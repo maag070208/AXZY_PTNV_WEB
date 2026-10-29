@@ -134,7 +134,7 @@ export default function SysConfigTab() {
   return (
     <ITFlex direction="column" gap={4} className="pt-2">
       <ITFlex align="center" gap={2}>
-        <FaEnvelope className="text-[#0D5777]" />
+        <FaEnvelope className="text-primary-500" />
         <ITText className="text-sm font-bold text-slate-800">
           {t("sysConfig.title")}
         </ITText>

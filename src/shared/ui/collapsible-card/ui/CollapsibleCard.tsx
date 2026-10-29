@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 export interface CollapsibleCardProps {
@@ -15,6 +15,7 @@ export interface CollapsibleCardProps {
 /**
  * Card con encabezado clicable que colapsa/expande su contenido.
  * El kit no expone un collapse genérico, por eso este wrapper compartido.
+ * Se pinta sobre `ITCard`: fondo, borde, radio y sombra salen de la apariencia.
  */
 export default function CollapsibleCard({
   icon,
@@ -27,13 +28,13 @@ export default function CollapsibleCard({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-3">
+    <ITCard className="w-full min-w-0">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={
           "w-full text-left" +
-          (open ? " hover:bg-slate-50 mb-4" : "")
+          (open ? " mb-4" : "")
         }
       >
         <ITFlex align="center" justify="between" gap={2}>
@@ -53,6 +54,6 @@ export default function CollapsibleCard({
       </button>
 
       {open && <div className="mt-5">{children}</div>}
-    </div>
+    </ITCard>
   );
 }

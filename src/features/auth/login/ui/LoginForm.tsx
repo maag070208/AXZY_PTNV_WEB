@@ -1,15 +1,7 @@
-import {
-  ITAlert,
-  ITButton,
-  ITCard,
-  ITFlex,
-  ITInput,
-  ITStack,
-  ITText,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
-import { FaSignInAlt } from "react-icons/fa";
+import { ITAlert, ITButton, ITInput, ITToast } from "@axzydev/axzy_ui_system";
+import { LuLogIn, LuUser } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
+import "./login.css";
 
 interface LoginFormProps {
   username: string;
@@ -41,26 +33,24 @@ export default function LoginForm({
   const { t: tt } = useTranslation(["auth"]);
   return (
     <>
-      <ITCard className="w-full p-8 shadow-xl border border-slate-100 rounded-[24px]">
-        <ITStack>
-          <ITText as="h2" className="text-2xl font-bold text-slate-800 text-center">
+      <section className="login-form-panel flex flex-1 items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
+        <div className="w-full max-w-md">
+          <span className="login-badge inline-block rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-widest">
+            {tt("login.badge")}
+          </span>
+
+          <h1 className="login-heading mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
             {tt("login.title")}
-          </ITText>
-          <ITText className="text-sm text-slate-500 block text-center mt-1">
-            {tt("login.subtitle")}
-          </ITText>
-        </ITStack>
+          </h1>
+          <p className="login-muted mt-2 text-sm sm:text-base">{tt("login.subtitle")}</p>
 
-        {deactivatedMsg && (
-          <div className="mt-4">
-            <ITAlert variant="warning">
-              {deactivatedMsg}
-            </ITAlert>
-          </div>
-        )}
+          {deactivatedMsg && (
+            <div className="mt-6">
+              <ITAlert variant="warning">{deactivatedMsg}</ITAlert>
+            </div>
+          )}
 
-        <form onSubmit={onSubmit} className="space-y-4 mt-6" noValidate>
-          <ITFlex direction="column" gap={4}>
+          <form onSubmit={onSubmit} className="mt-8 space-y-5" noValidate>
             <div>
               <ITInput
                 name="username"
@@ -69,6 +59,7 @@ export default function LoginForm({
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="admin"
                 autoFocus
+                iconRight={<LuUser aria-hidden size={16} />}
                 aria-invalid={!!errors.username}
               />
               {errors.username && (
@@ -93,24 +84,27 @@ export default function LoginForm({
                 </span>
               )}
             </div>
-          </ITFlex>
 
-          <ITButton
-            type="submit"
-            variant="filled"
-            color="primary"
-            disabled={isSubmitting || !canSubmit}
-            className="w-full flex items-center justify-center gap-2"
-          >
-            <ITFlex align="center" gap={1}>
-              <FaSignInAlt size={14} />
-              <ITText className="font-bold text-[11px]">
+            <ITButton
+              type="submit"
+              variant="filled"
+              color="primary"
+              disabled={isSubmitting || !canSubmit}
+              className="login-submit w-full flex items-center justify-center gap-2 py-3"
+            >
+              <span className="flex items-center justify-center gap-2 text-sm font-bold">
+                <LuLogIn aria-hidden size={16} />
                 {isSubmitting ? tt("login.submitting") : tt("login.submit")}
-              </ITText>
-            </ITFlex>
-          </ITButton>
-        </form>
-      </ITCard>
+              </span>
+            </ITButton>
+          </form>
+
+          <footer className="login-muted mt-10 flex items-center justify-between text-xs">
+            <span>{tt("login.footer")}</span>
+            <span className="font-medium">v{__APP_VERSION__}</span>
+          </footer>
+        </div>
+      </section>
 
       {toast && (
         <ITToast

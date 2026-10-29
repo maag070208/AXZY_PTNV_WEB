@@ -100,7 +100,7 @@ export default function RoleMembersPanel({ role, roleActive, members, onViewAcce
           {withRole.length === 0 ? t("members.empty") : t("matrix.noResults")}
         </p>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-[var(--it-card-bg)]">
           {rows.map((member, index) => {
             const primary = member.role === role;
             const otherRoles = [member.role, ...member.extraRoles].filter((key) => key !== role);
@@ -111,26 +111,26 @@ export default function RoleMembersPanel({ role, roleActive, members, onViewAcce
                   member.active ? "" : "opacity-60"
                 }`}
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0D5777]/10 text-[10px] font-black text-[#0D5777]">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-500/10 text-[10px] font-black text-primary-500">
                   {initialsOfName(member.name)}
                 </span>
                 <div className="min-w-[180px] flex-1">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="text-[12px] font-bold text-slate-800">{member.name}</span>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${
-                        primary ? "bg-[#0D5777] text-white" : "bg-slate-100 text-slate-600"
+                    className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${
+                        primary ? "bg-primary-500 text-white" : "bg-slate-100 text-slate-600"
                       }`}
                     >
                       {primary ? t("members.primary") : t("members.extra")}
                     </span>
                     {!member.active && (
-                      <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[9px] font-black uppercase text-rose-600">
+                      <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[12px] font-semibold text-rose-600">
                         {t("members.inactive")}
                       </span>
                     )}
                     {member.exceptions > 0 && (
-                      <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[9px] font-black uppercase text-violet-600">
+                      <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[12px] font-semibold text-violet-600">
                         {t("members.exceptions", { count: member.exceptions })}
                       </span>
                     )}

@@ -33,6 +33,7 @@
     "ownRest": "Today is your day off",
     "ownUnlinked": "Your time clock number is not linked; ask HR to link it",
     "viewReport": "View weekly report",
+    "ofExpected": "of {{total}} expected",
     "chartTitle": "How the day is going"
   },
   "records": {

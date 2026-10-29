@@ -27,7 +27,7 @@ interface Props {
 
 const ACTION_TONE: Record<string, string> = {
   ACCESS_DENIED: "bg-rose-50 text-rose-700",
-  ROLE_PERMISSIONS_UPDATED: "bg-[#0D5777]/10 text-[#0D5777]",
+  ROLE_PERMISSIONS_UPDATED: "bg-primary-500/10 text-primary-500",
   PERMISSION_EXCEPTION_SET: "bg-violet-50 text-violet-700",
   PERMISSION_EXCEPTION_REMOVED: "bg-violet-50 text-violet-700",
   USER_ROLE_ADDED: "bg-emerald-50 text-emerald-700",

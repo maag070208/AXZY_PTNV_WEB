@@ -145,7 +145,7 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
               </label>
             </ITGrid>
             <ITGrid item xs={12}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("types.fields")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{t("types.fields")}</ITText>
               <ITFlex wrap="wrap" gap={4} className="mt-2">
                 <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useSerialNumber} onChange={(e) => setUseSerialNumber(e.target.checked)} className="h-4 w-4 accent-emerald-600" />

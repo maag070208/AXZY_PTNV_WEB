@@ -20,7 +20,7 @@ export function PendingChangesBar({ changes, saving, onDiscard, onReview }: BarP
   if (changes.length === 0) return null;
   const roles = new Set(changes.map((change) => change.role)).size;
   return (
-    <div className="sticky bottom-3 z-40 mx-auto flex w-full max-w-2xl flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur">
+    <div className="sticky bottom-3 z-40 mx-auto flex w-full max-w-2xl flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-[var(--it-card-bg)]/95 px-3 py-2 shadow-lg backdrop-blur">
       <span className="relative flex h-3 w-3">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
         <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-500" />

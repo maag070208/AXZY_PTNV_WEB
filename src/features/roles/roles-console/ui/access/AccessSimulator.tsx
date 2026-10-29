@@ -55,8 +55,8 @@ function Step({
   return (
     <div className={`relative flex flex-col gap-1.5 rounded-xl border p-3 ${style.ring}`}>
       <div className="flex items-center gap-2">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">{icon}</span>
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{index}</span>
+        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--it-card-bg)] text-slate-500 shadow-sm">{icon}</span>
+        <span className="text-[12px] font-semibold text-slate-400">{index}</span>
         <span className="text-[12px] font-black text-slate-700">{title}</span>
         <span className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full ${style.badge}`}>{style.icon}</span>
       </div>
@@ -174,14 +174,14 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
     <li
       key={rule.id}
       className={`rounded-xl border px-3 py-2 ${
-        rule.id === decidedId ? "border-[#0D5777] bg-[#0D5777]/5" : "border-slate-200 bg-white"
+        rule.id === decidedId ? "border-primary-500 bg-primary-500/5" : "border-slate-200 bg-[var(--it-card-bg)]"
       } ${rule.active ? "" : "opacity-50"}`}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded bg-slate-100 px-1.5 text-[10px] font-black text-slate-500">#{rule.priority}</span>
         <span className="text-[12px] font-bold text-slate-700">{rule.name}</span>
         <span
-          className={`rounded px-1.5 py-0.5 text-[9px] font-black uppercase ${
+        className={`rounded px-1.5 py-0.5 text-[12px] font-semibold ${
             rule.effect === "DENY" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"
           }`}
         >
@@ -193,7 +193,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
         </span>
         <span className="ml-auto text-[10px] font-black">
           {rule.matches ? (
-            <span className="text-[#0D5777]">{rule.id === decidedId ? t("simulator.trace.decides") : t("simulator.trace.matches")}</span>
+            <span className="text-primary-500">{rule.id === decidedId ? t("simulator.trace.decides") : t("simulator.trace.matches")}</span>
           ) : (
             <span className="text-slate-400">{t("simulator.trace.noMatch")}</span>
           )}
@@ -212,7 +212,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
                 )}
                 <span className="font-bold text-slate-700">{field?.label ?? condition.field}</span>
                 <span className="text-slate-500">{tt(`policies.operator.${condition.operator}`)}</span>
-                {condition.value != null && <span className="font-bold text-[#0D5777]">{valueText(condition.value)}</span>}
+                {condition.value != null && <span className="font-bold text-primary-500">{valueText(condition.value)}</span>}
                 <span className="text-slate-400">
                   ({t("simulator.trace.actual")}:{" "}
                   {field?.type === "user" && condition.actual === subject
@@ -364,7 +364,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
 
           {result.abac.explanation && result.abac.explanation.rules.length > 0 && (
             <div>
-              <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-400">{t("simulator.trace.title")}</p>
+              <p className="mb-2 text-[12px] font-semibold text-slate-400">{t("simulator.trace.title")}</p>
               <ol className="flex flex-col gap-2">
                 {result.abac.explanation.rules.map((rule) => traceRow(rule, result.abac.explanation?.decidedBy?.id))}
               </ol>

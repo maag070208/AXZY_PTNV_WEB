@@ -128,7 +128,7 @@ export default function TicketDetailModal({
                             className="flex items-start gap-3 px-3.5 py-3"
                             style={i > 0 ? { borderTop: `1px solid ${BORDER.subtle}` } : undefined}
                           >
-                            <Avatar name={t.user.name} seed={t.userId} />
+                            <Avatar name={t.user.name} />
 
                             <div className="min-w-0 flex-1">
                               <div className="flex items-baseline gap-1.5 min-w-0">

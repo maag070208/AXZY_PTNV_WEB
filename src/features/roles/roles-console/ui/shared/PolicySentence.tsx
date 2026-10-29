@@ -39,7 +39,7 @@ export default function PolicySentence({ policy, action }: Props) {
         <span className="rounded-md bg-slate-100 px-1.5 py-0.5 font-bold text-slate-700">{fieldLabel(item.field)}</span>
         <span className="text-slate-500">{tt(`policies.operator.${item.operator}`)}</span>
         {item.value != null && (
-          <span className="rounded-md bg-[#0D5777]/10 px-1.5 py-0.5 font-bold text-[#0D5777]">{valueText(item.value)}</span>
+          <span className="rounded-md bg-primary-500/10 px-1.5 py-0.5 font-bold text-primary-500">{valueText(item.value)}</span>
         )}
       </span>
     )

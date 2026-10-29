@@ -41,7 +41,7 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
   }, [data, rolesMeta, query, t]);
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 lg:sticky lg:top-4">
+    <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-2 lg:sticky lg:top-4">
       <ITInput
         name="role_list_search"
         size="sm"
@@ -56,7 +56,7 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
         )}
         {groups.map(([module, roles]) => (
           <div key={module} className="flex flex-col gap-0.5">
-            <p className="px-2 text-[9px] font-black uppercase tracking-widest text-slate-400">{module}</p>
+            <p className="px-2 text-[12px] font-semibold text-slate-400">{module}</p>
             {roles.map((key) => {
               const meta = metaOf(key);
               const selected = key === selectedRole;
@@ -68,14 +68,14 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
                   onClick={() => onSelect(key)}
                   className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition ${
                     selected
-                      ? "border-[#0D5777]/40 !bg-[#0D5777]/5 shadow-sm"
+                      ? "border-primary-500/40 !bg-primary-500/5 shadow-sm"
                       : "border-transparent !bg-transparent hover:!bg-slate-50"
                   } ${meta && !meta.active ? "opacity-60" : ""}`}
                 >
                   <RoleAvatar role={key} size="sm" />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5">
-                      <span className={`truncate text-[12px] font-bold ${selected ? "text-[#0D5777]" : "text-slate-800"}`}>
+                      <span className={`truncate text-[12px] font-bold ${selected ? "text-primary-500" : "text-slate-800"}`}>
                         {roleLabel(key)}
                       </span>
                       {pending > 0 && (

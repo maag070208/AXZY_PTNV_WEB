@@ -23,6 +23,7 @@ import {
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDate, formatDateTime } from "@shared/utils/dates";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { dyn } from "@shared/i18n/dyn";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 import TaskAgentForm from "./TaskAgentForm";
@@ -37,12 +38,12 @@ interface Props {
   }) => React.ReactNode;
 }
 
-/** Color por estado: borde izquierdo de la tarjeta y avatar del responsable. */
-const STATUS_TONE: Record<string, { border: string; avatar: string }> = {
-  PENDING: { border: "border-l-slate-300", avatar: "bg-slate-100 text-slate-500" },
-  IN_PROGRESS: { border: "border-l-blue-400", avatar: "bg-blue-50 text-blue-600" },
-  IN_REVIEW: { border: "border-l-purple-400", avatar: "bg-purple-50 text-purple-600" },
-  COMPLETED: { border: "border-l-emerald-400", avatar: "bg-emerald-50 text-emerald-600" },
+/** Color por estado: borde izquierdo de la tarjeta. */
+const STATUS_TONE: Record<string, { border: string }> = {
+  PENDING: { border: "border-l-slate-300" },
+  IN_PROGRESS: { border: "border-l-blue-400" },
+  IN_REVIEW: { border: "border-l-purple-400" },
+  COMPLETED: { border: "border-l-emerald-400" },
 };
 
 const STATUS_BADGE: Record<string, string> = {
@@ -51,15 +52,6 @@ const STATUS_BADGE: Record<string, string> = {
   IN_REVIEW: "purple",
   PENDING: "gray",
 };
-
-const initialsOf = (name: string): string =>
-  name
-    .split(" ")
-    .map((p) => p[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
 /**
  * Tareas del ticket: una lista (no un grafo). Cada tarea es una tarjeta con el
@@ -175,11 +167,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                 {/* Quién y en qué estado. */}
                 <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="px-3 py-2.5">
                   <ITFlex align="center" gap={2} className="min-w-0">
-                    <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${tone.avatar} !text-[11px] font-black`}
-                    >
-                      {initialsOf(a.user.name)}
-                    </span>
+                    <ProfileAvatar name={a.user.name} size="sm" />
                     <ITFlex direction="column" gap={0} className="min-w-0">
                       <ITText className="!text-[12px] font-bold text-slate-800 truncate">{a.user.name}</ITText>
                       {a.user.employeeNumber && (

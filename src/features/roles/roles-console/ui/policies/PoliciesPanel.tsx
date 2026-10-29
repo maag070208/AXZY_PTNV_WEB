@@ -95,7 +95,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
       </div>
 
       {grouped.map(({ key, action, rules }) => (
-        <div key={key} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <div key={key} className="overflow-hidden rounded-xl border border-slate-200 bg-[var(--it-card-bg)]">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-3 py-2">
             <p className="text-[12px] text-slate-600">
               {t("policies.story.whoCan")} <b className="text-slate-900">{(action?.label ?? key).toLowerCase()}</b>
@@ -105,14 +105,14 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
               <button
                 type="button"
                 onClick={() => openNew(key)}
-                className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-white px-2 py-1 text-[10px] font-bold text-[#0D5777] hover:border-[#0D5777]"
+                className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-[var(--it-card-bg)] px-2 py-1 text-[10px] font-bold text-primary-500 hover:border-primary-500"
               >
                 <FaPlus size={8} /> {t("policies.addRule")}
               </button>
               <button
                 type="button"
                 onClick={() => onTest(key)}
-                className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-white px-2 py-1 text-[10px] font-bold text-[#0D5777] hover:border-[#0D5777]"
+                className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-[var(--it-card-bg)] px-2 py-1 text-[10px] font-bold text-primary-500 hover:border-primary-500"
               >
                 <FaVial size={9} /> {t("simulator.test")}
               </button>
@@ -127,7 +127,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
               >
                 <span
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
-                    policy.active ? "bg-[#0D5777] text-white" : "bg-slate-200 text-slate-500"
+                    policy.active ? "bg-primary-500 text-white" : "bg-slate-200 text-slate-500"
                   }`}
                 >
                   {index + 1}
@@ -162,7 +162,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
                   <span title={policy.active ? t("policies.turnOff") : t("policies.turnOn")}>
                     <ITSlideToggle
                       size="sm"
-                      activeColor="#0D5777"
+                      activeColor="var(--color-primary)"
                       isOn={policy.active}
                       disabled={saving}
                       onToggle={(active) => void runQuick(setActive(policy, active))}
@@ -175,7 +175,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
                       setEditorOpen(true);
                     }}
                     title={t("policies.edit")}
-                    className="flex h-6 w-6 items-center justify-center rounded-md !bg-transparent text-[#0D5777] hover:!bg-[#0D5777]/10"
+                    className="flex h-6 w-6 items-center justify-center rounded-md !bg-transparent text-primary-500 hover:!bg-primary-500/10"
                   >
                     <FaEdit size={10} />
                   </button>

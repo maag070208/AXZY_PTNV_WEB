@@ -33,7 +33,6 @@ interface Props {
 export default function EmployeeHero({ profile, onPhotoUpload }: Props) {
   const { t: tt } = useTranslation(["employees", "common"]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const initials = profile.name.split(" ").filter(Boolean).slice(0, 2).map((p) => p[0]).join("").toUpperCase();
 
   // Solo se muestran los datos que existen: una fila de guiones no aporta nada.
   const facts = [
@@ -45,7 +44,7 @@ export default function EmployeeHero({ profile, onPhotoUpload }: Props) {
   return (
     <section className="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center">
       <div className="relative w-fit shrink-0">
-        <ProfileAvatar photoUrl={profile.photoUrl} initials={initials} alt={profile.name} size="xl" className="h-28! w-28! text-3xl! ring-4 ring-slate-100" />
+        <ProfileAvatar photoUrl={profile.photoUrl} name={profile.name} size="xl" className="h-28! w-28! ring-4 ring-slate-100" />
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}

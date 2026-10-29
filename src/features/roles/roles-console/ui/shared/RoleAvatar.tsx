@@ -61,7 +61,7 @@ export function RoleChip({ role, suffix, muted = false, onClick }: ChipProps) {
   return (
     <Tag
       {...(onClick ? { type: "button" as const, onClick } : {})}
-      className={`inline-flex items-center gap-1.5 rounded-full border border-slate-200 !bg-white px-2.5 py-0.5 text-[11px] font-bold ${
+      className={`inline-flex items-center gap-1.5 rounded-full border border-slate-200 !bg-[var(--it-card-bg)] px-2.5 py-0.5 text-[11px] font-bold ${
         muted ? "text-slate-400 line-through" : "text-slate-700"
       } ${onClick ? "cursor-pointer hover:border-slate-300 hover:shadow-sm" : ""}`}
     >

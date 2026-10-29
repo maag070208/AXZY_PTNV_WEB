@@ -137,7 +137,7 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
               onClick={() => toggleHidden(role)}
               title={t("matrixView.toggleRole")}
               className={`inline-flex items-center gap-1 rounded-full border px-2 py-px text-[10px] font-bold transition ${
-                off ? "border-slate-200 !bg-slate-50 text-slate-400 line-through" : "border-slate-300 !bg-white text-slate-700"
+                off ? "border-slate-200 !bg-slate-50 text-slate-400 line-through" : "border-slate-300 !bg-[var(--it-card-bg)] text-slate-700"
               }`}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${off ? "bg-slate-300" : tone.dot}`} />
@@ -148,11 +148,11 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
         <span className="ml-auto text-[10px] italic text-slate-400">{t("matrixView.hint")}</span>
       </div>
 
-      <div className="max-h-[72vh] overflow-auto rounded-lg border border-slate-200 bg-white">
+      <div className="max-h-[72vh] overflow-auto rounded-lg border border-slate-200 bg-[var(--it-card-bg)]">
         <table className="min-w-full border-separate border-spacing-0 text-[11px]">
           <thead>
             <tr>
-              <th className="sticky left-0 top-0 z-30 min-w-[240px] border-b border-r border-slate-200 bg-white px-3 py-2 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <th className="sticky left-0 top-0 z-30 min-w-[240px] border-b border-r border-slate-200 bg-[var(--it-card-bg)] px-3 py-2 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">
                 {t("matrix.permission")}
               </th>
               {roles.map((role) => {
@@ -160,7 +160,7 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
                 return (
                   <th
                     key={role}
-                    className="sticky top-0 z-20 min-w-[72px] border-b border-slate-200 bg-white px-1 py-1.5 align-bottom"
+                    className="sticky top-0 z-20 min-w-[72px] border-b border-slate-200 bg-[var(--it-card-bg)] px-1 py-1.5 align-bottom"
                   >
                     <button
                       type="button"
@@ -198,7 +198,7 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
                         className="flex w-full items-center gap-2 !bg-transparent text-left"
                       >
                         {isCollapsed ? <FaChevronRight size={9} className="text-slate-400" /> : <FaChevronDown size={9} className="text-slate-400" />}
-                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-600">{module}</span>
+                        <span className="text-[12px] font-semibold text-slate-600">{module}</span>
                         <span className="text-[10px] text-slate-400">{permissions.length}</span>
                       </button>
                     </td>
@@ -219,7 +219,7 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
                   {!isCollapsed &&
                     visibleRows.map((permission) => (
                       <tr key={permission.key} className="group">
-                        <td className="sticky left-0 z-10 border-b border-r border-slate-100 bg-white px-3 py-1 group-hover:bg-slate-50">
+                        <td className="sticky left-0 z-10 border-b border-r border-slate-100 bg-[var(--it-card-bg)] px-3 py-1 group-hover:bg-slate-50">
                           <div className="flex items-center gap-1.5">
                             <span title={permission.key} className={`text-[12px] font-semibold ${permission.active ? "text-slate-700" : "text-slate-400 line-through"}`}>
                               {permission.name}

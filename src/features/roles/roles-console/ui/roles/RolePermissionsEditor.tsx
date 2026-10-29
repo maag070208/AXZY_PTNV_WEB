@@ -71,7 +71,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
       type="button"
       disabled={saving}
       onClick={() => setMany(role, permissions, mode)}
-      className="rounded border border-slate-200 !bg-white px-1.5 py-0.5 text-[10px] font-bold text-slate-500 hover:border-[#0D5777] hover:text-[#0D5777] disabled:opacity-50"
+      className="rounded border border-slate-200 !bg-[var(--it-card-bg)] px-1.5 py-0.5 text-[10px] font-bold text-slate-500 hover:border-primary-500 hover:text-primary-500 disabled:opacity-50"
     >
       {t(`bulk.${mode}`)}
     </button>
@@ -103,7 +103,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
           <button
             type="button"
             onClick={() => setExpanded(allOpen ? new Set() : new Set(visibleGroups.map((group) => group.module)))}
-            className="ml-auto !bg-transparent text-[11px] font-bold text-[#0D5777] hover:underline"
+            className="ml-auto !bg-transparent text-[11px] font-bold text-primary-500 hover:underline"
           >
             {allOpen ? t("editor.collapseAll") : t("editor.expandAll")}
           </button>
@@ -123,7 +123,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
             return (
               <div key={module} className={groupIndex > 0 ? "border-t border-slate-200" : ""}>
                 <div
-                  className={`flex flex-wrap items-center gap-2 px-3 py-2 ${open ? "bg-slate-50" : "bg-white hover:bg-slate-50/70"}`}
+                  className={`flex flex-wrap items-center gap-2 px-3 py-2 ${open ? "bg-slate-50" : "bg-[var(--it-card-bg)] hover:bg-slate-50/70"}`}
                 >
                   <button
                     type="button"
@@ -174,7 +174,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                           <span className="font-mono text-[10px] text-slate-400">{permission.key}</span>
                           {permission.sensitive && <FaLock size={8} className="text-amber-500" title={t("matrix.sensitive")} />}
                           {!permission.active && (
-                            <span className="text-[9px] font-black uppercase text-rose-500">{t("matrix.inactive")}</span>
+                          <span className="text-[12px] font-semibold text-rose-500">{t("matrix.inactive")}</span>
                           )}
                           {changed && <span className="h-1.5 w-1.5 self-center rounded-full bg-amber-500" title={t("editor.unsaved")} />}
                         </div>
@@ -189,7 +189,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                         <span title={locked ? t("matrix.adminLocked") : undefined}>
                           <ITSlideToggle
                             size="sm"
-                            activeColor="#0D5777"
+                            activeColor="var(--color-primary)"
                             isOn={granted}
                             disabled={disabled}
                             onToggle={() => toggle(role, permission.key)}

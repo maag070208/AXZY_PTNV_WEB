@@ -62,14 +62,6 @@ const DAY_STYLE: Record<AttendanceDayStatus, string> = {
 /** Anillo del día de hoy. */
 const TODAY_RING = "ring-2 ring-[#0D5777]/30 ring-offset-1";
 
-/** Iniciales para el avatar: primera letra de la primera y de la última palabra. */
-const initialsOf = (name: string): string => {
-  const words = name.split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  const first = words[0].charAt(0);
-  return words.length === 1 ? first : first + words[words.length - 1].charAt(0);
-};
-
 /** Fecha de una clave de día (`YYYY-MM-DD`) con las opciones dadas, sin corrimiento de zona. */
 const formatDay = (dayKey: string, options: Intl.DateTimeFormatOptions): string =>
   new Date(`${dayKey}T12:00:00Z`).toLocaleDateString(dateLocale(), { ...options, timeZone: "UTC" });
@@ -217,9 +209,8 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         return (
           <ITFlex align="center" gap={3}>
             <ProfileAvatar
-              initials={initialsOf(r.employeeName)}
+              name={r.employeeName}
               size="md"
-              className="!bg-slate-100 !text-slate-600"
             />
             <div className="min-w-0">
               <ITText className="truncate text-[13px] font-bold text-slate-800">{r.employeeName}</ITText>

@@ -19,7 +19,7 @@ import { roleLabel, useCan, usersApi } from "@entities/user";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { formatDate } from "@shared/i18n/format";
 import { groupByModule, isScopedPermission, matchesPermission } from "../../model/access-levels";
-import { initialsOfName, matchesMember, memberRoles, type AccessMembersState } from "../../model/useAccessMembers";
+import { matchesMember, memberRoles, type AccessMembersState } from "../../model/useAccessMembers";
 import { isLockedCell, type RolesAdminState } from "../../model/useRolesAdmin";
 import { useUserAccess } from "../../model/useUserAccess";
 import { RoleChip } from "../shared/RoleAvatar";
@@ -27,6 +27,7 @@ import { ScopeChip } from "../shared/Scope";
 import ScreensAccessList from "../shared/ScreensAccessList";
 import SidebarPreview from "../shared/SidebarPreview";
 import { TabBar } from "@shared/ui/tab-bar";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import ExceptionDialog from "./ExceptionDialog";
 
 interface Props {
@@ -247,7 +248,7 @@ export default function UserAccessExplorer({
   return (
     <div className="grid items-start gap-3 lg:grid-cols-[240px_minmax(0,1fr)]">
       {/* Personas */}
-      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 lg:sticky lg:top-4">
+      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-2 lg:sticky lg:top-4">
         <ITInput
           name="explorer_search"
           size="sm"
@@ -281,14 +282,12 @@ export default function UserAccessExplorer({
                   setSearch("");
                 }}
                 className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition ${
-                  selected ? "border-[#0D5777]/40 !bg-[#0D5777]/5" : "border-transparent !bg-transparent hover:!bg-slate-50"
+                  selected ? "border-primary-500/40 !bg-primary-500/5" : "border-transparent !bg-transparent hover:!bg-slate-50"
                 } ${member.active ? "" : "opacity-60"}`}
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0D5777]/10 text-[10px] font-black text-[#0D5777]">
-                  {initialsOfName(member.name)}
-                </span>
+                <ProfileAvatar name={member.name} size="sm" className="h-7! w-7!" />
                 <span className="min-w-0 flex-1">
-                  <span className={`block truncate text-[12px] font-bold ${selected ? "text-[#0D5777]" : "text-slate-800"}`}>
+                  <span className={`block truncate text-[12px] font-bold ${selected ? "text-primary-500" : "text-slate-800"}`}>
                     {member.name}
                   </span>
                   <span className="block truncate text-[10px] text-slate-400">{memberRoles(member).map(roleLabel).join(" · ")}</span>
@@ -303,7 +302,7 @@ export default function UserAccessExplorer({
       </div>
 
       {/* Acceso de la persona */}
-      <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-4">
         {!userId && (
           <div className="flex flex-col items-center gap-2 py-14 text-center">
             <FaUserSecret size={28} className="text-slate-300" />
@@ -328,14 +327,12 @@ export default function UserAccessExplorer({
           <>
             {/* Quién es y qué roles tiene */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D5777] text-[12px] font-black text-white">
-                {initialsOfName(access.user.name)}
-              </span>
+              <ProfileAvatar name={access.user.name} size="md" className="h-9! w-9!" />
               <div className="min-w-[200px] flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
                   <h2 className="text-[15px] font-black text-slate-900">{access.user.name}</h2>
                   {!access.user.active && (
-                    <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-rose-600">{t("members.inactive")}</span>
+                  <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[12px] font-bold text-rose-600">{t("members.inactive")}</span>
                   )}
                 </div>
                 <p className="truncate text-[11px] text-slate-500">
@@ -378,7 +375,7 @@ export default function UserAccessExplorer({
                   placement="bottom-start"
                   triggerLabel={t("explorer.addRole")}
                   trigger={
-                    <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-[11px] font-bold text-slate-500 hover:border-[#0D5777] hover:text-[#0D5777]">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-[11px] font-bold text-slate-500 hover:border-primary-500 hover:text-primary-500">
                       <FaPlus size={8} /> {t("explorer.addRole")}
                     </span>
                   }
@@ -425,8 +422,8 @@ export default function UserAccessExplorer({
                           onClick={() => setView(id)}
                           className={`rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
                             view === id
-                              ? "border-[#0D5777] !bg-[#0D5777] text-white"
-                              : "border-slate-200 !bg-white text-slate-600 hover:border-slate-300"
+                              ? "border-primary-500 !bg-primary-500 text-white"
+                              : "border-slate-200 !bg-[var(--it-card-bg)] text-slate-600 hover:border-slate-300"
                           }`}
                         >
                           {label}
@@ -444,7 +441,7 @@ export default function UserAccessExplorer({
                   <div className="overflow-hidden rounded-lg border border-slate-200">
                     {groups.map(({ module, rows }, groupIndex) => (
                       <div key={module} className={groupIndex > 0 ? "border-t border-slate-200" : ""}>
-                        <p className="bg-slate-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">{module}</p>
+                        <p className="bg-slate-50 px-3 py-1 text-[12px] font-semibold text-slate-500">{module}</p>
                         {rows.map((permission) => {
                           const row = byKey.get(permission.key);
                           if (!row) return null;
@@ -479,7 +476,7 @@ export default function UserAccessExplorer({
                                   type="button"
                                   onClick={() => onTest(access.user.id, permission.key)}
                                   title={t("explorer.hasRulesHint")}
-                                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 !bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:border-[#0D5777] hover:text-[#0D5777]"
+                                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 !bg-[var(--it-card-bg)] px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:border-primary-500 hover:text-primary-500"
                                 >
                                   <FaGavel size={8} /> {t("explorer.hasRules")}
                                 </button>
@@ -493,7 +490,7 @@ export default function UserAccessExplorer({
                                       className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-bold ${
                                         granted
                                           ? "border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-600"
-                                          : "border-[#0D5777]/30 text-[#0D5777] hover:border-[#0D5777]"
+                                          : "border-primary-500/30 text-primary-500 hover:border-primary-500"
                                       }`}
                                     >
                                       {granted ? t("explorer.fix.remove") : t("explorer.fix.give")}

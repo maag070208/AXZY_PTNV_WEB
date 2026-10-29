@@ -33,6 +33,7 @@
     "ownRest": "Hoy es tu día de descanso",
     "ownUnlinked": "Tu número del reloj no está vinculado; pide a RH que lo vincule",
     "viewReport": "Ver reporte semanal",
+    "ofExpected": "de {{total}} esperados",
     "chartTitle": "Cómo va el día"
   },
   "records": {

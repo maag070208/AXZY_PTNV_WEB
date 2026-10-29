@@ -1,5 +1,6 @@
 {
   "actions": {
+    "open": "Abrir",
     "new": "Nuevo",
     "edit": "Editar",
     "delete": "Eliminar",

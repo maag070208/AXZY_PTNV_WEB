@@ -33,14 +33,6 @@ const BROWSER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 /** Departamentos que se listan en la tarjeta de resumen. */
 const TOP_DEPARTMENTS = 4;
 
-/** Iniciales para el avatar: primera letra de la primera y de la última palabra. */
-const initialsOf = (name: string): string => {
-  const words = name.split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  const first = words[0].charAt(0);
-  return words.length === 1 ? first : first + words[words.length - 1].charAt(0);
-};
-
 /** "Mié 07 oct" de una clave de día (`YYYY-MM-DD`), sin corrimiento de zona. */
 const dayLabel = (dayKey: string): string => {
   const text = new Date(`${dayKey}T12:00:00Z`)
@@ -213,9 +205,8 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         return (
           <ITFlex align="center" gap={3}>
             <ProfileAvatar
-              initials={initialsOf(r.employeeName)}
+              name={r.employeeName}
               size="md"
-              className="!bg-slate-100 !text-slate-600"
             />
             <div className="min-w-0">
               <ITText className="truncate text-[13px] font-bold text-slate-800">{r.employeeName}</ITText>

@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { LuActivity, LuChefHat, LuClock, LuServer, LuUser, LuUsers } from "react-icons/lu";
 import { usePermissions, useCurrentRole } from "@entities/user";
 import { TabBar } from "@shared/ui/tab-bar";
 import AccessTodayWidget from "./widgets/AccessTodayWidget";
@@ -35,6 +36,16 @@ export type WidgetId =
  * del rol, no este catálogo.
  */
 export type WidgetGroup = "ops" | "people" | "clock" | "kitchen" | "system" | "mine";
+
+/** Ícono de línea de cada pestaña del tablero. */
+const GROUP_ICON: Record<WidgetGroup, ReactNode> = {
+  ops: <LuActivity size={15} />,
+  people: <LuUsers size={15} />,
+  clock: <LuClock size={15} />,
+  kitchen: <LuChefHat size={15} />,
+  system: <LuServer size={15} />,
+  mine: <LuUser size={15} />,
+};
 
 /**
  * Catálogo de widgets: qué permiso pide cada uno (la API vuelve a validarlo y
@@ -150,7 +161,7 @@ export default function RoleDashboard({ slots = {} }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <TabBar
-        items={grupos.map(([clave]) => ({ id: clave, label: t(`groups.${clave}`) }))}
+        items={grupos.map(([clave]) => ({ id: clave, label: t(`groups.${clave}`), icon: GROUP_ICON[clave] }))}
         value={activo}
         onChange={setGrupo}
       />

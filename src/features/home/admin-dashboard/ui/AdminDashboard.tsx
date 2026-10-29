@@ -1,37 +1,56 @@
 import { useNavigate } from "react-router-dom";
-import { ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import {
-  FaBoxOpen,
-  FaChevronRight,
-  FaClock,
-  FaFileSignature,
-  FaTicketAlt,
-  FaTrashAlt,
-} from "react-icons/fa";
-import { formatDateTime } from "@shared/utils/dates";
+  LuBox,
+  LuChartPie,
+  LuChevronRight,
+  LuClock,
+  LuFileText,
+  LuListChecks,
+  LuTicket,
+  LuTrash2,
+  LuActivity,
+} from "react-icons/lu";
+import { formatDate, formatTimeInTZ } from "@shared/utils/dates";
 import type { DashboardActivity } from "@entities/dashboard";
 import type { UseAdminDashboard } from "../model/useAdminDashboard";
 import { activityHref } from "../model/activityLinks";
-import { DonutChart } from "@shared/ui/charts";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { DonutChart, GaugeArc, WaveFill } from "@shared/ui/charts";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { KPI_TONES, KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
+import { PanelCard } from "@shared/ui/panel-card";
 
 const SCOPE_ICON: Record<DashboardActivity["scope"], React.ReactNode> = {
-  devices: <FaBoxOpen size={11} />,
-  tickets: <FaTicketAlt size={11} />,
-  custodyLetters: <FaFileSignature size={11} />,
-  materialOutputs: <FaTrashAlt size={11} />,
-  inventory: <FaFileSignature size={11} />,
+  devices: <LuBox size={14} />,
+  tickets: <LuTicket size={14} />,
+  custodyLetters: <LuFileText size={14} />,
+  materialOutputs: <LuTrash2 size={14} />,
+  inventory: <LuFileText size={14} />,
 };
 
-const SCOPE_COLOR: Record<DashboardActivity["scope"], string> = {
-  devices: "bg-blue-500",
-  tickets: "bg-amber-500",
-  custodyLetters: "bg-emerald-500",
-  materialOutputs: "bg-rose-500",
-  inventory: "bg-indigo-500",
+/** Tono pastel de cada tipo de actividad (coincide con el de su indicador). */
+const SCOPE_TONE: Record<DashboardActivity["scope"], KpiTone> = {
+  devices: "sky",
+  tickets: "amber",
+  custodyLetters: "violet",
+  materialOutputs: "rose",
+  inventory: "emerald",
 };
 
-const AGENT_COLORS = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+/** Paleta de segmentos del equipo, tomada de los tokens del tema (sigue la marca y la apariencia). */
+const AGENT_COLORS = [
+  "var(--color-primary)",
+  "var(--color-secondary)",
+  "var(--color-info)",
+  "var(--color-success)",
+  "var(--color-warning)",
+  "var(--color-danger)",
+];
+
+const dayKey = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+};
 
 /**
  * Panel de operación del inicio (`dashboard.view`).
@@ -49,24 +68,46 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
 
   const avgDays = summary.ticketMetrics.avgResolutionDays;
   const damaged = summary.materialOutputs.damaged;
+  const { resolvedTasks, pendingTasks } = summary.ticketMetrics;
   const efficiencySegments = summary.ticketEfficiency.map((e, i) => ({
     label: e.user.name,
     value: e.resolved,
     color: AGENT_COLORS[i % AGENT_COLORS.length],
   }));
+  // Proporciones reales del resumen; sin total no hay visual (nunca se inventa).
+  const devicesTotal = summary.devices.total;
+  const custodyTotal = summary.custodyLetters.total;
+  const tasksTotal = resolvedTasks + pendingTasks;
+  const efficiencyTotal = efficiencySegments.reduce((acc, e) => acc + e.value, 0);
+
+  // Actividad agrupada por día (el orden viene del servidor, más reciente primero).
+  const todayKey = dayKey(new Date().toISOString());
+  const yesterdayKey = dayKey(new Date(Date.now() - 86_400_000).toISOString());
+  const activityGroups: { key: string; label: string; items: DashboardActivity[] }[] = [];
+  for (const a of activity) {
+    const key = dayKey(a.at);
+    let group = activityGroups[activityGroups.length - 1];
+    if (!group || group.key !== key) {
+      const label =
+        key === todayKey ? t("adminDashboard.today") : key === yesterdayKey ? t("adminDashboard.yesterday") : formatDate(a.at);
+      group = { key, label, items: [] };
+      activityGroups.push(group);
+    }
+    group.items.push(a);
+  }
 
   return (
-    <ITFlex direction="column" gap={4}>
+    <ITFlex direction="column" gap={5}>
       <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
-        <ITText className="text-[13px] font-black uppercase tracking-widest text-slate-600">
+        <h2 className="m-0 !text-lg font-bold tracking-tight !text-slate-800">
           {t("adminDashboard.title")}
-        </ITText>
-        <ITFlex align="center" gap={1.5}>
+        </h2>
+        <ITFlex align="center" gap={1.5} className="rounded-full bg-[var(--color-success-soft)] px-2.5 py-0.5">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-success)]" />
           </span>
-          <ITText className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">
+          <ITText className="text-[11px] font-semibold text-[color:color-mix(in_srgb,var(--color-success)_55%,#000)]">
             {t("adminDashboard.live")}
           </ITText>
         </ITFlex>
@@ -77,101 +118,164 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
       <div className="!grid gap-4 sm:!grid-cols-2 xl:!grid-cols-5">
         <KpiTile
           label={t("adminDashboard.devices")}
-          value={summary.devices.total}
-          icon={<FaBoxOpen size={16} />}
+          value={devicesTotal}
+          icon={<LuBox size={16} />}
           tone="sky"
+          hint={t("adminDashboard.devicesAvailable", { available: summary.devices.available })}
+          visual={
+            devicesTotal > 0 ? (
+              <GaugeArc value={summary.devices.available / devicesTotal} color={KPI_TONES.sky.accent} />
+            ) : undefined
+          }
         />
         <KpiTile
           label={t("adminDashboard.activeCustodyLetters")}
           value={summary.custodyLetters.active}
-          icon={<FaFileSignature size={16} />}
+          icon={<LuFileText size={16} />}
           tone="violet"
+          hint={t("adminDashboard.custodyOfTotal", { total: custodyTotal })}
+          backdrop={
+            custodyTotal > 0 ? (
+              <WaveFill level={summary.custodyLetters.active / custodyTotal} color={KPI_TONES.violet.accent} />
+            ) : undefined
+          }
         />
         <KpiTile
           label={t("adminDashboard.damagedExits")}
           value={damaged}
-          icon={<FaTrashAlt size={16} />}
+          icon={<LuTrash2 size={16} />}
           tone={damaged > 0 ? "rose" : "neutral"}
+          hint={t("adminDashboard.damagedOfTotal", { total: summary.materialOutputs.total })}
         />
         <KpiTile
           label={t("adminDashboard.avgResolution")}
           value={avgDays !== null ? `${avgDays} d` : "—"}
-          icon={<FaClock size={16} />}
-          tone="neutral"
+          icon={<LuClock size={16} />}
+          tone="amber"
         />
         <KpiTile
           label={t("adminDashboard.resolvedTickets")}
-          value={summary.ticketMetrics.resolvedTasks}
-          icon={<FaTicketAlt size={16} />}
+          value={resolvedTasks}
+          icon={<LuListChecks size={16} />}
           tone="emerald"
+          hint={t("adminDashboard.resolvedPending", { pending: pendingTasks })}
+          visual={
+            tasksTotal > 0 ? (
+              <GaugeArc value={resolvedTasks / tasksTotal} color={KPI_TONES.emerald.accent} />
+            ) : undefined
+          }
         />
       </div>
 
-      {/* El donut va en una tarjeta angosta (antes ocupaba media pantalla para un
-          gráfico de 128 px) y la actividad se queda con el resto del ancho. */}
-      <div className="!grid gap-4 lg:!grid-cols-3">
-        <ITCard className="!p-5 border border-slate-200">
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
-            {t("adminDashboard.teamEfficiency")}
-          </ITText>
+      {/* Dona angosta con su leyenda propia (avatar, conteo y barra por persona) y la
+          actividad con el resto del ancho; ambas tarjetas se estiran a la misma altura. */}
+      <div className="!grid items-stretch gap-4 lg:!grid-cols-3">
+        <PanelCard
+          title={t("adminDashboard.teamEfficiency")}
+          icon={<LuChartPie size={18} />}
+          onOpen={() => navigate("/tickets")}
+          className="h-full"
+        >
           {efficiencySegments.length === 0 ? (
             <ITText className="text-[12px] font-bold text-slate-400">
               {t("adminDashboard.noEfficiency")}
             </ITText>
           ) : (
-            <DonutChart segments={efficiencySegments} size={148} />
+            <div className="flex flex-col items-center gap-5">
+              <DonutChart
+                segments={efficiencySegments}
+                size={160}
+                showLegend={false}
+                caption={t("adminDashboard.resolvedCaption")}
+              />
+              <ul className="m-0 flex w-full list-none flex-col gap-3 p-0">
+                {efficiencySegments.map((sec) => {
+                  const pct = efficiencyTotal > 0 ? Math.round((sec.value / efficiencyTotal) * 100) : 0;
+                  return (
+                    <li key={sec.label} className="flex items-center gap-3">
+                      <ProfileAvatar size="sm" name={sec.label} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-slate-800">
+                            {sec.label}
+                          </span>
+                          <span className="text-[13px] font-bold tabular-nums text-slate-800">{sec.value}</span>
+                          <span className="w-9 text-right text-[11px] tabular-nums text-slate-400">{pct}%</span>
+                        </div>
+                        <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${pct}%`, backgroundColor: sec.color }}
+                          />
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           )}
-        </ITCard>
+        </PanelCard>
 
-        <ITCard className="!p-5 border border-slate-200 lg:!col-span-2">
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
-            {t("adminDashboard.recentActivity")}
-          </ITText>
+        <PanelCard
+          title={t("adminDashboard.recentActivity")}
+          icon={<LuActivity size={18} />}
+          className="h-full lg:!col-span-2"
+        >
           {activity.length === 0 ? (
             <ITText className="text-[12px] font-bold text-slate-400">
               {t("adminDashboard.noActivity")}
             </ITText>
           ) : (
-            <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto pr-1">
-              {activity.map((a) => {
-                const href = activityHref(a);
-                const row = (
-                  <>
-                    <ITFlex
-                      align="center"
-                      justify="center"
-                      className={`w-6 h-6 shrink-0 rounded-full text-white ${SCOPE_COLOR[a.scope]}`}
-                    >
-                      {SCOPE_ICON[a.scope]}
-                    </ITFlex>
-                    <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
-                      <ITText className="text-[11px] font-bold text-slate-700 truncate">
-                        {a.message}
-                      </ITText>
-                      <ITText className="text-[9px] text-slate-400">
-                        {formatDateTime(a.at)}
-                      </ITText>
-                    </ITFlex>
-                    {href && <FaChevronRight size={9} className="text-slate-300 shrink-0" />}
-                  </>
-                );
-                return href ? (
-                  <button
-                    key={a.id}
-                    className="flex items-center gap-2 rounded-lg px-1.5 py-1 text-left hover:bg-slate-100 cursor-pointer transition-colors"
-                    onClick={() => navigate(href)}
-                  >
-                    {row}
-                  </button>
-                ) : (
-                  <ITFlex key={a.id} align="center" gap={2}>
-                    {row}
-                  </ITFlex>
-                );
-              })}
+            <div className="relative">
+              <div className="flex max-h-[380px] flex-col gap-0.5 overflow-y-auto pb-6 pr-1">
+                {activityGroups.map((group) => (
+                  <section key={group.key} className="flex flex-col gap-0.5">
+                    <h4 className="m-0 px-2 pb-1 pt-3 !text-[11px] font-semibold !text-slate-400 first:pt-0">
+                      {group.label}
+                    </h4>
+                    {group.items.map((a) => {
+                      const href = activityHref(a);
+                      const tone = KPI_TONES[SCOPE_TONE[a.scope]];
+                      const row = (
+                        <>
+                          <span
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                            style={{ backgroundColor: tone.bg, color: tone.accent }}
+                          >
+                            {SCOPE_ICON[a.scope]}
+                          </span>
+                          <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
+                            <ITText className="truncate text-[13px] font-semibold text-slate-800">
+                              {a.message}
+                            </ITText>
+                            <ITText className="text-[11px] text-slate-400">{formatTimeInTZ(a.at)}</ITText>
+                          </ITFlex>
+                          {href && <LuChevronRight size={14} className="shrink-0 text-slate-300" />}
+                        </>
+                      );
+                      return href ? (
+                        <button
+                          key={a.id}
+                          className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5 text-left transition-colors hover:bg-slate-50"
+                          onClick={() => navigate(href)}
+                        >
+                          {row}
+                        </button>
+                      ) : (
+                        <div key={a.id} className="flex items-center gap-3 rounded-xl px-2 py-1.5">
+                          {row}
+                        </div>
+                      );
+                    })}
+                  </section>
+                ))}
+              </div>
+              {/* Desvanecido inferior: avisa que la lista sigue al hacer scroll. */}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[var(--it-card-bg,#ffffff)] to-transparent" />
             </div>
           )}
-        </ITCard>
+        </PanelCard>
       </div>
     </ITFlex>
   );

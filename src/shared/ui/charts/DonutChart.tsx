@@ -7,6 +7,10 @@ interface Segment {
 interface Props {
   segments: Segment[];
   size?: number;
+  /** Leyenda integrada junto a la dona; ocúltala si quien llama dibuja la suya. */
+  showLegend?: boolean;
+  /** Texto tenue bajo el total, al centro (p. ej. "resueltos"). */
+  caption?: string;
 }
 
 /** Separación entre segmentos (px de arco), para que cada uno se distinga sin depender solo del color. */
@@ -17,7 +21,7 @@ const GAP = 2;
  * al centro, leyenda con valor y porcentaje, y el detalle de cada segmento al
  * pasar el mouse. Los segmentos deben ser partes de un todo (suman el total).
  */
-export default function DonutChart({ segments, size = 128 }: Props) {
+export default function DonutChart({ segments, size = 128, showLegend = true, caption }: Props) {
   const total = segments.reduce((s, sec) => s + sec.value, 0);
   const radius = size / 2 - 12;
   const circumference = 2 * Math.PI * radius;
@@ -26,15 +30,15 @@ export default function DonutChart({ segments, size = 128 }: Props) {
   let offset = 0;
 
   return (
-    <div className="flex items-center gap-5 w-full">
+    <div className={`flex items-center w-full ${showLegend ? "gap-5" : "justify-center"}`}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="shrink-0">
         <circle
           cx={center}
           cy={center}
           r={radius}
           fill="none"
-          stroke="currentColor"
-          className="text-slate-100"
+          stroke="var(--color-primary)"
+          strokeOpacity={0.15}
           strokeWidth={12}
         />
         {total > 0 &&
@@ -53,7 +57,7 @@ export default function DonutChart({ segments, size = 128 }: Props) {
                 cy={center}
                 r={radius}
                 fill="none"
-                stroke={sec.color}
+                style={{ stroke: sec.color }}
                 strokeWidth={12}
                 strokeDasharray={dashArray}
                 strokeDashoffset={dashOffset}
@@ -67,29 +71,43 @@ export default function DonutChart({ segments, size = 128 }: Props) {
           })}
         <text
           x={center}
-          y={center}
+          y={caption ? center - size * 0.04 : center}
           textAnchor="middle"
           dominantBaseline="central"
           className="fill-slate-700 font-black"
-          style={{ fontSize: size * 0.18 }}
+          style={{ fontSize: size * (caption ? 0.2 : 0.18) }}
         >
           {total}
         </text>
+        {caption && (
+          <text
+            x={center}
+            y={center + size * 0.13}
+            textAnchor="middle"
+            dominantBaseline="central"
+            className="fill-slate-400 font-medium"
+            style={{ fontSize: Math.max(10, size * 0.075) }}
+          >
+            {caption}
+          </text>
+        )}
       </svg>
-      <div className="flex flex-col gap-2 min-w-0 flex-1">
-        {segments.map((sec) => {
-          const pct = total > 0 ? Math.round((sec.value / total) * 100) : 0;
-          return (
-            <div key={sec.label} className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: sec.color }} />
-              <span className="text-[10px] font-bold text-slate-500 truncate">{sec.label}</span>
-              <span className="text-[10px] font-black text-slate-700 ml-auto">
-                {sec.value} · {pct}%
-              </span>
-            </div>
-          );
-        })}
-      </div>
+      {showLegend && (
+        <div className="flex flex-col gap-2 min-w-0 flex-1">
+          {segments.map((sec) => {
+            const pct = total > 0 ? Math.round((sec.value / total) * 100) : 0;
+            return (
+              <div key={sec.label} className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: sec.color }} />
+                <span className="text-[10px] font-bold text-slate-500 truncate">{sec.label}</span>
+                <span className="text-[10px] font-black text-slate-700 ml-auto">
+                  {sec.value} · {pct}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

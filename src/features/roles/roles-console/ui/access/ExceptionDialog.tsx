@@ -155,7 +155,7 @@ export default function ExceptionDialog({ isOpen, userId, personName, permission
               value={date}
               min={new Date().toISOString().slice(0, 10)}
               onChange={(event) => setDate(event.target.value)}
-              className="mt-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-[12px] text-slate-700 focus:border-[#0D5777] focus:outline-none"
+              className="mt-2 rounded-lg border border-slate-300 bg-[var(--it-card-bg)] px-3 py-1.5 text-[12px] text-slate-700 focus:border-primary-500 focus:outline-none"
             />
           )}
         </DialogSection>

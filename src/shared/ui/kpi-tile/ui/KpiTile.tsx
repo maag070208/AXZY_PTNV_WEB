@@ -1,62 +1,86 @@
 import type { ReactNode } from "react";
-
-export type KpiTone = "neutral" | "emerald" | "sky" | "amber" | "orange" | "rose" | "violet";
-
-const TONES: Record<KpiTone, { icon: string; dot: string }> = {
-  neutral: { icon: "bg-slate-100 text-slate-500", dot: "bg-slate-300" },
-  emerald: { icon: "bg-emerald-50 text-emerald-600", dot: "bg-emerald-500" },
-  sky: { icon: "bg-sky-50 text-sky-600", dot: "bg-sky-500" },
-  amber: { icon: "bg-amber-50 text-amber-600", dot: "bg-amber-500" },
-  // El tema redefine la paleta "orange" de Tailwind: valores exactos.
-  orange: { icon: "bg-[#fff7ed] text-[#ea580c]", dot: "bg-[#f97316]" },
-  rose: { icon: "bg-rose-50 text-rose-600", dot: "bg-rose-500" },
-  violet: { icon: "bg-violet-50 text-violet-600", dot: "bg-violet-500" },
-};
+import { ITCard } from "@axzydev/axzy_ui_system";
+import { KPI_TONES, type KpiTone } from "../model/tones";
 
 export interface KpiTileProps {
   label: string;
   value: ReactNode;
-  icon: ReactNode;
-  /** Color del ícono y del punto de estado; la tarjeta siempre es blanca. */
+  /** Ícono del encabezado (chip redondo con el color de acento); opcional en `size="sm"`. */
+  icon?: ReactNode;
+  /** Tono pastel de la tarjeta (se mapea al `tone` del kit) y color de acento. */
   tone?: KpiTone;
-  /** Línea de contexto bajo el número (con punto de color). */
+  /** Texto de contexto, tenue, a la derecha del número. */
   hint?: string;
   /** Contenido bajo el número (p. ej. una barra de progreso); reemplaza al `hint`. */
   footer?: ReactNode;
+  /** Visual decorativo al centro (`GaugeArc`, `WaveFill`, `Sparkline`); solo con datos reales. */
+  visual?: ReactNode;
+  /** Fondo a sangre completa de la tarjeta (p. ej. `WaveFill`); va detrás del contenido y la tarjeta lo recorta. */
+  backdrop?: ReactNode;
+  /** `sm` = compacto, para contadores pequeños dentro de otra tarjeta. */
+  size?: "md" | "sm";
   onClick?: () => void;
 }
 
 /**
- * Indicador de tablero: tarjeta blanca, número grande y el color solo en el
- * ícono y el punto de estado (sin fondos de color completos).
+ * Indicador de tablero: `ITCard` con tono pastel del kit, así que la apariencia
+ * (bento, flat o soft) la decide el proveedor: bento = tarjeta pastel sin borde;
+ * flat/soft = fondo teñido con borde fino del mismo tono. Título arriba, un
+ * visual opcional al centro y abajo el número grande con el contexto tenue.
+ * Si es clicable, `ITCard` ya da hover, foco y teclado.
  */
-export default function KpiTile({ label, value, icon, tone = "neutral", hint, footer, onClick }: KpiTileProps) {
-  const style = TONES[tone];
-  const Tag = onClick ? "button" : "div";
+export default function KpiTile({
+  label,
+  value,
+  icon,
+  tone = "neutral",
+  hint,
+  footer,
+  visual,
+  backdrop,
+  size = "md",
+  onClick,
+}: KpiTileProps) {
+  const { kit, accent } = KPI_TONES[tone];
+  const sm = size === "sm";
+  const valueClass = `font-extrabold leading-none tabular-nums text-slate-800 ${sm ? "!text-[22px]" : "!text-[28px]"}`;
   return (
-    <Tag
-      {...(onClick ? { type: "button" as const, onClick } : {})}
-      className={`flex w-full flex-col rounded-2xl border border-slate-200 !bg-white p-4 text-left shadow-sm transition ${
-        onClick ? "cursor-pointer hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md" : ""
-      }`}
+    <ITCard
+      tone={kit}
+      onClick={onClick}
+      className={`w-full text-left ${sm ? "" : "min-h-[164px]"}`}
+      // El cuerpo de `ITCard` fija el padding con estilo en línea: se anula aquí (`!p-0`) y se
+      // aplica en el contenedor interno. El primer hijo (ITText) se estira a todo el alto y es
+      // el ancla (`relative`) del `backdrop`.
+      contentClassName="relative flex flex-1 flex-col !p-0 [&>div]:relative [&>div]:flex [&>div]:flex-1 [&>div]:flex-col"
     >
-      <div className="flex w-full items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate !text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
-          <p className="mt-2 !text-[26px] font-black leading-none tabular-nums text-slate-900">{value}</p>
+      {backdrop && <div className="pointer-events-none absolute inset-0">{backdrop}</div>}
+      <div className={`relative z-10 flex flex-1 flex-col ${sm ? "gap-1.5 p-3" : "gap-2 p-[18px]"}`}>
+        <div className="flex w-full items-center justify-between gap-2">
+          <p className={`min-w-0 truncate font-semibold text-slate-800 ${sm ? "!text-[12px]" : "!text-[13px]"}`}>{label}</p>
+          {icon && (
+            <span
+              className={`flex shrink-0 items-center justify-center rounded-full ${sm ? "h-6 w-6" : "h-8 w-8"}`}
+              style={{ color: accent, backgroundColor: "color-mix(in srgb, var(--it-card-bg, #ffffff) 70%, transparent)" }}
+            >
+              {icon}
+            </span>
+          )}
         </div>
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${style.icon}`}>{icon}</span>
+        {visual && <div className="flex min-h-0 flex-1 items-center justify-center">{visual}</div>}
+        {!visual && <div className="min-h-1 flex-1" />}
+        {footer ? (
+          <div className="w-full">
+            <p className={valueClass}>{value}</p>
+            <div className="mt-2">{footer}</div>
+          </div>
+        ) : (
+          <div className="flex w-full items-baseline justify-between gap-2">
+            <p className={valueClass}>{value}</p>
+            {hint && <span className="min-w-0 truncate text-right !text-[11px] font-medium text-slate-500">{hint}</span>}
+          </div>
+        )}
       </div>
-      {footer ? (
-        <div className="mt-3 w-full">{footer}</div>
-      ) : (
-        hint && (
-          <p className="mt-3 flex items-center gap-1.5 !text-[11px] text-slate-500">
-            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${style.dot}`} />
-            <span className="truncate">{hint}</span>
-          </p>
-        )
-      )}
-    </Tag>
+    </ITCard>
   );
 }

@@ -11,9 +11,9 @@ interface RolesHelpDialogProps {
 
 function Layer({ icon, step, title, body }: { icon: ReactNode; step: number; title: string; body: string }) {
   return (
-    <div className="flex flex-1 flex-col gap-1.5 rounded-2xl border border-slate-200 bg-white p-3">
+    <div className="flex flex-1 flex-col gap-1.5 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-3">
       <div className="flex items-center gap-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0D5777]/10 text-[#0D5777]">{icon}</span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500">{icon}</span>
         <span className="text-[10px] font-black text-slate-400">{step}</span>
         <span className="text-[12px] font-black text-slate-800">{title}</span>
       </div>
@@ -25,7 +25,7 @@ function Layer({ icon, step, title, body }: { icon: ReactNode; step: number; tit
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-1.5">
-      <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-500">{title}</h3>
+      <h3 className="text-[12px] font-semibold text-slate-500">{title}</h3>
       {children}
     </section>
   );

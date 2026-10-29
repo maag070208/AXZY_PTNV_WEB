@@ -77,7 +77,7 @@ export default function RoleDetail({
   };
 
   return (
-    <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4">
+    <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-4">
       {/* Encabezado */}
       <div className="flex flex-wrap items-center gap-3">
         <RoleAvatar role={role} />
@@ -85,17 +85,17 @@ export default function RoleDetail({
           <div className="flex flex-wrap items-center gap-1.5">
             <h2 className="text-[15px] font-black text-slate-900">{roleLabel(role)}</h2>
             {meta.system && (
-              <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500">
+              <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[12px] font-bold text-slate-500">
                 <FaLock size={7} /> {t("access.systemRole")}
               </span>
             )}
             {!meta.active && (
-              <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-rose-600">
+              <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[12px] font-bold text-rose-600">
                 {t("access.inactiveRole")}
               </span>
             )}
             {meta.staff && (
-              <span className="rounded bg-sky-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-sky-700">{t("roleDialog.staff")}</span>
+            <span className="rounded bg-sky-50 px-1.5 py-0.5 text-[12px] font-bold text-sky-700">{t("roleDialog.staff")}</span>
             )}
           </div>
           <p className="truncate text-[11px] text-slate-500">
