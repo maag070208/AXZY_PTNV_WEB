@@ -16,10 +16,12 @@ import { FaEdit, FaFileAlt, FaPlus, FaTrash, FaTrashRestore } from "react-icons/
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { personalApi, type DocumentType } from "@entities/hr";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function DocumentCatalogPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [reloadKey, setReloadKey] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<DocumentType | null>(null);
@@ -199,7 +201,7 @@ export default function DocumentCatalogPage() {
       title={tt("catalog.title")}
       description={tt("catalog.description")}
       icon={<FaFileAlt size={20} />}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/employees")}
       breadcrumbs={[
         { label: tt("common:nav.home"), onClick: () => navigate("/") },
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },

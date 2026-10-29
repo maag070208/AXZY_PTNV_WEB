@@ -10,6 +10,7 @@ import {
   UserFormFields,
   useUserForm,
 } from "@features/user/user-form";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 interface AppStep {
   label: string;
@@ -33,6 +34,7 @@ const HINT_KEYS: Record<string, string> = {
 
 export default function UserFormPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   // Langostin sigue el campo donde está el cursor: cada input tiene su propia guía.
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const { t: tt } = useTranslation(["users", "common"]);
@@ -53,7 +55,7 @@ export default function UserFormPage() {
   const handleFinish = () => {
     userForm.handleSubmit().then((result) => {
       if (result.ok) {
-        navigate("/users");
+        goBack("/users");
         return;
       }
       const input = result.field ? INPUT_NAME[result.field] : undefined;
@@ -74,7 +76,7 @@ export default function UserFormPage() {
         title={title}
         description={description}
         loading
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/users")}
         icon={<FaUserPlus size={20} />}
         breadcrumbs={[
           { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
@@ -182,7 +184,7 @@ export default function UserFormPage() {
       noPadding
       title={title}
       description={description}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/users")}
       icon={<FaUserPlus size={20} />}
       breadcrumbs={[
         { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
@@ -201,7 +203,7 @@ export default function UserFormPage() {
 
 
       <ITFlex justify="end" align="center" gap={3} className="mb-6">
-        <ITButton variant="outlined" color="secondary" onClick={() => navigate(-1)} disabled={userForm.saving}>
+        <ITButton variant="outlined" color="secondary" onClick={() => goBack("/users")} disabled={userForm.saving}>
           {tt("form.cancel")}
         </ITButton>
         <ITButton variant="raised-text" color="primary" onClick={handleFinish} disabled={userForm.saving}>

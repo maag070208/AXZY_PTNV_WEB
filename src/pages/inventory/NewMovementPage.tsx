@@ -16,6 +16,7 @@ import {
 import { i18n } from "@shared/i18n";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { newId } from "@shared/lib/newId";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 const STATUS_LABEL_KEY = {
   AVAILABLE: "dashboard.available",
@@ -81,6 +82,7 @@ const UNIT_STATUS: Partial<Record<MovementType, DeviceUnitStatus>> = {
 export default function NewMovementPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [searchParams] = useSearchParams();
   const requestKey = useRequestKey();
   const [types, setTypes] = useState<DeviceType[]>([]);
@@ -270,7 +272,7 @@ export default function NewMovementPage() {
         })
       );
       setToast({ message: t("messages.movementRegistered"), type: "success" });
-      setTimeout(() => navigate("/inventory/movements"), 1000);
+      setTimeout(() => goBack("/inventory/movements"), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -281,7 +283,7 @@ export default function NewMovementPage() {
   if (loading) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("new.title")} backAction={() => navigate(-1)}>
+        noPadding title={t("new.title")} backAction={() => goBack("/inventory/movements")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -296,7 +298,7 @@ export default function NewMovementPage() {
       description={t("new.description")}
       icon={<FaSave size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("movements.title"), onClick: () => navigate("/inventory/movements") }, { label: t("movements.new") }]}
-      backAction={() => navigate("/inventory/movements")}
+      backAction={() => goBack("/inventory/movements")}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>

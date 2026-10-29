@@ -3,10 +3,12 @@ import { FaExchangeAlt, FaLink, FaMagic, FaUsersCog } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { TimeClockEmployeesTab, useTimeClockEmployees } from "@features/access/time-clock-employees";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function TimeClockEmployeesPage() {
   const { t } = useTranslation(["time-clock", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useTimeClockEmployees();
 
   return (
@@ -60,7 +62,7 @@ export default function TimeClockEmployeesPage() {
         { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
         { label: t("employees.title") },
       ]}
-      backAction={() => navigate("/hr/time-clock")}
+      backAction={() => goBack("/hr/time-clock")}
     >
       <TimeClockEmployeesTab
         fx={fx}

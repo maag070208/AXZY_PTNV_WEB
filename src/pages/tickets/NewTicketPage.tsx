@@ -9,16 +9,18 @@ import { FaSave, FaTicketAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { TicketAgent, useCreateTicket } from "@features/ticket/create-ticket";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function NewTicketPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t } = useTranslation(["tickets", "common"]);
 
   const createTicket = useCreateTicket();
 
   const handleSave = async () => {
     const ok = await createTicket.handleSave();
-    if (ok) setTimeout(() => navigate("/tickets"), 1000);
+    if (ok) setTimeout(() => goBack("/tickets"), 1000);
     return ok;
   };
 
@@ -27,7 +29,7 @@ export default function NewTicketPage() {
       noPadding
       title={t("new.title")}
       description={t("new.description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/tickets")}
       icon={<FaTicketAlt size={20} />}
       breadcrumbs={[
         { label: t("list.title"), onClick: () => navigate("/tickets") },

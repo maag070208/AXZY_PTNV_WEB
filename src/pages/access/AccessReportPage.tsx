@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AccessReportExportActions, AccessReportTab, useAccessReport } from "@features/access/report";
 import { downloadAccessReportPDF } from "@widgets/reports";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function AccessReportPage() {
   const { t } = useTranslation(["access-report", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useAccessReport({ download: downloadAccessReportPDF });
 
   return (
@@ -21,7 +23,7 @@ export default function AccessReportPage() {
         { label: t("common:nav.accessLog"), onClick: () => navigate("/access") },
         { label: t("title") },
       ]}
-      backAction={() => navigate("/access")}
+      backAction={() => goBack("/access")}
       actions={<AccessReportExportActions fx={fx} />}
     >
       <AccessReportTab fx={fx} />

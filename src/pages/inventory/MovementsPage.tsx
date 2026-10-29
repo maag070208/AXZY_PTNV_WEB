@@ -10,6 +10,7 @@ import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 import { downloadMovementPdf, downloadReportMovementsPdf } from "@widgets/movement-pdf";
 import { StatCard } from "@shared/ui/stat-card";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 interface StatCounts {
   total: number;
@@ -101,6 +102,7 @@ function flattenMovements(list: Movement[]): MovementRow[] {
 export default function MovementsPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [reloadKey, setReloadKey] = useState(0);
   const [typeFilter, setTypeFilter] = useState<TypeGroup | null>(null);
   const [stats, setStats] = useState<StatCounts>({ total: 0, retirements: 0, maintenance: 0 });
@@ -265,7 +267,7 @@ export default function MovementsPage() {
       description={t("movements.description")}
       icon={<FaHistory size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("movements.title") }]}
-      backAction={() => navigate("/inventory")}
+      backAction={() => goBack("/inventory")}
       actions={
         <ITFlex align="center" gap={2}>
           <ITButton variant="outlined" color="primary" onClick={generateReport} disabled={generatingPdf}>

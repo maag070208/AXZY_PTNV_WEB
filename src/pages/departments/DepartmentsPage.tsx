@@ -16,9 +16,11 @@ import {
   DepartmentsTable,
   useDepartmentsCrud,
 } from "@features/department/departments-list";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function DepartmentsPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["departments", "common"]);
   const canManage = useCan("departments.manage");
 
@@ -29,7 +31,7 @@ export default function DepartmentsPage() {
       noPadding
       title={tt("list.title")}
       description={tt("list.description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaBuilding size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },

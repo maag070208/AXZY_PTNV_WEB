@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITBadget,
@@ -23,11 +22,12 @@ import {
   type KitchenLotRow,
 } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** Conteo físico: captura lo que hay por lote; la diferencia se ajusta. */
 export default function KitchenCountPanel() {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const requestKey = useRequestKey();
   const categories = useKitchenCategoryOptions();
   const [categoryId, setCategoryId] = useState("");
@@ -91,7 +91,7 @@ export default function KitchenCountPanel() {
         await kitchenApi.adjust(input, requestKey(input));
       }
       setToast(t("count.success"));
-      setTimeout(() => navigate("/kitchen/items"), 600);
+      setTimeout(() => goBack("/kitchen/items"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {

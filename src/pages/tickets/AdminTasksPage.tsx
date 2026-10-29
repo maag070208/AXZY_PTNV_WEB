@@ -7,9 +7,11 @@ import {
   useAssignmentList,
   AdminTasksTable,
 } from "@features/ticket/tasks-table";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function AdminTasksPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const canCompleteTasks = useCan("tasks.complete");
 
@@ -22,7 +24,7 @@ export default function AdminTasksPage() {
       noPadding
       title={tt("admintasks.title")}
       description={tt("admintasks.description", { count: fx.rows.length })}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaTasks size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },

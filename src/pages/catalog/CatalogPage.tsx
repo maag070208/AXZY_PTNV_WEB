@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import { CatalogTabs } from "@widgets/catalog/tabs";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function CatalogPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["catalog", "common"]);
   const canAdminCatalogs = useCan("catalogs.manage");
 
@@ -22,7 +24,7 @@ export default function CatalogPage() {
       noPadding
       title={tt("title")}
       description={tt("description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaSlidersH size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },

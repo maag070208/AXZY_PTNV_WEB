@@ -16,10 +16,12 @@ import {
   DisciplinaryReportsTable,
   DisciplinaryReportForm,
 } from "@features/hr/disciplinary-reports";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function HrReportsPage() {
   const { t: tt } = useTranslation(["disciplinary-reports", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useDisciplinaryReports();
   const [disciplinaryReportToDelete, setDisciplinaryReportToDelete] = useState<DisciplinaryReport | null>(null);
 
@@ -28,7 +30,7 @@ export default function HrReportsPage() {
       noPadding
       title={tt("title")}
       description={tt("description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaScroll size={20} />}
       breadcrumbs={[
         { label: tt("common:nav.home"), onClick: () => navigate("/") },

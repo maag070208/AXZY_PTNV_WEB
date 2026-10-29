@@ -19,21 +19,23 @@ import {
   DepartmentInfoCard,
   useDepartmentDetail,
 } from "@features/department/department-detail";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function DepartmentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["departments", "common"]);
   const canManage = useCan("departments.manage");
 
-  const detail = useDepartmentDetail(id, () => navigate("/departments"));
+  const detail = useDepartmentDetail(id, () => goBack("/departments"));
 
   if (!detail.dept) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.loadingTitle")}
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/departments")}
         icon={<FaBuilding size={20} />}
         breadcrumbs={[
           { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departments") },
@@ -60,7 +62,7 @@ export default function DepartmentDetailPage() {
       noPadding
       title={tt("detail.title")}
       description={dept.name}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/departments")}
       icon={<FaBuilding size={20} />}
       breadcrumbs={[
         { label: tt("detail.breadcrumbDepartments"), onClick: () => navigate("/departments") },

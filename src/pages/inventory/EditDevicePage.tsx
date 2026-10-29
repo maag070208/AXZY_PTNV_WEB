@@ -5,6 +5,7 @@ import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITText, I
 import { FaBoxOpen, FaCheckCircle, FaChevronDown, FaChevronRight, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceUnitStatus, type DeviceUnit } from "@entities/inventory";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 const STATUS_COLOR: Record<DeviceUnitStatus, "success" | "warning" | "danger" | "gray"> = {
   AVAILABLE: "success",
@@ -25,6 +26,7 @@ export default function EditDevicePage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [device, setDevice] = useState<Device | null>(null);
   const [units, setUnits] = useState<DeviceUnit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,7 +90,7 @@ export default function EditDevicePage() {
         notes: form.notes || undefined,
       });
       setToast({ message: t("devices.savedEdit"), type: "success" });
-      setTimeout(() => navigate(`/inventory/devices/${id}`), 1000);
+      setTimeout(() => goBack(`/inventory/devices/${id}`), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -127,7 +129,7 @@ export default function EditDevicePage() {
   if (loading || !device) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("devices.edit")} backAction={() => navigate(-1)}>
+        noPadding title={t("devices.edit")} backAction={() => goBack(`/inventory/devices/${id}`)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -141,7 +143,7 @@ export default function EditDevicePage() {
       title={t("devices.edit")}
       description={device.name}
       icon={<FaBoxOpen size={20} />}
-      backAction={() => navigate(`/inventory/devices/${device.id}`)}
+      backAction={() => goBack(`/inventory/devices/${device.id}`)}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("dashboard.title"), onClick: () => navigate("/inventory") },

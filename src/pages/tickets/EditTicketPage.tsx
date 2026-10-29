@@ -14,9 +14,11 @@ import {
   EditTicketForm,
   useEditTicket,
 } from "@features/ticket/edit-ticket";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function EditTicketPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const canEditTicket = useCan("tickets.edit");
 
@@ -24,13 +26,13 @@ export default function EditTicketPage() {
 
   useEffect(() => {
     if (!canEditTicket) {
-      navigate("/tickets");
+      navigate("/tickets", { replace: true });
     }
   }, [canEditTicket, navigate]);
 
   const handleSave = () => {
     editTicket.handleSave().then((ok) => {
-      if (ok) setTimeout(() => navigate(`/tickets/${editTicket.id}`), 1000);
+      if (ok) setTimeout(() => goBack(`/tickets/${editTicket.id}`), 1000);
     });
   };
 
@@ -45,7 +47,7 @@ export default function EditTicketPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("edit.title")}
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/tickets")}
         icon={<FaTicketAlt size={20} />}
         breadcrumbs={breadcrumbs}
       >
@@ -59,7 +61,7 @@ export default function EditTicketPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("edit.title")}
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/tickets")}
         icon={<FaTicketAlt size={20} />}
         breadcrumbs={[
           { label: tt("list.title"), onClick: () => navigate("/tickets") },
@@ -76,7 +78,7 @@ export default function EditTicketPage() {
       noPadding
       title={tt("edit.title")}
       description={tt("edit.description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/tickets")}
       icon={<FaTicketAlt size={20} />}
       breadcrumbs={breadcrumbs}
       actions={

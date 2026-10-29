@@ -21,12 +21,14 @@ import {
 import { EmployeeCredentialDialog } from "@widgets/employee-credential";
 import { useCan } from "@entities/user";
 import { EmployeeClockSection } from "@widgets/employee-clock";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 type Section = "activity" | "documents" | "clock" | "info";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["employees", "common"]);
   const [credentialOpen, setCredentialOpen] = useState(false);
   const [section, setSection] = useState<Section>("activity");
@@ -44,7 +46,7 @@ export default function EmployeeDetailPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.loadingTitle")}
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/employees")}
         icon={<FaUserTie size={20} />}
         breadcrumbs={[
           { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
@@ -77,7 +79,7 @@ export default function EmployeeDetailPage() {
       noPadding
       title={tt("detail.title")}
       description={tt("detail.subtitle")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/employees")}
       icon={<FaUserTie size={20} />}
       breadcrumbs={[
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },

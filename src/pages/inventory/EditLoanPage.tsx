@@ -11,11 +11,13 @@ import { usersApi, type User } from "@entities/user";
 import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 import { UnitPicker, useSelectableUnits } from "@features/inventory/unit-picker";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function EditLoanPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
@@ -172,7 +174,7 @@ export default function EditLoanPage() {
         ...(resourceChanged && !lockedResource ? { deviceId, unitIds: selectedUnitIds } : {}),
       });
       setToast({ message: t("loans.savedEdit"), type: "success" });
-      setTimeout(() => navigate(`/inventory/loans/${id}`), 1000);
+      setTimeout(() => goBack(`/inventory/loans/${id}`), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -183,7 +185,7 @@ export default function EditLoanPage() {
   if (loading || !loan) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("loans.edit")} backAction={() => navigate(-1)}>
+        noPadding title={t("loans.edit")} backAction={() => goBack("/inventory/loans")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -198,7 +200,7 @@ export default function EditLoanPage() {
       description={`${loan.number}`}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.edit") }]}
-      backAction={() => navigate(`/inventory/loans/${loan.id}`)}
+      backAction={() => goBack(`/inventory/loans/${loan.id}`)}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>

@@ -12,10 +12,12 @@ import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 import { UnitPicker, useSelectableUnits } from "@features/inventory/unit-picker";
 import { useRequestKey } from "@shared/lib/useRequestKey";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function NewLoanPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const requestKey = useRequestKey();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -137,7 +139,7 @@ export default function NewLoanPage() {
       };
       await inventoryApi.createLoan(payload, requestKey(payload));
       setToast({ message: t("loans.saved"), type: "success" });
-      setTimeout(() => navigate("/inventory/loans"), 1000);
+      setTimeout(() => goBack("/inventory/loans"), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -148,7 +150,7 @@ export default function NewLoanPage() {
   if (loading) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("loans.new")} backAction={() => navigate(-1)}>
+        noPadding title={t("loans.new")} backAction={() => goBack("/inventory/loans")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -163,7 +165,7 @@ export default function NewLoanPage() {
       description={t("loans.formSub")}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.new") }]}
-      backAction={() => navigate("/inventory/loans")}
+      backAction={() => goBack("/inventory/loans")}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>

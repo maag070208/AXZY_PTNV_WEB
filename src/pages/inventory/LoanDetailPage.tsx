@@ -8,6 +8,7 @@ import { formatDate, formatDateTime } from "@shared/utils/dates";
 import { inventoryApi, type Condition, type Loan } from "@entities/inventory";
 import { CustodyLetterPreview, downloadCustodyLetterPdf } from "@widgets/custody-letter";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = {
   ACTIVE: "success",
@@ -27,6 +28,7 @@ export default function LoanDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [loan, setLoan] = useState<Loan | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +40,7 @@ export default function LoanDetailPage() {
   if (loading || !loan) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("loans.detail")} backAction={() => navigate(-1)}>
+        noPadding title={t("loans.detail")} backAction={() => goBack("/inventory/loans")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -53,7 +55,7 @@ export default function LoanDetailPage() {
       description={`${loan.custodian?.name ?? "—"} · ${formatDate(loan.date)}`}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: loan?.number ?? "" }]}
-      backAction={() => navigate("/inventory/loans")}
+      backAction={() => goBack("/inventory/loans")}
       actions={
         <ITFlex gap={2}>
           {(loan.status === "ACTIVE" || loan.status === "PARTIAL") && (

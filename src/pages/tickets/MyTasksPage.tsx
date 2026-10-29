@@ -6,9 +6,11 @@ import {
   useAssignmentList,
   MyTasksTable,
 } from "@features/ticket/tasks-table";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function MyTasksPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
 
   const fx = useAssignmentList("mytasks.loadError");
@@ -18,7 +20,7 @@ export default function MyTasksPage() {
       noPadding
       title={tt("mytasks.title")}
       description={tt("mytasks.description", { count: fx.rows.length })}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaTasks size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },

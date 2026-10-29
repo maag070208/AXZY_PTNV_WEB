@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   kitchenApi,
@@ -9,6 +9,7 @@ import {
   type SupplierInvoiceInput,
 } from "@entities/kitchen";
 import { emptyInvoiceDraftLine, localDay, type InvoiceDraftLine } from "./types";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /**
  * Formulario de una factura de proveedor. Si llega `purchaseOrderId` por estado
@@ -17,7 +18,7 @@ import { emptyInvoiceDraftLine, localDay, type InvoiceDraftLine } from "./types"
  */
 export const useInvoiceForm = () => {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const location = useLocation();
   const items = useKitchenItemOptions();
   const suppliers = useSupplierOptions();
@@ -141,7 +142,7 @@ export const useInvoiceForm = () => {
     try {
       await kitchenApi.createInvoice(input);
       setToast(t("invoices.registered"));
-      setTimeout(() => navigate("/kitchen/invoices"), 600);
+      setTimeout(() => goBack("/kitchen/invoices"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -188,7 +189,7 @@ export const useInvoiceForm = () => {
     setToast,
     save,
     canSave,
-    cancel: () => navigate("/kitchen/invoices"),
+    cancel: () => goBack("/kitchen/invoices"),
   };
 };
 

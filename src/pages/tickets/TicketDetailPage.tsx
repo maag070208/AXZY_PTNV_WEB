@@ -30,17 +30,19 @@ import {
   TasksGraph,
 } from "@features/ticket/ticket-detail";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const [editOpen, setEditOpen] = useState(false);
 
   const fx = useTicketDetail({
     id,
     download: downloadTicketPDF,
-    onDeleted: () => navigate("/tickets"),
+    onDeleted: () => goBack("/tickets"),
   });
 
   const renderAssignmentAttachments = ({
@@ -74,7 +76,7 @@ export default function TicketDetailPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.title")}
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/tickets")}
         icon={<FaTicketAlt size={20} />}
         breadcrumbs={[
           { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets") },
@@ -92,7 +94,7 @@ export default function TicketDetailPage() {
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={ticket.title}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/tickets")}
       icon={<FaTicketAlt size={20} />}
       breadcrumbs={[
         { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets") },

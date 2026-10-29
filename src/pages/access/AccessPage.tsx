@@ -46,6 +46,7 @@ import {
   type Site,
 } from "@entities/access";
 import { fileName } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -70,6 +71,7 @@ const GUARD_ROLES: UserRole[] = ["GUARD"];
 export default function AccessPage() {
   const { t: tt } = useTranslation(["access", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canVoid = useCan("access.void");
 
   const [sites, setSites] = useState<Site[]>([]);
@@ -396,7 +398,7 @@ export default function AccessPage() {
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: tt("title") },
       ]}
-      backAction={() => navigate("/")}
+      backAction={() => goBack("/")}
     >
       {sitesError && (
         <ITAlert variant="warning" dismissible onDismiss={() => setSitesError(false)}>

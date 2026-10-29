@@ -11,6 +11,7 @@ import {
   usesUnitIdentity,
   type UnitIdentityRow,
 } from "@features/inventory/unit-identities";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 function SectionHeader({
   icon,
@@ -39,6 +40,7 @@ function SectionHeader({
 export default function DeviceFormPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [types, setTypes] = useState<DeviceType[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -112,7 +114,7 @@ export default function DeviceFormPage() {
         })),
       });
       setToast({ message: t("devices.saved"), type: "success" });
-      setTimeout(() => navigate("/inventory/devices"), 1000);
+      setTimeout(() => goBack("/inventory/devices"), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -123,7 +125,7 @@ export default function DeviceFormPage() {
   if (loading) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("devices.new")} backAction={() => navigate(-1)}>
+        noPadding title={t("devices.new")} backAction={() => goBack("/inventory/devices")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -145,7 +147,7 @@ export default function DeviceFormPage() {
       description={t("devices.formSub")}
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title"), onClick: () => navigate("/inventory/devices") }, { label: t("devices.new") }]}
-      backAction={() => navigate("/inventory/devices")}
+      backAction={() => goBack("/inventory/devices")}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>

@@ -6,10 +6,12 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type LoanReturn } from "@entities/inventory";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function ReturnsPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
 
   const fetchData = useMemo(
     () =>
@@ -126,7 +128,7 @@ export default function ReturnsPage() {
       description={t("loanReturn.description")}
       icon={<FaUndoAlt size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loanReturn.title") }]}
-      backAction={() => navigate("/inventory")}
+      backAction={() => goBack("/inventory")}
       actions={
         <ITButton variant="filled" color="primary" onClick={() => navigate("/inventory/returns/new")}>
           <ITFlex align="center" gap={1}>

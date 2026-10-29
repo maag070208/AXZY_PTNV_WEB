@@ -6,10 +6,12 @@ import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type Device, type DeviceType } from "@entities/inventory";
 import { useCan } from "@entities/user";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function DevicesPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [types, setTypes] = useState<DeviceType[]>([]);
   const canCreate = useCan("devices.create");
 
@@ -114,7 +116,7 @@ export default function DevicesPage() {
       description={t("devices.description")}
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title") }]}
-      backAction={() => navigate("/inventory")}
+      backAction={() => goBack("/inventory")}
       actions={
         <ITFlex align="center" gap={2} wrap="wrap">
           {/* Carga masiva: solo para quien puede dar de alta dispositivos. */}

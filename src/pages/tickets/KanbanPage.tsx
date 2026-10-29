@@ -8,9 +8,11 @@ import {
   CreateTaskDialog,
   useKanban,
 } from "@features/ticket/kanban";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function KanbanPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const [searchParams] = useSearchParams();
   const ticketId = searchParams.get("ticketId") ?? undefined;
@@ -22,7 +24,7 @@ export default function KanbanPage() {
       noPadding
       title={ticketId ? tt("kanban.byTicket") : tt("kanban.board")}
       description={ticketId ? tt("kanban.descByTicket") : tt("kanban.descBoard")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/tickets")}
       icon={<FaTrello size={20} />}
       breadcrumbs={[
         { label: tt("list.title"), onClick: () => navigate("/tickets") },

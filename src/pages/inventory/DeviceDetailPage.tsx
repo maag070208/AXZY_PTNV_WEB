@@ -9,6 +9,7 @@ import { inventoryApi, type Device, type Stock, type StockLedgerRow, type Moveme
 import { StatCard } from "@shared/ui/stat-card";
 import { useCan } from "@entities/user";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = {
   AVAILABLE: "success",
@@ -35,6 +36,7 @@ export default function DeviceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   /** Mismo permiso que `POST /inventory/movements` (dar entrada/baja). */
   const canEditUnits = useCan("devices.edit");
   const [device, setDevice] = useState<Device | null>(null);
@@ -63,7 +65,7 @@ export default function DeviceDetailPage() {
   if (!loading && !device) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("devices.detail")} backAction={() => navigate("/inventory/devices")}>
+        noPadding title={t("devices.detail")} backAction={() => goBack("/inventory/devices")}>
         <ITAlert variant="error" dismissible={false}>
           {error ?? t("common:errors.load")}
         </ITAlert>
@@ -74,7 +76,7 @@ export default function DeviceDetailPage() {
   if (loading || !device) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("devices.detail")} backAction={() => navigate(-1)}>
+        noPadding title={t("devices.detail")} backAction={() => goBack("/inventory/devices")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -91,7 +93,7 @@ export default function DeviceDetailPage() {
       description={`${device.brand} ${device.model}`}
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title"), onClick: () => navigate("/inventory/devices") }, { label: device.name }]}
-      backAction={() => navigate("/inventory/devices")}
+      backAction={() => goBack("/inventory/devices")}
       actions={
         <ITFlex align="center" gap={2} wrap="wrap">
           {/* "Llegaron más piezas": abre el alta de ENTRADA con este

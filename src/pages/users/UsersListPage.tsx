@@ -18,9 +18,11 @@ import {
 } from "@features/user/users-list";
 import { UserEditDialog } from "@features/user/user-form";
 import { DeactivateDialog } from "@features/hr/employee-detail";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   // La edición es un diálogo sobre la lista: `/users/:id/edit` lo abre, así que
   // los enlaces directos (y el botón del expediente) siguen funcionando.
   const { id: editingId } = useParams<{ id: string }>();
@@ -35,7 +37,7 @@ export default function UsersListPage() {
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={tt("list.title")}
       description={tt("list.description", { count: fx.total })}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       noPadding
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
@@ -77,7 +79,7 @@ export default function UsersListPage() {
 
       <UserEditDialog
         userId={editingId ?? null}
-        onClose={() => navigate("/users")}
+        onClose={() => goBack("/users")}
         onSaved={fx.reload}
       />
 

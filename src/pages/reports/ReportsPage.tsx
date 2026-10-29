@@ -18,10 +18,12 @@ import {
   downloadDevicesPDF,
   downloadMaterialOutputsPdf,
 } from "@widgets/reports";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function ReportsPage() {
   const { t } = useTranslation(["reports", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const assignedFx = useAssignedDevicesReport({ download: downloadAssignedDevicesPdf });
   const devicesFx = useDevicesReport({ download: downloadDevicesPDF });
   const materialOutputsFx = useMaterialOutputsReport({ download: downloadMaterialOutputsPdf });
@@ -30,7 +32,7 @@ export default function ReportsPage() {
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("title")}
       description={t("description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaChartBar size={20} />}
       noPadding
       breadcrumbs={[

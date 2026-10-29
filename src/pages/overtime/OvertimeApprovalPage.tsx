@@ -5,10 +5,12 @@ import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import { OvertimeApprovalTable, OvertimeExportActions, useOvertimeApproval } from "@features/schedule";
 import { downloadOvertimePDF } from "@widgets/reports";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function OvertimeApprovalPage() {
   const { t } = useTranslation(["overtime", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canApprove = useCan("overtime.approve");
   const fx = useOvertimeApproval({ canApprove, downloadPdf: downloadOvertimePDF });
 
@@ -23,7 +25,7 @@ export default function OvertimeApprovalPage() {
         { label: t("common:nav.schedules"), onClick: () => navigate("/schedules") },
         { label: t("title") },
       ]}
-      backAction={() => navigate("/schedules")}
+      backAction={() => goBack("/schedules")}
       actions={<OvertimeExportActions fx={fx} />}
     >
       <OvertimeApprovalTable fx={fx} />

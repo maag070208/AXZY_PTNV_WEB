@@ -29,6 +29,7 @@ import {
 } from "@shared/validation";
 import { dyn, i18n } from "@shared/i18n";
 import Langostin from "@shared/ui/langostin/Langostin";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
 const dateStrToLocal = (value?: string | null): Date | undefined => {
@@ -104,6 +105,7 @@ function Cell({ children, min = 200 }: { children: React.ReactNode; min?: number
 export default function EmployeeProfileEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["employees", "common"]);
 
   const detail = useEmployeeDetail(id);
@@ -185,7 +187,7 @@ export default function EmployeeProfileEditPage() {
       ])
     ) as FormState;
     const ok = await detail.saveProfile(normalized, detail.profile?.discounts ?? []);
-    if (ok) navigate(`/employees/${id}`);
+    if (ok) goBack(`/employees/${id}`);
   };
 
   if (detail.loading || !detail.profile) {
@@ -193,7 +195,7 @@ export default function EmployeeProfileEditPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.editInfo")}
-        backAction={() => navigate(-1)}
+        backAction={() => goBack(`/employees/${id}`)}
         icon={<FaUserTie size={20} />}
         breadcrumbs={[
           { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
@@ -498,7 +500,7 @@ export default function EmployeeProfileEditPage() {
       noPadding
       title={tt("detail.editInfo")}
       description={profile.name}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack(`/employees/${id}`)}
       icon={<FaUserTie size={20} />}
       breadcrumbs={[
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
@@ -513,7 +515,7 @@ export default function EmployeeProfileEditPage() {
       )}
 
       <ITFlex justify="end" align="center" gap={3} className="mb-6">
-        <ITButton variant="outlined" color="secondary" onClick={() => navigate(-1)} disabled={detail.saving}>
+        <ITButton variant="outlined" color="secondary" onClick={() => goBack(`/employees/${id}`)} disabled={detail.saving}>
           {tt("common:actions.cancel")}
         </ITButton>
         <ITButton variant="raised-text" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>

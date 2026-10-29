@@ -13,10 +13,12 @@ import {
   EmployeesTable,
   useEmployeesList,
 } from "@features/user/employees-list";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function EmployeesListPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canEditEmployees = useCan("hr.records");
   // El alta crea la cuenta (`POST /users`): la API exige `users.create`.
   const canCreateEmployees = useCan("users.create");
@@ -27,7 +29,7 @@ export default function EmployeesListPage() {
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={tt("title")}
       description={tt("description", { count: list.total })}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       noPadding
       breadcrumbs={[
         { label: tt("common:nav.home"), onClick: () => navigate("/") },

@@ -14,9 +14,11 @@ import {
   TicketsTable,
   useTicketsList,
 } from "@features/ticket/tickets-list";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function TicketsListPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const canDelete = useCan("tickets.delete");
 
@@ -27,7 +29,7 @@ export default function TicketsListPage() {
       noPadding
       title={tt("list.title")}
       description={tt("list.description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaTicketAlt size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },

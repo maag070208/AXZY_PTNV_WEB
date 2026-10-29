@@ -9,6 +9,7 @@ import { formatDate } from "@shared/utils/dates";
 import { inventoryApi, type Condition, type Loan } from "@entities/inventory";
 import { i18n } from "@shared/i18n";
 import { useRequestKey } from "@shared/lib/useRequestKey";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** Una pieza pendiente de devolver: se decide pieza por pieza. */
 interface UnitRow {
@@ -45,6 +46,7 @@ const CONDITIONS: Condition[] = ["GOOD", "FAIR", "POOR", "BROKEN"];
 export default function NewLoanReturnPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [searchParams] = useSearchParams();
   const requestKey = useRequestKey();
   const loanIdParam = searchParams.get("loanId");
@@ -152,7 +154,7 @@ export default function NewLoanReturnPage() {
       };
       await inventoryApi.createLoanReturn(payload, requestKey(payload));
       setToast({ message: t("loanReturn.saved"), type: "success" });
-      setTimeout(() => navigate("/inventory/loans"), 1000);
+      setTimeout(() => navigate("/inventory/loans", { replace: true }), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -163,7 +165,7 @@ export default function NewLoanReturnPage() {
   if (loading) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("loanReturn.new")} backAction={() => navigate(-1)}>
+        noPadding title={t("loanReturn.new")} backAction={() => goBack("/inventory/returns")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -178,7 +180,7 @@ export default function NewLoanReturnPage() {
       description={t("loanReturn.description")}
       icon={<FaUndoAlt size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loanReturn.title"), onClick: () => navigate("/inventory/returns") }, { label: t("loanReturn.new") }]}
-      backAction={() => navigate("/inventory/loans")}
+      backAction={() => goBack("/inventory/loans")}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>

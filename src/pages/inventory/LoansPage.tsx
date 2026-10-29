@@ -7,6 +7,7 @@ import { formatDate } from "@shared/utils/dates";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type Loan } from "@entities/inventory";
 import { downloadCustodyLetterPdf } from "@widgets/custody-letter";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = {
   ACTIVE: "success",
@@ -18,6 +19,7 @@ const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = 
 export default function LoansPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
 
   const fetchData = useMemo(
     () =>
@@ -149,7 +151,7 @@ export default function LoansPage() {
       description={t("loans.description")}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title") }]}
-      backAction={() => navigate("/inventory")}
+      backAction={() => goBack("/inventory")}
       actions={
         <ITButton variant="filled" color="primary" onClick={() => navigate("/inventory/loans/new")}>
           <ITFlex align="center" gap={1}>

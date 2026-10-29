@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import { TimeClockActions, TimeClockTab, useTimeClock } from "@features/access/time-clock";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function TimeClockPage() {
   const { t } = useTranslation(["time-clock", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useTimeClock();
   // Dar de alta/baja relojes exige relojes.administrar (igual que en la API).
   const canManageClocks = useCan("time_clocks.manage");
@@ -29,7 +31,7 @@ export default function TimeClockPage() {
         { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
         { label: t("title") },
       ]}
-      backAction={() => navigate("/employees")}
+      backAction={() => goBack("/employees")}
     >
       <TimeClockTab fx={fx} />
     </ITPage>

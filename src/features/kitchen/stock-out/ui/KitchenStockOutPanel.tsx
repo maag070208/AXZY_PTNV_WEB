@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITBadget,
@@ -30,6 +29,7 @@ import {
 } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { dyn } from "@shared/i18n/dyn";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 interface Line {
   key: number;
@@ -47,7 +47,7 @@ const emptyDraft = (key: number): Line => ({ key, itemId: "", quantity: "" });
  */
 export default function KitchenStockOutPanel() {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const requestKey = useRequestKey();
   const items = useKitchenItemOptions();
   const itemById = useMemo(() => new Map(items.data.map((i) => [i.id, i])), [items.data]);
@@ -125,7 +125,7 @@ export default function KitchenStockOutPanel() {
     try {
       await kitchenApi.stockOut(input, requestKey(input));
       setToast(t("stockOut.success"));
-      setTimeout(() => navigate("/kitchen/items"), 600);
+      setTimeout(() => goBack("/kitchen/items"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {

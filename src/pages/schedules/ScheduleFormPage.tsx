@@ -3,10 +3,12 @@ import { FaRegClock } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ScheduleForm } from "@features/schedule";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function ScheduleFormPage() {
   const { t } = useTranslation(["schedules", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
 
@@ -20,7 +22,7 @@ export default function ScheduleFormPage() {
         { label: t("title"), onClick: () => navigate("/schedules") },
         { label: isEdit ? t("edit") : t("new") },
       ]}
-      backAction={() => navigate("/schedules")}
+      backAction={() => goBack("/schedules")}
     >
       <ScheduleForm id={id} />
     </ITPage>

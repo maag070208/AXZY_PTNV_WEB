@@ -8,11 +8,13 @@ import { formatDate } from "@shared/utils/dates";
 import { personalApi, type DisciplinaryReport } from "@entities/hr";
 import { DisciplinaryReportPreview, downloadDisciplinaryReportPdf } from "@widgets/disciplinary-report";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function DisciplinaryReportDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t: tt } = useTranslation(["disciplinary-reports", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [disciplinaryReport, setDisciplinaryReport] = useState<DisciplinaryReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export default function DisciplinaryReportDetailPage() {
   if (loading) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={tt("preview.title")} backAction={() => navigate("/employees/disciplinary-reports")}>
+        noPadding title={tt("preview.title")} backAction={() => goBack("/employees/disciplinary-reports")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -46,7 +48,7 @@ export default function DisciplinaryReportDetailPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("preview.title")}
-        backAction={() => navigate("/employees/disciplinary-reports")}
+        backAction={() => goBack("/employees/disciplinary-reports")}
         breadcrumbs={[
           { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
           { label: tt("breadcrumb"), onClick: () => navigate("/employees/disciplinary-reports") },
@@ -75,7 +77,7 @@ export default function DisciplinaryReportDetailPage() {
         { label: tt("breadcrumb"), onClick: () => navigate("/employees/disciplinary-reports") },
         { label: disciplinaryReport.user.name },
       ]}
-      backAction={() => navigate("/employees/disciplinary-reports")}
+      backAction={() => goBack("/employees/disciplinary-reports")}
       actions={
         <ITFlex gap={2}>
           <ITButton variant="outlined" color="secondary" onClick={() => void downloadDisciplinaryReportPdf(disciplinaryReport)}>

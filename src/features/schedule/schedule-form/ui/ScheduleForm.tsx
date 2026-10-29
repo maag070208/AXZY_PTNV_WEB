@@ -1,6 +1,5 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITBadget,
@@ -22,6 +21,7 @@ import { useIsMobile } from "@shared/lib/useIsMobile";
 import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import { dayMinutes, daysWorked, restDays, weeklyMinutes } from "../model/summary";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 const emptyDays = (): ScheduleDayInput[] =>
   [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({
@@ -73,7 +73,7 @@ function ActionBar({
 
 export default function ScheduleForm({ id }: { id?: string }) {
   const { t } = useTranslation("schedules");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const isEdit = Boolean(id);
   const isMobile = useIsMobile();
 
@@ -132,7 +132,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
       if (isEdit) await scheduleApi.update(id!, form);
       else await scheduleApi.create(form);
       setToast(t("save"));
-      setTimeout(() => navigate("/schedules"), 500);
+      setTimeout(() => goBack("/schedules"), 500);
     } catch (e) {
       setError((e as Error).message ?? t("saveError"));
     } finally {
@@ -190,7 +190,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
         saving={saving}
         cancelLabel={t("cancel")}
         saveLabel={t("save")}
-        onCancel={() => navigate("/schedules")}
+        onCancel={() => goBack("/schedules")}
         onSave={save}
       />
 

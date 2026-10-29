@@ -1,12 +1,12 @@
 import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaUsersCog } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { TimeClockPeopleView } from "@features/access/time-clock-people";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function TimeClockPeoplePage() {
   const { t } = useTranslation("time-clock");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
 
   return (
     <ITPage
@@ -15,7 +15,7 @@ export default function TimeClockPeoplePage() {
       description={t("people.description")}
       icon={<FaUsersCog size={20} />}
       breadcrumbs={[{ label: t("people.title") }]}
-      backAction={() => navigate("/time-clocks")}
+      backAction={() => goBack("/time-clocks")}
     >
       <TimeClockPeopleView />
     </ITPage>

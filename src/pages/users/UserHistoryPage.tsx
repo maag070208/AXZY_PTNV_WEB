@@ -11,10 +11,12 @@ import {
 import { UserPermissionsPanel } from "@features/user/user-permissions";
 import { usePermission } from "@entities/user";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function UserHistoryPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["users", "common"]);
   const canManagePermissions = usePermission("users.permissions") !== "NONE";
 
@@ -26,7 +28,7 @@ export default function UserHistoryPage() {
         noPadding
         title={tt("history.title")}
         loading
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/users")}
         icon={<FaUserShield size={20} />}
         breadcrumbs={[
           { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
@@ -45,7 +47,7 @@ export default function UserHistoryPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("history.title")}
-        backAction={() => navigate(-1)}
+        backAction={() => goBack("/users")}
         icon={<FaUserShield size={20} />}
         breadcrumbs={[
           { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
@@ -62,7 +64,7 @@ export default function UserHistoryPage() {
       noPadding
       title={tt("history.historyTitle")}
       description={user.name}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/users")}
       icon={<FaUserShield size={20} />}
       breadcrumbs={[
         { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },

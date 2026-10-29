@@ -6,10 +6,12 @@ import {
   TimeClockDifferencesTab,
   useTimeClockDifferences,
 } from "@features/access/time-clock-differences";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function TimeClockDifferencesPage() {
   const { t } = useTranslation(["time-clock", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useTimeClockDifferences();
 
   return (
@@ -24,7 +26,7 @@ export default function TimeClockDifferencesPage() {
         { label: t("employees.title"), onClick: () => navigate("/hr/time-clock/employees") },
         { label: t("differences.title") },
       ]}
-      backAction={() => navigate("/hr/time-clock/employees")}
+      backAction={() => goBack("/hr/time-clock/employees")}
     >
       <TimeClockDifferencesTab fx={fx} />
     </ITPage>

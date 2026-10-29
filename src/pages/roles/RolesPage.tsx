@@ -5,10 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import { RolesWorkspace, useRolesWorkspace } from "@features/roles/roles-console";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** Consola de control de acceso: roles, matriz, acceso por persona, políticas, catálogo y actividad. */
 function RolesConsole() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t } = useTranslation(["roles", "common"]);
   const workspace = useRolesWorkspace();
 
@@ -17,7 +19,7 @@ function RolesConsole() {
       noPadding
       title={t("title")}
       description={t("description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaUserShield size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
