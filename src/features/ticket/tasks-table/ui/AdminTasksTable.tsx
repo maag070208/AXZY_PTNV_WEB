@@ -1,5 +1,5 @@
 import {
-  ITBadget,
+  ITCard,
   ITDataTable,
   ITFlex,
   ITText,
@@ -10,7 +10,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import type { KanbanAssignment } from "@entities/ticket";
+import { ASSIGNMENT_TONE, TicketChip, type KanbanAssignment } from "@entities/ticket";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/i18n";
@@ -86,9 +86,7 @@ export default function AdminTasksTable({ fx }: Props) {
       },
       sortable: false,
       render: (row) => (
-        <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="lg">
-          {dyn(tt)(`detail.taskStatusOptions.${row.status}`)}
-        </ITBadget>
+        <TicketChip tone={ASSIGNMENT_TONE[row.status]} label={dyn(tt)(`detail.taskStatusOptions.${row.status}`)} />
       ),
     },
     {
@@ -113,7 +111,7 @@ export default function AdminTasksTable({ fx }: Props) {
           {row.dueDate &&
             row.status !== "COMPLETED" &&
             new Date(row.dueDate) < new Date() && (
-              <ITBadget color="danger" size="lg">{tt("tasksTable.overdue")}</ITBadget>
+              <TicketChip tone="danger" label={tt("tasksTable.overdue")} />
             )}
         </ITFlex>
       ),
@@ -121,6 +119,7 @@ export default function AdminTasksTable({ fx }: Props) {
   ];
 
   return (
+    <ITCard>
     <ITDataTable
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
@@ -138,5 +137,6 @@ export default function AdminTasksTable({ fx }: Props) {
       virtualized
       virtualizedMaxHeight={460}
     />
+    </ITCard>
   );
 }

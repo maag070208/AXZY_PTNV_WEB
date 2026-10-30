@@ -1,5 +1,5 @@
-import { ITBadget, ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { FaSync, FaTasks, FaTrello } from "react-icons/fa";
+import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { LuKanban, LuListChecks, LuRefreshCw } from "react-icons/lu";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
@@ -8,6 +8,7 @@ import {
   AdminTasksTable,
 } from "@features/ticket/tasks-table";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { TicketChip } from "@entities/ticket";
 
 export default function AdminTasksPage() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function AdminTasksPage() {
       title={tt("admintasks.title")}
       description={tt("admintasks.description", { count: fx.rows.length })}
       backAction={() => goBack("/")}
-      icon={<FaTasks size={20} />}
+      icon={<LuListChecks size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: tt("admintasks.breadcrumb") },
@@ -34,13 +35,13 @@ export default function AdminTasksPage() {
         <ITFlex gap={2}>
           <ITButton variant="outlined" color="secondary" onClick={() => navigate("/tickets/kanban")}>
             <ITFlex align="center" gap={1}>
-              <FaTrello size={12} />
+              <LuKanban size={14} />
               <ITText className="font-bold text-[11px]">{tt("admintasks.viewBoard")}</ITText>
             </ITFlex>
           </ITButton>
           <ITButton variant="outlined" onClick={fx.reload}>
             <ITFlex align="center" gap={1}>
-              <FaSync size={11} />
+              <LuRefreshCw size={13} />
               <ITText className="font-bold text-[11px]">{tt("admintasks.refresh")}</ITText>
             </ITFlex>
           </ITButton>
@@ -54,12 +55,10 @@ export default function AdminTasksPage() {
           </ITText>
         )}
         {fx.error && (
-          <ITText className="text-[11px] font-bold text-red-600">{fx.error}</ITText>
+          <ITText className="text-[12px] font-semibold text-[color:var(--color-danger)]">{fx.error}</ITText>
         )}
         {fx.overdue > 0 && (
-          <ITBadget color="danger" size="lg">
-            {tt("admintasks.overdueTasks", { count: fx.overdue })}
-          </ITBadget>
+          <TicketChip tone="danger" label={tt("admintasks.overdueTasks", { count: fx.overdue })} />
         )}
       </ITFlex>
       <AdminTasksTable fx={fx} />

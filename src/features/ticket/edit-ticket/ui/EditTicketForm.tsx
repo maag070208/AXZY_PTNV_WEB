@@ -5,22 +5,14 @@ import {
   ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
-import {
-  FaBan,
-  FaExclamationTriangle,
-  FaFire,
-  FaInfoCircle,
-} from "react-icons/fa";
+import { LuFileText, LuFlag } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
+import { FormSection } from "@shared/ui/form-section";
+import { PRIORITY_TONE } from "@entities/ticket";
 import type { TicketEditDraft } from "../model/useEditTicket";
 
-const PRIORITIES = [
-  { value: "LOW", icon: <FaInfoCircle size={11} />, color: "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200", activeColor: "bg-slate-600 text-white border-slate-600" },
-  { value: "MEDIUM", icon: <FaExclamationTriangle size={11} />, color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100", activeColor: "bg-amber-500 text-white border-amber-500" },
-  { value: "HIGH", icon: <FaFire size={11} />, color: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100", activeColor: "bg-orange-500 text-white border-orange-500" },
-  { value: "URGENT", icon: <FaBan size={11} />, color: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100", activeColor: "bg-red-500 text-white border-red-500" },
-];
+const PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
 
 interface Props {
   form: TicketEditDraft;
@@ -33,12 +25,13 @@ export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
   return (
     <ITFlex justify="center">
       <ITStack direction="column" spacing={5} className="w-full">
-        <ITFlex className="bg-[var(--it-card-bg)] rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
+        <FormSection
+          number={1}
+          icon={<LuFileText size={16} />}
+          title={tt("edit.formInfoTitle")}
+          complete={!!form.title.trim() && !!form.description.trim()}
+        >
           <ITStack direction="column" spacing={5} className="w-full">
-            <ITText className="text-[12px] font-semibold text-slate-500">
-              {tt("edit.formInfoTitle")}
-            </ITText>
-
             <div>
               <ITInput
                 name="title"
@@ -49,7 +42,7 @@ export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
                 aria-invalid={!!errors?.title}
               />
               {errors?.title && (
-                <span role="alert" className="text-red-500 text-xs mt-1 block">
+                <span role="alert" className="mt-1 block text-xs text-[color:var(--color-danger)]">
                   {errors.title}
                 </span>
               )}
@@ -64,36 +57,41 @@ export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
                 placeholder={tt("edit.descPlaceholder")}
                 rows={6}
               />
-              <ITText className="text-[9px] text-slate-400 text-right">
+              <ITText className="text-right text-[11px] text-slate-400">
                 {form.description.length} / 2000
               </ITText>
             </ITFlex>
           </ITStack>
-        </ITFlex>
+        </FormSection>
 
-        <ITFlex className="bg-[var(--it-card-bg)] rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
-          <ITStack direction="column" spacing={4} className="w-full">
-            <ITText className="text-[12px] font-semibold text-slate-500">
-              {tt("edit.priorityTitle")}
-            </ITText>
-
-            <ITFlex gap={2} wrap="wrap">
-              {PRIORITIES.map((p) => (
+        <FormSection number={2} icon={<LuFlag size={16} />} title={tt("edit.priorityTitle")} complete={!!form.priority}>
+          <ITFlex gap={2} wrap="wrap">
+            {PRIORITIES.map((value) => {
+              const active = form.priority === value;
+              const tone = PRIORITY_TONE[value];
+              const color = tone === "neutral" ? "var(--color-slate-500)" : `var(--color-${tone})`;
+              return (
                 <button
-                  key={p.value}
+                  key={value}
                   type="button"
-                  onClick={() => onFieldChange("priority", p.value)}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-[11px] font-bold transition-all cursor-pointer ${
-                    form.priority === p.value ? p.activeColor : p.color
-                  }`}
+                  aria-pressed={active}
+                  onClick={() => onFieldChange("priority", value)}
+                  className="cursor-pointer rounded-full !border-0 px-4 py-2 text-[12px] font-semibold transition-all"
+                  style={
+                    active
+                      ? { background: color, color: "#ffffff" }
+                      : {
+                          background: `color-mix(in srgb, ${color} 14%, transparent)`,
+                          color: `color-mix(in srgb, ${color} 78%, #000)`,
+                        }
+                  }
                 >
-                  {p.icon}
-                  {dyn(tt)(`priorityLabels.${p.value}`)}
+                  {dyn(tt)(`priorityLabels.${value}`)}
                 </button>
-              ))}
-            </ITFlex>
-          </ITStack>
-        </ITFlex>
+              );
+            })}
+          </ITFlex>
+        </FormSection>
       </ITStack>
     </ITFlex>
   );

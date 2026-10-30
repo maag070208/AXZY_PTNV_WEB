@@ -1,8 +1,8 @@
-import { FileTypeEnum, ITDropfile, ITGrid, ITSearchSelect } from "@axzydev/axzy_ui_system";
+import { FileTypeEnum, ITCard, ITDropfile, ITGrid, ITSearchSelect, ITTextarea } from "@axzydev/axzy_ui_system";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { FaArrowLeft, FaRedo } from "react-icons/fa";
+import { LuArrowLeft, LuRotateCcw } from "react-icons/lu";
 import { LangostinAvatar, type LangostinAnim } from "@shared/ui/langostin";
 import OptionChip from "@shared/ui/option-chip/OptionChip";
 import type { RootState } from "@app/store";
@@ -45,11 +45,20 @@ const STEP_ANIM: Record<AgentStep, LangostinAnim> = {
 
 const skipStyle = { emoji: "⏭️" };
 
+// Botones y burbujas con los tokens de bento (tinta / control); sin hex ni bordes propios.
 const secondaryButton =
-  "cursor-pointer rounded-full border border-slate-200 bg-[var(--it-card-bg)] px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 active:scale-95";
+  "cursor-pointer rounded-full !border-0 px-4 py-2.5 text-sm font-medium transition hover:brightness-95 active:scale-95";
+const secondaryStyle = {
+  backgroundColor: "var(--it-bento-control-bg, var(--color-slate-100))",
+  color: "var(--it-bento-control-text, var(--color-slate-600))",
+};
 
 const primaryButton =
-  "cursor-pointer rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400";
+  "cursor-pointer rounded-full !border-0 px-5 py-2.5 text-sm font-semibold transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40";
+const primaryStyle = {
+  backgroundColor: "var(--it-bento-ink-bg, var(--color-primary))",
+  color: "var(--it-bento-ink-text, #ffffff)",
+};
 
 export default function TicketAgent({
   form,
@@ -242,7 +251,7 @@ export default function TicketAgent({
               containerClassName="!mt-0"
             />
             <div className="flex justify-end">
-              <button type="button" onClick={agent.finishEvidence} className={primaryButton}>
+              <button type="button" onClick={agent.finishEvidence} className={primaryButton} style={primaryStyle}>
                 {files.length > 0 ? t("new.agent.continue") : t("new.agent.noEvidence")}
               </button>
             </div>
@@ -251,22 +260,22 @@ export default function TicketAgent({
       case "notes":
         return (
           <div className="flex flex-col gap-3">
-            <textarea
+            <ITTextarea
+              name="agentNotes"
               value={notesDraft}
-              onChange={(e) => setNotesDraft(e.target.value)}
+              onChange={setNotesDraft}
               maxLength={1000}
               rows={3}
               placeholder={t("new.agent.notesPlaceholder")}
-              aria-label={t("new.agent.notesPlaceholder")}
-              className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none"
             />
             <div className="flex justify-end gap-2">
-              <button type="button" className={secondaryButton} onClick={() => agent.sendNotes("")}>
+              <button type="button" className={secondaryButton} style={secondaryStyle} onClick={() => agent.sendNotes("")}>
                 {t("new.agent.noNotes")}
               </button>
               <button
                 type="button"
                 className={primaryButton}
+                style={primaryStyle}
                 disabled={!notesDraft.trim()}
                 onClick={() => agent.sendNotes(notesDraft)}
               >
@@ -311,15 +320,15 @@ export default function TicketAgent({
   return (
     <ITGrid container columns={12} spacing={6}>
       <ITGrid item xs={12} lg={7}>
-        <section className="flex h-[min(72vh,680px)] min-h-[480px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] shadow-sm">
-          <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+        <ITCard className="flex h-[min(72vh,680px)] min-h-[480px] flex-col overflow-hidden !p-0">
+          <header className="flex items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-3">
               <LangostinAvatar anim="idle" size={36} animated={false} />
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-slate-900">{t("new.agent.name")}</span>
                 <span className="text-[11px] text-slate-400">{t("new.agent.helper")}</span>
-                <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+                <span className="flex items-center gap-1.5 text-xs font-medium text-[color:var(--color-success)]">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-[color:var(--color-success)]" />
                   {t("new.agent.online")}
                 </span>
               </div>
@@ -331,14 +340,19 @@ export default function TicketAgent({
                 setReaction(null);
                 agent.restart();
               }}
-              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 active:scale-95"
+              className={`${secondaryButton} flex items-center gap-1.5 !px-3 !py-1.5 text-xs`}
+              style={secondaryStyle}
             >
-              <FaRedo size={10} />
+              <LuRotateCcw size={12} />
               {t("new.agent.restart")}
             </button>
           </header>
 
-          <div ref={threadRef} className="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 px-5 py-5">
+          <div
+            ref={threadRef}
+            className="flex-1 space-y-3 overflow-y-auto px-5 py-5"
+            style={{ background: "color-mix(in srgb, var(--color-slate-500) 6%, transparent)" }}
+          >
             {agent.messages.map((m, i) => {
               const isAgent = m.from === "agent";
               return (
@@ -354,11 +368,10 @@ export default function TicketAgent({
                       <span className="w-9 shrink-0" aria-hidden />
                     ))}
                   <p
-                    className={`max-w-[80%] whitespace-pre-line rounded-2xl px-4 py-2.5 text-sm leading-6 ${
-                      m.from === "user"
-                        ? "rounded-br-md bg-slate-900 text-white"
-                        : "rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] text-slate-800"
+                    className={`max-w-[80%] whitespace-pre-line rounded-[20px] px-4 py-2.5 text-sm leading-6 ${
+                      m.from === "user" ? "rounded-br-md" : "rounded-bl-md bg-[var(--it-card-bg)] text-slate-800"
                     }`}
+                    style={m.from === "user" ? primaryStyle : undefined}
                   >
                     {m.text}
                   </p>
@@ -369,7 +382,7 @@ export default function TicketAgent({
             {agent.typing && (
               <div className="agent-bubble flex items-end gap-2">
                 <LangostinAvatar anim="think" />
-                <span className="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] px-4 py-3">
+                <span className="flex gap-1 rounded-[20px] rounded-bl-md bg-[var(--it-card-bg)] px-4 py-3">
                   {[0, 1, 2].map((i) => (
                     <span
                       key={i}
@@ -385,10 +398,13 @@ export default function TicketAgent({
             {showBlock && (
               <div className="agent-bubble flex items-end gap-2">
                 <LangostinAvatar anim={mascot} />
-                <div className="flex max-w-[92%] flex-col gap-3 rounded-2xl rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] p-4 shadow-sm">
+                <div className="flex max-w-[92%] flex-col gap-3 rounded-[20px] rounded-bl-md bg-[var(--it-card-bg)] p-4">
                   <p key={guideKey} className="agent-pop flex items-center gap-2 text-xs text-slate-500">
                     {isOptionStep && sendAnim === null && (
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
+                      <span
+                        className="rounded-full px-2 py-0.5 font-semibold"
+                        style={secondaryStyle}
+                      >
                         {t("new.guide.step", { current: stepNumber, total: agent.steps.length })}
                       </span>
                     )}
@@ -399,9 +415,9 @@ export default function TicketAgent({
                     <button
                       type="button"
                       onClick={agent.goBack}
-                      className="flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-900"
+                      className="flex w-fit cursor-pointer items-center gap-1.5 !border-0 !bg-transparent text-xs font-medium text-slate-500 transition hover:text-slate-800"
                     >
-                      <FaArrowLeft size={10} />
+                      <LuArrowLeft size={12} />
                       {t("new.agent.back")}
                     </button>
                   )}
@@ -410,7 +426,7 @@ export default function TicketAgent({
             )}
 
           </div>
-        </section>
+        </ITCard>
       </ITGrid>
 
       <ITGrid item xs={12} lg={5}>

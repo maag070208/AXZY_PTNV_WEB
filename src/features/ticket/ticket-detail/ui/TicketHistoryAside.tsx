@@ -1,17 +1,20 @@
+import { ITBentoFeed } from "@axzydev/axzy_ui_system";
 import {
-  FaTicketAlt,
-  FaTimesCircle,
-  FaSync,
-  FaCheckCircle,
-  FaClock,
-  FaUserPlus,
-  FaBuilding,
-  FaComment,
-  FaPhoneAlt,
-} from "react-icons/fa";
+  LuArrowRightLeft,
+  LuBuilding2,
+  LuCircleCheck,
+  LuClock,
+  LuMessageSquare,
+  LuPhone,
+  LuRefreshCw,
+  LuTicket,
+  LuUserPlus,
+  LuCircleX,
+} from "react-icons/lu";
 import { useTranslation } from "react-i18next";
-import { formatDateTime } from "@shared/utils/dates";
+import { LangostinState } from "@shared/ui/langostin";
 import { PanelCard } from "@shared/ui/panel-card";
+import { formatDate } from "@shared/i18n";
 import type { TimelineEvent } from "../model/timeline";
 
 interface Props {
@@ -19,62 +22,66 @@ interface Props {
 }
 
 const EVENT_ICON: Record<string, React.ReactNode> = {
-  created: <FaTicketAlt size={11} />,
-  closed: <FaTimesCircle size={11} />,
-  follow: <FaSync size={11} />,
-  status: <FaCheckCircle size={11} />,
-  priority: <FaClock size={11} />,
-  assigned: <FaUserPlus size={11} />,
-  department: <FaBuilding size={11} />,
-  comment: <FaComment size={11} />,
-  captured: <FaPhoneAlt size={11} />,
-  default: <FaClock size={11} />,
+  created: <LuTicket size={13} />,
+  closed: <LuCircleX size={13} />,
+  follow: <LuRefreshCw size={13} />,
+  status: <LuCircleCheck size={13} />,
+  priority: <LuArrowRightLeft size={13} />,
+  assigned: <LuUserPlus size={13} />,
+  department: <LuBuilding2 size={13} />,
+  comment: <LuMessageSquare size={13} />,
+  captured: <LuPhone size={13} />,
+  default: <LuClock size={13} />,
 };
 
+const dayKey = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+};
+
+const timeOf = (iso: string) =>
+  new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
 /**
- * Historial del ticket: una fila por evento, con la línea de tiempo a la
- * izquierda. Cada fila dice **qué pasó** (título), **quién** lo hizo y **cuándo**,
- * cada dato una sola vez: antes el autor se repetía debajo del título y el
- * comentario mostraba el nombre dos veces.
+ * Historial del ticket como feed agrupado por día (más reciente arriba). Cada
+ * fila dice qué pasó, y quién y a qué hora lo hizo; los comentarios van entre comillas.
  */
 export default function TicketHistoryAside({ events }: Props) {
   const { t: tt } = useTranslation("tickets");
+
+  const todayKey = dayKey(new Date().toISOString());
+  const yesterdayKey = dayKey(new Date(Date.now() - 86_400_000).toISOString());
+
+  const groups: { key: string; label: string; items: { id: string; icon: React.ReactNode; title: string; meta: string; tone: "success" | "violet" | "neutral" }[] }[] = [];
+  for (const event of [...events].reverse()) {
+    const key = dayKey(event.timestamp);
+    let group = groups[groups.length - 1];
+    if (!group || group.key !== key) {
+      const label =
+        key === todayKey ? tt("detail.today") : key === yesterdayKey ? tt("detail.yesterday") : formatDate(event.timestamp);
+      group = { key, label, items: [] };
+      groups.push(group);
+    }
+    const isComment = event.type === "comment";
+    group.items.push({
+      id: event.id,
+      icon: EVENT_ICON[event.icon] ?? EVENT_ICON.default,
+      title: isComment ? `“${event.detail ?? ""}”` : event.title,
+      meta: [timeOf(event.timestamp), event.author].filter(Boolean).join(" · "),
+      tone: isComment ? "violet" : event.icon === "closed" || event.icon === "status" ? "success" : "neutral",
+    });
+  }
+
   return (
     <PanelCard
       title={tt("detail.historyTitle", { count: events.length })}
-      icon={<FaClock size={16} />}
+      icon={<LuClock size={16} />}
       className="md:sticky md:top-24"
     >
       {events.length === 0 ? (
-        <p className="text-[12px] italic text-slate-400">{tt("detail.noHistory")}</p>
+        <LangostinState kind="empty" size="sm" title={tt("detail.noHistory")} description={tt("detail.noHistoryHint")} />
       ) : (
-        <div className="max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
-          {[...events].reverse().map((event) => {
-            const isComment = event.type === "comment";
-            const title = isComment ? tt("detail.commentLabel") : event.title;
-            return (
-              <div key={event.id} className="flex gap-3">
-                <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                  {EVENT_ICON[event.icon] ?? EVENT_ICON.default}
-                </span>
-                <div className="min-w-0 flex-1 border-b border-slate-100 pb-3">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="min-w-0 flex-1 text-[12.5px] font-semibold leading-snug text-slate-800">{title}</p>
-                    <span className="shrink-0 text-[11px] tabular-nums text-slate-400">{formatDateTime(event.timestamp)}</span>
-                  </div>
-                  {event.detail && (
-                    <p className={`mt-0.5 break-words text-[12px] leading-snug ${isComment ? "italic text-slate-600" : "text-slate-600"}`}>
-                      {isComment ? `“${event.detail}”` : event.detail}
-                    </p>
-                  )}
-                  {event.author && (
-                    <p className="mt-1 text-[11px] text-slate-400">{tt("detail.by", { name: event.author })}</p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <ITBentoFeed groups={groups} maxHeight={520} />
       )}
     </PanelCard>
   );

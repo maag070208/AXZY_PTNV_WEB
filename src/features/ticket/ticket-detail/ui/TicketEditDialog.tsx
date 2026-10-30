@@ -1,7 +1,9 @@
 import { ITButton, ITDialog, ITFlex, ITGrid, ITSelect, ITText } from "@axzydev/axzy_ui_system";
+import { LuPencil } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { STATUS_BADGE } from "@entities/ticket";
 import { dyn } from "@shared/i18n/dyn";
+import { DialogHeader } from "@shared/ui/dialog-header";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 
 interface Props {
@@ -27,9 +29,9 @@ export default function TicketEditDialog({ fx, open, onClose }: Props) {
   }));
 
   return (
-    <ITDialog isOpen={open} onClose={onClose} title={tt("detail.editTitle")}>
+    <ITDialog isOpen={open} onClose={onClose}>
+      <DialogHeader icon={<LuPencil size={20} />} title={tt("detail.editTitle")} subtitle={tt("detail.editHint")} />
       <ITFlex direction="column" gap={4}>
-        <ITText className="text-xs text-slate-500">{tt("detail.editHint")}</ITText>
 
         <ITGrid container columns={12} spacing={4}>
           <ITGrid item xs={12} sm={6}>

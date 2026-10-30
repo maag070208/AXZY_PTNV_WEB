@@ -1,5 +1,5 @@
 import {
-  ITBadget,
+  ITBentoSegments,
   ITButton,
   ITDatePicker,
   ITFlex,
@@ -11,20 +11,21 @@ import {
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
 import {
-  FaCalendarAlt,
-  FaChevronDown,
-  FaChevronUp,
-  FaClipboardList,
-  FaComment,
-  FaPaperPlane,
-  FaPlus,
-  FaTasks,
-  FaTrash,
-} from "react-icons/fa";
+  LuCalendarDays,
+  LuChevronDown,
+  LuChevronUp,
+  LuListChecks,
+  LuMessageSquare,
+  LuPlus,
+  LuSend,
+  LuTrash2,
+} from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { formatDate, formatDateTime } from "@shared/utils/dates";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { dyn } from "@shared/i18n/dyn";
+import { LangostinState } from "@shared/ui/langostin";
+import { ASSIGNMENT_TONE, TicketChip } from "@entities/ticket";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 import TaskAgentForm from "./TaskAgentForm";
 
@@ -37,21 +38,6 @@ interface Props {
     canUpload: boolean;
   }) => React.ReactNode;
 }
-
-/** Color por estado: borde izquierdo de la tarjeta. */
-const STATUS_TONE: Record<string, { border: string }> = {
-  PENDING: { border: "border-l-slate-300" },
-  IN_PROGRESS: { border: "border-l-blue-400" },
-  IN_REVIEW: { border: "border-l-purple-400" },
-  COMPLETED: { border: "border-l-emerald-400" },
-};
-
-const STATUS_BADGE: Record<string, string> = {
-  COMPLETED: "success",
-  IN_PROGRESS: "info",
-  IN_REVIEW: "purple",
-  PENDING: "gray",
-};
 
 /**
  * Tareas del ticket: una lista (no un grafo). Cada tarea es una tarjeta con el
@@ -80,14 +66,12 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
         align="center"
         wrap="wrap"
         gap={2}
-        className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3"
+        className="w-full rounded-2xl bg-slate-50 px-4 py-3"
       >
         <ITFlex align="center" gap={2}>
-          <FaTasks size={13} className="text-slate-400" />
-          <ITText className="!text-[12px] font-bold text-slate-700">{tt("detail.tasksTitle")}</ITText>
-          <ITBadget color="primary" size="lg">
-            {tareas.length}
-          </ITBadget>
+          <LuListChecks size={16} className="text-slate-400" />
+          <ITText className="!text-[13px] font-bold text-slate-800">{tt("detail.tasksTitle")}</ITText>
+          <TicketChip tone="primary" label={String(tareas.length)} />
         </ITFlex>
         <ITButton variant="outlined" color="secondary" size="sm" onClick={() => fx.setTasksOpen(true)}>
           <ITText className="!text-[11px] font-bold">{tt("detail.showTasks")}</ITText>
@@ -101,17 +85,15 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
       {/* Encabezado: qué es y la acción principal, en una línea. */}
       <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
         <ITFlex align="center" gap={2}>
-          <FaTasks size={13} className="text-slate-400" />
-          <ITText className="!text-[13px] font-bold text-slate-800">{tt("detail.tasksTitle")}</ITText>
-          <ITBadget color="primary" size="lg">
-            {tt("detail.tasksCount", { count: tareas.length })}
-          </ITBadget>
+          <LuListChecks size={16} className="text-slate-400" />
+          <h3 className="m-0 !text-[16px] font-bold !text-slate-800">{tt("detail.tasksTitle")}</h3>
+          <TicketChip tone="primary" label={tt("detail.tasksCount", { count: tareas.length })} />
         </ITFlex>
         <ITFlex align="center" gap={2}>
           {canAddTask && !fx.newTaskOpen && (
             <ITButton variant="filled" color="primary" size="sm" onClick={() => fx.setNewTaskOpen(true)}>
               <ITFlex align="center" gap={1}>
-                <FaPlus size={10} />
+                <LuPlus size={12} />
                 <ITText className="!text-[11px] font-bold">{tt("detail.newTask")}</ITText>
               </ITFlex>
             </ITButton>
@@ -122,9 +104,21 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
         </ITFlex>
       </ITFlex>
 
+      {tareas.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <ITBentoSegments total={tareas.length} done={tareas.filter((a) => a.status === "COMPLETED").length} />
+          <p className="m-0 text-[12px] text-slate-500">
+            {tt("detail.tasksProgress", {
+              done: tareas.filter((a) => a.status === "COMPLETED").length,
+              total: tareas.length,
+            })}
+          </p>
+        </div>
+      )}
+
       {/* Tarea nueva: la arma Langostín en el chat de arriba de la lista. */}
       {fx.newTaskOpen && canAddTask && (
-        <div className="rounded-xl border border-primary-500/25 bg-primary-500/[0.03] p-3">
+        <div className="rounded-2xl bg-[color-mix(in_srgb,var(--color-primary)_6%,transparent)] p-3">
           <ITFlex direction="column" gap={1} className="mb-2.5 px-1">
             <ITText className="!text-[12px] font-semibold text-primary-500">
               {tt("detail.newTask")}
@@ -138,20 +132,15 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
 
       {/* Lista de tareas. */}
       {tareas.length === 0 ? (
-        <ITFlex
-          direction="column"
-          align="center"
-          gap={1}
-          className="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 px-4 py-8"
-        >
-          <FaClipboardList className="text-slate-300" size={22} />
-          <ITText className="!text-[12px] font-bold text-slate-600">{tt("detail.noAssignmentsYet")}</ITText>
-          {canAddTask && <ITText className="!text-[11px] text-slate-400">{tt("detail.noTasksHint")}</ITText>}
-        </ITFlex>
+        <LangostinState
+          kind="empty"
+          size="sm"
+          title={tt("detail.noAssignmentsYet")}
+          description={canAddTask ? tt("detail.noTasksHint") : undefined}
+        />
       ) : (
         <ITStack direction="column" spacing={2}>
           {tareas.map((a) => {
-            const tone = STATUS_TONE[a.status] ?? STATUS_TONE.PENDING;
             const open = fx.expandedAssignments[a.id] ?? false;
             const canEditTask = canManage && !isClosed;
             const canEditStatus = !isClosed && (canManage || a.userId === fx.currentUser?.id);
@@ -162,7 +151,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
             return (
               <div
                 key={a.id}
-                className={`rounded-xl border border-slate-200 border-l-4 ${tone.border} bg-[var(--it-card-bg)] shadow-sm`}
+                className="rounded-2xl bg-slate-50"
               >
                 {/* Quién y en qué estado. */}
                 <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="px-3 py-2.5">
@@ -179,9 +168,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                   </ITFlex>
 
                   <ITFlex align="center" gap={2} className="shrink-0">
-                    <ITBadget color={(STATUS_BADGE[a.status] as any) ?? "gray"} size="lg">
-                      {dyn(tt)(`detail.taskStatusOptions.${a.status}`)}
-                    </ITBadget>
+                    <TicketChip tone={ASSIGNMENT_TONE[a.status]} label={dyn(tt)(`detail.taskStatusOptions.${a.status}`)} />
                     {canManage && !isClosed && (
                       <ITButton
                         variant="text"
@@ -191,7 +178,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                         title={tt("detail.removeTask")}
                         disabled={fx.updatingId === a.id}
                       >
-                        <FaTrash size={10} />
+                        <LuTrash2 size={13} />
                       </ITButton>
                     )}
                     <ITButton
@@ -206,7 +193,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                         <ITText className="!text-[10px] font-bold">
                           {tt("detail.taskDetails")}
                         </ITText>
-                        {open ? <FaChevronUp size={8} /> : <FaChevronDown size={8} />}
+                        {open ? <LuChevronUp size={12} /> : <LuChevronDown size={12} />}
                       </ITFlex>
                     </ITButton>
                   </ITFlex>
@@ -217,27 +204,25 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                   <ITText className="!text-[13px] font-semibold text-slate-800">
                     {a.title || tt("detail.taskTitlePlaceholder")}
                   </ITText>
-                  <ITFlex align="center" gap={3} wrap="wrap" className="!text-[10px] text-slate-500">
+                  <ITFlex align="center" gap={3} wrap="wrap" className="!text-[12px] text-slate-500">
                     {a.startDate && (
                       <span className="flex items-center gap-1">
-                        <FaCalendarAlt size={9} />
+                        <LuCalendarDays size={12} />
                         {tt("detail.startShort")} {formatDate(a.startDate)}
                       </span>
                     )}
                     {a.dueDate && (
-                      <span className={`flex items-center gap-1 ${vencida ? "font-bold text-amber-700" : ""}`}>
-                        <FaCalendarAlt size={9} />
+                      <span className={`flex items-center gap-1 ${vencida ? "font-bold text-[color:var(--color-danger)]" : ""}`}>
+                        <LuCalendarDays size={12} />
                         {tt("detail.dueShort")} {formatDate(a.dueDate)}
                       </span>
                     )}
                     {vencida && (
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 !text-[12px] font-bold text-amber-800">
-                        {tt("detail.overdue")}
-                      </span>
+                      <TicketChip tone="danger" label={tt("detail.overdue")} />
                     )}
                     {comentarios > 0 && (
                       <span className="flex items-center gap-1">
-                        <FaComment size={9} />
+                        <LuMessageSquare size={12} />
                         {tt("detail.assignmentComments", { count: comentarios })}
                       </span>
                     )}
@@ -246,7 +231,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
 
                 {/* Detalles: lo editable, los archivos y los comentarios. */}
                 {open && (
-                  <ITStack direction="column" spacing={3} className="border-t border-slate-100 px-3 py-3">
+                  <ITStack direction="column" spacing={3} className="px-3 pb-3 pt-1">
                     <ITInput
                       name={`title-${a.id}`}
                       label={tt("detail.taskTitle")}
@@ -318,7 +303,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       canUpload: fx.canUploadToTicket || a.userId === fx.currentUser?.id,
                     })}
 
-                    <div className="border-t border-slate-100 pt-3">
+                    <div className="pt-2">
                       <ITButton
                         variant="outlined"
                         size="sm"
@@ -326,7 +311,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                         onClick={() => fx.setCommentOpen((s) => ({ ...s, [a.id]: !s[a.id] }))}
                       >
                         <ITFlex align="center" gap={1}>
-                          <FaComment size={10} />
+                          <LuMessageSquare size={12} />
                           <ITText className="!text-[10px] font-bold">
                             {tt("detail.commentsCount", { count: comentarios })}
                           </ITText>
@@ -339,7 +324,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                             <ITText className="!text-[11px] text-slate-400">{tt("detail.noComments")}</ITText>
                           ) : (
                             (a.comments ?? []).map((c) => (
-                              <div key={c.id} className="rounded-lg border border-slate-100 bg-slate-50 p-2">
+                              <div key={c.id} className="rounded-xl bg-[var(--it-card-bg)] p-2.5">
                                 <ITFlex justify="between" align="center" className="mb-0.5">
                                   <ITText className="!text-[10px] font-bold text-slate-600">
                                     {c.author?.name ?? tt("detail.systemUser")}
@@ -373,7 +358,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                                   fx.sendingCommentId === a.id || !(fx.commentDrafts[a.id] ?? "").trim()
                                 }
                               >
-                                <FaPaperPlane size={11} />
+                                <LuSend size={12} />
                               </ITButton>
                             </div>
                           )}

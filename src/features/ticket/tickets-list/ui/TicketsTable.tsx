@@ -1,24 +1,29 @@
 import {
-  ITBadget,
   ITButton,
+  ITCard,
   ITDataTable,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type {
   Column,
+  ColumnFilters,
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEye, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { LuEye, LuTrash2, LuUndo2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import { formatDate } from "@shared/utils/dates";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import {
   STATUS_BADGE,
   PRIORITY_BADGE,
+  STATUS_TONE,
+  PRIORITY_TONE,
+  WAIT_RATING_TONE,
+  TicketChip,
   UNASSIGNED,
-  WAIT_RATING_COLOR,
   daysOnHold,
   waitRating,
   type Ticket,
@@ -31,6 +36,8 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
+  /** Filtro rápido de la franja de resumen (cambiarlo remonta la tabla). */
+  externalFilters: ColumnFilters;
   /** Opciones de Categoría, Creador y Responsable (de los tickets visibles). */
   filterOptions: TicketFilterOptions;
   filterOptionsLoading: boolean;
@@ -43,6 +50,7 @@ export default function TicketsTable({
   canDelete,
   fetchData,
   reloadKey,
+  externalFilters,
   filterOptions,
   filterOptionsLoading,
   filterOptionsError,
@@ -68,9 +76,7 @@ export default function TicketsTable({
         <ITFlex direction="column" gap={0.5}>
           <ITFlex align="center" gap={1}>
             <ITText className="text-[12px] font-black text-slate-800">{t.title}</ITText>
-            {t.deletedAt && (
-              <ITBadget color="gray" size="lg">{tt("list.deleted")}</ITBadget>
-            )}
+            {t.deletedAt && <TicketChip label={tt("list.deleted")} />}
           </ITFlex>
           <ITText className="text-[12px] font-bold text-slate-400">
             {t.category?.name ?? "—"}
@@ -108,9 +114,7 @@ export default function TicketsTable({
         error: false,
       },
       render: (t) => (
-        <ITBadget size="lg" color={(STATUS_BADGE[t.status]?.color as any) ?? "default"}>
-          {dyn(tt)(`statusLabels.${t.status}`)}
-        </ITBadget>
+        <TicketChip tone={STATUS_TONE[t.status]} label={dyn(tt)(`statusLabels.${t.status}`)} />
       ),
     },
     {
@@ -129,9 +133,7 @@ export default function TicketsTable({
         error: false,
       },
       render: (t) => (
-        <ITBadget size="lg" color={(PRIORITY_BADGE[t.priority]?.color as any) ?? "default"}>
-          {dyn(tt)(`priorityLabels.${t.priority}`)}
-        </ITBadget>
+        <TicketChip tone={PRIORITY_TONE[t.priority]} label={dyn(tt)(`priorityLabels.${t.priority}`)} />
       ),
     },
     {
@@ -157,9 +159,7 @@ export default function TicketsTable({
         return (
           <ITFlex direction="column" align="center" gap={1}>
             <ITText className="text-[11px] font-bold text-slate-700">{days} d</ITText>
-            <ITBadget size="lg" color={WAIT_RATING_COLOR[rating] as any}>
-              {dyn(tt)(`list.waitLabels.${rating}`)}
-            </ITBadget>
+            <TicketChip tone={WAIT_RATING_TONE[rating]} label={dyn(tt)(`list.waitLabels.${rating}`)} />
           </ITFlex>
         );
       },
@@ -172,11 +172,7 @@ export default function TicketsTable({
       filter: "search",
       sortable: false,
       catalogOptions: catalog(filterOptions.creators),
-      render: (t) => (
-        <ITText className="text-[11px] font-bold text-slate-600">
-          {t.createdBy?.name ?? "—"}
-        </ITText>
-      ),
+      render: (t) => <PersonCell name={t.createdBy?.name} />,
     },
     {
       key: "assignedToId",
@@ -186,11 +182,7 @@ export default function TicketsTable({
       filter: "search",
       sortable: false,
       catalogOptions: catalog([{ id: UNASSIGNED, name: tt("list.unassigned") }, ...filterOptions.assignees]),
-      render: (t) => (
-        <ITText className="text-[11px] font-bold text-slate-600">
-          {t.assignedTo?.name ?? tt("list.unassigned")}
-        </ITText>
-      ),
+      render: (t) => <PersonCell name={t.assignedTo?.name} fallback={tt("list.unassigned")} />,
     },
     {
       key: "actions",
@@ -205,7 +197,7 @@ export default function TicketsTable({
             color="secondary"
             onClick={() => onView(t)}
           >
-            <FaEye size={12} />
+            <LuEye size={14} />
           </ITButton>
           {canDelete && (
             <ITButton
@@ -215,7 +207,7 @@ export default function TicketsTable({
               onClick={() => onMarkForDelete(t)}
               title={t.deletedAt ? tt("list.deleteForever") : tt("list.moveTrash")}
             >
-              {t.deletedAt ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
+              {t.deletedAt ? <LuUndo2 size={14} /> : <LuTrash2 size={14} />}
             </ITButton>
           )}
         </ITFlex>
@@ -224,7 +216,10 @@ export default function TicketsTable({
   ];
 
   return (
+    <ITCard>
     <ITDataTable
+      key={JSON.stringify(externalFilters)}
+      externalFilters={externalFilters}
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fetchData as unknown as (
@@ -233,7 +228,6 @@ export default function TicketsTable({
       }
       reloadTrigger={reloadKey}
       debounceMs={350}
-      variant="bordered"
       onRowClick={(row)=> onView(row as unknown as Ticket)}
       defaultItemsPerPage={25}
       itemsPerPageOptions={[25, 50, 100]}
@@ -243,5 +237,17 @@ export default function TicketsTable({
       virtualized
       virtualizedMaxHeight={460}
     />
+    </ITCard>
+  );
+}
+
+/** Persona con su Blobatar; sin nombre, un texto tenue. */
+function PersonCell({ name, fallback = "—" }: { name?: string; fallback?: string }) {
+  if (!name) return <ITText className="text-[12px] text-slate-400">{fallback}</ITText>;
+  return (
+    <ITFlex align="center" gap={2} className="min-w-0">
+      <ProfileAvatar name={name} size="xs" />
+      <ITText className="truncate text-[12px] font-semibold text-slate-600">{name}</ITText>
+    </ITFlex>
   );
 }

@@ -5,7 +5,7 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaSave, FaTicketAlt } from "react-icons/fa";
+import { LuSave, LuTicket } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { TicketAgent, useCreateTicket } from "@features/ticket/create-ticket";
@@ -30,7 +30,7 @@ export default function NewTicketPage() {
       title={t("new.title")}
       description={t("new.description")}
       backAction={() => goBack("/tickets")}
-      icon={<FaTicketAlt size={20} />}
+      icon={<LuTicket size={20} />}
       breadcrumbs={[
         { label: t("list.title"), onClick: () => navigate("/tickets") },
         { label: t("new.breadcrumb") },
@@ -43,7 +43,7 @@ export default function NewTicketPage() {
           disabled={createTicket.saving || !createTicket.isValid}
         >
           <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
+            <LuSave size={14} />
             <ITText className="font-bold text-[11px]">
               {createTicket.saving ? t("new.saving") : t("new.button")}
             </ITText>

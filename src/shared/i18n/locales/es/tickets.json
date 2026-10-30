@@ -38,7 +38,17 @@
       "GOOD": "BUENO",
       "REGULAR": "REGULAR",
       "POOR": "MALO"
-    }
+    },
+    "summary": {
+      "open": "Abiertos",
+      "followUp": "En seguimiento",
+      "unassigned": "Sin asignar",
+      "closed": "Cerrados",
+      "ofTotal": "de {{total}} tickets",
+      "clear": "Mostrar todos"
+    },
+    "confirmTrashTitle": "¿Mover a papelera?",
+    "confirmForeverTitle": "¿Eliminar definitivamente?"
   },
   "new": {
     "title": "Nuevo Ticket",
@@ -267,7 +277,19 @@
     "overdue": "Vencida",
     "cancel": "Cancelar",
     "by": "por {{name}}",
-    "commentLabel": "Comentario"
+    "commentLabel": "Comentario",
+    "folio": "Folio",
+    "tasksTile": "Tareas",
+    "tasksDone": "completadas",
+    "noAssignmentsShort": "sin tareas aún",
+    "daysOpen": "Tiempo abierto",
+    "sinceCreated": "desde que se levantó",
+    "tasksProgress": "{{done}} de {{total}} tareas completadas",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "noHistoryHint": "Aquí verás los cambios y comentarios del ticket.",
+    "confirmTrashTitle": "¿Mover este ticket a papelera?",
+    "confirmForeverTitle": "¿Eliminar este ticket definitivamente?"
   },
   "kanban": {
     "byTicket": "Tareas del ticket",
@@ -312,7 +334,27 @@
     "viewBoard": "Ver tablero kanban",
     "viewBoardTitle": "Ver en el tablero kanban",
     "loadError": "No se pudieron cargar tus tareas",
-    "overdueTasks": "{{count}} vencida(s)"
+    "overdueTasks": "{{count}} vencida(s)",
+    "greeting": "Hola, {{name}}",
+    "summary_one": "Tienes {{count}} tarea pendiente",
+    "summary_other": "Tienes {{count}} tareas pendientes",
+    "summaryNone": "No tienes tareas pendientes",
+    "dueTodayCount_one": "{{count}} vence hoy",
+    "dueTodayCount_other": "{{count}} vencen hoy",
+    "filterAll": "Todas",
+    "emptyTitle": "Sin tareas asignadas",
+    "emptyDescription": "Cuando te asignen una tarea en un ticket, aparecerá aquí.",
+    "groups": {
+      "overdue": "Vencidas",
+      "today": "Para hoy",
+      "week": "Esta semana",
+      "later": "Más adelante",
+      "noDate": "Sin fecha límite"
+    },
+    "dueToday": "Vence hoy",
+    "overdueOn": "Venció el {{date}}",
+    "dueOn": "Vence el {{date}}",
+    "noDueDate": "Sin fecha límite"
   },
   "admintasks": {
     "title": "Administración de tareas",
@@ -375,7 +417,8 @@
     "empty": "Sin archivos",
     "uploadEvidence": "Subir evidencia",
     "uploadTicketFiles": "Subir archivos del ticket",
-    "fallbackExt": "ARCHIVO"
+    "fallbackExt": "ARCHIVO",
+    "uploadHint": "Imágenes, PDF o video de hasta 50 MB."
   },
   "form": {
     "validation": {

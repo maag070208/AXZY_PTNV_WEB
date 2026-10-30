@@ -1,5 +1,5 @@
 import { ITButton, ITFlex, ITPage, ITText, ITToast } from "@axzydev/axzy_ui_system";
-import { FaPlus, FaTrello, FaUserPlus } from "react-icons/fa";
+import { LuKanban, LuPlus, LuUserPlus } from "react-icons/lu";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import TicketDetailModal from "@widgets/tickets/ticket-detail-modal";
@@ -25,7 +25,7 @@ export default function KanbanPage() {
       title={ticketId ? tt("kanban.byTicket") : tt("kanban.board")}
       description={ticketId ? tt("kanban.descByTicket") : tt("kanban.descBoard")}
       backAction={() => goBack("/tickets")}
-      icon={<FaTrello size={20} />}
+      icon={<LuKanban size={20} />}
       breadcrumbs={[
         { label: tt("list.title"), onClick: () => navigate("/tickets", { replace: true }) },
         ...(ticketId
@@ -47,7 +47,7 @@ export default function KanbanPage() {
               onClick={() => navigate(`/tickets/${ticketId}`)}
             >
               <ITFlex align="center" gap={1}>
-                <FaPlus size={12} />
+                <LuPlus size={14} />
                 <ITText className="font-bold text-[11px]">{tt("kanban.newTask")}</ITText>
               </ITFlex>
             </ITButton>
@@ -60,7 +60,7 @@ export default function KanbanPage() {
               onClick={() => fx.setShowCreatePanel(true)}
             >
               <ITFlex align="center" gap={1}>
-                <FaUserPlus size={12} />
+                <LuUserPlus size={14} />
                 <ITText className="font-bold text-[11px]">{tt("kanban.newTask")}</ITText>
               </ITFlex>
             </ITButton>
@@ -70,7 +70,7 @@ export default function KanbanPage() {
               onClick={() => navigate("/tickets/new")}
             >
               <ITFlex align="center" gap={1}>
-                <FaPlus size={12} />
+                <LuPlus size={14} />
                 <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
               </ITFlex>
             </ITButton>

@@ -6,7 +6,7 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { useEffect } from "react";
-import { FaSave, FaTicketAlt } from "react-icons/fa";
+import { LuSave, LuTicket } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
@@ -15,6 +15,7 @@ import {
   useEditTicket,
 } from "@features/ticket/edit-ticket";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { LangostinState } from "@shared/ui/langostin";
 
 export default function EditTicketPage() {
   const navigate = useNavigate();
@@ -48,10 +49,10 @@ export default function EditTicketPage() {
         noPadding
         title={tt("edit.title")}
         backAction={() => goBack("/tickets")}
-        icon={<FaTicketAlt size={20} />}
+        icon={<LuTicket size={20} />}
         breadcrumbs={breadcrumbs}
       >
-        <ITText className="text-slate-400">{tt("edit.loading")}</ITText>
+        <LangostinState kind="loading" title={tt("edit.loading")} description="" />
       </ITPage>
     );
   }
@@ -62,13 +63,13 @@ export default function EditTicketPage() {
         noPadding
         title={tt("edit.title")}
         backAction={() => goBack("/tickets")}
-        icon={<FaTicketAlt size={20} />}
+        icon={<LuTicket size={20} />}
         breadcrumbs={[
           { label: tt("list.title"), onClick: () => navigate("/tickets", { replace: true }) },
           { label: tt("edit.notFound") },
         ]}
       >
-        <ITText className="text-slate-400">{tt("edit.ticketNotFound")}</ITText>
+        <LangostinState kind="error" title={tt("edit.notFound")} description={tt("edit.ticketNotFound")} />
       </ITPage>
     );
   }
@@ -79,7 +80,7 @@ export default function EditTicketPage() {
       title={tt("edit.title")}
       description={tt("edit.description")}
       backAction={() => goBack("/tickets")}
-      icon={<FaTicketAlt size={20} />}
+      icon={<LuTicket size={20} />}
       breadcrumbs={breadcrumbs}
       actions={
         <ITButton
@@ -89,7 +90,7 @@ export default function EditTicketPage() {
           disabled={editTicket.saving || !editTicket.isValid}
         >
           <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
+            <LuSave size={14} />
             <ITText className="font-bold text-[11px]">
               {editTicket.saving ? tt("edit.saving") : tt("edit.button")}
             </ITText>
