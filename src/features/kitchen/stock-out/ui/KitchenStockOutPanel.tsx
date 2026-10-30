@@ -37,7 +37,7 @@ interface Line {
   quantity: string;
 }
 
-const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+const HEAD = "text-[12px] font-semibold text-slate-400";
 const emptyDraft = (key: number): Line => ({ key, itemId: "", quantity: "" });
 
 /**
@@ -141,7 +141,7 @@ export default function KitchenStockOutPanel() {
         </ITAlert>
       )}
 
-      <ITCard title={t("stockOut.dataTitle")} className="!p-5 border border-slate-200">
+      <ITCard title={t("stockOut.dataTitle")} className="!p-5">
         <ITGrid container columns={12} spacing={4}>
           <ITGrid item xs={12} md={3}>
             <ITSelect
@@ -184,7 +184,7 @@ export default function KitchenStockOutPanel() {
         </ITGrid>
       </ITCard>
 
-      <ITCard title={t("stockOut.itemsTitle")} className="!p-5 border border-slate-200">
+      <ITCard title={t("stockOut.itemsTitle")} className="!p-5">
         <ITFlex direction="column" gap={4}>
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <ITText className={`${HEAD} block mb-3`}>{t("stockOut.addTitle")}</ITText>

@@ -40,7 +40,7 @@ export default function TicketSummaryPanel({
   ];
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-6">
+    <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm lg:sticky lg:top-6">
       <div className="flex flex-col gap-1">
         <h2 className="text-base font-bold text-slate-900">{t("new.summary.heading")}</h2>
         <p className="text-sm text-slate-500">{t("new.summary.sub")}</p>

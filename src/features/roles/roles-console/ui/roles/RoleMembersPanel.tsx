@@ -118,7 +118,7 @@ export default function RoleMembersPanel({ role, roleActive, members, onViewAcce
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="text-[12px] font-bold text-slate-800">{member.name}</span>
                     <span
-                    className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${
+                      className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${
                         primary ? "bg-primary-500 text-white" : "bg-slate-100 text-slate-600"
                       }`}
                     >

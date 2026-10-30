@@ -205,12 +205,14 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
         rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
 
       <ITConfirmDialog

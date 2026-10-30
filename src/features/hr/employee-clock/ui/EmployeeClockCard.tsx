@@ -61,7 +61,7 @@ export default function EmployeeClockCard({
           const canAdd = canWrite && !!number && c.connection === "ONLINE" && c.state === "SIN_ALTA" && c.canAlta;
           const enrolled = c.state === "DADA_DE_ALTA" && c.connection === "ONLINE" && !!number;
           return (
-            <section key={c.serial} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section key={c.serial} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
               <header className="flex items-center justify-between gap-3">
                 <h3 className="truncate text-base font-black text-slate-900">{c.name}</h3>
                 <span className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${tone}`}>{label}</span>

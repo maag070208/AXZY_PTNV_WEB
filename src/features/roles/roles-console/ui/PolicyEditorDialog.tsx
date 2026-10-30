@@ -268,7 +268,7 @@ export default function PolicyEditorDialog({
         </DialogSection>
 
         <DialogSection step={2} title={t("policies.wizard.effect")}>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 sm:!grid-cols-2">
             <ChoiceCard
               tone="danger"
               selected={form.effect === "DENY"}
@@ -355,7 +355,7 @@ export default function PolicyEditorDialog({
         </DialogSection>
 
         <DialogSection step={4} title={t("policies.wizard.who")}>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 sm:!grid-cols-2">
             <ChoiceCard
               selected={form.allRoles}
               onClick={() => update({ allRoles: true })}

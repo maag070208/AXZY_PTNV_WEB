@@ -241,7 +241,7 @@ export default function InventoryMismatchesBoard() {
         justify="between"
         wrap="wrap"
         gap={3}
-        className="rounded-2xl border border-slate-200 !bg-white px-4 py-3 shadow-sm"
+        className="rounded-2xl border border-slate-200 !bg-[var(--it-card-bg)] px-4 py-3 shadow-sm"
       >
         <ITFlex align="center" gap={3}>
           <span
@@ -295,8 +295,8 @@ export default function InventoryMismatchesBoard() {
                       onClick={() => elegir(f)}
                       className={`flex w-full flex-col gap-2 rounded-xl border px-3 py-2.5 text-left transition ${
                         activo
-                          ? "border-[#0D5777] !bg-[#0D5777]/5 shadow-sm"
-                          : "border-slate-200 !bg-white hover:border-[#0D5777]/40 hover:!bg-slate-50"
+                          ? "border-primary-500 !bg-primary-500/5 shadow-sm"
+                          : "border-slate-200 !bg-[var(--it-card-bg)] hover:border-primary-500/40 hover:!bg-slate-50"
                       }`}
                     >
                       <span className="flex w-full items-center gap-2">
@@ -304,7 +304,7 @@ export default function InventoryMismatchesBoard() {
                           {f.movementType}
                         </span>
                         <span className="!text-[11px] text-slate-500">{formatDay(f.date)}</span>
-                        {activo && <FaCheckCircle className="ml-auto shrink-0 text-[#0D5777]" size={13} />}
+                        {activo && <FaCheckCircle className="ml-auto shrink-0 text-primary-500" size={13} />}
                       </span>
                       <span className="!text-[13px] font-semibold text-slate-800">{f.device}</span>
                       <span className="flex flex-wrap items-center gap-2">
@@ -352,7 +352,7 @@ export default function InventoryMismatchesBoard() {
                   description={t("audit.pickOneHint")}
                 />
                 <ITFlex direction="column" gap={1} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <ITText className="!text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                  <ITText className="!text-[12px] font-bold text-slate-400">
                     {t("audit.howTitle")}
                   </ITText>
                   <ITText className="!text-[11px] text-slate-600">{t("audit.howStep1")}</ITText>
@@ -376,7 +376,7 @@ export default function InventoryMismatchesBoard() {
 
                 {/* Las salidas que sirven, sin repetir lo que hace cada una. */}
                 <ITFlex direction="column" gap={2}>
-                  <ITText className="!text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                  <ITText className="!text-[12px] font-bold text-slate-400">
                     {t("audit.whatToDo")}
                   </ITText>
                   {opciones.map((o) => {
@@ -395,8 +395,8 @@ export default function InventoryMismatchesBoard() {
                         onClick={() => setModo(o.mode)}
                         className={`flex w-full flex-col gap-1.5 rounded-xl border px-3 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
                           activo
-                            ? "border-[#0D5777] !bg-[#0D5777]/5 ring-1 ring-[#0D5777]/30"
-                            : "border-slate-200 !bg-white hover:border-slate-300 hover:!bg-slate-50"
+                            ? "border-primary-500 !bg-primary-500/5 ring-1 ring-primary-500/30"
+                            : "border-slate-200 !bg-[var(--it-card-bg)] hover:border-slate-300 hover:!bg-slate-50"
                         }`}
                       >
                         <span className="flex w-full items-center gap-3">
@@ -405,13 +405,13 @@ export default function InventoryMismatchesBoard() {
                           </span>
                           <span className="!text-[12px] font-bold text-slate-800">{o.titulo}</span>
                           <span
-                            className={`ml-auto shrink-0 rounded-full px-2 py-0.5 !text-[9px] font-bold uppercase ${tonos[o.tono].tag}`}
+                            className={`ml-auto shrink-0 rounded-full px-2 py-0.5 !text-[12px] font-bold ${tonos[o.tono].tag}`}
                           >
                             {o.etiqueta}
                           </span>
                           <span
                             className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                              activo ? "border-[#0D5777] bg-[#0D5777]" : "border-slate-300 bg-white"
+                              activo ? "border-primary-500 bg-primary-500" : "border-slate-300 bg-[var(--it-card-bg)]"
                             }`}
                           >
                             {activo && <FaCheckCircle className="text-white" size={9} />}
@@ -430,13 +430,13 @@ export default function InventoryMismatchesBoard() {
                 <ITFlex direction="column" gap={2}>
                   <ITFlex direction="column" gap={0} className="overflow-hidden rounded-xl border border-slate-200">
                     <div className="flex items-center bg-slate-50 px-3 py-2">
-                      <span className="min-w-0 flex-1 !text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                      <span className="min-w-0 flex-1 !text-[12px] font-bold text-slate-500">
                         {t("audit.compareTitle")}
                       </span>
-                      <span className="w-14 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                      <span className="w-14 shrink-0 text-center !text-[12px] font-bold text-slate-500">
                         {t("audit.colToday")}
                       </span>
-                      <span className="w-28 shrink-0 text-center !text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                      <span className="w-28 shrink-0 text-center !text-[12px] font-bold text-slate-500">
                         {t("audit.colAfter")}
                       </span>
                     </div>

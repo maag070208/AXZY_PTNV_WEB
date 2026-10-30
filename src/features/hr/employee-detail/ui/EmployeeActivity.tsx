@@ -41,11 +41,11 @@ function Empty({ icon, text }: { icon: React.ReactNode; text: string }) {
 /** Tarjeta de una sección de actividad: encabezado con ícono y conteo, cuerpo con altura máxima. */
 function Card({ icon, tone, title, count, children, wide = false }: { icon: React.ReactNode; tone: string; title: string; count: number; children: React.ReactNode; wide?: boolean }) {
   return (
-    <section className={`flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white shadow-sm ${wide ? "lg:col-span-2" : ""}`}>
+    <section className={`flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] shadow-sm ${wide ? "lg:col-span-2" : ""}`}>
       <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
         <div className="flex items-center gap-3">
           <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}>{icon}</span>
-          <h3 className="text-sm font-black uppercase tracking-wide text-slate-700">{title}</h3>
+          <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
         </div>
         <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">{count}</span>
       </header>
@@ -83,7 +83,7 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:!grid-cols-4">
         {inventory && (
           <>
             <KpiTile icon={<FaBoxOpen size={14} />} tone="sky" label={t("detail.activity.kpi.units")} value={inventory.summary.borrowedUnits} hint={t("detail.activity.kpi.unitsHint", { count: inventory.summary.activeLoans })} />
@@ -94,7 +94,7 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
         <KpiTile icon={<FaTools size={14} />} tone={summary.pendingTasks ? "orange" : "neutral"} label={t("detail.activity.kpi.tasks")} value={summary.pendingTasks} hint={t("detail.activity.kpi.tasksHint")} />
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:!grid-cols-2">
         {inventory && (
         <Card icon={<FaBoxOpen size={14} />} tone="bg-sky-50 text-sky-600" title={t("detail.activity.tabs.loans")} count={openLoans.length}>
           <ul className="divide-y divide-slate-100">

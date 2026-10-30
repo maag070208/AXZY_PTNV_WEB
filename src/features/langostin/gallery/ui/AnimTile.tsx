@@ -23,14 +23,14 @@ export default function AnimTile({ anim, selected, onSelect }: Props) {
       data-testid={`langostin-anim-${anim}`}
       className={`group flex cursor-pointer flex-col items-center gap-1 rounded-xl border px-2 py-3 transition ${
         selected
-          ? "border-[#f97316] bg-[#fff7ed] shadow-sm"
-          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+          ? "border-primary-500 bg-primary-500/10 shadow-sm"
+          : "border-slate-200 bg-[var(--it-card-bg)] hover:border-slate-300 hover:bg-slate-50"
       }`}
     >
       <SpriteTile anim={anim} size={48} />
       <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-700">
         {d(`anims.${anim}.name`)}
-        {selected && <FaCheck size={9} className="text-[#f97316]" />}
+        {selected && <FaCheck size={9} className="text-primary-500" />}
       </span>
     </button>
   );

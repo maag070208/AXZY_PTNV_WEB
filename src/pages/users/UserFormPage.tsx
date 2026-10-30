@@ -221,7 +221,7 @@ export default function UserFormPage() {
 
       {/* Langostin flota abajo a la derecha: guía, avisa mientras verifica y anima mientras guarda. */}
       <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex items-end gap-3">
-        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-lg">
+        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-[var(--it-card-bg)] px-4 py-3 text-sm text-slate-600 shadow-lg">
           <p>{!userForm.saving && !isEdit && complete ? tt("form.ready") : guide}</p>
           {!userForm.saving && !isEdit && complete && (
             <ITButton variant="raised-text" color="primary" className="mt-3 w-full" onClick={handleFinish}>

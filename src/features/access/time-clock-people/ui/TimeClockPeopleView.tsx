@@ -232,16 +232,16 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
           fetchData as unknown as (p: ITDataTableFetchParams) => Promise<ITDataTableResponse<Record<string, unknown>>>
         }
         reloadTrigger={`${fx.version}-${fx.biometrics?.updatedAt ?? ""}`}
-        layout="fixed"
-        density="comfortable"
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 200]}
         debounceMs={350}
         variant="bordered"
-        virtualized
-        virtualizedMaxHeight={560}
-        rowHeight={64}
         onRowClick={(row) => openFicha(row as unknown as Row)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
 
       {viewing && (

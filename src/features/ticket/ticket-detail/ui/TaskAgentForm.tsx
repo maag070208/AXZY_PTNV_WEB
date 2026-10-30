@@ -23,7 +23,7 @@ const STEP_ANIM: Record<string, LangostinAnim> = {
 };
 
 const secondaryButton =
-  "cursor-pointer rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 active:scale-95";
+  "cursor-pointer rounded-full border border-slate-200 bg-[var(--it-card-bg)] px-3.5 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 active:scale-95";
 
 const primaryButton =
   "cursor-pointer rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400";
@@ -215,7 +215,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
   };
 
   return (
-    <section className="flex max-h-[520px] min-h-[360px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <section className="flex max-h-[520px] min-h-[360px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-[var(--it-card-bg)] shadow-sm">
       <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-2.5">
         <div className="flex items-center gap-2.5">
           <LangostinAvatar anim="idle" size={30} animated={false} />
@@ -265,7 +265,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
               className={`max-w-[80%] whitespace-pre-line rounded-2xl px-3.5 py-2 text-xs leading-5 ${
                 m.from === "user"
                   ? "rounded-br-md bg-slate-900 text-white"
-                  : "rounded-bl-md border border-slate-200 bg-white text-slate-800"
+                  : "rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] text-slate-800"
               }`}
             >
               {m.text}
@@ -276,7 +276,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
         {agent.typing && (
           <div className="agent-bubble flex items-end gap-2">
             <LangostinAvatar anim="think" size={24} />
-            <span className="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5">
+            <span className="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] px-3.5 py-2.5">
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
@@ -292,7 +292,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
         {showBlock && (
           <div className="agent-bubble flex items-end gap-2">
             <LangostinAvatar anim={mascot} size={24} />
-            <div className="flex max-w-[92%] flex-col gap-2.5 rounded-2xl rounded-bl-md border border-slate-200 bg-white p-3 shadow-sm">
+            <div className="flex max-w-[92%] flex-col gap-2.5 rounded-2xl rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] p-3 shadow-sm">
               <p key={guideKey} className="agent-pop flex items-center gap-2 text-[11px] text-slate-500">
                 {isOptionStep && sendAnim === null && (
                   <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">

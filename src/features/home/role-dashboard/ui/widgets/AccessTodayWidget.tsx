@@ -34,7 +34,7 @@ export default function AccessTodayWidget() {
             <Metric value={data.onSite.length} label={t("access.onSite")} tone="sky" />
             <Metric value={data.registeredByMe} label={t("access.mine")} />
           </MetricGrid>
-          <div className="grid gap-x-8 md:grid-cols-2">
+          <div className="grid gap-x-8 md:!grid-cols-2">
             <div>
               <SectionLabel>{t("access.onSite")}</SectionLabel>
               {data.onSite.length === 0 ? (

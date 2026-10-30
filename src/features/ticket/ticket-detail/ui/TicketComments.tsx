@@ -15,11 +15,11 @@ export default function TicketComments({ fx }: Props) {
   const isClosed = fx.isClosed;
 
   return (
-    <div className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
+    <div className="bg-[var(--it-card-bg)] rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
       <ITStack direction="column" spacing={3} className="w-full">
         <ITFlex align="center" gap={2}>
           <FaComment size={14} className="text-slate-400" />
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+          <ITText className="text-[12px] font-semibold text-slate-500">
             {isClosed ? tt("detail.commentsReadonly") : tt("detail.addComment")}
           </ITText>
         </ITFlex>
@@ -28,7 +28,7 @@ export default function TicketComments({ fx }: Props) {
           className={`w-full border border-slate-200 rounded-xl p-3 transition-all ${
             isClosed
               ? "bg-slate-50"
-              : "bg-slate-50/70 focus-within:bg-white focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100"
+              : "bg-slate-50/70 focus-within:bg-[var(--it-card-bg)] focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100"
           }`}
         >
           <ITTextarea

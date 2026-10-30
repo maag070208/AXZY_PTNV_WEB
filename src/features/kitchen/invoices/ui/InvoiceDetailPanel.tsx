@@ -9,7 +9,7 @@ import { fmtMoney, fmtQty, fmtRate } from "@entities/kitchen";
 import { useInvoice } from "../model/useInvoice";
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
 
-const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+const HEAD = "text-[12px] font-semibold text-slate-400";
 const money = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
 const off = (value: number | null) => value != null && Math.abs(value) > 0.005;
 
@@ -103,7 +103,7 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
             <ITGrid key={line.id} container columns={12} spacing={2} className="items-center border-b border-slate-50 pb-2">
               <ITGrid item xs={12} md={3}>
                 <ITText className="text-[12px] font-bold text-slate-800">{line.item.name}</ITText>
-                <ITText className="text-[10px] uppercase text-slate-400">{line.item.unit.name}</ITText>
+                <ITText className="text-[12px] text-slate-400">{line.item.unit.name}</ITText>
               </ITGrid>
               <ITGrid item xs={6} md={2}>
                 <ITText className="text-[12px] font-bold text-emerald-700">

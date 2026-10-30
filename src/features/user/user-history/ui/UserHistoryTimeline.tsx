@@ -35,11 +35,11 @@ export default function UserHistoryTimeline({ history }: Props) {
   const { t: tt } = useTranslation(["users", "common"]);
 
   return (
-    <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
+    <ITFlex className="bg-[var(--it-card-bg)] rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
       <ITStack direction="column" spacing={0} className="w-full">
         <ITFlex align="center" gap={2} className="mb-5">
           <FaClock size={14} className="text-slate-400" />
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+          <ITText className="text-[12px] font-semibold text-slate-500">
             {i18n.t("common:labels.activity", { count: history.length })}
           </ITText>
         </ITFlex>

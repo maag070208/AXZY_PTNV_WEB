@@ -1,18 +1,19 @@
 import {
   ITBadget,
   ITButton,
-  ITCard,
   ITDataTable,
   ITDatePicker,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaExclamationTriangle, FaFilePdf, FaSync, FaUndo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { AssignedDeviceRow } from "@entities/report";
 import { formatDate } from "@shared/i18n";
 import type { UseAssignedDevicesReport } from "../model/useAssignedDevicesReport";
+import { KpiTile } from "@shared/ui/kpi-tile";
 
 export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesReport }) {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
           <ITText className="text-[11px] font-bold text-slate-700">
             {r.description}
           </ITText>
-          <ITText className="text-[9px] uppercase tracking-widest text-slate-400">
+          <ITText className="text-[12px] text-slate-400">
             {r.type}
           </ITText>
         </ITFlex>
@@ -90,13 +91,16 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       catalogOptions: fx.peopleOptions,
       sortable: false,
       render: (r) => (
-        <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[11px] text-slate-700">{r.custodian}</ITText>
-          {r.employeeNumber && (
-            <ITText className="text-[9px] text-slate-400">
-              No. {r.employeeNumber}
-            </ITText>
-          )}
+        <ITFlex align="center" gap={2}>
+          <ProfileAvatar name={r.custodian ?? "—"} size="xs" />
+          <ITFlex direction="column" gap={0.5} className="min-w-0">
+            <ITText className="truncate text-[11px] text-slate-700">{r.custodian}</ITText>
+            {r.employeeNumber && (
+              <ITText className="text-[10px] text-slate-500">
+                No. {r.employeeNumber}
+              </ITText>
+            )}
+          </ITFlex>
         </ITFlex>
       ),
     },
@@ -109,7 +113,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       catalogOptions: fx.departmentOptions,
       sortable: false,
       render: (r) => (
-        <ITText className="text-[10px] uppercase text-slate-500">
+        <ITText className="text-[12px] text-slate-500">
           {r.department ?? "—"}
         </ITText>
       ),
@@ -193,36 +197,20 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
       </ITFlex>
 
       <ITFlex gap={3} wrap="wrap">
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-slate-800 leading-none">
-              {stats?.assigned ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("assigned.statAssigned")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-amber-700 leading-none">
-              {stats?.averageDays ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("assigned.statAverage")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[140px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-red-600 leading-none">
-              {stats?.over30 ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("assigned.statOver30")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
+        <div className="min-w-[140px] flex-1">
+          <KpiTile size="sm" tone="sky" label={t("assigned.statAssigned")} value={stats?.assigned ?? 0} />
+        </div>
+        <div className="min-w-[140px] flex-1">
+          <KpiTile size="sm" tone="neutral" label={t("assigned.statAverage")} value={stats?.averageDays ?? 0} />
+        </div>
+        <div className="min-w-[140px] flex-1">
+          <KpiTile
+            size="sm"
+            tone={(stats?.over30 ?? 0) > 0 ? "rose" : "neutral"}
+            label={t("assigned.statOver30")}
+            value={stats?.over30 ?? 0}
+          />
+        </div>
       </ITFlex>
 
       {error && (
@@ -268,15 +256,15 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         debounceMs={350}
+        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as AssignedDeviceRow).deviceId}`)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
-        virtualized
-        virtualizedMaxHeight={420}
         rowHeight={50}
-        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as AssignedDeviceRow).deviceId}`)}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITFlex>
   );

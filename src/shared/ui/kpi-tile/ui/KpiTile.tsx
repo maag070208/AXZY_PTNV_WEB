@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ITCard } from "@axzydev/axzy_ui_system";
+import { parseAnimatedNumber, useCountUp } from "@shared/lib/useCountUp";
 import { KPI_TONES, type KpiTone } from "../model/tones";
 
 export interface KpiTileProps {
@@ -43,25 +44,42 @@ export default function KpiTile({
 }: KpiTileProps) {
   const { kit, accent } = KPI_TONES[tone];
   const sm = size === "sm";
-  const valueClass = `font-extrabold leading-none tabular-nums text-slate-800 ${sm ? "!text-[22px]" : "!text-[28px]"}`;
+  const valueClass = `font-extrabold leading-none tabular-nums ${backdrop ? "text-slate-900" : "text-slate-800"} ${sm ? "!text-[22px]" : "!text-[28px]"}`;
+
+  // El número sube de 0 al valor real al montar; si el valor no es numérico
+  // (texto, "—", un rango) se pinta tal cual.
+  const numbers = parseAnimatedNumber(value);
+  const animated = useCountUp(numbers?.value ?? 0);
+  const shown = numbers
+    ? `${numbers.prefix}${animated.toFixed(numbers.decimals)}${numbers.suffix}`
+    : value;
+  // Sobre la ola de fondo el `hint` necesita más contraste que sobre la tarjeta lisa.
+  const hintClass = backdrop ? "text-slate-700" : "text-slate-500";
   return (
     <ITCard
       tone={kit}
       onClick={onClick}
-      className={`w-full text-left ${sm ? "" : "min-h-[164px]"}`}
+      className={`bento-rise w-full text-left transition-transform ${onClick ? "cursor-pointer hover:-translate-y-0.5" : ""} ${sm ? "" : "min-h-[164px]"}`}
       // El cuerpo de `ITCard` fija el padding con estilo en línea: se anula aquí (`!p-0`) y se
       // aplica en el contenedor interno. El primer hijo (ITText) se estira a todo el alto y es
       // el ancla (`relative`) del `backdrop`.
       contentClassName="relative flex flex-1 flex-col !p-0 [&>div]:relative [&>div]:flex [&>div]:flex-1 [&>div]:flex-col"
     >
       {backdrop && <div className="pointer-events-none absolute inset-0">{backdrop}</div>}
-      <div className={`relative z-10 flex flex-1 flex-col ${sm ? "gap-1.5 p-3" : "gap-2 p-[18px]"}`}>
+      {/* `p-5` y no `p-[18px]`: en este proyecto las utilidades de padding con
+          valor arbitrario no se aplican (el contenido quedaba pegado al borde y
+          se recortaba); el espaciado de la escala sí llega al navegador. */}
+      <div className={`relative z-10 flex flex-1 flex-col ${sm ? "gap-1.5 p-3" : "gap-2 p-5"}`}>
         <div className="flex w-full items-center justify-between gap-2">
           <p className={`min-w-0 truncate font-semibold text-slate-800 ${sm ? "!text-[12px]" : "!text-[13px]"}`}>{label}</p>
           {icon && (
             <span
-              className={`flex shrink-0 items-center justify-center rounded-full ${sm ? "h-6 w-6" : "h-8 w-8"}`}
-              style={{ color: accent, backgroundColor: "color-mix(in srgb, var(--it-card-bg, #ffffff) 70%, transparent)" }}
+              className={`flex shrink-0 items-center justify-center rounded-full transition-colors ${sm ? "h-6 w-6" : "h-8 w-8"}`}
+              style={{
+                color: accent,
+                backgroundColor: `color-mix(in srgb, ${accent} 14%, transparent)`,
+                boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 20%, transparent)`,
+              }}
             >
               {icon}
             </span>
@@ -71,13 +89,13 @@ export default function KpiTile({
         {!visual && <div className="min-h-1 flex-1" />}
         {footer ? (
           <div className="w-full">
-            <p className={valueClass}>{value}</p>
+            <p className={valueClass}>{shown}</p>
             <div className="mt-2">{footer}</div>
           </div>
         ) : (
           <div className="flex w-full items-baseline justify-between gap-2">
-            <p className={valueClass}>{value}</p>
-            {hint && <span className="min-w-0 truncate text-right !text-[11px] font-medium text-slate-500">{hint}</span>}
+            <p className={valueClass}>{shown}</p>
+            {hint && <span className={`min-w-0 truncate text-right !text-[11px] font-medium ${hintClass}`}>{hint}</span>}
           </div>
         )}
       </div>

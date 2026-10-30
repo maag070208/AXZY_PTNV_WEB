@@ -1,7 +1,19 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ITBadget, ITButton, ITCheckbox, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import {
+  ITBadget,
+  ITButton,
+  ITCard,
+  ITCheckbox,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITPage,
+  ITSearchSelect,
+  ITText,
+  ITToast,
+} from "@axzydev/axzy_ui_system";
 import { FaCheckCircle, FaFileSignature, FaInfoCircle, FaSave, FaTimesCircle, FaUndoAlt, FaUserTie } from "react-icons/fa";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
@@ -192,7 +204,7 @@ export default function NewLoanReturnPage() {
     >
       <ITGrid container columns={12} spacing={6}>
         <ITGrid item xs={12} lg={8}>
-          <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-4">
             <ITSearchSelect
               label={t("loanReturn.selectLoan")}
               placeholder={t("loanReturn.selectLoanPlaceholder")}
@@ -231,7 +243,7 @@ export default function NewLoanReturnPage() {
                               key={u.unitId}
                               direction="column"
                               gap={2}
-                              className={`rounded-lg border px-3 py-2 ${u.selected ? "border-slate-200 bg-white" : "border-dashed border-slate-200 bg-slate-50 opacity-70"}`}
+                              className={`rounded-lg border px-3 py-2 ${u.selected ? "border-slate-200 bg-[var(--it-card-bg)]" : "border-dashed border-slate-200 bg-slate-50 opacity-70"}`}
                             >
                               <ITFlex align="center" gap={3} wrap="wrap">
                                 <ITCheckbox
@@ -259,7 +271,7 @@ export default function NewLoanReturnPage() {
                                           className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition-all ${
                                             isActive
                                               ? `border-transparent bg-slate-50 ring-2 ${p.ring} ${p.text}`
-                                              : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+                                              : "border-slate-200 bg-[var(--it-card-bg)] text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                                           }`}
                                         >
                                           {p.icon}
@@ -300,30 +312,30 @@ export default function NewLoanReturnPage() {
                 </ITFlex>
               </>
             )}
-          </ITFlex>
+          </ITCard>
         </ITGrid>
 
         <ITGrid item xs={12} lg={4}>
           <ITFlex direction="column" gap={4} className="lg:sticky lg:top-6">
             {loan && (
-              <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <ITCard contentClassName="flex flex-col gap-4">
                 <ITFlex align="center" gap={2}>
                   <FaFileSignature className="text-slate-400" size={14} />
                   <ITText className="text-sm font-semibold text-slate-800">{t("loanReturn.custodyLetterInfo")}</ITText>
                 </ITFlex>
 
                 <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.colNumber")}</ITText>
+                  <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.colNumber")}</ITText>
                   <ITText className="text-sm font-bold text-slate-900">{loan.number}</ITText>
                 </ITFlex>
 
                 <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.colDate")}</ITText>
+                  <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.colDate")}</ITText>
                   <ITText className="text-sm text-slate-600">{formatDate(loan.date)}</ITText>
                 </ITFlex>
 
                 <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.assignment")}</ITText>
+                  <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.assignment")}</ITText>
                   <ITFlex align="center" gap={2}>
                     <FaUserTie className="text-slate-400" size={12} />
                     <ITText className="text-sm font-semibold text-slate-700">
@@ -351,7 +363,7 @@ export default function NewLoanReturnPage() {
                   <ITText className="text-xs text-slate-600">{t("loanReturn.toReturn")}</ITText>
                   <ITText className="text-lg font-black text-emerald-700">{totalToReturn}</ITText>
                 </ITFlex>
-              </ITFlex>
+              </ITCard>
             )}
           </ITFlex>
         </ITGrid>

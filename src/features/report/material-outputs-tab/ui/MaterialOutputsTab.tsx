@@ -1,7 +1,6 @@
 import {
   ITBadget,
   ITButton,
-  ITCard,
   ITDataTable,
   ITDatePicker,
   ITFlex,
@@ -13,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import type { MaterialOutput, MaterialOutputReason } from "@entities/material-output";
 import type { UseMaterialOutputsReport } from "../model/useMaterialOutputsReport";
+import { KpiTile } from "@shared/ui/kpi-tile";
 
 const REASON_COLORS: Record<MaterialOutputReason, "danger" | "warning" | "gray"> = {
   DAMAGED: "danger",
@@ -72,7 +72,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
             {r.description}
           </ITText>
           {(r.brand || r.model) && (
-            <ITText className="text-[9px] uppercase tracking-widest text-slate-400">
+            <ITText className="text-[12px] text-slate-400">
               {[r.brand, r.model].filter(Boolean).join(" · ")}
             </ITText>
           )}
@@ -98,7 +98,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       catalogOptions: fx.departmentOptions,
       sortable: false,
       render: (r) => (
-        <ITText className="text-[10px] uppercase text-slate-500">{r.departmentName}</ITText>
+        <ITText className="text-[12px] text-slate-500">{r.departmentName}</ITText>
       ),
     },
     {
@@ -193,16 +193,9 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
       </ITFlex>
 
       <ITFlex gap={3} wrap="wrap">
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-slate-800 leading-none">
-              {total}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("exits.statTotal")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
+        <div className="min-w-[132px] flex-1">
+          <KpiTile size="sm" tone="neutral" label={t("exits.statTotal")} value={total} />
+        </div>
       </ITFlex>
 
       {error && (
@@ -233,12 +226,14 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
         fetchData={fetchTableData}
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
         rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITFlex>
   );

@@ -15,10 +15,10 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
   if (!result) return null;
 
   return (
-    <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
+    <ITCard className="p-6">
       <ITFlex align="center" gap={2} className="mb-4">
         <FaCheckCircle size={14} className="text-emerald-600" />
-        <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+        <ITText className="text-[12px] font-semibold text-slate-500">
           {i18n.t("users:import.resultTitle")}
         </ITText>
       </ITFlex>
@@ -38,7 +38,7 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
         <div className="mt-2">
           <ITFlex align="center" gap={2} className="mb-2">
             <FaExclamationTriangle size={12} className="text-amber-500" />
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {i18n.t("users:import.skippedRows")}
             </ITText>
           </ITFlex>

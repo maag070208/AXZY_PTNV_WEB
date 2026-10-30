@@ -122,7 +122,8 @@
     "unassigned": "Unassigned",
     "stale": "Open for more than {{days}} days",
     "byAssignee": "Open by assignee",
-    "unassignedLabel": "Unassigned"
+    "unassignedLabel": "Unassigned",
+    "ofTotal": "of {{total}}"
   },
   "tasks": {
     "title": "Tasks",
@@ -134,7 +135,8 @@
     "completed": "Completed",
     "overdue": "Overdue",
     "byUser": "Pending by person",
-    "due": "Due {{date}}"
+    "due": "Due {{date}}",
+    "ofTotal": "of {{total}}"
   },
   "equipment": {
     "title": "My assigned equipment",

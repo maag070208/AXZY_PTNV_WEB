@@ -259,19 +259,19 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
       disabled={fx.loading || fx.confirming}
       className={`flex-1 rounded-xl border p-3 text-left transition ${
         fx.strategy === value
-          ? "border-[#1e3a5f] !bg-[#1e3a5f]/5"
-          : "border-slate-200 !bg-white hover:border-slate-300"
+          ? "border-primary-500 !bg-primary-500/5"
+          : "border-slate-200 !bg-[var(--it-card-bg)] hover:border-slate-300"
       }`}
     >
       <ITFlex align="center" gap={1}>
         <span
           className={`flex h-3.5 w-3.5 items-center justify-center rounded-full border ${
-            fx.strategy === value ? "border-[#1e3a5f]" : "border-slate-300"
+            fx.strategy === value ? "border-primary-500" : "border-slate-300"
           }`}
         >
-          {fx.strategy === value && <span className="h-1.5 w-1.5 rounded-full bg-[#1e3a5f]" />}
+          {fx.strategy === value && <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />}
         </span>
-        <ITText className="!text-[11px] font-black uppercase tracking-wider text-slate-700">
+        <ITText className="!text-[12px] font-semibold text-slate-700">
           {label}
         </ITText>
       </ITFlex>
@@ -378,13 +378,13 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
           // La tabla no reacciona al cambio de `fetchData`: al re-resolver la
           // previsualización (otra estrategia) hay que empujarla con el token.
           reloadTrigger={fx.previewToken}
-          defaultItemsPerPage={50}
+          defaultItemsPerPage={25}
           itemsPerPageOptions={[25, 50, 100]}
           layout="fixed"
           density="compact"
+          rowHeight={50}
           virtualized
-          virtualizedMaxHeight={420}
-          rowHeight={56}
+          virtualizedMaxHeight={460}
         />
       </PanelCard>
     </ITFlex>

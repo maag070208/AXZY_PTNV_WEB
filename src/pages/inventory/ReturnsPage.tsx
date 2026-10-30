@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ITBadget, ITButton, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaFileSignature, FaUndoAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
@@ -69,11 +70,15 @@ export default function ReturnsPage() {
       width: 200,
       filter: true,
       sortable: false,
-      render: (d: LoanReturn) => (
-        <ITText className="text-[11px] text-slate-600">
-          {d.loan?.custodian?.name ?? d.loan?.department?.name ?? "—"}
-        </ITText>
-      ),
+      render: (d: LoanReturn) => {
+        const name = d.loan?.custodian?.name ?? d.loan?.department?.name ?? "—";
+        return (
+          <ITFlex align="center" gap={2} className="min-w-0">
+            {d.loan?.custodian?.name && <ProfileAvatar name={name} size="xs" />}
+            <ITText className="truncate text-[11px] text-slate-600">{name}</ITText>
+          </ITFlex>
+        );
+      },
     },
     {
       type: "date",
@@ -141,13 +146,15 @@ export default function ReturnsPage() {
       <ITDataTable
         columns={columns as any}
         fetchData={fetchData as any}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
-        rowHeight={50}
         onRowClick={(row) => navigate(`/inventory/loans/${(row as unknown as LoanReturn).loanId}`)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITPage>
   );

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ITBadget } from "@axzydev/axzy_ui_system";
-import { LuListChecks } from "react-icons/lu";
+import { LuCircleCheckBig, LuClock, LuEye, LuListChecks, LuPlay } from "react-icons/lu";
 import { dashboardApi } from "@entities/dashboard";
 import { dyn } from "@shared/i18n/dyn";
 import { formatDate } from "@shared/utils/dates";
@@ -30,18 +30,28 @@ export default function TasksWidget() {
       {data && (
         <>
           <MetricGrid>
-            <Metric value={data.pending} label={t("tasks.pending")} tone={alarmTone(data.pending, "amber")} />
-            <Metric value={data.inProgress} label={t("tasks.inProgress")} tone={alarmTone(data.inProgress, "sky")} />
-            <Metric value={data.inReview} label={t("tasks.inReview")} tone={alarmTone(data.inReview, "violet")} />
+            <Metric value={data.pending} label={t("tasks.pending")} tone={alarmTone(data.pending, "amber")} icon={<LuClock size={14} />} />
+            <Metric value={data.inProgress} label={t("tasks.inProgress")} tone={alarmTone(data.inProgress, "sky")} icon={<LuPlay size={14} />} />
+            <Metric value={data.inReview} label={t("tasks.inReview")} tone={alarmTone(data.inReview, "violet")} icon={<LuEye size={14} />} />
             <Metric
               value={data.completed}
               label={t("tasks.completed")}
               tone={alarmTone(data.completed, "emerald")}
+              icon={<LuCircleCheckBig size={14} />}
+              hint={t("tasks.ofTotal", { total: totalTasks })}
               ratio={totalTasks > 0 ? data.completed / totalTasks : undefined}
             />
-            <Metric value={data.overdue.length} label={t("tasks.overdue")} tone={alarmTone(data.overdue.length, "rose")} />
           </MetricGrid>
-          <SectionLabel>{t("tasks.overdue")}</SectionLabel>
+          <SectionLabel>
+            <span className="flex items-center gap-2">
+              {t("tasks.overdue")}
+              {data.overdue.length > 0 && (
+                <span className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-danger)]">
+                  {data.overdue.length}
+                </span>
+              )}
+            </span>
+          </SectionLabel>
           {data.overdue.length === 0 ? (
             <EmptyText>{t("empty")}</EmptyText>
           ) : (
@@ -49,6 +59,7 @@ export default function TasksWidget() {
               {data.overdue.map((task) => (
                 <ListRow
                   key={task.id}
+                  avatarName={task.name}
                   title={task.title}
                   subtitle={task.name}
                   right={

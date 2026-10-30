@@ -48,3 +48,164 @@ html {
 .agent-bubble {
   animation: agent-bubble 0.25s ease-out both;
 }
+
+/* Entrada de las tarjetas del tablero: suben y aparecen en cascada. */
+@keyframes bento-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bento-rise,
+.bento-stagger > * {
+  animation: bento-rise 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.bento-stagger > *:nth-child(2) { animation-delay: 70ms; }
+.bento-stagger > *:nth-child(3) { animation-delay: 140ms; }
+.bento-stagger > *:nth-child(4) { animation-delay: 210ms; }
+.bento-stagger > *:nth-child(5) { animation-delay: 280ms; }
+.bento-stagger > *:nth-child(6) { animation-delay: 350ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-rise,
+  .bento-stagger > * {
+    animation: none;
+  }
+}
+
+/* Olas de fondo de un indicador: dos capas que se mecen en sentidos opuestos y a
+   distinta velocidad, con respiración de opacidad, para que el sistema se sienta
+   vivo aun con los datos ya cargados (decorativo). */
+@keyframes wave-sway-a {
+  from {
+    transform: translate3d(-26px, 4px, 0) rotate(-0.6deg);
+  }
+  to {
+    transform: translate3d(26px, -4px, 0) rotate(0.6deg);
+  }
+}
+
+@keyframes wave-sway-b {
+  from {
+    transform: translate3d(30px, -3px, 0) rotate(0.5deg);
+  }
+  to {
+    transform: translate3d(-30px, 3px, 0) rotate(-0.5deg);
+  }
+}
+
+@keyframes wave-alpha-a {
+  from {
+    opacity: 0.75;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wave-alpha-b {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+
+.wave-layer-a {
+  animation:
+    wave-sway-a 9s ease-in-out infinite alternate,
+    wave-alpha-a 5.5s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.wave-layer-b {
+  animation:
+    wave-sway-b 13s ease-in-out infinite alternate,
+    wave-alpha-b 7s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+/* Punto final de una línea de tendencia: late suave, como una lectura viva. */
+@keyframes spark-dot {
+  from {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+}
+
+.spark-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spark-dot 2.8s ease-in-out infinite alternate;
+}
+
+/* Ícono de un panel: flota un par de píxeles, casi imperceptible. */
+@keyframes icon-breathe {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-2px);
+  }
+}
+
+.icon-breathe {
+  animation: icon-breathe 5s ease-in-out infinite alternate;
+}
+
+/* La perilla del arco respira despacio, como un indicador vivo. */
+@keyframes gauge-knob-breath {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+.gauge-knob {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gauge-knob-breath 3.6s ease-in-out infinite alternate;
+}
+
+/* Punto "En vivo": anillo que se expande y se apaga. */
+@keyframes live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.live-dot {
+  animation: live-pulse 2.4s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-layer-a,
+  .wave-layer-b,
+  .gauge-knob,
+  .spark-dot,
+  .icon-breathe,
+  .live-dot {
+    animation: none;
+  }
+}

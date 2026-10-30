@@ -243,7 +243,7 @@ export default function PermissionFormDialog({ isOpen, permission, modules, savi
             {t("catalog.wizard.technical")}
           </button>
           {(showMore || !permission) && (
-            <div className="mt-2 grid gap-3 rounded-xl bg-slate-50 p-3 sm:grid-cols-2">
+            <div className="mt-2 grid gap-3 rounded-xl bg-slate-50 p-3 sm:!grid-cols-2">
               <div>
                 <ITInput
                   name="permission_key"

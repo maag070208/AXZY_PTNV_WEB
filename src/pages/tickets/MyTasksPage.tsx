@@ -37,7 +37,7 @@ export default function MyTasksPage() {
     >
       <ITFlex justify="end" align="center" gap={2} className="mb-3">
         {fx.loading && (
-          <ITText className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+          <ITText className="text-[12px] font-bold text-slate-400">
             {tt("mytasks.loading")}
           </ITText>
         )}

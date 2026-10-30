@@ -5,6 +5,7 @@ import {
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import type {
   Column,
   ITDataTableFetchParams,
@@ -95,11 +96,14 @@ export default function DisciplinaryReportsTable({
       catalogOptions: peopleOptions,
       sortable: false,
       render: (a) => (
-        <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[12px] font-black text-slate-800">{a.user.name}</ITText>
-          <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            {a.user.employeeNumber ? `#${a.user.employeeNumber}` : "—"}
-          </ITText>
+        <ITFlex align="center" gap={2}>
+          <ProfileAvatar name={a.user.name} size="sm" />
+          <ITFlex direction="column" gap={0.5} className="min-w-0">
+            <ITText className="truncate text-[12px] font-black text-slate-800">{a.user.name}</ITText>
+            <ITText className="text-[12px] font-bold text-slate-400">
+              {a.user.employeeNumber ? `#${a.user.employeeNumber}` : "—"}
+            </ITText>
+          </ITFlex>
         </ITFlex>
       ),
     },
@@ -192,14 +196,14 @@ export default function DisciplinaryReportsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
+      onRowClick={(row) => onView(row as unknown as DisciplinaryReport)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
       layout="fixed"
       density="compact"
-      virtualized
-      virtualizedMaxHeight={420}
       rowHeight={50}
-      onRowClick={(row) => onView(row as unknown as DisciplinaryReport)}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

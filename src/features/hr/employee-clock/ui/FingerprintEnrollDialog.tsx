@@ -134,7 +134,7 @@ export default function FingerprintEnrollDialog({ isOpen, onClose, userId, userN
                 i === stepIndex && phase !== "done" ? "bg-slate-900 text-white" : i < stepIndex || phase === "done" ? "bg-emerald-50 text-emerald-700" : "bg-slate-50 text-slate-400"
               }`}
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-[10px]">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--it-card-bg)]/20 text-[10px]">
                 {i < stepIndex || phase === "done" ? <FaCheck size={9} /> : i + 1}
               </span>
               {label}
@@ -147,7 +147,7 @@ export default function FingerprintEnrollDialog({ isOpen, onClose, userId, userN
           <ITFlex direction="column" align="center" gap={3} className="py-4">
             <div className="relative flex h-24 w-24 items-center justify-center">
               <span className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-300" />
-              <span className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white text-emerald-600 shadow">
+              <span className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[var(--it-card-bg)] text-emerald-600 shadow">
                 <FaFingerprint size={40} />
               </span>
             </div>
@@ -195,7 +195,7 @@ export default function FingerprintEnrollDialog({ isOpen, onClose, userId, userN
         {/* Listo */}
         {phase === "done" && (
           <ITFlex align="center" gap={3} className="rounded-xl bg-emerald-50 p-4">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-emerald-600">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--it-card-bg)] text-emerald-600">
               <FaCheck size={14} />
             </span>
             <ITText className="text-sm font-semibold text-emerald-700">
@@ -206,7 +206,7 @@ export default function FingerprintEnrollDialog({ isOpen, onClose, userId, userN
 
         {error && (
           <div role="alert" className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-red-600">!</span>
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--it-card-bg)] text-red-600">!</span>
             <div className="flex min-w-0 flex-col gap-1">
               <ITText className="text-sm font-semibold text-red-800">{t(`employeeClock.fingerprint.errors.${errorKey(error.code)}.title`)}</ITText>
               <ITText className="text-xs text-red-700">{t(`employeeClock.fingerprint.errors.${errorKey(error.code)}.hint`)}</ITText>

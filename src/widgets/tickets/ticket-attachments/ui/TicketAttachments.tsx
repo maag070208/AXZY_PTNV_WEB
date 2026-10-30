@@ -113,7 +113,7 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
   const thumbSize = compact ? 48 : 68;
 
   return (
-    <div className={compact ? "mt-2" : "rounded-xl border border-slate-200 bg-slate-50 p-3.5"}>
+    <div className={compact ? "mt-2" : "border-t border-slate-100 pt-4"}>
       <ITFlex justify="between" align="center" gap={2}>
         <ITFlex align="center" gap={1.5}>
           {assignmentId ? <FaCamera size={11} className="text-emerald-600" /> : <FaFileAlt size={11} className="text-blue-600" />}
@@ -131,9 +131,7 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
       {loading ? <ITText className="text-[11px] text-slate-400 mt-2">{tt("attachments.loading")}</ITText> : null}
       {error ? <ITText className="text-[11px] text-red-600 mt-2">{error}</ITText> : null}
       {!loading && items.length === 0 && !error ? (
-        <div className="mt-2.5 rounded-lg border border-dashed border-slate-300 py-3 text-center">
-          <ITText className="text-[11px] text-slate-400">{tt("attachments.empty")}</ITText>
-        </div>
+        <ITText className="mt-1.5 text-[12px] text-slate-400">{tt("attachments.empty")}</ITText>
       ) : null}
 
       {items.length > 0 && (

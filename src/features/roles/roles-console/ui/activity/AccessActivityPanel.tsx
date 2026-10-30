@@ -225,8 +225,13 @@ export default function AccessActivityPanel({
           ) => Promise<ITDataTableResponse<Record<string, unknown>>>
         }
         externalFilters={externalFilters}
-        defaultItemsPerPage={20}
-        itemsPerPageOptions={[20, 50, 100]}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </div>
   );

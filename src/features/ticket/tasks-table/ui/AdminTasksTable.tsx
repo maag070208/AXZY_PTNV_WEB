@@ -4,6 +4,7 @@ import {
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import type {
   Column,
   ITDataTableFetchParams,
@@ -49,11 +50,14 @@ export default function AdminTasksTable({ fx }: Props) {
       filter: true,
       sortable: false,
       render: (row) => (
-        <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
-          {row.user.employeeNumber && (
-            <ITText className="text-[9px] text-slate-400">{tt("tasksTable.employeeNo", { number: row.user.employeeNumber })}</ITText>
-          )}
+        <ITFlex align="center" gap={2}>
+          <ProfileAvatar name={row.user.name} size="sm" />
+          <ITFlex direction="column" gap={0.5} className="min-w-0">
+            <ITText className="truncate text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
+            {row.user.employeeNumber && (
+              <ITText className="text-[10px] text-slate-500">{tt("tasksTable.employeeNo", { number: row.user.employeeNumber })}</ITText>
+            )}
+          </ITFlex>
         </ITFlex>
       ),
     },
@@ -125,14 +129,14 @@ export default function AdminTasksTable({ fx }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
+      onRowClick={(row) => navigate(`/tickets/${(row as unknown as KanbanAssignment).ticketId}`)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
       layout="fixed"
       density="compact"
-      virtualized
-      virtualizedMaxHeight={420}
       rowHeight={50}
-      onRowClick={(row) => navigate(`/tickets/${(row as unknown as KanbanAssignment).ticketId}`)}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

@@ -14,12 +14,12 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     const ok = await login.handleSubmit(e);
-    if (ok) navigate("/");
+    if (ok) navigate("/", { replace: true });
   };
 
   return (
     <div className="login-canvas flex min-h-screen items-center justify-center p-0 sm:p-6 lg:p-10">
-      <div className="login-card flex w-full max-w-6xl flex-col overflow-hidden bg-white sm:rounded-[28px] lg:flex-row dark:bg-slate-900">
+      <div className="login-card flex w-full max-w-6xl flex-col overflow-hidden sm:rounded-[28px] lg:flex-row">
         <LoginBrandPanel />
         <LoginForm
           username={login.username}

@@ -1,6 +1,16 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITBadget, ITButton, ITDataTable, ITFlex, ITGrid, ITInput, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import {
+  ITBadget,
+  ITButton,
+  ITCard,
+  ITDataTable,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITPage,
+  ITText,
+} from "@axzydev/axzy_ui_system";
 import { FaEdit, FaPlus, FaTag } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
@@ -127,7 +137,7 @@ export default function DeviceTypesPage() {
       }
     >
       {showForm && (
-        <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <ITCard contentClassName="flex flex-col gap-3">
           <ITText className="text-sm font-bold text-slate-800">{editing ? t("types.edit") : t("types.new")}</ITText>
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={4}>
@@ -146,7 +156,7 @@ export default function DeviceTypesPage() {
               </label>
             </ITGrid>
             <ITGrid item xs={12}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("types.fields")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{t("types.fields")}</ITText>
               <ITFlex wrap="wrap" gap={4} className="mt-2">
                 <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useSerialNumber} onChange={(e) => setUseSerialNumber(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
@@ -177,19 +187,21 @@ export default function DeviceTypesPage() {
               </ITFlex>
             </ITGrid>
           </ITGrid>
-        </ITFlex>
+        </ITCard>
       )}
 
       <ITDataTable
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
         rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITPage>
   );

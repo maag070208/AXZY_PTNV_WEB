@@ -7,7 +7,7 @@ import { KpiTile } from "@shared/ui/kpi-tile";
 import { kitchenApi, fmtMoney, type CostCenterSpending } from "@entities/kitchen";
 import { fileName } from "@shared/i18n";
 
-const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+const HEAD = "text-[12px] font-semibold text-slate-400";
 const GRID = "grid grid-cols-[minmax(200px,2fr)_repeat(4,minmax(90px,1fr))] items-center gap-3";
 
 const localDay = (date: Date): string =>

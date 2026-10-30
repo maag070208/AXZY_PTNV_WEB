@@ -51,7 +51,7 @@ export default function LangostinGallery() {
     <ITStack direction="column" spacing={4}>
       <ITGrid container columns={12} spacing={4}>
         <ITGrid item xs={12} md={4}>
-          <KpiTile
+          <KpiTile size="sm"
             label={d("kpis.anims")}
             value={ALL_ANIMS.length}
             icon={<FaGamepad size={16} />}
@@ -60,7 +60,7 @@ export default function LangostinGallery() {
           />
         </ITGrid>
         <ITGrid item xs={12} md={4}>
-          <KpiTile
+          <KpiTile size="sm"
             label={d("kpis.scenes")}
             value={SCENE_CATALOG.length}
             icon={<FaImages size={16} />}
@@ -69,7 +69,7 @@ export default function LangostinGallery() {
           />
         </ITGrid>
         <ITGrid item xs={12} md={4}>
-          <KpiTile
+          <KpiTile size="sm"
             label={d("kpis.selected")}
             value={d(`anims.${anim}.name`)}
             icon={<FaUser size={16} />}
@@ -89,7 +89,7 @@ export default function LangostinGallery() {
                 type="checkbox"
                 checked={mascot}
                 onChange={(e) => setMascot(e.target.checked)}
-                className="h-4 w-4 cursor-pointer accent-[#f97316]"
+                className="h-4 w-4 cursor-pointer accent-primary-500"
               />
               {d("stage.showMascot")}
             </label>
@@ -105,7 +105,7 @@ export default function LangostinGallery() {
       >
         <ITGrid container columns={12} spacing={4}>
           <ITGrid item xs={12} md={7}>
-            <div className="flex items-center justify-center rounded-2xl bg-[#dff1f8] p-4">
+            <div className="flex items-center justify-center rounded-2xl bg-primary-500/10 p-4">
               <Escena
                 scene={scene}
                 anim={anim}
@@ -120,7 +120,7 @@ export default function LangostinGallery() {
           <ITGrid item xs={12} md={5}>
             <ITStack direction="column" spacing={2}>
               <div>
-                <ITText className="!text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                <ITText className="!text-[12px] font-semibold text-slate-500">
                   {d("stage.sceneLabel")}
                 </ITText>
                 <ITText
@@ -132,7 +132,7 @@ export default function LangostinGallery() {
                 <ITText className="!text-[12px] text-slate-500">{d(`scenes.${scene}.idea`)}</ITText>
               </div>
               <div>
-                <ITText className="!text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                <ITText className="!text-[12px] font-semibold text-slate-500">
                   {d("stage.animLabel")}
                 </ITText>
                 <ITText
@@ -147,7 +147,7 @@ export default function LangostinGallery() {
                 <button
                   type="button"
                   onClick={() => setAnim(sceneEntry.suggested)}
-                  className="w-fit cursor-pointer rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-[#f97316] hover:text-[#ea580c]"
+                  className="w-fit cursor-pointer rounded-full border border-slate-200 bg-[var(--it-card-bg)] px-3 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-primary-500 hover:text-primary-500"
                 >
                   {d("scenes.suggested")}: {d(`anims.${sceneEntry.suggested}.name`)}
                 </button>
@@ -172,7 +172,7 @@ export default function LangostinGallery() {
         }
       >
         {filtered ? (
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:!grid-cols-6 lg:!grid-cols-8">
+          <div className="grid grid-cols-3 gap-3 sm:!grid-cols-4 md:!grid-cols-6 lg:!grid-cols-8">
             {filtered.map((a) => (
               <AnimTile key={a} anim={a} selected={a === anim} onSelect={setAnim} />
             ))}
@@ -186,10 +186,10 @@ export default function LangostinGallery() {
           <ITStack direction="column" spacing={4}>
             {ANIM_GROUPS.map((group) => (
               <div key={group.id}>
-                <ITText className="mb-2 block !text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                <ITText className="mb-2 block !text-[12px] font-semibold text-slate-500">
                   {d(`groups.${group.id}`)}
                 </ITText>
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:!grid-cols-6 lg:!grid-cols-8">
+                <div className="grid grid-cols-3 gap-3 sm:!grid-cols-4 md:!grid-cols-6 lg:!grid-cols-8">
                   {group.anims.map((a) => (
                     <AnimTile key={a} anim={a} selected={a === anim} onSelect={setAnim} />
                   ))}
@@ -201,7 +201,7 @@ export default function LangostinGallery() {
       </PanelCard>
 
       <PanelCard title={d("scenesSection.title")} description={d("scenesSection.description")}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:!grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:!grid-cols-2 lg:!grid-cols-4">
           {SCENE_CATALOG.map((entry) => (
             <SceneCard
               key={entry.id}

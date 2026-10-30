@@ -72,7 +72,7 @@ export default function TicketsTable({
               <ITBadget color="gray" size="lg">{tt("list.deleted")}</ITBadget>
             )}
           </ITFlex>
-          <ITText className="text-[9px] font-bold text-slate-400 uppercase">
+          <ITText className="text-[12px] font-bold text-slate-400">
             {t.category?.name ?? "—"}
           </ITText>
         </ITFlex>
@@ -232,16 +232,16 @@ export default function TicketsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      layout="fixed"
-      density="compact"
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
       debounceMs={350}
       variant="bordered"
-      virtualized
-      virtualizedMaxHeight={420}
-      rowHeight={50}
       onRowClick={(row)=> onView(row as unknown as Ticket)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={50}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

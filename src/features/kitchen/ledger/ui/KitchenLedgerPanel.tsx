@@ -255,12 +255,14 @@ export default function KitchenLedgerPanel() {
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchData as never}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={50}
-        itemsPerPageOptions={[10, 25, 50, 100]}
         size="lg"
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
         virtualized
-        virtualizedMaxHeight={520}
-        rowHeight={64}
+        virtualizedMaxHeight={460}
       />
 
       <ITDialog isOpen={!!detail} onClose={() => setDetail(null)} title={t("ledger.detail")}>

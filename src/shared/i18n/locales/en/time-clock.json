@@ -136,7 +136,9 @@
     "links": "{{linkedCount}} of {{total}} time clock employees linked",
     "withoutLink": "The {{count}} unlinked ones show the time clock name and the “Not linked” mark.",
     "goToLink": "Link employees",
-    "rule": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h."
+    "rule": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h.",
+    "noEmployees": "The clock has no employees yet: punches cannot be matched to a person.",
+    "allLinked": "All {{total}} time clock employees are linked to a person."
   },
   "employees": {
     "title": "Time clock employees",
@@ -484,9 +486,11 @@
     }
   },
   "people": {
-
     "view": {
-      "columns": {"person": "Person", "progress": "Progress"},
+      "columns": {
+        "person": "Person",
+        "progress": "Progress"
+      },
       "count": "{{count}} person(s) on the clock",
       "title": "People on the clock",
       "connected": "Clock connected",
@@ -777,7 +781,12 @@
     }
   },
   "employeeClock": {
-    "tiles": {"faces":"Faces","fingers":"Fingerprints","cards":"Cards","punches":"Punches today"},
+    "tiles": {
+      "faces": "Faces",
+      "fingers": "Fingerprints",
+      "cards": "Cards",
+      "punches": "Punches today"
+    },
     "notEnrolled": "Not enrolled on this clock yet.",
     "title": "Time clock",
     "description": "Add this person to the clocks. For now it only writes to the test clock.",

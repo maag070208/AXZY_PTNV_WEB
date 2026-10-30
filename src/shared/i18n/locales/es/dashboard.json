@@ -122,7 +122,8 @@
     "unassigned": "Sin asignar",
     "stale": "Más de {{days}} días abiertos",
     "byAssignee": "Abiertos por responsable",
-    "unassignedLabel": "Sin asignar"
+    "unassignedLabel": "Sin asignar",
+    "ofTotal": "de {{total}}"
   },
   "tasks": {
     "title": "Tareas",
@@ -134,7 +135,8 @@
     "completed": "Completadas",
     "overdue": "Atrasadas",
     "byUser": "Pendientes por persona",
-    "due": "Vencía el {{date}}"
+    "due": "Vencía el {{date}}",
+    "ofTotal": "de {{total}}"
   },
   "equipment": {
     "title": "Mi equipo asignado",

@@ -1,19 +1,21 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  ITAlert,
   ITBadget,
+  ITCard,
   ITButton,
   ITChip,
   ITConfirmDialog,
   ITInput,
   ITProgress,
   ITSearchSelect,
-  ITStatCard,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaBell, FaCheck, FaChevronRight, FaSearch, FaTimes } from "react-icons/fa";
+import { FaBell, FaCheck, FaChevronRight, FaIdCard, FaSearch, FaTimes, FaUserCheck, FaUserClock } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
 import type { RecordGapsRow } from "@entities/dashboard";
 import { recordStatus, type RecordFilter, type RecordStatus, type UseEmployeeRecords } from "../model/useEmployeeRecords";
 
@@ -26,25 +28,29 @@ const STATUS_COLOR = { REQUIRED: "warning", INCOMPLETE: "gray", COMPLETE: "succe
 const percent = (done: number, total: number) => (total ? Math.round((done / total) * 100) : 0);
 
 function Progress({ done, total, label }: { done: number; total: number; label: string }) {
+  const pct = percent(done, total);
+  const complete = total > 0 && done === total;
   return (
-    <div className="w-[96px]" title={label}>
-      <ITProgress value={percent(done, total)} size="sm" color={done === total ? "success" : "primary"} />
-      <div className="mt-1 text-[10px] text-slate-500">{label}</div>
+    <div className="w-[110px]" title={label}>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-[10px] font-medium text-slate-500">{pct}%</span>
+        <span className={`text-[11px] font-bold tabular-nums ${complete ? "text-[color:var(--color-success)]" : "text-slate-700"}`}>
+          {done}/{total}
+        </span>
+      </div>
+      <div className="mt-1 h-1 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: `${Math.max(pct, done > 0 ? 6 : 0)}%`,
+            backgroundColor: complete ? "var(--color-success)" : "var(--color-primary)",
+          }}
+        />
+      </div>
     </div>
   );
 }
 
-function DocChip({ name, delivered }: { name: string; delivered: boolean }) {
-  return (
-    <ITChip
-      size="sm"
-      variant={delivered ? "soft" : "outlined"}
-      color={delivered ? "success" : "danger"}
-      icon={delivered ? <FaCheck size={8} /> : <FaTimes size={8} />}
-      label={name}
-    />
-  );
-}
 
 interface Props {
   fx: UseEmployeeRecords;
@@ -69,11 +75,17 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
     fileInput.current?.click();
   };
 
-  const kpis: Array<{ key: string; value: number; color?: string }> = [
-    { key: "active", value: fx.counts.total },
-    { key: "complete", value: fx.counts.COMPLETE },
-    { key: "missingRequired", value: fx.counts.REQUIRED, color: "bg-warning-50 dark:bg-warning-950/20" },
-    { key: "incomplete", value: fx.counts.INCOMPLETE },
+  // Indicadores con el mismo componente del resto de la app. En cero, neutro.
+  const kpis: Array<{ key: string; value: number; tone: KpiTone; icon: React.ReactNode }> = [
+    { key: "active", value: fx.counts.total, tone: "sky", icon: <FaIdCard size={14} /> },
+    { key: "complete", value: fx.counts.COMPLETE, tone: "emerald", icon: <FaUserCheck size={14} /> },
+    {
+      key: "missingRequired",
+      value: fx.counts.REQUIRED,
+      tone: fx.counts.REQUIRED > 0 ? "rose" : "neutral",
+      icon: <FaBell size={14} />,
+    },
+    { key: "incomplete", value: fx.counts.INCOMPLETE, tone: fx.counts.INCOMPLETE > 0 ? "amber" : "neutral", icon: <FaUserClock size={14} /> },
   ];
 
   const done = (items: Array<{ delivered: boolean }>) => items.filter((i) => i.delivered).length;
@@ -96,58 +108,53 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
       <div className="flex flex-wrap items-start gap-3">
         <div className="grid flex-1 !grid-cols-2 gap-3 md:!grid-cols-4">
           {kpis.map((k) => (
-            <ITStatCard key={k.key} label={t(`records.kpis.${k.key}`)} value={k.value} color={k.color} />
+            <KpiTile key={k.key} size="sm" tone={k.tone} label={t(`records.kpis.${k.key}`)} value={k.value} icon={k.icon} />
           ))}
         </div>
-        <ITButton
-          variant="filled"
-          color="primary"
-          size="sm"
-          icon={<FaBell size={11} />}
-          label={t("records.notifyPending")}
-          disabled={fx.pendingVisible.length === 0}
-          onClick={() => fx.setBulkOpen(true)}
-        />
+
       </div>
 
-      {fx.error && <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-[12px] font-bold text-rose-700">{fx.error}</div>}
+      {fx.error && (
+        <ITAlert variant="error">{fx.error}</ITAlert>
+      )}
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-4 xl:!grid-cols-[minmax(0,1fr)_320px]">
         {/* Lista */}
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-          <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-4 py-3">
-            <div className="min-w-[200px] flex-1 basis-full 2xl:basis-auto">
-              <ITInput
-                name="employee_records_search"
-                size="sm"
-                value={fx.search}
-                onChange={(e) => fx.setSearch(e.target.value)}
-                placeholder={t("records.filters.search")}
-                iconLeft={<FaSearch size={12} />}
-              />
+        <ITCard contentClassName="!p-0">
+          {/* Filtros: buscar, pastillas de estado y área */}
+          <div className="grid gap-2 border-b border-slate-100 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_auto_minmax(0,1fr)] md:items-center">
+            <ITInput
+              name="employee_records_search"
+              size="sm"
+              value={fx.search}
+              onChange={(e) => fx.setSearch(e.target.value)}
+              placeholder={t("records.filters.search")}
+              iconLeft={<FaSearch size={12} />}
+            />
+            <div className="flex flex-wrap items-center gap-1.5">
+              {FILTERS.map((f) => (
+                <ITChip
+                  key={f}
+                  size="sm"
+                  label={f === "ALL" ? t("records.filters.all") : t(`records.filters.${f}`)}
+                  selected={fx.filter === f}
+                  onClick={() => fx.setFilter(f)}
+                  color="primary"
+                  variant="outlined"
+                />
+              ))}
             </div>
             <ITSearchSelect
-              name="employeeRecordsFilter"
-              label={t("records.filters.title")}
+              name="employee_records_department"
               size="sm"
-              options={FILTERS.map((f) => ({ value: f, label: f === "ALL" ? t("records.filters.all") : t(`records.filters.${f}`) }))}
-              value={fx.filter}
-              onChange={(value) => fx.setFilter(String(value) as RecordFilter)}
-              className="min-w-[200px]"
+              placeholder={t("records.filters.department")}
+              options={[
+                { value: "", label: t("records.filters.allDepartments") },
+                ...fx.departments.map((d) => ({ value: d.id, label: d.name })),
+              ]}
+              value={fx.departmentId}
+              onChange={(value) => fx.setDepartmentId(String(value))}
             />
-            <div className="w-[220px]">
-              <ITSearchSelect
-                name="employee_records_department"
-                size="sm"
-                placeholder={t("records.filters.department")}
-                options={[
-                  { value: "", label: t("records.filters.allDepartments") },
-                  ...fx.departments.map((d) => ({ value: d.id, label: d.name })),
-                ]}
-                value={fx.departmentId}
-                onChange={(value) => fx.setDepartmentId(String(value))}
-              />
-            </div>
           </div>
 
           <div className="max-h-[640px] overflow-auto">
@@ -179,7 +186,7 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
                       key={r.userId}
                       onClick={() => fx.select(r.userId)}
                       className={`cursor-pointer border-t border-slate-100 align-middle ${
-                        active ? "bg-slate-50 shadow-[inset_3px_0_0_#1e3a5f]" : "hover:bg-slate-50/60"
+                        active ? "bg-slate-50 shadow-[inset_3px_0_0_var(--color-primary)]" : "hover:bg-slate-50/60"
                       }`}
                     >
                       <td className="px-4 py-2">
@@ -194,10 +201,22 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
                         </div>
                       </td>
                       <td className="px-3 py-3">
-                        <div className="flex flex-col items-start gap-0.5">
+                        {/* Los obligatorios, en puntos: se lee de un vistazo y no
+                            repite tres etiquetas rojas en cada fila. El detalle
+                            con el nombre de cada documento está a la derecha. */}
+                        <div
+                          className="flex items-center gap-1.5"
+                          title={r.requiredDocuments.map((d) => `${d.delivered ? "✓" : "✗"} ${d.name}`).join("\n")}
+                        >
                           {r.requiredDocuments.map((d) => (
-                            <DocChip key={d.id} name={d.name} delivered={d.delivered} />
+                            <span
+                              key={d.id}
+                              className={`h-2 w-2 rounded-full ${d.delivered ? "bg-emerald-500" : "bg-rose-300"}`}
+                            />
                           ))}
+                          <span className="ml-1 text-[11px] font-semibold tabular-nums text-slate-600">
+                            {done(r.requiredDocuments)}/{r.requiredDocuments.length}
+                          </span>
                         </div>
                       </td>
                       <td className="px-3 py-3">
@@ -219,20 +238,22 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
                       </td>
                       <td className="px-3 py-3">
                         <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                          {status !== "COMPLETE" && (
+                            <ITButton
+                              variant="text"
+                              color="secondary"
+                              size="sm"
+                              disabled={fx.notifying === r.userId}
+                              onClick={() => void fx.notify(r)}
+                              title={t("records.notify")}
+                              ariaLabel={t("records.notify")}
+                            >
+                              <FaBell size={12} />
+                            </ITButton>
+                          )}
                           <ITButton
-                            variant="icon-only"
-                            color="gray"
-                            size="sm"
-                            disabled={status === "COMPLETE" || fx.notifying === r.userId}
-                            onClick={() => void fx.notify(r)}
-                            title={t("records.notify")}
-                            ariaLabel={t("records.notify")}
-                          >
-                            <FaBell size={12} />
-                          </ITButton>
-                          <ITButton
-                            variant="icon-only"
-                            color="gray"
+                            variant="text"
+                            color="secondary"
                             size="sm"
                             onClick={() => navigate(`/employees/${r.userId}`)}
                             title={t("records.detail.open")}
@@ -248,10 +269,10 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
               </tbody>
             </table>
           </div>
-        </div>
+        </ITCard>
 
         {/* Detalle */}
-        <div className="flex max-h-[760px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white xl:sticky xl:top-4">
+        <ITCard className="xl:sticky xl:top-4" contentClassName="flex max-h-[760px] flex-col !p-4">
           {!sel ? (
             <div className="p-8 text-center text-[12px] text-slate-400">{t("records.detail.select")}</div>
           ) : (
@@ -276,7 +297,7 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
               </div>
 
               <div className="flex-1 overflow-auto p-4">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-orange-700">
+                <div className="text-[12px] font-bold text-orange-700">
                   {t("records.detail.required", { done: done(sel.requiredDocuments), total: sel.requiredDocuments.length })}
                 </div>
                 <div className="mt-2 divide-y divide-slate-100">
@@ -309,7 +330,7 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
                   })}
                 </div>
 
-                <div className="mt-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <div className="mt-4 text-[12px] font-bold text-slate-500">
                   {t("records.detail.other", { done: done(sel.otherDocuments), total: sel.otherDocuments.length })}
                 </div>
                 <div className="mt-2">
@@ -349,7 +370,7 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
                   />
                 )}
 
-                <div className="mt-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <div className="mt-4 text-[12px] font-bold text-slate-500">
                   {t("records.detail.personal", {
                     done: sel.filledFields.length,
                     total: sel.filledFields.length + sel.missingFields.length,
@@ -409,7 +430,7 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
               </div>
             </>
           )}
-        </div>
+        </ITCard>
       </div>
 
       <input

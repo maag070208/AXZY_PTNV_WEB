@@ -225,7 +225,7 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
         </span>
       }
     >
-      <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4 md:!grid-cols-4">
         <Metric label={t("dashboard.people")} value={clock.counts?.people ?? "—"} />
         <Metric label={t("dashboard.cards")} value={clock.counts?.cards ?? "—"} />
         <Metric label={t("dashboard.punchesToday")} value={clock.punchesToday} accent />
@@ -277,16 +277,19 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
           fetchData={
             fetchPunches as unknown as (p: ITDataTableFetchParams) => Promise<ITDataTableResponse<Record<string, unknown>>>
           }
-          layout="fixed"
-          density="compact"
-          defaultItemsPerPage={8}
-          itemsPerPageOptions={[8, 25]}
           debounceMs={350}
           variant="bordered"
           onRowClick={(row) => {
             const punch = row as unknown as Punch;
             if (punch.employeeNumber) onOpenPerson({ serial: clock.serial, employeeNumber: punch.employeeNumber });
           }}
+          defaultItemsPerPage={25}
+          itemsPerPageOptions={[25, 50, 100]}
+          layout="fixed"
+          density="compact"
+          rowHeight={50}
+          virtualized
+          virtualizedMaxHeight={460}
         />
       </div>
     </PanelCard>
@@ -380,7 +383,7 @@ function Estado({ data, visibleClocks, serial, onSeeAll, onOpenPerson }: {
 
   return (
     <ITFlex direction="column" gap={6}>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:!grid-cols-2 xl:!grid-cols-4">
         <KpiTile icon={<FaWifi size={14} />} tone="emerald" label={t("dashboard.kpi.online")} value={`${online} / ${data.clocks.length}`} hint={t("dashboard.kpi.onlineHint")} />
         <KpiTile icon={<FaUsers size={14} />} tone="sky" label={t("dashboard.kpi.people")} value={people} hint={t("dashboard.kpi.peopleHint")} />
         <KpiTile icon={<FaClock size={14} />} tone="orange" label={t("dashboard.kpi.punches")} value={punches} hint={t("dashboard.kpi.punchesHint")} />
@@ -395,7 +398,7 @@ function Estado({ data, visibleClocks, serial, onSeeAll, onOpenPerson }: {
 
       {data.alerts.length > 0 && (
         <PanelCard title={t("dashboard.alertsTitle")}>
-          <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-2 md:!grid-cols-2">
             {data.alerts.map((a) => (
               <AlertLine key={`g-${a.code}`} alert={a} />
             ))}
@@ -403,7 +406,7 @@ function Estado({ data, visibleClocks, serial, onSeeAll, onOpenPerson }: {
         </PanelCard>
       )}
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:!grid-cols-3">
         <div className="flex flex-col gap-6 xl:col-span-2">
           {visibleClocks.map((c) => (
             <DevicePanel key={c.serial} clock={c} onOpenPerson={onOpenPerson} />

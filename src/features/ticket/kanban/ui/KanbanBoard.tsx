@@ -91,7 +91,7 @@ export default function KanbanBoard({ fx }: Props) {
                   align="center"
                   justify="center"
                   className="w-7 h-7 shrink-0 rounded-full bg-slate-100 border text-slate-500 text-xs font-semibold"
-                  style={{ borderColor: "#e2e8f0" }}
+                  style={{ borderColor: "var(--color-slate-200)" }}
                 >
                   +{fx.uniqueAssignees.length - 4}
                 </ITFlex>
@@ -138,7 +138,7 @@ export default function KanbanBoard({ fx }: Props) {
               className={`flex-none w-[300px] sm:w-[320px] rounded-xl border p-3 transition-colors ${
                 fx.dragOver === col.status ? "bg-blue-50" : "bg-slate-100/70"
               }`}
-              style={{ borderColor: fx.dragOver === col.status ? "#93c5fd" : "#e2e8f0" }}
+              style={{ borderColor: fx.dragOver === col.status ? "var(--color-primary-300)" : "var(--color-slate-200)" }}
               onDragOver={(e) => {
                 e.preventDefault();
                 fx.setDragOver(col.status);
@@ -165,8 +165,8 @@ export default function KanbanBoard({ fx }: Props) {
               <div className="space-y-1.5 min-h-[120px]">
                 {count === 0 ? (
                   <div
-                    className="rounded-md border border-dashed bg-white/60 p-3 text-center"
-                    style={{ borderColor: "#e2e8f0" }}
+                    className="rounded-md border border-dashed bg-[var(--it-card-bg)]/60 p-3 text-center"
+                    style={{ borderColor: "var(--color-slate-200)" }}
                   >
                     <ITText className="text-xs text-slate-400">
                       {tt("kanban.emptyColumn")}
@@ -196,8 +196,8 @@ export default function KanbanBoard({ fx }: Props) {
                         }}
                         onDragEnd={() => fx.setDraggingId(null)}
                         onClick={() => fx.openTicket(a.ticketId)}
-                        className={`rounded-md border bg-white p-2.5 shadow-none hover:shadow-md transition-shadow cursor-pointer ${fx.draggingId === a.id ? "opacity-40" : ""}`}
-                        style={{ borderColor: "#e2e8f0" }}
+                        className={`rounded-md border bg-[var(--it-card-bg)] p-2.5 shadow-none hover:shadow-md transition-shadow cursor-pointer ${fx.draggingId === a.id ? "opacity-40" : ""}`}
+                        style={{ borderColor: "var(--color-slate-200)" }}
                       >
                         <ITFlex justify="between" align="center" gap={2} className="mb-1.5">
                           <Tag label={deptLabel} tone={deptTone} />
@@ -262,7 +262,7 @@ export default function KanbanBoard({ fx }: Props) {
                           align="center"
                           gap={2}
                           className="pt-1.5 border-t"
-                          style={{ borderTopColor: "#f1f5f9" }}
+                          style={{ borderTopColor: "var(--color-slate-100)" }}
                         >
                           <span className="text-[10px] text-slate-400 truncate">
                             #{a.ticketId.slice(0, 6).toUpperCase()}

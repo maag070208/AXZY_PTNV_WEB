@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { PanelCard } from "@shared/ui/panel-card";
+import { FaFilter } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITCard,
   ITCheckbox,
   ITDataTable,
   ITDatePicker,
@@ -47,6 +48,7 @@ import {
 } from "@entities/access";
 import { fileName } from "@shared/i18n";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -280,11 +282,12 @@ export default function AccessPage() {
     [tt]
   );
 
-  const kpis = [
-    { key: "total", value: stats?.total ?? 0, tint: "bg-[#0D5777]/10", color: "text-[#0D5777]", icon: <FaListUl size={15} /> },
-    { key: "entries", value: stats?.entries ?? 0, tint: "bg-emerald-50", color: "text-emerald-600", icon: <FaSignInAlt size={15} /> },
-    { key: "exits", value: stats?.exits ?? 0, tint: "bg-amber-50", color: "text-amber-600", icon: <FaSignOutAlt size={15} /> },
-    { key: "voided", value: stats?.voided ?? 0, tint: "bg-rose-50", color: "text-rose-600", icon: <FaBan size={15} /> },
+  // Tonos por significado; lo que va en cero se queda neutro (§3 del rediseño).
+  const kpis: Array<{ key: string; value: number; tone: KpiTone; icon: ReactNode }> = [
+    { key: "total", value: stats?.total ?? 0, tone: "sky", icon: <FaListUl size={14} /> },
+    { key: "entries", value: stats?.entries ?? 0, tone: "emerald", icon: <FaSignInAlt size={14} /> },
+    { key: "exits", value: stats?.exits ?? 0, tone: "amber", icon: <FaSignOutAlt size={14} /> },
+    { key: "voided", value: stats?.voided ?? 0, tone: (stats?.voided ?? 0) > 0 ? "rose" : "neutral", icon: <FaBan size={14} /> },
   ];
 
   const columns: Column<AccessEvent>[] = [
@@ -315,7 +318,7 @@ export default function AccessPage() {
           <ITText className="text-[12px] font-black text-slate-800">
             {e.employeeNameSnapshot ?? "—"}
           </ITText>
-          <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+          <ITText className="text-[12px] font-bold text-slate-400">
             {e.employeeNumberSnapshot ? `#${e.employeeNumberSnapshot}` : "—"}
           </ITText>
         </ITFlex>
@@ -399,6 +402,16 @@ export default function AccessPage() {
         { label: tt("title") },
       ]}
       backAction={() => goBack("/")}
+      actions={
+        <ITButton variant="outlined" size="lg" color="secondary" onClick={handleExportCsv} disabled={exporting}>
+          <ITFlex align="center" gap={1}>
+            <FaFileCsv className="text-emerald-600" size={13} />
+            <ITText className="font-bold text-[11px]">
+              {exporting ? tt("actions.exporting") : tt("actions.exportCsv")}
+            </ITText>
+          </ITFlex>
+        </ITButton>
+      }
     >
       {sitesError && (
         <ITAlert variant="warning" dismissible onDismiss={() => setSitesError(false)}>
@@ -407,10 +420,10 @@ export default function AccessPage() {
       )}
 
       {/* Filtros */}
-      <ITCard title={tt("toolbar.title")} className="!p-5 border border-slate-200">
+      <PanelCard title={tt("toolbar.title")} icon={<FaFilter size={16} />}>
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <ITText className="text-[12px] font-semibold text-slate-400">
               {tt("presets.title")}
             </ITText>
             <ITButton variant="outlined" color="secondary" size="sm" onClick={() => applyRange("today")}>
@@ -477,44 +490,15 @@ export default function AccessPage() {
             </ITGrid>
           </ITGrid>
         </ITFlex>
-      </ITCard>
+      </PanelCard>
 
       {/* KPIs + exportar */}
       <ITFlex wrap="wrap" gap={3}>
         {kpis.map((k) => (
-          <ITFlex
-            key={k.key}
-            grow={1}
-            basis="160px"
-            align="center"
-            gap={3}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-          >
-            <ITFlex
-              align="center"
-              justify="center"
-              className={`h-10 w-10 shrink-0 rounded-xl ${k.tint} ${k.color}`}
-            >
-              {k.icon}
-            </ITFlex>
-            <ITFlex direction="column" gap={0} className="min-w-0">
-              <ITText className="text-xl font-black leading-none text-slate-800">{k.value}</ITText>
-              <ITText className="truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                {dyn(tt)(`kpis.${k.key}`)}
-              </ITText>
-            </ITFlex>
-          </ITFlex>
+          <div key={k.key} className="min-w-[160px] flex-1">
+            <KpiTile size="sm" tone={k.tone} label={dyn(tt)(`kpis.${k.key}`)} value={k.value} icon={k.icon} />
+          </div>
         ))}
-        <ITFlex align="center" justify="center" className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <ITButton variant="outlined" color="gray" onClick={handleExportCsv} disabled={exporting}>
-            <ITFlex align="center" gap={1}>
-              <FaFileCsv className="text-emerald-600" size={13} />
-              <ITText className="font-bold text-[11px]">
-                {exporting ? tt("actions.exporting") : tt("actions.exportCsv")}
-              </ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
       </ITFlex>
 
       <ITDataTable
@@ -526,14 +510,16 @@ export default function AccessPage() {
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
-        rowHeight={50}
         onRowClick={(row) => void openDetail(row as unknown as AccessEvent)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
 
       <ITDialog
@@ -549,7 +535,7 @@ export default function AccessPage() {
         {detail && (
           <div style={{ minWidth: "100%" }}>
             {/* Header */}
-            <div className="pb-4 pr-8 mb-5" style={{ borderBottom: "1px solid #f1f5f9" }}>
+            <div className="pb-4 pr-8 mb-5 border-b border-slate-100">
               <ITFlex align="center" wrap="wrap" gap={2} className="mb-1.5">
                 <ITBadget color={TYPE_COLOR[detail.type]} size="lg">
                   {tt(`types.${detail.type}`)}
@@ -658,7 +644,7 @@ export default function AccessPage() {
             </div>
 
             {/* Footer */}
-            <ITFlex justify="end" gap={2} className="mt-5 pt-4" style={{ borderTop: "1px solid #f1f5f9" }}>
+            <ITFlex justify="end" gap={2} className="mt-5 pt-4 border-t border-slate-100">
               {canVoid && !detail.voidedAt && (
                 <ITButton
                   variant="outlined"
@@ -734,8 +720,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
     <ITFlex
       direction="column"
       gap={1}
-      className="py-3"
-      style={{ borderTop: "1px solid #f1f5f9" }}
+      className="py-3 border-t border-slate-100"
     >
       <ITText className="text-xs text-slate-400">{label}</ITText>
       <ITText className="text-sm font-semibold text-slate-800 break-words">{value}</ITText>

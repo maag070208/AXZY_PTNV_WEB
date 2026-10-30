@@ -68,7 +68,7 @@ export default function RolesWorkspace({ workspace }: Props) {
       )}
 
       {tab === "roles" && (
-        <div className="grid items-start gap-3 lg:grid-cols-[240px_minmax(0,1fr)]">
+        <div className="grid items-start gap-3 lg:!grid-cols-[240px_minmax(0,1fr)]">
           <RoleList admin={admin} selectedRole={workspace.selectedRole} onSelect={workspace.openRole} />
           {workspace.selectedRole && selectedMeta ? (
             <RoleDetail

@@ -265,7 +265,9 @@
     "newTaskHint": "Langostín te ayuda a dejarla lista: contesta lo que te pregunte.",
     "noTasksHint": "Usa «Nueva tarea» para asignar la primera.",
     "overdue": "Vencida",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "by": "por {{name}}",
+    "commentLabel": "Comentario"
   },
   "kanban": {
     "byTicket": "Tareas del ticket",

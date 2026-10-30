@@ -42,7 +42,7 @@ export default function TimeClockCameraView({ clockSerial }: { clockSerial: stri
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-[var(--it-card-bg)]">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>

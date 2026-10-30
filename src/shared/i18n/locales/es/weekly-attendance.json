@@ -106,5 +106,13 @@
     "view": "Vista",
     "generatedAt": "Generado el {{date}}"
   },
-  "sheetName": "Nómina"
+  "sheetName": "Nómina",
+  "hoursShort": "h",
+  "context": {
+    "people": "{{linked}} de {{total}} vinculadas al reloj",
+    "worked": "de {{scheduled}} programadas",
+    "overtime": "de {{worked}} trabajadas",
+    "approved": "{{pct}}% de las calculadas",
+    "absences": "de {{total}} personas"
+  }
 }

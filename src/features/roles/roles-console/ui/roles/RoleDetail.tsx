@@ -161,7 +161,7 @@ export default function RoleDetail({
         <RoleMembersPanel role={role} roleActive={meta.active} members={members} onViewAccess={onViewAccess} notify={notify} />
       )}
       {tab === "screens" && (
-        <div className="grid items-start gap-3 lg:grid-cols-[230px_minmax(0,1fr)]">
+        <div className="grid items-start gap-3 lg:!grid-cols-[230px_minmax(0,1fr)]">
           <SidebarPreview permissions={permissions} role={role} title={t("screens.menuOf", { role: roleLabel(role) })} />
           <ScreensAccessList permissions={permissions} role={role} catalog={catalog} />
         </div>

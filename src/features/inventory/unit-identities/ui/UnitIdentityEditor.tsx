@@ -45,7 +45,7 @@ export default function UnitIdentityEditor({ type, units, onChange, label, openF
     <ITFlex direction="column" gap={2}>
       <ITFlex justify="end">
         <button type="button" onClick={toggleAll} className="cursor-pointer">
-          <ITText className="text-[10px] font-bold uppercase text-[#1e3a5f]">
+          <ITText className="text-[12px] font-semibold text-primary-500">
             {allExpanded ? t("devices.collapseAll") : t("devices.expandAll")}
           </ITText>
         </button>
@@ -70,7 +70,7 @@ export default function UnitIdentityEditor({ type, units, onChange, label, openF
                 ) : (
                   <FaChevronRight className="shrink-0 text-slate-400" size={11} />
                 )}
-                <ITText className="truncate text-[11px] font-bold uppercase tracking-tight text-slate-700">
+                <ITText className="truncate text-[12px] font-bold text-slate-700">
                   {label(index)}
                 </ITText>
                 {filled && <FaCheck className="shrink-0 text-emerald-500" size={11} />}

@@ -27,7 +27,8 @@ import {
   type PeopleAttendanceView,
 } from "@entities/access";
 import { punchTime, workedTime } from "@entities/schedule";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { KPI_TONES, KpiTile } from "@shared/ui/kpi-tile";
+import { WaveFill } from "@shared/ui/charts";
 import { PeriodPicker } from "@shared/ui/period-picker";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
@@ -49,18 +50,18 @@ const DAYS_COLUMN_WIDTH: Record<"WEEK" | "FORTNIGHT" | "MONTH", number> = {
   MONTH: 380,
 };
 
-/** Color del marcador de cada día (hex exactos: el tema redefine las paletas de Tailwind). */
+/** Marcador de cada día: tonos semánticos del tema (no hex sueltos). */
 const DAY_STYLE: Record<AttendanceDayStatus, string> = {
-  ATTENDED: "!bg-[#0D5777] text-white",
-  LATE: "!bg-[#f97316] text-white",
-  ABSENCE: "border-[1.5px] border-dashed border-slate-400 !bg-white text-slate-500",
+  ATTENDED: "!bg-primary-500 text-white",
+  LATE: "!bg-[var(--color-warning)] !text-slate-900",
+  ABSENCE: "border-[1.5px] border-dashed border-slate-400 !bg-[var(--it-card-bg)] text-slate-500",
   REST: "!bg-slate-100 text-slate-400",
   PENDING: "!bg-slate-100 text-slate-400",
   NO_INFO: "!bg-slate-100 text-slate-400",
 };
 
 /** Anillo del día de hoy. */
-const TODAY_RING = "ring-2 ring-[#0D5777]/30 ring-offset-1";
+const TODAY_RING = "ring-2 ring-primary-500/30 ring-offset-1";
 
 /** Fecha de una clave de día (`YYYY-MM-DD`) con las opciones dadas, sin corrimiento de zona. */
 const formatDay = (dayKey: string, options: Intl.DateTimeFormatOptions): string =>
@@ -298,7 +299,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   return (
     <ITFlex direction="column" gap={4}>
       {/* Filtros */}
-      <ITCard className="!p-5 border border-slate-200">
+      <ITCard className="!p-5">
         <ITFlex direction="column" gap={4}>
           <ITFlex align="end" wrap="wrap" gap={3}>
             <PeriodPicker
@@ -342,51 +343,72 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         </ITFlex>
       </ITCard>
 
-      {/* Indicadores */}
-      <div className="grid !grid-cols-1 gap-3 sm:!grid-cols-2 lg:!grid-cols-5">
+      {/* Indicadores: compactos, con el contexto del dato debajo */}
+      <div className="bento-stagger grid gap-3 sm:!grid-cols-2 lg:!grid-cols-5">
         <KpiTile
+          size="sm"
           label={t("tiles.onSite")}
           value={summary?.onSite ?? 0}
-          hint={t("tiles.onSiteHint")}
+          footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.onSiteHint")}</span>}
           tone="emerald"
-          icon={<FaDoorOpen size={16} />}
+          icon={<FaDoorOpen size={14} />}
           onClick={() => setView("ON_SITE")}
         />
         <KpiTile
+          size="sm"
           label={t("tiles.withRecords")}
-          value={
-            <>
-              {withRecords}
-              <span className="ml-1.5 !text-[12px] font-semibold text-slate-400">
-                {t("tiles.ofTotal", { total: people })}
-              </span>
-            </>
+          value={withRecords}
+          footer={
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[11px] leading-snug text-slate-600">{t("tiles.ofTotal", { total: people })}</span>
+              <ITProgress value={recordsPercent} size="sm" color="info" />
+            </div>
           }
-          footer={<ITProgress value={recordsPercent} size="sm" color="info" />}
+          backdrop={
+            people > 0 && withRecords > 0 ? (
+              <WaveFill level={withRecords / people} color={KPI_TONES.sky.accent} />
+            ) : undefined
+          }
           tone="sky"
-          icon={<FaCheckCircle size={16} />}
+          icon={<FaCheckCircle size={14} />}
         />
         <KpiTile
+          size="sm"
           label={t("tiles.withoutRecords")}
           value={withoutRecords}
-          hint={withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded")}
+          footer={
+            <span className="text-[11px] leading-snug text-slate-600">
+              {withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded")}
+            </span>
+          }
           tone="neutral"
-          icon={<FaRegCircle size={16} />}
+          icon={<FaRegCircle size={14} />}
+          backdrop={
+            people > 0 && withoutRecords > 0 ? (
+              <WaveFill level={withoutRecords / people} color={KPI_TONES.neutral.accent} />
+            ) : undefined
+          }
           onClick={() => setView("WITHOUT_RECORDS")}
         />
         <KpiTile
+          size="sm"
           label={t("tiles.hours")}
           value={hoursValue}
-          hint={t("tiles.hoursHint")}
+          footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.hoursHint")}</span>}
           tone="neutral"
-          icon={<FaClock size={16} />}
+          icon={<FaClock size={14} />}
         />
         <KpiTile
+          size="sm"
           label={t("tiles.incidents")}
           value={incidentsTotal}
-          hint={incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear")}
+          footer={
+            <span className="text-[11px] leading-snug text-slate-500">
+              {incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear")}
+            </span>
+          }
           tone={incidentsTotal > 0 ? "amber" : "neutral"}
-          icon={<FaExclamationTriangle size={16} />}
+          icon={<FaExclamationTriangle size={14} />}
           onClick={() => setView("INCIDENTS")}
         />
       </div>
@@ -423,6 +445,10 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           defaultItemsPerPage={25}
           itemsPerPageOptions={[25, 50, 100]}
           layout="fixed"
+          density="compact"
+          rowHeight={50}
+          virtualized
+          virtualizedMaxHeight={460}
         />
 
         {multiDay && (

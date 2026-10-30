@@ -8,7 +8,7 @@ import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type Movement, type MovementType } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 import { downloadMovementPdf, downloadReportMovementsPdf } from "@widgets/movement-pdf";
-import { StatCard } from "@shared/ui/stat-card";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { i18n } from "@shared/i18n";
 import { useGoBack } from "@shared/lib/useGoBack";
 
@@ -285,51 +285,42 @@ export default function MovementsPage() {
         </ITFlex>
       }
     >
-      <ITGrid container columns={12} spacing={4}>
-        <ITGrid item xs={6} md={4}>
-          <StatCard
-            size="lg"
-            icon={<FaHistory size={16} className="text-white" />}
-            circleClass={statCardActive(null) ? "bg-slate-800 ring-4 ring-slate-200" : "bg-slate-800"}
-            value={stats.total}
-            label={t("movements.stats.total")}
-            onClick={() => applyFilter(null)}
-          />
-        </ITGrid>
-        <ITGrid item xs={6} md={4}>
-          <StatCard
-            size="lg"
-            icon={<FaTrash size={16} className="text-white" />}
-            circleClass={statCardActive("retirements") ? "bg-red-500 ring-4 ring-red-200" : "bg-red-500"}
-            value={stats.retirements}
-            label={t("movements.stats.retirements")}
-            onClick={() => applyFilter("retirements")}
-          />
-        </ITGrid>
-        <ITGrid item xs={6} md={4}>
-          <StatCard
-            size="lg"
-            icon={<FaWrench size={16} className="text-white" />}
-            circleClass={statCardActive("maintenance") ? "bg-sky-500 ring-4 ring-sky-200" : "bg-sky-500"}
-            value={stats.maintenance}
-            label={t("movements.stats.maintenance")}
-            onClick={() => applyFilter("maintenance")}
-          />
-        </ITGrid>
-      </ITGrid>
+      <div className="bento-stagger grid grid-cols-2 gap-4 md:!grid-cols-3">
+        <KpiTile size="sm"
+          label={t("movements.stats.total")}
+          value={stats.total}
+          tone="sky"
+          icon={<FaHistory size={16} />}
+          onClick={() => applyFilter(null)}
+        />
+        <KpiTile size="sm"
+          label={t("movements.stats.retirements")}
+          value={stats.retirements}
+          tone={stats.retirements > 0 || statCardActive("retirements") ? "rose" : "neutral"}
+          icon={<FaTrash size={16} />}
+          onClick={() => applyFilter("retirements")}
+        />
+        <KpiTile size="sm"
+          label={t("movements.stats.maintenance")}
+          value={stats.maintenance}
+          tone={stats.maintenance > 0 || statCardActive("maintenance") ? "amber" : "neutral"}
+          icon={<FaWrench size={16} />}
+          onClick={() => applyFilter("maintenance")}
+        />
+      </div>
 
       <ITDataTable
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
+        onRowClick={(row) => void openMovementPdf((row as unknown as MovementRow).movementId)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
-        virtualized
-        virtualizedMaxHeight={420}
         rowHeight={50}
-        onRowClick={(row) => void openMovementPdf((row as unknown as MovementRow).movementId)}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITPage>
   );

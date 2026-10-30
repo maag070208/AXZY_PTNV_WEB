@@ -30,6 +30,21 @@
     "resolvedTickets": "Tareas resueltas",
     "avgResolution": "Resolución promedio",
     "teamEfficiency": "Eficiencia del equipo",
-    "noEfficiency": "Sin datos de resolución"
+    "noEfficiency": "Sin datos de resolución",
+    "noDamage": "Sin daños",
+    "withDamage": "Con daño",
+    "availableShort": "Disponibles {{pct}}%",
+    "onLoan": "En préstamo {{count}}",
+    "perTask": "por tarea",
+    "of": "de {{total}}",
+    "pendingLabel": "pendientes",
+    "weekActivity": "Actividad de la semana",
+    "ticketsByStatus": "Tickets por estado",
+    "statusOpen": "Abiertos",
+    "statusInProgress": "En proceso",
+    "statusClosed": "Cerrados",
+    "tickets": "tickets",
+    "efficiencyNote": "{{top}} resolvió más; {{none}} aún no tiene tareas resueltas.",
+    "efficiencyNoteAll": "Todo el equipo con tareas resueltas."
   }
 }

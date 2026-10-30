@@ -181,7 +181,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
         <span className="rounded bg-slate-100 px-1.5 text-[10px] font-black text-slate-500">#{rule.priority}</span>
         <span className="text-[12px] font-bold text-slate-700">{rule.name}</span>
         <span
-        className={`rounded px-1.5 py-0.5 text-[12px] font-semibold ${
+          className={`rounded px-1.5 py-0.5 text-[12px] font-semibold ${
             rule.effect === "DENY" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"
           }`}
         >
@@ -233,7 +233,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
   return (
     <div className="flex flex-col gap-4">
       <p className="text-[11px] text-slate-500">{t("simulator.subtitle")}</p>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:!grid-cols-2">
         <DialogSection step={1} title={t("simulator.who")}>
           <ITSearchSelect
             name="simulator_person"
@@ -260,7 +260,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
 
       {action && action.fields.length > 0 && (
         <DialogSection step={3} title={t("simulator.context")} hint={t("simulator.contextHint")}>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:!grid-cols-2">
             {action.fields.map((field) =>
               field.type === "number" ? (
                 <ITInput
@@ -336,7 +336,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
             </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:!grid-cols-3">
             <Step index={1} title={t("simulator.steps.identity")} icon={<FaIdCard size={12} />} state={result.identity.ok ? "ok" : "fail"}>
               {result.identity.ok ? t("simulator.identity.active") : t("simulator.identity.inactive")}
             </Step>

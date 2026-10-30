@@ -33,9 +33,9 @@ export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
   return (
     <ITFlex justify="center">
       <ITStack direction="column" spacing={5} className="w-full">
-        <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
+        <ITFlex className="bg-[var(--it-card-bg)] rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
           <ITStack direction="column" spacing={5} className="w-full">
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("edit.formInfoTitle")}
             </ITText>
 
@@ -71,9 +71,9 @@ export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
           </ITStack>
         </ITFlex>
 
-        <ITFlex className="bg-white rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
+        <ITFlex className="bg-[var(--it-card-bg)] rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
           <ITStack direction="column" spacing={4} className="w-full">
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("edit.priorityTitle")}
             </ITText>
 

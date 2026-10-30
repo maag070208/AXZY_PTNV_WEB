@@ -12,7 +12,7 @@ interface Props {
   onRemove: (key: number) => void;
 }
 
-const HEAD = "text-[10px] font-semibold uppercase tracking-wide text-slate-400";
+const HEAD = "text-[12px] font-semibold text-slate-400";
 
 /** Lista de renglones agregados (o el estado vacío). */
 export default function StockInLinesList({ lines, itemById, onPatch, onRemove }: Props) {
@@ -22,7 +22,7 @@ export default function StockInLinesList({ lines, itemById, onPatch, onRemove }:
     return (
       <div className="mt-5 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-12">
         <ITFlex direction="column" align="center" gap={3}>
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-slate-300 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--it-card-bg)] text-slate-300 shadow-sm">
             <FaBoxOpen size={20} />
           </div>
           <div className="text-center">

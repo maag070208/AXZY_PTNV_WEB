@@ -141,13 +141,15 @@ export default function DepartmentsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
-      virtualized
-      virtualizedMaxHeight={420}
-      rowHeight={50}
       onRowClick={(row) => onView(row as unknown as Department)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={50}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

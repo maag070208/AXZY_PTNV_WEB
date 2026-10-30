@@ -23,7 +23,7 @@ export default function UserImportPage() {
       description={tt("import.description")}
       backAction={() => goBack("/users")}
       breadcrumbs={[
-        { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
+        { label: tt("list.breadcrumb"), onClick: () => navigate("/users", { replace: true }) },
         { label: tt("import.breadcrumb") },
       ]}
       icon={<FaUserShield size={20} />}
@@ -35,7 +35,7 @@ export default function UserImportPage() {
       )}
 
       <ImportPanel fx={fx} />
-      <ImportResultCard fx={fx} onGoToList={() => navigate("/users")} />
+      <ImportResultCard fx={fx} onGoToList={() => goBack("/users")} />
     </ITPage>
   );
 }

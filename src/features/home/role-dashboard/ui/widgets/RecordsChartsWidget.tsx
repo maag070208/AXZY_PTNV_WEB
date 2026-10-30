@@ -49,7 +49,7 @@ export default function RecordsChartsWidget() {
       onRetry={reload}
       wide
     >
-      <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
+      <div className="grid gap-x-8 gap-y-2 md:!grid-cols-2">
         <div>
           <SectionLabel>{t("records.chartStatus")}</SectionLabel>
           <DonutChart segments={charts.status} size={120} />

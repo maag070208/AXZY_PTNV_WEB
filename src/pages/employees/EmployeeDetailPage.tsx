@@ -138,7 +138,7 @@ export default function EmployeeDetailPage() {
       <ITFlex direction="column" gap={5}>
         <EmployeeHero profile={profile} onPhotoUpload={detail.uploadPhoto} />
 
-        <nav role="tablist" className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
+        <nav role="tablist" className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-1.5 shadow-sm">
           {sections.map((s) => (
             <button
               key={s.id}

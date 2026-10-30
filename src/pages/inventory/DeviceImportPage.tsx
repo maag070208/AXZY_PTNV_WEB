@@ -33,7 +33,7 @@ export default function DeviceImportPage() {
       backAction={() => goBack("/inventory/devices")}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("inventory:devices.title"), onClick: () => navigate("/inventory/devices") },
+        { label: t("inventory:devices.title"), onClick: () => navigate("/inventory/devices", { replace: true }) },
         { label: t("inventory:import.breadcrumb") },
       ]}
     >
@@ -42,8 +42,8 @@ export default function DeviceImportPage() {
       {fx.step === "done" && (
         <ImportResultCard
           fx={fx}
-          onGoToDevices={() => navigate("/inventory/devices")}
-          onGoToMovements={() => navigate("/inventory/movements")}
+          onGoToDevices={() => goBack("/inventory/devices")}
+          onGoToMovements={() => navigate("/inventory/movements", { replace: true })}
         />
       )}
     </ITPage>

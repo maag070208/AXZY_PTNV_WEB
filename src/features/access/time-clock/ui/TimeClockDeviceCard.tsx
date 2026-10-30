@@ -100,7 +100,7 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
     <article
       data-testid="clock-card"
       className={`flex h-full flex-col rounded-2xl border p-5 ${
-        desconectado ? "border-rose-200 !bg-rose-50" : "border-slate-200 !bg-white"
+        desconectado ? "border-rose-200 !bg-rose-50" : "border-slate-200 !bg-[var(--it-card-bg)]"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -119,7 +119,7 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
       </div>
 
       {desconectado && (
-        <div className="mt-4 rounded-xl border border-rose-200 !bg-white p-3">
+        <div className="mt-4 rounded-xl border border-rose-200 !bg-[var(--it-card-bg)] p-3">
           <p className="text-[12px] font-black text-rose-700">{alerta.titulo}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-slate-600">{alerta.texto}</p>
           {run?.error && (
@@ -161,7 +161,7 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
       </div>
 
       {abierto && (
-        <div className="mt-3 rounded-xl border border-slate-200 !bg-white p-3">
+        <div className="mt-3 rounded-xl border border-slate-200 !bg-[var(--it-card-bg)] p-3">
           <div className="!grid !grid-cols-2 gap-3">
             <Dato
               label={t("status.lastRunAt")}
@@ -203,7 +203,7 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
 function Dato({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
+      <p className="text-[12px] font-semibold text-slate-400">{label}</p>
       <p className="mt-0.5 text-[12px] font-bold break-words text-slate-800">{value}</p>
     </div>
   );

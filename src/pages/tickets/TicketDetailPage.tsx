@@ -1,5 +1,6 @@
 import {
   ITButton,
+  ITCard,
   ITConfirmDialog,
   ITFlex,
   ITGrid,
@@ -79,7 +80,7 @@ export default function TicketDetailPage() {
         backAction={() => goBack("/tickets")}
         icon={<FaTicketAlt size={20} />}
         breadcrumbs={[
-          { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets") },
+          { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets", { replace: true }) },
           { label: tt("detail.title") },
         ]}
       >
@@ -93,12 +94,12 @@ export default function TicketDetailPage() {
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
-      title={ticket.title}
+      title={ticket.title.charAt(0).toUpperCase() + ticket.title.slice(1)}
       backAction={() => goBack("/tickets")}
       icon={<FaTicketAlt size={20} />}
       breadcrumbs={[
-        { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets") },
-        { label: ticket.title },
+        { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets", { replace: true }) },
+        { label: tt("detail.title") },
       ]}
       actions={
         <ITFlex gap={2} wrap="wrap">
@@ -134,7 +135,7 @@ export default function TicketDetailPage() {
             <ITButton
               variant="filled"
               size="lg"
-              color="error"
+              color="primary"
               onClick={() => fx.handleStatusChange("CLOSED")}
             >
               <ITFlex align="center" gap={1}>
@@ -168,13 +169,13 @@ export default function TicketDetailPage() {
           />
 
           {(fx.canEditTicket || fx.canCreateTasks || fx.isInvolved) && (
-            <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
+            <ITCard>
               <TasksGraph
                 fx={fx}
                 canManage={fx.canEditTicket || fx.canCreateTasks}
                 renderAssignmentAttachments={renderAssignmentAttachments}
               />
-            </ITFlex>
+            </ITCard>
           )}
 
           <TicketComments fx={fx} />

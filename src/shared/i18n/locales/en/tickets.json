@@ -265,7 +265,9 @@
     "newTaskHint": "Langostín helps you get it ready: answer what it asks you.",
     "noTasksHint": "Use “New task” to assign the first one.",
     "overdue": "Overdue",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "by": "by {{name}}",
+    "commentLabel": "Comment"
   },
   "kanban": {
     "byTicket": "Ticket tasks",

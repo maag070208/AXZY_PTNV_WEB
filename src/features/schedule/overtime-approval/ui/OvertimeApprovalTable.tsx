@@ -15,14 +15,17 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaCheck, FaCheckCircle, FaClock, FaTimes, FaTimesCircle } from "react-icons/fa";
+import { FaBuilding, FaCheck, FaCheckCircle, FaClock, FaTimes, FaTimesCircle } from "react-icons/fa";
 import type { OvertimeDayRow } from "@entities/overtime";
 import { punchTime, workedTime } from "@entities/schedule";
 import { dateLocale } from "@shared/i18n";
 import { dyn } from "@shared/i18n/dyn";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { KPI_TONES, KpiTile } from "@shared/ui/kpi-tile";
+import { WaveFill } from "@shared/ui/charts";
+import { PanelCard } from "@shared/ui/panel-card";
 import { PeriodPicker } from "@shared/ui/period-picker";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { TabBar } from "@shared/ui/tab-bar";
 import { dayKeyOf, type StatusTab, type UseOvertimeApproval } from "../model/useOvertimeApproval";
 
 const TABS: StatusTab[] = ["PENDING", "APPROVED", "REJECTED", "ALL"];
@@ -77,6 +80,9 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
   const pendingDays = summary?.pendingDays ?? 0;
   const approvedDays = summary?.approvedDays ?? 0;
   const rejectedDays = summary?.rejectedDays ?? 0;
+  const totalMinutes =
+    (summary?.pendingMinutes ?? 0) + (summary?.approvedMinutes ?? 0) + (summary?.rejectedMinutes ?? 0);
+
   const byDepartment = (summary?.byDepartment ?? []).slice(0, TOP_DEPARTMENTS);
   const maxDepartment = Math.max(1, ...byDepartment.map((d) => d.minutes));
 
@@ -242,7 +248,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       width: 90,
       sortable: true,
       render: (r) => (
-        <ITText className="text-[13px] font-black tabular-nums text-[#ea580c]">
+        <ITText className="text-[13px] font-black tabular-nums text-[color:color-mix(in_srgb,var(--color-warning)_70%,black)]">
           +{workedTime(canApprove ? r.extraMin : r.approvedExtraMin)}
         </ITText>
       ),
@@ -272,7 +278,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
   return (
     <ITFlex direction="column" gap={4}>
       {/* Filtros */}
-      <ITCard className="!p-5 border border-slate-200">
+      <ITCard className="!p-5">
         <ITFlex direction="column" gap={3}>
           <ITFlex align="end" wrap="wrap" gap={3}>
             <PeriodPicker
@@ -311,68 +317,82 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         </ITFlex>
       </ITCard>
 
-      {/* Indicadores */}
-      <div
-        className={`grid !grid-cols-1 gap-3 sm:!grid-cols-2 ${canApprove ? "lg:!grid-cols-4" : "lg:!grid-cols-2"}`}
-      >
+      {/* Indicadores: el número y contra qué se compara, en tarjetas compactas */}
+      <div className={`bento-stagger grid gap-3 sm:!grid-cols-2 ${canApprove ? "xl:!grid-cols-3" : "xl:!grid-cols-2"}`}>
+        {/* La ola de cada tarjeta es su parte del total de minutos del periodo. */}
         {canApprove && (
           <KpiTile
+            size="sm"
             label={t("tiles.pending")}
             value={workedTime(summary?.pendingMinutes ?? 0)}
-            hint={`${t("tiles.requests", { count: pendingDays })} · ${t("tiles.people", {
-              count: summary?.peopleWithPending ?? 0,
-            })}`}
+            footer={
+              <span className="text-[11px] leading-snug text-slate-500">
+                {t("tiles.requests", { count: pendingDays })} · {t("tiles.people", { count: summary?.peopleWithPending ?? 0 })}
+              </span>
+            }
             tone="amber"
-            icon={<FaClock size={16} />}
+            icon={<FaClock size={14} />}
+            backdrop={
+              totalMinutes > 0 && (summary?.pendingMinutes ?? 0) > 0 ? (
+                <WaveFill level={(summary?.pendingMinutes ?? 0) / totalMinutes} color={KPI_TONES.amber.accent} />
+              ) : undefined
+            }
             onClick={() => setTab("PENDING")}
           />
         )}
         <KpiTile
+          size="sm"
           label={t("tiles.approved")}
           value={workedTime(summary?.approvedMinutes ?? 0)}
-          hint={t("tiles.requests", { count: approvedDays })}
+          footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: approvedDays })}</span>}
           tone="emerald"
-          icon={<FaCheckCircle size={16} />}
+          icon={<FaCheckCircle size={14} />}
+          backdrop={
+            totalMinutes > 0 && (summary?.approvedMinutes ?? 0) > 0 ? (
+              <WaveFill level={(summary?.approvedMinutes ?? 0) / totalMinutes} color={KPI_TONES.emerald.accent} />
+            ) : undefined
+          }
         />
         {canApprove && (
           <KpiTile
+            size="sm"
             label={t("tiles.rejected")}
             value={workedTime(summary?.rejectedMinutes ?? 0)}
-            hint={t("tiles.requests", { count: rejectedDays })}
+            footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: rejectedDays })}</span>}
             tone="rose"
-            icon={<FaTimesCircle size={16} />}
+            icon={<FaTimesCircle size={14} />}
+            backdrop={
+              totalMinutes > 0 && (summary?.rejectedMinutes ?? 0) > 0 ? (
+                <WaveFill level={(summary?.rejectedMinutes ?? 0) / totalMinutes} color={KPI_TONES.rose.accent} />
+              ) : undefined
+            }
           />
         )}
-        <div className="flex w-full flex-col rounded-2xl border border-slate-200 !bg-white p-4 shadow-sm">
-          <p className="truncate !text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            {t("tiles.byDepartment")}
-          </p>
-          {byDepartment.length === 0 ? (
-            <p className="mt-3 !text-[12px] text-slate-400">{t("tiles.noOvertime")}</p>
-          ) : (
-            <ul className="mt-3 flex flex-col gap-2">
-              {byDepartment.map((d) => (
-                <li key={d.departmentId ?? "none"}>
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="truncate !text-[12px] font-semibold text-slate-700">
-                      {d.departmentName ?? t("noDepartment")}
-                    </span>
-                    <span className="shrink-0 !text-[12px] font-bold tabular-nums text-slate-900">
-                      {workedTime(d.minutes)}
-                    </span>
-                  </div>
-                  <div className="mt-1 h-1.5 w-full rounded-full !bg-slate-100">
-                    <div
-                      className="h-1.5 rounded-full !bg-[#0D5777]"
-                      style={{ width: `${Math.max(4, Math.round((d.minutes * 100) / maxDepartment))}%` }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
+
+      {/* Desglose por departamento: solo cuando hay horas que repartir */}
+      {byDepartment.length > 0 && (
+        <PanelCard title={t("tiles.byDepartment")} icon={<FaBuilding size={16} />}>
+          <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
+            {byDepartment.map((d) => (
+              <li key={d.departmentId ?? "none"}>
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-[12px] font-semibold text-slate-700">
+                    {d.departmentName ?? t("noDepartment")}
+                  </span>
+                  <span className="shrink-0 text-[12px] font-bold tabular-nums text-slate-900">{workedTime(d.minutes)}</span>
+                </div>
+                <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
+                  <div
+                    className="h-1.5 rounded-full bg-primary-500"
+                    style={{ width: `${Math.max(4, Math.round((d.minutes * 100) / maxDepartment))}%` }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </PanelCard>
+      )}
 
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
@@ -380,35 +400,19 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         </ITAlert>
       )}
 
-      {/* Lista por estatus */}
-      <ITCard className="!p-5 border border-slate-200">
-        <div role="tablist" className="mb-4 flex flex-wrap gap-1 border-b border-slate-200">
-          {visibleTabs.map((value) => {
-            const active = tab === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setTab(value)}
-                className={`-mb-px flex items-center gap-2 border-b-2 !bg-transparent px-3 py-2 text-[13px] font-bold transition ${
-                  active
-                    ? "!border-[#0D5777] !text-[#0D5777]"
-                    : "!border-transparent text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                {tt(`tabs.${value}`)}
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
-                    active ? "!bg-[#0D5777] text-white" : "!bg-slate-100 text-slate-600"
-                  }`}
-                >
-                  {counts[value]}
-                </span>
-              </button>
-            );
-          })}
+      {/* Lista por estatus (la tabla ya trae su superficie) */}
+      <div className="flex flex-col gap-3">
+        <div>
+          <TabBar
+            items={visibleTabs.map((value) => ({
+              id: value,
+              label: tt(`tabs.${value}`),
+              count: counts[value],
+            }))}
+            value={tab}
+            onChange={setTab}
+            size="sm"
+          />
         </div>
 
         {canApprove && fx.selectedCount > 0 && (
@@ -460,10 +464,14 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
           defaultItemsPerPage={25}
           itemsPerPageOptions={[25, 50, 100]}
           layout="fixed"
+          density="compact"
+          rowHeight={50}
+          virtualized
+          virtualizedMaxHeight={460}
         />
 
-        <ITText className="mt-4 text-[11px] text-slate-500">{t("footnote")}</ITText>
-      </ITCard>
+        <ITText className="text-[11px] text-slate-500">{t("footnote")}</ITText>
+      </div>
 
       {/* Rechazo con motivo opcional */}
       {canApprove && (

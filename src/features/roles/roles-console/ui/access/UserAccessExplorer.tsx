@@ -246,7 +246,7 @@ export default function UserAccessExplorer({
     }));
 
   return (
-    <div className="grid items-start gap-3 lg:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="grid items-start gap-3 lg:!grid-cols-[240px_minmax(0,1fr)]">
       {/* Personas */}
       <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-2 lg:sticky lg:top-4">
         <ITInput
@@ -512,7 +512,7 @@ export default function UserAccessExplorer({
             )}
 
             {section === "screens" && (
-              <div className="grid items-start gap-3 lg:grid-cols-[230px_minmax(0,1fr)]">
+              <div className="grid items-start gap-3 lg:!grid-cols-[230px_minmax(0,1fr)]">
                 <SidebarPreview permissions={effective} role={access.user.role} title={access.user.name} />
                 <ScreensAccessList permissions={effective} role={access.user.role} catalog={catalog} />
               </div>

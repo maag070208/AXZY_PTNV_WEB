@@ -62,9 +62,9 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
 
         {/* Con expediente, los datos de la persona se editan en Personal. */}
         {hasRecord && (
-          <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="rounded-xl bg-[#fff7ed] px-3 py-2">
+          <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="rounded-xl bg-[var(--color-warning-soft)] px-3 py-2">
             <ITFlex align="center" gap={2}>
-              <FaUserCog size={12} className="text-[#ea580c]" />
+              <FaUserCog size={12} className="text-[color:color-mix(in_srgb,var(--color-warning)_70%,black)]" />
               <ITText className="!text-[11px] text-slate-600">{tt("form.personElsewhere")}</ITText>
             </ITFlex>
             {canSeeRecords && userId && (

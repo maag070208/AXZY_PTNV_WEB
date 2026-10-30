@@ -80,7 +80,7 @@ function SectionHeader({
         {icon}
       </ITFlex>
       <ITFlex direction="column" gap={0.25}>
-        <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">{title}</ITText>
+        <ITText className="text-[12px] font-semibold text-slate-700">{title}</ITText>
         <ITText className="text-[10px] text-slate-400">{hint}</ITText>
       </ITFlex>
     </ITFlex>
@@ -116,7 +116,7 @@ export default function UserFormFields({
   return (
     <>
       {step === "personal" && personFields && (
-        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
           <SectionHeader
             icon={<FaIdCard size={15} className="text-blue-600" />}
             iconBg="bg-blue-50"
@@ -152,7 +152,7 @@ export default function UserFormFields({
       )}
 
       {step === "access" && (
-        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
           <SectionHeader
             icon={<FaShieldAlt size={15} className="text-violet-600" />}
             iconBg="bg-violet-50"
@@ -185,7 +185,7 @@ export default function UserFormFields({
             </ITGrid>
             <ITGrid item xs={12}>
               <ITFlex direction="column" gap={2}>
-                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                <ITText className="text-[12px] font-semibold text-slate-500">
                   {tt("form.extraRoles")}
                 </ITText>
                 <ITText className="text-[10px] text-slate-400">
@@ -209,7 +209,7 @@ export default function UserFormFields({
       )}
 
       {step === "org" && (
-        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
           <SectionHeader
             icon={<FaBuilding size={15} className="text-emerald-600" />}
             iconBg="bg-emerald-50"
@@ -228,7 +228,7 @@ export default function UserFormFields({
       )}
 
       {step === "docs" && (
-        <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
           <SectionHeader
             icon={<FaFileUpload size={15} className="text-amber-600" />}
             iconBg="bg-amber-50"

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ITBadget, ITButton, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaFilePdf, FaFileSignature, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
@@ -68,7 +69,10 @@ export default function LoansPage() {
           {p.custodian ? (
             <>
               <ITBadget color="success" size="lg">{t("loans.toEmployee")}</ITBadget>
-              <ITText className="text-[11px] text-slate-600">{p.custodian.name}</ITText>
+              <ITFlex align="center" gap={2} className="min-w-0">
+                <ProfileAvatar name={p.custodian.name} size="xs" />
+                <ITText className="truncate text-[11px] text-slate-600">{p.custodian.name}</ITText>
+              </ITFlex>
             </>
           ) : p.department ? (
             <>
@@ -164,14 +168,14 @@ export default function LoansPage() {
       <ITDataTable
         columns={columns as any}
         fetchData={fetchData as any}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
+        onRowClick={(row) => navigate(`/inventory/loans/${(row as unknown as Loan).id}`)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
-        virtualized
-        virtualizedMaxHeight={420}
         rowHeight={50}
-        onRowClick={(row) => navigate(`/inventory/loans/${(row as unknown as Loan).id}`)}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITPage>
   );

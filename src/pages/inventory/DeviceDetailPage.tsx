@@ -1,12 +1,21 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import {
+  ITAlert,
+  ITBadget,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITPage,
+  ITText,
+} from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaEdit, FaHistory, FaPlusCircle, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
 import { inventoryApi, type Device, type Stock, type StockLedgerRow, type MovementType, type DeviceUnit } from "@entities/inventory";
-import { StatCard } from "@shared/ui/stat-card";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { useCan } from "@entities/user";
 import { i18n } from "@shared/i18n";
 import { useGoBack } from "@shared/lib/useGoBack";
@@ -122,15 +131,10 @@ export default function DeviceDetailPage() {
       }
     >
       {/* Hero */}
-      <ITFlex
-        as="section"
-        direction="column"
-        gap={4}
-        className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm"
-      >
+      <ITCard>
         <ITFlex align="center" justify="between" gap={4} wrap="wrap">
           <ITFlex align="center" gap={4} className="min-w-0">
-            <ITFlex align="center" justify="center" className="h-16 w-16 shrink-0 rounded-2xl bg-slate-800 text-white shadow-md">
+            <ITFlex align="center" justify="center" className="h-16 w-16 shrink-0 rounded-2xl bg-primary-500/10 text-primary-500">
               <FaBoxOpen size={26} />
             </ITFlex>
             <ITFlex direction="column" gap={1} className="min-w-0">
@@ -146,33 +150,25 @@ export default function DeviceDetailPage() {
             </ITFlex>
           </ITFlex>
           <ITFlex direction="column" align="end" gap={1}>
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("devices.active")}</ITText>
+            <ITText className="text-[12px] font-semibold text-slate-500">{t("devices.active")}</ITText>
             <ITText className="text-4xl font-black text-slate-900 leading-none">{s?.active ?? 0}</ITText>
-            <ITText className="text-[11px] text-slate-400">{t("devices.units", { total: s?.historical ?? 0 })}</ITText>
+            <ITText className="text-[11px] text-slate-500">{t("devices.units", { total: s?.historical ?? 0 })}</ITText>
           </ITFlex>
         </ITFlex>
-      </ITFlex>
+      </ITCard>
 
       {/* Stats */}
-      <ITGrid container columns={12} spacing={4}>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaCheckCircle size={16} className="text-white" />} circleClass="bg-emerald-500" value={s?.AVAILABLE ?? 0} label={t("devices.avail")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaUserTie size={16} className="text-white" />} circleClass="bg-amber-500" value={s?.ON_LOAN ?? 0} label={t("devices.loaned")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaThumbsDown size={16} className="text-white" />} circleClass="bg-orange-500" value={s?.DAMAGED ?? 0} label={t("devices.damaged")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaToolbox size={16} className="text-white" />} circleClass="bg-slate-500" value={s?.IN_MAINTENANCE ?? 0} label={t("devices.maintenance")} />
-        </ITGrid>
-      </ITGrid>
+      <div className="bento-stagger grid grid-cols-2 gap-4 md:!grid-cols-4">
+        <KpiTile size="sm" label={t("devices.avail")} value={s?.AVAILABLE ?? 0} tone="emerald" icon={<FaCheckCircle size={16} />} />
+        <KpiTile size="sm" label={t("devices.loaned")} value={s?.ON_LOAN ?? 0} tone="amber" icon={<FaUserTie size={16} />} />
+        <KpiTile size="sm" label={t("devices.damaged")} value={s?.DAMAGED ?? 0} tone={(s?.DAMAGED ?? 0) > 0 ? "rose" : "neutral"} icon={<FaThumbsDown size={16} />} />
+        <KpiTile size="sm" label={t("devices.maintenance")} value={s?.IN_MAINTENANCE ?? 0} tone={(s?.IN_MAINTENANCE ?? 0) > 0 ? "amber" : "neutral"} icon={<FaToolbox size={16} />} />
+      </div>
 
       <ITGrid container columns={12} spacing={6}>
         {/* Unidades */}
         <ITGrid item xs={12} lg={5}>
-          <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-3">
             <ITFlex align="center" justify="between" gap={2}>
               <ITText className="text-sm font-bold text-slate-800">{t("devices.deviceUnits")}</ITText>
               <ITBadget color="gray" size="lg">{units.length}</ITBadget>
@@ -181,7 +177,7 @@ export default function DeviceDetailPage() {
               {units.map((u) => (
                 <ITFlex key={u.id} align="center" justify="between" gap={3} className="border-b border-slate-100 px-3 py-2.5 last:border-0 hover:bg-slate-50/60">
                   <ITFlex direction="column" gap={0.5} className="min-w-0">
-                    <ITText className="font-black text-emerald-700 text-[12px] uppercase tracking-tight">{u.assetTag}</ITText>
+                    <ITText className="font-semibold text-emerald-700 text-[12px]">{u.assetTag}</ITText>
                     <ITFlex gap={2} wrap="wrap" className="text-[10px] text-slate-400">
                       {device.type?.useSerialNumber && u.serialNumber && <span>{i18n.t("common:labels.serialNumber", { value: u.serialNumber })}</span>}
                       {device.type?.useMac && u.macAddress && <span>MAC: {u.macAddress}</span>}
@@ -195,12 +191,12 @@ export default function DeviceDetailPage() {
               ))}
               {units.length === 0 && <ITText className="py-8 text-center text-sm text-slate-400">{t("devices.noUnits")}</ITText>}
             </div>
-          </ITFlex>
+          </ITCard>
         </ITGrid>
 
         {/* Kardex */}
         <ITGrid item xs={12} lg={7}>
-          <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-3">
             <ITFlex align="center" gap={2}>
               <FaHistory className="text-slate-400" size={14} />
               <ITText className="text-sm font-bold text-slate-800">{t("devices.stockLedger")}</ITText>
@@ -208,7 +204,7 @@ export default function DeviceDetailPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[520px] text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  <tr className="border-b border-slate-200 bg-slate-50 text-left text-[12px] font-semibold text-slate-500">
                     <th className="px-3 py-2.5">{t("stockLedger.date")}</th>
                     <th className="px-3 py-2.5">{t("stockLedger.movement")}</th>
                     <th className="px-3 py-2.5 text-right">{t("stockLedger.entry")}</th>
@@ -236,7 +232,7 @@ export default function DeviceDetailPage() {
                 </tbody>
               </table>
             </div>
-          </ITFlex>
+          </ITCard>
         </ITGrid>
       </ITGrid>
     </ITPage>

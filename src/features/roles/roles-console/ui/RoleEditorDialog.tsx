@@ -218,7 +218,7 @@ export default function RoleEditorDialog({
 
         {!editing && (
           <DialogSection step={3} title={t("roleDialog.startQuestion")}>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2 sm:!grid-cols-2">
               <ChoiceCard
                 selected={form.start === "blank"}
                 onClick={() => setForm((previous) => ({ ...previous, start: "blank" }))}
@@ -281,7 +281,7 @@ export default function RoleEditorDialog({
             {t("roleDialog.moreOptions")}
           </button>
           {showMore && (
-            <div className="mt-2 grid gap-3 rounded-xl bg-slate-50 p-3 sm:grid-cols-2">
+            <div className="mt-2 grid gap-3 rounded-xl bg-slate-50 p-3 sm:!grid-cols-2">
               <div>
                 <ITInput
                   name="role_key"

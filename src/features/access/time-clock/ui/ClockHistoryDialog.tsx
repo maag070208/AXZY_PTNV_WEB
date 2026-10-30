@@ -77,7 +77,7 @@ export default function ClockHistoryDialog({
         </ITFlex>
 
         {resumen && (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:!grid-cols-3">
             <Indicador
               titulo={t("history.attempts")}
               valor={`${resumen.okCount} / ${resumen.attempts}`}
@@ -99,7 +99,7 @@ export default function ClockHistoryDialog({
 
         {resumen?.lastError && (
           <div className="rounded-lg border border-solid border-red-200 bg-red-50 px-3 py-2">
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-red-700">
+            <ITText className="text-[12px] font-semibold text-red-700">
               {t("history.lastError")}
             </ITText>
             <ITText className="text-[11px] text-red-800 break-words">{resumen.lastError}</ITText>
@@ -174,7 +174,7 @@ function Indicador({
 }) {
   return (
     <div className={`rounded-lg border border-solid px-3 py-2 ${alerta ? "border-red-200 bg-red-50" : "border-slate-200 bg-slate-50"}`}>
-      <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{titulo}</ITText>
+      <ITText className="text-[12px] font-semibold text-slate-400">{titulo}</ITText>
       <ITText className={`text-[13px] font-black ${alerta ? "text-red-700" : "text-slate-800"}`}>{valor}</ITText>
       {detalle && <ITText className="text-[10px] text-slate-500">{detalle}</ITText>}
     </div>

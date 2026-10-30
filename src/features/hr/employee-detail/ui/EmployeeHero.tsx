@@ -18,7 +18,7 @@ const formatDateOnly = (iso?: string | null): string => {
 function Fact({ label, value }: { label: string; value?: string | null }) {
   return (
     <div className="min-w-0">
-      <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{label}</dt>
+      <dt className="text-[12px] font-bold text-slate-400">{label}</dt>
       <dd className="truncate text-sm font-semibold text-slate-800">{value?.trim() ? value : "—"}</dd>
     </div>
   );
@@ -42,7 +42,7 @@ export default function EmployeeHero({ profile, onPhotoUpload }: Props) {
   ].filter((f) => f.value?.trim());
 
   return (
-    <section className="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center">
+    <section className="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm md:flex-row md:items-center">
       <div className="relative w-fit shrink-0">
         <ProfileAvatar photoUrl={profile.photoUrl} name={profile.name} size="xl" className="h-28! w-28! ring-4 ring-slate-100" />
         <button
@@ -87,7 +87,7 @@ export default function EmployeeHero({ profile, onPhotoUpload }: Props) {
       </div>
 
       {facts.length > 0 && (
-        <dl className="grid shrink-0 grid-cols-2 gap-x-8 gap-y-3 md:grid-cols-1 lg:grid-cols-3">
+        <dl className="grid shrink-0 grid-cols-2 gap-x-8 gap-y-3 md:!grid-cols-1 lg:!grid-cols-3">
           {facts.map((f) => (
             <Fact key={f.label} label={f.label} value={f.value} />
           ))}

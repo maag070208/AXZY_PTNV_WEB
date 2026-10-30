@@ -1,5 +1,5 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
-import { FaRegClock } from "react-icons/fa";
+import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { FaPlus, FaRegClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SchedulesTable } from "@features/schedule";
@@ -21,6 +21,14 @@ export default function SchedulesPage() {
         { label: t("title") },
       ]}
       backAction={() => goBack("/")}
+      actions={
+        <ITButton variant="filled" size="lg" color="primary" onClick={() => navigate("/schedules/new")}>
+          <ITFlex align="center" gap={1}>
+            <FaPlus size={12} />
+            <ITText className="font-bold text-[11px]">{t("new")}</ITText>
+          </ITFlex>
+        </ITButton>
+      }
     >
       <SchedulesTable />
     </ITPage>

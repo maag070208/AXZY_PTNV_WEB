@@ -16,6 +16,8 @@ import type { AppDispatch, RootState } from "@app/store";
 import { logout, meThunk, setRolesCatalog } from "@entities/user";
 import { APP_SCREENS, isScreenVisible, permissionApi, type AppScreen } from "@entities/permission";
 import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
+import { blobatarDataUri } from "@shared/lib/blobatar";
+import { API_CONSTANTS } from "@shared/api/constants/API_CONSTANTS";
 import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
 import ForcePasswordChange from "./ForcePasswordChange";
@@ -200,7 +202,8 @@ export default function PrivateRoutes() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    // `replace`: tras salir, "atrás" no debe devolver a la pantalla protegida.
+    navigate("/login", { replace: true });
   };
 
   const sidebar: ITSidebarProps = {
@@ -221,6 +224,11 @@ export default function PrivateRoutes() {
       ? {
         userName: user.name ?? "—",
         userEmail: user.username,
+        // Foto del expediente si existe; si no, el mismo Blobatar del resto de
+        // la app (la barra solo acepta una URL de imagen).
+        userImage: user.photoUrl
+          ? `${API_CONSTANTS.BASE_URL}${user.photoUrl}`
+          : blobatarDataUri(user.name ?? user.username),
         menuItems: [
           {
             label:

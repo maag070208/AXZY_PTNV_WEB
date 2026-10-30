@@ -1,12 +1,19 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import {
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITPage,
+  ITText,
+} from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaBoxes, FaChartPie, FaCogs, FaLayerGroup, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Dashboard, type DashboardStat, type MovementType } from "@entities/inventory";
 import { TYPE_BADGE_HEX } from "@entities/inventory/model/movementColors";
-import { StatCard } from "@shared/ui/stat-card";
+import { KPI_TONES, KpiTile } from "@shared/ui/kpi-tile";
+import { WaveFill } from "@shared/ui/charts";
 import { InventoryAuditCard } from "@features/inventory/audit";
 import { useCan } from "@entities/user";
 
@@ -14,11 +21,11 @@ type Distrib = { label: string; value: number; color: string; to: string }[];
 
 function distribDe(s: DashboardStat): Distrib {
   return [
-    { label: "available", value: s.available, color: "#10b981", to: "/inventory/devices" },
-    { label: "loaned", value: s.loaned, color: "#f59e0b", to: "/inventory/loans" },
-    { label: "maintenance", value: s.maintenance, color: "#64748b", to: "/inventory/movements" },
-    { label: "damaged", value: s.damaged, color: "#f97316", to: "/inventory/movements" },
-    { label: "retirement", value: s.retirement, color: "#ef4444", to: "/inventory/movements" },
+    { label: "available", value: s.available, color: "var(--color-success)", to: "/inventory/devices" },
+    { label: "loaned", value: s.loaned, color: "var(--color-warning)", to: "/inventory/loans" },
+    { label: "maintenance", value: s.maintenance, color: "var(--color-text-muted)", to: "/inventory/movements" },
+    { label: "damaged", value: s.damaged, color: "var(--color-orange-500)", to: "/inventory/movements" },
+    { label: "retirement", value: s.retirement, color: "var(--color-danger)", to: "/inventory/movements" },
   ];
 }
 
@@ -31,7 +38,7 @@ function DonutChart({ items, centerValue, centerLabel }: { items: Distrib; cente
   return (
     <div className="relative mx-auto h-40 w-40 sm:h-48 sm:w-48">
       <svg viewBox="0 0 42 42" className="h-full w-full -rotate-90">
-        <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e2e8f0" strokeWidth="4.5" />
+        <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--color-secondary-100)" strokeWidth="4.5" />
         {total > 0 &&
           items.map((it) => {
             const pct = (it.value / total) * 100;
@@ -54,11 +61,16 @@ function DonutChart({ items, centerValue, centerLabel }: { items: Distrib; cente
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <ITText className="text-2xl font-extrabold text-slate-800">{centerValue}</ITText>
-        <ITText className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{centerLabel}</ITText>
+        <ITText className="text-[12px] font-semibold text-slate-400">{centerLabel}</ITText>
       </div>
     </div>
   );
 }
+
+
+/** Ola de fondo cuando hay una proporción real (parte sobre el total de unidades activas). */
+const ratio = (part: number, total: number, color: string) =>
+  total > 0 && part > 0 ? <WaveFill level={part / total} color={color} /> : undefined;
 
 export default function DashboardPage() {
   const { t } = useTranslation(["inventory", "common"]);
@@ -138,7 +150,7 @@ export default function DashboardPage() {
     >
       {canAudit && <InventoryAuditCard />}
 
-      <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <ITCard contentClassName="flex flex-col gap-4">
         <ITFlex align="center" gap={2}>
           <FaChartPie className="text-slate-400" size={16} />
           <ITText className="text-sm font-bold text-slate-800">{t("dashboard.execSummary")}</ITText>
@@ -147,7 +159,7 @@ export default function DashboardPage() {
         <ITGrid container columns={12} spacing={6}>
           <ITGrid item xs={12} md={6}>
             <ITFlex direction="column" gap={4} className="h-full rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-              <ITText className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("dashboard.inventoryHealth")}</ITText>
+              <ITText className="text-[12px] font-bold text-slate-500">{t("dashboard.inventoryHealth")}</ITText>
               <ITFlex align="center" justify="center" gap={8} wrap="wrap">
                 <DonutChart items={distrib} centerValue={s?.activeUnits ?? 0} centerLabel={t("dashboard.donutUnits")} />
                 <ITFlex direction="column" gap={2.5}>
@@ -165,7 +177,7 @@ export default function DashboardPage() {
 
           <ITGrid item xs={12} md={6}>
             <ITFlex direction="column" gap={3.5} className="h-full rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-              <ITText className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{t("dashboard.mov30d")}</ITText>
+              <ITText className="text-[12px] font-bold text-slate-500">{t("dashboard.mov30d")}</ITText>
               {rowsBars.length === 0 ? (
                 <ITText className="text-xs text-slate-400">{t("dashboard.noMovs")}</ITText>
               ) : (
@@ -188,34 +200,19 @@ export default function DashboardPage() {
             </ITFlex>
           </ITGrid>
         </ITGrid>
-      </ITFlex>
+      </ITCard>
 
-      <ITGrid container columns={12} spacing={4}>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaLayerGroup size={18} className="text-white" />} circleClass="bg-blue-500" value={s?.types ?? 0} label={t("dashboard.types")} onClick={() => navigate("/inventory/device-types")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaBoxes size={18} className="text-white" />} circleClass="bg-indigo-500" value={s?.devices ?? 0} label={t("dashboard.devices")} onClick={() => navigate("/inventory/devices")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaChartPie size={18} className="text-white" />} circleClass="bg-emerald-500" value={s?.activeUnits ?? 0} label={t("dashboard.activeUnits")} onClick={() => navigate("/inventory/devices")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaUserTie size={18} className="text-white" />} circleClass="bg-purple-500" value={s?.loaned ?? 0} label={t("dashboard.loaned")} onClick={() => navigate("/inventory/loans")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaToolbox size={18} className="text-white" />} circleClass="bg-amber-500" value={s?.maintenance ?? 0} label={t("dashboard.maintenance")} onClick={() => navigate("/inventory/movements")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaThumbsDown size={18} className="text-white" />} circleClass="bg-orange-500" value={s?.damaged ?? 0} label={t("dashboard.damaged")} onClick={() => navigate("/inventory/movements")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaCogs size={18} className="text-white" />} circleClass="bg-red-500" value={s?.retirement ?? 0} label={t("dashboard.retirement")} onClick={() => navigate("/inventory/movements")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaBoxOpen size={18} className="text-white" />} circleClass="bg-slate-500" value={s.available} label={t("dashboard.available")} onClick={() => navigate("/inventory/devices")} />
-        </ITGrid>
-      </ITGrid>
+      <div className="bento-stagger grid grid-cols-2 gap-4 md:!grid-cols-4">
+        {/* Las tarjetas con proporción real (sobre las unidades activas) llevan la ola de fondo. */}
+        <KpiTile size="sm" label={t("dashboard.types")} value={s?.types ?? 0} tone="sky" icon={<FaLayerGroup size={16} />} onClick={() => navigate("/inventory/device-types")} />
+        <KpiTile size="sm" label={t("dashboard.devices")} value={s?.devices ?? 0} tone="violet" icon={<FaBoxes size={16} />} onClick={() => navigate("/inventory/devices")} />
+        <KpiTile size="sm" label={t("dashboard.activeUnits")} value={s?.activeUnits ?? 0} tone="emerald" icon={<FaChartPie size={16} />} onClick={() => navigate("/inventory/devices")} backdrop={ratio(s?.activeUnits ?? 0, s?.activeUnits ?? 0, KPI_TONES.emerald.accent)} />
+        <KpiTile size="sm" label={t("dashboard.loaned")} value={s?.loaned ?? 0} tone="amber" icon={<FaUserTie size={16} />} onClick={() => navigate("/inventory/loans")} backdrop={ratio(s?.loaned ?? 0, s?.activeUnits ?? 0, KPI_TONES.amber.accent)} />
+        <KpiTile size="sm" label={t("dashboard.maintenance")} value={s?.maintenance ?? 0} tone={(s?.maintenance ?? 0) > 0 ? "amber" : "neutral"} icon={<FaToolbox size={16} />} onClick={() => navigate("/inventory/movements")} />
+        <KpiTile size="sm" label={t("dashboard.damaged")} value={s?.damaged ?? 0} tone={(s?.damaged ?? 0) > 0 ? "rose" : "neutral"} icon={<FaThumbsDown size={16} />} onClick={() => navigate("/inventory/movements")} backdrop={ratio(s?.damaged ?? 0, s?.activeUnits ?? 0, KPI_TONES.rose.accent)} />
+        <KpiTile size="sm" label={t("dashboard.retirement")} value={s?.retirement ?? 0} tone={(s?.retirement ?? 0) > 0 ? "rose" : "neutral"} icon={<FaCogs size={16} />} onClick={() => navigate("/inventory/movements")} />
+        <KpiTile size="sm" label={t("dashboard.available")} value={s.available} tone="emerald" icon={<FaBoxOpen size={16} />} onClick={() => navigate("/inventory/devices")} backdrop={ratio(s.available, s?.activeUnits ?? 0, KPI_TONES.emerald.accent)} />
+      </div>
     </ITPage>
   );
 }

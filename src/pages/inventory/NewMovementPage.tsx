@@ -1,7 +1,18 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import {
+  ITBadget,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITPage,
+  ITSearchSelect,
+  ITText,
+  ITToast,
+} from "@axzydev/axzy_ui_system";
 import { FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Condition, type Device, type DeviceUnitStatus, type DeviceType, type MovementType, type DeviceUnit } from "@entities/inventory";
@@ -308,7 +319,7 @@ export default function NewMovementPage() {
         </ITButton>
       }
     >
-      <ITFlex as="section" direction="column" gap={5} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <ITCard contentClassName="flex flex-col gap-5">
         <ITText className="text-sm font-semibold text-slate-700">{t("new.detail")}</ITText>
 
         <ITFlex align="center" justify="between" gap={2}>
@@ -328,7 +339,7 @@ export default function NewMovementPage() {
             return (
               <ITFlex key={r.key} direction="column" gap={3} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
                 <ITFlex align="center" justify="between" gap={2}>
-                  <ITText className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                  <ITText className="text-[12px] font-semibold text-slate-400">
                     {t("new.item")} {idx + 1}
                   </ITText>
                   <ITButton variant="outlined" color="error" size="lg" onClick={() => removeRow(r.key)} disabled={rows.length === 1}>
@@ -391,7 +402,7 @@ export default function NewMovementPage() {
                   </ITGrid>
                 </ITGrid>
 
-                <ITText className="text-[11px] font-black uppercase tracking-wider text-slate-400">{t("new.howLabel")}</ITText>
+                <ITText className="text-[12px] font-semibold text-slate-400">{t("new.howLabel")}</ITText>
                 <ITFlex gap={2} wrap="wrap">
                   {validTypes.map((tp) => {
                     const sel = r.type === tp;
@@ -430,7 +441,7 @@ export default function NewMovementPage() {
 
                 {r.type === "MAINTENANCE_OUT" && (
                       <>
-                        <ITText className="text-[11px] font-black uppercase tracking-wider text-slate-400">{t("loanReturn.condition")}</ITText>
+                        <ITText className="text-[12px] font-semibold text-slate-400">{t("loanReturn.condition")}</ITText>
                         <ITFlex gap={2} wrap="wrap">
                           {CONDITIONS.map((c) => {
                             const sel = r.condition === c;
@@ -487,7 +498,7 @@ export default function NewMovementPage() {
                     campos se piden. */}
                 {isEntry(r.type) && usesUnitIdentity(deviceOf(r)?.type) && (
                   <ITFlex direction="column" gap={2} className="rounded-xl border border-slate-100 !bg-slate-50/60 p-3">
-                    <ITText className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                    <ITText className="text-[12px] font-bold text-slate-600">
                       {t("new.identifyPieces", { count: r.quantity })}
                     </ITText>
                     <ITText className="text-[11px] text-slate-400">{t("new.identifyPiecesHint")}</ITText>
@@ -509,7 +520,7 @@ export default function NewMovementPage() {
             </ITButton>
           </ITFlex>
         </ITFlex>
-      </ITFlex>
+      </ITCard>
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

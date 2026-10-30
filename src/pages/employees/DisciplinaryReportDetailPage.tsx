@@ -1,7 +1,16 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import {
+  ITAlert,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITPage,
+  ITText,
+} from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaFilePdf, FaScroll } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
@@ -91,56 +100,59 @@ export default function DisciplinaryReportDetailPage() {
     >
       <ITGrid container columns={12} spacing={6}>
         <ITGrid item xs={12} lg={5}>
-          <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-3">
             <ITText className="text-sm font-bold text-slate-800">{tt("doc.documentTitle")}</ITText>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.employee")}</ITText>
-              <ITText className="text-sm font-bold text-slate-900">{disciplinaryReport.user.name}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-500">{tt("doc.employee")}</ITText>
+              <ITFlex align="center" gap={2}>
+                <ProfileAvatar name={disciplinaryReport.user.name} size="sm" />
+                <ITText className="text-sm font-bold text-slate-900">{disciplinaryReport.user.name}</ITText>
+              </ITFlex>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.employeeNumber")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{tt("doc.employeeNumber")}</ITText>
               <ITText className="text-sm text-slate-700">{disciplinaryReport.user.employeeNumber ?? "—"}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.jobTitle")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{tt("doc.jobTitle")}</ITText>
               <ITText className="text-sm text-slate-700">{disciplinaryReport.user.jobTitle ?? "—"}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.department")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{tt("doc.department")}</ITText>
               <ITText className="text-sm text-slate-700">{area}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.incidentDate")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{tt("doc.incidentDate")}</ITText>
               <ITText className="text-sm text-slate-700">{formatDate(disciplinaryReport.incidentDate)}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.reason")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{tt("doc.reason")}</ITText>
               <ITText className="text-sm text-slate-700">{tt(`reasons.${disciplinaryReport.reason}`)}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.description")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{tt("doc.description")}</ITText>
               <ITText className="text-sm text-slate-600">{disciplinaryReport.description}</ITText>
             </ITFlex>
 
             <ITFlex direction="column" gap={0.5}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tt("doc.sanction")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{tt("doc.sanction")}</ITText>
               <ITText className="text-sm text-slate-600">{disciplinaryReport.sanction || "—"}</ITText>
             </ITFlex>
-          </ITFlex>
+          </ITCard>
         </ITGrid>
 
         <ITGrid item xs={12} lg={7}>
-          <ITFlex as="section" direction="column" gap={2} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-2">
             <ITText className="text-sm font-bold text-slate-800">{tt("preview.title")}</ITText>
             <DisciplinaryReportPreview disciplinaryReport={disciplinaryReport} />
-          </ITFlex>
+          </ITCard>
         </ITGrid>
       </ITGrid>
     </ITPage>

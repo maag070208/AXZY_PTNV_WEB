@@ -144,14 +144,14 @@ export default function DevicesPage() {
       <ITDataTable
         columns={columns as any}
         fetchData={fetchData as any}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
+        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as Device).id}`)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
-        virtualized
-        virtualizedMaxHeight={420}
         rowHeight={50}
-        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as Device).id}`)}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITPage>
   );

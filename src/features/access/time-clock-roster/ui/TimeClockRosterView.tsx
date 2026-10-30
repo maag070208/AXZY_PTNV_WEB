@@ -1,4 +1,5 @@
 import { ITButton, ITFlex, ITSelect, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -66,6 +67,7 @@ export default function TimeClockRosterView() {
           <Section title={t("roster.sections.unlinked")} empty={t("roster.empty.unlinked")} count={fx.data.unlinked.length}>
             {fx.data.unlinked.map((p) => (
               <Row key={p.employeeNumber}>
+                <ProfileAvatar name={p.name} size="sm" />
                 <ITFlex direction="column" gap={0} className="min-w-0">
                   <ITText className="font-semibold text-slate-800">{p.name}</ITText>
                   <ITText className="text-xs text-slate-500">
@@ -87,7 +89,7 @@ export default function TimeClockRosterView() {
               const valid = draft.categoryId !== "" && draft.reason.trim().length >= MIN_REASON;
               const busy = fx.busyNumber === r.employeeNumber;
               return (
-                <div key={r.employeeNumber} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4">
+                <div key={r.employeeNumber} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-4">
                   <ITFlex direction="column" gap={0}>
                     <ITText className="font-semibold text-slate-800">{r.userName}</ITText>
                     <ITText className="text-xs text-slate-500">
@@ -199,7 +201,7 @@ function Section({
 
 function Row({ children }: { children: React.ReactNode }) {
   return (
-    <ITFlex align="center" justify="between" gap={3} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+    <ITFlex align="center" justify="between" gap={3} className="rounded-xl border border-slate-200 bg-[var(--it-card-bg)] px-4 py-3">
       {children}
     </ITFlex>
   );

@@ -1,5 +1,5 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
-import { FaIdCard } from "react-icons/fa";
+import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { FaBell, FaIdCard } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { EmployeeRecordsBoard, useEmployeeRecords } from "@features/hr/employee-records-board";
@@ -19,6 +19,20 @@ export default function EmployeeRecordsPage() {
       icon={<FaIdCard size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("records.menu") }]}
       backAction={() => goBack("/")}
+      actions={
+        <ITButton
+          variant="filled"
+          size="lg"
+          color="primary"
+          onClick={() => fx.setBulkOpen(true)}
+          disabled={fx.pendingVisible.length === 0}
+        >
+          <ITFlex align="center" gap={1}>
+            <FaBell size={12} />
+            <ITText className="font-bold text-[11px]">{t("records.notifyPending")}</ITText>
+          </ITFlex>
+        </ITButton>
+      }
     >
       <EmployeeRecordsBoard fx={fx} />
     </ITPage>

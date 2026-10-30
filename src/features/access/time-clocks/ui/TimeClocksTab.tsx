@@ -89,7 +89,7 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
         />
       ) : (
         <>
-          <ITCard className="!p-5 border border-slate-200">
+          <ITCard className="!p-5">
             <ITFlex align="center" wrap="wrap" gap={3}>
               <ITFlex direction="column" gap={1} className="min-w-0">
                 <ITFlex align="center" gap={1}>
@@ -125,11 +125,11 @@ export default function TimeClocksTab({ fx }: { fx: UseTimeClocks }) {
           )}
 
           {status && clocks.length === 0 ? (
-            <ITCard className="!p-5 border border-slate-200">
+            <ITCard className="!p-5">
               <ITText className="text-[12px] text-slate-500">{t("clocks.empty")}</ITText>
             </ITCard>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:!grid-cols-2 xl:!grid-cols-3">
               {clocks.map((clock) => (
                 <ClockCard
                   key={clock.clockSerial}

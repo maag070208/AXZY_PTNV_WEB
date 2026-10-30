@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { LuActivity, LuChefHat, LuClock, LuServer, LuUser, LuUsers } from "react-icons/lu";
 import { usePermissions, useCurrentRole } from "@entities/user";
+import { FEATURES } from "@shared/config/features";
 import { TabBar } from "@shared/ui/tab-bar";
 import AccessTodayWidget from "./widgets/AccessTodayWidget";
 import AttendanceTodayWidget from "./widgets/AttendanceTodayWidget";
@@ -120,6 +121,8 @@ export default function RoleDashboard({ slots = {} }: Props) {
   const [grupo, setGrupo] = useState<WidgetGroup | null>(null);
 
   const allowed = (id: WidgetId) => {
+    // Un módulo apagado no pinta su pestaña ni su tarjeta en el inicio.
+    if (id === "kitchen" && !FEATURES.kitchen) return false;
     const permission = WIDGETS[id].permission;
     return (permission === null || (permissions[permission] ?? "NONE") !== "NONE") && (!!WIDGETS[id].render || !!slots[id]);
   };
@@ -136,7 +139,7 @@ export default function RoleDashboard({ slots = {} }: Props) {
   }
 
   const rejilla = (delGrupo: WidgetId[]) => (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid items-start gap-4 lg:!grid-cols-2">
       {delGrupo.map((id) =>
         slots[id] ? (
           <div key={id} className="lg:col-span-2">

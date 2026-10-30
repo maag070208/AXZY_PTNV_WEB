@@ -129,7 +129,7 @@ export default function ExceptionDialog({ isOpen, userId, personName, permission
         </DialogSection>
 
         <DialogSection step={mode === "grant" && isScopedPermission(permission) ? 3 : 2} title={t("exception.expiryQuestion")}>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-2 sm:!grid-cols-3">
             <ChoiceCard
               selected={expiry === "default"}
               onClick={() => setExpiry("default")}

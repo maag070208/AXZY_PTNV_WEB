@@ -17,7 +17,11 @@
 }
 
 .login-card {
+  background: #ffffff;
   box-shadow: 0 30px 80px -20px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+.dark .login-card {
+  background: #0f172a;
 }
 .dark .login-card {
   box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.6);

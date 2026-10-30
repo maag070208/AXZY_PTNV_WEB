@@ -39,7 +39,7 @@ export default function NotificationItem({
     <div
       onClick={() => onSlotClick(n)}
       className={`flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-        n.read ? "bg-white hover:bg-slate-50" : "bg-blue-50/60 hover:bg-blue-50"
+        n.read ? "bg-[var(--it-card-bg)] hover:bg-slate-50" : "bg-blue-50/60 hover:bg-blue-50"
       } border ${n.read ? "border-slate-100" : "border-blue-100"}`}
     >
       <div

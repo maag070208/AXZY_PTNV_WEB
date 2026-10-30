@@ -2,6 +2,7 @@ import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
+  ITCard,
   ITButton,
   ITDatePicker,
   ITFlex,
@@ -11,10 +12,12 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaGripVertical, FaRegCircle, FaRegClock, FaTimes } from "react-icons/fa";
+import { FaCheck, FaGripVertical, FaPlus, FaRegClock, FaTimes } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { usersApi, type User } from "@entities/user";
 import { scheduleApi, type AssignedPerson, type Schedule } from "@entities/schedule";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { TabBar } from "@shared/ui/tab-bar";
 
 const toDateInput = (d: Date): string =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -170,30 +173,18 @@ export default function AssignSchedules() {
           />
         </ITGrid>
         <ITGrid item xs={12} md={3}>
-          <ITSearchSelect
-            name="assignMode"
-            label={t("assign.mode")}
-            options={[
-              { value: "list", label: t("assign.modeList") },
-              { value: "drag", label: t("assign.modeDrag") },
-            ]}
-            value={mode}
-            onChange={(v) => setMode(String(v) as "list" | "drag")}
-            className="w-full"
-          />
-        </ITGrid>
-        <ITGrid item xs={12} md={2}>
-          <ITButton
-            variant="filled"
-            color="primary"
-            onClick={apply}
-            disabled={saving || selected.size === 0 || !scheduleId}
-            className="w-full"
-          >
-            <ITText className="font-bold text-[11px]">
-              {t("assign.apply", { count: selected.size })}
-            </ITText>
-          </ITButton>
+          <ITFlex direction="column" gap={1}>
+            <ITText className="text-[12px] font-semibold text-slate-600">{t("assign.mode")}</ITText>
+            <TabBar
+              items={[
+                { id: "list" as const, label: t("assign.modeList") },
+                { id: "drag" as const, label: t("assign.modeDrag") },
+              ]}
+              value={mode}
+              onChange={setMode}
+              size="sm"
+            />
+          </ITFlex>
         </ITGrid>
       </ITGrid>
 
@@ -214,13 +205,12 @@ export default function AssignSchedules() {
               if (a) void removeAssigned(a);
               else if (p) toggle(p);
             }}
-            className={`rounded-2xl border-2 p-4 transition-colors ${
-              removeOver ? "border-rose-400 bg-rose-50" : "border-slate-200 bg-white"
-            } shadow-sm`}
+            className={`rounded-2xl transition-shadow ${removeOver ? "ring-2 ring-rose-400" : ""}`}
           >
+            <ITCard>
             <ITFlex direction="column" gap={3}>
               <ITFlex align="center" justify="between" gap={2} wrap="wrap">
-                <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                <ITText className="text-[12px] font-semibold text-slate-500">
                   {t("assign.people")} · {filtered.length}
                 </ITText>
                 <ITFlex gap={2}>
@@ -240,44 +230,50 @@ export default function AssignSchedules() {
                 onChange={(e) => setQ(e.target.value)}
               />
 
-              <ITText className="text-[10px] text-slate-400">{t("assign.removeHint")}</ITText>
+              {mode === "drag" && (
+                <ITText className="text-[10px] text-slate-400">{t("assign.removeHint")}</ITText>
+              )}
 
               <ITFlex direction="column" gap={1} className="max-h-[52vh] overflow-y-auto pr-1">
                 {filtered.length === 0 ? (
                   <ITText className="text-[11px] italic text-slate-400">{t("assign.noPeople")}</ITText>
                 ) : (
-                  filtered.map((e) => (
-                    <div
-                      key={e.id}
-                      draggable={mode === "drag"}
-                      onDragStart={(ev) => ev.dataTransfer.setData("text/plain", e.id)}
-                      className="rounded-lg border border-slate-200 bg-white"
-                    >
-                      <ITFlex align="center" justify="between" gap={2} className="px-3 py-2">
-                        <ITFlex align="center" gap={2} className="min-w-0">
-                          {mode === "drag" && <FaGripVertical size={11} className="text-slate-300" />}
-                          <ITText className="truncate text-[12px] font-semibold text-slate-700">
-                            {e.name}
-                          </ITText>
-                          <ITText className="text-[10px] text-slate-400">
-                            {e.employeeNumber ? `#${e.employeeNumber}` : ""}
-                          </ITText>
-                        </ITFlex>
-                        <ITButton
-                          variant="icon-only"
-                          color="gray"
-                          size="sm"
-                          onClick={() => toggle(e.id)}
-                          ariaLabel={e.name}
+                  filtered.map((e) => {
+                    const isSelected = selected.has(e.id);
+                    return (
+                      <div
+                        key={e.id}
+                        draggable={mode === "drag"}
+                        onDragStart={(ev) => ev.dataTransfer.setData("text/plain", e.id)}
+                        onClick={() => toggle(e.id)}
+                        className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 transition-colors ${
+                          isSelected
+                            ? "border-primary-500/40 bg-primary-500/5"
+                            : "border-transparent hover:bg-slate-50"
+                        }`}
+                      >
+                        {mode === "drag" && <FaGripVertical size={11} className="shrink-0 text-slate-300" />}
+                        <ProfileAvatar name={e.name} size="xs" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[12px] font-semibold text-slate-800">{e.name}</p>
+                          {e.employeeNumber && <p className="text-[10px] text-slate-500">#{e.employeeNumber}</p>}
+                        </div>
+                        <span
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                            isSelected
+                              ? "bg-primary-500 text-white"
+                              : "border border-slate-300 text-slate-400"
+                          }`}
                         >
-                          <FaRegCircle size={12} />
-                        </ITButton>
-                      </ITFlex>
-                    </div>
-                  ))
+                          {isSelected ? <FaCheck size={10} /> : <FaPlus size={10} />}
+                        </span>
+                      </div>
+                    );
+                  })
                 )}
               </ITFlex>
             </ITFlex>
+            </ITCard>
           </div>
         </ITGrid>
 
@@ -295,8 +291,10 @@ export default function AssignSchedules() {
               const id = e.dataTransfer.getData("text/plain");
               if (id) setSelected((prev) => new Set(prev).add(id));
             }}
-            className={`rounded-2xl border-2 border-dashed p-5 transition-colors ${
-              dragOver ? "border-[#0D5777] bg-[#0D5777]/5" : "border-slate-300 bg-slate-50"
+            className={`rounded-2xl p-5 transition-colors ${
+              mode === "drag"
+                ? `border-2 border-dashed ${dragOver ? "border-primary-500 bg-primary-500/5" : "border-slate-300 bg-slate-50"}`
+                : "bg-[var(--it-card-bg)]"
             }`}
           >
             <ITFlex direction="column" gap={3}>
@@ -304,7 +302,7 @@ export default function AssignSchedules() {
                 <ITFlex
                   align="center"
                   justify="center"
-                  className="h-10 w-10 rounded-xl bg-[#0D5777]/10 text-[#0D5777]"
+                  className="h-10 w-10 rounded-xl bg-primary-500/10 text-primary-500"
                 >
                   <FaRegClock size={15} />
                 </ITFlex>
@@ -319,15 +317,18 @@ export default function AssignSchedules() {
               </ITFlex>
 
               <ITText className="text-[11px] text-slate-500">
-                {mode === "drag" ? t("assign.dragHint") : t("assign.dropHere")}
+                {mode === "drag" ? t("assign.dragHint") : t("assign.listHint")}
               </ITText>
 
               {/* Por asignar (pendientes, en gris) */}
-              {pending.length > 0 && (
-                <ITFlex direction="column" gap={1} className="border-t border-slate-200 pt-3">
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-amber-600">
-                    {t("assign.pendingList")} · {pending.length}
-                  </ITText>
+              <ITFlex direction="column" gap={1} className="border-t border-slate-200 pt-3">
+                <ITText className="text-[12px] font-semibold text-amber-600">
+                  {t("assign.pendingList")} · {pending.length}
+                </ITText>
+                {pending.length === 0 ? (
+                  <ITText className="text-[11px] italic text-slate-400">{t("assign.nothingSelected")}</ITText>
+                ) : (
+                  <>
                   <ITFlex direction="column" gap={1} className="max-h-[24vh] overflow-y-auto pr-1">
                     {pending.map((e) => (
                       <div
@@ -339,6 +340,7 @@ export default function AssignSchedules() {
                         <ITFlex align="center" justify="between" gap={2} className="px-3 py-1.5">
                           <ITFlex align="center" gap={2} className="min-w-0">
                             <FaGripVertical size={10} className="text-slate-300" />
+                            <ProfileAvatar name={e.name} size="xs" />
                             <ITText className="truncate text-[11px] font-semibold text-slate-400">
                               {e.name}
                             </ITText>
@@ -357,12 +359,13 @@ export default function AssignSchedules() {
                       </div>
                     ))}
                   </ITFlex>
-                </ITFlex>
-              )}
+                  </>
+                )}
+              </ITFlex>
 
               {/* Asignadas actualmente (guardadas) */}
               <ITFlex direction="column" gap={1} className="border-t border-slate-200 pt-3">
-                <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                <ITText className="text-[12px] font-semibold text-slate-500">
                   {t("assign.assignedList")} · {assigned.length}
                 </ITText>
                 {assigned.length === 0 ? (
@@ -374,7 +377,7 @@ export default function AssignSchedules() {
                         key={a.userId}
                         draggable
                         onDragStart={(ev) => ev.dataTransfer.setData(ASSIGNED_MIME, a.userId)}
-                        className="rounded-lg border border-slate-200 bg-white"
+                        className="rounded-lg border border-slate-200 bg-[var(--it-card-bg)]"
                       >
                         <ITFlex align="center" justify="between" gap={2} className="px-3 py-1.5">
                           <ITFlex align="center" gap={2} className="min-w-0">
@@ -402,6 +405,18 @@ export default function AssignSchedules() {
                   </ITFlex>
                 )}
               </ITFlex>
+
+              <ITButton
+                variant="filled"
+                color="primary"
+                onClick={apply}
+                disabled={saving || selected.size === 0 || !scheduleId}
+                className="w-full"
+              >
+                <ITText className="font-bold text-[11px]">
+                  {t("assign.apply", { count: selected.size })}
+                </ITText>
+              </ITButton>
             </ITFlex>
           </div>
         </ITGrid>

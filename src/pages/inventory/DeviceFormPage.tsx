@@ -1,7 +1,18 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITAlert, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import {
+  ITAlert,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITPage,
+  ITSearchSelect,
+  ITText,
+  ITToast,
+} from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaBoxes, FaInfoCircle, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type DeviceType } from "@entities/inventory";
@@ -30,7 +41,7 @@ function SectionHeader({
         {icon}
       </ITFlex>
       <ITFlex direction="column" gap={0.25}>
-        <ITText className="text-[12px] font-black uppercase tracking-widest text-slate-700">{title}</ITText>
+        <ITText className="text-[12px] font-semibold text-slate-700">{title}</ITText>
         <ITText className="text-[10px] text-slate-400">{hint}</ITText>
       </ITFlex>
     </ITFlex>
@@ -157,9 +168,9 @@ export default function DeviceFormPage() {
         </ITButton>
       }
     >
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] items-start">
+      <div className="grid grid-cols-1 gap-6 lg:!grid-cols-[minmax(0,1fr)_340px] items-start">
         <div className="space-y-6 min-w-0">
-          <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+          <ITCard>
             <SectionHeader
               icon={<FaBoxOpen size={15} className="text-blue-600" />}
               iconBg="bg-blue-50"
@@ -200,12 +211,12 @@ export default function DeviceFormPage() {
                 </ITGrid>
               </ITGrid>
             </ITFlex>
-          </section>
+          </ITCard>
 
-          <section className="rounded-[24px] p-6 text-[11px] leading-5 text-slate-600 bg-gradient-to-br from-blue-50/80 to-indigo-50/60">
+          <ITCard tone="info">
             <ITFlex align="center" gap={2}>
               <FaInfoCircle size={11} className="text-blue-700" />
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-blue-800">
+              <ITText className="text-[12px] font-semibold text-blue-800">
                 {t("devices.initialQuantity")}
               </ITText>
               <ITText className="ml-auto rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700">{units.length}</ITText>
@@ -222,11 +233,11 @@ export default function DeviceFormPage() {
                 </li>
               )}
             </ul>
-          </section>
+          </ITCard>
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-5">
-          <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+          <ITCard>
             <SectionHeader
               icon={<FaBoxes size={15} className="text-emerald-600" />}
               iconBg="bg-emerald-50"
@@ -262,7 +273,7 @@ export default function DeviceFormPage() {
                 label={(index) => `${t("devices.unitRow")} ${index + 1}`}
               />
             )}
-          </section>
+          </ITCard>
         </aside>
       </div>
 

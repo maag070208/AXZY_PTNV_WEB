@@ -111,7 +111,7 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
             <ProfileAvatar name={c.name || c.employeeNumber} size="sm" />
             <ITFlex direction="column" gap={0.5} className="min-w-0">
               <ITText className="text-[12px] font-black text-slate-800">{c.name || "—"}</ITText>
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+              <ITText className="text-[12px] font-bold text-slate-400">
                 #{c.employeeNumber}
               </ITText>
             </ITFlex>
@@ -337,13 +337,15 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
           }
           externalFilters={externalFilters}
           reloadTrigger={reloadKey}
-          defaultItemsPerPage={100}
-          itemsPerPageOptions={[10, 25, 50, 100]}
           debounceMs={350}
           size="lg"
-          virtualized
-          virtualizedMaxHeight={420}
+          defaultItemsPerPage={25}
+          itemsPerPageOptions={[25, 50, 100]}
+          layout="fixed"
+          density="compact"
           rowHeight={50}
+          virtualized
+          virtualizedMaxHeight={460}
         />
 
         <ITFlex align="center" gap={1} className="mt-3">

@@ -3,6 +3,7 @@ import { Fragment, useEffect, useRef, useState, type FocusEvent, type KeyboardEv
 import {
   ITAlert,
   ITButton,
+  ITCard,
   ITDatePicker,
   ITFlex,
   ITInput,
@@ -413,7 +414,7 @@ export default function EmployeeProfileEditPage() {
             <ITFlex align="center" justify="center" className="h-8 w-8 rounded-lg bg-orange-50">
               <FaMapMarkerAlt size={12} className="text-orange-600" />
             </ITFlex>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.addressTitle")}
             </ITText>
           </ITFlex>
@@ -441,7 +442,7 @@ export default function EmployeeProfileEditPage() {
             </Cell>
           </Row>
 
-          <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 pt-2">
+          <ITText className="text-[12px] font-semibold text-slate-400 pt-2">
             {tt("detail.emergencyContactTitle")}
           </ITText>
           <Row>
@@ -520,13 +521,13 @@ export default function EmployeeProfileEditPage() {
         <ITFlex direction="column" gap={6}>
           {steps.map((section) => (
             <Fragment key={section.label}>
-              <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <ITCard>
                 <header className="mb-5 flex items-center gap-3">
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">{section.icon}</span>
-                  <h3 className="text-sm font-black uppercase tracking-wide text-slate-700">{section.label}</h3>
+                  <h3 className="text-sm font-semibold text-slate-700">{section.label}</h3>
                 </header>
                 {section.content}
-              </section>
+              </ITCard>
             </Fragment>
           ))}
         </ITFlex>
@@ -534,7 +535,7 @@ export default function EmployeeProfileEditPage() {
 
       {/* Langostin flota abajo a la derecha: guía del campo actual y avisa mientras guarda. */}
       <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex items-end gap-3">
-        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-lg">
+        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-[var(--it-card-bg)] px-4 py-3 text-sm text-slate-600 shadow-lg">
           {guide}
         </div>
         <div className="pointer-events-auto drop-shadow-lg">

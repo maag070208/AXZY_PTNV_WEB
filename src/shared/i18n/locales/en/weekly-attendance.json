@@ -106,5 +106,13 @@
     "view": "View",
     "generatedAt": "Generated on {{date}}"
   },
-  "sheetName": "Payroll"
+  "sheetName": "Payroll",
+  "hoursShort": "h",
+  "context": {
+    "people": "{{linked}} of {{total}} linked to a clock",
+    "worked": "of {{scheduled}} scheduled",
+    "overtime": "of {{worked}} worked",
+    "approved": "{{pct}}% of calculated",
+    "absences": "of {{total}} people"
+  }
 }

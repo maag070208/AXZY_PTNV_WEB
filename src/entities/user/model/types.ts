@@ -9,6 +9,8 @@ export interface AuthUser {
   email?: string | null;
   name: string;
   role: UserRole;
+  /** Foto del expediente (ruta relativa a la base del API); `null` si no tiene. */
+  photoUrl?: string | null;
   /** Roles efectivos: principal + adicionales (`GET /auth/me` y login). */
   roles?: UserRole[];
   departmentId?: string | null;

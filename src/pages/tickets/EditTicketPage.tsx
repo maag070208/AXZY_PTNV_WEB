@@ -37,7 +37,7 @@ export default function EditTicketPage() {
   };
 
   const breadcrumbs = [
-    { label: tt("list.title"), onClick: () => navigate("/tickets") },
+    { label: tt("list.title"), onClick: () => navigate("/tickets", { replace: true }) },
     editTicket.ticket && { label: editTicket.ticket.title },
     { label: tt("edit.breadcrumb") },
   ].filter(Boolean) as { label: string; onClick?: () => void }[];
@@ -64,7 +64,7 @@ export default function EditTicketPage() {
         backAction={() => goBack("/tickets")}
         icon={<FaTicketAlt size={20} />}
         breadcrumbs={[
-          { label: tt("list.title"), onClick: () => navigate("/tickets") },
+          { label: tt("list.title"), onClick: () => navigate("/tickets", { replace: true }) },
           { label: tt("edit.notFound") },
         ]}
       >

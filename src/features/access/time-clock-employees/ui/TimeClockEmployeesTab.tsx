@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import {
   ITAlert,
   ITBadget,
@@ -122,7 +123,12 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
         width: 250,
         filter: true,
         sortable: true,
-        render: (r) => <ITText className="text-[12px] font-bold text-slate-700">{r.name}</ITText>,
+        render: (r) => (
+          <ITFlex align="center" gap={2}>
+            <ProfileAvatar name={r.name} size="sm" />
+            <ITText className="truncate text-[12px] font-bold text-slate-700">{r.name}</ITText>
+          </ITFlex>
+        ),
       },
       {
         // Sin `filter` a propósito: el filtro de esta columna son las píldoras de
@@ -171,7 +177,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
             return (
               <ITFlex direction="column" gap={0.5} className="min-w-0">
                 <ITText className="text-[12px] font-black text-emerald-700">{r.link.name}</ITText>
-                <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                <ITText className="text-[12px] font-bold text-slate-400">
                   {r.link.employeeNumber ? `#${r.link.employeeNumber}` : "—"}
                   {!r.link.active && ` · ${t("employees.retirement")}`}
                 </ITText>
@@ -290,7 +296,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
 
       {/* Indicadores: cada uno filtra por su estado. */}
       <div className="!grid gap-4 sm:!grid-cols-2 xl:!grid-cols-4">
-        <KpiTile
+        <KpiTile size="sm"
           label={t("employees.kpis.total")}
           value={total}
           icon={<FaUsers size={16} />}
@@ -298,7 +304,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
           hint={total > 0 ? t("employees.kpis.hintTotal") : t("employees.kpis.allGood")}
           onClick={() => setStatus("")}
         />
-        <KpiTile
+        <KpiTile size="sm"
           label={t("employees.kpis.linkedCount")}
           value={linked}
           icon={<FaCheck size={16} />}
@@ -310,7 +316,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
           }
           onClick={() => setStatus("LINKED")}
         />
-        <KpiTile
+        <KpiTile size="sm"
           label={t("employees.kpis.withoutLink")}
           value={withoutLink}
           icon={<FaUnlink size={16} />}
@@ -318,7 +324,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
           hint={withoutLink > 0 ? t("employees.kpis.hintWithoutLink") : t("employees.kpis.allGood")}
           onClick={() => setStatus("UNLINKED")}
         />
-        <KpiTile
+        <KpiTile size="sm"
           label={t("employees.kpis.registrationSuggestions")}
           value={suggestions}
           icon={<FaMagic size={16} />}
@@ -415,14 +421,14 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
           }
           externalFilters={externalFilters}
           reloadTrigger={reloadKey}
-          defaultItemsPerPage={100}
-          itemsPerPageOptions={[10, 25, 50, 100]}
           debounceMs={350}
+          defaultItemsPerPage={25}
+          itemsPerPageOptions={[25, 50, 100]}
           layout="fixed"
           density="compact"
-          virtualized
-          virtualizedMaxHeight={420}
           rowHeight={50}
+          virtualized
+          virtualizedMaxHeight={460}
         />
       </PanelCard>
 

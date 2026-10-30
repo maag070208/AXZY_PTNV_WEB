@@ -75,7 +75,7 @@ export default function TimeClockInspectView({ clockSerial, tabs = ALL_TABS }: P
               className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${
                 fx.tab === tab
                   ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-400"
+                  : "border-slate-200 bg-[var(--it-card-bg)] text-slate-600 hover:border-slate-400"
               }`}
             >
               {tabLabel(tab)}
@@ -88,7 +88,7 @@ export default function TimeClockInspectView({ clockSerial, tabs = ALL_TABS }: P
       {fx.loading && <ITText className="text-sm text-slate-400">{t("inspect.loading")}</ITText>}
 
       {fx.tab === "overview" && fx.overview && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:!grid-cols-2">
           <Card title={t("inspect.overview.device")}>
             <Field label={t("inspect.overview.name")} value={fx.overview.device.deviceName} />
             <Field label={t("inspect.overview.model")} value={fx.overview.device.model} />
@@ -143,7 +143,7 @@ export default function TimeClockInspectView({ clockSerial, tabs = ALL_TABS }: P
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
       <ITText className="text-sm font-bold text-slate-800">{title}</ITText>
       {children}
     </section>
@@ -176,7 +176,7 @@ function Table({
       {rows.length === 0 ? (
         <ITText className="text-sm text-slate-400">{empty}</ITText>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-[var(--it-card-bg)]">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
               <tr>

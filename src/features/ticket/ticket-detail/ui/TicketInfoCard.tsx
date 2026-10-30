@@ -1,4 +1,4 @@
-import { ITBadget, ITButton, ITFlex, ITGrid, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITCard, ITFlex, ITGrid, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaPen } from "react-icons/fa";
 import { formatDateTime } from "@shared/utils/dates";
 import { useTranslation } from "react-i18next";
@@ -24,7 +24,7 @@ export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: P
   const efficacy = calculateEfficacy(ticket);
 
   return (
-    <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
+    <ITCard>
       <ITStack direction="column" spacing={5} className="w-full">
         <ITFlex align="center" justify="between" gap={2} wrap="wrap">
           <ITFlex gap={2} wrap="wrap">
@@ -57,7 +57,7 @@ export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: P
         </ITFlex>
 
         <ITStack direction="column" spacing={2}>
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+          <ITText className="text-[12px] font-semibold text-slate-500">
             {tt("detail.description")}
           </ITText>
           <ITText className="text-[13px] text-slate-700 whitespace-pre-wrap break-words leading-relaxed">
@@ -70,7 +70,7 @@ export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: P
         <ITGrid container columns={12} spacing={3}>
           <ITGrid item xs={12} sm={6} md={4}>
             <ITStack direction="column" spacing={1}>
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+              <ITText className="text-[12px] font-bold text-slate-400">
                 {tt("detail.createdBy")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700 truncate">
@@ -92,7 +92,7 @@ export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: P
               />
             ) : (
               <ITStack direction="column" spacing={1}>
-                <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                <ITText className="text-[12px] font-bold text-slate-400">
                   {tt("detail.assignedTo")}
                 </ITText>
                 <ITText className="text-[12px] font-bold text-slate-700 truncate">
@@ -103,7 +103,7 @@ export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: P
           </ITGrid>
           <ITGrid item xs={12} sm={6} md={4}>
             <ITStack direction="column" spacing={1}>
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+              <ITText className="text-[12px] font-bold text-slate-400">
                 {tt("detail.department")}
               </ITText>
               <ITText className="text-[12px] font-bold text-slate-700 truncate">
@@ -114,62 +114,23 @@ export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: P
         </ITGrid>
 
         {efficacy && (
-          <ITFlex className="mt-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <ITStack direction="column" spacing={1} className="flex-1">
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                {tt("detail.efficacyTitle")}
-              </ITText>
-              <ITFlex align="center" gap={2}>
-                <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${
-                      efficacy.score === 100
-                        ? "bg-emerald-500"
-                        : efficacy.score === 80
-                        ? "bg-blue-500"
-                        : efficacy.score === 60
-                        ? "bg-amber-500"
-                        : "bg-red-500"
-                    }`}
-                    style={{ width: `${efficacy.score}%` }}
-                  />
-                </div>
-                <ITFlex align="center" gap={1}>
-                  <ITText
-                    className={`text-[13px] font-black ${
-                      efficacy.score === 100
-                        ? "text-emerald-600"
-                        : efficacy.score === 80
-                        ? "text-blue-600"
-                        : efficacy.score === 60
-                        ? "text-amber-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {efficacy.score}%
-                  </ITText>
-                  <ITText
-                    className={`text-[9px] font-bold ${
-                      efficacy.score === 100
-                        ? "text-emerald-500"
-                        : efficacy.score === 80
-                        ? "text-blue-500"
-                        : efficacy.score === 60
-                        ? "text-amber-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {dyn(tt)(`detail.efficacyLabels.${efficacy.label}`)}
-                  </ITText>
-                </ITFlex>
-              </ITFlex>
-              <ITText className="text-[9px] text-slate-400">
-                {tt("detail.resolvedIn", { hours: efficacy.hours })}
-              </ITText>
-            </ITStack>
+          <ITFlex align="center" wrap="wrap" gap={3} className="rounded-xl bg-slate-50 px-3 py-2">
+            <ITText className="text-[12px] font-semibold text-slate-500">{tt("detail.efficacyTitle")}</ITText>
+            <div className="h-1.5 min-w-[120px] flex-1 overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${efficacy.score}%`,
+                  backgroundColor:
+                    efficacy.score >= 80 ? "var(--color-success)" : efficacy.score >= 60 ? "var(--color-warning)" : "var(--color-danger)",
+                }}
+              />
+            </div>
+            <span className="text-[13px] font-bold tabular-nums text-slate-800">{efficacy.score}%</span>
+            <ITText className="text-[12px] text-slate-500">{tt("detail.resolvedIn", { hours: efficacy.hours })}</ITText>
           </ITFlex>
         )}
       </ITStack>
-    </ITFlex>
+    </ITCard>
   );
 }

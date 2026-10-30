@@ -1,7 +1,16 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import {
+  ITBadget,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITPage,
+  ITText,
+} from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaCommentDots, FaEdit, FaFilePdf, FaFileSignature, FaUndoAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDate, formatDateTime } from "@shared/utils/dates";
@@ -89,24 +98,25 @@ export default function LoanDetailPage() {
         <ITGrid item xs={12} lg={5}>
           <ITFlex direction="column" gap={4}>
             {/* Formulario en modo lectura */}
-            <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <ITCard contentClassName="flex flex-col gap-3">
               <ITText className="text-sm font-bold text-slate-800">{t("loans.detailData")}</ITText>
 
               <ITFlex direction="column" gap={0.5}>
-                <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.colNumber")}</ITText>
+                <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.colNumber")}</ITText>
                 <ITText className="text-sm font-bold text-slate-900">{loan.number}</ITText>
               </ITFlex>
 
               <ITFlex direction="column" gap={0.5}>
-                <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.colDate")}</ITText>
+                <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.colDate")}</ITText>
                 <ITText className="text-sm text-slate-700">{formatDate(loan.date)}</ITText>
               </ITFlex>
 
               <ITFlex direction="column" gap={0.5}>
-                <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.assignment")}</ITText>
+                <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.assignment")}</ITText>
                 {loan.custodian ? (
                   <ITFlex align="center" gap={2}>
                     <ITBadget color="success" size="lg">{t("loans.toEmployee")}</ITBadget>
+                    <ProfileAvatar name={loan.custodian.name} size="sm" />
                     <ITText className="text-sm font-semibold text-slate-700">{loan.custodian.name}</ITText>
                   </ITFlex>
                 ) : loan.department ? (
@@ -125,7 +135,7 @@ export default function LoanDetailPage() {
               </ITFlex>
 
               <ITFlex direction="column" gap={0.5}>
-                <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.resource")}</ITText>
+                <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.resource")}</ITText>
                 {loan.items.map((d) => (
                   <ITText key={d.id} className="text-sm text-slate-700">
                     {d.device?.name} ({d.device?.brand} {d.device?.model}) —{" "}
@@ -136,14 +146,14 @@ export default function LoanDetailPage() {
 
               {loan.notes && (
                 <ITFlex direction="column" gap={0.5}>
-                  <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("loans.notes")}</ITText>
+                  <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.notes")}</ITText>
                   <ITText className="text-sm text-slate-600">{loan.notes}</ITText>
                 </ITFlex>
               )}
-            </ITFlex>
+            </ITCard>
 
             {/* Seguimiento del préstamo */}
-            <ITFlex as="section" direction="column" gap={2} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <ITCard contentClassName="flex flex-col gap-2">
               <ITText className="text-sm font-bold text-slate-800">{t("loans.items")}</ITText>
               {loan.items.map((d) => {
                 const pending = d.quantity - d.returnedQuantity;
@@ -161,10 +171,10 @@ export default function LoanDetailPage() {
                   </ITFlex>
                 );
               })}
-            </ITFlex>
+            </ITCard>
 
             {/* Historial de devoluciones (kardex) */}
-            <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <ITCard contentClassName="flex flex-col gap-3">
               <ITFlex direction="column" gap={0.5}>
                 <ITText className="text-sm font-bold text-slate-800">{t("loans.loanReturnHistory")}</ITText>
                 <ITText className="text-[10px] text-slate-400">{t("loans.loanReturnHistoryHint")}</ITText>
@@ -221,15 +231,15 @@ export default function LoanDetailPage() {
                     ))}
                 </div>
               )}
-            </ITFlex>
+            </ITCard>
           </ITFlex>
         </ITGrid>
 
         <ITGrid item xs={12} lg={7}>
-          <ITFlex as="section" direction="column" gap={2} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-2">
             <ITText className="text-sm font-bold text-slate-800">{t("loans.preview")}</ITText>
             <CustodyLetterPreview loan={loan} />
-          </ITFlex>
+          </ITCard>
         </ITGrid>
       </ITGrid>
     </ITPage>

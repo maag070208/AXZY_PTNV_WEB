@@ -256,7 +256,7 @@ export default function EmployeeProfileEditDialog({
           {errors.email && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</span>}
         </div>
       </ITFlex>
-      <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 pt-2">
+      <ITText className="text-[12px] font-semibold text-slate-400 pt-2">
         {tt("detail.emergencyContactTitle")}
       </ITText>
       <ITFlex gap={4} wrap="wrap">

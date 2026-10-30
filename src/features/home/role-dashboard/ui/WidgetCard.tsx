@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { LuUser } from "react-icons/lu";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { WaveFill } from "@shared/ui/charts";
 import { KPI_TONES, KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
@@ -48,9 +49,18 @@ export default function WidgetCard({ title, icon, to, toLabel, loading, error, o
   );
 }
 
-/** Rejilla de indicadores de un widget: mosaicos de la misma altura que se acomodan al ancho disponible. */
+/**
+ * Rejilla de indicadores de un widget: mosaicos de la misma altura que se
+ * acomodan al ancho disponible (mínimo 150 px, para que la etiqueta no se
+ * recorte). Un widget con más indicadores de los que caben deja el resto en otra
+ * fila: mejor recortar el número de mosaicos que apilar uno solo.
+ */
 export function MetricGrid({ children }: { children: ReactNode }) {
-  return <div className="!grid grid-cols-[repeat(auto-fit,minmax(130px,1fr))] items-stretch gap-3">{children}</div>;
+  return (
+    <div className="!grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] items-stretch gap-2.5">
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -62,6 +72,7 @@ export function Metric({
   label,
   tone = "neutral",
   hint,
+  icon,
   ratio,
   onClick,
 }: {
@@ -69,6 +80,8 @@ export function Metric({
   label: string;
   tone?: KpiTone;
   hint?: string;
+  /** Ícono de línea del indicador (le da color y forma al mosaico). */
+  icon?: ReactNode;
   ratio?: number;
   onClick?: () => void;
 }) {
@@ -79,6 +92,7 @@ export function Metric({
       value={value}
       tone={tone}
       hint={hint}
+      icon={icon}
       backdrop={ratio !== undefined && ratio > 0 ? <WaveFill level={ratio} color={KPI_TONES[tone].accent} /> : undefined}
       onClick={onClick}
     />
@@ -111,14 +125,24 @@ interface ListRowProps {
   right?: ReactNode;
   /** Persona de la fila: pinta su avatar (semilla = nombre). */
   avatarName?: string | null;
+  /** Sin persona (p. ej. ticket sin asignar): pinta un hueco con ícono para que las filas queden alineadas. */
+  avatarPlaceholder?: boolean;
   onClick?: () => void;
 }
 
 /** Fila de lista de un widget: avatar opcional, título, subtítulo tenue y valor a la derecha; sin bordes propios. */
-export function ListRow({ title, subtitle, right, avatarName, onClick }: ListRowProps) {
+export function ListRow({ title, subtitle, right, avatarName, avatarPlaceholder, onClick }: ListRowProps) {
   const body = (
     <>
-      {avatarName && <ProfileAvatar size="sm" name={avatarName} />}
+      {avatarName ? (
+        <ProfileAvatar size="sm" name={avatarName} />
+      ) : (
+        avatarPlaceholder && (
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <LuUser size={14} />
+          </span>
+        )
+      )}
       <div className="min-w-0 flex-1">
         <div className="truncate text-[13px] font-semibold text-slate-800">{title}</div>
         {subtitle && <div className="truncate text-[11px] text-slate-500">{subtitle}</div>}

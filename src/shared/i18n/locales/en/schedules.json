@@ -76,7 +76,9 @@
     "remove": "Remove",
     "removeHint": "Drag an assigned person here to remove them",
     "empty": "No assignments",
-    "pendingList": "To assign"
+    "pendingList": "To assign",
+    "listHint": "Pick people from the list; apply them with the button below.",
+    "nothingSelected": "Sin personas seleccionadas"
   },
   "overtime": {
     "title": "Overtime",
@@ -140,6 +142,42 @@
   "assignedLabel": "Assigned",
   "secondHint": "Enable it on days with a split shift (e.g. housekeeping or restaurant).",
   "form": {
-    "notFound": "Schedule not found"
+    "notFound": "Schedule not found",
+    "confirmTitle": "Save new schedule",
+    "confirmMessage": "“{{name}}” will be created with {{days}} working days ({{weekly}} hours per week). Continue?"
+  },
+  "namePlaceholder": "e.g. Front desk morning",
+  "agent": {
+    "title": "Build the schedule with Langostín",
+    "open": "Build it with Langostín",
+    "hello": "Hi! I can build this schedule with a couple of questions.",
+    "qName": "What is this schedule called?",
+    "namePlaceholder": "e.g. Front desk morning",
+    "next": "Next",
+    "qDays": "Which days are worked?",
+    "days": {
+      "weekdays": "Monday to Friday",
+      "weekdaysSaturday": "Monday to Saturday",
+      "allWeek": "Every day",
+      "weekends": "Weekends only"
+    },
+    "qHours": "From what time to what time?",
+    "useThese": "Use these",
+    "qSplit": "Is there a split shift (two shifts in one day)?",
+    "noSplit": "No, straight",
+    "yesSplit": "Yes, split",
+    "qSplitTimes": "What is the break between shifts? (from what time to what time)",
+    "summary": "Done: {{days}} days, {{from}} to {{to}}{{split}}. I apply it and you review before saving.",
+    "apply": "Save",
+    "applied": "Schedule applied to the form. Review it and save.",
+    "back": "← Back",
+    "progress": "Step {{step}} of {{total}}",
+    "botName": "Langostín",
+    "botSubtitle": "Builds the schedule step by step",
+    "online": "Online",
+    "restart": "Start over",
+    "summaryTitle": "Your schedule",
+    "hintHint": "It fills as you answer; fine-tune the details below.",
+    "qRules": "Last one: tolerances and workday rules. Keep them or adjust them."
   }
 }

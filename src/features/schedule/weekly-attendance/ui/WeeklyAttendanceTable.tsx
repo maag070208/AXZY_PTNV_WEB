@@ -16,6 +16,7 @@ import {
   type WeeklyAttendanceRow,
 } from "@entities/schedule";
 import { makeClientTableFetch } from "@shared/api/clientTable";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { dyn } from "@shared/i18n/dyn";
 import { dateLocale } from "@shared/i18n";
 import { detailFields, summaryFields } from "../model/fields";
@@ -50,9 +51,12 @@ const STATUSES: WeeklyAttendanceDayStatus[] = [
 ];
 
 const employeeCell = (name: string, sub: string) => (
-  <ITFlex direction="column" gap={0}>
-    <ITText className="text-[12px] font-black text-slate-800">{name}</ITText>
-    <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">{sub}</ITText>
+  <ITFlex align="center" gap={2}>
+    <ProfileAvatar name={name} size="sm" />
+    <ITFlex direction="column" gap={0} className="min-w-0">
+      <ITText className="truncate text-[12px] font-black text-slate-800">{name}</ITText>
+      <ITText className="truncate text-[12px] font-bold text-slate-400">{sub}</ITText>
+    </ITFlex>
   </ITFlex>
 );
 
@@ -120,7 +124,7 @@ export default function WeeklyAttendanceTable({
       key: "name",
       label: t("columns.employee"),
       type: "string",
-      width: 200,
+      width: 230,
       sortable: false,
       render: (r) =>
         employeeCell(
@@ -159,7 +163,7 @@ export default function WeeklyAttendanceTable({
               {entry ?? "?"} - {exit ?? "?"}
             </ITText>
             {(missingExit || missingEntry) && (
-              <ITText className="text-[9px] font-black uppercase tracking-wide text-amber-600">
+              <ITText className="text-[12px] font-semibold text-amber-600">
                 {missingExit ? t("noExit") : t("noEntry")}
               </ITText>
             )}
@@ -297,12 +301,7 @@ export default function WeeklyAttendanceTable({
 
   const common = {
     reloadTrigger,
-    defaultItemsPerPage: 50,
-    itemsPerPageOptions: [10, 25, 50, 100],
     size: "lg" as const,
-    virtualized: true,
-    virtualizedMaxHeight: 560,
-    rowHeight: 46,
   };
 
   return mode === "DETAIL" ? (
@@ -310,18 +309,28 @@ export default function WeeklyAttendanceTable({
       key={`detail:${queryKey}`}
       columns={detailColumns as unknown as Column<Record<string, unknown>>[]}
       fetchData={detailFetch as never}
-      density="compact"
-      layout="fixed"
       {...common}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={50}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   ) : (
     <ITDataTable
       key={`summary:${queryKey}`}
       columns={summaryColumns as unknown as Column<Record<string, unknown>>[]}
-      density="compact"
       fetchData={summaryFetch as never}
-      layout="fixed"
       {...common}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={50}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

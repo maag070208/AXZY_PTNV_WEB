@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { usePrefersReducedMotion } from "@shared/lib/usePrefersReducedMotion";
+
 interface Segment {
   label: string;
   value: number;
@@ -20,14 +23,29 @@ const GAP = 2;
  * Dona simple en SVG inline (no hay librería de gráficas en el proyecto): total
  * al centro, leyenda con valor y porcentaje, y el detalle de cada segmento al
  * pasar el mouse. Los segmentos deben ser partes de un todo (suman el total).
+ *
+ * Al montarse, los segmentos se dibujan uno tras otro (respeta
+ * `prefers-reduced-motion`).
  */
 export default function DonutChart({ segments, size = 128, showLegend = true, caption }: Props) {
+  const reduced = usePrefersReducedMotion();
+  const [drawn, setDrawn] = useState(reduced);
   const total = segments.reduce((s, sec) => s + sec.value, 0);
   const radius = size / 2 - 12;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
+  useEffect(() => {
+    if (reduced) {
+      setDrawn(true);
+      return;
+    }
+    const frame = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(frame);
+  }, [reduced]);
+
   let offset = 0;
+  let visibleIndex = -1;
 
   return (
     <div className={`flex items-center w-full ${showLegend ? "gap-5" : "justify-center"}`}>
@@ -50,6 +68,7 @@ export default function DonutChart({ segments, size = 128, showLegend = true, ca
             const dashArray = `${visible} ${circumference - visible}`;
             const dashOffset = -offset;
             offset += dash;
+            visibleIndex += 1;
             return (
               <circle
                 key={sec.label}
@@ -57,13 +76,18 @@ export default function DonutChart({ segments, size = 128, showLegend = true, ca
                 cy={center}
                 r={radius}
                 fill="none"
-                style={{ stroke: sec.color }}
+                style={{
+                  stroke: sec.color,
+                  transition: reduced
+                    ? undefined
+                    : `stroke-dasharray 800ms cubic-bezier(.2,.7,.3,1) ${visibleIndex * 110}ms, opacity 150ms`,
+                }}
                 strokeWidth={12}
-                strokeDasharray={dashArray}
+                strokeDasharray={reduced || drawn ? dashArray : `0 ${circumference}`}
                 strokeDashoffset={dashOffset}
                 transform={`rotate(-90 ${center} ${center})`}
                 strokeLinecap="butt"
-                className="transition-opacity hover:opacity-80"
+                className="hover:opacity-80"
               >
                 <title>{`${sec.label}: ${sec.value} (${Math.round(fraction * 100)}%)`}</title>
               </circle>

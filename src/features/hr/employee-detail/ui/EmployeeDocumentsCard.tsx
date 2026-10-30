@@ -39,9 +39,9 @@ export default function EmployeeDocumentsCard({
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="flex flex-wrap items-center gap-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="flex flex-wrap items-center gap-6 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
         <div className="min-w-[240px] flex-1">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{tt("detail.documentsTitle")}</p>
+          <p className="text-[12px] font-bold text-slate-400">{tt("detail.documentsTitle")}</p>
           <p className="mt-1 text-3xl font-black text-slate-900">
             {uploadedCount}
             <span className="text-lg font-semibold text-slate-400"> / {requiredCount}</span>
@@ -51,15 +51,15 @@ export default function EmployeeDocumentsCard({
         <dl className="grid grid-cols-3 gap-6 text-center">
           <div>
             <dd className="text-2xl font-black text-emerald-600">{uploadedCount}</dd>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{tt("detail.uploaded")}</dt>
+            <dt className="text-[12px] font-semibold text-slate-400">{tt("detail.uploaded")}</dt>
           </div>
           <div>
             <dd className="text-2xl font-black text-amber-600">{pendingCount}</dd>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{tt("detail.pending")}</dt>
+            <dt className="text-[12px] font-semibold text-slate-400">{tt("detail.pending")}</dt>
           </div>
           <div>
             <dd className="text-2xl font-black text-slate-700">{documents.length}</dd>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{tt("detail.filesLabel")}</dt>
+            <dt className="text-[12px] font-semibold text-slate-400">{tt("detail.filesLabel")}</dt>
           </div>
         </dl>
       </section>
@@ -68,14 +68,14 @@ export default function EmployeeDocumentsCard({
         <p className="py-6 text-center text-sm text-slate-400">{tt("detail.noDocumentTypes")}</p>
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:!grid-cols-2 xl:!grid-cols-3">
         {documentTypes.map((type) => {
           const files = byType.get(type.id) ?? [];
           const covered = files.length > 0;
           return (
             <article
               key={type.id}
-              className={`flex flex-col rounded-2xl border bg-white p-4 shadow-sm ${covered ? "border-emerald-200" : "border-dashed border-slate-300"}`}
+              className={`flex flex-col rounded-2xl border bg-[var(--it-card-bg)] p-4 shadow-sm ${covered ? "border-emerald-200" : "border-dashed border-slate-300"}`}
             >
               <header className="flex items-start gap-3">
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${covered ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>

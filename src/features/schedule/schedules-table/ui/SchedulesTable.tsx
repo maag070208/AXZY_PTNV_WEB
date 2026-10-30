@@ -10,7 +10,7 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaPlus, FaTrashRestore } from "react-icons/fa";
+import { FaEdit, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { scheduleApi, type Schedule, type ScheduleDay } from "@entities/schedule";
 import { makeClientTableFetch } from "@shared/api/clientTable";
@@ -198,27 +198,18 @@ export default function SchedulesTable() {
         </ITAlert>
       )}
 
-      <ITFlex justify="end">
-        <ITButton variant="filled" color="primary" onClick={() => navigate("/schedules/new")}>
-          <ITFlex align="center" gap={1}>
-            <FaPlus size={12} />
-            <ITText className="font-bold text-[11px]">{t("new")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
-
       <ITDataTable
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchData as never}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[10, 25, 50]}
+        onRowClick={(row) => navigate(`/schedules/${(row as unknown as Schedule).id}/edit`)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
-        virtualized
-        virtualizedMaxHeight={420}
         rowHeight={50}
-        onRowClick={(row) => navigate(`/schedules/${(row as unknown as Schedule).id}/edit`)}
+        virtualized
+        virtualizedMaxHeight={460}
       />
 
       <ITConfirmDialog

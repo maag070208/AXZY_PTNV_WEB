@@ -138,17 +138,17 @@ export default function KitchenCountPanel() {
         ) : (
           <ITFlex direction="column" gap={3}>
             <ITGrid container columns={12} spacing={3} className="border-b border-slate-100 pb-2">
-              <ITGrid item xs={5}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.item")}</ITText></ITGrid>
-              <ITGrid item xs={3}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.lot")}</ITText></ITGrid>
-              <ITGrid item xs={2}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.system")}</ITText></ITGrid>
-              <ITGrid item xs={2}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.counted")}</ITText></ITGrid>
+              <ITGrid item xs={5}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.item")}</ITText></ITGrid>
+              <ITGrid item xs={3}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.lot")}</ITText></ITGrid>
+              <ITGrid item xs={2}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.system")}</ITText></ITGrid>
+              <ITGrid item xs={2}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.counted")}</ITText></ITGrid>
             </ITGrid>
             {lots.map((l) => (
               <ITGrid key={l.id} container columns={12} spacing={3} className="items-center">
                 <ITGrid item xs={5}>
                   <ITFlex direction="column" gap={0}>
                     <ITText className="text-[12px] font-black text-slate-800">{l.item.name}</ITText>
-                    <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">{l.item.code}</ITText>
+                    <ITText className="text-[12px] font-bold text-slate-400">{l.item.code}</ITText>
                   </ITFlex>
                 </ITGrid>
                 <ITGrid item xs={3}>

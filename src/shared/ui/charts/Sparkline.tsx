@@ -29,7 +29,15 @@ export default function Sparkline({ data, color, width = 132, height = 48 }: Pro
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx={last[0]} cy={last[1]} r={3.5} fill="var(--it-card-bg, #ffffff)" stroke={color} strokeWidth={2.5} />
+      <circle
+        cx={last[0]}
+        cy={last[1]}
+        r={3.5}
+        fill="var(--it-card-bg, #ffffff)"
+        stroke={color}
+        strokeWidth={2.5}
+        className="spark-dot"
+      />
     </svg>
   );
 }

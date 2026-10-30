@@ -126,12 +126,14 @@ export default function SuppliersPanel() {
       <ITDataTable
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={kitchenApi.suppliersTable as never}
-        defaultItemsPerPage={50}
-        itemsPerPageOptions={[10, 25, 50, 100]}
         size="lg"
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
         virtualized
-        virtualizedMaxHeight={560}
-        rowHeight={58}
+        virtualizedMaxHeight={460}
       />
     </ITFlex>
   );

@@ -16,7 +16,7 @@ function Cell({ item }: { item: Item }) {
   const has = !!item.value?.trim();
   return (
     <div className={item.wide ? "sm:col-span-2" : ""}>
-      <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{item.label}</dt>
+      <dt className="text-[12px] font-bold text-slate-400">{item.label}</dt>
       <dd className={`mt-0.5 break-words text-sm ${has ? "font-semibold text-slate-900" : "italic text-slate-300"}`}>
         {has ? item.value : tt("detail.noData")}
       </dd>
@@ -27,17 +27,17 @@ function Cell({ item }: { item: Item }) {
 function InfoCard({ icon, tone, title, items }: { icon: React.ReactNode; tone: string; title: string; items: Item[] }) {
   const filled = items.filter((i) => i.value?.trim()).length;
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
       <header className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}>{icon}</span>
-          <h3 className="text-sm font-black uppercase tracking-wide text-slate-700">{title}</h3>
+          <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
         </div>
         <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${filled === items.length ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
           {filled}/{items.length}
         </span>
       </header>
-      <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:!grid-cols-2">
         {items.map((i) => (
           <Cell key={i.label} item={i} />
         ))}
@@ -100,9 +100,9 @@ export default function EmployeeInfoCards({ profile }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="flex flex-wrap items-center gap-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="flex flex-wrap items-center gap-6 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
         <div className="min-w-[240px] flex-1">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{tt("detail.completeness")}</p>
+          <p className="text-[12px] font-bold text-slate-400">{tt("detail.completeness")}</p>
           <p className="mt-1 text-3xl font-black text-slate-900">
             {filled}
             <span className="text-lg font-semibold text-slate-400"> / {all.length}</span>
@@ -111,7 +111,7 @@ export default function EmployeeInfoCards({ profile }: Props) {
         </div>
         <p className="max-w-sm text-sm text-slate-500">{tt("detail.completenessHint")}</p>
       </section>
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 lg:!grid-cols-2 xl:!grid-cols-3">
         {groups.map((g) => (
           <InfoCard key={g.title} icon={g.icon} tone={g.tone} title={g.title} items={g.items} />
         ))}

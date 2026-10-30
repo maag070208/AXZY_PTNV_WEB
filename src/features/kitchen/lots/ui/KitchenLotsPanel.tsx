@@ -41,7 +41,7 @@ export default function KitchenLotsPanel() {
       render: (r) => (
         <ITFlex direction="column" gap={0}>
           <ITText className="text-[12px] font-black text-slate-800">{r.item.name}</ITText>
-          <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+          <ITText className="text-[12px] font-bold text-slate-400">
             {r.item.code} · {r.item.category.name}
           </ITText>
         </ITFlex>
@@ -110,12 +110,14 @@ export default function KitchenLotsPanel() {
       <ITDataTable
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={kitchenApi.lotsTable as never}
-      defaultItemsPerPage={50}
-      itemsPerPageOptions={[10, 25, 50, 100]}
       size="lg"
-      virtualized
-      virtualizedMaxHeight={560}
-      rowHeight={54}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITFlex>
   );

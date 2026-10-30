@@ -124,9 +124,9 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
 
       {/* Tarea nueva: la arma Langostín en el chat de arriba de la lista. */}
       {fx.newTaskOpen && canAddTask && (
-        <div className="rounded-xl border border-[#0D5777]/25 bg-[#0D5777]/[0.03] p-3">
+        <div className="rounded-xl border border-primary-500/25 bg-primary-500/[0.03] p-3">
           <ITFlex direction="column" gap={1} className="mb-2.5 px-1">
-            <ITText className="!text-[11px] font-black uppercase tracking-widest text-[#0D5777]">
+            <ITText className="!text-[12px] font-semibold text-primary-500">
               {tt("detail.newTask")}
             </ITText>
             <ITText className="!text-[11px] text-slate-500">{tt("detail.newTaskHint")}</ITText>
@@ -162,7 +162,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
             return (
               <div
                 key={a.id}
-                className={`rounded-xl border border-slate-200 border-l-4 ${tone.border} bg-white shadow-sm`}
+                className={`rounded-xl border border-slate-200 border-l-4 ${tone.border} bg-[var(--it-card-bg)] shadow-sm`}
               >
                 {/* Quién y en qué estado. */}
                 <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="px-3 py-2.5">
@@ -171,7 +171,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                     <ITFlex direction="column" gap={0} className="min-w-0">
                       <ITText className="!text-[12px] font-bold text-slate-800 truncate">{a.user.name}</ITText>
                       {a.user.employeeNumber && (
-                        <ITText className="!text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                        <ITText className="!text-[12px] font-bold text-slate-400">
                           {tt("detail.employeeNo", { number: a.user.employeeNumber })}
                         </ITText>
                       )}
@@ -231,7 +231,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                       </span>
                     )}
                     {vencida && (
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 !text-[9px] font-bold uppercase text-amber-800">
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 !text-[12px] font-bold text-amber-800">
                         {tt("detail.overdue")}
                       </span>
                     )}

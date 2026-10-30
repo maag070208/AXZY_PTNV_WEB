@@ -27,7 +27,7 @@ export default function KanbanPage() {
       backAction={() => goBack("/tickets")}
       icon={<FaTrello size={20} />}
       breadcrumbs={[
-        { label: tt("list.title"), onClick: () => navigate("/tickets") },
+        { label: tt("list.title"), onClick: () => navigate("/tickets", { replace: true }) },
         ...(ticketId
           ? [
               {

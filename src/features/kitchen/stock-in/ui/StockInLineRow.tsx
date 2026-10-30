@@ -19,7 +19,7 @@ export default function StockInLineRow({ line, item, complete, onPatch, onRemove
   return (
     <div
       className={[
-        "rounded-xl border bg-white p-4 transition-shadow",
+        "rounded-xl border bg-[var(--it-card-bg)] p-4 transition-shadow",
         complete ? "border-slate-200 hover:shadow-sm" : "border-amber-200 bg-amber-50/20",
       ].join(" ")}
     >
