@@ -3,7 +3,6 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITChip,
   ITDataTable,
   ITDatePicker,
   ITFlex,
@@ -16,13 +15,15 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaLock, FaUndo } from "react-icons/fa";
-import type { TimeClockPunch, PunchMethod } from "@entities/time-clock";
+import { LuActivity, LuFingerprint, LuLock, LuRotateCcw, LuTriangleAlert } from "react-icons/lu";
+import { clockStatus, type TimeClockPunch, type PunchMethod } from "@entities/time-clock";
 import { formatAgo, formatDate } from "@shared/i18n";
 import { formatDateTime, formatTimeInTZ } from "@shared/utils/dates";
 import { PanelCard } from "@shared/ui/panel-card";
+import { FilterPills } from "@shared/ui/filter-pills";
+import { ListSummaryStrip, type ListSummaryItem } from "@shared/ui/list-summary-strip";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
-import type { UseTimeClock } from "../model/useTimeClock";
+import type { TimeClockRangeMode, UseTimeClock } from "../model/useTimeClock";
 import TimeClockStatusCard from "./TimeClockStatusCard";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
@@ -184,6 +185,35 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
   const tableTitle =
     tableTotal == null ? rangeLabel : `${rangeLabel} · ${t("table.punches", { count: tableTotal })}`;
 
+  // Franja de resumen: totales que la pantalla ya tiene (checadas del rango y estado de los relojes).
+  const devices = status?.devices ?? [];
+  const failing = devices.filter((d) => ["error", "paused"].includes(clockStatus(d))).length;
+  const summaryItems: ListSummaryItem[] = [
+    {
+      id: "punches",
+      label: t("summary.punches"),
+      value: tableTotal ?? "—",
+      tone: "sea",
+      icon: <LuFingerprint size={15} />,
+      caption: rangeLabel,
+    },
+    {
+      id: "clocks",
+      label: t("summary.clocks"),
+      value: devices.length,
+      icon: <LuActivity size={15} />,
+      caption: t("summary.connected", { count: devices.length - failing }),
+    },
+    {
+      id: "problems",
+      label: t("summary.problems"),
+      value: failing,
+      tone: failing > 0 ? "sun" : "mint",
+      icon: <LuTriangleAlert size={15} />,
+      caption: failing > 0 ? t("summary.problemsHint") : t("summary.allOk"),
+    },
+  ];
+
   const updatedAgo = formatAgo("time-clock:status", new Date(tableUpdatedAt).toISOString());
 
   return (
@@ -194,43 +224,23 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
         </ITAlert>
       )}
 
+      {status && devices.length > 0 && <ListSummaryStrip items={summaryItems} />}
+
       <TimeClockStatusCard fx={fx} />
 
       {/* Filtros: píldoras del rango, del reloj y del método. */}
       <PanelCard title={t("filters.title")}>
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITChip
-              label={t("presets.today")}
-              selected={rangeMode === "today"}
-              onClick={() => applyRange("today")}
-              color="primary"
-              variant="outlined"
-              size="sm"
-            />
-            <ITChip
-              label={t("presets.yesterday")}
-              selected={rangeMode === "yesterday"}
-              onClick={() => applyRange("yesterday")}
-              color="primary"
-              variant="outlined"
-              size="sm"
-            />
-            <ITChip
-              label={t("presets.last7")}
-              selected={rangeMode === "last7"}
-              onClick={() => applyRange("last7")}
-              color="primary"
-              variant="outlined"
-              size="sm"
-            />
-            <ITChip
-              label={t("presets.custom")}
-              selected={rangeMode === "custom"}
-              onClick={chooseCustomRange}
-              color="primary"
-              variant="outlined"
-              size="sm"
+            <FilterPills
+              items={[
+                { id: "today" as TimeClockRangeMode, label: t("presets.today") },
+                { id: "yesterday" as TimeClockRangeMode, label: t("presets.yesterday") },
+                { id: "last7" as TimeClockRangeMode, label: t("presets.last7") },
+                { id: "custom" as TimeClockRangeMode, label: t("presets.custom") },
+              ]}
+              value={rangeMode}
+              onChange={(id) => (id === "custom" ? chooseCustomRange() : applyRange(id))}
             />
             <div className="ml-auto w-full sm:w-72">
               <ITInput
@@ -257,56 +267,28 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
           )}
 
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITChip
-              label={t("filters.allClocks")}
-              selected={!clock}
-              onClick={() => setClock("")}
-              color="primary"
-              variant="outlined"
-              size="sm"
+            <FilterPills
+              items={[
+                { id: "", label: t("filters.allClocks") },
+                ...(status?.devices ?? []).map((d) => ({ id: d.clockSerial, label: d.name })),
+              ]}
+              value={clock}
+              onChange={setClock}
             />
-            {(status?.devices ?? []).map((d) => (
-              <ITChip
-                key={d.clockSerial}
-                label={d.name}
-                selected={clock === d.clockSerial}
-                onClick={() => setClock(d.clockSerial)}
-                color="primary"
-                variant="outlined"
-                size="sm"
-              />
-            ))}
           </ITFlex>
 
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITChip
-              label={t("filters.allMethods")}
-              selected={!method}
-              onClick={() => setMethod("")}
-              color="primary"
-              variant="outlined"
-              size="sm"
+            <FilterPills
+              items={[
+                { id: "" as PunchMethod | "", label: t("filters.allMethods") },
+                ...METHODS.map((m) => ({ id: m as PunchMethod | "", label: t(`methods.${m}`) })),
+              ]}
+              value={method as PunchMethod | ""}
+              onChange={(id) => setMethod(id)}
             />
-            {METHODS.map((m) => (
-              <ITChip
-                key={m}
-                label={t(`methods.${m}`)}
-                selected={method === m}
-                onClick={() => setMethod(m)}
-                color="primary"
-                variant="outlined"
-                size="sm"
-              />
-            ))}
-            <ITButton
-              variant="text"
-              color="gray"
-              size="sm"
-              className="ml-auto"
-              onClick={clearFilters}
-            >
+            <ITButton variant="text" color="gray" size="sm" className="ml-auto" onClick={clearFilters}>
               <ITFlex align="center" gap={1}>
-                <FaUndo size={11} />
+                <LuRotateCcw size={12} />
                 <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
               </ITFlex>
             </ITButton>
@@ -320,7 +302,7 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
         actions={
           updatedAgo && (
             <ITFlex align="center" gap={1}>
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
               <ITText className="text-[11px] text-slate-500">
                 {t("table.updated", { ago: updatedAgo })}
               </ITText>
@@ -349,7 +331,7 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
         />
 
         <ITFlex align="center" gap={1} className="mt-3">
-          <FaLock size={10} className="text-slate-400" />
+          <LuLock size={11} className="text-slate-400" />
           <ITText className="text-[10px] font-bold text-slate-400">{t("status.readOnly")}</ITText>
         </ITFlex>
       </PanelCard>

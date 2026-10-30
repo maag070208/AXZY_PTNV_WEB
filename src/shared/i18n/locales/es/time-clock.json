@@ -882,5 +882,13 @@
     "altaPending": "{{clock}} es de solo lectura: el alta queda pendiente ahí",
     "altaRequestFailed": "No se pudo dar de alta en los relojes",
     "failed": "No se pudo actualizar {{clock}}"
+  },
+  "summary": {
+    "punches": "Checadas",
+    "clocks": "Relojes",
+    "connected": "{{count}} conectados",
+    "problems": "Con problemas",
+    "problemsHint": "No conectan: revisa su detalle",
+    "allOk": "Todos conectan"
   }
 }

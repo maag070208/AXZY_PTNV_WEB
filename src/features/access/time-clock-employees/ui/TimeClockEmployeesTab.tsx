@@ -4,7 +4,6 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITChip,
   ITDataTable,
   ITDialog,
   ITFlex,
@@ -18,17 +17,16 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaCheck, FaLink, FaMagic, FaUndo, FaUnlink, FaUsers } from "react-icons/fa";
+import { LuCheck, LuLink, LuLink2Off, LuRotateCcw, LuUsers, LuWandSparkles } from "react-icons/lu";
 import type { TimeClockEmployee, TimeClockEmployeeStatus } from "@entities/time-clock";
 import { formatDateTime } from "@shared/utils/dates";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { ListSummaryStrip, type ListSummaryItem } from "@shared/ui/list-summary-strip";
+import { DialogHeader } from "@shared/ui/dialog-header";
 import { PanelCard } from "@shared/ui/panel-card";
 import type { UseTimeClockEmployees } from "../model/useTimeClockEmployees";
 import { usePeopleOptions } from "@entities/user";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
-
-const STATUSES: TimeClockEmployeeStatus[] = ["LINKED", "UNLINKED", "SUGGESTED"];
 
 const STATUS_COLOR: Record<TimeClockEmployeeStatus, BadgeColor> = {
   LINKED: "success",
@@ -83,11 +81,40 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
   const suggestions = summary?.registrationSuggestions ?? 0;
   const percent = total > 0 ? Math.round((linked / total) * 100) : 0;
 
-  const counts: Record<TimeClockEmployeeStatus, number> = {
-    LINKED: linked,
-    UNLINKED: withoutLink,
-    SUGGESTED: suggestions,
-  };
+  // Franja de resumen: cada mosaico filtra la lista por su estado.
+  const summaryItems: ListSummaryItem[] = [
+    {
+      id: "",
+      label: t("employees.kpis.total"),
+      value: total,
+      icon: <LuUsers size={15} />,
+      caption: total > 0 ? t("employees.kpis.hintTotal") : t("employees.kpis.allGood"),
+    },
+    {
+      id: "LINKED",
+      label: t("employees.kpis.linkedCount"),
+      value: linked,
+      tone: "mint",
+      icon: <LuCheck size={15} />,
+      caption: total > 0 ? t("employees.kpis.hintLinked", { percent }) : t("employees.kpis.allGood"),
+    },
+    {
+      id: "UNLINKED",
+      label: t("employees.kpis.withoutLink"),
+      value: withoutLink,
+      tone: withoutLink > 0 ? "sun" : "plain",
+      icon: <LuLink2Off size={15} />,
+      caption: withoutLink > 0 ? t("employees.kpis.hintWithoutLink") : t("employees.kpis.allGood"),
+    },
+    {
+      id: "SUGGESTED",
+      label: t("employees.kpis.registrationSuggestions"),
+      value: suggestions,
+      tone: suggestions > 0 ? "lavender" : "plain",
+      icon: <LuWandSparkles size={15} />,
+      caption: suggestions > 0 ? t("employees.kpis.hintSuggestions") : t("employees.kpis.allGood"),
+    },
+  ];
 
   const userOptions = useMemo(
     () =>
@@ -214,7 +241,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
                     onClick={() => acceptSuggestion(r)}
                   >
                     <ITFlex align="center" gap={1}>
-                      <FaCheck size={10} />
+                      <LuCheck size={12} />
                       <ITText className="font-bold text-[11px]">{t("employees.actions.accept")}</ITText>
                     </ITFlex>
                   </ITButton>
@@ -244,7 +271,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
                     onClick={() => openLink(r)}
                   >
                     <ITFlex align="center" gap={1}>
-                      <FaLink size={10} />
+                      <LuLink size={12} />
                       <ITText className="font-bold text-[11px]">
                         {r.link ? t("employees.actions.change") : t("employees.actions.linkEmployee")}
                       </ITText>
@@ -259,7 +286,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
                       onClick={() => void unlinkEmployee(r)}
                     >
                       <ITFlex align="center" gap={1}>
-                        <FaUnlink size={10} />
+                        <LuLink2Off size={12} />
                         <ITText className="font-bold text-[11px]">
                           {t("employees.actions.unlinkEmployee")}
                         </ITText>
@@ -294,45 +321,12 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
         </ITAlert>
       )}
 
-      {/* Indicadores: cada uno filtra por su estado. */}
-      <div className="!grid gap-4 sm:!grid-cols-2 xl:!grid-cols-4">
-        <KpiTile size="sm"
-          label={t("employees.kpis.total")}
-          value={total}
-          icon={<FaUsers size={16} />}
-          tone="sky"
-          hint={total > 0 ? t("employees.kpis.hintTotal") : t("employees.kpis.allGood")}
-          onClick={() => setStatus("")}
-        />
-        <KpiTile size="sm"
-          label={t("employees.kpis.linkedCount")}
-          value={linked}
-          icon={<FaCheck size={16} />}
-          tone="emerald"
-          hint={
-            total > 0
-              ? t("employees.kpis.hintLinked", { percent })
-              : t("employees.kpis.allGood")
-          }
-          onClick={() => setStatus("LINKED")}
-        />
-        <KpiTile size="sm"
-          label={t("employees.kpis.withoutLink")}
-          value={withoutLink}
-          icon={<FaUnlink size={16} />}
-          tone={withoutLink > 0 ? "amber" : "neutral"}
-          hint={withoutLink > 0 ? t("employees.kpis.hintWithoutLink") : t("employees.kpis.allGood")}
-          onClick={() => setStatus("UNLINKED")}
-        />
-        <KpiTile size="sm"
-          label={t("employees.kpis.registrationSuggestions")}
-          value={suggestions}
-          icon={<FaMagic size={16} />}
-          tone={suggestions > 0 ? "sky" : "neutral"}
-          hint={suggestions > 0 ? t("employees.kpis.hintSuggestions") : t("employees.kpis.allGood")}
-          onClick={() => setStatus("SUGGESTED")}
-        />
-      </div>
+      {/* Resumen: cada mosaico filtra por su estado. */}
+      <ListSummaryStrip
+        items={summaryItems}
+        activeId={status}
+        onSelect={(id) => setStatus(id as TimeClockEmployeeStatus | "")}
+      />
 
       {/* Filtros: píldoras del estado (con su conteo) y el buscador. */}
       <PanelCard
@@ -348,33 +342,14 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
             }}
           >
             <ITFlex align="center" gap={1}>
-              <FaUndo size={11} />
+              <LuRotateCcw size={12} />
               <ITText className="font-bold text-[11px]">{t("employees.filters.clear")}</ITText>
             </ITFlex>
           </ITButton>
         }
       >
         <ITFlex align="center" wrap="wrap" gap={2}>
-          <ITChip
-            label={`${t("employees.filters.all")} (${total})`}
-            selected={!status}
-            onClick={() => setStatus("")}
-            color="primary"
-            variant="outlined"
-            size="sm"
-          />
-          {STATUSES.map((s) => (
-            <ITChip
-              key={s}
-              label={`${t(`employees.statuses.${s}`)} (${counts[s]})`}
-              selected={status === s}
-              onClick={() => setStatus(s)}
-              color="primary"
-              variant="outlined"
-              size="sm"
-            />
-          ))}
-          <div className="ml-auto w-full sm:w-80">
+          <div className="w-full sm:w-80 w-full sm:w-80">
             <ITInput
               name="checadorEmpleadosQ"
               placeholder={t("employees.filters.qPlaceholder")}
@@ -435,13 +410,14 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
       <ITDialog
         isOpen={!!target}
         onClose={() => setTarget(null)}
-        title={t("employees.dialog.title", { number: target?.employeeNumber ?? "" })}
         className="max-w-md"
       >
-        <ITFlex direction="column" gap={3} className="mt-2">
-          <ITText className="text-[12px] text-slate-600">
-            {t("employees.dialog.clock", { name: target?.name ?? "" })}
-          </ITText>
+        <DialogHeader
+          icon={<LuLink />}
+          title={t("employees.dialog.title", { number: target?.employeeNumber ?? "" })}
+          subtitle={t("employees.dialog.clock", { name: target?.name ?? "" })}
+        />
+        <ITFlex direction="column" gap={3}>
           <ITSearchSelect
             name="checadorVinculoUsuario"
             label={t("employees.dialog.user")}

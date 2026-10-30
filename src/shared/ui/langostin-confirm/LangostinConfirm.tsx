@@ -20,6 +20,10 @@ interface Props {
   /** Animación de Langostín; por defecto depende de `variant`. */
   anim?: LangostinAnim;
   loading?: boolean;
+  /** Contenido extra entre el mensaje y los botones (p. ej. un campo de motivo). */
+  children?: ReactNode;
+  /** Deshabilita Confirmar (p. ej. mientras falte un dato en `children`). */
+  confirmDisabled?: boolean;
 }
 
 const ANIM_BY_VARIANT: Record<LangostinConfirmVariant, LangostinAnim> = {
@@ -45,6 +49,8 @@ export default function LangostinConfirm({
   variant = "primary",
   anim,
   loading = false,
+  children,
+  confirmDisabled = false,
 }: Props) {
   const { t } = useTranslation("langostin");
   const reduced = usePrefersReducedMotion();
@@ -73,6 +79,7 @@ export default function LangostinConfirm({
           {message ? <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">{message}</div> : null}
         </div>
       </div>
+      {children ? <div className="mt-4">{children}</div> : null}
       <div ref={actionsRef} className="mt-6 flex justify-end gap-3">
         <ITButton
           label={cancelLabel ?? t("confirm.cancel")}
@@ -89,7 +96,7 @@ export default function LangostinConfirm({
           color={variant}
           size="sm"
           onClick={onConfirm}
-          disabled={loading}
+          disabled={loading || confirmDisabled}
         />
       </div>
     </ITDialog>

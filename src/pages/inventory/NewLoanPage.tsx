@@ -10,7 +10,7 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import { FaFileSignature } from "react-icons/fa";
-import { LuFileText, LuPackageOpen, LuUser } from "react-icons/lu";
+import { LuFileText, LuMessageCircle, LuPackageOpen, LuUser } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceType } from "@entities/inventory";
 import { departmentsApi, type Department } from "@entities/department";
@@ -19,6 +19,7 @@ import { usersApi, type User } from "@entities/user";
 import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 import { UnitPicker, useSelectableUnits } from "@features/inventory/unit-picker";
+import { LoanAgent, type LoanAgentItem } from "@widgets/loan-agent";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { useGoBack } from "@shared/lib/useGoBack";
 import { FormSection } from "@shared/ui/form-section";
@@ -26,6 +27,17 @@ import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { PanelCard } from "@shared/ui/panel-card";
 import { StickyActions } from "@shared/ui/sticky-actions";
 import { LangostinState } from "@shared/ui/langostin";
+
+const MODE_KEY = "ptnv.newLoan.mode";
+
+// Preferencia por persona (chat con Langostín o formulario clásico); por defecto, chat.
+const readMode = (): "chat" | "form" => {
+  try {
+    return localStorage.getItem(MODE_KEY) === "form" ? "form" : "chat";
+  } catch {
+    return "chat";
+  }
+};
 
 export default function NewLoanPage() {
   const { t } = useTranslation(["inventory", "common"]);
@@ -50,6 +62,18 @@ export default function NewLoanPage() {
   const [deviceId, setDeviceId] = useState("");
   const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
+  const [mode, setModeState] = useState<"chat" | "form">(readMode);
+  // Equipos armados en la conversación (el formulario clásico usa deviceId + selectedUnitIds).
+  const [chatItems, setChatItems] = useState<LoanAgentItem[]>([]);
+
+  const setMode = (next: "chat" | "form") => {
+    setModeState(next);
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* sin almacenamiento: la preferencia solo dura la sesión */
+    }
+  };
 
   useEffect(() => {
     Promise.all([inventoryApi.types(), inventoryApi.devices(), usersApi.employees(), departmentsApi.list(), subareaApi.list()])
@@ -120,7 +144,16 @@ export default function NewLoanPage() {
         : null,
       status: "ACTIVE" as const,
       notes: notes || null,
-      items: deviceId
+      items: mode === "chat"
+        ? chatItems.map((ci, idx) => ({
+            id: `item-${idx}`,
+            deviceId: ci.device.id,
+            device: ci.device,
+            quantity: ci.units.length || 1,
+            returnedQuantity: 0,
+            units: ci.units.map((u) => ({ id: u.id, deviceUnit: u })),
+          }))
+        : deviceId
         ? [
             {
               id: "item",
@@ -133,7 +166,7 @@ export default function NewLoanPage() {
           ]
         : [],
     }),
-    [assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, selectedUnits, notes]
+    [mode, chatItems, assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, selectedUnits, notes]
   );
 
   // El preview se actualiza con debounce para no parpadear en cada tecla.
@@ -147,7 +180,10 @@ export default function NewLoanPage() {
         departmentId: assignment === "DEPARTMENT" ? departmentId : undefined,
         subareaId: assignment === "DEPARTMENT" ? subareaId || undefined : undefined,
         notes: notes || undefined,
-        items: [{ deviceId, unitIds: selectedUnits.map((u) => u.id) }],
+        items:
+          mode === "chat"
+            ? chatItems.map((ci) => ({ deviceId: ci.device.id, unitIds: ci.units.map((u) => u.id) }))
+            : [{ deviceId, unitIds: selectedUnits.map((u) => u.id) }],
       };
       await inventoryApi.createLoan(payload, requestKey(payload));
       setToast({ message: t("loans.saved"), type: "success" });
@@ -177,6 +213,47 @@ export default function NewLoanPage() {
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.new") }]}
       backAction={() => goBack("/inventory/loans")}
     >
+      {mode === "chat" ? (
+        <LoanAgent
+          assignment={assignment}
+          setAssignment={setAssignment}
+          custodianId={custodianId}
+          setCustodianId={setCustodianId}
+          departmentId={departmentId}
+          setDepartmentId={setDepartmentId}
+          subareaId={subareaId}
+          setSubareaId={setSubareaId}
+          notes={notes}
+          setNotes={setNotes}
+          items={chatItems}
+          setItems={setChatItems}
+          custodians={custodians}
+          departments={departments}
+          subareas={subareas}
+          devices={devices}
+          saving={saving}
+          onSubmit={handleSubmit}
+          onUseForm={() => setMode("form")}
+        />
+      ) : (
+      <>
+      <div className="flex justify-end">
+        <ITButton variant="text" color="secondary" size="sm" onClick={() => {
+            // El chat arranca limpio: no hereda lo que quedó a medias en el formulario.
+            setAssignment("EMPLOYEE");
+            setCustodianId("");
+            setDepartmentId("");
+            setSubareaId("");
+            setNotes("");
+            setChatItems([]);
+            setMode("chat");
+          }} disabled={saving}>
+          <ITFlex align="center" gap={1}>
+            <LuMessageCircle size={14} />
+            <span className="text-[11px] font-bold">{t("loans.agent.useChat")}</span>
+          </ITFlex>
+        </ITButton>
+      </div>
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
           <FormSection
@@ -294,10 +371,14 @@ export default function NewLoanPage() {
         </LiveSummary>
       </div>
 
+      </>
+      )}
+
       <PanelCard title={t("loans.preview")} icon={<LuFileText size={16} />}>
         <CustodyLetterPreview loan={draftPreview as never} />
       </PanelCard>
 
+      {mode === "form" && (
       <StickyActions>
         <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/loans")} disabled={saving} />
         <ITButton
@@ -309,6 +390,7 @@ export default function NewLoanPage() {
           disabled={saving || !isValid}
         />
       </StickyActions>
+      )}
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

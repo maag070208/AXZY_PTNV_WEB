@@ -882,5 +882,13 @@
     "altaPending": "{{clock}} is read-only: the addition stays pending there",
     "altaRequestFailed": "Could not enroll in the clocks",
     "failed": "Could not update {{clock}}"
+  },
+  "summary": {
+    "punches": "Punches",
+    "clocks": "Clocks",
+    "connected": "{{count}} connected",
+    "problems": "With problems",
+    "problemsHint": "Not connecting: check their detail",
+    "allOk": "All connecting"
   }
 }

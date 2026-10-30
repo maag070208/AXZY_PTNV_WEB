@@ -1,10 +1,6 @@
-import { ITPage, ITTabs } from "@axzydev/axzy_ui_system";
-import {
-  FaBoxOpen,
-  FaChartBar,
-  FaHandHolding,
-  FaTrashAlt,
-} from "react-icons/fa";
+import { useState } from "react";
+import { ITPage } from "@axzydev/axzy_ui_system";
+import { LuBox, LuChartColumn, LuHandshake, LuTrash2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,11 +15,15 @@ import {
   downloadMaterialOutputsPdf,
 } from "@widgets/reports";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { TabBar } from "@shared/ui/tab-bar";
+
+type ReportTab = "assigned" | "devices" | "exits";
 
 export default function ReportsPage() {
   const { t } = useTranslation(["reports", "common"]);
   const navigate = useNavigate();
   const goBack = useGoBack();
+  const [tab, setTab] = useState<ReportTab>("assigned");
   const assignedFx = useAssignedDevicesReport({ download: downloadAssignedDevicesPdf });
   const devicesFx = useDevicesReport({ download: downloadDevicesPDF });
   const materialOutputsFx = useMaterialOutputsReport({ download: downloadMaterialOutputsPdf });
@@ -33,37 +33,27 @@ export default function ReportsPage() {
       title={t("title")}
       description={t("description")}
       backAction={() => goBack("/")}
-      icon={<FaChartBar size={20} />}
+      icon={<LuChartColumn size={20} />}
       noPadding
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("title") },
       ]}
     >
-      <ITTabs
-        variant="line"
-        defaultActiveId="assigned"
-        items={[
-          {
-            id: "assigned",
-            label: t("tabs.assigned"),
-            icon: <FaHandHolding size={13} />,
-            content: <AssignedDevicesTab fx={assignedFx} />,
-          },
-          {
-            id: "devices",
-            label: t("tabs.devices"),
-            icon: <FaBoxOpen size={13} />,
-            content: <DevicesTab fx={devicesFx} />,
-          },
-          {
-            id: "exits",
-            label: t("tabs.exits"),
-            icon: <FaTrashAlt size={13} />,
-            content: <MaterialOutputsTab fx={materialOutputsFx} />,
-          },
-        ]}
-      />
+      <div className="mb-4">
+        <TabBar
+          items={[
+            { id: "assigned" as ReportTab, label: t("tabs.assigned"), icon: <LuHandshake size={13} /> },
+            { id: "devices" as ReportTab, label: t("tabs.devices"), icon: <LuBox size={13} /> },
+            { id: "exits" as ReportTab, label: t("tabs.exits"), icon: <LuTrash2 size={13} /> },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
+      </div>
+      {tab === "assigned" && <AssignedDevicesTab fx={assignedFx} />}
+      {tab === "devices" && <DevicesTab fx={devicesFx} />}
+      {tab === "exits" && <MaterialOutputsTab fx={materialOutputsFx} />}
     </ITPage>
   );
 }

@@ -2,7 +2,7 @@ import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaPlus, FaRegClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { SchedulesTable } from "@features/schedule";
+import { SchedulesBoard } from "@features/schedule";
 import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function SchedulesPage() {
@@ -30,7 +30,7 @@ export default function SchedulesPage() {
         </ITButton>
       }
     >
-      <SchedulesTable />
+      <SchedulesBoard />
     </ITPage>
   );
 }

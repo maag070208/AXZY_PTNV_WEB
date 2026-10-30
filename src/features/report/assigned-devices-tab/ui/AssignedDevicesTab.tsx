@@ -1,19 +1,23 @@
 import {
+  ITAlert,
   ITBadget,
+  ITBentoGrid,
+  ITBentoSegments,
+  ITBentoTile,
   ITButton,
   ITDataTable,
-  ITDatePicker,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
-import { FaExclamationTriangle, FaFilePdf, FaSync, FaUndo } from "react-icons/fa";
+import { LuClock, LuFileText, LuHandshake, LuRefreshCw, LuTriangleAlert } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { AssignedDeviceRow } from "@entities/report";
 import { formatDate } from "@shared/i18n";
 import type { UseAssignedDevicesReport } from "../model/useAssignedDevicesReport";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { Num } from "@shared/ui/bento-bits";
+import ReportPeriodBar from "../../ui/ReportPeriodBar";
 
 export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesReport }) {
   const navigate = useNavigate();
@@ -30,15 +34,6 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
     handleDownloadPdf,
     fetchTableData,
   } = fx;
-
-  const handleDateRange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } }
-  ) => {
-    const value = e.target.value;
-    if (Array.isArray(value)) setDateRange(value);
-  };
 
   const sourceBadgeColor = (source: AssignedDeviceRow["source"]) =>
     source === "CUSTODY_LETTER" ? "success" : source === "MOVEMENT" ? "warning" : "gray";
@@ -171,59 +166,47 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
 
   return (
     <ITFlex direction="column" gap={4}>
-      <ITFlex align="end" wrap="wrap" gap={3}>
-        <div className="min-w-[240px] max-w-[340px] flex-1">
-          <ITDatePicker
-            name="assignedDateRange"
-            label={t("filters.dateRange")}
-            range
-            value={dateRange}
-            onChange={handleDateRange}
-            className="w-full min-w-0"
-          />
-        </div>
-        <ITButton
-          variant="text"
-          color="gray"
-          size="sm"
-          onClick={() => setDateRange([null, null])}
-          disabled={!dateRange[0] && !dateRange[1]}
+      <ReportPeriodBar name="assignedDateRange" dateRange={dateRange} setDateRange={setDateRange} />
+
+      <ITBentoGrid>
+        <ITBentoTile
+          tone="sea"
+          cols={5}
+          rows={2}
+          icon={<LuHandshake size={15} />}
+          label={t("assigned.statAssigned")}
+          value={<Num value={stats?.assigned ?? 0} />}
+        />
+        <ITBentoTile
+          cols={3}
+          rows={2}
+          icon={<LuClock size={15} />}
+          label={t("assigned.statAverage")}
+          value={<Num value={stats?.averageDays ?? 0} />}
+        />
+        <ITBentoTile
+          tone={(stats?.over30 ?? 0) > 0 ? "sun" : "plain"}
+          cols={4}
+          rows={2}
+          icon={<LuTriangleAlert size={15} />}
+          label={t("assigned.statOver30")}
+          value={<Num value={stats?.over30 ?? 0} />}
+          aside={stats?.assigned ? `/ ${stats.assigned}` : undefined}
         >
-          <ITFlex align="center" gap={1}>
-            <FaUndo size={11} />
-            <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
+          {(stats?.assigned ?? 0) > 0 && (
+            <div className="mt-1 max-h-[42px] min-h-0 flex-1">
+              <ITBentoSegments total={stats?.assigned ?? 0} done={stats?.over30 ?? 0} color="var(--color-warning)" />
+            </div>
+          )}
+        </ITBentoTile>
+      </ITBentoGrid>
 
-      <ITFlex gap={3} wrap="wrap">
-        <div className="min-w-[140px] flex-1">
-          <KpiTile size="sm" tone="sky" label={t("assigned.statAssigned")} value={stats?.assigned ?? 0} />
-        </div>
-        <div className="min-w-[140px] flex-1">
-          <KpiTile size="sm" tone="neutral" label={t("assigned.statAverage")} value={stats?.averageDays ?? 0} />
-        </div>
-        <div className="min-w-[140px] flex-1">
-          <KpiTile
-            size="sm"
-            tone={(stats?.over30 ?? 0) > 0 ? "rose" : "neutral"}
-            label={t("assigned.statOver30")}
-            value={stats?.over30 ?? 0}
-          />
-        </div>
-      </ITFlex>
-
-      {error && (
-        <ITFlex align="center" gap={2} className="text-red-600">
-          <FaExclamationTriangle size={12} />
-          <ITText className="text-[11px] font-bold">{error}</ITText>
-        </ITFlex>
-      )}
+      {error && <ITAlert variant="error">{error}</ITAlert>}
 
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
-            <FaSync size={11} />
+            <LuRefreshCw size={13} />
             <ITText className="font-bold text-[11px]">
               {t("assigned.refresh")}
             </ITText>
@@ -236,7 +219,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
           disabled={exporting || (stats?.assigned ?? 0) === 0}
         >
           <ITFlex align="center" gap={1}>
-            <FaFilePdf className="text-red-600" size={13} />
+            <LuFileText size={14} />
             <ITText className="font-bold text-[11px]">
               {exporting ? t("assigned.exporting") : t("assigned.export")}
             </ITText>

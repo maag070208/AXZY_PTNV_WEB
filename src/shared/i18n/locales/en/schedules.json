@@ -27,7 +27,13 @@
   "summary": {
     "days": "Working days",
     "weeklyHours": "Weekly hours",
-    "restDays": "Rest days"
+    "restDays": "Rest days",
+    "total": "Schedules",
+    "totalCaption": "in the catalog",
+    "active": "Active",
+    "activeCaption": "in force today",
+    "assigned": "People assigned",
+    "assignedCaption": "with a schedule"
   },
   "days": "Days",
   "day1": "Monday",
@@ -179,5 +185,13 @@
     "summaryTitle": "Your schedule",
     "hintHint": "It fills as you answer; fine-tune the details below.",
     "qRules": "Last one: tolerances and workday rules. Keep them or adjust them."
-  }
+  },
+  "weekHours": "hours per week",
+  "daysWorked": "Days",
+  "searchPlaceholder": "Search schedule by name…",
+  "filter": {
+    "all": "All"
+  },
+  "emptyTitle": "No schedules",
+  "emptyHint": "Create the first one with “New schedule”."
 }

@@ -2,24 +2,18 @@ import { useMemo } from "react";
 import {
   ITAlert,
   ITBadget,
-  ITCard,
+  ITBentoGrid,
+  ITBentoTile,
+  ITBentoWaves,
   ITCheckbox,
-  ITChip,
   ITDataTable,
   ITFlex,
   ITInput,
-  ITProgress,
   ITSearchSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import {
-  FaCheckCircle,
-  FaClock,
-  FaDoorOpen,
-  FaExclamationTriangle,
-  FaRegCircle,
-} from "react-icons/fa";
+import { LuCircleAlert, LuCircleCheck, LuCircleDashed, LuClock, LuDoorOpen } from "react-icons/lu";
 import {
   type AttendanceDayStatus,
   type PeopleAttendanceDay,
@@ -27,8 +21,8 @@ import {
   type PeopleAttendanceView,
 } from "@entities/access";
 import { punchTime, workedTime } from "@entities/schedule";
-import { KPI_TONES, KpiTile } from "@shared/ui/kpi-tile";
-import { WaveFill } from "@shared/ui/charts";
+import { Num } from "@shared/ui/bento-bits";
+import { FilterPills } from "@shared/ui/filter-pills";
 import { PeriodPicker } from "@shared/ui/period-picker";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
@@ -299,7 +293,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   return (
     <ITFlex direction="column" gap={4}>
       {/* Filtros */}
-      <ITCard className="!p-5">
+      <PanelCard>
         <ITFlex direction="column" gap={4}>
           <ITFlex align="end" wrap="wrap" gap={3}>
             <PeriodPicker
@@ -341,77 +335,62 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
             onChange={fx.setIncludeInactive}
           />
         </ITFlex>
-      </ITCard>
+      </PanelCard>
 
-      {/* Indicadores: compactos, con el contexto del dato debajo */}
-      <div className="bento-stagger grid gap-3 sm:!grid-cols-2 lg:!grid-cols-5">
-        <KpiTile
-          size="sm"
+      {/* Indicadores del periodo: mosaicos con el contexto del dato */}
+      <ITBentoGrid>
+        <ITBentoTile
+          tone="sea"
+          cols={3}
+          rows={2}
+          icon={<LuDoorOpen size={15} />}
           label={t("tiles.onSite")}
-          value={summary?.onSite ?? 0}
-          footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.onSiteHint")}</span>}
-          tone="emerald"
-          icon={<FaDoorOpen size={14} />}
+          value={<Num value={summary?.onSite ?? 0} />}
+          caption={t("tiles.onSiteHint")}
           onClick={() => setView("ON_SITE")}
         />
-        <KpiTile
-          size="sm"
+        <ITBentoTile
+          tone="lavender"
+          cols={3}
+          rows={2}
+          icon={<LuCircleCheck size={15} />}
           label={t("tiles.withRecords")}
-          value={withRecords}
-          footer={
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] leading-snug text-slate-600">{t("tiles.ofTotal", { total: people })}</span>
-              <ITProgress value={recordsPercent} size="sm" color="info" />
-            </div>
-          }
-          backdrop={
-            people > 0 && withRecords > 0 ? (
-              <WaveFill level={withRecords / people} color={KPI_TONES.sky.accent} />
-            ) : undefined
-          }
-          tone="sky"
-          icon={<FaCheckCircle size={14} />}
-        />
-        <KpiTile
-          size="sm"
+          value={<Num value={withRecords} />}
+          caption={t("tiles.ofTotal", { total: people })}
+        >
+          {people > 0 && withRecords > 0 && (
+            <ITBentoWaves level={withRecords / people} color="var(--color-violet-400, #a895e0)" />
+          )}
+        </ITBentoTile>
+        <ITBentoTile
+          cols={2}
+          rows={2}
+          icon={<LuCircleDashed size={15} />}
           label={t("tiles.withoutRecords")}
-          value={withoutRecords}
-          footer={
-            <span className="text-[11px] leading-snug text-slate-600">
-              {withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded")}
-            </span>
-          }
-          tone="neutral"
-          icon={<FaRegCircle size={14} />}
-          backdrop={
-            people > 0 && withoutRecords > 0 ? (
-              <WaveFill level={withoutRecords / people} color={KPI_TONES.neutral.accent} />
-            ) : undefined
-          }
+          value={<Num value={withoutRecords} />}
+          caption={withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded")}
           onClick={() => setView("WITHOUT_RECORDS")}
         />
-        <KpiTile
-          size="sm"
+        <ITBentoTile
+          tone="mint"
+          cols={2}
+          rows={2}
+          icon={<LuClock size={15} />}
           label={t("tiles.hours")}
           value={hoursValue}
-          footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.hoursHint")}</span>}
-          tone="neutral"
-          icon={<FaClock size={14} />}
+          caption={t("tiles.hoursHint")}
         />
-        <KpiTile
-          size="sm"
+        <ITBentoTile
+          tone={incidentsTotal > 0 ? "sun" : "plain"}
+          cols={2}
+          rows={2}
+          icon={<LuCircleAlert size={15} />}
           label={t("tiles.incidents")}
-          value={incidentsTotal}
-          footer={
-            <span className="text-[11px] leading-snug text-slate-500">
-              {incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear")}
-            </span>
-          }
-          tone={incidentsTotal > 0 ? "amber" : "neutral"}
-          icon={<FaExclamationTriangle size={14} />}
+          value={<Num value={incidentsTotal} />}
+          caption={incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear")}
           onClick={() => setView("INCIDENTS")}
         />
-      </div>
+      </ITBentoGrid>
 
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
@@ -421,17 +400,13 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
 
       <PanelCard
         title={t("table.title", { count: fx.total })}
-        actions={VIEWS.map((value) => (
-          <ITChip
-            key={value}
-            label={tt(`views.${value}`)}
-            selected={view === value}
-            onClick={() => setView(value)}
-            color="primary"
-            variant="outlined"
-            size="sm"
+        actions={
+          <FilterPills
+            items={VIEWS.map((value) => ({ id: value, label: tt(`views.${value}`) }))}
+            value={view}
+            onChange={setView}
           />
-        ))}
+        }
       >
         <ITDataTable
           key={fx.tableKey}

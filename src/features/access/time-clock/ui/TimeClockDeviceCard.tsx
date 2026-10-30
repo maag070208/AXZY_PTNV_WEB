@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ITBadget, ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
-import { FaCircleInfo } from "react-icons/fa6";
-import { FaChevronDown, FaChevronUp, FaRedoAlt } from "react-icons/fa";
+import { LuChevronDown, LuChevronUp, LuInfo, LuRefreshCw } from "react-icons/lu";
 import {
   CLOCK_STATUS_COLOR,
   clockStatus,
@@ -15,10 +14,10 @@ import ClockHistoryDialog from "./ClockHistoryDialog";
 
 /** Punto de color del encabezado: el mismo lenguaje que las insignias. */
 const DOT: Record<TimeClockState, string> = {
-  ok: "bg-emerald-500",
-  running: "bg-sky-500",
-  error: "bg-rose-500",
-  paused: "bg-rose-500",
+  ok: "bg-[var(--color-success)]",
+  running: "bg-[var(--color-info)]",
+  error: "bg-[var(--color-danger)]",
+  paused: "bg-[var(--color-danger)]",
   pending: "bg-slate-300",
 };
 
@@ -99,9 +98,8 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
   return (
     <article
       data-testid="clock-card"
-      className={`flex h-full flex-col rounded-2xl border p-5 ${
-        desconectado ? "border-rose-200 !bg-rose-50" : "border-slate-200 !bg-[var(--it-card-bg)]"
-      }`}
+      className={`flex h-full flex-col rounded-3xl p-5 ${desconectado ? "" : "bg-[color-mix(in_srgb,currentColor_5%,transparent)]"}`}
+      style={desconectado ? { background: "var(--color-danger-soft)" } : undefined}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -119,11 +117,11 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
       </div>
 
       {desconectado && (
-        <div className="mt-4 rounded-xl border border-rose-200 !bg-[var(--it-card-bg)] p-3">
-          <p className="text-[12px] font-black text-rose-700">{alerta.titulo}</p>
+        <div className="mt-4 rounded-2xl !bg-[var(--it-card-bg)] p-3">
+          <p className="text-[12px] font-black text-[color:var(--color-danger)]">{alerta.titulo}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-slate-600">{alerta.texto}</p>
           {run?.error && (
-            <p className="mt-2 break-words font-mono text-[10px] font-bold text-rose-600">
+            <p className="mt-2 break-words font-mono text-[10px] font-bold text-[color:var(--color-danger)]">
               {run.error}
             </p>
           )}
@@ -146,22 +144,22 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
         {desconectado && (
           <ITButton variant="outlined" color="secondary" size="sm" disabled={retrying} onClick={onRetry}>
             <ITFlex align="center" gap={1}>
-              <FaRedoAlt size={11} className={retrying ? "animate-spin" : undefined} />
+              <LuRefreshCw size={12} className={retrying ? "animate-spin" : undefined} />
               <ITText className="font-bold text-[11px]">{t("status.retry")}</ITText>
             </ITFlex>
           </ITButton>
         )}
         <ITButton variant="text" color="gray" size="sm" className="!px-0" onClick={() => setAbierto((o) => !o)}>
           <ITFlex align="center" gap={1}>
-            <FaCircleInfo size={11} />
+            <LuInfo size={12} />
             <ITText className="text-[10px] font-bold">{t("status.technical")}</ITText>
-            {abierto ? <FaChevronUp size={9} /> : <FaChevronDown size={9} />}
+            {abierto ? <LuChevronUp size={11} /> : <LuChevronDown size={11} />}
           </ITFlex>
         </ITButton>
       </div>
 
       {abierto && (
-        <div className="mt-3 rounded-xl border border-slate-200 !bg-[var(--it-card-bg)] p-3">
+        <div className="mt-3 rounded-2xl !bg-[var(--it-card-bg)] p-3">
           <div className="!grid !grid-cols-2 gap-3">
             <Dato
               label={t("status.lastRunAt")}
@@ -188,7 +186,7 @@ export default function TimeClockDeviceCard({ device, onRetry, retrying }: Props
             onClick={() => setHistorial(true)}
           >
             <ITFlex align="center" gap={1}>
-              <FaCircleInfo size={11} />
+              <LuInfo size={12} />
               <ITText className="text-[10px] font-bold">{t("history.open")}</ITText>
             </ITFlex>
           </ITButton>

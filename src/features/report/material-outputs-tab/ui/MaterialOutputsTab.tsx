@@ -1,18 +1,21 @@
 import {
+  ITAlert,
   ITBadget,
+  ITBentoGrid,
+  ITBentoTile,
   ITButton,
   ITDataTable,
-  ITDatePicker,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaExclamationTriangle, FaFilePdf, FaUndo } from "react-icons/fa";
+import { LuFileText, LuTrash2 } from "react-icons/lu";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import type { MaterialOutput, MaterialOutputReason } from "@entities/material-output";
 import type { UseMaterialOutputsReport } from "../model/useMaterialOutputsReport";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { Num } from "@shared/ui/bento-bits";
+import ReportPeriodBar from "../../ui/ReportPeriodBar";
 
 const REASON_COLORS: Record<MaterialOutputReason, "danger" | "warning" | "gray"> = {
   DAMAGED: "danger",
@@ -34,15 +37,6 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
     handleDownloadPdf,
     fetchTableData,
   } = fx;
-
-  const handleDateRange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } }
-  ) => {
-    const value = e.target.value;
-    if (Array.isArray(value)) setDateRange(value);
-  };
 
   const columns: Column<MaterialOutput>[] = [
     {
@@ -167,43 +161,20 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
 
   return (
     <ITFlex direction="column" gap={4}>
-      <ITFlex align="end" wrap="wrap" gap={3}>
-        <div className="min-w-[240px] max-w-[340px] flex-1">
-          <ITDatePicker
-            name="exitsDateRange"
-            label={t("filters.dateRange")}
-            range
-            value={dateRange}
-            onChange={handleDateRange}
-            className="w-full min-w-0"
-          />
-        </div>
-        <ITButton
-          variant="text"
-          color="gray"
-          size="sm"
-          onClick={() => setDateRange([null, null])}
-          disabled={!dateRange[0] && !dateRange[1]}
-        >
-          <ITFlex align="center" gap={1}>
-            <FaUndo size={11} />
-            <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
+      <ReportPeriodBar name="exitsDateRange" dateRange={dateRange} setDateRange={setDateRange} />
 
-      <ITFlex gap={3} wrap="wrap">
-        <div className="min-w-[132px] flex-1">
-          <KpiTile size="sm" tone="neutral" label={t("exits.statTotal")} value={total} />
-        </div>
-      </ITFlex>
+      <ITBentoGrid>
+        <ITBentoTile
+          tone="sea"
+          cols={4}
+          rows={2}
+          icon={<LuTrash2 size={15} />}
+          label={t("exits.statTotal")}
+          value={<Num value={total} />}
+        />
+      </ITBentoGrid>
 
-      {error && (
-        <ITFlex align="center" gap={2} className="text-red-600">
-          <FaExclamationTriangle size={12} />
-          <ITText className="text-[11px] font-bold">{error}</ITText>
-        </ITFlex>
-      )}
+      {error && <ITAlert variant="error">{error}</ITAlert>}
 
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
         <ITButton
@@ -213,7 +184,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
           disabled={exporting || total === 0}
         >
           <ITFlex align="center" gap={1}>
-            <FaFilePdf className="text-red-600" size={13} />
+            <LuFileText size={14} />
             <ITText className="font-bold text-[11px]">
               {exporting ? t("exits.exporting") : t("exits.export")}
             </ITText>

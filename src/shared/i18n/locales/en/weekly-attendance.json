@@ -73,7 +73,8 @@
   "noExit": "no exit",
   "noEntry": "no entry",
   "notices": {
-    "title": "Week notices"
+    "title": "Week notices",
+    "subtitle": "Things worth checking before closing the week."
   },
   "unlinked": "Not linked to the time clock",
   "unlinkedHint": "{{count}} person(s) not linked to the time clock: their days show no information. Link them in Access control → Time clock employees.",
@@ -114,5 +115,12 @@
     "overtime": "of {{worked}} worked",
     "approved": "{{pct}}% of calculated",
     "absences": "of {{total}} people"
-  }
+  },
+  "charts": {
+    "extraByDay": "Overtime by day",
+    "extraByDepartment": "Overtime by department",
+    "dayNote": "The day with the most overtime was {{day}}: {{hours}} h.",
+    "noExtra": "No overtime calculated this week."
+  },
+  "emptyHint": "Try another week or clear the filters."
 }

@@ -27,7 +27,13 @@
   "summary": {
     "days": "Días de trabajo",
     "weeklyHours": "Horas por semana",
-    "restDays": "Días de descanso"
+    "restDays": "Días de descanso",
+    "total": "Horarios",
+    "totalCaption": "en el catálogo",
+    "active": "Activos",
+    "activeCaption": "vigentes hoy",
+    "assigned": "Personas asignadas",
+    "assignedCaption": "con un horario"
   },
   "days": "Días",
   "day1": "Lunes",
@@ -179,5 +185,13 @@
     "summaryTitle": "Tu horario",
     "hintHint": "Se llena mientras contestas; puedes ajustar los detalles abajo.",
     "qRules": "Última: tolerancias y reglas de la jornada. Déjalas así o ajústalas."
-  }
+  },
+  "weekHours": "horas por semana",
+  "daysWorked": "Días",
+  "searchPlaceholder": "Buscar horario por nombre…",
+  "filter": {
+    "all": "Todos"
+  },
+  "emptyTitle": "Sin horarios",
+  "emptyHint": "Crea el primero con «Nuevo horario»."
 }

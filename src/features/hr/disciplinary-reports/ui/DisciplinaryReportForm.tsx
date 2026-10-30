@@ -13,7 +13,9 @@ import {
 import { FaFilePen } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
 import type { DisciplinaryReason } from "@entities/hr";
+import { localToDateStr } from "../model/dateStr";
 import { searchEmployees } from "../model/useDisciplinaryReports";
+import DisciplinaryReportAgent from "./DisciplinaryReportAgent";
 
 const REASONS: DisciplinaryReason[] = [
   "ABSENCE",
@@ -42,11 +44,15 @@ interface EmployeeOption {
   label: string;
 }
 
-const localToDateStr = (value: Date): string => {
-  const y = value.getFullYear();
-  const m = String(value.getMonth() + 1).padStart(2, "0");
-  const d = String(value.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+const MODE_KEY = "ptnv.disciplinaryReport.mode";
+
+// Preferencia por persona (chat con Langostín o formulario clásico); por defecto, chat.
+const readMode = (): "chat" | "form" => {
+  try {
+    return localStorage.getItem(MODE_KEY) === "form" ? "form" : "chat";
+  } catch {
+    return "chat";
+  }
 };
 
 export default function DisciplinaryReportForm({
@@ -63,6 +69,16 @@ export default function DisciplinaryReportForm({
   const [incidentDate, setIncidentDate] = useState<string>("");
   const [description, setDescription] = useState("");
   const [sanction, setSanction] = useState("");
+  const [mode, setModeState] = useState<"chat" | "form">(readMode);
+
+  const setMode = (next: "chat" | "form") => {
+    setModeState(next);
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* sin almacenamiento: la preferencia solo dura la sesión */
+    }
+  };
 
   const reset = () => {
     setUserId("");
@@ -124,6 +140,10 @@ export default function DisciplinaryReportForm({
         </ITText>
       </div>
 
+      {mode === "chat" ? (
+        <DisciplinaryReportAgent saving={saving} onSave={onSave} onUseForm={() => setMode("form")} />
+      ) : (
+      <>
       <ITGrid container columns={12} spacing={2}>
         <ITGrid item xs={12}>
           <ITSearchSelect
@@ -183,6 +203,9 @@ export default function DisciplinaryReportForm({
       </ITGrid>
 
       <ITFlex justify="end" gap={2} className="mt-6 pt-4 border-t border-slate-100">
+        <ITButton variant="text" color="secondary" onClick={() => setMode("chat")} disabled={saving}>
+          <ITText className="font-bold text-[11px]">{tt("form.agent.useChat")}</ITText>
+        </ITButton>
         <ITButton variant="outlined" color="secondary" onClick={close} disabled={saving}>
           <ITText className="font-bold text-[11px]">{tt("common:actions.cancel")}</ITText>
         </ITButton>
@@ -192,6 +215,8 @@ export default function DisciplinaryReportForm({
           </ITText>
         </ITButton>
       </ITFlex>
+      </>
+      )}
     </ITDialog>
   );
 }

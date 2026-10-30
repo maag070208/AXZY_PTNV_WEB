@@ -77,7 +77,8 @@
     "confirm": "Anular evento",
     "cancel": "Cancelar",
     "success": "El evento fue anulado correctamente",
-    "error": "No se pudo anular el evento"
+    "error": "No se pudo anular el evento",
+    "subtitle": "Esta acción queda en la bitácora."
   },
   "errors": {
     "load": "No se pudieron cargar los eventos de acceso",
@@ -105,5 +106,9 @@
   },
   "toolbar": {
     "title": "Filtros"
+  },
+  "live": {
+    "title": "Última checada",
+    "none": "Aún no hay checadas registradas."
   }
 }

@@ -73,7 +73,8 @@
   "noExit": "sin salida",
   "noEntry": "sin entrada",
   "notices": {
-    "title": "Avisos de la semana"
+    "title": "Avisos de la semana",
+    "subtitle": "Cosas que conviene revisar antes de cerrar la semana."
   },
   "unlinked": "Sin vínculo al reloj",
   "unlinkedHint": "{{count}} persona(s) sin vínculo al reloj: sus días salen sin información. Vincúlalas en Control de acceso → Empleados del reloj.",
@@ -114,5 +115,12 @@
     "overtime": "de {{worked}} trabajadas",
     "approved": "{{pct}}% de las calculadas",
     "absences": "de {{total}} personas"
-  }
+  },
+  "charts": {
+    "extraByDay": "Horas extra por día",
+    "extraByDepartment": "Horas extra por departamento",
+    "dayNote": "El día con más tiempo extra fue el {{day}}: {{hours}} h.",
+    "noExtra": "No hay horas extra calculadas esta semana."
+  },
+  "emptyHint": "Prueba con otra semana o quita los filtros."
 }
