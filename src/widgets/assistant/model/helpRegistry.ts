@@ -1,4 +1,13 @@
 import type { ReactNode } from "react";
+import type { AppEventMap } from "@shared/lib/appEvents";
+
+/**
+ * Aviso que dispara una opción: el texto solo (sin datos) o el objeto con el
+ * evento y su carga, tipados contra `AppEventMap`.
+ */
+export type HelpEmit =
+  | "kanban:guide"
+  | { event: "attendance:view"; payload: AppEventMap["attendance:view"] };
 
 /**
  * Registro de ayuda por pantalla (nivel 1: sin IA, todo declarado aquí).
@@ -26,7 +35,7 @@ export interface HelpAction {
    * Aviso que se dispara a la pantalla (p. ej. la animación guiada del tablero).
    * El panel se cierra para que la persona vea la animación.
    */
-  emit?: "kanban:guide" | "disciplinary:new";
+  emit?: HelpEmit;
 }
 
 export interface HelpScreen {
@@ -205,13 +214,29 @@ export const HELP_SCREENS: HelpScreen[] = [
     explain: "Las cartas y actas administrativas de los empleados: motivo, sanción y quién la levantó. Arriba las cifras filtran por tipo.",
     match: (p) => p.startsWith("/employees/disciplinary-reports"),
     actions: [
-      { label: "Nueva acta", answer: "Te abro el alta de acta.", emit: "disciplinary:new", permission: "hr.disciplinary_reports" },
       { label: "¿Qué es un acta administrativa?", answer: "El registro formal de una falta (inasistencia, retardo, conducta) con su sanción. Queda en la bitácora y en el expediente de la persona." },
       { label: "Ver personal", to: "/employees", permission: "hr.records" },
     ],
     glossary: {
       Inasistencia: "Falta sin justificar en un día laboral.",
       Retardo: "Llegada después de la hora de entrada con la tolerancia del horario.",
+    },
+  },
+  {
+    screenId: "employees.disciplinary.detail",
+    title: "Vista previa del acta",
+    route: "/employees/disciplinary-reports/:id",
+    explain: "Aquí se revisa el acta ya levantada y se descarga en PDF con el formato de la empresa.",
+    match: (p) => /^\/employees\/disciplinary-reports\/[^/]+$/.test(p),
+    actions: [
+      { label: "¿Cómo la descargo?", answer: "Con «Descargar PDF», arriba a la derecha. El PDF lleva el formato oficial, con los mismos datos que ves aquí." },
+      { label: "¿Puedo corregirla?", answer: "No: un acta levantada no se edita. Si hubo un error, se levanta una nueva con la corrección y se anota la razón." },
+      { label: "Volver a Reportes de personal", to: "/employees/disciplinary-reports", permission: "hr.records" },
+      { label: "Ver personal", to: "/employees", permission: "hr.records" },
+    ],
+    glossary: {
+      "Descripción del hecho": "Lo que pasó, con hechos y sin adjetivos.",
+      "Sanción / medida aplicada": "Lo que se determinó: llamada de atención, suspensión, etc.",
     },
   },
   {
@@ -250,6 +275,7 @@ export const HELP_SCREENS: HelpScreen[] = [
     explain: "Los horarios del personal y las reglas de jornada con las que se calculan horas extra.",
     match: (p) => p === "/schedules",
     actions: [
+      { label: "Nuevo horario", to: "/schedules/new", permission: "schedules.view", keywords: "crear alta turno" },
       { label: "¿Cómo creo un horario?", answer: "Usa «Nuevo horario»: Langostín te pregunta nombre, días, horas y reglas, y te muestra el resumen antes de guardar." },
       { label: "Ver horas extra", to: "/schedules/overtime/approval", permission: "overtime.view" },
       { label: "Asignar horario", to: "/schedules/assign", permission: "schedules.view" },
@@ -257,6 +283,19 @@ export const HELP_SCREENS: HelpScreen[] = [
     glossary: {
       "Cruza medianoche": "La salida es al día siguiente (turnos nocturnos).",
     },
+  },
+  {
+    screenId: "schedules.assign",
+    title: "Asignar horario",
+    route: "/schedules/assign",
+    explain: "Pones a varias personas el mismo horario, o se lo quitas, filtrando por departamento.",
+    match: (p) => p.startsWith("/schedules/assign"),
+    actions: [
+      { label: "¿Cómo asigno a varias personas?", answer: "Elige el horario arriba, filtra por departamento y busca a quien necesites: toca los renglones para seleccionarlos y pulsa «Asignar (N)». El botón + de cada renglón asigna solo a esa persona." },
+      { label: "¿Cómo le quito el horario a alguien?", answer: "En la lista de la derecha (En <horario>) toca a las personas y pulsa «Quitar (N)», o el botón − de su renglón. Se quita a partir de hoy." },
+      { label: "Ver horarios", to: "/schedules", permission: "schedules.view" },
+      { label: "Ver horas extra", to: "/schedules/overtime/approval", permission: "overtime.view" },
+    ],
   },
   {
     screenId: "access",
@@ -268,6 +307,87 @@ export const HELP_SCREENS: HelpScreen[] = [
       { label: "¿Qué es un registro anulado?", answer: "Un acceso que se corrigió después: sigue visible para auditoría pero no cuenta." },
       { label: "Ver tiempo extra", to: "/schedules/overtime/approval", permission: "overtime.view" },
     ],
+  },
+  {
+    screenId: "timeclock.entries",
+    title: "Entradas y salidas",
+    route: "/hr/time-clock/entries-exits",
+    explain:
+      "Quién checó, a qué hora y cuántas horas lleva cada persona en el periodo. Las cifras de arriba filtran la lista y a la derecha ves el detalle de la persona elegida.",
+    match: (p) => p === "/hr/time-clock/entries-exits",
+    actions: [
+      {
+        label: "Muéstrame solo las incidencias",
+        answer: "Listo: la lista muestra solo a quienes tienen retardos, faltas o checadas incompletas. Toca la cifra otra vez para quitar el filtro.",
+        emit: { event: "attendance:view", payload: { view: "INCIDENTS" } },
+        keywords: "incidencia retardo falta problema",
+      },
+      {
+        label: "¿Quién está en sitio ahora?",
+        answer: "Listo: la lista muestra a quienes tienen una entrada abierta hoy. Solo tiene sentido en el periodo actual.",
+        emit: { event: "attendance:view", payload: { view: "ON_SITE" } },
+        keywords: "presente dentro turno",
+      },
+      {
+        label: "¿Quién no tiene registros?",
+        answer: "Listo: la lista muestra a quienes no tienen ninguna checada en el periodo.",
+        emit: { event: "attendance:view", payload: { view: "WITHOUT_RECORDS" } },
+        keywords: "sin checadas ausente",
+      },
+      {
+        label: "¿Cómo se lee la tira de días?",
+        answer:
+          "Cada cuadro es un día con la hora de entrada y de salida. Verde: asistió; ámbar: retardo; rojo: falta; gris: descanso; con línea punteada: día pendiente. El anillo marca hoy y el punto verde, a quien sigue en sitio. En quincena y mes se ven como cuadritos; pasa el cursor para ver las horas.",
+        keywords: "tira dias colores semana",
+      },
+      {
+        label: "¿Qué es «sin salida»?",
+        answer:
+          "Una entrada que no tiene salida después. Puede ser que la persona siga dentro o que olvidó checar al irse. Si ya se fue, revisa el día en el detalle de la derecha.",
+        keywords: "salida incompleta olvido",
+      },
+      {
+        label: "¿Por qué alguien sale sin registros?",
+        answer:
+          "Casi siempre es porque no está vinculado al reloj: sus checadas no se pueden asociar a una persona. Vincúlalo en «Vincular personas» y vuelve a esta pantalla.",
+        keywords: "vinculado reloj checadas",
+      },
+      {
+        label: "¿Cómo exporto el reporte?",
+        answer:
+          "Usa «PDF» o «Exportar CSV» arriba a la derecha. Salen las sesiones del periodo con los mismos filtros que tienes puestos (departamento, búsqueda e inactivos).",
+        keywords: "descargar excel pdf csv",
+      },
+      { label: "Vincular personas", to: "/hr/time-clock/employees", permission: "time_clock.view", keywords: "reloj numero empleado" },
+      { label: "Ver el rol de turnos", to: "/hr/time-clock/roster", permission: "time_clock.view", keywords: "turnos rol" },
+      { label: "Ver horas extra", to: "/schedules/overtime/approval", permission: "overtime.view", keywords: "tiempo extra aprobar" },
+      { label: "Ver nómina", to: "/schedules/payroll", permission: "payroll.view", keywords: "pago quincena" },
+      { label: "Ver horarios", to: "/schedules", permission: "schedules.view", keywords: "jornada" },
+    ],
+    glossary: {
+      Retardo: "Llegada después de la hora de entrada con la tolerancia del horario.",
+      Falta: "Día laboral sin ninguna checada.",
+      Descanso: "Día que el horario marca como libre.",
+      "Sin salida": "Hay entrada pero no una salida después.",
+      "Sin entrada": "Hay salida pero no una entrada antes.",
+      "En sitio": "Tiene una entrada abierta hoy: sigue dentro.",
+      Vinculado: "Su número del reloj está relacionado con una persona del sistema.",
+    },
+  },
+  {
+    screenId: "timeclock.home",
+    title: "Checadas",
+    route: "/hr/time-clock",
+    explain: "Los registros crudos de los relojes checadores. Se copian solos cada 5 minutos.",
+    match: (p) => p === "/hr/time-clock",
+    actions: [
+      { label: "¿Qué diferencia hay con Entradas y salidas?", answer: "Aquí ves cada checada tal como la dio el reloj; en Entradas y salidas se arman las jornadas por persona y se comparan con su horario." },
+      { label: "Ver entradas y salidas", to: "/hr/time-clock/entries-exits", permission: "time_clock.view" },
+      { label: "Vincular personas", to: "/hr/time-clock/employees", permission: "time_clock.view", keywords: "reloj numero empleado" },
+    ],
+    glossary: {
+      Vinculado: "Su número del reloj está relacionado con una persona del sistema.",
+    },
   },
   {
     screenId: "users",

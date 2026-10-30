@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import {
   ITAlert,
   ITBadget,
+  ITBentoStatStrip,
   ITButton,
   ITCard,
   ITCheckbox,
@@ -276,132 +277,86 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
 
   return (
     <ITFlex direction="column" gap={4}>
-      {/* Filtros */}
-      <ITCard className="!p-5">
-        <ITFlex direction="column" gap={3}>
-          <ITFlex align="end" wrap="wrap" gap={3}>
-            <PeriodPicker
-              name="overtime"
-              period={fx.period}
-              onPeriodChange={fx.changePeriod}
-              date={fx.date}
-              range={fx.periodRange}
-              onDateChange={fx.setDate}
-              onPrevious={fx.previousPeriod}
-              onNext={fx.nextPeriod}
-              labels={periodLabels}
-            />
-            <div className="min-w-[200px] flex-1">
-              <ITSearchSelect
-                name="overtimeDepartment"
-                label={t("filters.department")}
-                options={departmentOptions}
-                value={fx.departmentId}
-                onChange={(value) => fx.setDepartmentId(String(value))}
-                className="w-full min-w-0"
-              />
-            </div>
-            <div className="min-w-[220px] flex-1">
-              <ITInput
-                name="overtimeEmployee"
-                label={t("filters.employee")}
-                placeholder={t("filters.employeePlaceholder")}
-                value={fx.search}
-                onChange={(e) => fx.setSearch(e.target.value)}
-                className="w-full min-w-0"
-              />
-            </div>
-          </ITFlex>
-          <ITText className="text-[11px] text-slate-500">{t("timezone", { city: cityOf(tz) })}</ITText>
-        </ITFlex>
-      </ITCard>
-
-      {/* Indicadores: el número y contra qué se compara, en tarjetas compactas */}
-      <div className={`bento-stagger grid gap-3 sm:!grid-cols-2 ${canApprove ? "xl:!grid-cols-3" : "xl:!grid-cols-2"}`}>
-        {/* La ola de cada tarjeta es su parte del total de minutos del periodo. */}
-        {canApprove && (
-          <KpiTile
-            size="sm"
-            label={t("tiles.pending")}
-            value={workedTime(summary?.pendingMinutes ?? 0)}
-            footer={
-              <ITText as="span" className="text-[11px] leading-snug text-slate-500">
-                {t("tiles.requests", { count: pendingDays })} · {t("tiles.people", { count: summary?.peopleWithPending ?? 0 })}
-              </ITText>
-            }
-            tone="amber"
-            icon={<FaClock size={14} />}
-            backdrop={
-              totalMinutes > 0 && (summary?.pendingMinutes ?? 0) > 0 ? (
-                <WaveFill level={(summary?.pendingMinutes ?? 0) / totalMinutes} color={KPI_TONES.amber.accent} />
-              ) : undefined
-            }
-            onClick={() => setTab("PENDING")}
-          />
-        )}
-        <KpiTile
-          size="sm"
-          label={t("tiles.approved")}
-          value={workedTime(summary?.approvedMinutes ?? 0)}
-          footer={<ITText as="span" className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: approvedDays })}</ITText>}
-          tone="emerald"
-          icon={<FaCheckCircle size={14} />}
-          backdrop={
-            totalMinutes > 0 && (summary?.approvedMinutes ?? 0) > 0 ? (
-              <WaveFill level={(summary?.approvedMinutes ?? 0) / totalMinutes} color={KPI_TONES.emerald.accent} />
-            ) : undefined
-          }
-        />
-        {canApprove && (
-          <KpiTile
-            size="sm"
-            label={t("tiles.rejected")}
-            value={workedTime(summary?.rejectedMinutes ?? 0)}
-            footer={<ITText as="span" className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: rejectedDays })}</ITText>}
-            tone="rose"
-            icon={<FaTimesCircle size={14} />}
-            backdrop={
-              totalMinutes > 0 && (summary?.rejectedMinutes ?? 0) > 0 ? (
-                <WaveFill level={(summary?.rejectedMinutes ?? 0) / totalMinutes} color={KPI_TONES.rose.accent} />
-              ) : undefined
-            }
-          />
-        )}
-      </div>
-
-      {/* Desglose por departamento: solo cuando hay horas que repartir */}
-      {byDepartment.length > 0 && (
-        <PanelCard title={t("tiles.byDepartment")} icon={<FaBuilding size={16} />}>
-          <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-            {byDepartment.map((d) => (
-              <li key={d.departmentId ?? "none"}>
-                <ITFlex align="baseline" justify="between" gap={2}>
-                  <ITText as="span" className="truncate text-[12px] font-semibold text-slate-700">
-                    {d.departmentName ?? t("noDepartment")}
-                  </ITText>
-                  <ITText as="span" className="shrink-0 text-[12px] font-bold tabular-nums text-slate-900">{workedTime(d.minutes)}</ITText>
-                </ITFlex>
-                <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
-                  <div
-                    className="h-1.5 rounded-full bg-primary-500"
-                    style={{ width: `${Math.max(4, Math.round((d.minutes * 100) / maxDepartment))}%` }}
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </PanelCard>
-      )}
-
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
           {fx.error}
         </ITAlert>
       )}
 
-      {/* Lista por estatus (la tabla ya trae su superficie) */}
-      <ITStack spacing={3}>
-        <div>
+      {/* Cifras del periodo: el total a aprobar, lo aprobado y lo rechazado.
+          Tocarlas filtra la tabla por ese estatus. */}
+      <ITBentoStatStrip
+        items={[
+          {
+            id: "PENDING",
+            label: t("tiles.pending"),
+            value: workedTime(summary?.pendingMinutes ?? 0),
+            caption: `${t("tiles.requests", { count: pendingDays })} · ${t("tiles.people", { count: summary?.peopleWithPending ?? 0 })}`,
+            tone: "sun",
+          },
+          {
+            id: "APPROVED",
+            label: t("tiles.approved"),
+            value: workedTime(summary?.approvedMinutes ?? 0),
+            caption: t("tiles.requests", { count: approvedDays }),
+            tone: "mint",
+          },
+          ...(canApprove
+            ? [
+                {
+                  id: "REJECTED",
+                  label: t("tiles.rejected"),
+                  value: workedTime(summary?.rejectedMinutes ?? 0),
+                  caption: t("tiles.requests", { count: rejectedDays }),
+                  tone: "rose" as const,
+                },
+              ]
+            : []),
+        ]}
+        activeId={tab === "ALL" ? undefined : tab}
+        onSelect={(id: string) => setTab(id as StatusTab)}
+      />
+
+      {/* Una sola tarjeta: filtros, estatus, acciones en lote y la tabla */}
+      <ITCard contentClassName="!p-0">
+        <ITFlex wrap="wrap" align="end" gap={3} className="border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-4">
+          <PeriodPicker
+            name="overtime"
+            period={fx.period}
+            onPeriodChange={fx.changePeriod}
+            date={fx.date}
+            range={fx.periodRange}
+            onDateChange={fx.setDate}
+            onPrevious={fx.previousPeriod}
+            onNext={fx.nextPeriod}
+            labels={periodLabels}
+          />
+          <ITFlex className="min-w-[200px] flex-1">
+            <ITSearchSelect
+              name="overtimeDepartment"
+              label={t("filters.department")}
+              options={departmentOptions}
+              value={fx.departmentId}
+              onChange={(value) => fx.setDepartmentId(String(value))}
+              className="w-full min-w-0"
+            />
+          </ITFlex>
+          <ITFlex className="min-w-[200px] flex-1">
+            <ITInput
+              name="overtimeEmployee"
+              label={t("filters.employee")}
+              placeholder={t("filters.employeePlaceholder")}
+              value={fx.search}
+              onChange={(e) => fx.setSearch(e.target.value)}
+              className="w-full min-w-0"
+            />
+          </ITFlex>
+          <ITText muted className="w-full !text-[11px]">
+            {t("timezone", { city: cityOf(tz) })} · {t("howTo")}
+          </ITText>
+        </ITFlex>
+
+        <ITFlex align="center" wrap="wrap" gap={3} className="px-5 pb-2 pt-3">
           <TabBar
             items={visibleTabs.map((value) => ({
               id: value,
@@ -412,19 +367,11 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
             onChange={setTab}
             size="sm"
           />
-        </div>
-
-        {canApprove && fx.selectedCount > 0 && (
-          <ITFlex
-            align="center"
-            wrap="wrap"
-            gap={3}
-            className="mb-4 rounded-xl border border-slate-200 !bg-slate-50 px-4 py-2.5"
-          >
-            <ITText className="text-[12px] font-bold text-slate-700">
-              {t("bulk.selected", { count: fx.selectedCount })}
-            </ITText>
-            <ITFlex gap={2} wrap="wrap" className="ml-auto">
+          {canApprove && fx.selectedCount > 0 && (
+            <ITFlex align="center" wrap="wrap" gap={2} className="ml-auto rounded-full bg-[color-mix(in_srgb,var(--color-primary)_7%,transparent)] px-3 py-1.5">
+              <ITText className="!text-[12px] font-bold">
+                {t("bulk.selected", { count: fx.selectedCount })}
+              </ITText>
               <ITButton variant="text" color="gray" size="sm" onClick={fx.clearSelection}>
                 <ITText className="text-[11px] font-bold">{t("actions.clearSelection")}</ITText>
               </ITButton>
@@ -434,21 +381,15 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
                   <ITText className="text-[11px] font-bold">{t("actions.reject")}</ITText>
                 </ITFlex>
               </ITButton>
-              <ITButton
-                variant="filled"
-                color="primary"
-                size="sm"
-                disabled={fx.saving}
-                onClick={() => void fx.approveSelected()}
-              >
+              <ITButton variant="filled" color="success" size="sm" disabled={fx.saving} onClick={() => void fx.approveSelected()}>
                 <ITFlex align="center" gap={1}>
                   <FaCheck size={11} />
                   <ITText className="text-[11px] font-bold">{t("actions.approve")}</ITText>
                 </ITFlex>
               </ITButton>
             </ITFlex>
-          </ITFlex>
-        )}
+          )}
+        </ITFlex>
 
         <ITDataTable showViewToggle={false}
           key={fx.tableKey}
@@ -469,8 +410,10 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
           virtualizedMaxHeight={460}
         />
 
-        <ITText className="text-[11px] text-slate-500">{t("footnote")}</ITText>
-      </ITStack>
+        <ITText muted className="px-5 pb-4 !text-[11px]">
+          {t("footnote")}
+        </ITText>
+      </ITCard>
 
       {/* Rechazo con motivo opcional */}
       {canApprove && (

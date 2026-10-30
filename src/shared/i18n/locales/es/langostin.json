@@ -287,7 +287,10 @@
     "agentEmployee": "Buscar a una persona",
     "agentEmployeeForm": "Rellenar desde aquí",
     "agentAct": "Nueva acta aquí",
-    "actOfferBubble": "¿Un acta nueva? Te la levanto yo aquí mismo."
+    "actOfferBubble": "¿Un acta nueva? Te la levanto yo aquí mismo.",
+    "agentSchedule": "Crear horario",
+    "scheduleOfferBubble": "¿Un horario nuevo? Te lo armo yo aquí mismo.",
+    "agentScheduleEdit": "Editar horario"
   },
   "season": {
     "halloween": {

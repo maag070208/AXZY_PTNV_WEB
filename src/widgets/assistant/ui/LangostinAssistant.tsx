@@ -15,7 +15,7 @@ import { ITButton } from "@axzydev/axzy_ui_system";
 import { LuArrowLeft, LuSparkles } from "react-icons/lu";
 import { ASSISTANT_AGENTS, type AssistantAgent } from "../model/agents";
 import { useSeason } from "../model/useSeason";
-import { emitAppEvent } from "@shared/lib/appEvents";
+import { emitAppEvent, onAppEvent } from "@shared/lib/appEvents";
 
 type Message = { id: number; from: "agent" | "user"; text: string };
 
@@ -31,6 +31,7 @@ export default function LangostinAssistant() {
   const { pathname } = useLocation();
   const userName = useSelector((s: RootState) => s.auth.user?.name ?? "");
   const [open, setOpen] = useState(false);
+  const [targetId, setTargetId] = useState<string | undefined>(undefined);
   // Formulario activo dentro del panel (null = modo ayuda). Cada formulario vive
   // en su componente, así sus hooks sólo corren cuando está abierto.
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -49,6 +50,7 @@ export default function LangostinAssistant() {
   const canCreateTicket = useCan("tickets.create");
   const canAssignTasks = useCan("tasks.assign");
   const canManageActs = useCan("hr.disciplinary_reports");
+  const canManageSchedules = useCan("schedules.view");
 
   // Al cambiar de pantalla el asistente se **reinicia**: cierra el formulario
   // que estuviera abierto y vuelve a ofrecerse desde cero. Así no se puede, por
@@ -141,6 +143,18 @@ export default function LangostinAssistant() {
   );
   const activeAgent = availableAgents.find((agent) => agent.id === agentId) ?? null;
 
+  // La tabla de Horarios pide editar una fila: el panel abre el formulario con
+  // ese id (no se navega a otra pantalla ni se abre un modal).
+  useEffect(
+    () =>
+      onAppEvent("schedule:edit", ({ id }) => {
+        setTargetId(id);
+        setAgentId("scheduleEdit");
+        setOpen(true);
+      }),
+    [],
+  );
+
   // Oferta proactiva según la pantalla: en Tickets, el alta de ticket; en el
   // tablero, la de tarea. Sólo aparece si el permiso de esa pantalla está.
   const offerAgent =
@@ -148,8 +162,10 @@ export default function LangostinAssistant() {
       ? { agentId: "ticket", labelKey: "help.agentTicket" as const, bubbleKey: "help.ticketOfferBubble" as const }
       : (screen.screenId === "tickets.kanban" || screen.screenId === "tickets.tasks") && canAssignTasks
         ? { agentId: "task", labelKey: "help.agentTask" as const, bubbleKey: "help.taskOfferBubble" as const }
-        : screen.screenId === "employees.disciplinary" && canManageActs
-          ? { emit: "disciplinary:new" as const, labelKey: "help.agentAct" as const, bubbleKey: "help.actOfferBubble" as const }
+        : screen.screenId === "schedules" && canManageSchedules
+          ? { agentId: "schedule", labelKey: "help.agentSchedule" as const, bubbleKey: "help.scheduleOfferBubble" as const }
+          : screen.screenId === "employees.disciplinary" && canManageActs
+          ? { agentId: "act", labelKey: "help.agentAct" as const, bubbleKey: "help.actOfferBubble" as const }
           : null;
 
   // Las rutas del registro pueden traer `:id` (la ficha de una persona, por
@@ -160,8 +176,9 @@ export default function LangostinAssistant() {
   const runAction = (action: HelpAction) => {
     push({ from: "user", text: action.label });
     if (action.emit) {
-      // Aviso a la pantalla (animación guiada) y se cierra el panel para verla.
-      emitAppEvent(action.emit, {});
+      // Aviso a la pantalla (animación guiada o vista rápida) y se cierra el panel para verla.
+      if (typeof action.emit === "string") emitAppEvent(action.emit, {});
+      else emitAppEvent(action.emit.event, action.emit.payload);
       push({ from: "agent", text: action.answer ?? t("help.unknown") });
       window.setTimeout(() => setOpen(false), 700);
       return;
@@ -218,8 +235,10 @@ export default function LangostinAssistant() {
               </ITFlex>
               <div className="relative z-[1] min-h-0 flex-1 overflow-hidden">
                 <activeAgent.Component
+                  targetId={targetId}
                   onDone={() => {
                     setAgentId(null);
+                    setTargetId(undefined);
                     setOpen(false);
                   }}
                 />
@@ -360,12 +379,6 @@ export default function LangostinAssistant() {
               size="sm"
               onClick={() => {
                 setOfferDismissed(true);
-                if ("emit" in offerAgent && offerAgent.emit) {
-                  // El formulario vive en la pantalla: se le avisa y el panel se cierra.
-                  emitAppEvent(offerAgent.emit, {});
-                  setOpen(false);
-                  return;
-                }
                 setOpen(true);
                 setAgentId(offerAgent.agentId);
               }}

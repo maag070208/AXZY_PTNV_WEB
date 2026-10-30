@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { onAppEvent } from "@shared/lib/appEvents";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
   accessApi,
@@ -74,6 +75,10 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
   const q = useDebouncedValue(search.trim(), 350);
   const [includeInactive, setIncludeInactive] = useState(false);
   const [view, setView] = useState<PeopleAttendanceView>("ALL");
+
+  // Langostín: «Muéstrame solo las incidencias», «¿Quién está en sitio?»…
+  // El panel avisa y la tabla se filtra sin que la persona toque las píldoras.
+  useEffect(() => onAppEvent("attendance:view", ({ view: next }) => setView(next)), []);
 
   const [summary, setSummary] = useState<PeopleAttendanceSummary | null>(null);
   const [total, setTotal] = useState(0);

@@ -24,9 +24,14 @@ export default function DialogHeader({ icon, title, subtitle, tone = "primary" }
       >
         {icon}
       </ITText>
-      <ITFlex className="min-w-0">
-        <ITText as="h2" className="m-0 truncate !text-[18px] font-bold leading-tight !text-slate-800">{title}</ITText>
-        {subtitle && <ITText className="m-0 mt-0.5 text-[12.5px] text-slate-500">{subtitle}</ITText>}
+      {/* Título arriba y subtítulo debajo: en fila se pegaban ("títuloSubtítulo"). */}
+      <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
+        <ITText as="h2" className="m-0 line-clamp-1 !text-[18px] font-bold leading-tight !text-slate-800">
+          {title}
+        </ITText>
+        {subtitle && (
+          <ITText className="m-0 mt-0.5 line-clamp-2 !text-[12.5px] leading-snug text-slate-500">{subtitle}</ITText>
+        )}
       </ITFlex>
     </div>
   );

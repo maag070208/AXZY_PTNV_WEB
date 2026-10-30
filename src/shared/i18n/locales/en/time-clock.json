@@ -133,12 +133,9 @@
     "title": "Attendance",
     "description": "Shifts built from the time clock punches and matched to each employee by their time clock number.",
     "pdfTitle": "Entries and exits — Time clock",
-    "links": "{{linkedCount}} of {{total}} time clock employees linked",
-    "withoutLink": "The {{count}} unlinked ones show the time clock name and the “Not linked” mark.",
-    "goToLink": "Link employees",
-    "rule": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h.",
     "noEmployees": "The clock has no employees yet: punches cannot be matched to a person.",
-    "allLinked": "All {{total}} time clock employees are linked to a person."
+    "unlinkedNotice": "{{count}} of {{total}} clock employees are not linked to a person: their clock-ins show the clock name and the “Not linked” mark.",
+    "link": "Link"
   },
   "employees": {
     "title": "Time clock employees",

@@ -2,9 +2,7 @@ import { useMemo } from "react";
 import {
   ITAlert,
   ITBadget,
-  ITBentoGrid,
-  ITBentoTile,
-  ITBentoWaves,
+  ITBentoStatStrip,
   ITCheckbox,
   ITDataTable,
   ITFlex,
@@ -13,7 +11,6 @@ import {
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { LuCircleAlert, LuCircleCheck, LuCircleDashed, LuClock, LuDoorOpen } from "react-icons/lu";
 import {
   type AttendanceDayStatus,
   type PeopleAttendanceDay,
@@ -189,7 +186,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "employeeName",
       label: t("columns.employee"),
       type: "string",
-      width: 280,
+      width: 300,
       sortable: false,
       render: (r) => {
         const subtitle = [
@@ -233,7 +230,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
             key: "focusEntry",
             label: focusIsToday ? t("focus.entryToday") : t("focus.entry"),
             type: "string" as const,
-            width: 110,
+            width: 100,
             sortable: false,
             render: (r: PeopleAttendanceRow) => renderPunch(r.days[focusIndex]?.entryAt, r.days[focusIndex]),
           },
@@ -241,7 +238,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
             key: "focusExit",
             label: focusIsToday ? t("focus.exitToday") : t("focus.exit"),
             type: "string" as const,
-            width: 110,
+            width: 100,
             sortable: false,
             render: (r: PeopleAttendanceRow) => renderPunch(r.days[focusIndex]?.exitAt, r.days[focusIndex]),
           },
@@ -263,7 +260,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "state",
       label: t("columns.status"),
       type: "string",
-      width: 200,
+      width: 80,
       sortable: false,
       render: renderState,
     },
@@ -274,7 +271,6 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const withRecords = summary?.withRecords ?? 0;
   const withoutRecords = summary?.withoutRecords ?? 0;
   const workedMinutes = summary?.workedMinutes ?? 0;
-  const recordsPercent = people > 0 ? Math.round((withRecords * 100) / people) : 0;
   const hoursValue = `${Math.floor(workedMinutes / 60).toLocaleString(dateLocale())}:${String(
     workedMinutes % 60
   ).padStart(2, "0")}`;
@@ -292,9 +288,71 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
 
   return (
     <ITFlex direction="column" gap={4}>
-      {/* Filtros */}
-      <PanelCard>
-        <ITFlex direction="column" gap={4}>
+      {fx.error && (
+        <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
+          {fx.error}
+        </ITAlert>
+      )}
+
+      {/* Cifras del periodo en la tira del mosaico: cada una aplica su vista. */}
+      <ITBentoStatStrip
+        items={[
+          {
+            id: "onSite",
+            label: t("tiles.onSite"),
+            value: <Num value={summary?.onSite ?? 0} />,
+            caption: t("tiles.onSiteHint"),
+            tone: "sea",
+          },
+          {
+            id: "withRecords",
+            label: t("tiles.withRecords"),
+            value: <Num value={withRecords} />,
+            caption: t("tiles.ofTotal", { total: people }),
+            tone: "lavender",
+          },
+          {
+            id: "withoutRecords",
+            label: t("tiles.withoutRecords"),
+            value: <Num value={withoutRecords} />,
+            caption: withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded"),
+            tone: "plain",
+          },
+          {
+            id: "hours",
+            label: t("tiles.hours"),
+            value: hoursValue,
+            caption: t("tiles.hoursHint"),
+            tone: "mint",
+          },
+          {
+            id: "incidents",
+            label: t("tiles.incidents"),
+            value: <Num value={incidentsTotal} />,
+            caption: incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear"),
+            tone: incidentsTotal > 0 ? "sun" : "plain",
+          },
+        ]}
+        activeId={view === "ON_SITE" ? "onSite" : view === "WITHOUT_RECORDS" ? "withoutRecords" : view === "INCIDENTS" ? "incidents" : "withRecords"}
+        onSelect={(id: string) =>
+          setView(
+            id === "onSite" ? "ON_SITE" : id === "withoutRecords" ? "WITHOUT_RECORDS" : id === "incidents" ? "INCIDENTS" : "ALL"
+          )
+        }
+      />
+
+      {/* Una sola tarjeta: filtros del periodo arriba y la tabla debajo. */}
+      <PanelCard
+        title={t("table.title", { count: fx.total })}
+        actions={
+          <FilterPills
+            items={VIEWS.map((value) => ({ id: value, label: tt(`views.${value}`) }))}
+            value={view}
+            onChange={setView}
+          />
+        }
+      >
+        <ITFlex direction="column" gap={4} className="pb-4">
           <ITFlex align="end" wrap="wrap" gap={3}>
             <PeriodPicker
               name="accessReport"
@@ -307,7 +365,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
               onNext={fx.nextPeriod}
               labels={periodLabels}
             />
-            <div className="min-w-[200px] flex-1">
+            <ITFlex className="min-w-[200px] flex-1">
               <ITSearchSelect
                 name="accessReportDepartment"
                 label={t("filters.department")}
@@ -316,8 +374,8 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
                 onChange={(value) => fx.setDepartmentId(String(value))}
                 className="w-full min-w-0"
               />
-            </div>
-            <div className="min-w-[220px] flex-1">
+            </ITFlex>
+            <ITFlex className="min-w-[220px] flex-1">
               <ITInput
                 name="accessReportEmployee"
                 label={t("filters.employee")}
@@ -326,88 +384,16 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
                 onChange={(e) => fx.setSearch(e.target.value)}
                 className="w-full min-w-0"
               />
-            </div>
+            </ITFlex>
+            <ITCheckbox
+              name="accessReportIncludeInactive"
+              label={t("filters.includeInactive")}
+              checked={fx.includeInactive}
+              onChange={fx.setIncludeInactive}
+            />
           </ITFlex>
-          <ITCheckbox
-            name="accessReportIncludeInactive"
-            label={t("filters.includeInactive")}
-            checked={fx.includeInactive}
-            onChange={fx.setIncludeInactive}
-          />
         </ITFlex>
-      </PanelCard>
 
-      {/* Indicadores del periodo: mosaicos con el contexto del dato */}
-      <ITBentoGrid>
-        <ITBentoTile
-          tone="sea"
-          cols={3}
-          rows={2}
-          icon={<LuDoorOpen size={15} />}
-          label={t("tiles.onSite")}
-          value={<Num value={summary?.onSite ?? 0} />}
-          caption={t("tiles.onSiteHint")}
-          onClick={() => setView("ON_SITE")}
-        />
-        <ITBentoTile
-          tone="lavender"
-          cols={3}
-          rows={2}
-          icon={<LuCircleCheck size={15} />}
-          label={t("tiles.withRecords")}
-          value={<Num value={withRecords} />}
-          caption={t("tiles.ofTotal", { total: people })}
-        >
-          {people > 0 && withRecords > 0 && (
-            <ITBentoWaves level={withRecords / people} color="var(--color-violet-400, #a895e0)" />
-          )}
-        </ITBentoTile>
-        <ITBentoTile
-          cols={2}
-          rows={2}
-          icon={<LuCircleDashed size={15} />}
-          label={t("tiles.withoutRecords")}
-          value={<Num value={withoutRecords} />}
-          caption={withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded")}
-          onClick={() => setView("WITHOUT_RECORDS")}
-        />
-        <ITBentoTile
-          tone="mint"
-          cols={2}
-          rows={2}
-          icon={<LuClock size={15} />}
-          label={t("tiles.hours")}
-          value={hoursValue}
-          caption={t("tiles.hoursHint")}
-        />
-        <ITBentoTile
-          tone={incidentsTotal > 0 ? "sun" : "plain"}
-          cols={2}
-          rows={2}
-          icon={<LuCircleAlert size={15} />}
-          label={t("tiles.incidents")}
-          value={<Num value={incidentsTotal} />}
-          caption={incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear")}
-          onClick={() => setView("INCIDENTS")}
-        />
-      </ITBentoGrid>
-
-      {fx.error && (
-        <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
-          {fx.error}
-        </ITAlert>
-      )}
-
-      <PanelCard
-        title={t("table.title", { count: fx.total })}
-        actions={
-          <FilterPills
-            items={VIEWS.map((value) => ({ id: value, label: tt(`views.${value}`) }))}
-            value={view}
-            onChange={setView}
-          />
-        }
-      >
         <ITDataTable showViewToggle={false}
           key={fx.tableKey}
           columns={columns as unknown as Column<Record<string, unknown>>[]}

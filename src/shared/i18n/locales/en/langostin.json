@@ -287,7 +287,10 @@
     "agentEmployee": "Find a person",
     "agentEmployeeForm": "Fill it from here",
     "agentAct": "New report here",
-    "actOfferBubble": "A new disciplinary report? I can start it right here."
+    "actOfferBubble": "A new disciplinary report? I can start it right here.",
+    "agentSchedule": "Create schedule",
+    "scheduleOfferBubble": "A new schedule? I can put it together right here.",
+    "agentScheduleEdit": "Edit schedule"
   },
   "season": {
     "halloween": {

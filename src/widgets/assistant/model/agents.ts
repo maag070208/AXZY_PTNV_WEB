@@ -1,16 +1,28 @@
 import type { ComponentType } from "react";
+import ActChatAgent from "../ui/agents/ActChatAgent";
+import ScheduleChatAgent from "../ui/agents/ScheduleChatAgent";
+import ScheduleEditAgent from "../ui/agents/ScheduleEditAgent";
 import EmployeeFinderAgent from "../ui/agents/EmployeeFinderAgent";
 import EmployeeFormAgent from "../ui/agents/EmployeeFormAgent";
 import TaskChatAgent from "../ui/agents/TaskChatAgent";
 import TicketChatAgent from "../ui/agents/TicketChatAgent";
 
 /** Claves de i18n de los formularios del panel (tipadas para `t()`). */
-export type AssistantAgentLabelKey = "help.agentTicket" | "help.agentTask" | "help.agentEmployee" | "help.agentEmployeeForm";
+export type AssistantAgentLabelKey =
+  | "help.agentTicket"
+  | "help.agentTask"
+  | "help.agentEmployee"
+  | "help.agentEmployeeForm"
+  | "help.agentAct"
+  | "help.agentSchedule"
+  | "help.agentScheduleEdit";
 
 /** Props que recibe todo formulario que vive dentro del panel de Langostín. */
 export interface AssistantAgentProps {
   /** Cierra el formulario (el panel vuelve a la ayuda). */
   onDone: () => void;
+  /** Id de la fila que se está editando (p. ej. el horario elegido en la tabla). */
+  targetId?: string;
 }
 
 /**
@@ -37,6 +49,33 @@ export interface AssistantAgent {
 }
 
 export const ASSISTANT_AGENTS: AssistantAgent[] = [
+  {
+    id: "act",
+    labelKey: "help.agentAct",
+    permission: "hr.disciplinary_reports",
+    // El acta se levanta desde el bot en Reportes de personal.
+    screens: ["employees.disciplinary"],
+    tone: "warning",
+    Component: ActChatAgent,
+  },
+  {
+    id: "schedule",
+    labelKey: "help.agentSchedule",
+    permission: "schedules.view",
+    // En Horarios el alta la hace el bot: no hay botón de «Nuevo horario».
+    screens: ["schedules"],
+    tone: "primary",
+    Component: ScheduleChatAgent,
+  },
+  {
+    id: "scheduleEdit",
+    labelKey: "help.agentScheduleEdit",
+    permission: "schedules.view",
+    // Editar un horario ocurre en el panel: la fila avisa y el bot pregunta qué cambiar.
+    screens: ["schedules"],
+    tone: "primary",
+    Component: ScheduleEditAgent,
+  },
   {
     id: "employee",
     labelKey: "help.agentEmployee",

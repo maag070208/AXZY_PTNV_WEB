@@ -8,7 +8,7 @@ import {
   ITText,
   useITBentoCountUp,
 } from "@axzydev/axzy_ui_system";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LuCalendarDays,
   LuClockAlert,
@@ -27,7 +27,6 @@ import type { DisciplinaryReport } from "@entities/hr";
 import { useCan } from "@entities/user";
 import {
   DISCIPLINARY_REASONS,
-  DisciplinaryReportForm,
   DisciplinaryReportsTable,
   useDisciplinaryReports,
   type DisciplinaryQuickFilter,
@@ -51,10 +50,25 @@ export default function HrReportsPage() {
   // Consultar, levantar y eliminar actas piden el mismo permiso en la API.
   const canManage = useCan("hr.disciplinary_reports");
 
-  // "Nueva acta" desde el panel del bot: abre el mismo formulario de la pantalla.
+  // El bot levanta el acta: la tabla y los totales se recargan y la fila nueva
+  // entra con el mismo destello verde que un ticket recién creado.
+  const [flashNew, setFlashNew] = useState(false);
+  const flashTimer = useRef<number | null>(null);
   useEffect(
-    () => onAppEvent("disciplinary:new", () => fx.setShowForm(true)),
+    () =>
+      onAppEvent("disciplinary:created", () => {
+        fx.reload();
+        setFlashNew(true);
+        if (flashTimer.current) window.clearTimeout(flashTimer.current);
+        flashTimer.current = window.setTimeout(() => setFlashNew(false), 2600);
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+  useEffect(
+    () => () => {
+      if (flashTimer.current) window.clearTimeout(flashTimer.current);
+    },
     [],
   );
 
@@ -207,17 +221,11 @@ export default function HrReportsPage() {
               canDelete={canManage}
               onView={(disciplinaryReport) => navigate(`/employees/disciplinary-reports/${disciplinaryReport.id}`)}
               onDelete={(disciplinaryReport) => setDisciplinaryReportToDelete(disciplinaryReport)}
+              flashNew={flashNew}
             />
           </PanelCard>
         </ITFlex>
       )}
-
-      <DisciplinaryReportForm
-        isOpen={fx.showForm}
-        saving={fx.saving}
-        onClose={() => fx.setShowForm(false)}
-        onSave={(input) => void fx.createDisciplinaryReport(input)}
-      />
 
       <LangostinConfirm
         isOpen={!!disciplinaryReportToDelete}

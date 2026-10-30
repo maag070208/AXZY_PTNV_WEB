@@ -133,12 +133,9 @@
     "title": "Asistencias",
     "description": "Jornadas armadas con las checadas del reloj y relacionadas con cada empleado por su número en el reloj.",
     "pdfTitle": "Entradas y salidas — Reloj checador",
-    "links": "{{linkedCount}} de {{total}} empleados del reloj vinculados",
-    "withoutLink": "Los {{count}} sin vincular salen con el nombre del reloj y la marca «Sin vincular».",
-    "goToLink": "Vincular empleados",
-    "rule": "El reloj no distingue entrada de salida: las checadas se alternan, las repetidas en menos de 5 min se ignoran y una jornada dura máximo 13 h.",
     "noEmployees": "El reloj todavía no tiene empleados: las checadas no se pueden asociar a una persona.",
-    "allLinked": "Los {{total}} empleados del reloj están vinculados a una persona."
+    "unlinkedNotice": "{{count}} de {{total}} empleados del reloj no están vinculados a una persona: sus checadas salen con el nombre del reloj y la marca «Sin vincular».",
+    "link": "Vincular"
   },
   "employees": {
     "title": "Empleados del reloj",

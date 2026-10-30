@@ -2,9 +2,10 @@ import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
-  ITCard,
+  ITBentoStatStrip,
   ITButton,
-  ITDatePicker,
+  ITCard,
+  ITCheckbox,
   ITFlex,
   ITGrid,
   ITInput,
@@ -12,19 +13,26 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaCheck, FaGripVertical, FaPlus, FaRegClock, FaTimes } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaMinus, FaPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { usersApi, type User } from "@entities/user";
+import { useDepartmentOptions } from "@entities/department";
 import { scheduleApi, type AssignedPerson, type Schedule } from "@entities/schedule";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
-import { TabBar } from "@shared/ui/tab-bar";
 
 const toDateInput = (d: Date): string =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-const ASSIGNED_MIME = "application/x-assigned";
-const PENDING_MIME = "application/x-pending";
+/** "#número · puesto · departamento": lo justo para reconocer a la persona. */
+function personMeta(employeeNumber?: string | null, jobTitle?: string, department?: string) {
+  return [employeeNumber ? `#${employeeNumber}` : null, jobTitle, department].filter(Boolean).join(" · ");
+}
 
+/**
+ * Asignar horario: elegir el horario, filtrar por departamento y marcar a varias
+ * personas para **asignar** o **quitar** de una vez (o una por una con el botón
+ * del renglón). Sin modos ni arrastrar: dos listas y dos botones.
+ */
 export default function AssignSchedules() {
   const { t } = useTranslation("schedules");
   const [schedules, setSchedules] = useState<Schedule[]>([]);
@@ -34,14 +42,14 @@ export default function AssignSchedules() {
   const [toast, setToast] = useState<string | null>(null);
 
   const [scheduleId, setScheduleId] = useState("");
-  const [from, setFrom] = useState<Date>(new Date());
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [departmentId, setDepartmentId] = useState("");
   const [assigned, setAssigned] = useState<AssignedPerson[]>([]);
+  const [toAssign, setToAssign] = useState<Set<string>>(new Set());
+  const [toRemove, setToRemove] = useState<Set<string>>(new Set());
   const [q, setQ] = useState("");
-  const [mode, setMode] = useState<"list" | "drag">("list");
-  const [dragOver, setDragOver] = useState(false);
-  const [removeOver, setRemoveOver] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const departments = useDepartmentOptions();
 
   useEffect(() => {
     Promise.all([scheduleApi.list(), usersApi.employees()])
@@ -64,54 +72,76 @@ export default function AssignSchedules() {
 
   useEffect(() => {
     loadAssigned(scheduleId);
+    setToAssign(new Set());
+    setToRemove(new Set());
   }, [scheduleId, loadAssigned]);
 
   const employeeById = useMemo(() => new Map(employees.map((e) => [e.id, e])), [employees]);
   const assignedIds = useMemo(() => new Set(assigned.map((a) => a.userId)), [assigned]);
-  const pending = useMemo(
-    () => [...selected].map((id) => employeeById.get(id)).filter(Boolean) as User[],
-    [selected, employeeById]
-  );
-
-  // Solo mostramos personas disponibles: ni ya asignadas a este horario ni pendientes.
-  const filtered = useMemo(() => {
-    const term = q.trim().toLowerCase();
-    return employees.filter((e) => {
-      if (assignedIds.has(e.id) || selected.has(e.id)) return false;
-      if (!term) return true;
-      return (
-        e.name.toLowerCase().includes(term) ||
-        (e.employeeNumber ?? "").toLowerCase().includes(term)
-      );
-    });
-  }, [employees, assignedIds, selected, q]);
-
-  const toggle = (id: string) =>
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-
-  const selectAllVisible = () => setSelected(new Set(filtered.map((e) => e.id)));
-  const clearSelection = () => setSelected(new Set());
-
-  const scheduleOptions = schedules.map((h) => ({ value: h.id, label: h.name }));
   const currentSchedule = schedules.find((h) => h.id === scheduleId);
 
-  const apply = async () => {
-    if (!scheduleId || selected.size === 0) return;
+  const matches = useCallback(
+    (name: string, employeeNumber: string | null | undefined) => {
+      const term = q.trim().toLowerCase();
+      if (!term) return true;
+      return name.toLowerCase().includes(term) || (employeeNumber ?? "").toLowerCase().includes(term);
+    },
+    [q],
+  );
+
+  // Personas que todavía no tienen este horario (con departamento y búsqueda).
+  const available = useMemo(
+    () =>
+      employees.filter((e) => {
+        if (assignedIds.has(e.id)) return false;
+        if (departmentId && e.departmentId !== departmentId) return false;
+        return matches(e.name, e.employeeNumber);
+      }),
+    [employees, assignedIds, departmentId, matches],
+  );
+
+  // Personas que ya lo tienen: el nombre viene del horario y los datos del catálogo.
+  const assignedRows = useMemo(
+    () =>
+      assigned
+        .map((a) => {
+          const person = employeeById.get(a.userId);
+          return {
+            id: a.userId,
+            name: person?.name ?? a.employeeName,
+            employeeNumber: person?.employeeNumber ?? a.employeeNumber,
+            jobTitle: person?.jobTitle,
+            department: person?.department?.name,
+            departmentId: person?.departmentId ?? null,
+          };
+        })
+        .filter((p) => {
+          if (departmentId && p.departmentId !== departmentId) return false;
+          return matches(p.name, p.employeeNumber);
+        }),
+    [assigned, employeeById, departmentId, matches],
+  );
+
+  const allPending = available.length > 0 && available.every((e) => toAssign.has(e.id));
+  const somePending = toAssign.size > 0 && !allPending;
+  const allAssigned = assignedRows.length > 0 && assignedRows.every((p) => toRemove.has(p.id));
+  const someAssigned = toRemove.size > 0 && !allAssigned;
+
+  const toggle = (set: Set<string>, setSet: (next: Set<string>) => void, id: string) => {
+    const next = new Set(set);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSet(next);
+  };
+
+  const assign = async (ids: string[]) => {
+    if (!scheduleId || ids.length === 0) return;
     setSaving(true);
     setError(null);
     try {
-      const res = await scheduleApi.assign({
-        scheduleId,
-        userIds: [...selected],
-        from: toDateInput(from),
-      });
+      const res = await scheduleApi.assign({ scheduleId, userIds: ids, from: toDateInput(new Date()) });
       setToast(t("assign.success", { count: res.assigned }));
-      setSelected(new Set());
+      setToAssign(new Set());
       loadAssigned(scheduleId);
     } catch (e) {
       setError((e as Error).message ?? t("assign.error"));
@@ -120,13 +150,19 @@ export default function AssignSchedules() {
     }
   };
 
-  const removeAssigned = async (userId: string) => {
-    if (!scheduleId) return;
+  const remove = async (ids: string[]) => {
+    if (!scheduleId || ids.length === 0) return;
+    setSaving(true);
+    setError(null);
     try {
-      await scheduleApi.removeAssignments({ scheduleId, userIds: [userId] });
+      const res = await scheduleApi.removeAssignments({ scheduleId, userIds: ids });
+      setToast(t("assign.removed", { count: res.removed }));
+      setToRemove(new Set());
       loadAssigned(scheduleId);
     } catch (e) {
-      setError((e as Error).message);
+      setError((e as Error).message ?? t("assign.removeError"));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -138,6 +174,16 @@ export default function AssignSchedules() {
     );
   }
 
+  const scheduleOptions = schedules.map((h) => ({ value: h.id, label: h.name }));
+  const departmentOptions = [
+    { value: "", label: t("assign.allDepartments") },
+    ...departments.data.map((d) => ({ value: d.id, label: d.name })),
+  ];
+
+  const departmentName = departmentId
+    ? departments.data.find((d) => d.id === departmentId)?.name ?? t("assign.allDepartments")
+    : t("assign.allDepartments");
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && (
@@ -146,290 +192,237 @@ export default function AssignSchedules() {
         </ITAlert>
       )}
 
-      <ITGrid container columns={12} spacing={4} className="items-end">
-        <ITGrid item xs={12} md={4}>
-          <ITSearchSelect
-            name="schedule"
-            label={t("assign.schedule")}
-            options={scheduleOptions}
-            value={scheduleId}
-            onChange={(v) => {
-              setScheduleId(String(v));
-              setSelected(new Set());
-            }}
-            className="w-full min-w-0"
-          />
-        </ITGrid>
-        <ITGrid item xs={12} md={3}>
-          <ITDatePicker
-            name="from"
-            label={t("assign.since")}
-            value={from}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (v instanceof Date) setFrom(v);
-            }}
-            className="w-full min-w-0"
-          />
-        </ITGrid>
-        <ITGrid item xs={12} md={3}>
-          <ITFlex direction="column" gap={1}>
-            <ITText className="text-[12px] font-semibold text-slate-600">{t("assign.mode")}</ITText>
-            <TabBar
-              items={[
-                { id: "list" as const, label: t("assign.modeList") },
-                { id: "drag" as const, label: t("assign.modeDrag") },
-              ]}
-              value={mode}
-              onChange={setMode}
-              size="sm"
+      {/* Cifras de la asignación: en el horario, por asignar y el filtro activo */}
+      <ITBentoStatStrip
+        items={[
+          {
+            id: "inSchedule",
+            label: t("assign.inSchedule"),
+            value: assigned.length,
+            caption: currentSchedule?.name ?? "—",
+            tone: "mint",
+          },
+          {
+            id: "pending",
+            label: t("assign.pending"),
+            value: available.length,
+            caption: t("assign.pendingCaption"),
+            tone: "sun",
+          },
+          {
+            id: "people",
+            label: t("assign.people"),
+            value: employees.length,
+            caption: departmentId ? departmentName : t("assign.allDepartments"),
+            tone: "sea",
+          },
+        ]}
+      />
+
+      {/* Una tarjeta: filtros arriba y las dos listas debajo */}
+      <ITCard contentClassName="!p-0">
+        <ITFlex wrap="wrap" align="end" gap={3} className="border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-4">
+          <ITFlex className="min-w-[220px] flex-1">
+            <ITSearchSelect
+              name="schedule"
+              label={t("assign.schedule")}
+              options={scheduleOptions}
+              value={scheduleId}
+              onChange={(v) => setScheduleId(String(v))}
+              className="w-full min-w-0"
             />
           </ITFlex>
-        </ITGrid>
-      </ITGrid>
+          <ITFlex className="min-w-[180px] flex-1">
+            <ITSearchSelect
+              name="department"
+              label={t("assign.department")}
+              options={departmentOptions}
+              value={departmentId}
+              onChange={(v) => {
+                setDepartmentId(String(v));
+                setToAssign(new Set());
+                setToRemove(new Set());
+              }}
+              className="w-full min-w-0"
+            />
+          </ITFlex>
+          <ITFlex className="min-w-[180px] flex-1">
+            <ITInput
+              name="searchPerson"
+              label={t("assign.searchLabel")}
+              placeholder={t("assign.search")}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="w-full min-w-0"
+            />
+          </ITFlex>
+        </ITFlex>
 
-      <ITGrid container columns={12} spacing={4} className="items-start">
-        {/* Personas disponibles */}
-        <ITGrid item xs={12} md={7} className="min-w-0">
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setRemoveOver(true);
-            }}
-            onDragLeave={() => setRemoveOver(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setRemoveOver(false);
-              const a = e.dataTransfer.getData(ASSIGNED_MIME);
-              const p = e.dataTransfer.getData(PENDING_MIME);
-              if (a) void removeAssigned(a);
-              else if (p) toggle(p);
-            }}
-            className={`rounded-2xl transition-shadow ${removeOver ? "ring-2 ring-rose-400" : ""}`}
-          >
-            <ITCard>
-            <ITFlex direction="column" gap={3}>
-              <ITFlex align="center" justify="between" gap={2} wrap="wrap">
-                <ITText className="text-[12px] font-semibold text-slate-500">
-                  {t("assign.people")} · {filtered.length}
+        <ITGrid container columns={12} spacing={0}>
+          {/* Por asignar */}
+          <ITGrid item xs={12} lg={6} className="min-w-0 lg:border-r lg:border-[color-mix(in_srgb,currentColor_7%,transparent)]">
+            <ITFlex align="center" justify="between" gap={2} className="px-5 pb-2 pt-4">
+              <ITFlex align="center" gap={1.5}>
+                <ITCheckbox
+                  name="pending-all"
+                  checked={allPending}
+                  indeterminate={somePending}
+                  disabled={available.length === 0}
+                  onChange={(value) => setToAssign(value ? new Set(available.map((e) => e.id)) : new Set())}
+                />
+                <ITText className="!text-[12.5px] font-bold">{t("assign.available")}</ITText>
+                <ITText as="span" className="rounded-full bg-[color-mix(in_srgb,var(--color-warning)_16%,transparent)] px-2 py-0.5 !text-[11px] font-bold text-[color:var(--color-warning)]">
+                  {available.length}
                 </ITText>
-                <ITFlex gap={2}>
-                  <ITButton variant="text" color="primary" size="sm" onClick={selectAllVisible}>
-                    {t("assign.selectAll")}
-                  </ITButton>
-                  <ITButton variant="text" color="gray" size="sm" onClick={clearSelection}>
-                    {t("assign.clear")}
-                  </ITButton>
-                </ITFlex>
               </ITFlex>
-
-              <ITInput
-                name="searchPerson"
-                placeholder={t("assign.search")}
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-              />
-
-              {mode === "drag" && (
-                <ITText className="text-[10px] text-slate-400">{t("assign.removeHint")}</ITText>
-              )}
-
-              <ITFlex direction="column" gap={1} className="max-h-[52vh] overflow-y-auto pr-1">
-                {filtered.length === 0 ? (
-                  <ITText className="text-[11px] italic text-slate-400">{t("assign.noPeople")}</ITText>
-                ) : (
-                  filtered.map((e) => {
-                    const isSelected = selected.has(e.id);
-                    return (
-                      <div
-                        key={e.id}
-                        draggable={mode === "drag"}
-                        onDragStart={(ev) => ev.dataTransfer.setData("text/plain", e.id)}
-                        onClick={() => toggle(e.id)}
-                        className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 transition-colors ${
-                          isSelected
-                            ? "border-primary-500/40 bg-primary-500/5"
-                            : "border-transparent hover:bg-slate-50"
-                        }`}
-                      >
-                        {mode === "drag" && <FaGripVertical size={11} className="shrink-0 text-slate-300" />}
-                        <ProfileAvatar name={e.name} size="xs" />
-                        <ITFlex className="min-w-0 flex-1">
-                          <ITText className="truncate text-[12px] font-semibold text-slate-800">{e.name}</ITText>
-                          {e.employeeNumber && <ITText className="text-[10px] text-slate-500">#{e.employeeNumber}</ITText>}
-                        </ITFlex>
-                        <ITText as="span"
-                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                            isSelected
-                              ? "bg-primary-500 text-white"
-                              : "border border-slate-300 text-slate-400"
-                          }`}
-                        >
-                          {isSelected ? <FaCheck size={10} /> : <FaPlus size={10} />}
-                        </ITText>
-                      </div>
-                    );
-                  })
-                )}
-              </ITFlex>
-            </ITFlex>
-            </ITCard>
-          </div>
-        </ITGrid>
-
-        {/* Horario destino */}
-        <ITGrid item xs={12} md={5} className="min-w-0">
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragOver(true);
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDragOver(false);
-              const id = e.dataTransfer.getData("text/plain");
-              if (id) setSelected((prev) => new Set(prev).add(id));
-            }}
-            className={`rounded-2xl p-5 transition-colors ${
-              mode === "drag"
-                ? `border-2 border-dashed ${dragOver ? "border-primary-500 bg-primary-500/5" : "border-slate-300 bg-slate-50"}`
-                : "bg-[var(--it-card-bg)]"
-            }`}
-          >
-            <ITFlex direction="column" gap={3}>
-              <ITFlex align="center" gap={2}>
-                <ITFlex
-                  align="center"
-                  justify="center"
-                  className="h-10 w-10 rounded-xl bg-primary-500/10 text-primary-500"
-                >
-                  <FaRegClock size={15} />
-                </ITFlex>
-                <ITFlex direction="column" gap={0} className="min-w-0">
-                  <ITText className="truncate text-[13px] font-black text-slate-800">
-                    {currentSchedule?.name ?? "—"}
-                  </ITText>
-                  <ITText className="text-[10px] text-slate-400">
-                    {t("assign.since")} {toDateInput(from)}
-                  </ITText>
-                </ITFlex>
-              </ITFlex>
-
-              <ITText className="text-[11px] text-slate-500">
-                {mode === "drag" ? t("assign.dragHint") : t("assign.listHint")}
+              <ITText muted className="!text-[11.5px]">
+                {t("assign.picked", { count: toAssign.size })}
               </ITText>
+            </ITFlex>
 
-              {/* Por asignar (pendientes, en gris) */}
-              <ITFlex direction="column" gap={1} className="border-t border-slate-200 pt-3">
-                <ITText className="text-[12px] font-semibold text-amber-600">
-                  {t("assign.pendingList")} · {pending.length}
+            <ITFlex direction="column" gap={0} className="max-h-[44vh] overflow-y-auto px-3 pb-3">
+              {available.length === 0 ? (
+                <ITText muted className="px-2 py-6 !text-[12px]">
+                  {departmentId ? t("assign.noPeopleFiltered") : t("assign.noPeople")}
                 </ITText>
-                {pending.length === 0 ? (
-                  <ITText className="text-[11px] italic text-slate-400">{t("assign.nothingSelected")}</ITText>
-                ) : (
-                  <>
-                  <ITFlex direction="column" gap={1} className="max-h-[24vh] overflow-y-auto pr-1">
-                    {pending.map((e) => (
-                      <div
-                        key={e.id}
-                        draggable
-                        onDragStart={(ev) => ev.dataTransfer.setData(PENDING_MIME, e.id)}
-                        className="rounded-lg border border-dashed border-slate-300 bg-slate-100"
-                      >
-                        <ITFlex align="center" justify="between" gap={2} className="px-3 py-1.5">
-                          <ITFlex align="center" gap={2} className="min-w-0">
-                            <FaGripVertical size={10} className="text-slate-300" />
-                            <ProfileAvatar name={e.name} size="xs" />
-                            <ITText className="truncate text-[11px] font-semibold text-slate-400">
-                              {e.name}
-                            </ITText>
-                          </ITFlex>
-                          <ITButton
-                            variant="icon-only"
-                            color="gray"
-                            size="sm"
-                            onClick={() => toggle(e.id)}
-                            ariaLabel={t("assign.remove")}
-                            title={t("assign.remove")}
-                          >
-                            <FaTimes size={11} />
-                          </ITButton>
-                        </ITFlex>
-                      </div>
-                    ))}
-                  </ITFlex>
-                  </>
-                )}
-              </ITFlex>
+              ) : (
+                available.map((e) => {
+                  const picked = toAssign.has(e.id);
+                  return (
+                    <ITFlex
+                      key={e.id}
+                      align="center"
+                      gap={2}
+                      onClick={() => toggle(toAssign, setToAssign, e.id)}
+                      className={`cursor-pointer rounded-xl px-2 py-1.5 transition-colors ${
+                        picked
+                          ? "bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]"
+                          : "hover:bg-[color-mix(in_srgb,currentColor_5%,transparent)]"
+                      }`}
+                    >
+                      <ITText as="span" onClick={(ev) => ev.stopPropagation()}>
+                        <ITCheckbox name={`assign-${e.id}`} checked={picked} onChange={() => toggle(toAssign, setToAssign, e.id)} />
+                      </ITText>
+                      <ProfileAvatar name={e.name} size="sm" />
+                      <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
+                        <ITText className="truncate !text-[12.5px] font-semibold">{e.name}</ITText>
+                        <ITText muted className="truncate !text-[11px]">
+                          {personMeta(e.employeeNumber, e.jobTitle, e.department?.name)}
+                        </ITText>
+                      </ITFlex>
+                      <ITText as="span" aria-hidden className="shrink-0" style={{ color: "var(--color-success)" }}>
+                        <FaArrowRight size={12} />
+                      </ITText>
+                    </ITFlex>
+                  );
+                })
+              )}
+            </ITFlex>
 
-              {/* Asignadas actualmente (guardadas) */}
-              <ITFlex direction="column" gap={1} className="border-t border-slate-200 pt-3">
-                <ITText className="text-[12px] font-semibold text-slate-500">
-                  {t("assign.assignedList")} · {assigned.length}
-                </ITText>
-                {assigned.length === 0 ? (
-                  <ITText className="text-[11px] italic text-slate-400">{t("assign.empty")}</ITText>
-                ) : (
-                  <ITFlex direction="column" gap={1} className="max-h-[30vh] overflow-y-auto pr-1">
-                    {assigned.map((a) => (
-                      <div
-                        key={a.userId}
-                        draggable
-                        onDragStart={(ev) => ev.dataTransfer.setData(ASSIGNED_MIME, a.userId)}
-                        className="rounded-lg border border-slate-200 bg-[var(--it-card-bg)]"
-                      >
-                        <ITFlex align="center" justify="between" gap={2} className="px-3 py-1.5">
-                          <ITFlex align="center" gap={2} className="min-w-0">
-                            <FaGripVertical size={10} className="text-slate-300" />
-                            <ITText className="truncate text-[11px] font-semibold text-slate-700">
-                              {a.employeeName}
-                            </ITText>
-                            <ITText className="text-[10px] text-slate-400">
-                              {a.employeeNumber ? `#${a.employeeNumber}` : ""}
-                            </ITText>
-                          </ITFlex>
-                          <ITButton
-                            variant="icon-only"
-                            color="error"
-                            size="sm"
-                            onClick={() => void removeAssigned(a.userId)}
-                            ariaLabel={t("assign.remove")}
-                            title={t("assign.remove")}
-                          >
-                            <FaTimes size={11} />
-                          </ITButton>
-                        </ITFlex>
-                      </div>
-                    ))}
-                  </ITFlex>
-                )}
-              </ITFlex>
-
+            <ITFlex align="center" justify="between" gap={2} className="border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-3">
+              <ITText muted className="!text-[11.5px]">
+                {t("assign.immediate")}
+              </ITText>
               <ITButton
                 variant="filled"
-                color="primary"
-                onClick={apply}
-                disabled={saving || selected.size === 0 || !scheduleId}
-                className="w-full"
+                color="success"
+                size="sm"
+                disabled={saving || toAssign.size === 0}
+                onClick={() => void assign([...toAssign])}
               >
-                <ITText className="font-bold text-[11px]">
-                  {t("assign.apply", { count: selected.size })}
-                </ITText>
+                <ITFlex align="center" gap={1}>
+                  <FaPlus size={10} />
+                  <ITText className="font-bold text-[11px]">{t("assign.apply", { count: toAssign.size })}</ITText>
+                </ITFlex>
               </ITButton>
             </ITFlex>
-          </div>
+          </ITGrid>
+
+          {/* Ya lo tienen */}
+          <ITGrid item xs={12} lg={6} className="min-w-0">
+            <ITFlex align="center" justify="between" gap={2} className="px-5 pb-2 pt-4">
+              <ITFlex align="center" gap={1.5}>
+                <ITCheckbox
+                  name="assigned-all"
+                  checked={allAssigned}
+                  indeterminate={someAssigned}
+                  disabled={assignedRows.length === 0}
+                  onChange={(value) => setToRemove(value ? new Set(assignedRows.map((p) => p.id)) : new Set())}
+                />
+                <ITText className="!text-[12.5px] font-bold">
+                  {t("assign.assignedTo")} {currentSchedule?.name ?? "—"}
+                </ITText>
+                <ITText as="span" className="rounded-full bg-[color-mix(in_srgb,var(--color-success)_16%,transparent)] px-2 py-0.5 !text-[11px] font-bold text-[color:var(--color-success)]">
+                  {assignedRows.length}
+                </ITText>
+              </ITFlex>
+              <ITText muted className="!text-[11.5px]">
+                {t("assign.picked", { count: toRemove.size })}
+              </ITText>
+            </ITFlex>
+
+            <ITFlex direction="column" gap={0} className="max-h-[44vh] overflow-y-auto px-3 pb-3">
+              {assignedRows.length === 0 ? (
+                <ITText muted className="px-2 py-6 !text-[12px]">
+                  {t("assign.noAssigned")}
+                </ITText>
+              ) : (
+                assignedRows.map((p) => {
+                  const picked = toRemove.has(p.id);
+                  return (
+                    <ITFlex
+                      key={p.id}
+                      align="center"
+                      gap={2}
+                      onClick={() => toggle(toRemove, setToRemove, p.id)}
+                      className={`cursor-pointer rounded-xl px-2 py-1.5 transition-colors ${
+                        picked
+                          ? "bg-[color-mix(in_srgb,var(--color-danger)_10%,transparent)]"
+                          : "hover:bg-[color-mix(in_srgb,currentColor_5%,transparent)]"
+                      }`}
+                    >
+                      <ITText as="span" onClick={(ev) => ev.stopPropagation()}>
+                        <ITCheckbox name={`remove-${p.id}`} checked={picked} onChange={() => toggle(toRemove, setToRemove, p.id)} />
+                      </ITText>
+                      <ProfileAvatar name={p.name} size="sm" />
+                      <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
+                        <ITText className="truncate !text-[12.5px] font-semibold">{p.name}</ITText>
+                        <ITText muted className="truncate !text-[11px]">
+                          {personMeta(p.employeeNumber, p.jobTitle, p.department)}
+                        </ITText>
+                      </ITFlex>
+                      <ITText as="span" aria-hidden className="shrink-0" style={{ color: "var(--color-danger)" }}>
+                        <FaArrowLeft size={12} />
+                      </ITText>
+                    </ITFlex>
+                  );
+                })
+              )}
+            </ITFlex>
+
+            <ITFlex align="center" justify="between" gap={2} className="border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-3">
+              <ITText muted className="!text-[11.5px]">
+                {t("assign.removeHint")}
+              </ITText>
+              <ITButton
+                variant="filled"
+                color="error"
+                size="sm"
+                disabled={saving || toRemove.size === 0}
+                onClick={() => void remove([...toRemove])}
+              >
+                <ITFlex align="center" gap={1}>
+                  <FaMinus size={10} />
+                  <ITText className="font-bold text-[11px]">{t("assign.remove", { count: toRemove.size })}</ITText>
+                </ITFlex>
+              </ITButton>
+            </ITFlex>
+          </ITGrid>
         </ITGrid>
-      </ITGrid>
+      </ITCard>
 
       {toast && (
-        <ITToast
-          message={toast}
-          type="success"
-          position="bottom-center"
-          duration={2500}
-          onClose={() => setToast(null)}
-        />
+        <ITToast message={toast} type="success" position="top-right" duration={3000} onClose={() => setToast(null)} />
       )}
     </ITFlex>
   );

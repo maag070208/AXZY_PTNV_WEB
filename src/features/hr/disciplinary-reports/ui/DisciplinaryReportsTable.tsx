@@ -38,6 +38,8 @@ interface Props {
   externalFilters?: ColumnFilters;
   /** Remonta la tabla en la página 1 al cambiar un filtro de fuera. */
   tableKey?: string;
+  /** Recién creada desde el bot: anima la primera fila al recargar. */
+  flashNew?: boolean;
   /** El API exige `hr.disciplinary_reports` para consultar y para eliminar. */
   canDelete?: boolean;
   onView: (disciplinaryReport: DisciplinaryReport) => void;
@@ -52,6 +54,7 @@ export default function DisciplinaryReportsTable({
   canDelete = true,
   onView,
   onDelete,
+  flashNew = false,
 }: Props) {
   const { t: tt } = useTranslation("disciplinary-reports");
 
@@ -199,6 +202,7 @@ export default function DisciplinaryReportsTable({
   ];
 
   return (
+    <div className={flashNew ? "ticket-row-flash" : undefined}>
     <ITDataTable showViewToggle={false}
       // Otro mosaico del resumen = otra lista: la tabla se remonta.
       key={tableKey ?? JSON.stringify(externalFilters ?? {})}
@@ -219,5 +223,6 @@ export default function DisciplinaryReportsTable({
       virtualized
       virtualizedMaxHeight={460}
     />
+    </div>
   );
 }

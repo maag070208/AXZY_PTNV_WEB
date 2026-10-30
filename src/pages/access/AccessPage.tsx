@@ -4,10 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITBadget,
-  ITBentoGauge,
-  ITBentoGrid,
-  ITBentoTile,
   ITButton,
+  ITCard,
   ITCheckbox,
   ITDataTable,
   ITDatePicker,
@@ -16,6 +14,7 @@ import {
   ITGrid,
   ITInput,
   ITBentoPill,
+  ITBentoStatStrip,
   ITPage,
   ITSearchSelect,
   ITText,
@@ -43,7 +42,7 @@ import {
 import { fileName } from "@shared/i18n";
 import { useGoBack } from "@shared/lib/useGoBack";
 import { FilterPills } from "@shared/ui/filter-pills";
-import { ListSummaryStrip, type ListSummaryItem } from "@shared/ui/list-summary-strip";
+import type { ListSummaryItem } from "@shared/ui/list-summary-strip";
 import { DialogHeader } from "@shared/ui/dialog-header";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { Num } from "@shared/ui/bento-bits";
@@ -464,56 +463,51 @@ export default function AccessPage() {
         </ITAlert>
       )}
 
-      {/* Escaneo en vivo: la última checada registrada, con la proporción entradas/salidas del rango */}
-      <ITBentoGrid>
-        <ITBentoTile
-          tone="sea"
-          cols={12}
-          rows={2}
-          wide
-          icon={<LuRadio size={15} />}
-          label={tt("live.title")}
-        >
+      {/* Última checada: una fila normal (no el hueco de valor grande del mosaico,
+          que aplastaba el texto cuando no hay checadas). */}
+      <ITCard contentClassName="!p-0">
+        <ITFlex align="center" gap={3} wrap="wrap" className="px-5 py-3">
+          <ITFlex align="center" gap={1.5} className="shrink-0">
+            <ITText as="span" style={{ color: "var(--color-primary)" }}>
+              <LuRadio size={15} />
+            </ITText>
+            <ITText className="!text-[12px] font-bold uppercase tracking-[0.04em] text-slate-500">
+              {tt("live.title")}
+            </ITText>
+          </ITFlex>
           {lastEvent ? (
-            <div className="relative z-[1] flex min-h-0 flex-1 flex-wrap items-center justify-between gap-4">
-              <ITFlex align="center" gap={3.5} className="min-w-0">
-                <ProfileAvatar name={lastEvent.employeeNameSnapshot ?? "—"} size="xl" />
-                <ITFlex className="min-w-0">
-                  <div className="it-bento-tile__value truncate !text-[22px]">{lastEvent.employeeNameSnapshot ?? "—"}</div>
-                  <ITFlex wrap="wrap" align="center" gap={1.5} className="mt-1">
-                    <ITBentoPill>
-                      {lastEvent.type === "ENTRY" ? <LuLogIn size={12} /> : <LuLogOut size={12} />}
-                      {tt(`types.${lastEvent.type}`)}
-                    </ITBentoPill>
-                    <ITBentoPill>{formatDateTime(lastEvent.occurredAt)}</ITBentoPill>
-                    {lastEvent.site?.name && <ITBentoPill>{lastEvent.site.name}</ITBentoPill>}
-                  </ITFlex>
-                </ITFlex>
-              </ITFlex>
-              {stats && stats.entries + stats.exits > 0 && (
-                <div className="flex w-[190px] shrink-0 flex-col items-center">
-                  <ITBentoGauge
-                    value={stats.entries / (stats.entries + stats.exits)}
-                    color="var(--color-warning)"
-                    trackColor="rgb(255 255 255 / 0.14)"
-                    size={170}
-                  />
-                  <ITText as="small" className="it-bento-tile__caption">
-                    <Num value={stats.entries} /> {tt("kpis.entries").toLowerCase()} · <Num value={stats.exits} />{" "}
-                    {tt("kpis.exits").toLowerCase()}
-                  </ITText>
-                </div>
-              )}
-            </div>
+            <ITFlex align="center" gap={2.5} className="min-w-0 flex-1">
+              <ProfileAvatar name={lastEvent.employeeNameSnapshot ?? "—"} size="sm" />
+              <ITText className="min-w-0 truncate !text-[15px] font-bold">
+                {lastEvent.employeeNameSnapshot ?? "—"}
+              </ITText>
+              <ITBentoPill>
+                {lastEvent.type === "ENTRY" ? <LuLogIn size={12} /> : <LuLogOut size={12} />}
+                {tt(`types.${lastEvent.type}`)}
+              </ITBentoPill>
+              <ITBentoPill>{formatDateTime(lastEvent.occurredAt)}</ITBentoPill>
+              {lastEvent.site?.name && <ITBentoPill>{lastEvent.site.name}</ITBentoPill>}
+            </ITFlex>
           ) : (
-            <ITText className="relative z-[1] m-0 mt-3 text-[12.5px] font-semibold opacity-70">{tt("live.none")}</ITText>
+            <ITText muted className="min-w-0 flex-1 !text-[13px]">
+              {tt("live.none")}
+            </ITText>
           )}
-        </ITBentoTile>
-      </ITBentoGrid>
+        </ITFlex>
+      </ITCard>
 
-      <ListSummaryStrip items={summaryItems} activeId={activeSummary} onSelect={selectSummary} />
+      <ITBentoStatStrip
+        items={summaryItems.map((item) => ({
+          id: item.id,
+          label: item.label,
+          value: <Num value={Number(item.value)} />,
+          tone: (item.tone ?? "plain") as "plain" | "sea" | "lavender" | "mint" | "sun",
+        }))}
+        activeId={activeSummary}
+        onSelect={selectSummary}
+      />
 
-      {/* Filtros */}
+      {/* Filtros y tabla en una sola tarjeta */}
       <PanelCard title={tt("toolbar.title")} icon={<LuFilter size={16} />}>
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
@@ -576,9 +570,7 @@ export default function AccessPage() {
             </ITGrid>
           </ITGrid>
         </ITFlex>
-      </PanelCard>
-
-      <ITDataTable showViewToggle={false}
+        <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (
@@ -598,6 +590,7 @@ export default function AccessPage() {
         virtualized
         virtualizedMaxHeight={460}
       />
+      </PanelCard>
 
       <ITDialog
         isOpen={!!detail}

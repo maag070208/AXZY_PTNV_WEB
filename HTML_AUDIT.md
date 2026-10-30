@@ -4,27 +4,27 @@ Generado por `python3 -I web/scripts/audit-raw-html.py --report`.
 Mide etiquetas crudas donde el kit ya tiene componente, **sin** contar la landing
 pública, los generadores de PDF/HTML para imprimir ni cocina (oculta).
 
-**Total: 840 etiquetas crudas en 160 archivos**
-(div 593 · p 0 · span 77 · style 170).
+**Total: 838 etiquetas crudas en 162 archivos**
+(div 589 · p 0 · span 76 · style 173).
 
 ## Por categoría
 
 | Categoría | Cuántas | Reemplazo correcto |
 |---|---:|---|
-| Layout (`<div className="flex/grid…">`) | 271 | `ITFlex`, `ITStack`, `ITGrid` |
-| Texto (`<p>`, `<span>`, `<b>`, `<small>`, `<h1..6>`) | 82 | `ITText` (con `as`, `muted`) |
+| Layout (`<div className="flex/grid…">`) | 265 | `ITFlex`, `ITStack`, `ITGrid` |
+| Texto (`<p>`, `<span>`, `<b>`, `<small>`, `<h1..6>`) | 81 | `ITText` (con `as`, `muted`) |
 | Tablas (`<table>`, `<tr>`, `<td>`…) | 70 | `ITDataTable` |
-| Controles (`<button>`, `<input>`, `<select>`) | 111 | `ITButton`, `ITInput`, `ITSelect` |
-| Estilos de apariencia (`style={ color/bg/padding… }`) | 120 | tokens del kit o componente |
+| Controles (`<button>`, `<input>`, `<select>`) | 116 | `ITButton`, `ITInput`, `ITSelect` |
+| Estilos de apariencia (`style={ color/bg/padding… }`) | 121 | tokens del kit o componente |
 
 ## Por capa
 
 | Capa | Archivos | Etiquetas |
 |---|---:|---:|
-| `features` | 92 | 530 |
+| `features` | 92 | 523 |
 | `shared` | 36 | 128 |
-| `pages` | 20 | 120 |
-| `widgets` | 12 | 62 |
+| `pages` | 21 | 121 |
+| `widgets` | 13 | 66 |
 
 ## Archivos con más HTML a mano
 
@@ -79,7 +79,6 @@ pública, los generadores de PDF/HTML para imprimir ni cocina (oculta).
 | `src/features/hr/employee-detail/ui/EmployeeDocumentsCard.tsx` | 3 | 0 | 0 | 3 | 6 |
 | `src/features/hr/employee-detail/ui/EmployeeInfoCards.tsx` | 4 | 0 | 0 | 2 | 6 |
 | `src/features/hr/employee-detail/ui/EmployeeActivity.tsx` | 2 | 0 | 0 | 4 | 6 |
-| `src/features/hr/disciplinary-reports/ui/DisciplinaryReportAgent.tsx` | 6 | 0 | 0 | 0 | 6 |
 | `src/features/ticket/ticket-detail/ui/TicketHero.tsx` | 6 | 0 | 0 | 0 | 6 |
 | `src/widgets/assistant/ui/agents/EmployeeFormAgent.tsx` | 3 | 0 | 0 | 3 | 6 |
 | `src/widgets/tickets/ticket-attachments/ui/TicketAttachments.tsx` | 5 | 0 | 0 | 1 | 6 |
@@ -90,6 +89,7 @@ pública, los generadores de PDF/HTML para imprimir ni cocina (oculta).
 | `src/pages/inventory/NewLoanReturnPage.tsx` | 5 | 0 | 0 | 0 | 5 |
 | `src/features/home/role-dashboard/ui/widgets/RecordsChartsWidget.tsx` | 5 | 0 | 0 | 0 | 5 |
 | `src/features/schedule/assign/ui/AssignSchedules.tsx` | 5 | 0 | 0 | 0 | 5 |
+| `src/features/access/time-clock-people/ui/PersonClockPanel.tsx` | 5 | 0 | 0 | 0 | 5 |
 
 ## Cómo se corrige (regla del dueño)
 

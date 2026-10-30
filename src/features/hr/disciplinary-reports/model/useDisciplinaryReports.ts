@@ -49,8 +49,6 @@ const SEARCH_DEBOUNCE_MS = 350;
 export const useDisciplinaryReports = () => {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [saving, setSaving] = useState(false);
-  const [showForm, setShowForm] = useState(false);
 
   const [reason, setReason] = useState<DisciplinaryReasonFilter>("all");
   const [monthOnly, setMonthOnly] = useState(false);
@@ -153,35 +151,6 @@ export const useDisciplinaryReports = () => {
     };
   }, []);
 
-  const createDisciplinaryReport = async (input: {
-    userId: string;
-    reason: string;
-    incidentDate: string;
-    description: string;
-    sanction?: string;
-  }) => {
-    setSaving(true);
-    try {
-      await personalApi.createDisciplinaryReport({
-        userId: input.userId,
-        reason: input.reason as never,
-        incidentDate: input.incidentDate,
-        description: input.description,
-        sanction: input.sanction,
-      });
-      setShowForm(false);
-      reload();
-      return null;
-    } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : i18n.t("employees:disciplinary.saveError")
-      );
-      return err instanceof Error ? err.message : i18n.t("employees:disciplinary.saveError");
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const deleteDisciplinaryReport = async (id: string) => {
     try {
       await personalApi.deleteDisciplinaryReport(id);
@@ -200,11 +169,7 @@ export const useDisciplinaryReports = () => {
     setError,
     reloadKey,
     reload,
-    saving,
-    showForm,
-    setShowForm,
     fetchTableData,
-    createDisciplinaryReport,
     deleteDisciplinaryReport,
     /** Totales reales de la lista (`null` mientras carga o si no hay acceso). */
     summary,
