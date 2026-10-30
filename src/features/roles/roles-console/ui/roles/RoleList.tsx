@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITInput, ITText, ITStack } from "@axzydev/axzy_ui_system";
+import { ITCard, ITFlex, ITInput, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaSearch, FaUsers } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { RoleAdmin } from "@entities/permission";
