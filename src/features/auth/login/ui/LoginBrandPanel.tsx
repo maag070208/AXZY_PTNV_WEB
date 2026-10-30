@@ -24,82 +24,72 @@ const FEATURES: {
 ];
 
 /**
- * Panel izquierdo del login. En móvil se reduce a una cabecera compacta
- * (logotipo + nombre); desde `lg` muestra el mensaje de marca completo.
- *
- * Colores, bordes y fondos van en `login.css` (clases `login-*`): el CSS del
- * kit va sin capa y se impone a las utilidades de Tailwind en `h2` y bordes.
+ * Panel de marca del login, en el lenguaje **bento**: logo compacto, mensaje
+ * corto y los módulos como mosaicos de vidrio con entrada escalonada. En móvil
+ * se reduce a la cabecera con el logotipo.
  */
 export default function LoginBrandPanel() {
   const { t: tt } = useTranslation(["auth"]);
 
   return (
-    <aside className="login-brand relative flex flex-col overflow-hidden px-6 py-7 lg:w-[52%] lg:justify-between lg:px-14 lg:py-14">
+    <aside className="login-brand relative flex flex-col overflow-hidden px-6 py-7 lg:w-1/2 lg:justify-between lg:px-10 lg:py-10">
       {/* Círculos decorativos */}
-      <div aria-hidden className="login-orb pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full" />
-      <div aria-hidden className="login-orb login-orb--faint pointer-events-none absolute -bottom-36 -left-24 h-96 w-96 rounded-full" />
+      <div aria-hidden className="login-orb pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full" />
+      <div aria-hidden className="login-orb login-orb--faint pointer-events-none absolute -bottom-32 -left-20 h-80 w-80 rounded-full" />
 
-      {/* Marca: la animación del logotipo trae su propio texto, por eso va en una
-          tarjeta blanca sin recortar (un círculo cortaba el nombre). */}
-      <div className="relative flex items-center gap-5">
-        <div className="login-logo-tile flex shrink-0 items-center justify-center rounded-2xl p-2 lg:rounded-[26px] lg:p-2.5">
+      {/* Marca */}
+      <div className="login-rise relative flex items-center gap-3.5">
+        <div className="login-logo-tile flex shrink-0 items-center justify-center rounded-[18px] p-1.5">
           <LottieLoader size="sm" label={tt("login.brand.logoAlt")} className="lg:hidden" />
-          <LottieLoader size="md" label={tt("login.brand.logoAlt")} className="hidden lg:block" />
+          <LottieLoader size="sm" label={tt("login.brand.logoAlt")} className="hidden lg:block" />
         </div>
         <div className="leading-tight">
-          <ITText className="login-on-brand text-xl font-extrabold tracking-tight lg:text-2xl">
+          <ITText className="login-on-brand block text-[17px] font-extrabold tracking-tight">
             {tt("login.brand.name")}
           </ITText>
-          <ITText className="login-on-brand-muted mt-1 block text-[12px] font-semibold uppercase tracking-[0.22em]">
+          <ITText className="login-on-brand-muted mt-0.5 block text-[10.5px] font-semibold uppercase tracking-[0.18em]">
             {tt("login.brand.eyebrow")}
           </ITText>
         </div>
       </div>
 
       {/* Mensaje (solo desktop) */}
-      <div className="relative mt-12 hidden lg:block">
-        <ITText as="h2" className="login-on-brand max-w-xl text-[2.5rem] font-extrabold leading-[1.06] tracking-tight xl:text-[3rem]">
+      <div className="relative mt-8 hidden lg:block">
+        <ITText as="h2" className="login-on-brand login-rise login-rise-1 max-w-[24rem] text-[26px] font-extrabold leading-[1.12] tracking-tight">
           {tt("login.brand.headline")}
         </ITText>
-        <ITText className="login-on-brand-muted mt-5 max-w-lg text-[16px] leading-relaxed">
+        <ITText className="login-on-brand-muted login-rise login-rise-2 mt-3 block max-w-[23rem] text-[13.5px] leading-relaxed">
           {tt("login.brand.subcopy")}
         </ITText>
 
-        <div className="login-glass mt-10 flex items-center gap-5 rounded-[26px] px-6 py-5">
-          <div aria-hidden className="flex -space-x-2.5">
+        <div className="login-glass login-rise login-rise-3 mt-6 flex items-center gap-3 rounded-2xl px-3.5 py-3">
+          <div aria-hidden className="flex -space-x-2">
             {AVATAR_SEEDS.map((seed) => (
-              <Blobatar
-                key={seed}
-                name={seed}
-                size={48}
-                alt=""
-                aria-hidden
-                className="login-avatar h-12 w-12 rounded-full"
-              />
+              <Blobatar key={seed} name={seed} size={34} alt="" aria-hidden className="login-avatar h-[34px] w-[34px] rounded-full" />
             ))}
           </div>
-          <ITFlex direction="column" gap={0.5} className="min-w-0">
-            <ITText className="login-on-brand text-[15px] font-bold">{tt("login.brand.teamTitle")}</ITText>
-            <ITText className="login-on-brand-muted text-[13px] leading-snug">{tt("login.brand.teamText")}</ITText>
+          <ITFlex direction="column" gap={0} className="min-w-0">
+            <ITText className="login-on-brand text-[13.5px] font-bold leading-tight">{tt("login.brand.teamTitle")}</ITText>
+            <ITText className="login-on-brand-muted mt-0.5 block truncate text-[12px] leading-snug">{tt("login.brand.teamText")}</ITText>
           </ITFlex>
         </div>
 
-        <ul className="mt-4 grid grid-cols-2 gap-3.5">
+        <ul className="bento-stagger mt-3 grid grid-cols-2 gap-2.5">
           {FEATURES.map(({ labelKey, icon: Icon }) => (
-            <li key={labelKey} className="login-glass flex items-center gap-3.5 rounded-[20px] px-4 py-3.5">
-              <ITText as="span" aria-hidden className="login-chip flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px]">
-                <Icon size={20} />
+            <li key={labelKey} className="login-glass flex items-center gap-2.5 rounded-2xl px-3 py-2.5">
+              <ITText as="span" aria-hidden className="login-chip flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
+                <Icon size={16} />
               </ITText>
-              <ITText as="span" className="login-on-brand text-[14.5px] font-semibold leading-tight">{tt(labelKey)}</ITText>
+              <ITText as="span" className="login-on-brand text-[12.5px] font-semibold leading-tight">{tt(labelKey)}</ITText>
             </li>
           ))}
         </ul>
       </div>
 
-      <ITText className="login-on-brand-muted relative mt-12 hidden items-center gap-2.5 text-[14px] font-medium lg:flex">
+      <ITText className="login-on-brand-muted login-rise login-rise-4 relative mt-8 hidden items-center gap-2 text-[12.5px] font-medium lg:flex">
         <span aria-hidden className="login-pulse h-2 w-2 rounded-full" />
         {tt("login.brand.realtime")}
-        <LuArrowRight aria-hidden size={15} />
+        <LuArrowRight aria-hidden size={14} />
       </ITText>
     </aside>
   );

@@ -33,16 +33,16 @@ export default function LoginForm({
   const { t: tt } = useTranslation(["auth"]);
   return (
     <>
-      <section className="login-form-panel flex flex-1 items-center justify-center px-6 py-12 sm:px-12 lg:px-16 lg:py-16">
-        <div className="w-full max-w-lg">
-          <ITText as="span" className="login-badge inline-block rounded-full px-4 py-2 text-[11.5px] font-bold uppercase tracking-widest">
+      <section className="login-form-panel flex flex-1 items-center justify-center px-6 py-9 sm:px-8 lg:px-10 lg:py-10">
+        <div className="w-full max-w-[22rem]">
+          <ITText as="span" className="login-badge login-rise inline-block rounded-full px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.14em]">
             {tt("login.badge")}
           </ITText>
 
-          <ITText as="h1" className="login-heading mt-6 text-[2rem] font-extrabold tracking-tight sm:text-[2.6rem] sm:leading-[1.05]">
+          <ITText as="h1" className="login-heading mt-6 text-[26px] font-extrabold tracking-tight sm:text-[30px] sm:leading-[1.1]">
             {tt("login.title")}
           </ITText>
-          <ITText className="login-muted mt-3 block text-[15px] sm:text-[16px]">{tt("login.subtitle")}</ITText>
+          <ITText className="login-muted login-rise login-rise-2 mt-2 block text-[13px] leading-relaxed">{tt("login.subtitle")}</ITText>
 
           {deactivatedMsg && (
             <div className="mt-6">
@@ -50,10 +50,11 @@ export default function LoginForm({
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="mt-10 space-y-6" noValidate>
+          <form onSubmit={onSubmit} className="bento-stagger mt-6 space-y-4" noValidate>
             <div>
               <ITInput
                 name="username"
+                size="lg"
                 label={tt("login.userLabel")}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -71,6 +72,7 @@ export default function LoginForm({
             <div>
               <ITInput
                 name="password"
+                size="lg"
                 type="password"
                 label={tt("login.passwordLabel")}
                 value={password}
@@ -89,6 +91,7 @@ export default function LoginForm({
               type="submit"
               variant="filled"
               color="primary"
+              size="lg"
               disabled={isSubmitting || !canSubmit}
               className="login-submit w-full flex items-center justify-center gap-2 py-3"
             >
@@ -99,7 +102,7 @@ export default function LoginForm({
             </ITButton>
           </form>
 
-          <footer className="login-muted mt-12 flex items-center justify-between text-[12.5px]">
+          <footer className="login-muted mt-8 flex items-center justify-between text-[11.5px]">
             <ITText as="span">{tt("login.footer")}</ITText>
             <ITText as="span" className="font-medium">v{__APP_VERSION__}</ITText>
           </footer>

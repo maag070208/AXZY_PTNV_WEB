@@ -19,7 +19,10 @@ export default function LoginPage() {
 
   return (
     <div className="login-canvas flex min-h-screen items-center justify-center p-0 sm:p-8 lg:p-12">
-      <div className="login-card flex w-full max-w-7xl flex-col overflow-hidden sm:rounded-[32px] lg:flex-row">
+      <div
+        className="login-card flex w-full flex-col overflow-hidden sm:rounded-[32px] lg:flex-row"
+        style={{ maxWidth: "980px" }}
+      >
         <LoginBrandPanel />
         <LoginForm
           username={login.username}
