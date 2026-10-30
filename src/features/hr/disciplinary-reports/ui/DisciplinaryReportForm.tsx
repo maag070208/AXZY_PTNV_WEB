@@ -12,6 +12,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaFilePen } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
+import { DialogHeader } from "@shared/ui/dialog-header";
 import type { DisciplinaryReason } from "@entities/hr";
 import { localToDateStr } from "../model/dateStr";
 import { searchEmployees } from "../model/useDisciplinaryReports";
@@ -130,15 +131,12 @@ export default function DisciplinaryReportForm({
       onClose={close}
       className="w-full max-w-2xl"
     >
-      <div className="pb-3 mb-3 border-b border-slate-100 pr-6">
-        <ITFlex align="center" gap={2}>
-          <FaFilePen size={14} className="text-rose-500" />
-          <ITText className="text-lg font-black text-slate-800">{tt("form.title")}</ITText>
-        </ITFlex>
-        <ITText className="text-[11px] text-slate-400 mt-1">
-          {tt("description")}
-        </ITText>
-      </div>
+      <DialogHeader
+        icon={<FaFilePen size={16} />}
+        tone="danger"
+        title={tt("form.title")}
+        subtitle={tt("description")}
+      />
 
       {mode === "chat" ? (
         <DisciplinaryReportAgent saving={saving} onSave={onSave} onUseForm={() => setMode("form")} />

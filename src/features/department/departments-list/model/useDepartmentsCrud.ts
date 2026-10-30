@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import { departmentsApi, type Department } from "@entities/department";
 
@@ -78,6 +78,7 @@ export const useDepartmentsCrud = () => {
     createOpen,
     setCreateOpen,
     reloadKey,
+    reload,
     deptToDelete,
     setDeptToDelete,
     deptToEdit,
@@ -90,4 +91,32 @@ export const useDepartmentsCrud = () => {
     confirmDeleteDept,
     fetchTableData,
   };
+};
+
+/**
+ * Catálogo completo de departamentos (activos e inactivos) para la rejilla de
+ * tarjetas: una sola petición, sin paginación de servidor. Se recarga cuando
+ * cambia `reloadKey` (altas, ediciones y bajas de `useDepartmentsCrud`).
+ */
+export const useDepartmentsList = (reloadKey: number) => {
+  const [departments, setDepartments] = useState<Department[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setFailed(false);
+    departmentsApi
+      .list(true)
+      .then((list) => {
+        if (active) setDepartments(list);
+      })
+      .catch(() => {
+        if (active) setFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [reloadKey]);
+
+  return { departments, failed };
 };

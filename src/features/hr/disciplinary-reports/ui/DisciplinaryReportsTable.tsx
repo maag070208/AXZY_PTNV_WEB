@@ -1,24 +1,26 @@
 import {
-  ITBadget,
   ITButton,
+  ITChip,
   ITDataTable,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import type {
   Column,
+  ColumnFilters,
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEye, FaTrash } from "react-icons/fa6";
+import { LuEye, LuTrash2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
-import type { DisciplinaryReport } from "@entities/hr";
+import type { DisciplinaryReason, DisciplinaryReport } from "@entities/hr";
 import { usePeopleOptions } from "@entities/user";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { formatDate } from "@shared/utils/dates";
+import { DISCIPLINARY_REASONS } from "../model/useDisciplinaryReports";
 
-type BadgeColor = "error" | "warning" | "info" | "success" | "danger" | "primary" | "secondary" | "purple" | "gray";
-
-const REASON_COLOR: Record<string, BadgeColor> = {
+/** Chip pastel del motivo: el color dice qué tan grave es el asunto. */
+const REASON_CHIP: Record<DisciplinaryReason, "danger" | "warning" | "secondary"> = {
   ABSENCE: "danger",
   TARDINESS: "warning",
   INTOXICATION: "danger",
@@ -32,22 +34,22 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
+  /** Filtros de la franja de resumen y del buscador (los mandan sobre la columna). */
+  externalFilters?: ColumnFilters;
+  /** Remonta la tabla en la página 1 al cambiar un filtro de fuera. */
+  tableKey?: string;
+  /** El API exige `hr.disciplinary_reports` para consultar y para eliminar. */
+  canDelete?: boolean;
   onView: (disciplinaryReport: DisciplinaryReport) => void;
   onDelete: (disciplinaryReport: DisciplinaryReport) => void;
 }
 
-const REASONS = [
-  "ABSENCE",
-  "TARDINESS",
-  "INTOXICATION",
-  "MISCONDUCT",
-  "NONCOMPLIANCE",
-  "OTHER",
-] as const;
-
 export default function DisciplinaryReportsTable({
   fetchData,
   reloadKey,
+  externalFilters,
+  tableKey,
+  canDelete = true,
   onView,
   onDelete,
 }: Props) {
@@ -61,47 +63,50 @@ export default function DisciplinaryReportsTable({
       key: "incidentDate",
       label: tt("table.date"),
       type: "date",
-      width: 190,
+      width: 130,
       filter: "date-range",
-      sortable: false,
+      sortable: true,
       dateFilterOptions: { maxDate: new Date() },
       render: (a) => (
-        <ITText className="text-[11px] font-black text-slate-700">{a.incidentDate}</ITText>
+        <ITText className="text-[12px] font-semibold text-slate-700">
+          {formatDate(a.incidentDate)}
+        </ITText>
       ),
     },
     {
       key: "reason",
       label: tt("table.reason"),
       type: "catalog",
-      width: 140,
+      width: 200,
       filter: "catalog",
-      sortable: false,
+      sortable: true,
       catalogOptions: {
-        data: REASONS.map((id) => ({ id, name: tt(`reasons.${id}`) })),
+        data: DISCIPLINARY_REASONS.map((id) => ({ id, name: tt(`reasons.${id}`) })),
         loading: false,
         error: false,
       },
       render: (a) => (
-        <ITBadget color={REASON_COLOR[a.reason] ?? "secondary"} size="lg">
-          {tt(`reasons.${a.reason}`)}
-        </ITBadget>
+        <ITChip color={REASON_CHIP[a.reason] ?? "secondary"} size="sm" variant="soft" label={tt(`reasons.${a.reason}`)} />
       ),
     },
     {
       key: "userId",
       label: tt("table.employee"),
       type: "catalog",
-      width: 220,
+      width: 230,
       filter: "search",
       catalogOptions: peopleOptions,
-      sortable: false,
+      sortable: true,
       render: (a) => (
-        <ITFlex align="center" gap={2}>
+        <ITFlex align="center" gap={2} className="min-w-0">
           <ProfileAvatar name={a.user.name} size="sm" />
           <ITFlex direction="column" gap={0.5} className="min-w-0">
-            <ITText className="truncate text-[12px] font-black text-slate-800">{a.user.name}</ITText>
-            <ITText className="text-[12px] font-bold text-slate-400">
+            <ITText className="truncate text-[13px] font-semibold text-slate-800">
+              {a.user.name}
+            </ITText>
+            <ITText className="truncate text-[11px] text-slate-400">
               {a.user.employeeNumber ? `#${a.user.employeeNumber}` : "—"}
+              {a.user.department ? ` · ${a.user.department.name}` : ""}
             </ITText>
           </ITFlex>
         </ITFlex>
@@ -111,24 +116,22 @@ export default function DisciplinaryReportsTable({
       key: "jobTitle",
       label: tt("table.jobTitle"),
       type: "string",
-      width: 220,
+      width: 170,
       filter: true,
-      sortable: false,
+      sortable: true,
       render: (a) => (
-        <ITText className="text-[11px] font-bold text-slate-600">
-          {a.user.jobTitle ?? "—"}
-        </ITText>
+        <ITText className="text-[12px] text-slate-600">{a.user.jobTitle ?? "—"}</ITText>
       ),
     },
     {
       key: "description",
       label: tt("table.description"),
       type: "string",
-      width: 300,
+      width: 260,
       filter: true,
       sortable: false,
       render: (a) => (
-        <ITText className="text-[10px] text-slate-500 line-clamp-2 max-w-[260px]">
+        <ITText className="line-clamp-2 max-w-[260px] text-[12px] text-slate-500">
           {a.description}
         </ITText>
       ),
@@ -137,32 +140,38 @@ export default function DisciplinaryReportsTable({
       key: "sanction",
       label: tt("table.sanction"),
       type: "string",
-      width: 200,
+      width: 170,
       filter: true,
       sortable: false,
-      render: (a) => (
-        <ITText className="text-[10px] text-slate-500 line-clamp-2 max-w-[200px]">
-          {a.sanction || "—"}
-        </ITText>
-      ),
+      render: (a) =>
+        a.sanction ? (
+          <ITText className="line-clamp-2 max-w-[200px] text-[12px] text-slate-500">
+            {a.sanction}
+          </ITText>
+        ) : (
+          <ITText className="text-[12px] text-slate-400">{tt("table.noSanction")}</ITText>
+        ),
     },
     {
       key: "createdById",
       label: tt("table.createdBy"),
       type: "catalog",
-      width: 200,
+      width: 170,
       filter: "search",
       catalogOptions: peopleOptions,
-      sortable: false,
+      sortable: true,
       render: (a) => (
-        <ITText className="text-[10px] font-bold text-slate-500">{a.createdBy.name}</ITText>
+        <ITFlex align="center" gap={2} className="min-w-0">
+          <ProfileAvatar name={a.createdBy.name} size="xs" />
+          <ITText className="truncate text-[12px] text-slate-500">{a.createdBy.name}</ITText>
+        </ITFlex>
       ),
     },
     {
       key: "actions",
       label: "",
       type: "string" as const,
-      width: 120,
+      width: 110,
       sortable: false,
       render: (a: DisciplinaryReport) => (
         <ITFlex align="center" gap={2}>
@@ -172,16 +181,18 @@ export default function DisciplinaryReportsTable({
             color="secondary"
             title={tt("actions.view")}
           >
-            <FaEye size={14} />
+            <LuEye size={15} />
           </ITButton>
-          <ITButton
-            onClick={() => onDelete(a)}
-            size="lg"
-            color="danger"
-            title={tt("actions.delete")}
-          >
-            <FaTrash size={14} />
-          </ITButton>
+          {canDelete && (
+            <ITButton
+              onClick={() => onDelete(a)}
+              size="lg"
+              color="danger"
+              title={tt("actions.delete")}
+            >
+              <LuTrash2 size={15} />
+            </ITButton>
+          )}
         </ITFlex>
       ),
     },
@@ -189,6 +200,9 @@ export default function DisciplinaryReportsTable({
 
   return (
     <ITDataTable
+      // Otro mosaico del resumen = otra lista: la tabla se remonta.
+      key={tableKey ?? JSON.stringify(externalFilters ?? {})}
+      externalFilters={externalFilters}
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fetchData as unknown as (

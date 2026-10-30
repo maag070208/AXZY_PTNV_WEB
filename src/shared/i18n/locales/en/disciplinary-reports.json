@@ -11,13 +11,31 @@
     "NONCOMPLIANCE": "Failure to comply with duties",
     "OTHER": "Other"
   },
+  "summary": {
+    "total": "Total",
+    "month": "This month",
+    "absences": "Absences",
+    "tardiness": "Tardiness",
+    "share": "{{percent}}% of the total"
+  },
+  "filters": {
+    "all": "All",
+    "searchPlaceholder": "Search by employee, number or description",
+    "clear": "Clear filters"
+  },
+  "empty": {
+    "title": "No records yet",
+    "description": "The first administrative record filed will show up here."
+  },
   "table": {
+    "title": "Filed records",
     "date": "Incident date",
     "reason": "Reason",
     "employee": "Employee",
     "jobTitle": "Position",
     "description": "Description",
     "sanction": "Penalty",
+    "noSanction": "No penalty",
     "createdBy": "Created by"
   },
   "form": {

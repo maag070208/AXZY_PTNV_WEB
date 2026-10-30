@@ -247,7 +247,31 @@
     "historyTitle": "Historial del usuario",
     "loading": "Cargando…",
     "empty": "Sin registros en el historial",
-    "notFound": "Usuario no encontrado"
+    "emptyHint": "Aquí aparecerán sus préstamos, tickets y cambios de cuenta.",
+    "notFound": "Usuario no encontrado",
+    "notFoundHint": "La cuenta no existe o no tienes acceso a su historial.",
+    "noResults": "Sin eventos de este tipo",
+    "noResultsHint": "Prueba con otra píldora del filtro.",
+    "accountLabel": "Cuenta",
+    "accountChanges": "Cambios de cuenta",
+    "events": "eventos registrados",
+    "eventsShort": "eventos",
+    "activity": "Actividad de la cuenta",
+    "distribution": "Familias de evento",
+    "daysWithActivity": "Días con actividad",
+    "share": "{{pct}}% del total",
+    "insight": "{{total}} registros entre {{from}} y {{to}}.",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "family": {
+      "all": "Todo",
+      "equipment": "Inventario",
+      "tickets": "Tickets",
+      "account": "Cuenta",
+      "other": "Otros"
+    },
+    "byType": "Por tipo",
+    "insightOneDay": "{{total}} registros del {{date}}."
   },
   "import": {
     "title": "Cargar usuarios desde Excel",

@@ -11,13 +11,31 @@
     "NONCOMPLIANCE": "Incumplimiento de funciones",
     "OTHER": "Otro"
   },
+  "summary": {
+    "total": "Total",
+    "month": "Este mes",
+    "absences": "Inasistencias",
+    "tardiness": "Retardos",
+    "share": "{{percent}}% del total"
+  },
+  "filters": {
+    "all": "Todas",
+    "searchPlaceholder": "Buscar por empleado, número o descripción",
+    "clear": "Limpiar filtros"
+  },
+  "empty": {
+    "title": "Todavía no hay actas",
+    "description": "Cuando se levante la primera acta administrativa aparecerá aquí."
+  },
   "table": {
+    "title": "Actas registradas",
     "date": "Fecha del incidente",
     "reason": "Motivo",
     "employee": "Empleado",
     "jobTitle": "Puesto",
     "description": "Descripción",
     "sanction": "Sanción",
+    "noSanction": "Sin sanción",
     "createdBy": "Creado"
   },
   "form": {
