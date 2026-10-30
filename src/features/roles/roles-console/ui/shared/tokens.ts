@@ -18,6 +18,19 @@ export const ROLE_TONES: Record<RoleTone, { soft: string; dot: string; ring: str
   fuchsia: { soft: "bg-fuchsia-50 text-fuchsia-600", dot: "bg-fuchsia-500", ring: "ring-fuchsia-200" },
 };
 
+/** El mismo tono como variable CSS: para las barras y leyendas del kit. */
+export const ROLE_VARS: Record<RoleTone, string> = {
+  indigo: "var(--color-indigo-500)",
+  sky: "var(--color-sky-500)",
+  amber: "var(--color-amber-500)",
+  slate: "var(--color-slate-500)",
+  emerald: "var(--color-emerald-500)",
+  rose: "var(--color-rose-500)",
+  violet: "var(--color-violet-500)",
+  teal: "var(--color-teal-500)",
+  fuchsia: "var(--color-fuchsia-500)",
+};
+
 /** Tonos fijos de los roles base; los creados en `/roles` toman uno estable por su clave. */
 const BASE_TONES: Record<string, RoleTone> = {
   ADMIN: "indigo",

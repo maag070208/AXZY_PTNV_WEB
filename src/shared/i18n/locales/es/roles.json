@@ -584,6 +584,10 @@
     "people": "Personas",
     "peopleHint": "con acceso",
     "policies": "Políticas",
-    "policiesHint": "reglas activas"
+    "policiesHint": "reglas activas",
+    "peopleByRole": "Personas por rol",
+    "assignments": "{{assignments}} asignaciones · {{people}} personas",
+    "grantedHint": "concedidos",
+    "moreRoles": "+{{count}} roles más"
   }
 }

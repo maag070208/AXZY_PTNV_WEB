@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITAlert, ITButton, ITSlideToggle, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITCard, ITFlex, ITSlideToggle, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaArrowDown, FaArrowUp, FaCheckCircle, FaEdit, FaLightbulb, FaLock, FaPlus, FaVial } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PolicyAdmin } from "@entities/permission";
@@ -95,20 +95,19 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
       </ITFlex>
 
       {grouped.map(({ key, action, rules }) => (
-        <div key={key} className="overflow-hidden rounded-xl border border-slate-200 bg-[var(--it-card-bg)]">
+        <ITCard key={key} contentClassName="!p-0">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-3 py-2">
             <ITText className="text-[12px] text-slate-600">
               {t("policies.story.whoCan")} <ITText as="b" className="text-slate-900">{(action?.label ?? key).toLowerCase()}</ITText>
               {action && <ITText as="span" className="text-slate-400"> · {action.module}</ITText>}
             </ITText>
             <ITText as="span" className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => openNew(key)}
-                className="inline-flex items-center gap-1 rounded-md border border-slate-200 !bg-[var(--it-card-bg)] px-2 py-1 text-[10px] font-bold text-primary-500 hover:border-primary-500"
-              >
-                <FaPlus size={8} /> {t("policies.addRule")}
-              </button>
+              <ITButton variant="text" color="primary" size="sm" onClick={() => openNew(key)}>
+                <ITFlex align="center" gap={1}>
+                  <FaPlus size={8} />
+                  <ITText className="text-[10px] font-bold">{t("policies.addRule")}</ITText>
+                </ITFlex>
+              </ITButton>
               <button
                 type="button"
                 onClick={() => onTest(key)}
@@ -191,7 +190,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
               </ITText>
             </li>
           </ol>
-        </div>
+        </ITCard>
       ))}
 
       <PolicyEditorDialog

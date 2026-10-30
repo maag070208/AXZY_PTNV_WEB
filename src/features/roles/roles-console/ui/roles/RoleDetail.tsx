@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { ITButton, ITConfirmDialog, ITDropdownMenu, ITText, ITFlex } from "@axzydev/axzy_ui_system";
-import { FaClone, FaDesktop, FaGavel, FaKey, FaLock, FaPen, FaPowerOff, FaTrash, FaUsers } from "react-icons/fa";
+import { ITButton, ITCard, ITConfirmDialog, ITDropdownMenu, ITFlex, ITSegmentedControl, ITText } from "@axzydev/axzy_ui_system";
+import { FaClone, FaLock, FaPen, FaPowerOff, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { isScreenVisibleInGroup, screenLeaves, type RoleAdmin } from "@entities/permission";
 import { roleLabel } from "@entities/user";
@@ -10,7 +10,6 @@ import type { RolesAdminState } from "../../model/useRolesAdmin";
 import RoleAvatar from "../shared/RoleAvatar";
 import ScreensAccessList from "../shared/ScreensAccessList";
 import SidebarPreview from "../shared/SidebarPreview";
-import { TabBar } from "@shared/ui/tab-bar";
 import RoleMembersPanel from "./RoleMembersPanel";
 import RolePermissionsEditor from "./RolePermissionsEditor";
 import RolePoliciesList from "./RolePoliciesList";
@@ -46,6 +45,15 @@ export default function RoleDetail({
 }: Props) {
   const { t } = useTranslation("roles");
   const [tab, setTab] = useState<DetailTab>("permissions");
+  /** Cuántos elementos tiene cada pestaña, para mostrarlo en la pastilla. */
+  const countOf = (id: DetailTab): number =>
+    id === "permissions"
+      ? permissionCount
+      : id === "members"
+        ? memberCount
+        : id === "screens"
+          ? screens
+          : rolePolicies;
   const [confirm, setConfirm] = useState<"delete" | "toggle" | null>(null);
   const { data, rolesMeta, permissionsByRole, scopeOf, updateRole, deleteRole, roleSaving, changeDetails } = admin;
 
@@ -77,7 +85,7 @@ export default function RoleDetail({
   };
 
   return (
-    <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-4">
+    <ITCard className="min-w-0" contentClassName="flex flex-col gap-3 !p-4">
       {/* Encabezado */}
       <ITFlex align="center" wrap="wrap" gap={3}>
         <RoleAvatar role={role} />
@@ -138,23 +146,24 @@ export default function RoleDetail({
         </ITFlex>
       </ITFlex>
 
-      <TabBar
-        size="sm"
-        value={tab}
-        onChange={setTab}
-        items={[
-          {
-            id: "permissions",
-            label: t("roleDetail.tabs.permissions"),
-            icon: <FaKey size={10} />,
-            count: permissionCount,
-            dot: changeDetails.some((change) => change.role === role),
-          },
-          { id: "members", label: t("roleDetail.tabs.members"), icon: <FaUsers size={10} />, count: memberCount },
-          { id: "screens", label: t("roleDetail.tabs.screens"), icon: <FaDesktop size={10} />, count: screens },
-          { id: "policies", label: t("roleDetail.tabs.policies"), icon: <FaGavel size={10} />, count: rolePolicies },
-        ]}
-      />
+      <ITFlex align="center" wrap="wrap" gap={2}>
+        <ITSegmentedControl
+          size="sm"
+          value={tab}
+          onChange={(value) => setTab(value as DetailTab)}
+          options={[
+            { value: "permissions", label: `${t("roleDetail.tabs.permissions")} · ${countOf("permissions")}` },
+            { value: "members", label: `${t("roleDetail.tabs.members")} · ${countOf("members")}` },
+            { value: "screens", label: `${t("roleDetail.tabs.screens")} · ${countOf("screens")}` },
+            { value: "policies", label: `${t("roleDetail.tabs.policies")} · ${countOf("policies")}` },
+          ]}
+        />
+        {changeDetails.some((change) => change.role === role) && (
+          <ITText as="span" className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+            {t("editor.unsaved")}
+          </ITText>
+        )}
+      </ITFlex>
 
       {tab === "permissions" && <RolePermissionsEditor admin={admin} role={role} />}
       {tab === "members" && (
@@ -196,6 +205,6 @@ export default function RoleDetail({
               : t("roleDetail.activateConfirm", { role: roleLabel(role) })
         }
       />
-    </div>
+    </ITCard>
   );
 }

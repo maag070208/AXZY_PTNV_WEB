@@ -6,6 +6,7 @@ import type { RoleAdmin } from "@entities/permission";
 import { roleLabel } from "@entities/user";
 import { normalizeText } from "../../model/access-levels";
 import type { RolesAdminState } from "../../model/useRolesAdmin";
+import { ROLE_TONES, roleTone } from "../shared/tokens";
 import RoleAvatar from "../shared/RoleAvatar";
 
 interface Props {
@@ -19,6 +20,7 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
   const { t } = useTranslation("roles");
   const [query, setQuery] = useState("");
   const { data, rolesMeta, permissionsByRole, changeDetails } = admin;
+  const catalogTotal = data?.catalog.length ?? 0;
 
   const metaOf = (key: string): RoleAdmin | undefined => rolesMeta.find((role) => role.key === key);
   const pendingByRole = useMemo(() => {
@@ -94,6 +96,16 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
                         <FaUsers size={9} /> {meta?.userCount ?? 0}
                       </ITText>
                       {meta && !meta.active && <ITText as="span" className="font-bold text-rose-500">{t("access.inactiveRole")}</ITText>}
+                    </ITText>
+                    {/* Cobertura del rol sobre el catálogo de permisos */}
+                    <ITText as="span" className="mt-1 block h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                      <ITText
+                        as="span"
+                        className={`block h-1 rounded-full ${ROLE_TONES[roleTone(key)].dot}`}
+                        style={{
+                          width: `${Math.round((Object.keys(permissionsByRole[key] ?? {}).length / Math.max(1, catalogTotal)) * 100)}%`,
+                        }}
+                      />
                     </ITText>
                   </ITText>
                 </ITFlex>

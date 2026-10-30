@@ -584,6 +584,10 @@
     "people": "People",
     "peopleHint": "with access",
     "policies": "Policies",
-    "policiesHint": "active rules"
+    "policiesHint": "active rules",
+    "peopleByRole": "People by role",
+    "assignments": "{{assignments}} assignments · {{people}} people",
+    "grantedHint": "granted",
+    "moreRoles": "+{{count}} more roles"
   }
 }

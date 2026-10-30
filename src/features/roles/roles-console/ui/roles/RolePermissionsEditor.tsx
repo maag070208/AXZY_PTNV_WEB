@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITInput, ITSegmentedControl, ITSlideToggle, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
+import { ITButton, ITCard, ITFlex, ITInput, ITSegmentedControl, ITSlideToggle, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaChevronRight, FaLock, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PermissionCatalog } from "@entities/permission";
@@ -67,14 +67,9 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
     });
 
   const bulkButton = (permissions: PermissionCatalog[], mode: BulkMode) => (
-    <button
-      type="button"
-      disabled={saving}
-      onClick={() => setMany(role, permissions, mode)}
-      className="rounded border border-slate-200 !bg-[var(--it-card-bg)] px-1.5 py-0.5 text-[10px] font-bold text-slate-500 hover:border-primary-500 hover:text-primary-500 disabled:opacity-50"
-    >
-      {t(`bulk.${mode}`)}
-    </button>
+    <ITButton variant="text" color="secondary" size="sm" disabled={saving} onClick={() => setMany(role, permissions, mode)}>
+      <ITText className="text-[10px] font-bold">{t(`bulk.${mode}`)}</ITText>
+    </ITButton>
   );
 
   return (
@@ -90,30 +85,36 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
             iconLeft={<FaSearch size={11} />}
           />
         </div>
-        <ITSegmentedControl
-          size="sm"
-          value={filter}
-          onChange={(value) => setFilter(value as Filter)}
-          options={(["all", "granted", "missing", "sensitive"] as const).map((value) => ({
-            value,
-            label: t(`editor.filter.${value}`),
-          }))}
-        />
-        {!searching && (
-          <button
-            type="button"
-            onClick={() => setExpanded(allOpen ? new Set() : new Set(visibleGroups.map((group) => group.module)))}
-            className="ml-auto !bg-transparent text-[11px] font-bold text-primary-500 hover:underline"
-          >
-            {allOpen ? t("editor.collapseAll") : t("editor.expandAll")}
-          </button>
-        )}
+        {/* Filtros y “Abrir todos” a la derecha, separados de la búsqueda */}
+        <ITFlex align="center" gap={2} className="ml-auto">
+          <ITSegmentedControl
+            size="sm"
+            value={filter}
+            onChange={(value) => setFilter(value as Filter)}
+            options={(["all", "granted", "missing", "sensitive"] as const).map((value) => ({
+              value,
+              label: t(`editor.filter.${value}`),
+            }))}
+          />
+          {!searching && (
+            <ITButton
+              variant="text"
+              color="primary"
+              size="sm"
+              onClick={() => setExpanded(allOpen ? new Set() : new Set(visibleGroups.map((group) => group.module)))}
+            >
+              <ITText className="text-[11px] font-bold">
+                {allOpen ? t("editor.collapseAll") : t("editor.expandAll")}
+              </ITText>
+            </ITButton>
+          )}
+        </ITFlex>
       </ITFlex>
 
       {visibleGroups.length === 0 ? (
         <ITText className="py-8 text-center text-[12px] italic text-slate-400">{t("matrix.noResults")}</ITText>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-200">
+        <ITCard contentClassName="!p-0">
           {visibleGroups.map(({ module, permissions, rows }, groupIndex) => {
             const scope = (key: string) => scopeOf(role, key);
             const level = moduleLevel(permissions, scope);
@@ -125,19 +126,28 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                 <div
                   className={`flex flex-wrap items-center gap-2 px-3 py-2 ${open ? "bg-slate-50" : "bg-[var(--it-card-bg)] hover:bg-slate-50/70"}`}
                 >
-                  <button
-                    type="button"
+                  <ITFlex
+                    as="button"
+                    align="center"
+                    gap={2}
+                    className="min-w-[160px] flex-1 text-left"
                     onClick={() => toggleModule(module)}
-                    className="flex min-w-[160px] flex-1 items-center gap-2 !bg-transparent text-left"
                   >
                     {open ? (
-                      <FaChevronDown size={9} className="text-slate-400" />
+                      <FaChevronDown size={9} className="shrink-0 text-slate-400" />
                     ) : (
-                      <FaChevronRight size={9} className="text-slate-400" />
+                      <FaChevronRight size={9} className="shrink-0 text-slate-400" />
                     )}
                     <ITText as="span" className="text-[12px] font-bold text-slate-800">{module}</ITText>
-                    {pending && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" title={t("editor.unsaved")} />}
-                  </button>
+                    {pending && (
+                      <ITText
+                        as="span"
+                        aria-label={t("editor.unsaved")}
+                        title={t("editor.unsaved")}
+                        className="h-1.5 w-1.5 rounded-full bg-amber-500"
+                      />
+                    )}
+                  </ITFlex>
                   {open && (
                     <ITText as="span" className="flex items-center gap-1">
                       {bulkButton(permissions, "all")}
@@ -176,7 +186,14 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                           {!permission.active && (
                           <ITText as="span" className="text-[12px] font-semibold text-rose-500">{t("matrix.inactive")}</ITText>
                           )}
-                          {changed && <span className="h-1.5 w-1.5 self-center rounded-full bg-amber-500" title={t("editor.unsaved")} />}
+                          {changed && (
+                            <ITText
+                              as="span"
+                              aria-label={t("editor.unsaved")}
+                              title={t("editor.unsaved")}
+                              className="h-1.5 w-1.5 self-center rounded-full bg-amber-500"
+                            />
+                          )}
                         </div>
                         {granted && isScopedPermission(permission) && (
                           <ScopePicker
@@ -201,7 +218,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
               </div>
             );
           })}
-        </div>
+        </ITCard>
       )}
     </ITStack>
   );

@@ -1,4 +1,4 @@
-import { ITAlert, ITBentoStatStrip, ITDialog, ITToast, ITText, ITStack } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITToast, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaGavel, FaHistory, FaListUl, FaTable, FaUserShield, FaUsersCog } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { LottieLoader } from "@shared/ui/lottie-loader";
@@ -10,6 +10,7 @@ import PermissionMatrixPanel from "./matrix/PermissionMatrixPanel";
 import PermissionCatalogPanel from "./PermissionCatalogPanel";
 import PoliciesPanel from "./policies/PoliciesPanel";
 import RoleDetail from "./roles/RoleDetail";
+import RolesSummary from "./roles/RolesSummary";
 import RoleList from "./roles/RoleList";
 import RoleEditorDialog from "./RoleEditorDialog";
 import RolesHelpDialog from "./RolesHelpDialog";
@@ -59,14 +60,12 @@ export default function RolesWorkspace({ workspace }: Props) {
 
   return (
     <ITStack spacing={3}>
-      {/* Cifras del control de acceso, en la tira del mosaico */}
-      <ITBentoStatStrip
-        items={[
-          { id: "roles", label: t("summary.roles"), value: data.roles.length, caption: t("summary.rolesHint"), tone: "sea", color: "var(--color-primary-600)" },
-          { id: "permissions", label: t("summary.permissions"), value: data.catalog.length, caption: t("summary.permissionsHint"), tone: "lavender", color: "var(--color-violet-500)" },
-          { id: "people", label: t("summary.people"), value: members.members.length, caption: t("summary.peopleHint"), tone: "mint", color: "var(--color-success)" },
-          { id: "policies", label: t("summary.policies"), value: policies.data?.policies.length ?? 0, caption: t("summary.policiesHint"), tone: "sun", color: "var(--color-warning)" },
-        ]}
+      {/* Resumen del control de acceso en una sola tarjeta */}
+      <RolesSummary
+        rolesMeta={rolesMeta}
+        catalogTotal={data.catalog.length}
+        people={members.members.length}
+        policiesCount={policies.data?.policies.length ?? 0}
       />
 
       <TabBar items={tabs} value={tab} onChange={setTab} />
