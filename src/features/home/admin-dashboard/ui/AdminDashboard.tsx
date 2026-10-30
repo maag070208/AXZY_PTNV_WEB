@@ -25,6 +25,7 @@ import type { DashboardActivity } from "@entities/dashboard";
 import type { UseAdminDashboard } from "../model/useAdminDashboard";
 import { activityHref } from "../model/activityLinks";
 import { seriesColor } from "@shared/ui/charts";
+import { InsightNote } from "@shared/ui/bento-bits";
 
 const SCOPE_ICON: Record<DashboardActivity["scope"], React.ReactNode> = {
   devices: <LuBox size={13} />,
@@ -291,16 +292,13 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
               </div>
             </div>
           )}
-          <p
-            className="m-0 mt-auto rounded-xl bg-[color-mix(in_srgb,currentColor_5%,transparent)] px-3 py-2 text-[12px]"
-            style={{ color: "var(--it-bento-muted)" }}
-          >
+          <InsightNote className="mt-auto">
             {topPerson
               ? withoutTasks.length > 0
                 ? t("adminDashboard.efficiencyNote", { top: topPerson.user.name, none: withoutTasks[0] })
                 : t("adminDashboard.efficiencyNoteAll")
               : t("adminDashboard.noEfficiency")}
-          </p>
+          </InsightNote>
         </ITBentoTile>
 
         {/* Dispositivos por categoría */}

@@ -154,5 +154,12 @@
     "PC": "Desktop PC",
     "TABLET": "Tablet",
     "LAPTOP": "Laptop"
+  },
+  "formSection": {
+    "complete": "Complete"
+  },
+  "liveSummary": {
+    "title": "Summary",
+    "progress": "{{done}} of {{total}} sections complete"
   }
 }

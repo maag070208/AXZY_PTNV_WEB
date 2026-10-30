@@ -1,6 +1,27 @@
 {
   "title": "Langostin",
   "description": "Puerto Nuevo's mascot: every animation and the scenes where it lives.",
+  "state": {
+    "empty": { "title": "Nothing here yet", "description": "Records will show up in this spot once there are any." },
+    "noResults": { "title": "No results", "description": "Try another search or remove a filter." },
+    "forbidden": { "title": "You don't have access", "description": "Ask whoever manages the system for access if you need it." },
+    "error": { "title": "Something went wrong", "description": "We couldn't load the data. Please try again in a moment." },
+    "offline": { "title": "You're offline", "description": "Check your network; we'll retry when it's back." },
+    "loading": { "title": "Loading…", "description": "One moment, I'm fetching the data." }
+  },
+  "guide": {
+    "label": "Langostin, form guide",
+    "default": "I'll keep you company while you fill in the form.",
+    "close": "Close guide",
+    "saving": "Saving…",
+    "saved": "Done, saved.",
+    "error": "Check the highlighted fields before saving."
+  },
+  "confirm": {
+    "title": "Continue?",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
   "kpis": {
     "anims": "Animations",
     "animsHint": "The mascot's gestures and poses",

@@ -1,5 +1,5 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
-import { Fragment, useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
   ITAlert,
   ITButton,
@@ -29,7 +29,7 @@ import {
   validateRfc,
 } from "@shared/validation";
 import { dyn, i18n } from "@shared/i18n";
-import Langostin from "@shared/ui/langostin/Langostin";
+import { LangostinGuide } from "@shared/ui/langostin";
 import { useGoBack } from "@shared/lib/useGoBack";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
@@ -110,8 +110,6 @@ export default function EmployeeProfileEditPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
 
   const detail = useEmployeeDetail(id);
-  // Langostin sigue el campo donde está el cursor.
-  const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -463,14 +461,12 @@ export default function EmployeeProfileEditPage() {
   ];
 
   const hasErrors = Object.keys(errors).length > 0;
-  const hintKey = focusedInput && HINT_FIELDS.has(focusedInput) ? focusedInput : null;
-  const guide = detail.saving
-    ? tt("detail.guide.saving")
-    : hasErrors
-      ? tt("detail.guide.fix")
-      : hintKey
-        ? dyn(tt)(`detail.guide.fields.${hintKey}`)
-        : tt("detail.guide.start");
+  // Pistas por campo (ya traducidas) para LangostinGuide.
+  const guideHints = Object.fromEntries(
+    Array.from(HINT_FIELDS, (name) => [name, dyn(tt)(`detail.guide.fields.${name}`)]),
+  );
+  const guideStatus = detail.saving ? "saving" : hasErrors ? "error" : "idle";
+  const guideStatusText = detail.saving ? tt("detail.guide.saving") : tt("detail.guide.fix");
 
   // Enter pasa al siguiente campo, como en el alta.
   const handleEnter = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -484,11 +480,6 @@ export default function EmployeeProfileEditPage() {
     event.preventDefault();
     next.focus();
   };
-  const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
-    const name = (event.target as HTMLInputElement).name;
-    if (name) setFocusedInput(name);
-  };
-
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -517,7 +508,7 @@ export default function EmployeeProfileEditPage() {
         </ITButton>
       </ITFlex>
 
-      <div onKeyDown={handleEnter} onFocus={handleFocus}>
+      <div onKeyDown={handleEnter}>
         <ITFlex direction="column" gap={6}>
           {steps.map((section) => (
             <Fragment key={section.label}>
@@ -534,14 +525,13 @@ export default function EmployeeProfileEditPage() {
       </div>
 
       {/* Langostin flota abajo a la derecha: guía del campo actual y avisa mientras guarda. */}
-      <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex items-end gap-3">
-        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-[var(--it-card-bg)] px-4 py-3 text-sm text-slate-600 shadow-lg">
-          {guide}
-        </div>
-        <div className="pointer-events-auto drop-shadow-lg">
-          <Langostin anim={detail.saving ? "work" : "wave"} size={72} label={tt("detail.guide.label")} />
-        </div>
-      </div>
+      <LangostinGuide
+        hints={guideHints}
+        status={guideStatus}
+        statusText={guideStatusText}
+        defaultText={tt("detail.guide.start")}
+        storageKey={`employee-profile-edit:${id ?? ""}`}
+      />
     </ITPage>
   );
 }

@@ -154,5 +154,12 @@
     "PC": "PC de escritorio",
     "TABLET": "Tablet",
     "LAPTOP": "Laptop"
+  },
+  "formSection": {
+    "complete": "Completa"
+  },
+  "liveSummary": {
+    "title": "Resumen",
+    "progress": "{{done}} de {{total}} secciones completas"
   }
 }
