@@ -89,7 +89,36 @@
     "unitRow": "Unit",
     "quantityHint": "Number of units to generate",
     "importExcel": "Upload Excel",
-    "addUnits": "Add units"
+    "addUnits": "Add units",
+    "summaryTotal": "Units",
+    "summaryAvailable": "Available",
+    "summaryLoaned": "On loan",
+    "summaryMaintenance": "In maintenance",
+    "summaryModels_one": "{{count}} model",
+    "summaryModels_other": "{{count}} models",
+    "emptyHint": "Add the first model to start tracking the inventory.",
+    "unitsAll": "All",
+    "noUnitsHint": "Pieces of this model will show up here once they are added.",
+    "noMovementsHint": "Entries, loans and write-offs of this model will be listed here.",
+    "chipAvailable": "Available {{pct}}%",
+    "chipLoaned": "On loan {{count}}",
+    "ofActive": "{{pct}}% of active",
+    "sectionData": "Device details",
+    "sectionDataHint": "Type, name, brand and model. Fields marked * are required.",
+    "sectionPiecesHint": "How many pieces arrive and, if you want, their serial, MAC or IP.",
+    "summaryTitle": "Registration summary",
+    "summaryPieces": "Pieces to create",
+    "summaryIdentified": "Identified",
+    "summaryIdentifiedValue": "{{done}} of {{total}}",
+    "hints": {
+      "type": "The type decides which details are asked for each piece (serial, MAC, IP…) and the asset tag prefix.",
+      "name": "Use the name the team knows it by, for example “Samsung A9”.",
+      "brand": "The manufacturer brand, as printed on the box.",
+      "model": "The exact model; it avoids duplicating the device when more pieces are loaded.",
+      "code": "Optional: the barcode or internal code of the model.",
+      "description": "Optional: color, capacity or any useful detail.",
+      "quantity": "How many pieces arrived. Each one gets its own asset tag (500 at most)."
+    }
   },
   "import": {
     "title": "Bulk device upload",
@@ -379,7 +408,26 @@
     "loanReturnHistory": "Return history (kardex)",
     "loanReturnHistoryHint": "When, what and in which condition was returned",
     "withoutReturns": "No returns registered yet",
-    "quantityLabel": "Quantity"
+    "quantityLabel": "Quantity",
+    "summaryTotal": "Letters",
+    "summaryActive": "Active",
+    "summaryPartial": "With pending",
+    "summaryReturned": "Returned",
+    "summaryPending_one": "{{count}} piece to return",
+    "summaryPending_other": "{{count}} pieces to return",
+    "emptyHint": "When you lend equipment to someone, their responsibility letter will show up here.",
+    "pieces_one": "{{count}} piece",
+    "pieces_other": "{{count}} pieces",
+    "progress": "{{returned}} of {{loaned}} pieces returned",
+    "withoutReturnsHint": "When pieces come back from this letter you will see them here.",
+    "sectionWho": "Who is it for?",
+    "sectionWhoHint": "Who becomes responsible for the equipment.",
+    "sectionWhat": "What is being lent?",
+    "sectionWhatHint": "Pick the device and the exact pieces handed over.",
+    "summaryTitle": "Letter summary",
+    "summaryTo": "For",
+    "summaryDevice": "Device",
+    "summaryPieces": "Pieces"
   },
   "loanReturn": {
     "title": "Returns",
@@ -415,7 +463,21 @@
     "toReturn": "To return",
     "colAssigned": "ASSIGNED TO",
     "unitsHint": "Check the units that come back and the condition of each one.",
-    "returnUnit": "Return {{assetTag}}"
+    "returnUnit": "Return {{assetTag}}",
+    "sectionLoan": "Pick the loan",
+    "sectionLoanHint": "Only letters with pieces left to return are listed.",
+    "sectionUnits": "Mark what comes back",
+    "pickLoanFirst": "No loan yet",
+    "pickLoanFirstHint": "Pick a loan to see the pieces it still has pending.",
+    "nothingPending": "Nothing to return",
+    "nothingPendingHint": "This loan has no pending pieces left.",
+    "summaryTitle": "Return summary",
+    "withDamage": "With damage",
+    "hints": {
+      "loan": "Pick the responsibility letter the pieces come back from.",
+      "notes": "Tell what happened to the piece (3 characters minimum); it stays in the history.",
+      "default": "Mark the pieces that come back and in what condition."
+    }
   },
   "messages": {
     "movementRegistered": "Movement registered",
@@ -543,5 +605,11 @@
     "chipAvailable": "Available {{n}}",
     "viewDevice": "View device",
     "noMismatchesShort": "No mismatched movements"
+  },
+  "ui": {
+    "retry": "Try again",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "balance": "Balance {{n}}"
   }
 }

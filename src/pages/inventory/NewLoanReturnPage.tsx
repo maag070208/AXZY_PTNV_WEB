@@ -1,20 +1,17 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  ITBadget,
   ITButton,
-  ITCard,
   ITCheckbox,
+  ITChip,
   ITFlex,
-  ITGrid,
   ITInput,
   ITPage,
   ITSearchSelect,
-  ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaCheckCircle, FaFileSignature, FaInfoCircle, FaSave, FaTimesCircle, FaUndoAlt, FaUserTie } from "react-icons/fa";
+import { FaCheckCircle, FaInfoCircle, FaTimesCircle, FaUndoAlt } from "react-icons/fa";
+import { LuClipboardList, LuPackageCheck } from "react-icons/lu";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
@@ -22,6 +19,11 @@ import { inventoryApi, type Condition, type Loan } from "@entities/inventory";
 import { i18n } from "@shared/i18n";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { FormSection } from "@shared/ui/form-section";
+import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
+import { StickyActions } from "@shared/ui/sticky-actions";
+import { LangostinGuide, LangostinState, type LangostinGuideStatus } from "@shared/ui/langostin";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 
 /** Una pieza pendiente de devolver: se decide pieza por pieza. */
 interface UnitRow {
@@ -45,12 +47,12 @@ interface Row {
 
 const needsNotes = (c: Condition) => c === "POOR" || c === "BROKEN";
 
-// Presets de condición (estilo "Urgencia" del ticket).
-const CONDITION_PRESETS: Record<string, { icon: ReactNode; ring: string; text: string; dot: string }> = {
-  GOOD: { icon: <FaCheckCircle size={12} />, ring: "ring-emerald-300", text: "text-emerald-700", dot: "bg-emerald-500" },
-  FAIR: { icon: <FaInfoCircle size={12} />, ring: "ring-amber-300", text: "text-amber-700", dot: "bg-amber-500" },
-  POOR: { icon: <FaTimesCircle size={12} />, ring: "ring-orange-300", text: "text-orange-700", dot: "bg-orange-500" },
-  BROKEN: { icon: <FaTimesCircle size={12} />, ring: "ring-red-300", text: "text-red-700", dot: "bg-red-500" },
+// Presets de condición: ícono y tono pastel (tokens `--color-<tono>-soft`).
+const CONDITION_PRESETS: Record<Condition, { icon: ReactNode; tone: "success" | "info" | "warning" | "danger" }> = {
+  GOOD: { icon: <FaCheckCircle size={12} />, tone: "success" },
+  FAIR: { icon: <FaInfoCircle size={12} />, tone: "info" },
+  POOR: { icon: <FaTimesCircle size={12} />, tone: "warning" },
+  BROKEN: { icon: <FaTimesCircle size={12} />, tone: "danger" },
 };
 
 const CONDITIONS: Condition[] = ["GOOD", "FAIR", "POOR", "BROKEN"];
@@ -178,12 +180,28 @@ export default function NewLoanReturnPage() {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loanReturn.new")} backAction={() => goBack("/inventory/returns")}>
-        <ITFlex justify="center" align="center" className="py-20">
-          <LottieLoader size="lg" />
-        </ITFlex>
+        <LangostinState kind="loading" />
       </ITPage>
     );
   }
+
+  const damagedCount = selectedUnits.filter(({ unit }) => needsNotes(unit.condition)).length;
+  const brokenCount = selectedUnits.filter(({ unit }) => unit.condition === "BROKEN").length;
+  const assignedName = loan ? (loan.custodian?.name ?? loan.department?.name ?? "—") : undefined;
+  const sectionsDone = (loan ? 1 : 0) + (totalToReturn > 0 ? 1 : 0);
+
+  // Pistas de Langostín por campo (clave = atributo `name` del input).
+  const hints: Record<string, string> = { loan: t("loanReturn.hints.loan") };
+  for (const { unit } of selectedUnits) {
+    if (needsNotes(unit.condition)) hints[`notes-${unit.unitId}`] = t("loanReturn.hints.notes");
+  }
+  const guideStatus: LangostinGuideStatus = saving
+    ? "saving"
+    : toast?.type === "success"
+      ? "saved"
+      : toast?.type === "error" || Object.keys(errors).length > 0
+        ? "error"
+        : "idle";
 
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -193,181 +211,175 @@ export default function NewLoanReturnPage() {
       icon={<FaUndoAlt size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loanReturn.title"), onClick: () => navigate("/inventory/returns") }, { label: t("loanReturn.new") }]}
       backAction={() => goBack("/inventory/loans")}
-      actions={
-        <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
-          <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("loanReturn.save")}</ITText>
-          </ITFlex>
-        </ITButton>
-      }
     >
-      <ITGrid container columns={12} spacing={6}>
-        <ITGrid item xs={12} lg={8}>
-          <ITCard contentClassName="flex flex-col gap-4">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
+          <FormSection
+            number={1}
+            icon={<LuClipboardList size={16} />}
+            title={t("loanReturn.sectionLoan")}
+            description={t("loanReturn.sectionLoanHint")}
+            complete={!!loan}
+          >
             <ITSearchSelect
+              name="loan"
               label={t("loanReturn.selectLoan")}
               placeholder={t("loanReturn.selectLoanPlaceholder")}
               options={loans.map((p) => ({ value: p.id, label: `${p.number} · ${p.custodian?.name ?? p.department?.name ?? ""}` }))}
               value={loan?.id ?? ""}
               onChange={(v) => select(String(v))}
             />
+          </FormSection>
 
-            {loan && rows.length > 0 && (
-              <>
-                <ITFlex direction="column" gap={3}>
-                  {rows.map((r) => {
-                    return (
-                      <ITFlex
-                        key={r.key}
-                        direction="column"
-                        gap={3}
-                        className="rounded-xl border border-slate-200 bg-slate-50/50 p-4"
-                      >
-                        <ITFlex align="center" justify="between" gap={3} wrap="wrap">
-                          <ITFlex align="center" gap={2} className="min-w-0">
-                            <ITText className="text-sm font-bold text-slate-800">{r.deviceName}</ITText>
-                          </ITFlex>
-                          <ITFlex gap={1.5} wrap="wrap">
-                            <ITBadget color="gray" size="lg">{t("loanReturn.loaned")}: {r.loaned}</ITBadget>
-                            <ITBadget color="success" size="lg">{t("loanReturn.returnedQuantity")}: {r.returnedQuantity}</ITBadget>
-                            <ITBadget color="warning" size="lg">{t("loanReturn.pending")}: {r.pending}</ITBadget>
-                          </ITFlex>
-                        </ITFlex>
-
-                        <ITText className="text-[11px] text-slate-500">{t("loanReturn.unitsHint")}</ITText>
-
-                        <ITFlex direction="column" gap={2}>
-                          {r.units.map((u) => (
-                            <ITFlex
-                              key={u.unitId}
-                              direction="column"
-                              gap={2}
-                              className={`rounded-lg border px-3 py-2 ${u.selected ? "border-slate-200 bg-[var(--it-card-bg)]" : "border-dashed border-slate-200 bg-slate-50 opacity-70"}`}
-                            >
-                              <ITFlex align="center" gap={3} wrap="wrap">
-                                <ITCheckbox
-                                  name={`return-${u.unitId}`}
-                                  checked={u.selected}
-                                  onChange={(checked) => updateUnit(r.key, u.unitId, { selected: checked })}
-                                  label={<span className="sr-only">{t("loanReturn.returnUnit", { assetTag: u.assetTag })}</span>}
-                                />
-                                <ITFlex direction="column" className="min-w-0">
-                                  <ITText className="text-[12px] font-bold text-slate-800">{u.assetTag}</ITText>
-                                  <ITText className={`text-[11px] ${u.serialNumber ? "text-slate-600" : "italic text-slate-400"}`}>
-                                    {u.serialNumber ? t("units.serial", { value: u.serialNumber }) : t("units.noSerial")}
-                                  </ITText>
-                                </ITFlex>
-                                {u.selected && (
-                                  <ITFlex gap={1.5} wrap="wrap" className="ml-auto">
-                                    {CONDITIONS.map((c) => {
-                                      const p = CONDITION_PRESETS[c];
-                                      const isActive = u.condition === c;
-                                      return (
-                                        <button
-                                          key={c}
-                                          type="button"
-                                          onClick={() => updateUnit(r.key, u.unitId, { condition: c })}
-                                          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition-all ${
-                                            isActive
-                                              ? `border-transparent bg-slate-50 ring-2 ${p.ring} ${p.text}`
-                                              : "border-slate-200 bg-[var(--it-card-bg)] text-slate-500 hover:border-slate-300 hover:bg-slate-50"
-                                          }`}
-                                        >
-                                          {p.icon}
-                                          <span>{t(`loanReturn.conditionLabels.${c}`)}</span>
-                                        </button>
-                                      );
-                                    })}
-                                  </ITFlex>
-                                )}
-                              </ITFlex>
-
-                              {u.selected && u.condition === "BROKEN" && (
-                                <ITText className="text-[11px] font-semibold text-red-600">{t("loanReturn.brokenRetirementHint")}</ITText>
-                              )}
-                              {u.selected && needsNotes(u.condition) && (
-                                <div>
-                                  <ITInput
-                                    name={`notes-${u.unitId}`}
-                                    label={t("new.comment")}
-                                    placeholder={t("loanReturn.commentPlaceholder")}
-                                    value={u.notes}
-                                    onChange={(e) => updateUnit(r.key, u.unitId, { notes: e.target.value })}
-                                    aria-invalid={!!errors[`notes-${u.unitId}`]}
-                                  />
-                                  {errors[`notes-${u.unitId}`] && (
-                                    <span role="alert" className="text-red-500 text-xs mt-1 block">
-                                      {errors[`notes-${u.unitId}`]}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </ITFlex>
-                          ))}
-                        </ITFlex>
+          <FormSection
+            number={2}
+            icon={<LuPackageCheck size={16} />}
+            title={t("loanReturn.sectionUnits")}
+            description={t("loanReturn.unitsHint")}
+            complete={totalToReturn > 0}
+          >
+            {!loan ? (
+              <LangostinState kind="empty" size="sm" title={t("loanReturn.pickLoanFirst")} description={t("loanReturn.pickLoanFirstHint")} />
+            ) : rows.length === 0 ? (
+              <LangostinState kind="empty" size="sm" title={t("loanReturn.nothingPending")} description={t("loanReturn.nothingPendingHint")} />
+            ) : (
+              <ITFlex direction="column" gap={3}>
+                {rows.map((r) => (
+                  <div
+                    key={r.key}
+                    className="flex flex-col gap-3 rounded-[16px] bg-[color-mix(in_srgb,currentColor_4%,transparent)] p-4"
+                  >
+                    <ITFlex align="center" justify="between" gap={3} wrap="wrap">
+                      <p className="m-0 text-sm font-bold text-slate-800">{r.deviceName}</p>
+                      <ITFlex gap={1.5} wrap="wrap">
+                        <ITChip size="sm" color="gray">{t("loanReturn.loaned")}: {r.loaned}</ITChip>
+                        <ITChip size="sm" color="success">{t("loanReturn.returnedQuantity")}: {r.returnedQuantity}</ITChip>
+                        <ITChip size="sm" color="warning">{t("loanReturn.pending")}: {r.pending}</ITChip>
                       </ITFlex>
-                    );
-                  })}
-                </ITFlex>
-              </>
+                    </ITFlex>
+
+                    <ITFlex direction="column" gap={2}>
+                      {r.units.map((u) => (
+                        <div
+                          key={u.unitId}
+                          className={`flex flex-col gap-2 rounded-[14px] px-3 py-2.5 transition-opacity ${
+                            u.selected ? "bg-[var(--it-card-bg)]" : "opacity-60"
+                          }`}
+                        >
+                          <ITFlex align="center" gap={3} wrap="wrap">
+                            <ITCheckbox
+                              name={`return-${u.unitId}`}
+                              checked={u.selected}
+                              onChange={(checked) => updateUnit(r.key, u.unitId, { selected: checked })}
+                              label={<span className="sr-only">{t("loanReturn.returnUnit", { assetTag: u.assetTag })}</span>}
+                            />
+                            <div className="min-w-0">
+                              <p className="m-0 text-[13px] font-bold text-slate-800">{u.assetTag}</p>
+                              <p className={`m-0 text-[12px] ${u.serialNumber ? "text-slate-600" : "italic text-slate-400"}`}>
+                                {u.serialNumber ? t("units.serial", { value: u.serialNumber }) : t("units.noSerial")}
+                              </p>
+                            </div>
+                            {u.selected && (
+                              <ITFlex gap={1.5} wrap="wrap" className="ml-auto">
+                                {CONDITIONS.map((c) => {
+                                  const p = CONDITION_PRESETS[c];
+                                  const isActive = u.condition === c;
+                                  return (
+                                    <button
+                                      key={c}
+                                      type="button"
+                                      aria-pressed={isActive}
+                                      onClick={() => updateUnit(r.key, u.unitId, { condition: c })}
+                                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full !border-0 px-3 py-1.5 text-[12px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]"
+                                      style={
+                                        isActive
+                                          ? { background: `var(--color-${p.tone}-soft)`, color: `var(--color-${p.tone})` }
+                                          : { background: "color-mix(in srgb, currentColor 6%, transparent)", color: "inherit", opacity: 0.8 }
+                                      }
+                                    >
+                                      {p.icon}
+                                      <span>{t(`loanReturn.conditionLabels.${c}`)}</span>
+                                    </button>
+                                  );
+                                })}
+                              </ITFlex>
+                            )}
+                          </ITFlex>
+
+                          {u.selected && u.condition === "BROKEN" && (
+                            <p className="m-0 text-[12px] font-semibold text-[color:var(--color-danger)]">{t("loanReturn.brokenRetirementHint")}</p>
+                          )}
+                          {u.selected && needsNotes(u.condition) && (
+                            <div>
+                              <ITInput
+                                name={`notes-${u.unitId}`}
+                                label={t("new.comment")}
+                                placeholder={t("loanReturn.commentPlaceholder")}
+                                value={u.notes}
+                                onChange={(e) => updateUnit(r.key, u.unitId, { notes: e.target.value })}
+                                aria-invalid={!!errors[`notes-${u.unitId}`]}
+                              />
+                              {errors[`notes-${u.unitId}`] && (
+                                <span role="alert" className="mt-1 block text-xs text-[color:var(--color-danger)]">
+                                  {errors[`notes-${u.unitId}`]}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </ITFlex>
+                  </div>
+                ))}
+              </ITFlex>
             )}
-          </ITCard>
-        </ITGrid>
+          </FormSection>
+        </div>
 
-        <ITGrid item xs={12} lg={4}>
-          <ITFlex direction="column" gap={4} className="lg:sticky lg:top-6">
-            {loan && (
-              <ITCard contentClassName="flex flex-col gap-4">
-                <ITFlex align="center" gap={2}>
-                  <FaFileSignature className="text-slate-400" size={14} />
-                  <ITText className="text-sm font-semibold text-slate-800">{t("loanReturn.custodyLetterInfo")}</ITText>
-                </ITFlex>
+        {/* Resumen vivo: el préstamo elegido y lo que se va a devolver */}
+        <LiveSummary
+          title={t("loanReturn.summaryTitle")}
+          total={2}
+          done={sectionsDone}
+          footer={
+            brokenCount > 0 ? (
+              <p className="m-0 text-[12px] font-semibold text-[color:var(--color-danger)]">{t("loanReturn.brokenRetirementHint")}</p>
+            ) : undefined
+          }
+        >
+          {loan?.custodian && (
+            <div className="flex items-center gap-2.5">
+              <ProfileAvatar name={loan.custodian.name} size="lg" />
+              <div className="min-w-0">
+                <p className="m-0 truncate text-[13px] font-bold text-slate-800">{loan.custodian.name}</p>
+                {loan.custodian.employeeNumber && (
+                  <p className="m-0 text-[11.5px] text-slate-500">{t("loans.employeeNo", { n: loan.custodian.employeeNumber })}</p>
+                )}
+              </div>
+            </div>
+          )}
+          <LiveSummaryRow label={t("loans.colNumber")} value={loan?.number} />
+          <LiveSummaryRow label={t("loans.colDate")} value={loan ? formatDate(loan.date) : undefined} />
+          <LiveSummaryRow label={t("loans.assignment")} value={assignedName} />
+          <LiveSummaryRow label={t("loanReturn.pendingTotal")} value={loan ? pendingTotal : undefined} />
+          <LiveSummaryRow label={t("loanReturn.toReturn")} value={loan ? totalToReturn : undefined} />
+          {loan && damagedCount > 0 && <LiveSummaryRow label={t("loanReturn.withDamage")} value={damagedCount} />}
+        </LiveSummary>
+      </div>
 
-                <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.colNumber")}</ITText>
-                  <ITText className="text-sm font-bold text-slate-900">{loan.number}</ITText>
-                </ITFlex>
+      <StickyActions>
+        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/loans")} disabled={saving} />
+        <ITButton
+          label={saving ? t("new.saving") : t("loanReturn.save")}
+          variant="rounded"
+          color="primary"
+          size="sm"
+          onClick={handleSubmit}
+          disabled={saving || !isValid}
+        />
+      </StickyActions>
 
-                <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.colDate")}</ITText>
-                  <ITText className="text-sm text-slate-600">{formatDate(loan.date)}</ITText>
-                </ITFlex>
-
-                <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[12px] font-semibold text-slate-400">{t("loans.assignment")}</ITText>
-                  <ITFlex align="center" gap={2}>
-                    <FaUserTie className="text-slate-400" size={12} />
-                    <ITText className="text-sm font-semibold text-slate-700">
-                      {loan.custodian?.name ?? (loan.department?.name || "—")}
-                    </ITText>
-                  </ITFlex>
-                </ITFlex>
-
-                <ITFlex
-                  align="center"
-                  justify="between"
-                  gap={2}
-                  className="rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3"
-                >
-                  <ITText className="text-xs text-slate-600">{t("loanReturn.pendingTotal")}</ITText>
-                  <ITText className="text-lg font-black text-slate-800">{pendingTotal}</ITText>
-                </ITFlex>
-
-                <ITFlex
-                  align="center"
-                  justify="between"
-                  gap={2}
-                  className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3"
-                >
-                  <ITText className="text-xs text-slate-600">{t("loanReturn.toReturn")}</ITText>
-                  <ITText className="text-lg font-black text-emerald-700">{totalToReturn}</ITText>
-                </ITFlex>
-              </ITCard>
-            )}
-          </ITFlex>
-        </ITGrid>
-      </ITGrid>
+      <LangostinGuide storageKey="inventory-return-new" hints={hints} status={guideStatus} defaultText={t("loanReturn.hints.default")} />
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

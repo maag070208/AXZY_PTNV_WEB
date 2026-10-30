@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { ITButton, ITConfirmDialog, ITEmptyState, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITEmptyState, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 import {
   FaBalanceScale,
   FaCheckCircle,
@@ -494,7 +495,7 @@ export default function InventoryMismatchesBoard() {
         </div>
       </div>
 
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={confirmar}
         onClose={() => {
           if (!guardando) setConfirmar(false);

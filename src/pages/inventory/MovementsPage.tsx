@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITBadget, ITButton, ITDataTable, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITChip, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaArrowDown, FaArrowRight, FaArrowUp, FaExchangeAlt, FaFilePdf, FaHistory, FaPlus, FaTrash, FaUndoAlt, FaWrench } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
@@ -8,7 +8,8 @@ import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type Movement, type MovementType } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 import { downloadMovementPdf, downloadReportMovementsPdf } from "@widgets/movement-pdf";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { ListSummaryStrip } from "@shared/ui/list-summary-strip";
+import { LuHistory, LuTrash2, LuWrench } from "react-icons/lu";
 import { i18n } from "@shared/i18n";
 import { useGoBack } from "@shared/lib/useGoBack";
 
@@ -38,7 +39,6 @@ const ACTION_VISUAL: Record<MovementType, { icon: ReactNode; color: ActionColor 
   MAINTENANCE_OUT: { icon: <FaWrench size={12} />, color: "warning" },
   REVERSAL: { icon: <FaUndoAlt size={12} />, color: "danger" },
 };
-const ACTION_DEFAULT: ActionColor = "warning";
 
 /** Tipos de movimiento, para el filtro tipo catálogo. */
 const MOVEMENT_TYPES = Object.keys(ACTION_VISUAL) as MovementType[];
@@ -143,16 +143,6 @@ export default function MovementsPage() {
     setReloadKey((k) => k + 1);
   };
 
-  const revert = async (movementId: string) => {
-    if (!window.confirm(t("movements.confirmRevert"))) return;
-    try {
-      await inventoryApi.revert(movementId);
-      setReloadKey((k) => k + 1);
-    } catch (e: any) {
-      window.alert(e.message || "Error");
-    }
-  };
-
   const generateReport = async () => {
     setGeneratingPdf(true);
     try {
@@ -164,8 +154,6 @@ export default function MovementsPage() {
       setGeneratingPdf(false);
     }
   };
-
-  const statCardActive = (group: TypeGroup | null) => typeFilter === group;
 
   /** Abre el PDF del movimiento de la fila (el botón "Reporte" es el global). */
   const openMovementPdf = async (movementId: string) => {
@@ -202,9 +190,9 @@ export default function MovementsPage() {
         error: false,
       },
       render: (m: MovementRow) => (
-        <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">
+        <ITChip size="sm" color={TYPE_BADGE_COLOR[m.type]}>
           {t(`typeLabels.${m.type}`)}
-        </ITBadget>
+        </ITChip>
       ),
     },
     {
@@ -251,11 +239,11 @@ export default function MovementsPage() {
       },
       render: (m: MovementRow) =>
         m.status === "CANCELLED" ? (
-          <ITBadget color="danger" size="lg">{t("movements.cancelled")}</ITBadget>
+          <ITChip size="sm" color="danger">{t("movements.cancelled")}</ITChip>
         ) : m.type === "RETIREMENT" ? (
-          <ITBadget color="warning" size="lg">{t("movements.retiredLabel")}</ITBadget>
+          <ITChip size="sm" color="warning">{t("movements.retiredLabel")}</ITChip>
         ) : (
-          <ITBadget color="success" size="lg">{t("movements.activeLabel")}</ITBadget>
+          <ITChip size="sm" color="success">{t("movements.activeLabel")}</ITChip>
         ),
     },
   ];
@@ -285,29 +273,15 @@ export default function MovementsPage() {
         </ITFlex>
       }
     >
-      <div className="bento-stagger grid grid-cols-2 gap-4 md:!grid-cols-3">
-        <KpiTile size="sm"
-          label={t("movements.stats.total")}
-          value={stats.total}
-          tone="sky"
-          icon={<FaHistory size={16} />}
-          onClick={() => applyFilter(null)}
-        />
-        <KpiTile size="sm"
-          label={t("movements.stats.retirements")}
-          value={stats.retirements}
-          tone={stats.retirements > 0 || statCardActive("retirements") ? "rose" : "neutral"}
-          icon={<FaTrash size={16} />}
-          onClick={() => applyFilter("retirements")}
-        />
-        <KpiTile size="sm"
-          label={t("movements.stats.maintenance")}
-          value={stats.maintenance}
-          tone={stats.maintenance > 0 || statCardActive("maintenance") ? "amber" : "neutral"}
-          icon={<FaWrench size={16} />}
-          onClick={() => applyFilter("maintenance")}
-        />
-      </div>
+      <ListSummaryStrip
+        activeId={typeFilter ?? "all"}
+        onSelect={(id) => applyFilter(id === "all" ? null : (id as TypeGroup))}
+        items={[
+          { id: "all", label: t("movements.stats.total"), value: stats.total, tone: "sea", icon: <LuHistory size={15} /> },
+          { id: "retirements", label: t("movements.stats.retirements"), value: stats.retirements, tone: "sun", icon: <LuTrash2 size={15} /> },
+          { id: "maintenance", label: t("movements.stats.maintenance"), value: stats.maintenance, tone: "lavender", icon: <LuWrench size={15} /> },
+        ]}
+      />
 
       <ITDataTable
         columns={columns as any}

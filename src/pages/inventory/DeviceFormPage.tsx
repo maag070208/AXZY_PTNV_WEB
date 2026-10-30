@@ -1,19 +1,17 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITButton,
-  ITCard,
   ITFlex,
   ITGrid,
   ITInput,
   ITPage,
   ITSearchSelect,
-  ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaBoxes, FaInfoCircle, FaSave } from "react-icons/fa";
+import { FaBoxOpen } from "react-icons/fa";
+import { LuBox, LuLayers } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type DeviceType } from "@entities/inventory";
 import {
@@ -23,30 +21,10 @@ import {
   type UnitIdentityRow,
 } from "@features/inventory/unit-identities";
 import { useGoBack } from "@shared/lib/useGoBack";
-
-function SectionHeader({
-  icon,
-  iconBg,
-  title,
-  hint,
-}: {
-  icon: React.ReactNode;
-  iconBg: string;
-  title: string;
-  hint: string;
-}) {
-  return (
-    <ITFlex align="center" gap={3} className="mb-5">
-      <ITFlex align="center" justify="center" className={`h-10 w-10 shrink-0 rounded-xl shadow-sm ${iconBg}`}>
-        {icon}
-      </ITFlex>
-      <ITFlex direction="column" gap={0.25}>
-        <ITText className="text-[12px] font-semibold text-slate-700">{title}</ITText>
-        <ITText className="text-[10px] text-slate-400">{hint}</ITText>
-      </ITFlex>
-    </ITFlex>
-  );
-}
+import { FormSection } from "@shared/ui/form-section";
+import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
+import { StickyActions } from "@shared/ui/sticky-actions";
+import { LangostinGuide, LangostinState, type LangostinGuideStatus } from "@shared/ui/langostin";
 
 export default function DeviceFormPage() {
   const { t } = useTranslation(["inventory", "common"]);
@@ -137,19 +115,32 @@ export default function DeviceFormPage() {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("devices.new")} backAction={() => goBack("/inventory/devices")}>
-        <ITFlex justify="center" align="center" className="py-20">
-          <LottieLoader size="lg" />
-        </ITFlex>
+        <LangostinState kind="loading" />
       </ITPage>
     );
   }
 
-  const activeFields = [
-    { key: "serialNumber", label: t("devices.serialNumber"), active: type?.useSerialNumber },
-    { key: "macAddress", label: t("devices.mac"), active: type?.useMac },
-    { key: "ip", label: t("devices.ip"), active: type?.useIp },
-    { key: "hostname", label: t("devices.hostname"), active: type?.useHostname },
-  ].filter((f) => f.active);
+  const identified = units.filter((u) => u.serialNumber || u.macAddress || u.ip || u.hostname).length;
+  const pieceSectionDone = !!type && quantityNum >= 1;
+  const sectionsDone = (isValid ? 1 : 0) + (pieceSectionDone ? 1 : 0);
+
+  // Pistas de Langostín por campo (clave = atributo `name` del input).
+  const hints: Record<string, string> = {
+    type: t("devices.hints.type"),
+    name: t("devices.hints.name"),
+    brand: t("devices.hints.brand"),
+    model: t("devices.hints.model"),
+    code: t("devices.hints.code"),
+    description: t("devices.hints.description"),
+    quantity: t("devices.hints.quantity"),
+  };
+  const guideStatus: LangostinGuideStatus = saving
+    ? "saving"
+    : toast?.type === "success"
+      ? "saved"
+      : toast?.type === "error"
+        ? "error"
+        : "idle";
 
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -159,24 +150,16 @@ export default function DeviceFormPage() {
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title"), onClick: () => navigate("/inventory/devices") }, { label: t("devices.new") }]}
       backAction={() => goBack("/inventory/devices")}
-      actions={
-        <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
-          <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("devices.save")}</ITText>
-          </ITFlex>
-        </ITButton>
-      }
     >
-      <div className="grid grid-cols-1 gap-6 lg:!grid-cols-[minmax(0,1fr)_340px] items-start">
-        <div className="space-y-6 min-w-0">
-          <ITCard>
-            <SectionHeader
-              icon={<FaBoxOpen size={15} className="text-blue-600" />}
-              iconBg="bg-blue-50"
-              title={t("devices.new")}
-              hint={t("devices.formSub")}
-            />
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
+          <FormSection
+            number={1}
+            icon={<LuBox size={16} />}
+            title={t("devices.sectionData")}
+            description={t("devices.sectionDataHint")}
+            complete={isValid}
+          >
             <ITFlex direction="column" gap={4}>
               <ITSearchSelect
                 name="type"
@@ -211,40 +194,16 @@ export default function DeviceFormPage() {
                 </ITGrid>
               </ITGrid>
             </ITFlex>
-          </ITCard>
+          </FormSection>
 
-          <ITCard tone="info">
-            <ITFlex align="center" gap={2}>
-              <FaInfoCircle size={11} className="text-blue-700" />
-              <ITText className="text-[12px] font-semibold text-blue-800">
-                {t("devices.initialQuantity")}
-              </ITText>
-              <ITText className="ml-auto rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700">{units.length}</ITText>
-            </ITFlex>
-            <ul className="mt-3 space-y-2 font-bold text-slate-600">
-              <li className="flex items-start gap-2">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
-                {t("devices.registrationHint", { count: units.length })}
-              </li>
-              {activeFields.length > 0 && (
-                <li className="flex items-start gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
-                  {t("devices.unitsHintType", { type: type?.name ?? "" })}
-                </li>
-              )}
-            </ul>
-          </ITCard>
-        </div>
-
-        <aside className="space-y-6 lg:sticky lg:top-5">
-          <ITCard>
-            <SectionHeader
-              icon={<FaBoxes size={15} className="text-emerald-600" />}
-              iconBg="bg-emerald-50"
-              title={t("devices.unitsSection")}
-              hint={t("devices.unitSidebarHint")}
-            />
-            <ITFlex align="center" gap={2} className="mb-4">
+          <FormSection
+            number={2}
+            icon={<LuLayers size={16} />}
+            title={t("devices.unitsSection")}
+            description={t("devices.sectionPiecesHint")}
+            complete={pieceSectionDone}
+          >
+            <ITFlex direction="column" gap={4}>
               <ITInput
                 name="quantity"
                 label={t("devices.initialQuantity")}
@@ -253,29 +212,57 @@ export default function DeviceFormPage() {
                 max={500}
                 value={quantity}
                 onChange={(e) => syncQuantity(Number(e.target.value))}
-                className="flex-1"
               />
+              {!type ? (
+                <ITAlert variant="info" dismissible={false}>
+                  {t("devices.unitsSelectType")}
+                </ITAlert>
+              ) : !anyUnitField ? (
+                <ITAlert variant="info" dismissible={false}>
+                  {t("devices.unitsNoFields", { type: type.name })}
+                </ITAlert>
+              ) : (
+                <UnitIdentityEditor
+                  type={type}
+                  units={units}
+                  onChange={updateUnit}
+                  label={(index) => `${t("devices.unitRow")} ${index + 1}`}
+                />
+              )}
             </ITFlex>
+          </FormSection>
+        </div>
 
-            {!type ? (
-              <ITAlert variant="info" dismissible={false}>
-                {t("devices.unitsSelectType")}
-              </ITAlert>
-            ) : !anyUnitField ? (
-              <ITAlert variant="info" dismissible={false}>
-                {t("devices.unitsNoFields", { type: type.name })}
-              </ITAlert>
-            ) : (
-              <UnitIdentityEditor
-                type={type}
-                units={units}
-                onChange={updateUnit}
-                label={(index) => `${t("devices.unitRow")} ${index + 1}`}
-              />
-            )}
-          </ITCard>
-        </aside>
+        {/* Resumen vivo: lo capturado hasta ahora, en lenguaje humano */}
+        <LiveSummary
+          title={t("devices.summaryTitle")}
+          total={2}
+          done={sectionsDone}
+          footer={<p className="m-0 text-[12px] text-slate-500">{t("devices.registrationHint", { count: units.length })}</p>}
+        >
+          <LiveSummaryRow label={t("devices.type")} value={type ? `${type.name} (${type.assetTagPrefix})` : undefined} />
+          <LiveSummaryRow label={t("devices.name")} value={form.name.trim() || undefined} />
+          <LiveSummaryRow label={`${t("devices.brand")} / ${t("devices.model")}`} value={[form.brand.trim(), form.model.trim()].filter(Boolean).join(" · ") || undefined} />
+          <LiveSummaryRow label={t("devices.summaryPieces")} value={units.length || quantityNum} />
+          {type && anyUnitField && (
+            <LiveSummaryRow label={t("devices.summaryIdentified")} value={t("devices.summaryIdentifiedValue", { done: identified, total: units.length })} />
+          )}
+        </LiveSummary>
       </div>
+
+      <StickyActions>
+        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/devices")} disabled={saving} />
+        <ITButton
+          label={saving ? t("new.saving") : t("devices.save")}
+          variant="rounded"
+          color="primary"
+          size="sm"
+          onClick={handleSubmit}
+          disabled={saving || !isValid}
+        />
+      </StickyActions>
+
+      <LangostinGuide storageKey="inventory-device-new" hints={hints} status={guideStatus} />
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

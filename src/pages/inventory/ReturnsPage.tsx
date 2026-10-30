@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITBadget, ITButton, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITChip, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaFileSignature, FaUndoAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -101,13 +101,13 @@ export default function ReturnsPage() {
           {d.items.map((x) => (
             <ITFlex key={x.id} align="center" gap={1.5} className="min-w-0">
               <ITText className="text-[11px] text-slate-600 truncate">{x.device?.name ?? "—"}</ITText>
-              <ITBadget color="gray" size="lg">×{x.quantity}</ITBadget>
-              <ITBadget
-                size="lg"
-                color={x.condition === "GOOD" ? "success" : x.condition === "FAIR" ? "warning" : x.condition === "POOR" ? "warning" : "danger"}
+              <ITChip size="sm" color="gray">×{x.quantity}</ITChip>
+              <ITChip
+                size="sm"
+                color={x.condition === "GOOD" ? "success" : x.condition === "FAIR" ? "info" : x.condition === "POOR" ? "warning" : "danger"}
               >
                 {t(`loanReturn.conditionLabels.${x.condition}`)}
-              </ITBadget>
+              </ITChip>
             </ITFlex>
           ))}
         </ITFlex>

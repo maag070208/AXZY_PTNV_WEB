@@ -89,7 +89,36 @@
     "unitRow": "Unidad",
     "quantityHint": "Cantidad de unidades a generar",
     "importExcel": "Cargar Excel",
-    "addUnits": "Agregar unidades"
+    "addUnits": "Agregar unidades",
+    "summaryTotal": "Unidades",
+    "summaryAvailable": "Disponibles",
+    "summaryLoaned": "En préstamo",
+    "summaryMaintenance": "En mantenimiento",
+    "summaryModels_one": "{{count}} modelo",
+    "summaryModels_other": "{{count}} modelos",
+    "emptyHint": "Da de alta el primer modelo para empezar a llevar el inventario.",
+    "unitsAll": "Todas",
+    "noUnitsHint": "Cuando se den de alta piezas de este modelo aparecerán aquí.",
+    "noMovementsHint": "Las entradas, préstamos y bajas de este modelo se irán listando aquí.",
+    "chipAvailable": "Disponibles {{pct}}%",
+    "chipLoaned": "En préstamo {{count}}",
+    "ofActive": "{{pct}}% de las activas",
+    "sectionData": "Datos del dispositivo",
+    "sectionDataHint": "Tipo, nombre, marca y modelo. Los campos con * son obligatorios.",
+    "sectionPiecesHint": "Cuántas piezas llegan y, si quieres, su serie, MAC o IP.",
+    "summaryTitle": "Resumen del alta",
+    "summaryPieces": "Piezas a crear",
+    "summaryIdentified": "Con identificación",
+    "summaryIdentifiedValue": "{{done}} de {{total}}",
+    "hints": {
+      "type": "El tipo decide qué datos se piden de cada pieza (serie, MAC, IP…) y el prefijo del activo fijo.",
+      "name": "Usa el nombre con el que lo conoce el equipo, por ejemplo «Samsung A9».",
+      "brand": "La marca del fabricante, tal como viene en la caja.",
+      "model": "El modelo exacto; sirve para no duplicar el dispositivo al cargar más piezas.",
+      "code": "Opcional: el código de barras o interno del modelo.",
+      "description": "Opcional: color, capacidad o cualquier detalle útil.",
+      "quantity": "Cuántas piezas llegaron. Cada una recibe su propio folio de activo fijo (máximo 500)."
+    }
   },
   "import": {
     "title": "Carga masiva de dispositivos",
@@ -379,7 +408,26 @@
     "loanReturnHistory": "Historial de devoluciones (kardex)",
     "loanReturnHistoryHint": "Cuándo, qué y en qué condición devolvieron",
     "withoutReturns": "Aún no hay devoluciones registradas",
-    "quantityLabel": "Cantidad de piezas"
+    "quantityLabel": "Cantidad de piezas",
+    "summaryTotal": "Cartas",
+    "summaryActive": "Activas",
+    "summaryPartial": "Con pendientes",
+    "summaryReturned": "Devueltas",
+    "summaryPending_one": "{{count}} pieza por devolver",
+    "summaryPending_other": "{{count}} piezas por devolver",
+    "emptyHint": "Cuando prestes equipo a alguien, su carta responsiva aparecerá aquí.",
+    "pieces_one": "{{count}} pieza",
+    "pieces_other": "{{count}} piezas",
+    "progress": "{{returned}} de {{loaned}} piezas devueltas",
+    "withoutReturnsHint": "Cuando regresen piezas de esta carta las verás aquí.",
+    "sectionWho": "¿Para quién es?",
+    "sectionWhoHint": "Quién queda como responsable del equipo.",
+    "sectionWhat": "¿Qué se presta?",
+    "sectionWhatHint": "Elige el dispositivo y las piezas exactas que se entregan.",
+    "summaryTitle": "Resumen de la carta",
+    "summaryTo": "Para",
+    "summaryDevice": "Dispositivo",
+    "summaryPieces": "Piezas"
   },
   "loanReturn": {
     "title": "Devoluciones",
@@ -415,7 +463,21 @@
     "toReturn": "A devolver",
     "colAssigned": "ASIGNADO A",
     "unitsHint": "Marca las unidades que regresan y la condición de cada una.",
-    "returnUnit": "Devolver {{assetTag}}"
+    "returnUnit": "Devolver {{assetTag}}",
+    "sectionLoan": "Elige el préstamo",
+    "sectionLoanHint": "Solo aparecen las cartas con piezas por devolver.",
+    "sectionUnits": "Marca lo que regresa",
+    "pickLoanFirst": "Aún no hay préstamo",
+    "pickLoanFirstHint": "Elige un préstamo para ver las piezas que tiene pendientes.",
+    "nothingPending": "Nada por devolver",
+    "nothingPendingHint": "Este préstamo ya no tiene piezas pendientes.",
+    "summaryTitle": "Resumen de la devolución",
+    "withDamage": "Con daño",
+    "hints": {
+      "loan": "Elige la carta responsiva de la que regresan las piezas.",
+      "notes": "Cuenta qué le pasó a la pieza (mínimo 3 caracteres); queda en el historial.",
+      "default": "Marca las piezas que regresan y en qué condición."
+    }
   },
   "messages": {
     "movementRegistered": "Movimiento registrado",
@@ -543,5 +605,11 @@
     "chipAvailable": "Disponibles {{n}}",
     "viewDevice": "Ver dispositivo",
     "noMismatchesShort": "Sin movimientos descuadrados"
+  },
+  "ui": {
+    "retry": "Reintentar",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "balance": "Saldo {{n}}"
   }
 }
