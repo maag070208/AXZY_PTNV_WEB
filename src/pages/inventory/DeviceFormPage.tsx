@@ -8,8 +8,7 @@ import {
   ITInput,
   ITPage,
   ITSearchSelect,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITText } from "@axzydev/axzy_ui_system";
 import { FaBoxOpen } from "react-icons/fa";
 import { LuBox, LuLayers } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
@@ -238,7 +237,7 @@ export default function DeviceFormPage() {
           title={t("devices.summaryTitle")}
           total={2}
           done={sectionsDone}
-          footer={<p className="m-0 text-[12px] text-slate-500">{t("devices.registrationHint", { count: units.length })}</p>}
+          footer={<ITText className="m-0 text-[12px] text-slate-500">{t("devices.registrationHint", { count: units.length })}</ITText>}
         >
           <LiveSummaryRow label={t("devices.type")} value={type ? `${type.name} (${type.assetTagPrefix})` : undefined} />
           <LiveSummaryRow label={t("devices.name")} value={form.name.trim() || undefined} />

@@ -38,7 +38,7 @@ export default function TimeClockActions({ fx, onManageClocks }: Props) {
           </ITFlex>
         </ITButton>
       )}
-      <span title={t("import.hint")}>
+      <ITText as="span" title={t("import.hint")}>
         <ITButton
           variant="outlined"
           color="primary"
@@ -53,7 +53,7 @@ export default function TimeClockActions({ fx, onManageClocks }: Props) {
             </ITText>
           </ITFlex>
         </ITButton>
-      </span>
+      </ITText>
       <ITButton
         variant="outlined"
         color="gray"
@@ -68,7 +68,7 @@ export default function TimeClockActions({ fx, onManageClocks }: Props) {
           </ITText>
         </ITFlex>
       </ITButton>
-      <span title={t("sync.hint")}>
+      <ITText as="span" title={t("sync.hint")}>
         <ITButton
           variant="filled"
           color="primary"
@@ -81,7 +81,7 @@ export default function TimeClockActions({ fx, onManageClocks }: Props) {
             <ITText className="font-bold text-[11px]">{t("sync.button")}</ITText>
           </ITFlex>
         </ITButton>
-      </span>
+      </ITText>
     </ITFlex>
   );
 }

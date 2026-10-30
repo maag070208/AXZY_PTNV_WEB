@@ -100,7 +100,7 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
 
         {editsPerson && (
           <section>
-          <h3 className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionPersonal")}</h3>
+          <ITText as="h3" className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionPersonal")}</ITText>
           <UserFormFields
             step="personal"
             isEdit
@@ -118,7 +118,7 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
           </section>
         )}
         <section>
-        <h3 className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionAccess")}</h3>
+        <ITText as="h3" className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionAccess")}</ITText>
         <UserFormFields
           step="access"
           isEdit
@@ -136,7 +136,7 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
         />
         </section>
         <section>
-        <h3 className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionOrganization")}</h3>
+        <ITText as="h3" className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionOrganization")}</ITText>
         <UserFormFields
           step="org"
           isEdit

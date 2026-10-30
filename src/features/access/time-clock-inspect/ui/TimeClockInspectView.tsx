@@ -153,8 +153,8 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div className="flex items-start justify-between gap-4 border-t border-dashed border-slate-200 pt-2">
-      <span className="text-xs text-slate-500">{label}</span>
-      <span className="text-right text-sm text-slate-900">{value || "—"}</span>
+      <ITText as="span" className="text-xs text-slate-500">{label}</ITText>
+      <ITText as="span" className="text-right text-sm text-slate-900">{value || "—"}</ITText>
     </div>
   );
 }

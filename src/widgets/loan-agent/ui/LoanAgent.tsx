@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITButton, ITInput, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITInput, ITSearchSelect, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import type { Device, DeviceUnit } from "@entities/inventory";
 import type { Department } from "@entities/department";
@@ -194,11 +194,11 @@ export default function LoanAgent(props: Props) {
     .filter((line): line is string => Boolean(line));
 
   const footer = (
-    <div className="flex flex-wrap items-center justify-between gap-2">
+    <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
       <ITButton variant="text" color="secondary" size="sm" onClick={back} disabled={history.length === 0 || saving}>
         <ITText className="text-[11px] font-bold">{t("loans.agent.back")}</ITText>
       </ITButton>
-      <div className="flex flex-wrap items-center gap-2">
+      <ITFlex align="center" wrap="wrap" gap={2}>
         <ITButton variant="text" color="secondary" size="sm" onClick={onUseForm} disabled={saving}>
           <ITText className="text-[11px] font-bold">{t("loans.agent.useForm")}</ITText>
         </ITButton>
@@ -207,8 +207,8 @@ export default function LoanAgent(props: Props) {
             <ITText className="text-[11px] font-bold">{saving ? t("new.saving") : t("loans.agent.confirm")}</ITText>
           </ITButton>
         )}
-      </div>
-    </div>
+      </ITFlex>
+    </ITFlex>
   );
 
   return (
@@ -224,10 +224,10 @@ export default function LoanAgent(props: Props) {
     >
       <AgentBubble text={t("loans.agent.hello")} />
       {log.map((entry, i) => (
-        <div key={i} className="flex flex-col gap-3">
+        <ITStack key={i} spacing={3}>
           <AgentBubble text={entry.q} />
           <UserBubble text={entry.a} />
-        </div>
+        </ITStack>
       ))}
       {step === "summary" ? (
         <>
@@ -332,11 +332,11 @@ export default function LoanAgent(props: Props) {
           ) : pickExact ? (
             <>
               <UnitPicker units={units} selected={exactIds} onChange={setExactIds} />
-              <div className="flex justify-end">
+              <ITFlex justify="end">
                 <ITButton variant="filled" color="primary" size="sm" onClick={confirmQty} disabled={exactIds.length === 0}>
                   <ITText className="text-[11px] font-bold">{t("loans.agent.add")}</ITText>
                 </ITButton>
-              </div>
+              </ITFlex>
             </>
           ) : (
             <>
@@ -355,12 +355,12 @@ export default function LoanAgent(props: Props) {
                   <ITText className="text-[11px] font-bold">{t("loans.agent.add")}</ITText>
                 </ITButton>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <ITFlex wrap="wrap" gap={2}>
                 {units.length > 1 && (
                   <OptionChip label={t("loans.agent.allUnits", { count: units.length })} onClick={() => setQty(String(units.length))} />
                 )}
                 <OptionChip label={t("loans.agent.pickExact")} emoji="🔎" onClick={() => setPickExact(true)} />
-              </div>
+              </ITFlex>
             </>
           )}
         </div>

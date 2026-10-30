@@ -42,9 +42,9 @@ export default function EditTicketForm({ form, errors, onFieldChange }: Props) {
                 aria-invalid={!!errors?.title}
               />
               {errors?.title && (
-                <span role="alert" className="mt-1 block text-xs text-[color:var(--color-danger)]">
+                <ITText as="span" role="alert" className="mt-1 block text-xs text-[color:var(--color-danger)]">
                   {errors.title}
-                </span>
+                </ITText>
               )}
             </div>
 

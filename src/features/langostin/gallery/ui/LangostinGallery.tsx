@@ -84,7 +84,7 @@ export default function LangostinGallery() {
         description={d("stage.description")}
         actions={
           <ITFlex align="center" gap={3} wrap="wrap">
-            <label className="flex items-center gap-2 text-[11px] font-semibold text-slate-600">
+            <ITText as="label" className="flex items-center gap-2 text-[11px] font-semibold text-slate-600">
               <input
                 type="checkbox"
                 checked={mascot}
@@ -92,7 +92,7 @@ export default function LangostinGallery() {
                 className="h-4 w-4 cursor-pointer accent-primary-500"
               />
               {d("stage.showMascot")}
-            </label>
+            </ITText>
             <ITSelect
               name="speed"
               value={String(speed)}

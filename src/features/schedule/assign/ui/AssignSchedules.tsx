@@ -254,11 +254,11 @@ export default function AssignSchedules() {
                       >
                         {mode === "drag" && <FaGripVertical size={11} className="shrink-0 text-slate-300" />}
                         <ProfileAvatar name={e.name} size="xs" />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[12px] font-semibold text-slate-800">{e.name}</p>
-                          {e.employeeNumber && <p className="text-[10px] text-slate-500">#{e.employeeNumber}</p>}
-                        </div>
-                        <span
+                        <ITFlex className="min-w-0 flex-1">
+                          <ITText className="truncate text-[12px] font-semibold text-slate-800">{e.name}</ITText>
+                          {e.employeeNumber && <ITText className="text-[10px] text-slate-500">#{e.employeeNumber}</ITText>}
+                        </ITFlex>
+                        <ITText as="span"
                           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                             isSelected
                               ? "bg-primary-500 text-white"
@@ -266,7 +266,7 @@ export default function AssignSchedules() {
                           }`}
                         >
                           {isSelected ? <FaCheck size={10} /> : <FaPlus size={10} />}
-                        </span>
+                        </ITText>
                       </div>
                     );
                   })

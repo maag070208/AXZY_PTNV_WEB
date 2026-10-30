@@ -3,6 +3,7 @@ import { FaCheck } from "react-icons/fa";
 import type { LangostinAnim } from "@shared/ui/langostin";
 import { dyn } from "@shared/i18n/dyn";
 import SpriteTile from "./SpriteTile";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 interface Props {
   anim: LangostinAnim;
@@ -28,10 +29,10 @@ export default function AnimTile({ anim, selected, onSelect }: Props) {
       }`}
     >
       <SpriteTile anim={anim} size={48} />
-      <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-700">
+      <ITText as="span" className="flex items-center gap-1 text-[11px] font-semibold text-slate-700">
         {d(`anims.${anim}.name`)}
         {selected && <FaCheck size={9} className="text-primary-500" />}
-      </span>
+      </ITText>
     </button>
   );
 }

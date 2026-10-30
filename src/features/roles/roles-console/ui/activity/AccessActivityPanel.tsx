@@ -1,5 +1,5 @@
 import { useMemo, type ReactNode } from "react";
-import { ITButton, ITDataTable, ITSegmentedControl } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDataTable, ITSegmentedControl, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import type { Column, ColumnFilters, ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
 import { FaShieldAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -77,17 +77,17 @@ export default function AccessActivityPanel({
       case "RolePermission":
         return (
           <>
-            <b>{roleLabel(first)}</b> · {permissionName(second)}:{" "}
-            <span className="text-slate-400">{scopeText(scopeOfState(row.previousState) ?? "NONE")}</span> →{" "}
-            <b>{scopeText(scopeOfState(row.newState))}</b>
+            <ITText as="b">{roleLabel(first)}</ITText> · {permissionName(second)}:{" "}
+            <ITText as="span" className="text-slate-400">{scopeText(scopeOfState(row.previousState) ?? "NONE")}</ITText> →{" "}
+            <ITText as="b">{scopeText(scopeOfState(row.newState))}</ITText>
           </>
         );
       case "Role":
         return (
           <>
-            <b>{roleLabel(first)}</b>
+            <ITText as="b">{roleLabel(first)}</ITText>
             {typeof row.metadata?.copiedFrom === "string" && (
-              <span className="text-slate-400"> · {t("activity.copiedFrom", { role: roleLabel(row.metadata.copiedFrom) })}</span>
+              <ITText as="span" className="text-slate-400"> · {t("activity.copiedFrom", { role: roleLabel(row.metadata.copiedFrom) })}</ITText>
             )}
           </>
         );
@@ -97,28 +97,28 @@ export default function AccessActivityPanel({
           const path = typeof row.metadata?.path === "string" ? row.metadata.path : "";
           return (
             <>
-              <b>{row.entityId.split("|").map(permissionName).join(" / ")}</b>
-              {path && <span className="font-mono text-[10px] text-slate-400"> · {method} {path}</span>}
+              <ITText as="b">{row.entityId.split("|").map(permissionName).join(" / ")}</ITText>
+              {path && <ITText as="span" className="font-mono text-[10px] text-slate-400"> · {method} {path}</ITText>}
             </>
           );
         }
-        return <b>{permissionName(first)}</b>;
+        return <ITText as="b">{permissionName(first)}</ITText>;
       case "Policy": {
         const policy = policies.find((item) => item.id === first);
-        return <b>{policy?.name ?? t("activity.deletedPolicy")}</b>;
+        return <ITText as="b">{policy?.name ?? t("activity.deletedPolicy")}</ITText>;
       }
       case "UserPermission":
         return (
           <>
-            <b>{memberName(first)}</b> · {permissionName(second)}:{" "}
-            <span className="text-slate-400">{scopeText(scopeOfState(row.previousState))}</span> →{" "}
-            <b>{row.action === "PERMISSION_EXCEPTION_REMOVED" ? t("activity.followsRole") : scopeText(scopeOfState(row.newState))}</b>
+            <ITText as="b">{memberName(first)}</ITText> · {permissionName(second)}:{" "}
+            <ITText as="span" className="text-slate-400">{scopeText(scopeOfState(row.previousState))}</ITText> →{" "}
+            <ITText as="b">{row.action === "PERMISSION_EXCEPTION_REMOVED" ? t("activity.followsRole") : scopeText(scopeOfState(row.newState))}</ITText>
           </>
         );
       case "UserRole":
         return (
           <>
-            <b>{typeof row.metadata?.user === "string" ? row.metadata.user : memberName(first)}</b> · {roleLabel(second)}
+            <ITText as="b">{typeof row.metadata?.user === "string" ? row.metadata.user : memberName(first)}</ITText> · {roleLabel(second)}
           </>
         );
       default:
@@ -135,9 +135,9 @@ export default function AccessActivityPanel({
       filter: "date-range",
       sortable: false,
       render: (row) => (
-        <span className="text-[11px] tabular-nums text-slate-600">
+        <ITText as="span" className="text-[11px] tabular-nums text-slate-600">
           {new Date(row.createdAt).toLocaleString(dateLocale(), { dateStyle: "short", timeStyle: "short" })}
-        </span>
+        </ITText>
       ),
     },
     {
@@ -151,9 +151,9 @@ export default function AccessActivityPanel({
         data: ACCESS_ACTIVITY_ACTIONS.map((action) => ({ id: action, name: tt(`activity.action.${action}`) })),
       },
       render: (row) => (
-        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${ACTION_TONE[row.action] ?? "bg-slate-100 text-slate-600"}`}>
+        <ITText as="span" className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${ACTION_TONE[row.action] ?? "bg-slate-100 text-slate-600"}`}>
           {tt(`activity.action.${row.action}`)}
-        </span>
+        </ITText>
       ),
     },
     {
@@ -164,10 +164,10 @@ export default function AccessActivityPanel({
       filter: true,
       sortable: false,
       render: (row) => (
-        <span className="flex flex-col">
-          <span className="text-[12px] font-bold text-slate-700">{row.actor.name ?? row.actor.username ?? "—"}</span>
-          {row.actor.username && <span className="text-[10px] text-slate-400">@{row.actor.username}</span>}
-        </span>
+        <ITText as="span" className="flex flex-col">
+          <ITText as="span" className="text-[12px] font-bold text-slate-700">{row.actor.name ?? row.actor.username ?? "—"}</ITText>
+          {row.actor.username && <ITText as="span" className="text-[10px] text-slate-400">@{row.actor.username}</ITText>}
+        </ITText>
       ),
     },
     {
@@ -176,7 +176,7 @@ export default function AccessActivityPanel({
       type: "string",
       filter: true,
       sortable: false,
-      render: (row) => <span className="text-[12px] text-slate-600">{describe(row)}</span>,
+      render: (row) => <ITText as="span" className="text-[12px] text-slate-600">{describe(row)}</ITText>,
     },
     {
       key: "actions",
@@ -188,9 +188,9 @@ export default function AccessActivityPanel({
         if (!subject) return null;
         return (
           <ITButton variant="outlined" color="primary" size="sm" onClick={() => onViewAccess(subject.userId, subject.permission)}>
-            <span className="flex items-center gap-1 text-[10px] font-bold">
+            <ITText as="span" className="flex items-center gap-1 text-[10px] font-bold">
               <FaShieldAlt size={9} /> {t("members.viewAccess")}
-            </span>
+            </ITText>
           </ITButton>
         );
       },
@@ -203,9 +203,9 @@ export default function AccessActivityPanel({
   );
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[12px] text-slate-500">{t("activity.subtitle")}</p>
+    <ITStack spacing={3}>
+      <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
+        <ITText className="text-[12px] text-slate-500">{t("activity.subtitle")}</ITText>
         <ITSegmentedControl
           size="sm"
           value={quickFilter}
@@ -215,7 +215,7 @@ export default function AccessActivityPanel({
             { value: "denied", label: t("activity.quick.denied") },
           ]}
         />
-      </div>
+      </ITFlex>
       <ITDataTable
         key={quickFilter}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
@@ -233,6 +233,6 @@ export default function AccessActivityPanel({
         virtualized
         virtualizedMaxHeight={460}
       />
-    </div>
+    </ITStack>
   );
 }

@@ -8,8 +8,7 @@ import {
   ITPage,
   ITSelect,
   ITText,
-  ITTextarea,
-} from "@axzydev/axzy_ui_system";
+  ITTextarea, ITStack } from "@axzydev/axzy_ui_system";
 import { LuCamera, LuIdCard, LuMapPin, LuPhone, LuUserRound } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -263,7 +262,7 @@ export default function EmployeeProfileEditPage() {
           <Row>
             <Cell>
               <ITInput name="name" label={tt("detail.fields.name")} value={form.name ?? ""} onChange={field("name")} aria-invalid={!!errors.name} required />
-              {errors.name && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.name}</span>}
+              {errors.name && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.name}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="middleName" label={tt("detail.fields.secondName")} value={form.middleName ?? ""} onChange={field("middleName")} />
@@ -329,11 +328,11 @@ export default function EmployeeProfileEditPage() {
           <Row>
             <Cell>
               <ITInput name="employeeNumber" label={tt("detail.fields.employeeNo")} value={form.employeeNumber ?? ""} onChange={field("employeeNumber")} aria-invalid={!!errors.employeeNumber} />
-              {errors.employeeNumber && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.employeeNumber}</span>}
+              {errors.employeeNumber && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.employeeNumber}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="jobTitle" label={tt("detail.fields.position")} value={form.jobTitle ?? ""} onChange={field("jobTitle")} aria-invalid={!!errors.jobTitle} />
-              {errors.jobTitle && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.jobTitle}</span>}
+              {errors.jobTitle && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.jobTitle}</ITText>}
             </Cell>
           </Row>
           <Row>
@@ -378,17 +377,17 @@ export default function EmployeeProfileEditPage() {
             </Cell>
             <Cell>
               <ITInput name="rfc" label={tt("detail.fields.rfc")} value={form.rfc ?? ""} onChange={field("rfc")} aria-invalid={!!errors.rfc} />
-              {errors.rfc && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.rfc}</span>}
+              {errors.rfc && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.rfc}</ITText>}
             </Cell>
           </Row>
           <Row>
             <Cell>
               <ITInput name="curp" label={tt("detail.fields.curp")} value={form.curp ?? ""} onChange={field("curp")} aria-invalid={!!errors.curp} />
-              {errors.curp && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.curp}</span>}
+              {errors.curp && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.curp}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="nss" label={tt("detail.fields.nss")} value={form.nss ?? ""} onChange={field("nss")} aria-invalid={!!errors.nss} />
-              {errors.nss && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.nss}</span>}
+              {errors.nss && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.nss}</ITText>}
             </Cell>
           </Row>
         </ITFlex>
@@ -403,24 +402,24 @@ export default function EmployeeProfileEditPage() {
           <Row>
             <Cell>
               <ITInput name="personalPhone" label={tt("detail.fields.personalCell")} value={form.personalPhone ?? ""} onChange={field("personalPhone")} aria-invalid={!!errors.personalPhone} />
-              {errors.personalPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</span>}
+              {errors.personalPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="workPhone" label={tt("detail.fields.companyCell")} value={form.workPhone ?? ""} onChange={field("workPhone")} aria-invalid={!!errors.workPhone} />
-              {errors.workPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</span>}
+              {errors.workPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="email" type="email" label={tt("detail.fields.email")} value={form.email ?? ""} onChange={field("email")} aria-invalid={!!errors.email} />
-              {errors.email && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</span>}
+              {errors.email && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</ITText>}
             </Cell>
           </Row>
           <ITFlex align="center" gap={2}>
-            <span
+            <ITText as="span"
               className="flex h-8 w-8 items-center justify-center rounded-lg"
               style={{ background: "var(--color-warning-soft)", color: "var(--color-warning)" }}
             >
               <LuMapPin size={14} />
-            </span>
+            </ITText>
             <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.addressTitle")}
             </ITText>
@@ -434,7 +433,7 @@ export default function EmployeeProfileEditPage() {
             </Cell>
             <Cell min={120}>
               <ITInput name="postalCode" label={tt("detail.fields.zip")} value={form.postalCode ?? ""} onChange={field("postalCode")} aria-invalid={!!errors.postalCode} />
-              {errors.postalCode && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</span>}
+              {errors.postalCode && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</ITText>}
             </Cell>
           </Row>
           <Row>
@@ -458,7 +457,7 @@ export default function EmployeeProfileEditPage() {
             </Cell>
             <Cell>
               <ITInput name="emergencyContactPhone" label={tt("detail.fields.emergencyPhone")} value={form.emergencyContactPhone ?? ""} onChange={field("emergencyContactPhone")} aria-invalid={!!errors.emergencyContactPhone} />
-              {errors.emergencyContactPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</span>}
+              {errors.emergencyContactPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="emergencyContactRelationship" label={tt("detail.fields.emergencyRelation")} value={form.emergencyContactRelationship ?? ""} onChange={field("emergencyContactRelationship")} />
@@ -509,13 +508,13 @@ export default function EmployeeProfileEditPage() {
       )}
 
       <div onKeyDown={handleEnter} className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="flex min-w-0 flex-col gap-5">
+        <ITStack className="min-w-0" spacing={5}>
           {steps.map((section, index) => (
             <FormSection key={section.label} number={index + 1} title={section.label} icon={section.icon} complete={section.complete}>
               {section.content}
             </FormSection>
           ))}
-        </div>
+        </ITStack>
 
         <LiveSummary total={steps.length} done={steps.filter((section) => section.complete).length}>
           <LiveSummaryRow

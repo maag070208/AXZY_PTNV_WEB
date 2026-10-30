@@ -7,8 +7,7 @@ import {
   ITFlex,
   ITInput,
   ITText,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITStack } from "@axzydev/axzy_ui_system";
 import { FaRegClock, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { scheduleApi, type ScheduleDayInput, type ScheduleInput } from "@entities/schedule";
@@ -222,10 +221,10 @@ export default function ScheduleForm({ id }: { id?: string }) {
 
       {/* Chat + resumen: Langostín pregunta a la izquierda y el horario se arma a la derecha */}
       <div className="grid gap-4 xl:!grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:items-start">
-        <div className="flex min-w-0 flex-col gap-4">
+        <ITStack className="min-w-0" spacing={4}>
           <ScheduleChat onApply={applyAgent} onDraft={setDraft} />
 
-        </div>
+        </ITStack>
 
         {/* Preview del horario: se llena mientras contestas */}
         <PanelCard title={t("agent.summaryTitle")} icon={<FaRegClock size={16} />} className="xl:sticky xl:top-4">
@@ -243,70 +242,70 @@ export default function ScheduleForm({ id }: { id?: string }) {
               }}
             />
 
-            <div className="flex flex-col">
+            <ITStack>
               {view.days.map((d) => (
                 <div
                   key={d.weekday}
                   className="flex items-center justify-between gap-2 border-b border-slate-100 py-1.5 last:border-0"
                 >
-                  <span className="text-[12px] font-semibold text-slate-600">{dyn(t)(`day${d.weekday}`)}</span>
+                  <ITText as="span" className="text-[12px] font-semibold text-slate-600">{dyn(t)(`day${d.weekday}`)}</ITText>
                   {d.restDay ? (
-                    <span className="text-[11px] font-semibold text-slate-400">{t("rest")}</span>
+                    <ITText as="span" className="text-[11px] font-semibold text-slate-400">{t("rest")}</ITText>
                   ) : (
-                    <span className="text-right text-[11px] font-bold tabular-nums text-slate-800">
+                    <ITText as="span" className="text-right text-[11px] font-bold tabular-nums text-slate-800">
                       {d.startTime || "—"}–{d.endTime || "—"}
                       {d.splitStartTime ? (
-                        <span className="block font-medium text-slate-500">
+                        <ITText as="span" className="block font-medium text-slate-500">
                           {d.splitStartTime}–{d.splitEndTime}
-                        </span>
+                        </ITText>
                       ) : null}
-                    </span>
+                    </ITText>
                   )}
                 </div>
               ))}
-            </div>
+            </ITStack>
 
             <div className="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
               <div>
-                <p className="text-[11px] font-semibold text-slate-500">{t("summary.days")}</p>
-                <p className="text-[15px] font-black tabular-nums text-slate-800">{viewSummary.days}/7</p>
+                <ITText className="text-[11px] font-semibold text-slate-500">{t("summary.days")}</ITText>
+                <ITText className="text-[15px] font-black tabular-nums text-slate-800">{viewSummary.days}/7</ITText>
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-slate-500">{t("summary.restDays")}</p>
-                <p className="text-[15px] font-black tabular-nums text-slate-800">{viewSummary.rest}</p>
+                <ITText className="text-[11px] font-semibold text-slate-500">{t("summary.restDays")}</ITText>
+                <ITText className="text-[15px] font-black tabular-nums text-slate-800">{viewSummary.rest}</ITText>
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-slate-500">{t("summary.weeklyHours")}</p>
-                <p className="text-[15px] font-black tabular-nums text-slate-800">{formatMinutesAsHhMm(viewSummary.weekly)}</p>
+                <ITText className="text-[11px] font-semibold text-slate-500">{t("summary.weeklyHours")}</ITText>
+                <ITText className="text-[15px] font-black tabular-nums text-slate-800">{formatMinutesAsHhMm(viewSummary.weekly)}</ITText>
               </div>
             </div>
 
             <div className="border-t border-slate-100 pt-3">
-              <p className="mb-1 text-[11px] font-semibold text-slate-500">
+              <ITText className="mb-1 text-[11px] font-semibold text-slate-500">
                 {t("sections.rules")}
-              </p>
+              </ITText>
               <ul className="m-0 flex list-none flex-col gap-0.5 p-0 text-[11px] text-slate-600">
                 <li className="flex justify-between gap-2">
-                  <span>{t("tolEntry")}</span>
-                  <b>{view.entryToleranceMin}</b>
+                  <ITText as="span">{t("tolEntry")}</ITText>
+                  <ITText as="b">{view.entryToleranceMin}</ITText>
                 </li>
                 <li className="flex justify-between gap-2">
-                  <span>{t("tolExit")}</span>
-                  <b>{view.exitToleranceMin}</b>
+                  <ITText as="span">{t("tolExit")}</ITText>
+                  <ITText as="b">{view.exitToleranceMin}</ITText>
                 </li>
                 <li className="flex justify-between gap-2">
-                  <span>{t("meal")}</span>
-                  <b>{view.mealBreakMin}</b>
+                  <ITText as="span">{t("meal")}</ITText>
+                  <ITText as="b">{view.mealBreakMin}</ITText>
                 </li>
                 <li className="flex justify-between gap-2">
-                  <span>{t("minExtra")}</span>
-                  <b>{view.minOvertimeMin}</b>
+                  <ITText as="span">{t("minExtra")}</ITText>
+                  <ITText as="b">{view.minOvertimeMin}</ITText>
                 </li>
                 {view.crossesMidnight && <li className="font-semibold text-slate-700">{t("crossesMidnight")}</li>}
               </ul>
             </div>
 
-            <p className="text-[11px] text-slate-500">{t("agent.hintHint")}</p>
+            <ITText className="text-[11px] text-slate-500">{t("agent.hintHint")}</ITText>
           </ITFlex>
         </PanelCard>
       </div>

@@ -12,6 +12,7 @@ import {
 } from "react-icons/lu";
 import type { Notification } from "@entities/notification";
 import { formatTimeInTZ } from "@shared/utils/dates";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 type Tone = "primary" | "success" | "warning" | "danger" | "info";
 
@@ -55,20 +56,20 @@ export default function NotificationItem({
         onClick={() => onSlotClick(n)}
         className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[11px] !border-0 !bg-transparent px-1.5 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]"
       >
-        <span
+        <ITText as="span"
           className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px]"
           style={{ background: `var(--color-${style.tone}-soft)`, color: `var(--color-${style.tone})` }}
         >
           {style.icon}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className={`block truncate text-[13px] ${n.read ? "font-medium text-slate-600" : "font-bold text-slate-800"}`}>
+        </ITText>
+        <ITText as="span" className="min-w-0 flex-1">
+          <ITText as="span" className={`block truncate text-[13px] ${n.read ? "font-medium text-slate-600" : "font-bold text-slate-800"}`}>
             {n.title}
-          </span>
-          {n.detail && <span className="block truncate text-[12px] text-slate-500">{n.detail}</span>}
-        </span>
-        <span className="flex shrink-0 items-center gap-2">
-          <span className="text-[11.5px] tabular-nums text-slate-400">{formatTimeInTZ(n.createdAt)}</span>
+          </ITText>
+          {n.detail && <ITText as="span" className="block truncate text-[12px] text-slate-500">{n.detail}</ITText>}
+        </ITText>
+        <ITText as="span" className="flex shrink-0 items-center gap-2">
+          <ITText as="span" className="text-[11.5px] tabular-nums text-slate-400">{formatTimeInTZ(n.createdAt)}</ITText>
           {!n.read && (
             <span
               role="img"
@@ -77,7 +78,7 @@ export default function NotificationItem({
               style={{ background: "var(--color-primary)" }}
             />
           )}
-        </span>
+        </ITText>
       </button>
       <button
         type="button"

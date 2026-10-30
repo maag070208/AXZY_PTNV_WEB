@@ -1,4 +1,4 @@
-import { ITBentoFeed, ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile, useITBentoCountUp } from "@axzydev/axzy_ui_system";
+import { ITBentoFeed, ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile, useITBentoCountUp, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { LuClock, LuDoorOpen, LuWrench } from "react-icons/lu";
@@ -19,9 +19,9 @@ function Blank({ text }: { text: string }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-1.5 py-6 text-center">
       <LuClock size={26} className="opacity-25" />
-      <p className="m-0 text-[12px] font-medium" style={{ color: "var(--it-bento-muted)" }}>
+      <ITText className="m-0 text-[12px] font-medium" style={{ color: "var(--it-bento-muted)" }}>
         {text}
-      </p>
+      </ITText>
     </div>
   );
 }
@@ -93,9 +93,9 @@ export default function ClockDashboard({ access, setup }: Props) {
           {entries > 0 ? (
             <ITBentoGauge value={insideShare} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
           ) : (
-            <p className="m-0 text-center text-[12px] font-medium" style={{ color: "rgba(234,246,248,.6)" }}>
+            <ITText className="m-0 text-center text-[12px] font-medium" style={{ color: "rgba(234,246,248,.6)" }}>
               {t("access.noEntries")}
-            </p>
+            </ITText>
           )}
           <div className="mt-1 flex flex-wrap gap-1.5">
             <ITBentoPill dot="var(--color-success)">{t("access.entries")} {entries}</ITBentoPill>
@@ -114,15 +114,15 @@ export default function ClockDashboard({ access, setup }: Props) {
             {access?.onSite.map((p) => (
               <li key={p.employeeId} className="flex items-center gap-2">
                 <ProfileAvatar size="sm" name={p.name ?? "—"} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[12.5px] font-semibold">{p.name ?? "—"}</span>
-                  <span className="block truncate text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
+                <ITText as="span" className="min-w-0 flex-1">
+                  <ITText as="span" className="block truncate text-[12.5px] font-semibold">{p.name ?? "—"}</ITText>
+                  <ITText as="span" className="block truncate text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
                     {p.site ?? "—"}
-                  </span>
-                </span>
-                <span className="shrink-0 text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
+                  </ITText>
+                </ITText>
+                <ITText as="span" className="shrink-0 text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
                   {t("access.since", { time: time(p.since) })}
-                </span>
+                </ITText>
               </li>
             ))}
           </ul>

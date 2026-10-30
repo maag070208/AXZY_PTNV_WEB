@@ -9,8 +9,7 @@ import {
   ITFlex,
   ITPage,
   ITText,
-  useITBentoCountUp,
-} from "@axzydev/axzy_ui_system";
+  useITBentoCountUp, ITStack } from "@axzydev/axzy_ui_system";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { PanelCard } from "@shared/ui/panel-card";
 import { InsightNote } from "@shared/ui/bento-bits";
@@ -79,59 +78,59 @@ function ReturnsFeed({ returns }: { returns: LoanReturn[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <ITStack spacing={4}>
       {groups.map((g) => (
-        <div key={g.key} className="flex flex-col gap-2">
-          <p className="m-0 text-[12px] font-semibold text-slate-500">{g.label}</p>
+        <ITStack key={g.key} spacing={2}>
+          <ITText className="m-0 text-[12px] font-semibold text-slate-500">{g.label}</ITText>
           {g.items.map((dv) => (
-            <div key={dv.id} className="flex gap-3">
-              <span
+            <ITFlex gap={3} key={dv.id}>
+              <ITText as="span"
                 className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]"
                 style={{ background: "var(--color-primary-soft)", color: "var(--color-primary)" }}
               >
                 <LuUndo2 size={15} />
-              </span>
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
+              </ITText>
+              <ITStack className="min-w-0 flex-1" spacing={2}>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                   <ITChip size="sm" color="info">{dv.number}</ITChip>
-                  <span className="text-[12px] text-slate-500">{formatTimeInTZ(dv.date)}</span>
+                  <ITText as="span" className="text-[12px] text-slate-500">{formatTimeInTZ(dv.date)}</ITText>
                   {dv.custodian?.name && (
-                    <span className="text-[12px] text-slate-400">{i18n.t("common:labels.byName", { name: dv.custodian.name })}</span>
+                    <ITText as="span" className="text-[12px] text-slate-400">{i18n.t("common:labels.byName", { name: dv.custodian.name })}</ITText>
                   )}
                 </div>
                 {dv.items.map((dd) => (
                   <div key={dd.id} className="flex flex-col gap-1.5 rounded-[14px] bg-[color-mix(in_srgb,currentColor_5%,transparent)] p-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="m-0 text-[12.5px] font-semibold text-slate-700">
-                        {dd.device?.name ?? t("loans.title")} <span className="font-normal text-slate-400">×{dd.quantity}</span>
-                      </p>
+                    <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
+                      <ITText className="m-0 text-[12.5px] font-semibold text-slate-700">
+                        {dd.device?.name ?? t("loans.title")} <ITText as="span" className="font-normal text-slate-400">×{dd.quantity}</ITText>
+                      </ITText>
                       <ITChip size="sm" color={CONDITION_COLOR[dd.condition]}>
                         {t(`loanReturn.conditionLabels.${dd.condition}`)}
                       </ITChip>
-                    </div>
+                    </ITFlex>
                     {dd.units && dd.units.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
+                      <ITFlex wrap="wrap" gap={1}>
                         {dd.units.map((u) => (
                           <ITChip key={u.id} size="sm" color="gray">
                             {u.deviceUnit.assetTag}
                             {u.deviceUnit.serialNumber ? ` · ${u.deviceUnit.serialNumber}` : ""}
                           </ITChip>
                         ))}
-                      </div>
+                      </ITFlex>
                     )}
                     {dd.notes && (
-                      <p className="m-0 flex items-center gap-1.5 text-[12px] italic text-slate-500">
+                      <ITText className="m-0 flex items-center gap-1.5 text-[12px] italic text-slate-500">
                         <LuMessageSquareText size={12} className="shrink-0" />“{dd.notes}”
-                      </p>
+                      </ITText>
                     )}
                   </div>
                 ))}
-              </div>
-            </div>
+              </ITStack>
+            </ITFlex>
           ))}
-        </div>
+        </ITStack>
       ))}
-    </div>
+    </ITStack>
   );
 }
 
@@ -226,23 +225,23 @@ export default function LoanDetailPage() {
             {loan.custodian ? (
               <ProfileAvatar name={loan.custodian.name} size="xl" />
             ) : (
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)]">
+              <ITText as="span" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)]">
                 <LuBuilding2 size={26} />
-              </span>
+              </ITText>
             )}
-            <div className="flex min-w-0 flex-col gap-1.5">
-              <p className="m-0 text-[22px] font-bold leading-tight">{assignedName}</p>
-              <p className="m-0 text-[12px] opacity-70">
+            <ITStack className="min-w-0" spacing={1.5}>
+              <ITText className="m-0 text-[22px] font-bold leading-tight">{assignedName}</ITText>
+              <ITText className="m-0 text-[12px] opacity-70">
                 {formatDate(loan.date)}
                 {loan.custodian?.employeeNumber ? ` · ${t("loans.employeeNo", { n: loan.custodian.employeeNumber })}` : ""}
-              </p>
-              <div className="flex flex-wrap items-center gap-1.5">
+              </ITText>
+              <ITFlex align="center" wrap="wrap" gap={1.5}>
                 <ITChip size="sm" color={STATUS_COLOR[loan.status]}>{t(`loanStatus.${loan.status}`)}</ITChip>
                 <ITChip size="sm" color={loan.custodian ? "success" : "info"}>
                   {loan.custodian ? t("loans.toEmployee") : t("loans.toDepartment")}
                 </ITChip>
-              </div>
-            </div>
+              </ITFlex>
+            </ITStack>
           </div>
         </ITBentoTile>
 
@@ -282,36 +281,36 @@ export default function LoanDetailPage() {
       <div className="grid gap-2.5 lg:grid-cols-12">
         <div className="flex min-w-0 flex-col gap-2.5 lg:col-span-5">
           <PanelCard title={t("loans.detailData")} icon={<LuClipboardList size={16} />}>
-            <div className="flex flex-col gap-2.5">
+            <ITStack spacing={2.5}>
               <LiveSummaryRow label={t("loans.colNumber")} value={loan.number} />
               <LiveSummaryRow label={t("loans.colDate")} value={formatDate(loan.date)} />
               <LiveSummaryRow label={t("loans.assignment")} value={assignedName} />
               {loan.notes && <InsightNote icon={<LuMessageSquareText size={13} />}>{loan.notes}</InsightNote>}
-            </div>
+            </ITStack>
           </PanelCard>
 
           {/* Seguimiento del préstamo */}
           <PanelCard title={t("loans.items")} icon={<LuPackageOpen size={16} />}>
-            <div className="flex flex-col gap-1">
+            <ITStack spacing={1}>
               {loan.items.map((d) => {
                 const left = d.quantity - d.returnedQuantity;
                 return (
                   <div key={d.id} className="flex items-center justify-between gap-2 rounded-[14px] px-2.5 py-2">
-                    <div className="min-w-0">
-                      <p className="m-0 truncate text-[12.5px] font-semibold text-slate-700">
-                        {d.device?.name} <span className="font-normal text-slate-400">({d.device?.brand} {d.device?.model})</span>
-                      </p>
-                      <p className="m-0 text-[11.5px] text-slate-400">
+                    <ITFlex className="min-w-0">
+                      <ITText className="m-0 truncate text-[12.5px] font-semibold text-slate-700">
+                        {d.device?.name} <ITText as="span" className="font-normal text-slate-400">({d.device?.brand} {d.device?.model})</ITText>
+                      </ITText>
+                      <ITText className="m-0 text-[11.5px] text-slate-400">
                         {t("loanReturn.loaned")}: {d.quantity} · {t("loanReturn.returnedQuantity")}: {d.returnedQuantity} · {t("loanReturn.pending")}: {left}
-                      </p>
-                    </div>
+                      </ITText>
+                    </ITFlex>
                     <ITChip size="sm" color={left > 0 ? "warning" : "success"}>
                       {left > 0 ? t("loanReturn.partial") : t("loanReturn.complete")}
                     </ITChip>
                   </div>
                 );
               })}
-            </div>
+            </ITStack>
           </PanelCard>
 
           {/* Historial de devoluciones (kardex) */}

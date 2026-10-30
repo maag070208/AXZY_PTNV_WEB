@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton, ITPage, ITFlex } from "@axzydev/axzy_ui_system";
 import { useCan } from "@entities/user";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -98,7 +98,7 @@ export function KitchenItemsPage() {
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("items.title"))}
       backAction={() => goBack("/kitchen")}
       actions={
-        <div className="flex flex-wrap items-center gap-2">
+        <ITFlex align="center" wrap="wrap" gap={2}>
           {canIn && (
             <ITButton variant="outlined" color="success" icon={<FaArrowDown size={11} />} label={t("items.quick.stockIn")} onClick={() => navigate("/kitchen/stock-in")} />
           )}
@@ -118,7 +118,7 @@ export function KitchenItemsPage() {
             />
           )}
           {canManage && newButton(t("items.new"), () => setNewSignal((n) => n + 1))}
-        </div>
+        </ITFlex>
       }
     >
       <KitchenItemsPanel newSignal={newSignal} />

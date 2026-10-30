@@ -1,5 +1,6 @@
 import { Blobatar } from "@blobatar/react";
 import { useState } from "react";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 const SIZE_MAP = {
   xs: "w-6 h-6",
@@ -25,7 +26,7 @@ export interface ProfileAvatarProps {
  * Avatar circular con fallback garantizado a un Blobatar determinista.
  *
  * Bypassea al `ITAvatar` del kit porque su rama de fallback usa un ternario
- * mutuamente excluyente (`src ? <img onError=hide> : <span>fallback</span>`):
+ * mutuamente excluyente (`src ? <img onError=hide> : <ITText as="span">fallback</ITText>`):
  * cuando el `<img>` falla, el fallback no se renderiza y el contenedor queda
  * en blanco. Aquí el Blobatar (generado a partir de `name`) siempre se
  * renderiza como capa de fondo y la foto como overlay; en error de carga la

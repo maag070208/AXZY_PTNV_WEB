@@ -6,8 +6,7 @@ import {
   ITBentoGrid,
   ITBentoTile,
   ITBentoWaves,
-  ITPage,
-} from "@axzydev/axzy_ui_system";
+  ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { LuActivity, LuBox, LuHandshake, LuLayers, LuPackageX, LuTriangleAlert, LuWrench } from "react-icons/lu";
 import { FaBoxes } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -195,14 +194,14 @@ export default function DashboardPage() {
               <ITBentoGauge value={s.available / s.activeUnits} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
             )}
             <div className="mt-1 flex flex-wrap gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px]">
+              <ITText as="span" className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px]">
                 <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
                 {t("dashboard.availablePct", { pct: availablePct })}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px]">
+              </ITText>
+              <ITText as="span" className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px]">
                 <b className="h-[7px] w-[7px] rounded-full bg-[color-mix(in_srgb,currentColor_45%,transparent)]" />
                 {t("dashboard.available")} {s.available}
-              </span>
+              </ITText>
             </div>
           </div>
         </ITBentoTile>
@@ -253,9 +252,9 @@ export default function DashboardPage() {
           icon={<LuTriangleAlert size={15} />}
           label={t("dashboard.damaged")}
           value={
-            <span style={{ color: s.damaged > 0 ? "var(--color-danger)" : "var(--color-success)" }}>
+            <ITText as="span" style={{ color: s.damaged > 0 ? "var(--color-danger)" : "var(--color-success)" }}>
               <Num value={s.damaged} />
-            </span>
+            </ITText>
           }
           caption={s.damaged === 0 ? t("dashboard.noDamaged") : t("dashboard.ofActive", { total: s.activeUnits })}
           onClick={() => navigate("/inventory/movements")}
@@ -271,16 +270,16 @@ export default function DashboardPage() {
           onClick={() => navigate("/inventory/device-types")}
         >
           {categories.length === 0 ? (
-            <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{tt("home:adminDashboard.noCategories")}</p>
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{tt("home:adminDashboard.noCategories")}</ITText>
           ) : (
             <div className="it-bento-bars mt-4 flex-1 content-around">
               {categories.map((row) => (
                 <div key={row.label} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
                   <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
-                  <span className="truncate lowercase first-letter:uppercase">{row.label}</span>
-                  <span>
-                    {row.value} <span className="opacity-60">{Math.round((row.value / Math.max(1, categoryTotal)) * 100)}%</span>
-                  </span>
+                  <ITText as="span" className="truncate lowercase first-letter:uppercase">{row.label}</ITText>
+                  <ITText as="span">
+                    {row.value} <ITText as="span" className="opacity-60">{Math.round((row.value / Math.max(1, categoryTotal)) * 100)}%</ITText>
+                  </ITText>
                   <div className="it-bento-bar col-span-3">
                     <i style={{ "--it-bento-w": `${(row.value / categoryMax) * 100}%`, background: row.color } as React.CSSProperties} />
                   </div>
@@ -300,15 +299,15 @@ export default function DashboardPage() {
           onClick={() => navigate("/inventory/movements")}
         >
           {rowsBars.length === 0 ? (
-            <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("dashboard.noMovs")}</p>
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("dashboard.noMovs")}</ITText>
           ) : (
             <>
               <div className="it-bento-bars mt-4 flex-1 content-around">
                 {rowsBars.slice(0, 6).map((r) => (
                   <div key={r.type} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
                     <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: TYPE_BADGE_HEX[r.type] }} />
-                    <span className="truncate">{tt(`typeLabels.${r.type}`)}</span>
-                    <span>{r.count}</span>
+                    <ITText as="span" className="truncate">{tt(`typeLabels.${r.type}`)}</ITText>
+                    <ITText as="span">{r.count}</ITText>
                     <div className="it-bento-bar col-span-3">
                       <i style={{ "--it-bento-w": `${(r.count / barMax) * 100}%`, background: TYPE_BADGE_HEX[r.type] } as React.CSSProperties} />
                     </div>
@@ -325,7 +324,7 @@ export default function DashboardPage() {
         {/* Movimientos recientes */}
         <ITBentoTile cols={4} rows={4} wide icon={<LuActivity size={15} />} label={t("dashboard.recentMovements")}>
           {feedGroups.length === 0 ? (
-            <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("dashboard.noMovs")}</p>
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("dashboard.noMovs")}</ITText>
           ) : (
             <div className="mt-1 min-h-0 flex-1">
               <ITBentoFeed

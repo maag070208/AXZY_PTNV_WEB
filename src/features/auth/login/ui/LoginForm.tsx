@@ -1,4 +1,4 @@
-import { ITAlert, ITButton, ITInput, ITToast } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITInput, ITToast, ITText } from "@axzydev/axzy_ui_system";
 import { LuLogIn, LuUser } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import "./login.css";
@@ -35,14 +35,14 @@ export default function LoginForm({
     <>
       <section className="login-form-panel flex flex-1 items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
         <div className="w-full max-w-md">
-          <span className="login-badge inline-block rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-widest">
+          <ITText as="span" className="login-badge inline-block rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-widest">
             {tt("login.badge")}
-          </span>
+          </ITText>
 
-          <h1 className="login-heading mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          <ITText as="h1" className="login-heading mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
             {tt("login.title")}
-          </h1>
-          <p className="login-muted mt-2 text-sm sm:text-base">{tt("login.subtitle")}</p>
+          </ITText>
+          <ITText className="login-muted mt-2 text-sm sm:text-base">{tt("login.subtitle")}</ITText>
 
           {deactivatedMsg && (
             <div className="mt-6">
@@ -63,9 +63,9 @@ export default function LoginForm({
                 aria-invalid={!!errors.username}
               />
               {errors.username && (
-                <span role="alert" className="text-red-500 text-xs mt-1 block">
+                <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">
                   {errors.username}
-                </span>
+                </ITText>
               )}
             </div>
             <div>
@@ -79,9 +79,9 @@ export default function LoginForm({
                 aria-invalid={!!errors.password}
               />
               {errors.password && (
-                <span role="alert" className="text-red-500 text-xs mt-1 block">
+                <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">
                   {errors.password}
-                </span>
+                </ITText>
               )}
             </div>
 
@@ -92,16 +92,16 @@ export default function LoginForm({
               disabled={isSubmitting || !canSubmit}
               className="login-submit w-full flex items-center justify-center gap-2 py-3"
             >
-              <span className="flex items-center justify-center gap-2 text-sm font-bold">
+              <ITText as="span" className="flex items-center justify-center gap-2 text-sm font-bold">
                 <LuLogIn aria-hidden size={16} />
                 {isSubmitting ? tt("login.submitting") : tt("login.submit")}
-              </span>
+              </ITText>
             </ITButton>
           </form>
 
           <footer className="login-muted mt-10 flex items-center justify-between text-xs">
-            <span>{tt("login.footer")}</span>
-            <span className="font-medium">v{__APP_VERSION__}</span>
+            <ITText as="span">{tt("login.footer")}</ITText>
+            <ITText as="span" className="font-medium">v{__APP_VERSION__}</ITText>
           </footer>
         </div>
       </section>

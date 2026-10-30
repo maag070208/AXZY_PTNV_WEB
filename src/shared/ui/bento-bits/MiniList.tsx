@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { LuCheck } from "react-icons/lu";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 interface Props {
   icon: ReactNode;
@@ -32,25 +33,25 @@ export default function MiniList({ icon, title, items, emptyLabel, onClick }: Pr
       }`}
       style={{ background: "color-mix(in srgb, currentColor 5%, transparent)" }}
     >
-      <p className="m-0 flex items-center gap-2 text-[12px] font-semibold leading-tight">
-        <span className="flex h-5 w-5 items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, currentColor 9%, transparent)" }}>
+      <ITText className="m-0 flex items-center gap-2 text-[12px] font-semibold leading-tight">
+        <ITText as="span" className="flex h-5 w-5 items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, currentColor 9%, transparent)" }}>
           {icon}
-        </span>
+        </ITText>
         {title}
-      </p>
+      </ITText>
       {items.length === 0 ? (
-        <p className="m-0 mt-px flex items-center gap-1 pl-7 text-[11px] leading-none" style={{ color: "var(--it-bento-muted)" }}>
+        <ITText className="m-0 mt-px flex items-center gap-1 pl-7 text-[11px] leading-none" style={{ color: "var(--it-bento-muted)" }}>
           {emptyLabel}
           <LuCheck size={12} className="text-[color:var(--color-success)]" />
-        </p>
+        </ITText>
       ) : (
         <ul className="m-0 mt-1 flex list-none flex-col gap-0.5 overflow-y-auto p-0" style={{ maxHeight: 92 }}>
           {items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-2 text-[12px]">
-              <span className="truncate">{item.name}</span>
-              <span className="shrink-0 text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
+              <ITText as="span" className="truncate">{item.name}</ITText>
+              <ITText as="span" className="shrink-0 text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
                 {item.right}
-              </span>
+              </ITText>
             </li>
           ))}
         </ul>

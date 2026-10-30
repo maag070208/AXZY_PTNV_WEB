@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LuHeartPulse, LuLandmark, LuMapPin, LuPhone, LuUserRound } from "react-icons/lu";
-import { ITBentoSegments, ITCard } from "@axzydev/axzy_ui_system";
+import { ITBentoSegments, ITCard, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import type { PersonalProfile } from "@entities/hr";
 
 const formatDateOnly = (iso?: string | null): string => {
@@ -30,21 +30,21 @@ function InfoCard({ icon, tone, title, items }: { icon: React.ReactNode; tone: "
   return (
     <ITCard>
       <header className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <span
+        <ITFlex align="center" gap={3} className="min-w-0">
+          <ITText as="span"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
             style={{ background: `var(--color-${tone}-soft)`, color: `var(--color-${tone})` }}
           >
             {icon}
-          </span>
-          <h3 className="m-0 truncate !text-[15px] font-bold !text-slate-800">{title}</h3>
-        </div>
-        <span
+          </ITText>
+          <ITText as="h3" className="m-0 truncate !text-[15px] font-bold !text-slate-800">{title}</ITText>
+        </ITFlex>
+        <ITText as="span"
           className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums"
           style={{ background: `var(--color-${complete ? "success" : "warning"}-soft)`, color: `var(--color-${complete ? "success" : "warning"})` }}
         >
           {filled}/{items.length}
-        </span>
+        </ITText>
       </header>
       <dl className="m-0 grid grid-cols-1 gap-x-6 gap-y-4 sm:!grid-cols-2">
         {items.map((i) => (
@@ -108,28 +108,28 @@ export default function EmployeeInfoCards({ profile }: Props) {
   const percent = Math.round((filled / all.length) * 100);
 
   return (
-    <div className="flex flex-col gap-5">
+    <ITStack spacing={5}>
       <ITCard>
-        <div className="flex flex-wrap items-center gap-6">
+        <ITFlex align="center" wrap="wrap" gap={6}>
           <div className="min-w-[240px] flex-1">
-            <p className="m-0 text-[13px] text-slate-500">{tt("detail.completeness")}</p>
-            <p className="m-0 mt-1 text-3xl font-extrabold text-slate-800">
+            <ITText className="m-0 text-[13px] text-slate-500">{tt("detail.completeness")}</ITText>
+            <ITText className="m-0 mt-1 text-3xl font-extrabold text-slate-800">
               {filled}
-              <span className="text-lg font-semibold text-slate-400"> / {all.length}</span>
-            </p>
+              <ITText as="span" className="text-lg font-semibold text-slate-400"> / {all.length}</ITText>
+            </ITText>
             <div className="mt-3">
               <ITBentoSegments total={all.length} done={filled} />
             </div>
-            <p className="m-0 mt-1 text-[12px] text-slate-500">{percent}%</p>
+            <ITText className="m-0 mt-1 text-[12px] text-slate-500">{percent}%</ITText>
           </div>
-          <p className="m-0 max-w-sm text-sm text-slate-500">{tt("detail.completenessHint")}</p>
-        </div>
+          <ITText className="m-0 max-w-sm text-sm text-slate-500">{tt("detail.completenessHint")}</ITText>
+        </ITFlex>
       </ITCard>
       <div className="grid grid-cols-1 gap-5 lg:!grid-cols-2 xl:!grid-cols-3">
         {groups.map((g) => (
           <InfoCard key={g.title} icon={g.icon} tone={g.tone} title={g.title} items={g.items} />
         ))}
       </div>
-    </div>
+    </ITStack>
   );
 }

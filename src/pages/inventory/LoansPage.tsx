@@ -153,9 +153,9 @@ export default function LoansPage() {
             const pending = d.quantity - d.returnedQuantity;
             return (
               <ITText key={d.id} className="text-[10px] leading-tight">
-                <span className="font-bold text-slate-700">{d.device?.name}</span> <span className="text-slate-400">×{d.quantity}</span>
-                <span className="text-slate-500"> · {t("loanReturn.returnedQuantity")} {d.returnedQuantity}</span>
-                {pending > 0 && <span className="font-semibold text-[color:var(--color-warning)]"> · {t("loanReturn.pending")} {pending}</span>}
+                <ITText as="span" className="font-bold text-slate-700">{d.device?.name}</ITText> <ITText as="span" className="text-slate-400">×{d.quantity}</ITText>
+                <ITText as="span" className="text-slate-500"> · {t("loanReturn.returnedQuantity")} {d.returnedQuantity}</ITText>
+                {pending > 0 && <ITText as="span" className="font-semibold text-[color:var(--color-warning)]"> · {t("loanReturn.pending")} {pending}</ITText>}
               </ITText>
             );
           })}

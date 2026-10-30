@@ -56,16 +56,16 @@ export default function LangostinChat({
     <ITCard contentClassName="!p-0" className={className}>
       <header className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
         <LangostinAvatar anim="idle" size={26} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-bold text-slate-800">{title}</p>
-          {subtitle && <p className="truncate text-[11px] text-slate-500">{subtitle}</p>}
+        <ITFlex className="min-w-0 flex-1">
+          <ITText className="truncate text-[13px] font-bold text-slate-800">{title}</ITText>
+          {subtitle && <ITText className="truncate text-[11px] text-slate-500">{subtitle}</ITText>}
           {online && (
-            <p className="mt-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--color-success)]">
+            <ITText className="mt-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--color-success)]">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
               {online}
-            </p>
+            </ITText>
           )}
-        </div>
+        </ITFlex>
         {onRestart && restartLabel && (
           <ITButton variant="outlined" color="gray" size="sm" onClick={onRestart}>
             <ITText className="text-[11px] font-bold">{restartLabel}</ITText>

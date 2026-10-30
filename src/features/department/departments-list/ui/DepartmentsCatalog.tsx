@@ -3,8 +3,7 @@ import {
   ITBentoGrid,
   ITBentoTile,
   ITButton,
-  ITInput,
-} from "@axzydev/axzy_ui_system";
+  ITInput, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import {
   LuBuilding2,
   LuCircleCheck,
@@ -43,7 +42,7 @@ const peopleOf = (d: Department) => d._count?.users ?? 0;
 /** Chip pastel del estado del departamento (verde activo, tenue inactivo). */
 function StatusChip({ active, label }: { active: boolean; label: string }) {
   return (
-    <span
+    <ITText as="span"
       className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold"
       style={{
         background: active
@@ -53,7 +52,7 @@ function StatusChip({ active, label }: { active: boolean; label: string }) {
       }}
     >
       {label}
-    </span>
+    </ITText>
   );
 }
 
@@ -158,10 +157,10 @@ export default function DepartmentsCatalog({
 
   const createButton = (
     <ITButton variant="filled" color="primary" onClick={onCreate}>
-      <span className="flex items-center gap-1.5 text-[11px] font-bold">
+      <ITText as="span" className="flex items-center gap-1.5 text-[11px] font-bold">
         <LuPlus size={12} />
         {t("list.new")}
-      </span>
+      </ITText>
     </ITButton>
   );
 
@@ -172,7 +171,7 @@ export default function DepartmentsCatalog({
         description={t("common:errors.load")}
         action={
           <ITButton variant="outlined" color="primary" onClick={onRetry}>
-            <span className="text-[11px] font-bold">{t("list.retry")}</span>
+            <ITText as="span" className="text-[11px] font-bold">{t("list.retry")}</ITText>
           </ITButton>
         }
       />
@@ -193,7 +192,7 @@ export default function DepartmentsCatalog({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <ITStack spacing={4}>
       {/* Totales reales del catálogo; el mosaico elegido filtra la rejilla. */}
       <ListSummaryStrip
         items={summary}
@@ -202,7 +201,7 @@ export default function DepartmentsCatalog({
       />
 
       {/* Búsqueda por nombre o área + filtro por áreas */}
-      <div className="flex flex-wrap items-center gap-2">
+      <ITFlex align="center" wrap="wrap" gap={2}>
         <div className="min-w-[220px] flex-1">
           <ITInput
             name="departments_search"
@@ -219,7 +218,7 @@ export default function DepartmentsCatalog({
           onChange={setAreas}
           className="max-w-full overflow-x-auto"
         />
-      </div>
+      </ITFlex>
 
       {visible.length === 0 ? (
         <LangostinState
@@ -228,7 +227,7 @@ export default function DepartmentsCatalog({
           description={t("list.noResultsHint")}
           action={
             <ITButton variant="outlined" color="secondary" onClick={resetFilters}>
-              <span className="text-[11px] font-bold">{t("list.clearFilters")}</span>
+              <ITText as="span" className="text-[11px] font-bold">{t("list.clearFilters")}</ITText>
             </ITButton>
           }
         />
@@ -266,13 +265,13 @@ export default function DepartmentsCatalog({
                 }
               >
                 <div className="mt-2 flex min-w-0 flex-1 flex-col gap-2">
-                  <p
+                  <ITText
                     className="m-0 truncate text-[12px]"
                     style={{ color: "var(--it-bento-muted)" }}
                     title={areasText}
                   >
                     {areasText}
-                  </p>
+                  </ITText>
                   <div className="mt-auto flex items-center justify-end gap-1.5">
                     <ITButton
                       variant="icon-only"
@@ -325,7 +324,7 @@ export default function DepartmentsCatalog({
                 borderRadius: 20,
               }}
             >
-              <span
+              <ITText as="span"
                 className="flex h-10 w-10 items-center justify-center rounded-full"
                 style={{
                   background: "color-mix(in srgb, var(--color-primary-500) 12%, transparent)",
@@ -333,17 +332,17 @@ export default function DepartmentsCatalog({
                 }}
               >
                 <LuPlus size={18} />
-              </span>
-              <span className="text-[13px] font-semibold text-slate-600 dark:text-slate-300">
+              </ITText>
+              <ITText as="span" className="text-[13px] font-semibold text-slate-600 dark:text-slate-300">
                 {t("list.addCard")}
-              </span>
-              <span className="text-[11.5px] text-slate-500 dark:text-slate-400">
+              </ITText>
+              <ITText as="span" className="text-[11.5px] text-slate-500 dark:text-slate-400">
                 {t("list.addCardHint")}
-              </span>
+              </ITText>
             </button>
           )}
         </ITBentoGrid>
       )}
-    </div>
+    </ITStack>
   );
 }

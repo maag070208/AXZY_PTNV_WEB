@@ -6,8 +6,7 @@ import {
   ITDialog,
   ITInput,
   ITSelect,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { FaUndo } from "react-icons/fa";
 import { LuShieldCheck } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
@@ -126,13 +125,13 @@ export default function UserPermissionsPanel({ userId }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <ITStack spacing={4}>
       {byModule.map(([module, permissions]) => (
         <section key={module} className="flex flex-col gap-1.5">
-          <p className="m-0 text-[12px] font-semibold" style={{ color: "var(--it-bento-muted)" }}>
+          <ITText className="m-0 text-[12px] font-semibold" style={{ color: "var(--it-bento-muted)" }}>
             {module}
-          </p>
-          <div className="flex flex-col gap-1.5">
+          </ITText>
+          <ITStack spacing={1.5}>
             {permissions.map((row) => (
               <div
                 key={row.permission}
@@ -140,8 +139,8 @@ export default function UserPermissionsPanel({ userId }: Props) {
                 style={{ background: "color-mix(in srgb, currentColor 4%, transparent)" }}
               >
                 <div className="min-w-[200px] flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="m-0 text-[12.5px] font-bold text-slate-800 dark:text-slate-100">{row.name}</p>
+                  <ITFlex align="center" wrap="wrap" gap={2}>
+                    <ITText className="m-0 text-[12.5px] font-bold text-slate-800 dark:text-slate-100">{row.name}</ITText>
                     {row.sensitive && (
                       <ITBadget color="warning" size="sm">
                         {t("roles:matrix.sensitive")}
@@ -152,14 +151,14 @@ export default function UserPermissionsPanel({ userId }: Props) {
                         {t("form.permissions.hasException")}
                       </ITBadget>
                     )}
-                  </div>
-                  <p className="m-0 font-mono text-[10px] text-slate-400">{row.permission}</p>
+                  </ITFlex>
+                  <ITText className="m-0 font-mono text-[10px] text-slate-400">{row.permission}</ITText>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="m-0 text-[10px] text-slate-400">
+                <ITFlex align="center" wrap="wrap" gap={3}>
+                  <ITText className="m-0 text-[10px] text-slate-400">
                     {t("form.permissions.roleScope", { scope: t(`roles:scope.${row.roleScope}`) })}
-                  </p>
+                  </ITText>
                   <ITBadget color={row.effective === "NONE" ? "gray" : "success"} size="sm">
                     {t(`roles:scopePlain.${row.effective}`)}
                   </ITBadget>
@@ -173,10 +172,10 @@ export default function UserPermissionsPanel({ userId }: Props) {
                       onChange={(e) => onChange(row, e.target.value)}
                     />
                   </div>
-                </div>
+                </ITFlex>
               </div>
             ))}
-          </div>
+          </ITStack>
         </section>
       ))}
 
@@ -187,7 +186,7 @@ export default function UserPermissionsPanel({ userId }: Props) {
           subtitle={t("form.permissions.dialogIntro", { scope: t(`roles:scope.${editing?.scope ?? "NONE"}`) })}
           tone="warning"
         />
-        <div className="flex flex-col gap-4">
+        <ITStack spacing={4}>
           <ITInput
             name="exception_reason"
             label={t("form.permissions.reason")}
@@ -203,18 +202,18 @@ export default function UserPermissionsPanel({ userId }: Props) {
             value={expiresAt}
             onChange={(e) => setExpiresAt(e.target.value)}
           />
-          <div className="flex justify-end gap-2">
+          <ITFlex justify="end" gap={2}>
             <ITButton variant="outlined" color="secondary" onClick={() => setEditing(null)}>
-              <span className="font-bold text-[11px]">{t("common:actions.cancel")}</span>
+              <ITText as="span" className="font-bold text-[11px]">{t("common:actions.cancel")}</ITText>
             </ITButton>
             <ITButton variant="filled" color="primary" onClick={confirm} disabled={saving}>
-              <span className="flex items-center gap-1">
+              <ITText as="span" className="flex items-center gap-1">
                 <FaUndo size={10} />
-                <span className="font-bold text-[11px]">{t("common:actions.save")}</span>
-              </span>
+                <ITText as="span" className="font-bold text-[11px]">{t("common:actions.save")}</ITText>
+              </ITText>
             </ITButton>
-          </div>
-        </div>
+          </ITFlex>
+        </ITStack>
       </ITDialog>
 
       {toast && (
@@ -226,6 +225,6 @@ export default function UserPermissionsPanel({ userId }: Props) {
           onClose={() => setToast(null)}
         />
       )}
-    </div>
+    </ITStack>
   );
 }

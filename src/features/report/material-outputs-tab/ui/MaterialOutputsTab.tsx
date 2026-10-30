@@ -15,7 +15,7 @@ import { formatDate } from "@shared/utils/dates";
 import type { MaterialOutput, MaterialOutputReason } from "@entities/material-output";
 import type { UseMaterialOutputsReport } from "../model/useMaterialOutputsReport";
 import { Num } from "@shared/ui/bento-bits";
-import ReportPeriodBar from "../../ui/ReportPeriodBar";
+import { ReportPeriodBar } from "@shared/ui/report-period-bar";
 
 const REASON_COLORS: Record<MaterialOutputReason, "danger" | "warning" | "gray"> = {
   DAMAGED: "danger",

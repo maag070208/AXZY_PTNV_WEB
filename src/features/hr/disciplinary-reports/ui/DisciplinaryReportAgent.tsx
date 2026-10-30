@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITButton, ITDatePicker, ITInput, ITSearchSelect, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDatePicker, ITInput, ITSearchSelect, ITText, ITTextarea, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import type { DisciplinaryReason } from "@entities/hr";
 import { AgentBubble, LangostinChat, UserBubble } from "@shared/ui/langostin-chat";
@@ -164,17 +164,17 @@ export default function DisciplinaryReportAgent({ saving, onSave, onUseForm }: P
   ].filter((line): line is string => Boolean(line));
 
   const footer = (
-    <div className="flex flex-wrap items-center justify-between gap-2">
+    <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
       <ITButton variant="text" color="secondary" size="sm" onClick={back} disabled={history.length === 0 || saving}>
         <ITText className="text-[11px] font-bold">{t("form.agent.back")}</ITText>
       </ITButton>
-      <div className="flex flex-wrap items-center gap-2">
+      <ITFlex align="center" wrap="wrap" gap={2}>
         <ITButton variant="text" color="secondary" size="sm" onClick={onUseForm} disabled={saving}>
           <ITText className="text-[11px] font-bold">{t("form.agent.useForm")}</ITText>
         </ITButton>
         {step === "summary" && nextButton(saving ? t("form.saving") : t("form.agent.confirm"), !canSave, save)}
-      </div>
-    </div>
+      </ITFlex>
+    </ITFlex>
   );
 
   return (
@@ -189,10 +189,10 @@ export default function DisciplinaryReportAgent({ saving, onSave, onUseForm }: P
     >
       <AgentBubble text={t("form.agent.hello")} />
       {log.map((entry, i) => (
-        <div key={i} className="flex flex-col gap-3">
+        <ITStack key={i} spacing={3}>
           <AgentBubble text={entry.q} />
           <UserBubble text={entry.a} />
-        </div>
+        </ITStack>
       ))}
       {step === "summary" ? (
         <>
@@ -262,9 +262,9 @@ export default function DisciplinaryReportAgent({ saving, onSave, onUseForm }: P
             rows={4}
             placeholder={t("form.descriptionHint")}
           />
-          <div className="flex justify-end">
+          <ITFlex justify="end">
             {nextButton(t("form.agent.next"), !text.trim(), () => go("witnesses", text.trim(), { facts: text.trim() }))}
-          </div>
+          </ITFlex>
         </div>
       )}
 

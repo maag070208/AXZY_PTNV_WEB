@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ITBadget } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITText } from "@axzydev/axzy_ui_system";
 import { LuCircleCheck, LuClock, LuInbox, LuTicket, LuUserX } from "react-icons/lu";
 import { dashboardApi } from "@entities/dashboard";
 import { PRIORITY_BADGE, daysOnHold } from "@entities/ticket";
@@ -57,14 +57,14 @@ export default function TicketsWidget() {
                   title={ticket.title}
                   subtitle={ticket.assignedTo ?? t("tickets.unassignedLabel")}
                   right={
-                    <span className="flex items-center gap-2">
+                    <ITText as="span" className="flex items-center gap-2">
                       <ITBadget color={(PRIORITY_BADGE[ticket.priority as keyof typeof PRIORITY_BADGE]?.color as never) ?? "gray"} size="sm">
                         {t(`tickets:priorityLabels.${ticket.priority}`)}
                       </ITBadget>
-                      <span className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-danger)]">
+                      <ITText as="span" className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-danger)]">
                         {daysOnHold(ticket.createdAt, null)} d
-                      </span>
-                    </span>
+                      </ITText>
+                    </ITText>
                   }
                   onClick={() => navigate(`/tickets/${ticket.id}`)}
                 />

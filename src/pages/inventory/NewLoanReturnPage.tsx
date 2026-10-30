@@ -8,8 +8,7 @@ import {
   ITInput,
   ITPage,
   ITSearchSelect,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITText } from "@axzydev/axzy_ui_system";
 import { FaCheckCircle, FaInfoCircle, FaTimesCircle, FaUndoAlt } from "react-icons/fa";
 import { LuClipboardList, LuPackageCheck } from "react-icons/lu";
 import type { ReactNode } from "react";
@@ -250,7 +249,7 @@ export default function NewLoanReturnPage() {
                     className="flex flex-col gap-3 rounded-[16px] bg-[color-mix(in_srgb,currentColor_4%,transparent)] p-4"
                   >
                     <ITFlex align="center" justify="between" gap={3} wrap="wrap">
-                      <p className="m-0 text-sm font-bold text-slate-800">{r.deviceName}</p>
+                      <ITText className="m-0 text-sm font-bold text-slate-800">{r.deviceName}</ITText>
                       <ITFlex gap={1.5} wrap="wrap">
                         <ITChip size="sm" color="gray">{t("loanReturn.loaned")}: {r.loaned}</ITChip>
                         <ITChip size="sm" color="success">{t("loanReturn.returnedQuantity")}: {r.returnedQuantity}</ITChip>
@@ -271,14 +270,14 @@ export default function NewLoanReturnPage() {
                               name={`return-${u.unitId}`}
                               checked={u.selected}
                               onChange={(checked) => updateUnit(r.key, u.unitId, { selected: checked })}
-                              label={<span className="sr-only">{t("loanReturn.returnUnit", { assetTag: u.assetTag })}</span>}
+                              label={<ITText as="span" className="sr-only">{t("loanReturn.returnUnit", { assetTag: u.assetTag })}</ITText>}
                             />
-                            <div className="min-w-0">
-                              <p className="m-0 text-[13px] font-bold text-slate-800">{u.assetTag}</p>
-                              <p className={`m-0 text-[12px] ${u.serialNumber ? "text-slate-600" : "italic text-slate-400"}`}>
+                            <ITFlex className="min-w-0">
+                              <ITText className="m-0 text-[13px] font-bold text-slate-800">{u.assetTag}</ITText>
+                              <ITText className={`m-0 text-[12px] ${u.serialNumber ? "text-slate-600" : "italic text-slate-400"}`}>
                                 {u.serialNumber ? t("units.serial", { value: u.serialNumber }) : t("units.noSerial")}
-                              </p>
-                            </div>
+                              </ITText>
+                            </ITFlex>
                             {u.selected && (
                               <ITFlex gap={1.5} wrap="wrap" className="ml-auto">
                                 {CONDITIONS.map((c) => {
@@ -298,7 +297,7 @@ export default function NewLoanReturnPage() {
                                       }
                                     >
                                       {p.icon}
-                                      <span>{t(`loanReturn.conditionLabels.${c}`)}</span>
+                                      <ITText as="span">{t(`loanReturn.conditionLabels.${c}`)}</ITText>
                                     </button>
                                   );
                                 })}
@@ -307,7 +306,7 @@ export default function NewLoanReturnPage() {
                           </ITFlex>
 
                           {u.selected && u.condition === "BROKEN" && (
-                            <p className="m-0 text-[12px] font-semibold text-[color:var(--color-danger)]">{t("loanReturn.brokenRetirementHint")}</p>
+                            <ITText className="m-0 text-[12px] font-semibold text-[color:var(--color-danger)]">{t("loanReturn.brokenRetirementHint")}</ITText>
                           )}
                           {u.selected && needsNotes(u.condition) && (
                             <div>
@@ -320,9 +319,9 @@ export default function NewLoanReturnPage() {
                                 aria-invalid={!!errors[`notes-${u.unitId}`]}
                               />
                               {errors[`notes-${u.unitId}`] && (
-                                <span role="alert" className="mt-1 block text-xs text-[color:var(--color-danger)]">
+                                <ITText as="span" role="alert" className="mt-1 block text-xs text-[color:var(--color-danger)]">
                                   {errors[`notes-${u.unitId}`]}
-                                </span>
+                                </ITText>
                               )}
                             </div>
                           )}
@@ -343,20 +342,20 @@ export default function NewLoanReturnPage() {
           done={sectionsDone}
           footer={
             brokenCount > 0 ? (
-              <p className="m-0 text-[12px] font-semibold text-[color:var(--color-danger)]">{t("loanReturn.brokenRetirementHint")}</p>
+              <ITText className="m-0 text-[12px] font-semibold text-[color:var(--color-danger)]">{t("loanReturn.brokenRetirementHint")}</ITText>
             ) : undefined
           }
         >
           {loan?.custodian && (
-            <div className="flex items-center gap-2.5">
+            <ITFlex align="center" gap={2.5}>
               <ProfileAvatar name={loan.custodian.name} size="lg" />
-              <div className="min-w-0">
-                <p className="m-0 truncate text-[13px] font-bold text-slate-800">{loan.custodian.name}</p>
+              <ITFlex className="min-w-0">
+                <ITText className="m-0 truncate text-[13px] font-bold text-slate-800">{loan.custodian.name}</ITText>
                 {loan.custodian.employeeNumber && (
-                  <p className="m-0 text-[11.5px] text-slate-500">{t("loans.employeeNo", { n: loan.custodian.employeeNumber })}</p>
+                  <ITText className="m-0 text-[11.5px] text-slate-500">{t("loans.employeeNo", { n: loan.custodian.employeeNumber })}</ITText>
                 )}
-              </div>
-            </div>
+              </ITFlex>
+            </ITFlex>
           )}
           <LiveSummaryRow label={t("loans.colNumber")} value={loan?.number} />
           <LiveSummaryRow label={t("loans.colDate")} value={loan ? formatDate(loan.date) : undefined} />

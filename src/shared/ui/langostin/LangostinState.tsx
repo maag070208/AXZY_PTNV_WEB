@@ -4,6 +4,7 @@ import { dyn } from "@shared/i18n";
 import { usePrefersReducedMotion } from "@shared/lib/usePrefersReducedMotion";
 import Langostin from "./Langostin";
 import type { LangostinAnim } from "./langostinSprite";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 export type LangostinStateKind = "empty" | "noResults" | "forbidden" | "error" | "offline" | "loading";
 
@@ -47,12 +48,12 @@ export default function LangostinState({ kind, title, description, action, size 
       className={`flex flex-col items-center justify-center gap-2 text-center ${size === "sm" ? "px-4 py-6" : "px-6 py-12"} ${className ?? ""}`}
     >
       <Langostin anim={ANIM_BY_KIND[kind]} size={MASCOT_SIZE[size]} animated={!reduced} label={t("guide.label")} />
-      <p className={`m-0 font-semibold text-slate-700 dark:text-slate-100 ${size === "sm" ? "text-sm" : "text-base"}`}>
+      <ITText className={`m-0 font-semibold text-slate-700 dark:text-slate-100 ${size === "sm" ? "text-sm" : "text-base"}`}>
         {title ?? tr(`state.${kind}.title`)}
-      </p>
-      <p className={`m-0 max-w-sm text-slate-500 dark:text-slate-400 ${size === "sm" ? "text-xs" : "text-sm"}`}>
+      </ITText>
+      <ITText className={`m-0 max-w-sm text-slate-500 dark:text-slate-400 ${size === "sm" ? "text-xs" : "text-sm"}`}>
         {description ?? tr(`state.${kind}.description`)}
-      </p>
+      </ITText>
       {action ? <div className="mt-2">{action}</div> : null}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITAlert, ITButton, ITSlideToggle } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITSlideToggle, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { FaArrowDown, FaArrowUp, FaCheckCircle, FaEdit, FaLightbulb, FaLock, FaPlus, FaVial } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PolicyAdmin } from "@entities/permission";
@@ -81,27 +81,27 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <ITStack spacing={3}>
+      <ITFlex align="start" justify="between" wrap="wrap" gap={3}>
         <div className="flex max-w-3xl items-start gap-2 rounded-lg bg-amber-50 px-3 py-2">
           <FaLightbulb size={12} className="mt-0.5 shrink-0 text-amber-500" />
-          <p className="text-[11px] leading-relaxed text-amber-900">{t("policies.explainer")}</p>
+          <ITText className="text-[11px] leading-relaxed text-amber-900">{t("policies.explainer")}</ITText>
         </div>
         <ITButton variant="filled" color="primary" size="sm" onClick={() => openNew(null)}>
-          <span className="flex items-center gap-1.5 text-[11px] font-bold">
+          <ITText as="span" className="flex items-center gap-1.5 text-[11px] font-bold">
             <FaPlus size={10} /> {t("policies.new")}
-          </span>
+          </ITText>
         </ITButton>
-      </div>
+      </ITFlex>
 
       {grouped.map(({ key, action, rules }) => (
         <div key={key} className="overflow-hidden rounded-xl border border-slate-200 bg-[var(--it-card-bg)]">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-3 py-2">
-            <p className="text-[12px] text-slate-600">
-              {t("policies.story.whoCan")} <b className="text-slate-900">{(action?.label ?? key).toLowerCase()}</b>
-              {action && <span className="text-slate-400"> · {action.module}</span>}
-            </p>
-            <span className="flex items-center gap-1">
+            <ITText className="text-[12px] text-slate-600">
+              {t("policies.story.whoCan")} <ITText as="b" className="text-slate-900">{(action?.label ?? key).toLowerCase()}</ITText>
+              {action && <ITText as="span" className="text-slate-400"> · {action.module}</ITText>}
+            </ITText>
+            <ITText as="span" className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => openNew(key)}
@@ -116,7 +116,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
               >
                 <FaVial size={9} /> {t("simulator.test")}
               </button>
-            </span>
+            </ITText>
           </div>
 
           <ol className="divide-y divide-slate-100">
@@ -125,22 +125,22 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
                 key={policy.id}
                 className={`flex flex-wrap items-center gap-2 px-3 py-2 ${policy.active ? "" : "bg-slate-50/60"}`}
               >
-                <span
+                <ITText as="span"
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
                     policy.active ? "bg-primary-500 text-white" : "bg-slate-200 text-slate-500"
                   }`}
                 >
                   {index + 1}
-                </span>
+                </ITText>
                 <div className={`min-w-[260px] flex-1 ${policy.active ? "" : "opacity-50"}`}>
                   <PolicySentence policy={policy} action={action} />
-                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-slate-400">
+                  <ITText className="mt-0.5 flex items-center gap-1 text-[10px] text-slate-400">
                     {policy.key && <FaLock size={7} />}
                     {policy.name}
-                    {!policy.active && <span className="font-bold text-amber-600"> · {t("policies.inactive")}</span>}
-                  </p>
+                    {!policy.active && <ITText as="span" className="font-bold text-amber-600"> · {t("policies.inactive")}</ITText>}
+                  </ITText>
                 </div>
-                <span className="flex items-center gap-1">
+                <ITText as="span" className="flex items-center gap-1">
                   <button
                     type="button"
                     disabled={saving || index === 0}
@@ -159,7 +159,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
                   >
                     <FaArrowDown size={9} />
                   </button>
-                  <span title={policy.active ? t("policies.turnOff") : t("policies.turnOn")}>
+                  <ITText as="span" title={policy.active ? t("policies.turnOff") : t("policies.turnOn")}>
                     <ITSlideToggle
                       size="sm"
                       activeColor="var(--color-primary)"
@@ -167,7 +167,7 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
                       disabled={saving}
                       onToggle={(active) => void runQuick(setActive(policy, active))}
                     />
-                  </span>
+                  </ITText>
                   <button
                     type="button"
                     onClick={() => {
@@ -179,16 +179,16 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
                   >
                     <FaEdit size={10} />
                   </button>
-                </span>
+                </ITText>
               </li>
             ))}
             <li className="flex items-center gap-2 px-3 py-2">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <ITText as="span" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                 <FaCheckCircle size={10} />
-              </span>
-              <span className="text-[11px] text-slate-500">
+              </ITText>
+              <ITText as="span" className="text-[11px] text-slate-500">
                 {rules.length === 0 ? t("policies.story.noRules") : t("policies.story.otherwise")}
-              </span>
+              </ITText>
             </li>
           </ol>
         </div>
@@ -205,6 +205,6 @@ export default function PoliciesPanel({ policies, onTest, notify }: Props) {
         onSubmit={handleSubmit}
         onDelete={handleDelete}
       />
-    </div>
+    </ITStack>
   );
 }

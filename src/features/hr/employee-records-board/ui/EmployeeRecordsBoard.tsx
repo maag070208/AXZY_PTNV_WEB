@@ -10,8 +10,7 @@ import {
   ITConfirmDialog,
   ITInput,
   ITSearchSelect,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITText } from "@axzydev/axzy_ui_system";
 import { FaBell, FaChevronRight, FaIdCard, FaSearch, FaUserCheck, FaUserClock } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
@@ -34,10 +33,10 @@ function Progress({ done, total, label }: { done: number; total: number; label: 
   return (
     <div className="w-[110px]" title={label}>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[10px] font-medium text-slate-500">{pct}%</span>
-        <span className={`text-[11px] font-bold tabular-nums ${complete ? "text-[color:var(--color-success)]" : "text-slate-700"}`}>
+        <ITText as="span" className="text-[10px] font-medium text-slate-500">{pct}%</ITText>
+        <ITText as="span" className={`text-[11px] font-bold tabular-nums ${complete ? "text-[color:var(--color-success)]" : "text-slate-700"}`}>
           {done}/{total}
-        </span>
+        </ITText>
       </div>
       <div className="mt-1 h-1 overflow-hidden rounded-full bg-slate-100">
         <div
@@ -216,9 +215,9 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
                               className={`h-2 w-2 rounded-full ${d.delivered ? "bg-emerald-500" : "bg-rose-300"}`}
                             />
                           ))}
-                          <span className="ml-1 text-[11px] font-semibold tabular-nums text-slate-600">
+                          <ITText as="span" className="ml-1 text-[11px] font-semibold tabular-nums text-slate-600">
                             {done(r.requiredDocuments)}/{r.requiredDocuments.length}
-                          </span>
+                          </ITText>
                         </div>
                       </td>
                       <td className="px-3 py-3">
@@ -284,11 +283,11 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
 
                 {/* Total del expediente: número grande a la derecha, como el diseño */}
                 <div className="mt-4 flex items-baseline justify-between gap-2">
-                  <span className="text-[13.5px] font-bold text-slate-900">{t("records.detail.total")}</span>
-                  <span className="flex items-baseline gap-1">
-                    <b className="text-[22px] font-extrabold leading-none tabular-nums text-slate-900">{totalOf(sel).done}</b>
-                    <span className="text-[12px] text-slate-500">{t("records.detail.ofTotal", { total: totalOf(sel).total })}</span>
-                  </span>
+                  <ITText as="span" className="text-[13.5px] font-bold text-slate-900">{t("records.detail.total")}</ITText>
+                  <ITText as="span" className="flex items-baseline gap-1">
+                    <ITText as="b" className="text-[22px] font-extrabold leading-none tabular-nums text-slate-900">{totalOf(sel).done}</ITText>
+                    <ITText as="span" className="text-[12px] text-slate-500">{t("records.detail.ofTotal", { total: totalOf(sel).total })}</ITText>
+                  </ITText>
                 </div>
                 <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
                   <div
@@ -311,7 +310,7 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
                           className="h-2 w-2 shrink-0 rounded-full"
                           style={{ background: d.delivered ? "var(--color-success)" : "var(--color-warning)" }}
                         />
-                        <span className="flex-1 text-[12.5px] font-medium text-slate-800">{d.name}</span>
+                        <ITText as="span" className="flex-1 text-[12.5px] font-medium text-slate-800">{d.name}</ITText>
                         {d.delivered && file ? (
                           <ITButton variant="text" color="primary" size="sm" label={t("records.detail.view")} onClick={() => window.open(file.url, "_blank", "noopener")} />
                         ) : (
@@ -338,7 +337,7 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
                     return (
                       <div key={d.id} className="flex items-center gap-2.5 py-1">
                         <span className={`h-2 w-2 shrink-0 rounded-full ${d.delivered ? "bg-emerald-600" : "bg-slate-300"}`} />
-                        <span className="flex-1 text-[12px] text-slate-800">{d.name}</span>
+                        <ITText as="span" className="flex-1 text-[12px] text-slate-800">{d.name}</ITText>
                         {d.delivered && file ? (
                           <a href={file.url} target="_blank" rel="noreferrer" className="text-[11px] text-slate-500 hover:underline">
                             {t("records.detail.delivered")}
@@ -353,7 +352,7 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
                             label={fx.uploading === d.id ? t("records.detail.uploading") : t("records.detail.upload")}
                           />
                         ) : (
-                          <span className="text-[11px] text-slate-500">{d.delivered ? t("records.detail.delivered") : t("records.detail.pending")}</span>
+                          <ITText as="span" className="text-[11px] text-slate-500">{d.delivered ? t("records.detail.delivered") : t("records.detail.pending")}</ITText>
                         )}
                       </div>
                     );

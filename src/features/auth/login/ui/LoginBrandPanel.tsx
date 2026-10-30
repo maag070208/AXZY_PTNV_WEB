@@ -4,6 +4,7 @@ import { LuArrowRight, LuBoxes, LuChefHat, LuClock, LuTicket } from "react-icons
 import { useTranslation } from "react-i18next";
 import LottieLoader from "@shared/ui/lottie-loader/ui/LottieLoader";
 import "./login.css";
+import { ITText, ITFlex } from "@axzydev/axzy_ui_system";
 
 /** Semillas fijas y decorativas para los avatares del panel de marca. */
 const AVATAR_SEEDS = ["front-desk", "housekeeping", "kitchen", "maintenance"] as const;
@@ -46,23 +47,23 @@ export default function LoginBrandPanel() {
           <LottieLoader size="md" label={tt("login.brand.logoAlt")} className="hidden lg:block" />
         </div>
         <div className="leading-tight">
-          <p className="login-on-brand text-lg font-extrabold tracking-tight lg:text-xl">
+          <ITText className="login-on-brand text-lg font-extrabold tracking-tight lg:text-xl">
             {tt("login.brand.name")}
-          </p>
-          <p className="login-on-brand-muted text-xs font-semibold uppercase tracking-[0.2em]">
+          </ITText>
+          <ITText className="login-on-brand-muted text-xs font-semibold uppercase tracking-[0.2em]">
             {tt("login.brand.eyebrow")}
-          </p>
+          </ITText>
         </div>
       </div>
 
       {/* Mensaje (solo desktop) */}
       <div className="relative mt-10 hidden lg:block">
-        <h2 className="login-on-brand max-w-lg text-4xl font-extrabold leading-[1.08] tracking-tight xl:text-[2.75rem]">
+        <ITText as="h2" className="login-on-brand max-w-lg text-4xl font-extrabold leading-[1.08] tracking-tight xl:text-[2.75rem]">
           {tt("login.brand.headline")}
-        </h2>
-        <p className="login-on-brand-muted mt-4 max-w-md text-[15px] leading-relaxed">
+        </ITText>
+        <ITText className="login-on-brand-muted mt-4 max-w-md text-[15px] leading-relaxed">
           {tt("login.brand.subcopy")}
-        </p>
+        </ITText>
 
         <div className="login-glass mt-9 flex items-center gap-4 rounded-3xl px-5 py-4">
           <div aria-hidden className="flex -space-x-2.5">
@@ -77,29 +78,29 @@ export default function LoginBrandPanel() {
               />
             ))}
           </div>
-          <div className="min-w-0">
-            <p className="login-on-brand font-bold">{tt("login.brand.teamTitle")}</p>
-            <p className="login-on-brand-muted text-sm">{tt("login.brand.teamText")}</p>
-          </div>
+          <ITFlex className="min-w-0">
+            <ITText className="login-on-brand font-bold">{tt("login.brand.teamTitle")}</ITText>
+            <ITText className="login-on-brand-muted text-sm">{tt("login.brand.teamText")}</ITText>
+          </ITFlex>
         </div>
 
         <ul className="mt-3 grid grid-cols-2 gap-3">
           {FEATURES.map(({ labelKey, icon: Icon }) => (
             <li key={labelKey} className="login-glass flex items-center gap-3 rounded-2xl px-3.5 py-3">
-              <span aria-hidden className="login-chip flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
+              <ITText as="span" aria-hidden className="login-chip flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
                 <Icon size={18} />
-              </span>
-              <span className="login-on-brand text-sm font-semibold leading-tight">{tt(labelKey)}</span>
+              </ITText>
+              <ITText as="span" className="login-on-brand text-sm font-semibold leading-tight">{tt(labelKey)}</ITText>
             </li>
           ))}
         </ul>
       </div>
 
-      <p className="login-on-brand-muted relative mt-10 hidden items-center gap-2 text-sm font-medium lg:flex">
+      <ITText className="login-on-brand-muted relative mt-10 hidden items-center gap-2 text-sm font-medium lg:flex">
         <span aria-hidden className="login-pulse h-2 w-2 rounded-full" />
         {tt("login.brand.realtime")}
         <LuArrowRight aria-hidden size={15} />
-      </p>
+      </ITText>
     </aside>
   );
 }

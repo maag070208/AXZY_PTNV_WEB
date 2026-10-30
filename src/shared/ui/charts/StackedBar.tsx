@@ -1,3 +1,4 @@
+import { ITText } from "@axzydev/axzy_ui_system";
 interface Segment {
   label: string;
   value: number;
@@ -29,11 +30,11 @@ export default function StackedBar({ segments }: { segments: Segment[] }) {
       </div>
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
         {segments.map((s) => (
-          <span key={s.label} className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
+          <ITText as="span" key={s.label} className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
             {s.label}
-            <span className="font-black text-slate-700">{s.display ?? s.value}</span>
-          </span>
+            <ITText as="span" className="font-black text-slate-700">{s.display ?? s.value}</ITText>
+          </ITText>
         ))}
       </div>
     </div>

@@ -73,9 +73,9 @@ export default function ImportUploadCard({ fx }: { fx: UseDeviceImport }) {
           gap={3}
           className="rounded-2xl border border-dashed border-slate-300 !bg-slate-50/60 px-6 py-8"
         >
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-warning-soft)] text-[color:color-mix(in_srgb,var(--color-warning)_70%,black)]">
+          <ITText as="span" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-warning-soft)] text-[color:color-mix(in_srgb,var(--color-warning)_70%,black)]">
             <FaFileExcel size={20} />
-          </span>
+          </ITText>
           <ITText className="!text-[12px] font-semibold text-slate-600">
             {fx.file ? t("import.file", { name: fx.file.name }) : t("import.dropHint")}
           </ITText>

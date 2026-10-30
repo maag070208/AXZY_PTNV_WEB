@@ -1,4 +1,4 @@
-import { useITAppearance } from "@axzydev/axzy_ui_system";
+import { useITAppearance, ITText } from "@axzydev/axzy_ui_system";
 
 interface Props {
   label: string;
@@ -24,9 +24,9 @@ export default function OptionChip({ emoji, label, delay = 0, onClick }: Props) 
       className={`agent-pop inline-flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-xs font-medium transition duration-200 hover:-translate-y-0.5 active:scale-95 ${look}`}
     >
       {emoji && (
-        <span aria-hidden className="text-sm leading-none">
+        <ITText as="span" aria-hidden className="text-sm leading-none">
           {emoji}
-        </span>
+        </ITText>
       )}
       {label}
     </button>

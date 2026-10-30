@@ -8,6 +8,7 @@ import { LangostinState } from "@shared/ui/langostin";
 import { PanelCard } from "@shared/ui/panel-card";
 import { dyn } from "@shared/i18n";
 import { formatDateTime } from "@shared/utils/dates";
+import { ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 
 type Tone = "primary" | "success" | "warning" | "danger" | "info" | "secondary";
 
@@ -28,12 +29,12 @@ const STATUS_TONE: Record<string, Tone> = {
 function Pill({ value, label }: { value: string; label: string }) {
   const tone = STATUS_TONE[value] ?? "secondary";
   return (
-    <span
+    <ITText as="span"
       className="inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold"
       style={{ background: `var(--color-${tone}-soft, var(--color-secondary-100))`, color: `var(--color-${tone})` }}
     >
       {label}
-    </span>
+    </ITText>
   );
 }
 
@@ -43,7 +44,7 @@ function Card({ icon, title, count, children }: { icon: React.ReactNode; title: 
     <PanelCard
       icon={icon}
       title={title}
-      actions={<span className="rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums" style={{ background: "var(--color-secondary-100)" }}>{count}</span>}
+      actions={<ITText as="span" className="rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums" style={{ background: "var(--color-secondary-100)" }}>{count}</ITText>}
     >
       <div className="-mx-2 max-h-[22rem] overflow-y-auto">{children}</div>
     </PanelCard>
@@ -78,7 +79,7 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
   const tasks = [...data.tasks].sort((a, b) => Number(a.status === "COMPLETED") - Number(b.status === "COMPLETED"));
 
   return (
-    <div className="flex flex-col gap-5">
+    <ITStack spacing={5}>
       <div className="grid grid-cols-2 gap-3 xl:!grid-cols-4">
         {inventory && (
           <>
@@ -96,17 +97,17 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
           <ul className="divide-y divide-slate-100">
             {openLoans.map((l) => (
               <li key={l.id} className="px-2 py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold text-slate-900">{l.number}</p>
+                <ITFlex align="center" justify="between" gap={3}>
+                  <ITText className="font-semibold text-slate-900">{l.number}</ITText>
                   <Pill value={l.status} label={label(l.status)} />
-                </div>
-                <p className="text-xs text-slate-500">{formatDateTime(l.date)}</p>
+                </ITFlex>
+                <ITText className="text-xs text-slate-500">{formatDateTime(l.date)}</ITText>
                 <ul className="mt-2 flex flex-col gap-1">
                   {l.items.map((i, idx) => (
                     <li key={idx} className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-slate-700" style={{ background: "var(--color-secondary-100)" }}>
-                      <span className="font-bold text-slate-900">{i.quantity - i.returned}×</span>
-                      <span className="truncate">{i.device}</span>
-                      {i.returned > 0 && <span className="ml-auto text-xs text-[color:var(--color-success)]">{t("detail.activity.returnedCount", { count: i.returned })}</span>}
+                      <ITText as="span" className="font-bold text-slate-900">{i.quantity - i.returned}×</ITText>
+                      <ITText as="span" className="truncate">{i.device}</ITText>
+                      {i.returned > 0 && <ITText as="span" className="ml-auto text-xs text-[color:var(--color-success)]">{t("detail.activity.returnedCount", { count: i.returned })}</ITText>}
                     </li>
                   ))}
                 </ul>
@@ -121,10 +122,10 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
           <ul className="divide-y divide-slate-100">
             {tickets.map((tk) => (
               <li key={tk.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-[color-mix(in_srgb,currentColor_6%,transparent)]" onClick={() => navigate(`/tickets/${tk.id}`)}>
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-900">{tk.title}</p>
-                  <p className="text-xs text-slate-500">{dyn(t)(`detail.activity.relation.${tk.relation}`)} · {formatDateTime(tk.createdAt)}</p>
-                </div>
+                <ITFlex className="min-w-0">
+                  <ITText className="truncate font-semibold text-slate-900">{tk.title}</ITText>
+                  <ITText className="text-xs text-slate-500">{dyn(t)(`detail.activity.relation.${tk.relation}`)} · {formatDateTime(tk.createdAt)}</ITText>
+                </ITFlex>
                 <Pill value={tk.status} label={label(tk.status)} />
               </li>
             ))}
@@ -136,12 +137,12 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
           <ul className="divide-y divide-slate-100">
             {tasks.map((tk) => (
               <li key={tk.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-[color-mix(in_srgb,currentColor_6%,transparent)]" onClick={() => navigate(`/tickets/${tk.ticketId}`)}>
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-900">{tk.title}</p>
-                  <p className="truncate text-xs text-slate-500">
+                <ITFlex className="min-w-0">
+                  <ITText className="truncate font-semibold text-slate-900">{tk.title}</ITText>
+                  <ITText className="truncate text-xs text-slate-500">
                     {tk.ticketTitle}{tk.dueDate ? ` · ${t("detail.activity.due", { date: formatDateTime(tk.dueDate) })}` : ""}
-                  </p>
-                </div>
+                  </ITText>
+                </ITFlex>
                 <Pill value={tk.status} label={label(tk.status)} />
               </li>
             ))}
@@ -154,17 +155,17 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
           <ul className="relative ml-4 border-l border-slate-200 py-2">
             {inventory.kardex.map((k, idx) => (
               <li key={`${k.number}-${idx}`} className="relative py-3 pl-6">
-                <span className={`absolute -left-3.5 top-3.5 flex h-7 w-7 items-center justify-center rounded-full ring-4 ring-[var(--it-card-bg)]`} style={{ background: `var(--color-${k.type === "LOAN" ? "info" : "success"}-soft)`, color: `var(--color-${k.type === "LOAN" ? "info" : "success"})` }}>
+                <ITText as="span" className={`absolute -left-3.5 top-3.5 flex h-7 w-7 items-center justify-center rounded-full ring-4 ring-[var(--it-card-bg)]`} style={{ background: `var(--color-${k.type === "LOAN" ? "info" : "success"}-soft)`, color: `var(--color-${k.type === "LOAN" ? "info" : "success"})` }}>
                   <LuArrowLeftRight size={12} />
-                </span>
-                <p className="font-semibold text-slate-900">
+                </ITText>
+                <ITText className="font-semibold text-slate-900">
                   {dyn(t)(`detail.activity.kardex.${k.type}`)} · {k.number}
-                  {k.loanNumber ? <span className="font-normal text-slate-500"> ({k.loanNumber})</span> : null}
-                </p>
-                <p className="text-xs text-slate-500">{formatDateTime(k.date)}</p>
-                <p className="mt-1 text-sm text-slate-700">
+                  {k.loanNumber ? <ITText as="span" className="font-normal text-slate-500"> ({k.loanNumber})</ITText> : null}
+                </ITText>
+                <ITText className="text-xs text-slate-500">{formatDateTime(k.date)}</ITText>
+                <ITText className="mt-1 text-sm text-slate-700">
                   {k.items.map((i) => `${i.quantity}× ${i.device}${i.condition ? ` · ${i.condition}` : ""}`).join(", ")}
-                </p>
+                </ITText>
               </li>
             ))}
           </ul>
@@ -172,6 +173,6 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
         </Card>
         )}
       </div>
-    </div>
+    </ITStack>
   );
 }

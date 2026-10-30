@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ITInput } from "@axzydev/axzy_ui_system";
+import { ITInput, ITText } from "@axzydev/axzy_ui_system";
 import { FaCalendarAlt } from "react-icons/fa";
 import { usePopoverPosition } from "./usePopoverPosition";
 import { i18n } from "@shared/i18n";
@@ -136,9 +136,9 @@ export default function DatePickerPortal({
               >
                 ‹
               </button>
-              <span style={{ fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
+              <ITText as="span" style={{ fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
                 {monthLabel}
-              </span>
+              </ITText>
               <button
                 type="button"
                 onClick={() =>

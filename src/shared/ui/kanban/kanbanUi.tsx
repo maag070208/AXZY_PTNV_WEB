@@ -4,6 +4,7 @@
 // ambos las importen desde un solo lugar en vez de duplicarlas.
 
 import { ProfileAvatar } from "../profile-avatar";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 export type Status = "PENDING" | "IN_PROGRESS" | "IN_REVIEW" | "COMPLETED";
 
@@ -72,13 +73,13 @@ export function metaFor(map: Record<string, { tone: Tone }>, key: string) {
 
 export function Tag({ label, tone, icon }: { label: string; tone: Tone; icon?: React.ReactNode }) {
   return (
-    <span
+    <ITText as="span"
       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide whitespace-nowrap"
       style={{ backgroundColor: tone.bg, color: tone.text }}
     >
       {icon}
       {label}
-    </span>
+    </ITText>
   );
 }
 
@@ -96,8 +97,8 @@ const AVATAR_SIZE_CLASSES: Record<number, string> = {
 export function Avatar({ name, size = 7 }: { name: string; size?: 6 | 7 | 8 }) {
   const sizeClass = AVATAR_SIZE_CLASSES[size] ?? AVATAR_SIZE_CLASSES[7];
   return (
-    <span title={name} className="inline-flex shrink-0">
+    <ITText as="span" title={name} className="inline-flex shrink-0">
       <ProfileAvatar name={name} size="sm" className={`${sizeClass} border-2 border-white shadow-sm`} />
-    </span>
+    </ITText>
   );
 }

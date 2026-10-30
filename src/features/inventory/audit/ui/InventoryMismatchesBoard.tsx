@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { ITButton, ITEmptyState, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITEmptyState, ITFlex, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 import {
   FaBalanceScale,
@@ -236,7 +236,7 @@ export default function InventoryMismatchesBoard() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <ITStack spacing={4}>
       <ITFlex
         align="center"
         justify="between"
@@ -521,6 +521,6 @@ export default function InventoryMismatchesBoard() {
         variant="danger"
         loading={guardando}
       />
-    </div>
+    </ITStack>
   );
 }

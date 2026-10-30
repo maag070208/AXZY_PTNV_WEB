@@ -41,12 +41,12 @@ export default function LinksSummary({ onGoToLink }: { onGoToLink: () => void })
   return (
     <ITCard tone={allLinked ? "success" : undefined}>
       <ITFlex align="center" wrap="wrap" gap={3}>
-        <span
+        <ITText as="span"
           className={allLinked ? "text-[color:var(--color-success)]" : "text-primary-500"}
           title={t("report.rule")}
         >
           {icon}
-        </span>
+        </ITText>
         <ITFlex direction="column" gap={0.5} className="min-w-0 flex-1">
           <ITText className="text-[12.5px] font-semibold text-slate-800">
             {noEmployees

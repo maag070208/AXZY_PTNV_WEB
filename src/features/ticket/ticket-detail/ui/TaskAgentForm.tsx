@@ -1,4 +1,4 @@
-import { ITFlex, ITInput, ITSearchSelect } from "@axzydev/axzy_ui_system";
+import { ITFlex, ITInput, ITSearchSelect, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaRedo } from "react-icons/fa";
@@ -129,7 +129,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
         );
       case "what":
         return (
-          <div className="flex flex-col gap-2">
+          <ITStack spacing={2}>
             <ITInput
               name="taskTitle"
               placeholder={t("taskAgent.titlePlaceholder")}
@@ -143,7 +143,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
                 }
               }}
             />
-            <div className="flex justify-end">
+            <ITFlex justify="end">
               <button
                 type="button"
                 className={primaryButton}
@@ -155,12 +155,12 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
               >
                 {t("taskAgent.send")}
               </button>
-            </div>
-          </div>
+            </ITFlex>
+          </ITStack>
         );
       case "notes":
         return (
-          <div className="flex flex-col gap-2">
+          <ITStack spacing={2}>
             <textarea
               value={notesDraft}
               onChange={(e) => setNotesDraft(e.target.value)}
@@ -170,7 +170,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
               aria-label={t("taskAgent.notesPlaceholder")}
               className="w-full resize-none rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none"
             />
-            <div className="flex justify-end gap-2">
+            <ITFlex justify="end" gap={2}>
               <button
                 type="button"
                 className={secondaryButton}
@@ -192,12 +192,12 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
               >
                 {t("taskAgent.send")}
               </button>
-            </div>
-          </div>
+            </ITFlex>
+          </ITStack>
         );
       case "when":
         return (
-          <div className="flex flex-wrap gap-2">
+          <ITFlex wrap="wrap" gap={2}>
             {agent.whenOptions.map((o, i) => (
               <OptionChip
                 key={o.value}
@@ -207,7 +207,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
                 onClick={() => agent.pickWhen(o)}
               />
             ))}
-          </div>
+          </ITFlex>
         );
       default:
         return null;
@@ -217,13 +217,13 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
   return (
     <section className="flex max-h-[520px] min-h-[360px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-[var(--it-card-bg)] shadow-sm">
       <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
+        <ITFlex align="center" gap={2.5}>
           <LangostinAvatar anim="idle" size={30} animated={false} />
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-slate-900">{t("taskAgent.name")}</span>
-            <span className="text-[10px] text-slate-400">{t("taskAgent.helper")}</span>
-          </div>
-        </div>
+          <ITStack>
+            <ITText as="span" className="text-xs font-semibold text-slate-900">{t("taskAgent.name")}</ITText>
+            <ITText as="span" className="text-[10px] text-slate-400">{t("taskAgent.helper")}</ITText>
+          </ITStack>
+        </ITFlex>
         <ITFlex align="center" gap={1}>
           <button
             type="button"
@@ -261,7 +261,7 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
               ) : (
                 <span className="w-9 shrink-0" aria-hidden />
               ))}
-            <p
+            <ITText
               className={`max-w-[80%] whitespace-pre-line rounded-2xl px-3.5 py-2 text-xs leading-5 ${
                 m.from === "user"
                   ? "rounded-br-md bg-slate-900 text-white"
@@ -269,14 +269,14 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
               }`}
             >
               {m.text}
-            </p>
+            </ITText>
           </div>
         ))}
 
         {agent.typing && (
           <div className="agent-bubble flex items-end gap-2">
             <LangostinAvatar anim="think" size={24} />
-            <span className="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] px-3.5 py-2.5">
+            <ITText as="span" className="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] px-3.5 py-2.5">
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
@@ -284,8 +284,8 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
                   style={{ animationDelay: `${i * 150}ms` }}
                 />
               ))}
-              <span className="sr-only">{t("taskAgent.typing")}</span>
-            </span>
+              <ITText as="span" className="sr-only">{t("taskAgent.typing")}</ITText>
+            </ITText>
           </div>
         )}
 
@@ -293,14 +293,14 @@ export default function TaskAgentForm({ fx, onCancel }: Props) {
           <div className="agent-bubble flex items-end gap-2">
             <LangostinAvatar anim={mascot} size={24} />
             <div className="flex max-w-[92%] flex-col gap-2.5 rounded-2xl rounded-bl-md border border-slate-200 bg-[var(--it-card-bg)] p-3 shadow-sm">
-              <p key={guideKey} className="agent-pop flex items-center gap-2 text-[11px] text-slate-500">
+              <ITText key={guideKey} className="agent-pop flex items-center gap-2 text-[11px] text-slate-500">
                 {isOptionStep && sendAnim === null && (
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
+                  <ITText as="span" className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
                     {t("taskAgent.guide.step", { current: stepNumber, total: 4 })}
-                  </span>
+                  </ITText>
                 )}
-                <span>{t(`taskAgent.guide.${guideKey}`)}</span>
-              </p>
+                <ITText as="span">{t(`taskAgent.guide.${guideKey}`)}</ITText>
+              </ITText>
               {isOptionStep && sendAnim === null && renderOptions()}
               {isOptionStep && sendAnim === null && agent.canGoBack && (
                 <button

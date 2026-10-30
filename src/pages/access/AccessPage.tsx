@@ -476,9 +476,9 @@ export default function AccessPage() {
         >
           {lastEvent ? (
             <div className="relative z-[1] flex min-h-0 flex-1 flex-wrap items-center justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-3.5">
+              <ITFlex align="center" gap={3.5} className="min-w-0">
                 <ProfileAvatar name={lastEvent.employeeNameSnapshot ?? "—"} size="xl" />
-                <div className="min-w-0">
+                <ITFlex className="min-w-0">
                   <div className="it-bento-tile__value truncate !text-[22px]">{lastEvent.employeeNameSnapshot ?? "—"}</div>
                   <ITFlex wrap="wrap" align="center" gap={1.5} className="mt-1">
                     <ITBentoPill>
@@ -488,8 +488,8 @@ export default function AccessPage() {
                     <ITBentoPill>{formatDateTime(lastEvent.occurredAt)}</ITBentoPill>
                     {lastEvent.site?.name && <ITBentoPill>{lastEvent.site.name}</ITBentoPill>}
                   </ITFlex>
-                </div>
-              </div>
+                </ITFlex>
+              </ITFlex>
               {stats && stats.entries + stats.exits > 0 && (
                 <div className="flex w-[190px] shrink-0 flex-col items-center">
                   <ITBentoGauge
@@ -498,15 +498,15 @@ export default function AccessPage() {
                     trackColor="rgb(255 255 255 / 0.14)"
                     size={170}
                   />
-                  <small className="it-bento-tile__caption">
+                  <ITText as="small" className="it-bento-tile__caption">
                     <Num value={stats.entries} /> {tt("kpis.entries").toLowerCase()} · <Num value={stats.exits} />{" "}
                     {tt("kpis.exits").toLowerCase()}
-                  </small>
+                  </ITText>
                 </div>
               )}
             </div>
           ) : (
-            <p className="relative z-[1] m-0 mt-3 text-[12.5px] font-semibold opacity-70">{tt("live.none")}</p>
+            <ITText className="relative z-[1] m-0 mt-3 text-[12.5px] font-semibold opacity-70">{tt("live.none")}</ITText>
           )}
         </ITBentoTile>
       </ITBentoGrid>
@@ -614,10 +614,10 @@ export default function AccessPage() {
             {/* Encabezado héroe */}
             <div className="mb-5 flex items-center gap-3 pr-8">
               <ProfileAvatar name={detail.employeeNameSnapshot ?? "—"} size="lg" />
-              <div className="min-w-0">
-                <h2 className="m-0 truncate !text-[18px] font-bold leading-tight !text-slate-800">
+              <ITFlex className="min-w-0">
+                <ITText as="h2" className="m-0 truncate !text-[18px] font-bold leading-tight !text-slate-800">
                   {detail.employeeNameSnapshot ?? "—"}
-                </h2>
+                </ITText>
                 <ITFlex align="center" wrap="wrap" gap={2} className="mt-1">
                   <ITBadget color={TYPE_COLOR[detail.type]} size="lg">
                     {tt(`types.${detail.type}`)}
@@ -625,12 +625,12 @@ export default function AccessPage() {
                   <ITBadget color={detail.voidedAt ? "danger" : "success"} size="lg">
                     {detail.voidedAt ? tt("status.voided") : tt("status.active")}
                   </ITBadget>
-                  <span className="text-xs text-slate-500">
+                  <ITText as="span" className="text-xs text-slate-500">
                     {formatDateTime(detail.occurredAt)}
                     {detail.employeeNumberSnapshot ? ` · #${detail.employeeNumberSnapshot}` : ""}
-                  </span>
+                  </ITText>
                 </ITFlex>
-              </div>
+              </ITFlex>
             </div>
 
             {/* Cuerpo */}

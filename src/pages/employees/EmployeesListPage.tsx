@@ -3,8 +3,7 @@ import {
   ITButton,
   ITFlex,
   ITPage,
-  ITText,
-} from "@axzydev/axzy_ui_system";
+  ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { LuPlus, LuUserCheck, LuUserMinus, LuUsers, LuUsersRound } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -70,7 +69,7 @@ export default function EmployeesListPage() {
         </ITAlert>
       )}
 
-      <div className="flex flex-col gap-4">
+      <ITStack spacing={4}>
         {summary.length > 0 && (
           <ListSummaryStrip
             items={summary}
@@ -106,7 +105,7 @@ export default function EmployeesListPage() {
             onChanged={list.reload}
           />
         )}
-      </div>
+      </ITStack>
     </ITPage>
   );
 }

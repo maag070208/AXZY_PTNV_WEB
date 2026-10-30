@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { FaBolt, FaEye, FaPen, FaPlus, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { permissionVerb, type PermissionVerb } from "../../model/access-levels";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 const STYLE: Record<PermissionVerb, string> = {
   view: "bg-sky-50 text-sky-600",
@@ -24,11 +25,11 @@ export default function VerbIcon({ permissionKey }: { permissionKey: string }) {
   const { t } = useTranslation("roles");
   const verb = permissionVerb(permissionKey);
   return (
-    <span
+    <ITText as="span"
       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${STYLE[verb]}`}
       title={t(`verb.${verb}`)}
     >
       {ICON[verb]}
-    </span>
+    </ITText>
   );
 }

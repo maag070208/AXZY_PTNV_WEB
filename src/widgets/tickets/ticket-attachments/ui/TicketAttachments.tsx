@@ -50,17 +50,17 @@ function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number 
             className="h-full w-full object-cover bg-slate-900"
           />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/35">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--it-card-bg)] text-slate-800">
+            <ITText as="span" className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--it-card-bg)] text-slate-800">
               <LuPlay size={10} className="ml-0.5" />
-            </span>
+            </ITText>
           </div>
         </>
       ) : (
         <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-1 text-slate-400">
           <LuFileText size={iconSize} />
-          <span className="w-full truncate px-0.5 text-center text-[9px] font-bold leading-none">
+          <ITText as="span" className="w-full truncate px-0.5 text-center text-[9px] font-bold leading-none">
             {item.originalName.split(".").pop()?.toUpperCase() ?? tt("attachments.fallbackExt")}
-          </span>
+          </ITText>
         </div>
       )}
       <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5" />
@@ -116,7 +116,7 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
     <div className={compact ? "mt-2" : "pt-2"}>
       <ITFlex justify="between" align="center" gap={2}>
         <ITFlex align="center" gap={1.5}>
-          <span className="flex items-center text-slate-400">{assignmentId ? <LuCamera size={14} /> : <LuFileText size={14} />}</span>
+          <ITText as="span" className="flex items-center text-slate-400">{assignmentId ? <LuCamera size={14} /> : <LuFileText size={14} />}</ITText>
           <ITText className="text-[12px] font-semibold text-slate-500">
             {assignmentId ? tt("attachments.evidenceTitle", { count: items.length }) : tt("attachments.photosTitle", { count: items.length })}
           </ITText>

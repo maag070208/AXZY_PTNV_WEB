@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ITDialog } from "@axzydev/axzy_ui_system";
+import { ITDialog, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import { FaArrowRight, FaGavel, FaIdCard, FaKey, FaLightbulb } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { ScopeChip } from "./shared/Scope";
@@ -12,12 +12,12 @@ interface RolesHelpDialogProps {
 function Layer({ icon, step, title, body }: { icon: ReactNode; step: number; title: string; body: string }) {
   return (
     <div className="flex flex-1 flex-col gap-1.5 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-3">
-      <div className="flex items-center gap-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500">{icon}</span>
-        <span className="text-[10px] font-black text-slate-400">{step}</span>
-        <span className="text-[12px] font-black text-slate-800">{title}</span>
-      </div>
-      <p className="text-[11px] leading-relaxed text-slate-600">{body}</p>
+      <ITFlex align="center" gap={2}>
+        <ITText as="span" className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500">{icon}</ITText>
+        <ITText as="span" className="text-[10px] font-black text-slate-400">{step}</ITText>
+        <ITText as="span" className="text-[12px] font-black text-slate-800">{title}</ITText>
+      </ITFlex>
+      <ITText className="text-[11px] leading-relaxed text-slate-600">{body}</ITText>
     </div>
   );
 }
@@ -25,7 +25,7 @@ function Layer({ icon, step, title, body }: { icon: ReactNode; step: number; tit
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-1.5">
-      <h3 className="text-[12px] font-semibold text-slate-500">{title}</h3>
+      <ITText as="h3" className="text-[12px] font-semibold text-slate-500">{title}</ITText>
       {children}
     </section>
   );
@@ -41,7 +41,7 @@ export default function RolesHelpDialog({ isOpen, onClose }: RolesHelpDialogProp
   return (
     <ITDialog isOpen={isOpen} onClose={onClose} title={t("help.title")}>
       <div className="flex max-h-[72vh] flex-col gap-5 overflow-y-auto pr-1">
-        <p className="text-[12px] leading-relaxed text-slate-600">{t("help.intro")}</p>
+        <ITText className="text-[12px] leading-relaxed text-slate-600">{t("help.intro")}</ITText>
 
         <div className="flex flex-col items-stretch gap-2 md:flex-row md:items-center">
           <Layer icon={<FaIdCard size={13} />} step={1} title={t("help.layers.identity.title")} body={t("help.layers.identity.body")} />
@@ -52,28 +52,28 @@ export default function RolesHelpDialog({ isOpen, onClose }: RolesHelpDialogProp
         </div>
 
         <Section title={t("help.rolesTitle")}>
-          <p className="text-[12px] leading-relaxed text-slate-600">{t("help.rolesBody")}</p>
+          <ITText className="text-[12px] leading-relaxed text-slate-600">{t("help.rolesBody")}</ITText>
         </Section>
 
         <Section title={t("help.scopeTitle")}>
-          <p className="text-[12px] leading-relaxed text-slate-600">{t("help.scopeIntro")}</p>
+          <ITText className="text-[12px] leading-relaxed text-slate-600">{t("help.scopeIntro")}</ITText>
           {(["OWN", "AREA", "ALL"] as const).map((scope) => (
-            <div key={scope} className="flex items-start gap-2">
+            <ITFlex align="start" gap={2} key={scope}>
               <ScopeChip scope={scope} />
-              <span className="text-[12px] leading-relaxed text-slate-600">
+              <ITText as="span" className="text-[12px] leading-relaxed text-slate-600">
                 {t(scope === "OWN" ? "help.scopeOwnExample" : scope === "AREA" ? "help.scopeAreaExample" : "help.scopeAllExample")}
-              </span>
-            </div>
+              </ITText>
+            </ITFlex>
           ))}
-          <p className="text-[12px] leading-relaxed text-slate-600">{t("help.scopeNote")}</p>
+          <ITText className="text-[12px] leading-relaxed text-slate-600">{t("help.scopeNote")}</ITText>
         </Section>
 
         <Section title={t("help.exceptionsTitle")}>
-          <p className="text-[12px] leading-relaxed text-slate-600">{t("help.exceptionsBody")}</p>
+          <ITText className="text-[12px] leading-relaxed text-slate-600">{t("help.exceptionsBody")}</ITText>
         </Section>
 
         <Section title={t("help.appliesTitle")}>
-          <p className="text-[12px] leading-relaxed text-slate-600">{t("help.appliesBody")}</p>
+          <ITText className="text-[12px] leading-relaxed text-slate-600">{t("help.appliesBody")}</ITText>
         </Section>
 
         <div className="flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-3">

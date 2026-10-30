@@ -5,6 +5,7 @@ import type { PolicyActionDef, PolicyAdmin, PolicyCondition } from "@entities/pe
 import { roleLabel } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { useConditionValue } from "./useConditionValue";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 interface Props {
   policy: Pick<PolicyAdmin, "effect" | "roles" | "conditions">;
@@ -25,44 +26,44 @@ export default function PolicySentence({ policy, action }: Props) {
   const parts: ReactNode[] = [];
   if (policy.roles.length > 0) {
     parts.push(
-      <span key="roles" className="inline-flex flex-wrap items-center gap-1">
-        <span className="text-slate-500">{t("policies.isRole")}</span>
-        <span className="rounded-md bg-slate-100 px-1.5 py-0.5 font-bold text-slate-700">
+      <ITText as="span" key="roles" className="inline-flex flex-wrap items-center gap-1">
+        <ITText as="span" className="text-slate-500">{t("policies.isRole")}</ITText>
+        <ITText as="span" className="rounded-md bg-slate-100 px-1.5 py-0.5 font-bold text-slate-700">
           {policy.roles.map(roleLabel).join(` ${t("policies.or")} `)}
-        </span>
-      </span>
+        </ITText>
+      </ITText>
     );
   }
   policy.conditions.forEach((item: PolicyCondition, index) =>
     parts.push(
-      <span key={`${item.field}-${index}`} className="inline-flex flex-wrap items-center gap-1">
-        <span className="rounded-md bg-slate-100 px-1.5 py-0.5 font-bold text-slate-700">{fieldLabel(item.field)}</span>
-        <span className="text-slate-500">{tt(`policies.operator.${item.operator}`)}</span>
+      <ITText as="span" key={`${item.field}-${index}`} className="inline-flex flex-wrap items-center gap-1">
+        <ITText as="span" className="rounded-md bg-slate-100 px-1.5 py-0.5 font-bold text-slate-700">{fieldLabel(item.field)}</ITText>
+        <ITText as="span" className="text-slate-500">{tt(`policies.operator.${item.operator}`)}</ITText>
         {item.value != null && (
-          <span className="rounded-md bg-primary-500/10 px-1.5 py-0.5 font-bold text-primary-500">{valueText(item.value)}</span>
+          <ITText as="span" className="rounded-md bg-primary-500/10 px-1.5 py-0.5 font-bold text-primary-500">{valueText(item.value)}</ITText>
         )}
-      </span>
+      </ITText>
     )
   );
 
   return (
-    <span className="inline-flex flex-wrap items-center gap-1.5 text-[11px]">
-      <span className="font-black text-slate-400">{parts.length === 0 ? t("policies.always") : t("policies.if")}</span>
+    <ITText as="span" className="inline-flex flex-wrap items-center gap-1.5 text-[11px]">
+      <ITText as="span" className="font-black text-slate-400">{parts.length === 0 ? t("policies.always") : t("policies.if")}</ITText>
       {parts.map((part, index) => (
-        <span key={index} className="inline-flex flex-wrap items-center gap-1.5">
-          {index > 0 && <span className="font-black text-slate-400">{t("policies.and")}</span>}
+        <ITText as="span" key={index} className="inline-flex flex-wrap items-center gap-1.5">
+          {index > 0 && <ITText as="span" className="font-black text-slate-400">{t("policies.and")}</ITText>}
           {part}
-        </span>
+        </ITText>
       ))}
-      <span className="text-slate-300">→</span>
-      <span
+      <ITText as="span" className="text-slate-300">→</ITText>
+      <ITText as="span"
         className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-black ${
           policy.effect === "DENY" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"
         }`}
       >
         {policy.effect === "DENY" ? <FaBan size={9} /> : <FaCheckCircle size={9} />}
         {t(`policies.verdict.${policy.effect}`)}
-      </span>
-    </span>
+      </ITText>
+    </ITText>
   );
 }

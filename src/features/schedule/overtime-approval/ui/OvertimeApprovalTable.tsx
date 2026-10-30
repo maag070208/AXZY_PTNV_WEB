@@ -12,8 +12,7 @@ import {
   ITSearchSelect,
   ITText,
   ITTextarea,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITStack } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { FaBuilding, FaCheck, FaCheckCircle, FaClock, FaTimes, FaTimesCircle } from "react-icons/fa";
 import type { OvertimeDayRow } from "@entities/overtime";
@@ -111,14 +110,14 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
           <ITBadget color="gray" size="sm">
             {t("columns.restDay")}
           </ITBadget>
-          {exit && <span className="font-mono text-[12px] text-slate-700">→ {exit}</span>}
+          {exit && <ITText as="span" className="font-mono text-[12px] text-slate-700">→ {exit}</ITText>}
         </ITFlex>
       );
     }
     return (
-      <span className="font-mono text-[12px] text-slate-700">
+      <ITText as="span" className="font-mono text-[12px] text-slate-700">
         {r.shift ?? "—"} → {exit ?? "—"}
-      </span>
+      </ITText>
     );
   };
 
@@ -214,10 +213,10 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
               name={r.employeeName}
               size="md"
             />
-            <div className="min-w-0">
+            <ITFlex className="min-w-0">
               <ITText className="truncate text-[13px] font-bold text-slate-800">{r.employeeName}</ITText>
               <ITText className="truncate text-[11px] text-slate-500">{subtitle}</ITText>
-            </div>
+            </ITFlex>
           </ITFlex>
         );
       },
@@ -326,9 +325,9 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
             label={t("tiles.pending")}
             value={workedTime(summary?.pendingMinutes ?? 0)}
             footer={
-              <span className="text-[11px] leading-snug text-slate-500">
+              <ITText as="span" className="text-[11px] leading-snug text-slate-500">
                 {t("tiles.requests", { count: pendingDays })} · {t("tiles.people", { count: summary?.peopleWithPending ?? 0 })}
-              </span>
+              </ITText>
             }
             tone="amber"
             icon={<FaClock size={14} />}
@@ -344,7 +343,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
           size="sm"
           label={t("tiles.approved")}
           value={workedTime(summary?.approvedMinutes ?? 0)}
-          footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: approvedDays })}</span>}
+          footer={<ITText as="span" className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: approvedDays })}</ITText>}
           tone="emerald"
           icon={<FaCheckCircle size={14} />}
           backdrop={
@@ -358,7 +357,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
             size="sm"
             label={t("tiles.rejected")}
             value={workedTime(summary?.rejectedMinutes ?? 0)}
-            footer={<span className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: rejectedDays })}</span>}
+            footer={<ITText as="span" className="text-[11px] leading-snug text-slate-500">{t("tiles.requests", { count: rejectedDays })}</ITText>}
             tone="rose"
             icon={<FaTimesCircle size={14} />}
             backdrop={
@@ -376,12 +375,12 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
           <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
             {byDepartment.map((d) => (
               <li key={d.departmentId ?? "none"}>
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="truncate text-[12px] font-semibold text-slate-700">
+                <ITFlex align="baseline" justify="between" gap={2}>
+                  <ITText as="span" className="truncate text-[12px] font-semibold text-slate-700">
                     {d.departmentName ?? t("noDepartment")}
-                  </span>
-                  <span className="shrink-0 text-[12px] font-bold tabular-nums text-slate-900">{workedTime(d.minutes)}</span>
-                </div>
+                  </ITText>
+                  <ITText as="span" className="shrink-0 text-[12px] font-bold tabular-nums text-slate-900">{workedTime(d.minutes)}</ITText>
+                </ITFlex>
                 <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
                   <div
                     className="h-1.5 rounded-full bg-primary-500"
@@ -401,7 +400,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       )}
 
       {/* Lista por estatus (la tabla ya trae su superficie) */}
-      <div className="flex flex-col gap-3">
+      <ITStack spacing={3}>
         <div>
           <TabBar
             items={visibleTabs.map((value) => ({
@@ -471,7 +470,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
         />
 
         <ITText className="text-[11px] text-slate-500">{t("footnote")}</ITText>
-      </div>
+      </ITStack>
 
       {/* Rechazo con motivo opcional */}
       {canApprove && (

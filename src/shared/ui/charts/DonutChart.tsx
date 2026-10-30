@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { usePrefersReducedMotion } from "@shared/lib/usePrefersReducedMotion";
+import { ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 
 interface Segment {
   label: string;
@@ -117,20 +118,20 @@ export default function DonutChart({ segments, size = 128, showLegend = true, ca
         )}
       </svg>
       {showLegend && (
-        <div className="flex flex-col gap-2 min-w-0 flex-1">
+        <ITStack className="min-w-0 flex-1" spacing={2}>
           {segments.map((sec) => {
             const pct = total > 0 ? Math.round((sec.value / total) * 100) : 0;
             return (
-              <div key={sec.label} className="flex items-center gap-2">
+              <ITFlex align="center" gap={2} key={sec.label}>
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: sec.color }} />
-                <span className="text-[10px] font-bold text-slate-500 truncate">{sec.label}</span>
-                <span className="text-[10px] font-black text-slate-700 ml-auto">
+                <ITText as="span" className="text-[10px] font-bold text-slate-500 truncate">{sec.label}</ITText>
+                <ITText as="span" className="text-[10px] font-black text-slate-700 ml-auto">
                   {sec.value} · {pct}%
-                </span>
-              </div>
+                </ITText>
+              </ITFlex>
             );
           })}
-        </div>
+        </ITStack>
       )}
     </div>
   );

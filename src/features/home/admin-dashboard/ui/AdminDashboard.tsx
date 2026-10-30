@@ -9,8 +9,7 @@ import {
   ITBentoTile,
   ITBentoWaves,
   ITBentoWeekBars,
-  useITBentoCountUp,
-} from "@axzydev/axzy_ui_system";
+  useITBentoCountUp, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import {
   LuBox,
   LuChartPie,
@@ -135,7 +134,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
 
   return (
     <>
-      {error && <p className="m-0 text-[11px] font-bold text-red-600">{error}</p>}
+      {error && <ITText className="m-0 text-[11px] font-bold text-red-600">{error}</ITText>}
 
       <ITBentoGrid>
         {/* Dispositivos: tarjeta oscura con medidor de disponibilidad */}
@@ -182,20 +181,20 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
           icon={<LuTrash2 size={15} />}
           label={t("adminDashboard.damagedExits")}
           value={
-            <span style={{ color: damaged > 0 ? "var(--color-danger, #e11d48)" : "var(--color-success)" }}>
+            <ITText as="span" style={{ color: damaged > 0 ? "var(--color-danger, #e11d48)" : "var(--color-success)" }}>
               <Big value={damaged} />
-            </span>
+            </ITText>
           }
           caption={t("adminDashboard.damagedOfTotal", { total: summary.materialOutputs.total })}
           onClick={() => navigate("/inventory/movements")}
         >
           {damaged === 0 && (
-            <span className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[color:var(--color-success)]">
+            <ITText as="span" className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[color:var(--color-success)]">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m4 12 5 5L20 6" />
               </svg>
               {t("adminDashboard.noDamage")}
-            </span>
+            </ITText>
           )}
         </ITBentoTile>
 
@@ -219,24 +218,24 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
           icon={<LuListChecks size={15} />}
         >
           <div className="flex h-full min-h-0 items-center gap-3">
-            <div className="shrink-0">
-              <h3 className="it-bento-tile__label">
+            <ITFlex className="shrink-0">
+              <ITText as="h3" className="it-bento-tile__label">
                 <LuListChecks size={15} />
                 {t("adminDashboard.resolvedTickets")}
-              </h3>
+              </ITText>
               <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="it-bento-tile__value">
+                <ITText as="span" className="it-bento-tile__value">
                   <Big value={resolvedTasks} />
-                </span>
-                <span className="text-[15px] font-semibold opacity-60">/ {tasksTotal}</span>
+                </ITText>
+                <ITText as="span" className="text-[15px] font-semibold opacity-60">/ {tasksTotal}</ITText>
               </div>
-            </div>
+            </ITFlex>
             <div className="max-h-[42px] min-h-0 flex-1">
               <ITBentoSegments total={tasksTotal} done={resolvedTasks} color="var(--color-success)" />
             </div>
             <div className="shrink-0 text-right">
               <div className="it-bento-tile__value !text-[22px]">{pendingTasks}</div>
-              <small className="it-bento-tile__caption">{t("adminDashboard.pendingLabel")}</small>
+              <ITText as="small" className="it-bento-tile__caption">{t("adminDashboard.pendingLabel")}</ITText>
             </div>
           </div>
         </ITBentoTile>
@@ -258,26 +257,26 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
           onClick={() => navigate("/tickets")}
         >
           {efficiencySegments.length === 0 ? (
-            <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noEfficiency")}</p>
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noEfficiency")}</ITText>
           ) : (
             <div className="mt-2 flex items-center gap-3.5">
-              <div className="shrink-0">
+              <ITFlex className="shrink-0">
                 <ITBentoDonut
                   size={132}
                   segments={efficiencySegments}
                   center={<Big value={efficiencyTotal} />}
                   caption={t("adminDashboard.resolvedCaption")}
                 />
-              </div>
+              </ITFlex>
               <div className="grid min-w-0 flex-1 gap-2.5">
                 {efficiencySegments.slice(0, 4).map((sec) => {
                   const pct = efficiencyTotal > 0 ? Math.round((sec.value / efficiencyTotal) * 100) : 0;
                   return (
                     <div key={sec.label} className="grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 text-[12.5px] font-medium">
-                      <span className="truncate">{sec.label}</span>
-                      <span>
-                        {sec.value} <span className="opacity-60">{pct}%</span>
-                      </span>
+                      <ITText as="span" className="truncate">{sec.label}</ITText>
+                      <ITText as="span">
+                        {sec.value} <ITText as="span" className="opacity-60">{pct}%</ITText>
+                      </ITText>
                       <div className="it-bento-bar col-span-2">
                         <i style={{ "--it-bento-w": `${pct}%`, background: sec.color } as React.CSSProperties} />
                       </div>
@@ -306,16 +305,16 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
           onClick={() => navigate("/inventory/device-types")}
         >
           {categories.length === 0 ? (
-            <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noCategories")}</p>
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noCategories")}</ITText>
           ) : (
             <div className="it-bento-bars mt-4 flex-1 content-around">
               {categories.map((row) => (
                 <div key={row.label} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
                   <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
-                  <span className="truncate lowercase first-letter:uppercase">{row.label}</span>
-                  <span>
-                    {row.value} <span className="opacity-60">{Math.round((row.value / Math.max(1, categoryTotal)) * 100)}%</span>
-                  </span>
+                  <ITText as="span" className="truncate lowercase first-letter:uppercase">{row.label}</ITText>
+                  <ITText as="span">
+                    {row.value} <ITText as="span" className="opacity-60">{Math.round((row.value / Math.max(1, categoryTotal)) * 100)}%</ITText>
+                  </ITText>
                   <div className="it-bento-bar col-span-3">
                     <i style={{ "--it-bento-w": `${(row.value / categoryMax) * 100}%`, background: row.color } as React.CSSProperties} />
                   </div>
@@ -328,7 +327,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
         {/* Actividad reciente */}
         <ITBentoTile cols={4} rows={4} wide icon={<LuActivity size={15} />} label={t("adminDashboard.recentActivity")}>
           {activityGroups.length === 0 ? (
-            <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noActivity")}</p>
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noActivity")}</ITText>
           ) : (
             <div className="mt-1 min-h-0 flex-1">
               <ITBentoFeed

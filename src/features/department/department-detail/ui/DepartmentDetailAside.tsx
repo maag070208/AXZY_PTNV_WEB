@@ -34,9 +34,9 @@ function AsideSection({
             {title}
           </ITText>
         </ITFlex>
-        <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-black shrink-0">
+        <ITText as="span" className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-black shrink-0">
           {count}
-        </span>
+        </ITText>
       </ITFlex>
       {children}
     </div>

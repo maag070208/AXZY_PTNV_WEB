@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ITBentoSegments, ITCard } from "@axzydev/axzy_ui_system";
+import { ITBentoSegments, ITCard, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 
 interface Props {
@@ -25,12 +25,12 @@ export default function LiveSummary({ title, total = 0, done = 0, children, foot
   const { t } = useTranslation("common");
   return (
     <ITCard className={`self-start lg:sticky lg:top-4 ${className}`}>
-      <h3 className="m-0 mb-3 !text-[16px] font-bold !text-slate-800">{title ?? t("liveSummary.title")}</h3>
-      {children && <div className="flex flex-col gap-2.5">{children}</div>}
+      <ITText as="h3" className="m-0 mb-3 !text-[16px] font-bold !text-slate-800">{title ?? t("liveSummary.title")}</ITText>
+      {children && <ITStack spacing={2.5}>{children}</ITStack>}
       {total > 0 && (
         <div className={`${children ? "mt-4" : ""} flex flex-col gap-1.5`}>
           <ITBentoSegments total={total} done={done} />
-          <p className="m-0 text-[11.5px] text-slate-500">{t("liveSummary.progress", { done, total })}</p>
+          <ITText className="m-0 text-[11.5px] text-slate-500">{t("liveSummary.progress", { done, total })}</ITText>
         </div>
       )}
       {footer && <div className="mt-4">{footer}</div>}
@@ -43,8 +43,8 @@ export function LiveSummaryRow({ label, value }: { label: string; value?: ReactN
   const empty = value === undefined || value === null || value === "";
   return (
     <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
-      <span className="shrink-0 text-slate-500">{label}</span>
-      <span className={`min-w-0 text-right font-semibold ${empty ? "text-slate-400" : "text-slate-800"}`}>{empty ? "—" : value}</span>
+      <ITText as="span" className="shrink-0 text-slate-500">{label}</ITText>
+      <ITText as="span" className={`min-w-0 text-right font-semibold ${empty ? "text-slate-400" : "text-slate-800"}`}>{empty ? "—" : value}</ITText>
     </div>
   );
 }

@@ -209,3 +209,22 @@ html {
     animation: none;
   }
 }
+
+/* Emojis de temporada que caen dentro del panel de ayuda de Langostín. */
+@keyframes help-fall {
+  to {
+    transform: translateY(620px) rotate(220deg);
+  }
+}
+
+.help-fall {
+  animation-name: help-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .help-fall {
+    display: none;
+  }
+}

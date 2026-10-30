@@ -13,8 +13,7 @@ import {
   ITInput,
   ITPage,
   ITText,
-  type Column,
-} from "@axzydev/axzy_ui_system";
+  type Column, ITStack } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaPlus, FaTag } from "react-icons/fa";
 import { LuListChecks, LuSearch, LuTag } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
@@ -235,7 +234,7 @@ export default function DeviceTypesPage() {
         sortable: true,
         render: (tp: DeviceType) => (
           <ITFlex align="center" gap={2} className="min-w-0">
-            <span
+            <ITText as="span"
               aria-hidden
               className="h-2.5 w-2.5 shrink-0 rounded-[3px]"
               style={{ background: seriesColor((types ?? []).findIndex((x) => x.id === tp.id) % 7) }}
@@ -393,7 +392,7 @@ export default function DeviceTypesPage() {
           action={canManage ? newButton : undefined}
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <ITStack spacing={3}>
           {/* Resumen: una sola tarjeta con las cuatro cifras separadas por línea. */}
           <ITCard contentClassName="!p-0">
             <ITFlex className="!grid grid-cols-2 md:!grid-cols-4">
@@ -491,7 +490,7 @@ export default function DeviceTypesPage() {
               </ITFlex>
             </ITButton>
           )}
-        </div>
+        </ITStack>
       )}
 
       {/* M2: alta y edición en el mismo diálogo, con resumen vivo a la derecha. */}
@@ -514,7 +513,7 @@ export default function DeviceTypesPage() {
         <div className="max-h-[62vh] overflow-y-auto pr-1">
           <ITGrid container columns={12} spacing={4} className="items-start">
             <ITGrid item xs={12} lg={8}>
-              <div className="flex flex-col gap-4">
+              <ITStack spacing={4}>
                 <FormSection
                   number={1}
                   title={t("types.sectionIdentity")}
@@ -593,7 +592,7 @@ export default function DeviceTypesPage() {
                     </ITGrid>
                   </ITGrid>
                 </FormSection>
-              </div>
+              </ITStack>
             </ITGrid>
 
             <ITGrid item xs={12} lg={4}>

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useITBentoCountUp } from "@axzydev/axzy_ui_system";
+import { useITBentoCountUp, ITText } from "@axzydev/axzy_ui_system";
 
 /** Número que sube de 0 al valor al montar (mismo comportamiento del inicio). */
 export function Num({ value, decimals = 0 }: { value: number; decimals?: number }) {
@@ -60,10 +60,10 @@ export default function MiniStat({ label, value, color, outline = false, onClick
           }}
         />
       )}
-      <p className="m-0 text-[11.5px] font-semibold leading-tight" style={{ color: `color-mix(in srgb, ${color} 62%, #0f172a)` }}>
+      <ITText className="m-0 text-[11.5px] font-semibold leading-tight" style={{ color: `color-mix(in srgb, ${color} 62%, #0f172a)` }}>
         {label}
-      </p>
-      <p className="m-0 mt-2 text-[28px] font-extrabold leading-none tabular-nums text-slate-900">{value}</p>
+      </ITText>
+      <ITText className="m-0 mt-2 text-[28px] font-extrabold leading-none tabular-nums text-slate-900">{value}</ITText>
     </div>
   );
 }

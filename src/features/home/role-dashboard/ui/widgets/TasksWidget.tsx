@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ITBadget } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITText } from "@axzydev/axzy_ui_system";
 import { LuCircleCheckBig, LuClock, LuEye, LuListChecks, LuPlay } from "react-icons/lu";
 import { dashboardApi } from "@entities/dashboard";
 import { dyn } from "@shared/i18n/dyn";
@@ -43,14 +43,14 @@ export default function TasksWidget() {
             />
           </MetricGrid>
           <SectionLabel>
-            <span className="flex items-center gap-2">
+            <ITText as="span" className="flex items-center gap-2">
               {t("tasks.overdue")}
               {data.overdue.length > 0 && (
-                <span className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-danger)]">
+                <ITText as="span" className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-danger)]">
                   {data.overdue.length}
-                </span>
+                </ITText>
               )}
-            </span>
+            </ITText>
           </SectionLabel>
           {data.overdue.length === 0 ? (
             <EmptyText>{t("empty")}</EmptyText>

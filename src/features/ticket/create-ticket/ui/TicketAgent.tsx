@@ -1,4 +1,4 @@
-import { FileTypeEnum, ITCard, ITDropfile, ITGrid, ITSearchSelect, ITTextarea } from "@axzydev/axzy_ui_system";
+import { FileTypeEnum, ITCard, ITDropfile, ITGrid, ITSearchSelect, ITTextarea, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -170,9 +170,9 @@ export default function TicketAgent({
     switch (agent.step) {
       case "category":
         return (
-          <div className="flex flex-wrap gap-2">
+          <ITFlex wrap="wrap" gap={2}>
             {categories.length === 0 && (
-              <span className="text-xs text-slate-400">{t("new.agent.loadingCategories")}</span>
+              <ITText as="span" className="text-xs text-slate-400">{t("new.agent.loadingCategories")}</ITText>
             )}
             {categories.map((c, i) => {
               const style = CATEGORY_STYLES[c.name] ?? DEFAULT_CATEGORY_STYLE;
@@ -186,11 +186,11 @@ export default function TicketAgent({
                 />
               );
             })}
-          </div>
+          </ITFlex>
         );
       case "detail":
         return (
-          <div className="flex flex-wrap gap-2">
+          <ITFlex wrap="wrap" gap={2}>
             {SYMPTOM_KEYS.map((key, i) => (
               <OptionChip
                 key={key}
@@ -200,13 +200,13 @@ export default function TicketAgent({
                 onClick={() => agent.pickSymptom(suggestionsLabel(key))}
               />
             ))}
-          </div>
+          </ITFlex>
         );
       case "where":
         return (
-          <div className="flex flex-wrap gap-2">
+          <ITFlex wrap="wrap" gap={2}>
             {agent.departments.length === 0 && (
-              <span className="text-xs text-slate-400">{t("new.agent.noDepartments")}</span>
+              <ITText as="span" className="text-xs text-slate-400">{t("new.agent.noDepartments")}</ITText>
             )}
             {agent.departments.map((d, i) => (
               <OptionChip
@@ -218,11 +218,11 @@ export default function TicketAgent({
               />
             ))}
             <OptionChip emoji={skipStyle.emoji} label={t("new.agent.skip")} onClick={agent.skipDepartment} />
-          </div>
+          </ITFlex>
         );
       case "urgency":
         return (
-          <div className="flex flex-wrap gap-2">
+          <ITFlex wrap="wrap" gap={2}>
             {PRIORITIES.map((p, i) => (
               <OptionChip
                 key={p.value}
@@ -232,11 +232,11 @@ export default function TicketAgent({
                 onClick={() => agent.pickPriority(p.value)}
               />
             ))}
-          </div>
+          </ITFlex>
         );
       case "evidence":
         return (
-          <div className="flex flex-col gap-3">
+          <ITStack spacing={3}>
             <ITDropfile
               key={agent.dropfileKey}
               onFileSelect={() => {}}
@@ -250,16 +250,16 @@ export default function TicketAgent({
               showStatusBadge
               containerClassName="!mt-0"
             />
-            <div className="flex justify-end">
+            <ITFlex justify="end">
               <button type="button" onClick={agent.finishEvidence} className={primaryButton} style={primaryStyle}>
                 {files.length > 0 ? t("new.agent.continue") : t("new.agent.noEvidence")}
               </button>
-            </div>
-          </div>
+            </ITFlex>
+          </ITStack>
         );
       case "notes":
         return (
-          <div className="flex flex-col gap-3">
+          <ITStack spacing={3}>
             <ITTextarea
               name="agentNotes"
               value={notesDraft}
@@ -268,7 +268,7 @@ export default function TicketAgent({
               rows={3}
               placeholder={t("new.agent.notesPlaceholder")}
             />
-            <div className="flex justify-end gap-2">
+            <ITFlex justify="end" gap={2}>
               <button type="button" className={secondaryButton} style={secondaryStyle} onClick={() => agent.sendNotes("")}>
                 {t("new.agent.noNotes")}
               </button>
@@ -281,14 +281,14 @@ export default function TicketAgent({
               >
                 {t("new.agent.sendNote")}
               </button>
-            </div>
-          </div>
+            </ITFlex>
+          </ITStack>
         );
       case "requester":
         if (agent.forOthers) {
           return (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-slate-500">{t("new.agent.whoRequested")}</p>
+            <ITStack spacing={2}>
+              <ITText className="text-xs text-slate-500">{t("new.agent.whoRequested")}</ITText>
               <ITSearchSelect
                 name="requester"
                 placeholder={t("new.agent.searchPerson")}
@@ -303,14 +303,14 @@ export default function TicketAgent({
                 }}
                 className="w-full"
               />
-            </div>
+            </ITStack>
           );
         }
         return (
-          <div className="flex flex-wrap gap-2">
+          <ITFlex wrap="wrap" gap={2}>
             <OptionChip emoji="🙋" label={t("new.agent.forMe")} onClick={agent.keepAsMine} />
             <OptionChip emoji="📞" label={t("new.agent.forOther")} onClick={agent.askWhoRequested} />
-          </div>
+          </ITFlex>
         );
       default:
         return null;
@@ -322,17 +322,17 @@ export default function TicketAgent({
       <ITGrid item xs={12} lg={7}>
         <ITCard className="flex h-[min(72vh,680px)] min-h-[480px] flex-col overflow-hidden !p-0">
           <header className="flex items-center justify-between gap-3 px-5 py-4">
-            <div className="flex items-center gap-3">
+            <ITFlex align="center" gap={3}>
               <LangostinAvatar anim="idle" size={36} animated={false} />
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-slate-900">{t("new.agent.name")}</span>
-                <span className="text-[11px] text-slate-400">{t("new.agent.helper")}</span>
-                <span className="flex items-center gap-1.5 text-xs font-medium text-[color:var(--color-success)]">
+              <ITStack>
+                <ITText as="span" className="text-sm font-semibold text-slate-900">{t("new.agent.name")}</ITText>
+                <ITText as="span" className="text-[11px] text-slate-400">{t("new.agent.helper")}</ITText>
+                <ITText as="span" className="flex items-center gap-1.5 text-xs font-medium text-[color:var(--color-success)]">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-[color:var(--color-success)]" />
                   {t("new.agent.online")}
-                </span>
-              </div>
-            </div>
+                </ITText>
+              </ITStack>
+            </ITFlex>
             <button
               type="button"
               onClick={() => {
@@ -367,14 +367,14 @@ export default function TicketAgent({
                     ) : (
                       <span className="w-9 shrink-0" aria-hidden />
                     ))}
-                  <p
+                  <ITText
                     className={`max-w-[80%] whitespace-pre-line rounded-[20px] px-4 py-2.5 text-sm leading-6 ${
                       m.from === "user" ? "rounded-br-md" : "rounded-bl-md bg-[var(--it-card-bg)] text-slate-800"
                     }`}
                     style={m.from === "user" ? primaryStyle : undefined}
                   >
                     {m.text}
-                  </p>
+                  </ITText>
                 </div>
               );
             })}
@@ -382,7 +382,7 @@ export default function TicketAgent({
             {agent.typing && (
               <div className="agent-bubble flex items-end gap-2">
                 <LangostinAvatar anim="think" />
-                <span className="flex gap-1 rounded-[20px] rounded-bl-md bg-[var(--it-card-bg)] px-4 py-3">
+                <ITText as="span" className="flex gap-1 rounded-[20px] rounded-bl-md bg-[var(--it-card-bg)] px-4 py-3">
                   {[0, 1, 2].map((i) => (
                     <span
                       key={i}
@@ -390,8 +390,8 @@ export default function TicketAgent({
                       style={{ animationDelay: `${i * 150}ms` }}
                     />
                   ))}
-                  <span className="sr-only">{t("new.agent.typing")}</span>
-                </span>
+                  <ITText as="span" className="sr-only">{t("new.agent.typing")}</ITText>
+                </ITText>
               </div>
             )}
 
@@ -399,17 +399,17 @@ export default function TicketAgent({
               <div className="agent-bubble flex items-end gap-2">
                 <LangostinAvatar anim={mascot} />
                 <div className="flex max-w-[92%] flex-col gap-3 rounded-[20px] rounded-bl-md bg-[var(--it-card-bg)] p-4">
-                  <p key={guideKey} className="agent-pop flex items-center gap-2 text-xs text-slate-500">
+                  <ITText key={guideKey} className="agent-pop flex items-center gap-2 text-xs text-slate-500">
                     {isOptionStep && sendAnim === null && (
-                      <span
+                      <ITText as="span"
                         className="rounded-full px-2 py-0.5 font-semibold"
                         style={secondaryStyle}
                       >
                         {t("new.guide.step", { current: stepNumber, total: agent.steps.length })}
-                      </span>
+                      </ITText>
                     )}
-                    <span>{t(`new.guide.${guideKey}`)}</span>
-                  </p>
+                    <ITText as="span">{t(`new.guide.${guideKey}`)}</ITText>
+                  </ITText>
                   {isOptionStep && sendAnim === null && renderOptions()}
                   {isOptionStep && sendAnim === null && agent.canGoBack && (
                     <button

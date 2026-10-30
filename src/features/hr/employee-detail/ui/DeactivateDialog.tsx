@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITTextarea, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 

@@ -23,7 +23,7 @@ type Props = {
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col items-start gap-1 py-3">
-      <span className="text-xs text-slate-500">{label}</span>
+      <ITText as="span" className="text-xs text-slate-500">{label}</ITText>
       {children}
     </div>
   );
@@ -110,39 +110,39 @@ export default function TicketDetailModal({
                           >
                             <ProfileAvatar name={t.user.name} size="sm" />
 
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-baseline gap-1.5 min-w-0">
-                                <span className="text-[13px] font-semibold text-slate-800 truncate">
+                            <ITFlex className="min-w-0 flex-1">
+                              <ITFlex align="baseline" gap={1.5} className="min-w-0">
+                                <ITText as="span" className="text-[13px] font-semibold text-slate-800 truncate">
                                   {t.title}
-                                </span>
+                                </ITText>
                                 {t.description ? (
-                                  <span className="text-xs text-slate-500 min-w-0 flex-1 truncate">
+                                  <ITText as="span" className="text-xs text-slate-500 min-w-0 flex-1 truncate">
                                     — {t.description}
-                                  </span>
+                                  </ITText>
                                 ) : null}
-                              </div>
+                              </ITFlex>
 
                               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-400">
-                                <span>{t.user.name}</span>
+                                <ITText as="span">{t.user.name}</ITText>
                                 {t.startDate && (
-                                  <span className="inline-flex items-center gap-1">
+                                  <ITText as="span" className="inline-flex items-center gap-1">
                                     <LuCalendarDays size={12} />
                                     {tt("detail.startShort")} {formatDate(t.startDate)}
-                                  </span>
+                                  </ITText>
                                 )}
                                 {t.dueDate && (
-                                  <span
+                                  <ITText as="span"
                                     className={`inline-flex items-center gap-1 ${overdue ? "font-semibold text-[color:var(--color-danger)]" : ""}`}
                                   >
                                     <LuCalendarDays size={12} />
                                     {tt("detail.dueShort")} {formatDate(t.dueDate)}
-                                  </span>
+                                  </ITText>
                                 )}
                                 {t.comments && t.comments.length > 0 && (
-                                  <span className="inline-flex items-center gap-1">
+                                  <ITText as="span" className="inline-flex items-center gap-1">
                                     <LuMessageSquare size={12} />
                                     {tt("detail.assignmentComments", { count: t.comments.length })}
-                                  </span>
+                                  </ITText>
                                 )}
                               </div>
 
@@ -154,7 +154,7 @@ export default function TicketDetailModal({
                                   canUpload={canManage || t.userId === currentUserId}
                                 />
                               </div>
-                            </div>
+                            </ITFlex>
 
                             <TicketChip tone={ASSIGNMENT_TONE[t.status]} label={dyn(tt)(`detail.taskStatusOptions.${t.status}`)} />
                           </div>
@@ -180,19 +180,19 @@ export default function TicketDetailModal({
                 </ITButton>
 
                 <DetailRow label={tt("detail.createdByLabel")}>
-                  <span className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <ITText as="span" className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                     <ProfileAvatar name={ticket.createdBy?.name ?? "—"} size="xs" />
                     {ticket.createdBy?.name}
-                  </span>
+                  </ITText>
                 </DetailRow>
                 <DetailRow label={tt("detail.assignedTo")}>
                   {ticket.assignedTo ? (
-                    <span className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <ITText as="span" className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                       <ProfileAvatar name={ticket.assignedTo.name} size="xs" />
                       {ticket.assignedTo.name}
-                    </span>
+                    </ITText>
                   ) : (
-                    <span className="text-sm text-slate-400">{tt("detail.unassigned")}</span>
+                    <ITText as="span" className="text-sm text-slate-400">{tt("detail.unassigned")}</ITText>
                   )}
                 </DetailRow>
               </aside>

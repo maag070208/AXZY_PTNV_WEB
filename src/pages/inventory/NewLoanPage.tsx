@@ -7,8 +7,7 @@ import {
   ITInput,
   ITPage,
   ITSearchSelect,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaFileSignature } from "react-icons/fa";
 import { LuFileText, LuMessageCircle, LuPackageOpen, LuUser } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
@@ -237,7 +236,7 @@ export default function NewLoanPage() {
         />
       ) : (
       <>
-      <div className="flex justify-end">
+      <ITFlex justify="end">
         <ITButton variant="text" color="secondary" size="sm" onClick={() => {
             // El chat arranca limpio: no hereda lo que quedó a medias en el formulario.
             setAssignment("EMPLOYEE");
@@ -250,10 +249,10 @@ export default function NewLoanPage() {
           }} disabled={saving}>
           <ITFlex align="center" gap={1}>
             <LuMessageCircle size={14} />
-            <span className="text-[11px] font-bold">{t("loans.agent.useChat")}</span>
+            <ITText as="span" className="text-[11px] font-bold">{t("loans.agent.useChat")}</ITText>
           </ITFlex>
         </ITButton>
-      </div>
+      </ITFlex>
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
           <FormSection
@@ -263,7 +262,7 @@ export default function NewLoanPage() {
             description={t("loans.sectionWhoHint")}
             complete={whoDone}
           >
-            <div className="flex flex-col gap-4">
+            <ITStack spacing={4}>
               {/* Asignación a personal o departamento */}
               <ITFlex as="fieldset" direction="column" gap={2}>
                 <ITSearchSelect
@@ -309,7 +308,7 @@ export default function NewLoanPage() {
                   )}
                 </>
               )}
-            </div>
+            </ITStack>
           </FormSection>
 
           <FormSection

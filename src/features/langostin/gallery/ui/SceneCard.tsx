@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { FaCheck } from "react-icons/fa";
 import { Escena, type LangostinAnim, type LangostinScene } from "@shared/ui/langostin";
 import { dyn } from "@shared/i18n/dyn";
+import { ITText, ITFlex } from "@axzydev/axzy_ui_system";
 
 interface Props {
   scene: LangostinScene;
@@ -47,11 +48,11 @@ export default function SceneCard({
         />
       </div>
       <div className="flex flex-col gap-1 p-3">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[13px] font-bold text-slate-900">{d(`scenes.${scene}.name`)}</span>
+        <ITFlex align="center" gap={1.5}>
+          <ITText as="span" className="text-[13px] font-bold text-slate-900">{d(`scenes.${scene}.name`)}</ITText>
           {selected && <FaCheck size={10} className="text-primary-500" />}
-        </div>
-        <p className="text-[11px] text-slate-500">{d(`scenes.${scene}.idea`)}</p>
+        </ITFlex>
+        <ITText className="text-[11px] text-slate-500">{d(`scenes.${scene}.idea`)}</ITText>
         <button
           type="button"
           onClick={(e) => {

@@ -16,7 +16,7 @@ import type { Column } from "@axzydev/axzy_ui_system";
 import type { DeviceReportRow } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
 import { Num } from "@shared/ui/bento-bits";
-import ReportPeriodBar from "../../ui/ReportPeriodBar";
+import { ReportPeriodBar } from "@shared/ui/report-period-bar";
 
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const navigate = useNavigate();

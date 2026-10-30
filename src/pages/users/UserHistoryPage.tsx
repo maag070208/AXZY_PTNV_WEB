@@ -1,5 +1,5 @@
 import { useMemo, type CSSProperties } from "react";
-import { ITBentoDonut, ITBentoGrid, ITBentoTile, ITBentoWaves, ITPage } from "@axzydev/axzy_ui_system";
+import { ITBentoDonut, ITBentoGrid, ITBentoTile, ITBentoWaves, ITPage, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import { LuCalendarDays, LuChartPie, LuHistory, LuPackage, LuShieldCheck, LuTicket, LuUserCog, LuUserRound } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -158,7 +158,7 @@ export default function UserHistoryPage() {
           icon={<LuCalendarDays size={15} />}
           label={tt("history.daysWithActivity")}
           value={<Num value={stats.days} />}
-          aside={lastActivity ? <span className="text-[11px] tabular-nums opacity-70">{lastActivity}</span> : undefined}
+          aside={lastActivity ? <ITText as="span" className="text-[11px] tabular-nums opacity-70">{lastActivity}</ITText> : undefined}
         />
 
         {total === 0 ? (
@@ -173,24 +173,24 @@ export default function UserHistoryPage() {
 
             <ITBentoTile cols={5} rows={6} wide icon={<LuChartPie size={15} />} label={tt("history.distribution")}>
               <div className="mt-2 flex min-h-0 flex-1 flex-col gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="shrink-0">
+                <ITFlex align="center" gap={3.5}>
+                  <ITFlex className="shrink-0">
                     <ITBentoDonut
                       size={148}
                       segments={segments}
                       center={<Num value={total} />}
                       caption={tt("history.eventsShort")}
                     />
-                  </div>
+                  </ITFlex>
                   <div className="grid min-w-0 flex-1 gap-2.5">
                     {segments.map((segment) => {
                       const share = pct(segment.value);
                       return (
                         <div key={segment.label} className="grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 text-[12.5px] font-medium">
-                          <span className="truncate">{segment.label}</span>
-                          <span className="tabular-nums">
-                            {segment.value} <span className="opacity-60">{share}%</span>
-                          </span>
+                          <ITText as="span" className="truncate">{segment.label}</ITText>
+                          <ITText as="span" className="tabular-nums">
+                            {segment.value} <ITText as="span" className="opacity-60">{share}%</ITText>
+                          </ITText>
                           <div className="it-bento-bar col-span-2">
                             <i style={{ "--it-bento-w": `${share}%`, background: segment.color } as CSSProperties} />
                           </div>
@@ -198,16 +198,16 @@ export default function UserHistoryPage() {
                       );
                     })}
                   </div>
-                </div>
+                </ITFlex>
 
                 <div className="flex min-h-0 flex-col gap-1 overflow-y-auto">
-                  <p className="m-0 text-[11.5px] font-semibold" style={{ color: "var(--it-bento-muted)" }}>
+                  <ITText className="m-0 text-[11.5px] font-semibold" style={{ color: "var(--it-bento-muted)" }}>
                     {tt("history.byType")}
-                  </p>
+                  </ITText>
                   {typeRows.map(([type, row]) => (
                     <div key={type} className="flex items-baseline justify-between gap-2 text-[12px]">
-                      <span className="truncate">{row.title}</span>
-                      <span className="shrink-0 tabular-nums opacity-60">{row.count}</span>
+                      <ITText as="span" className="truncate">{row.title}</ITText>
+                      <ITText as="span" className="shrink-0 tabular-nums opacity-60">{row.count}</ITText>
                     </div>
                   ))}
                 </div>

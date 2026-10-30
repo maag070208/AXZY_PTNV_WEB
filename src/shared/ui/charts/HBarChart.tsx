@@ -1,3 +1,4 @@
+import { ITText } from "@axzydev/axzy_ui_system";
 interface Row {
   label: string;
   value: number;
@@ -32,18 +33,18 @@ export default function HBarChart({ rows, color = "var(--color-primary)", max = 
           className="group grid grid-cols-[minmax(0,9rem)_1fr_auto] items-center gap-2 rounded px-1 hover:bg-[color:var(--it-bento-control-bg,#f8fafc)]"
           title={`${r.label}: ${r.value}${unit ? ` ${unit}` : ""}`}
         >
-          <span className="truncate text-[10px] font-bold text-slate-600">{r.label}</span>
+          <ITText as="span" className="truncate text-[10px] font-bold text-slate-600">{r.label}</ITText>
           <div className="h-2 rounded-r" style={{ backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)` }}>
             <div
               className="h-2 rounded-r transition-opacity group-hover:opacity-80"
               style={{ width: `${top ? Math.max((r.value / top) * 100, 2) : 0}%`, backgroundColor: color }}
             />
           </div>
-          <span className="text-[10px] font-black text-slate-700">{r.value}</span>
+          <ITText as="span" className="text-[10px] font-black text-slate-700">{r.value}</ITText>
         </div>
       ))}
       {sorted.length > max && moreLabel && (
-        <span className="px-1 text-[9px] font-bold text-slate-400">{moreLabel(sorted.length - max)}</span>
+        <ITText as="span" className="px-1 text-[9px] font-bold text-slate-400">{moreLabel(sorted.length - max)}</ITText>
       )}
     </div>
   );

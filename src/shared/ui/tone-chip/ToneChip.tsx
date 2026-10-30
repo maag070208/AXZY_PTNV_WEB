@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 export type ToneChipTone =
   | "neutral"
@@ -39,7 +40,7 @@ export default function ToneChip({ label, tone = "neutral", size = "sm", icon, d
   // Fondo del kit (`--color-<tono>-soft`) si existe; si no, el tono al 16 %.
   const background = tone === "neutral" ? mix : `var(--color-${tone}-soft, ${mix})`;
   return (
-    <span
+    <ITText as="span"
       className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full font-semibold ${SIZE[size]} ${className}`}
       style={{
         background,
@@ -51,6 +52,6 @@ export default function ToneChip({ label, tone = "neutral", size = "sm", icon, d
           <span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
         ) : null)}
       {label}
-    </span>
+    </ITText>
   );
 }

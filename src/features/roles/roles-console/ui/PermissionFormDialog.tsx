@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ITButton, ITCheckbox, ITDialog, ITInput, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITButton, ITCheckbox, ITDialog, ITInput, ITTextarea, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { CatalogCreateDto, CatalogUpdateDto, PermissionCatalog } from "@entities/permission";
@@ -150,8 +150,8 @@ export default function PermissionFormDialog({ isOpen, permission, modules, savi
       title={permission ? t("catalog.editTitle") : t("catalog.createTitle")}
       useFormHeader
     >
-      <div className="flex flex-col gap-4">
-        {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-[11px] font-semibold text-rose-700">{error}</p>}
+      <ITStack spacing={4}>
+        {error && <ITText className="rounded-lg bg-rose-50 px-3 py-2 text-[11px] font-semibold text-rose-700">{error}</ITText>}
 
         <DialogSection step={1} title={t("catalog.wizard.name")} hint={t("catalog.wizard.nameHint")}>
           <ITInput
@@ -254,7 +254,7 @@ export default function PermissionFormDialog({ isOpen, permission, modules, savi
                   onChange={(event) => update({ key: event.target.value.toLowerCase() })}
                 />
                 <FieldError message={errors.key} />
-                <p className="mt-1 text-[10px] text-slate-400">{t("catalog.wizard.keyHint")}</p>
+                <ITText className="mt-1 text-[10px] text-slate-400">{t("catalog.wizard.keyHint")}</ITText>
               </div>
               <div>
                 <ITInput
@@ -272,15 +272,15 @@ export default function PermissionFormDialog({ isOpen, permission, modules, savi
 
         <DialogFooter>
           <ITButton variant="outlined" color="secondary" onClick={onClose}>
-            <span className="text-[11px] font-bold">{t("common:actions.cancel")}</span>
+            <ITText as="span" className="text-[11px] font-bold">{t("common:actions.cancel")}</ITText>
           </ITButton>
           <ITButton variant="filled" color="primary" onClick={handleSave} disabled={saving}>
-            <span className="text-[11px] font-bold">
+            <ITText as="span" className="text-[11px] font-bold">
               {saving ? t("catalog.saving") : permission ? t("roleDialog.saveChanges") : t("catalog.wizard.create")}
-            </span>
+            </ITText>
           </ITButton>
         </DialogFooter>
-      </div>
+      </ITStack>
     </ITDialog>
   );
 }

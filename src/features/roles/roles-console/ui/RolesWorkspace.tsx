@@ -1,4 +1,4 @@
-import { ITAlert, ITDialog, ITToast } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITToast, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaGavel, FaHistory, FaListUl, FaTable, FaUserShield, FaUsersCog } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { LottieLoader } from "@shared/ui/lottie-loader";
@@ -58,7 +58,7 @@ export default function RolesWorkspace({ workspace }: Props) {
   ];
 
   return (
-    <div className="flex flex-col gap-3">
+    <ITStack spacing={3}>
       <TabBar items={tabs} value={tab} onChange={setTab} />
 
       {admin.roleError && tab === "roles" && !workspace.roleDialog.open && (
@@ -84,7 +84,7 @@ export default function RolesWorkspace({ workspace }: Props) {
               notify={workspace.notify}
             />
           ) : (
-            <p className="py-16 text-center text-[12px] italic text-slate-400">{t("roleList.pick")}</p>
+            <ITText className="py-16 text-center text-[12px] italic text-slate-400">{t("roleList.pick")}</ITText>
           )}
         </div>
       )}
@@ -192,6 +192,6 @@ export default function RolesWorkspace({ workspace }: Props) {
           onClose={workspace.clearToast}
         />
       )}
-    </div>
+    </ITStack>
   );
 }

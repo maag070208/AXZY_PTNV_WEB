@@ -1,4 +1,4 @@
-import { useITAppearance } from "@axzydev/axzy_ui_system";
+import { useITAppearance, ITText } from "@axzydev/axzy_ui_system";
 import { TabBar, type TabBarItem } from "../tab-bar";
 
 export type FilterPillItem<T extends string> = Pick<TabBarItem<T>, "id" | "label" | "count" | "icon">;
@@ -45,7 +45,7 @@ export default function FilterPills<T extends string>({ items, value, onChange, 
           >
             {item.icon}
             {item.label}
-            {item.count !== undefined && <span className="text-[10px] tabular-nums opacity-70">{item.count}</span>}
+            {item.count !== undefined && <ITText as="span" className="text-[10px] tabular-nums opacity-70">{item.count}</ITText>}
           </button>
         );
       })}

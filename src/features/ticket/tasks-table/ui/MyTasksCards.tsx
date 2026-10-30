@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITButton, ITCard } from "@axzydev/axzy_ui_system";
+import { ITButton, ITCard, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { LuCalendarClock, LuMessageSquare, LuTicket } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -56,7 +56,7 @@ export default function MyTasksCards({ fx, onOpenBoard }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <ITStack spacing={5}>
       <FilterPills items={pills} value={filter} onChange={setFilter} />
 
       {visible.length === 0 ? (
@@ -66,10 +66,10 @@ export default function MyTasksCards({ fx, onOpenBoard }: Props) {
       ) : (
         DUE_GROUPS.filter((g) => groups[g].length > 0).map((g) => (
           <section key={g} className="flex flex-col gap-2.5">
-            <h3 className="m-0 flex items-center gap-2 text-[13px] font-bold text-slate-700">
+            <ITText as="h3" className="m-0 flex items-center gap-2 text-[13px] font-bold text-slate-700">
               {dyn(tt)(`mytasks.groups.${g}`)}
               <TicketChip label={String(groups[g].length)} tone={g === "overdue" ? "danger" : "neutral"} />
-            </h3>
+            </ITText>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {groups[g].map((a) => (
                 <TaskCard key={a.id} a={a} onOpen={() => navigate(`/tickets/${a.ticketId}`)} />
@@ -78,7 +78,7 @@ export default function MyTasksCards({ fx, onOpenBoard }: Props) {
           </section>
         ))
       )}
-    </div>
+    </ITStack>
   );
 }
 
@@ -102,20 +102,20 @@ function TaskCard({ a, onOpen }: { a: KanbanAssignment; onOpen: () => void }) {
     >
       <ITCard className="flex-1">
         <div className="flex h-full flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-1.5">
+          <ITFlex align="center" wrap="wrap" gap={1.5}>
             <TicketChip tone={ASSIGNMENT_TONE[a.status]} label={dyn(tt)(`detail.taskStatusOptions.${a.status}`)} />
             <TicketChip tone={PRIORITY_TONE[a.ticket.priority]} label={dyn(tt)(`priorityLabels.${a.ticket.priority}`)} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="m-0 text-[15px] font-bold leading-snug text-slate-800">{a.title}</p>
-            {a.description && <p className="m-0 mt-1 line-clamp-2 text-[12.5px] text-slate-500">{a.description}</p>}
-          </div>
-          <p className="m-0 flex items-center gap-1.5 truncate text-[12px] text-slate-500">
+          </ITFlex>
+          <ITFlex className="min-w-0 flex-1">
+            <ITText className="m-0 text-[15px] font-bold leading-snug text-slate-800">{a.title}</ITText>
+            {a.description && <ITText className="m-0 mt-1 line-clamp-2 text-[12.5px] text-slate-500">{a.description}</ITText>}
+          </ITFlex>
+          <ITText className="m-0 flex items-center gap-1.5 truncate text-[12px] text-slate-500">
             <LuTicket size={13} className="shrink-0" />
-            <span className="truncate">{a.ticket.title}</span>
-          </p>
+            <ITText as="span" className="truncate">{a.ticket.title}</ITText>
+          </ITText>
           <div className="flex items-center justify-between gap-2 text-[12px]">
-            <span
+            <ITText as="span"
               className={`flex items-center gap-1.5 font-semibold ${group === "overdue" ? "text-[color:var(--color-danger)]" : "text-slate-500"}`}
             >
               <LuCalendarClock size={14} />
@@ -126,12 +126,12 @@ function TaskCard({ a, onOpen }: { a: KanbanAssignment; onOpen: () => void }) {
                     ? tt("mytasks.overdueOn", { date: formatDate(a.dueDate) })
                     : tt("mytasks.dueOn", { date: formatDate(a.dueDate) })
                 : tt("mytasks.noDueDate")}
-            </span>
+            </ITText>
             {comments > 0 && (
-              <span className="flex items-center gap-1 text-slate-400">
+              <ITText as="span" className="flex items-center gap-1 text-slate-400">
                 <LuMessageSquare size={13} />
                 {comments}
-              </span>
+              </ITText>
             )}
           </div>
         </div>

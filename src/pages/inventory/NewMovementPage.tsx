@@ -9,8 +9,7 @@ import {
   ITInput,
   ITPage,
   ITSearchSelect,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
+  ITToast, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { LuArrowLeftRight, LuBoxes, LuCheck, LuInfo, LuPackageOpen, LuTrash2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import {
@@ -486,20 +485,20 @@ export default function NewMovementPage() {
               </div>
             )}
             <div className="flex flex-wrap gap-1.5 text-[11.5px] font-semibold">
-              <span
+              <ITText as="span"
                 className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
                 style={{ background: "color-mix(in srgb, currentColor 12%, transparent)" }}
               >
                 <LuBoxes size={12} />
                 {t("new.boardDevices", { count: selectedDevices.length })}
-              </span>
-              <span
+              </ITText>
+              <ITText as="span"
                 className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
                 style={{ background: "color-mix(in srgb, currentColor 12%, transparent)" }}
               >
                 <LuArrowLeftRight size={12} />
                 {t("new.boardTypes", { count: typeCount })}
-              </span>
+              </ITText>
             </div>
           </div>
         </ITBentoTile>
@@ -518,16 +517,16 @@ export default function NewMovementPage() {
               selectedDevices.length === 0 ? (
                 t("new.stockPick")
               ) : (
-                <span className="break-words">
+                <ITText as="span" className="break-words">
                   {selectedDevices.length === 1 ? selectedDevices[0].name : t("new.stockTitleMany", { count: selectedDevices.length })}
-                </span>
+                </ITText>
               )
             }
             aside={
               selectedDevices.length > 0 ? (
                 <div className="text-right">
                   <div className="it-bento-tile__value !text-[20px]">{stock.inMaintenance}</div>
-                  <small className="it-bento-tile__caption">{t("dashboard.maintenance")}</small>
+                  <ITText as="small" className="it-bento-tile__caption">{t("dashboard.maintenance")}</ITText>
                 </div>
               ) : undefined
             }
@@ -545,7 +544,7 @@ export default function NewMovementPage() {
             description={t("new.sectionRowHint")}
             complete={formComplete}
           >
-            <div className="flex flex-col gap-3">
+            <ITStack spacing={3}>
               {rows.map((r, idx) => {
                 const visible = visibleUnits(r);
                 const device = deviceOf(r);
@@ -558,13 +557,13 @@ export default function NewMovementPage() {
                     key={r.key}
                     className="flex flex-col gap-3 rounded-[16px] bg-[color-mix(in_srgb,currentColor_4%,transparent)] p-4"
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex min-w-0 flex-wrap items-center gap-2">
-                        <p className="m-0 text-[12px] font-semibold" style={{ color: "var(--color-text-muted)" }}>
+                    <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
+                      <ITFlex align="center" wrap="wrap" gap={2} className="min-w-0">
+                        <ITText className="m-0 text-[12px] font-semibold" style={{ color: "var(--color-text-muted)" }}>
                           {t("new.item")} {idx + 1}
-                        </p>
+                        </ITText>
                         {device && <StatusChip label={device.name} tone="primary" icon={<LuBoxes size={11} />} />}
-                      </div>
+                      </ITFlex>
                       {rows.length > 1 && (
                         <button
                           type="button"
@@ -579,11 +578,11 @@ export default function NewMovementPage() {
                           {t("common:actions.delete")}
                         </button>
                       )}
-                    </div>
+                    </ITFlex>
 
                     {/* El tipo primero: explica qué le pasa a las piezas y filtra la unidad. */}
-                    <div className="flex flex-col gap-2">
-                      <p className="m-0 text-[12px] font-semibold text-slate-700">{t("new.howLabel")}</p>
+                    <ITStack spacing={2}>
+                      <ITText className="m-0 text-[12px] font-semibold text-slate-700">{t("new.howLabel")}</ITText>
                       <div role="group" aria-label={t("new.howLabel")} className="flex flex-wrap gap-2">
                         {validTypes.map((tp) => {
                           const active = r.type === tp;
@@ -603,9 +602,9 @@ export default function NewMovementPage() {
                         })}
                       </div>
                       {!r.type ? (
-                        <p className="m-0 text-[12px]" style={{ color: "var(--color-text-muted)" }}>
+                        <ITText className="m-0 text-[12px]" style={{ color: "var(--color-text-muted)" }}>
                           {t("new.chooseType")}
-                        </p>
+                        </ITText>
                       ) : (
                         <InsightNote icon={<LuInfo size={13} />}>
                           {t(MOVEMENT_HINT_KEY[r.type as keyof typeof MOVEMENT_HINT_KEY])}
@@ -613,13 +612,13 @@ export default function NewMovementPage() {
                       )}
                       {r.type && validStatus && (
                         <div className="flex flex-wrap items-center gap-2 text-[11.5px]" style={{ color: "var(--color-text-muted)" }}>
-                          <span>{t("new.piecesStatus")}</span>
+                          <ITText as="span">{t("new.piecesStatus")}</ITText>
                           <StatusChip label={t(STATUS_LABEL_KEY[validStatus])} tone={STATUS_TONE[validStatus]} icon={<span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: `var(--color-${STATUS_TONE[validStatus]})` }} />} />
                         </div>
                       )}
-                    </div>
+                    </ITStack>
 
-                    <div className="flex flex-wrap gap-3">
+                    <ITFlex wrap="wrap" gap={3}>
                       <div className="min-w-[190px] flex-1">
                         <ITSearchSelect
                           name={`typeFilter-${r.key}`}
@@ -640,7 +639,7 @@ export default function NewMovementPage() {
                           onChange={(v) => selectDevice(r.key, String(v))}
                         />
                       </div>
-                    </div>
+                    </ITFlex>
 
                     {isEntry(r.type) ? (
                       <div>
@@ -658,9 +657,9 @@ export default function NewMovementPage() {
                           aria-invalid={!!errors[`quantity-${idx}`]}
                         />
                         {errors[`quantity-${idx}`] && (
-                          <span role="alert" className="mt-1 block text-xs" style={{ color: "var(--color-danger)" }}>
+                          <ITText as="span" role="alert" className="mt-1 block text-xs" style={{ color: "var(--color-danger)" }}>
                             {errors[`quantity-${idx}`]}
-                          </span>
+                          </ITText>
                         )}
                       </div>
                     ) : (
@@ -677,9 +676,9 @@ export default function NewMovementPage() {
                     )}
 
                     {r.deviceId && !isEntry(r.type) && !r.unitsLoading && visible.length === 0 && (
-                      <p className="m-0 text-[12px] font-semibold" style={{ color: "var(--color-warning)" }}>
+                      <ITText className="m-0 text-[12px] font-semibold" style={{ color: "var(--color-warning)" }}>
                         {t("new.withoutUnitsStatus")}
-                      </p>
+                      </ITText>
                     )}
 
                     {(r.type === "RETIREMENT" || r.type === "MAINTENANCE_IN" || isEntry(r.type)) && (
@@ -693,17 +692,17 @@ export default function NewMovementPage() {
                           aria-invalid={!!errors[`reason-${idx}`]}
                         />
                         {errors[`reason-${idx}`] && (
-                          <span role="alert" className="mt-1 block text-xs" style={{ color: "var(--color-danger)" }}>
+                          <ITText as="span" role="alert" className="mt-1 block text-xs" style={{ color: "var(--color-danger)" }}>
                             {errors[`reason-${idx}`]}
-                          </span>
+                          </ITText>
                         )}
                       </div>
                     )}
 
                     {r.type === "MAINTENANCE_OUT" && (
-                      <div className="flex flex-col gap-3">
-                        <div className="flex flex-col gap-2">
-                          <p className="m-0 text-[12px] font-semibold text-slate-700">{t("loanReturn.condition")}</p>
+                      <ITStack spacing={3}>
+                        <ITStack spacing={2}>
+                          <ITText className="m-0 text-[12px] font-semibold text-slate-700">{t("loanReturn.condition")}</ITText>
                           <div role="group" aria-label={t("loanReturn.condition")} className="flex flex-wrap gap-2">
                             {CONDITIONS.map((c) => {
                               const active = r.condition === c;
@@ -721,7 +720,7 @@ export default function NewMovementPage() {
                               );
                             })}
                           </div>
-                        </div>
+                        </ITStack>
                         <div>
                           <ITInput
                             name={`notes-${r.key}`}
@@ -731,17 +730,17 @@ export default function NewMovementPage() {
                             aria-invalid={!!errors[`notes-${idx}`]}
                           />
                           {errors[`notes-${idx}`] && (
-                            <span role="alert" className="mt-1 block text-xs" style={{ color: "var(--color-danger)" }}>
+                            <ITText as="span" role="alert" className="mt-1 block text-xs" style={{ color: "var(--color-danger)" }}>
                               {errors[`notes-${idx}`]}
-                            </span>
+                            </ITText>
                           )}
                         </div>
                         {r.condition === "BROKEN" && (
-                          <p className="m-0 text-[11.5px] font-semibold" style={{ color: "var(--color-danger)" }}>
+                          <ITText className="m-0 text-[11.5px] font-semibold" style={{ color: "var(--color-danger)" }}>
                             {t("loanReturn.brokenRetirementHint")}
-                          </p>
+                          </ITText>
                         )}
-                      </div>
+                      </ITStack>
                     )}
 
                     {/* Las piezas nuevas se identifican aquí mismo (serie, MAC, IP):
@@ -752,12 +751,12 @@ export default function NewMovementPage() {
                         className="flex flex-col gap-2 rounded-[14px] p-3"
                         style={{ background: "color-mix(in srgb, currentColor 4%, transparent)" }}
                       >
-                        <p className="m-0 text-[12px] font-semibold text-slate-700">
+                        <ITText className="m-0 text-[12px] font-semibold text-slate-700">
                           {t("new.identifyPieces", { count: r.quantity })}
-                        </p>
-                        <p className="m-0 text-[11.5px]" style={{ color: "var(--color-text-muted)" }}>
+                        </ITText>
+                        <ITText className="m-0 text-[11.5px]" style={{ color: "var(--color-text-muted)" }}>
                           {t("new.identifyPiecesHint")}
-                        </p>
+                        </ITText>
                         <UnitIdentityEditor
                           type={device?.type}
                           units={r.unitRows}
@@ -776,7 +775,7 @@ export default function NewMovementPage() {
                   + {t("new.addRow")}
                 </ITButton>
               </div>
-            </div>
+            </ITStack>
           </FormSection>
 
           {/* ② Cómo se registra: la API guarda un movimiento por tipo. */}
@@ -790,7 +789,7 @@ export default function NewMovementPage() {
             {createdMovements.length === 0 ? (
               <InsightNote icon={<LuInfo size={13} />}>{t("new.reviewEmpty")}</InsightNote>
             ) : (
-              <div className="flex flex-col gap-2">
+              <ITStack spacing={2}>
                 {createdMovements.map((tp) => {
                   const group = rows.filter((r) => r.type === tp);
                   const pieces = group.reduce((sum, r) => sum + (isEntry(tp) ? r.quantity : 1), 0);
@@ -800,19 +799,19 @@ export default function NewMovementPage() {
                       key={tp}
                       className="flex flex-wrap items-center justify-between gap-2 rounded-[14px] bg-[color-mix(in_srgb,currentColor_4%,transparent)] px-3 py-2"
                     >
-                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <ITFlex align="center" wrap="wrap" gap={2} className="min-w-0">
                         <StatusChip label={t(`typeLabels.${tp}`)} tone={TYPE_TONE[tp]} icon={<span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: `var(--color-${TYPE_TONE[tp]})` }} />} />
-                        <p className="m-0 min-w-0 truncate text-[12.5px] font-semibold text-slate-700">
+                        <ITText className="m-0 min-w-0 truncate text-[12.5px] font-semibold text-slate-700">
                           {names || t("new.summaryNoDevices")}
-                        </p>
-                      </div>
-                      <p className="m-0 shrink-0 text-[11.5px] font-semibold" style={{ color: "var(--color-text-muted)" }}>
+                        </ITText>
+                      </ITFlex>
+                      <ITText className="m-0 shrink-0 text-[11.5px] font-semibold" style={{ color: "var(--color-text-muted)" }}>
                         {t("new.quantityPieces", { count: pieces })}
-                      </p>
+                      </ITText>
                     </div>
                   );
                 })}
-              </div>
+              </ITStack>
             )}
           </FormSection>
         </div>
@@ -824,9 +823,9 @@ export default function NewMovementPage() {
           done={sectionsDone}
           footer={
             typeCount > 0 ? (
-              <p className="m-0 text-[11.5px]" style={{ color: "var(--color-text-muted)" }}>
+              <ITText className="m-0 text-[11.5px]" style={{ color: "var(--color-text-muted)" }}>
                 {t("new.summaryHint", { count: typeCount })}
-              </p>
+              </ITText>
             ) : undefined
           }
         >

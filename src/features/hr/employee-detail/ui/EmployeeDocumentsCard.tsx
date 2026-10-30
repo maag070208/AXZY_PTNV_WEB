@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITBentoGrid, ITBentoSegments, ITBentoTile, ITCard, ITDropfile, FileTypeEnum, useITBentoCountUp } from "@axzydev/axzy_ui_system";
+import { ITBentoGrid, ITBentoSegments, ITBentoTile, ITCard, ITDropfile, FileTypeEnum, useITBentoCountUp, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { LuCircleCheck, LuFileImage, LuFileText, LuFiles, LuHourglass, LuX } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import type { EmployeeDocument, DocumentType } from "@entities/hr";
@@ -43,7 +43,7 @@ export default function EmployeeDocumentsCard({
   const filesShown = useITBentoCountUp(documents.length);
 
   return (
-    <div className="flex flex-col gap-5">
+    <ITStack spacing={5}>
       <ITBentoGrid>
         <ITBentoTile
           cols={6}
@@ -74,18 +74,18 @@ export default function EmployeeDocumentsCard({
           return (
             <ITCard key={type.id} className="flex flex-col">
               <header className="flex items-start gap-3">
-                <span
+                <ITText as="span"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
                   style={{ background: `var(--color-${covered ? "success" : "warning"}-soft)`, color: `var(--color-${covered ? "success" : "warning"})` }}
                 >
                   {covered ? <LuCircleCheck size={16} /> : <LuHourglass size={15} />}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="m-0 truncate !text-[14px] font-bold !text-slate-800">{type.name}</h3>
-                  <p className="m-0 text-xs font-medium" style={{ color: `var(--color-${covered ? "success" : "warning"})` }}>
+                </ITText>
+                <ITFlex className="min-w-0 flex-1">
+                  <ITText as="h3" className="m-0 truncate !text-[14px] font-bold !text-slate-800">{type.name}</ITText>
+                  <ITText className="m-0 text-xs font-medium" style={{ color: `var(--color-${covered ? "success" : "warning"})` }}>
                     {covered ? tt("detail.uploaded") : tt("detail.pendingOne")}
-                  </p>
-                </div>
+                  </ITText>
+                </ITFlex>
               </header>
 
               {files.length > 0 && (
@@ -98,7 +98,7 @@ export default function EmployeeDocumentsCard({
                         ) : (
                           <LuFileImage size={14} className="shrink-0 text-slate-400" />
                         )}
-                        <span className="truncate text-xs font-medium group-hover:underline">{file.originalName}</span>
+                        <ITText as="span" className="truncate text-xs font-medium group-hover:underline">{file.originalName}</ITText>
                       </a>
                       <button
                         type="button"
@@ -133,6 +133,6 @@ export default function EmployeeDocumentsCard({
         })}
       </div>
 
-    </div>
+    </ITStack>
   );
 }

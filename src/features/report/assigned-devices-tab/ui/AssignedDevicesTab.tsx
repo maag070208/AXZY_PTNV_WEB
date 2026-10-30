@@ -17,7 +17,7 @@ import type { AssignedDeviceRow } from "@entities/report";
 import { formatDate } from "@shared/i18n";
 import type { UseAssignedDevicesReport } from "../model/useAssignedDevicesReport";
 import { Num } from "@shared/ui/bento-bits";
-import ReportPeriodBar from "../../ui/ReportPeriodBar";
+import { ReportPeriodBar } from "@shared/ui/report-period-bar";
 
 export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesReport }) {
   const navigate = useNavigate();

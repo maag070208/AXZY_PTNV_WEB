@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ITButton, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDialog, ITFlex, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { useCan } from "@entities/user";
 import type { EmployeeClockStatus } from "@entities/time-clock";
 import { useEmployeeClock } from "../model/useEmployeeClock";
@@ -54,7 +54,7 @@ export default function EmployeeClockCard({
       {done && <ITText role="status" className="text-sm text-emerald-700">{done}</ITText>}
       {fx.status && fx.status.clocks.length === 0 && <ITText className="text-sm text-slate-400">{t("employeeClock.empty")}</ITText>}
 
-      <div className="flex flex-col gap-5">
+      <ITStack spacing={5}>
         {fx.status?.clocks.map((c) => {
           const tone = c.connection === "NO_RESPONSE" ? STATE_TONE.NO_RESPONSE : STATE_TONE[c.state ?? "SIN_ALTA"];
           const label = c.connection === "NO_RESPONSE" ? t("employeeClock.state.NO_RESPONSE") : t(`employeeClock.state.${c.state ?? "SIN_ALTA"}`);
@@ -63,8 +63,8 @@ export default function EmployeeClockCard({
           return (
             <section key={c.serial} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
               <header className="flex items-center justify-between gap-3">
-                <h3 className="truncate text-base font-black text-slate-900">{c.name}</h3>
-                <span className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${tone}`}>{label}</span>
+                <ITText as="h3" className="truncate text-base font-black text-slate-900">{c.name}</ITText>
+                <ITText as="span" className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${tone}`}>{label}</ITText>
               </header>
 
               {enrolled && renderDetail &&
@@ -86,22 +86,22 @@ export default function EmployeeClockCard({
 
               {!enrolled && (
                 <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 px-4 py-6 text-center">
-                  <p className="text-sm text-slate-500">
+                  <ITText className="text-sm text-slate-500">
                     {c.connection === "NO_RESPONSE" ? t("employeeClock.state.NO_RESPONSE") : t("employeeClock.notEnrolled")}
-                  </p>
+                  </ITText>
                   {canAdd ? (
                     <ITButton variant="filled" color="primary" size="sm" onClick={() => setTarget(c)}>
                       {t("employeeClock.alta")}
                     </ITButton>
                   ) : (
-                    !c.canAlta && <p className="text-xs text-slate-400">{t("employeeClock.readOnly")}</p>
+                    !c.canAlta && <ITText className="text-xs text-slate-400">{t("employeeClock.readOnly")}</ITText>
                   )}
                 </div>
               )}
             </section>
           );
         })}
-      </div>
+      </ITStack>
 
       <ITDialog
         isOpen={!!target}

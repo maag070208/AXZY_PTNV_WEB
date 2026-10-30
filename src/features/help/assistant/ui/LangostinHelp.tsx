@@ -1,0 +1,291 @@
+import { useEffect, useRef, useState } from "react";
+import { ITChip, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { LuArrowRight, LuMapPin, LuRotateCcw, LuX } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
+
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@app/store";
+import { useCan } from "@entities/user";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { LangostinAvatar } from "@shared/ui/langostin";
+import { usePrefersReducedMotion } from "@shared/lib/usePrefersReducedMotion";
+import { helpScreenFor, isHelpHidden, type HelpAction } from "../model/helpRegistry";
+import { useSeason } from "../model/useSeason";
+
+type Message = { id: number; from: "agent" | "user"; text: string };
+
+/**
+ * Langostín como **asistente de ayuda contextual**: botón flotante abajo a la
+ * derecha que abre un panel con lo que se puede hacer en la pantalla actual y a
+ * dónde ir según el rol. Es determinista (nivel 1): solo ofrece lo registrado en
+ * `helpRegistry`, nunca inventa rutas y no ejecuta acciones que cambien datos.
+ */
+export default function LangostinHelp() {
+  const { t } = useTranslation("langostin");
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const userName = useSelector((s: RootState) => s.auth.user?.name ?? "");
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [hintSeen, setHintSeen] = useState(true);
+  const seq = useRef(0);
+  const screen = helpScreenFor(pathname);
+  const hidden = isHelpHidden(pathname);
+  // Caracterización por temporada del año: sólo cambia el ánimo del botón y el
+  // saludo; las respuestas de ayuda son las mismas.
+  const season = useSeason();
+  const reduced = usePrefersReducedMotion();
+
+  const push = (message: Omit<Message, "id">) => {
+    seq.current += 1;
+    setMessages((prev) => [...prev, { ...message, id: seq.current }]);
+  };
+
+  // Al abrir (o cambiar de pantalla) saluda con lo que se puede hacer ahí.
+  useEffect(() => {
+    if (!open) return;
+    setMessages([]);
+    push({ from: "agent", text: t("help.context", { screen: screen.title, explain: screen.explain }) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, screen.screenId]);
+
+  // El globo de "¿Te ayudo?" aparece la primera vez en la sesión.
+  useEffect(() => {
+    try {
+      setHintSeen(sessionStorage.getItem("ptnv.help.hint") === "1");
+    } catch {
+      setHintSeen(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const dismissHint = () => {
+    setHintSeen(true);
+    try {
+      sessionStorage.setItem("ptnv.help.hint", "1");
+    } catch {
+      /* sin almacenamiento: el globo se oculta solo en esta vista */
+    }
+  };
+
+  const openPanel = () => {
+    setOpen(true);
+    dismissHint();
+  };
+
+  // "Sorpréndeme": un consejo al azar de esta pantalla (o una pausa si no hay).
+  const surprise = () => {
+    const tips = screen.actions.filter((action) => !action.to && action.answer);
+    const tip = tips[Math.floor(Math.random() * Math.max(tips.length, 1))];
+    push({ from: "user", text: `✨ ${t("help.surprise")}` });
+    push({ from: "agent", text: tip?.answer ?? t("help.pause") });
+  };
+
+  // "Felicitar": el saludo de la temporada (o uno neutro fuera de temporada).
+  const greet = () => {
+    push({ from: "user", text: `${season?.emoji ?? "👋"} ${t("help.greet")}` });
+    push({ from: "agent", text: season ? t(`season.${season.key}.greeting`) : t("help.hello") });
+  };
+
+  const runAction = (action: HelpAction) => {
+    push({ from: "user", text: action.label });
+    if (action.to) {
+      push({ from: "agent", text: t("help.going", { screen: action.label }) });
+      navigate(action.to);
+      setOpen(false);
+      return;
+    }
+    push({ from: "agent", text: action.answer ?? t("help.unknown") });
+  };
+
+  const navActions = screen.actions.filter((action) => action.to);
+  const infoActions = screen.actions.filter((action) => !action.to);
+
+  if (hidden) return null;
+
+  return (
+    <>
+      {/* Panel de ayuda */}
+      {open && (
+        <div
+          role="dialog"
+          aria-label={t("help.title")}
+          className="fixed bottom-24 right-5 z-50 flex h-[min(600px,calc(100dvh-8rem))] w-[min(380px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-[28px] bg-[var(--it-card-bg)] shadow-[0_28px_70px_-18px_rgba(13,47,64,0.55)] ring-1 ring-black/5"
+        >
+          {season && !reduced && (
+            <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+              {Array.from({ length: 7 }, (_, i) => (
+                <ITText as="span"
+                  key={i}
+                  className="help-fall absolute top-[-24px] text-[14px] opacity-50"
+                  style={{ left: `${8 + i * 13}%`, animationDelay: `${i * 0.9}s`, animationDuration: `${6 + (i % 3)}s` }}
+                >
+                  {season.particles[i % season.particles.length]}
+                </ITText>
+              ))}
+            </div>
+          )}
+
+          {/* Encabezado: mascota, nombre, estado con la temporada y acciones */}
+          <ITFlex
+            align="center"
+            gap={3}
+            className="relative z-[1] px-5 pb-3 pt-4"
+            style={season ? { background: `linear-gradient(110deg, ${season.tint}, transparent 78%)` } : undefined}
+          >
+            <LangostinAvatar anim={season?.anim ?? "wave"} size={54} />
+            <ITFlex direction="column" gap={0.5} className="min-w-0 flex-1">
+              <ITText className="!text-[17px] font-bold leading-tight">{t("help.name")}</ITText>
+              <ITFlex align="center" gap={1} className="min-w-0">
+                <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-success)]" />
+                <ITText className="!text-[12.5px] font-semibold leading-snug text-[color:var(--color-success)]">
+                  {season ? `${t("help.online")} · ${season.emoji} ${t(`season.${season.key}.name`)}` : t("help.online")}
+                </ITText>
+              </ITFlex>
+            </ITFlex>
+            <button
+              type="button"
+              onClick={() => setMessages([])}
+              title={t("help.restart")}
+              aria-label={t("help.restart")}
+              className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-500 transition hover:bg-[color-mix(in_srgb,currentColor_8%,transparent)]"
+            >
+              <LuRotateCcw size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              title={t("help.close")}
+              aria-label={t("help.close")}
+              className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-500 transition hover:bg-[color-mix(in_srgb,currentColor_8%,transparent)]"
+            >
+              <LuX size={18} />
+            </button>
+          </ITFlex>
+
+          {/* Contexto: dónde está y con qué rol */}
+          <ITFlex
+            align="center"
+            gap={1.5}
+            className="relative z-[1] border-y border-[color-mix(in_srgb,currentColor_7%,transparent)] bg-[color-mix(in_srgb,currentColor_4%,transparent)] px-5 py-2.5"
+          >
+            <LuMapPin size={15} className="shrink-0 text-slate-400" />
+            <ITText muted className="shrink-0 !text-[13px]">
+              {t("help.contextLabel")}
+            </ITText>
+            <ITText className="min-w-0 flex-1 truncate !text-[13.5px] font-bold">{screen.title}</ITText>
+          </ITFlex>
+
+          {/* Conversación */}
+          <div className="relative z-[1] flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-5 py-4">
+            {messages.map((message) =>
+              message.from === "agent" ? (
+                <ITText
+                  key={message.id}
+                  className="agent-pop max-w-[86%] self-start rounded-2xl rounded-bl-md bg-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-2.5 !text-[13.5px] leading-snug"
+                >
+                  {message.text}
+                </ITText>
+              ) : (
+                // Cada mensaje de la persona lleva su Blobatar, como en un chat.
+                <ITFlex key={message.id} align="end" justify="end" gap={1.5} className="agent-pop max-w-full self-end">
+                  <ITText className="max-w-[78%] rounded-2xl rounded-br-md bg-[var(--it-bento-ink-bg,var(--color-primary))] px-4 py-2.5 !text-[13.5px] font-semibold leading-snug text-[var(--it-bento-ink-text,#fff)]">
+                    {message.text}
+                  </ITText>
+                  <ProfileAvatar name={userName} size="sm" />
+                </ITFlex>
+              ),
+            )}
+          </div>
+
+          {/* Opciones: a dónde ir, qué preguntar y los juegos de Langostín */}
+          <div className="relative z-[1] max-h-[46%] overflow-y-auto border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-3">
+            {navActions.length > 0 && (
+              <>
+                <ITText muted className="!text-[11px] font-bold uppercase tracking-[0.06em]">
+                  {t("help.goTo")}
+                </ITText>
+                <ITFlex wrap="wrap" gap={1.5} className="mt-1.5">
+                  {navActions.map((action) => (
+                    <NavChip key={action.label} action={action} onClick={() => runAction(action)} />
+                  ))}
+                </ITFlex>
+              </>
+            )}
+
+            {infoActions.length > 0 && (
+              <>
+                <ITText muted className="mt-3 block !text-[11px] font-bold uppercase tracking-[0.06em]">
+                  {t("help.onThisScreen")}
+                </ITText>
+                <ITFlex wrap="wrap" gap={1.5} className="mt-1.5">
+                  {infoActions.map((action) => (
+                    <ITChip key={action.label} size="lg" variant="outlined" color="gray" onClick={() => runAction(action)}>
+                      {action.label}
+                    </ITChip>
+                  ))}
+                </ITFlex>
+              </>
+            )}
+
+            <ITText muted className="mt-3 block !text-[11px] font-bold uppercase tracking-[0.06em]">
+              {t("help.name")}
+            </ITText>
+            <ITFlex wrap="wrap" gap={1.5} className="mt-1.5">
+              <ITChip size="lg" variant="outlined" color="gray" icon={<ITText as="span" aria-hidden>✨</ITText>} onClick={surprise}>
+                {t("help.surprise")}
+              </ITChip>
+              <ITChip size="lg" variant="outlined" color="gray" icon={<ITText as="span" aria-hidden>{season?.emoji ?? "👋"}</ITText>} onClick={greet}>
+                {t("help.greet")}
+              </ITChip>
+            </ITFlex>
+          </div>
+        </div>
+      )}
+
+      {/* Globo de la primera vez */}
+      {!open && !hintSeen && (
+        <div className="fixed bottom-24 right-6 z-50 max-w-[240px] rounded-2xl rounded-br-sm bg-[var(--it-card-bg)] px-3 py-2 shadow-lg ring-1 ring-black/5">
+          <ITText className="!text-[12px] font-semibold">{t("help.hint", { screen: screen.title })}</ITText>
+        </div>
+      )}
+
+      {/* Botón flotante (el anillo y el emoji cambian con la temporada) */}
+      <button
+        type="button"
+        onClick={open ? () => setOpen(false) : openPanel}
+        aria-expanded={open}
+        aria-label={open ? t("help.close") : t("help.open")}
+        style={{ boxShadow: `0 10px 28px -8px rgba(13,47,64,0.5), 0 0 0 3px ${season?.ring ?? "var(--color-primary-600)"}` }}
+        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-[var(--it-card-bg)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color:var(--color-primary)]"
+      >
+        <LangostinAvatar anim={open ? "ok" : (season?.anim ?? "idle")} size={30} />
+        {season && (
+          <ITText as="span" aria-hidden className="absolute -left-2 -top-2 text-[16px] drop-shadow-sm">
+            {season.emoji}
+          </ITText>
+        )}
+      </button>
+    </>
+  );
+}
+
+/** Opción de navegación: píldora verde con flecha, como el diseño de referencia. */
+function NavChip({ action, onClick }: { action: HelpAction; onClick: () => void }) {
+  const can = useCan(action.permission ?? "");
+  if (action.permission && !can) return null;
+  return (
+    <ITChip size="lg" color="success" variant="soft" icon={<LuArrowRight size={13} />} onClick={onClick}>
+      {action.label}
+    </ITChip>
+  );
+}

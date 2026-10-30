@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { LuActivity, LuChefHat, LuClock, LuServer, LuUser, LuUsers } from "react-icons/lu";
 import { usePermissions, useCurrentRole } from "@entities/user";
 import { FEATURES } from "@shared/config/features";
-import { ITFlex } from "@axzydev/axzy_ui_system";
+import { ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { TabBar } from "@shared/ui/tab-bar";
 import AccessTodayWidget from "./widgets/AccessTodayWidget";
 import AttendanceTodayWidget from "./widgets/AttendanceTodayWidget";
@@ -174,7 +174,7 @@ export default function RoleDashboard({ slots = {}, panels = {}, live }: Props) 
   const panel = panels[activo];
 
   return (
-    <div className="flex flex-col gap-4">
+    <ITStack spacing={4}>
       {/* Las pestañas van a la derecha, con la píldora "En vivo" antes de ellas. */}
       <ITFlex align="center" justify="end" gap={3} wrap="wrap">
         {live}
@@ -185,6 +185,6 @@ export default function RoleDashboard({ slots = {}, panels = {}, live }: Props) 
         />
       </ITFlex>
       {panel ?? rejilla(widgets)}
-    </div>
+    </ITStack>
   );
 }

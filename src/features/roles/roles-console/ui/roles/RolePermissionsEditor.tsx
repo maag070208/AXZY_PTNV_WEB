@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITInput, ITSegmentedControl, ITSlideToggle } from "@axzydev/axzy_ui_system";
+import { ITInput, ITSegmentedControl, ITSlideToggle, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaChevronRight, FaLock, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PermissionCatalog } from "@entities/permission";
@@ -78,8 +78,8 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
   );
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center gap-2">
+    <ITStack spacing={2}>
+      <ITFlex align="center" wrap="wrap" gap={2}>
         <div className="w-full max-w-[260px]">
           <ITInput
             name="role_permission_search"
@@ -108,10 +108,10 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
             {allOpen ? t("editor.collapseAll") : t("editor.expandAll")}
           </button>
         )}
-      </div>
+      </ITFlex>
 
       {visibleGroups.length === 0 ? (
-        <p className="py-8 text-center text-[12px] italic text-slate-400">{t("matrix.noResults")}</p>
+        <ITText className="py-8 text-center text-[12px] italic text-slate-400">{t("matrix.noResults")}</ITText>
       ) : (
         <div className="overflow-hidden rounded-lg border border-slate-200">
           {visibleGroups.map(({ module, permissions, rows }, groupIndex) => {
@@ -135,19 +135,19 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                     ) : (
                       <FaChevronRight size={9} className="text-slate-400" />
                     )}
-                    <span className="text-[12px] font-bold text-slate-800">{module}</span>
+                    <ITText as="span" className="text-[12px] font-bold text-slate-800">{module}</ITText>
                     {pending && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" title={t("editor.unsaved")} />}
                   </button>
                   {open && (
-                    <span className="flex items-center gap-1">
+                    <ITText as="span" className="flex items-center gap-1">
                       {bulkButton(permissions, "all")}
                       {bulkButton(permissions, "read")}
                       {bulkButton(permissions, "none")}
-                    </span>
+                    </ITText>
                   )}
-                  <span className="w-28">
+                  <ITText as="span" className="w-28">
                     <AccessLevelBadge level={level} />
-                  </span>
+                  </ITText>
                   <CoverageBar granted={coverage.granted} total={coverage.total} level={level} className="w-24" />
                 </div>
 
@@ -168,13 +168,13 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                       >
                         <VerbIcon permissionKey={permission.key} />
                         <div className="flex min-w-[180px] flex-1 flex-wrap items-baseline gap-x-2">
-                          <span className={`text-[12px] font-semibold ${granted ? "text-slate-800" : "text-slate-500"}`}>
+                          <ITText as="span" className={`text-[12px] font-semibold ${granted ? "text-slate-800" : "text-slate-500"}`}>
                             {permission.name}
-                          </span>
-                          <span className="font-mono text-[10px] text-slate-400">{permission.key}</span>
+                          </ITText>
+                          <ITText as="span" className="font-mono text-[10px] text-slate-400">{permission.key}</ITText>
                           {permission.sensitive && <FaLock size={8} className="text-amber-500" title={t("matrix.sensitive")} />}
                           {!permission.active && (
-                          <span className="text-[12px] font-semibold text-rose-500">{t("matrix.inactive")}</span>
+                          <ITText as="span" className="text-[12px] font-semibold text-rose-500">{t("matrix.inactive")}</ITText>
                           )}
                           {changed && <span className="h-1.5 w-1.5 self-center rounded-full bg-amber-500" title={t("editor.unsaved")} />}
                         </div>
@@ -186,7 +186,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                             onChange={(next) => setScope(role, permission.key, next)}
                           />
                         )}
-                        <span title={locked ? t("matrix.adminLocked") : undefined}>
+                        <ITText as="span" title={locked ? t("matrix.adminLocked") : undefined}>
                           <ITSlideToggle
                             size="sm"
                             activeColor="var(--color-primary)"
@@ -194,7 +194,7 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
                             disabled={disabled}
                             onToggle={() => toggle(role, permission.key)}
                           />
-                        </span>
+                        </ITText>
                       </div>
                     );
                   })}
@@ -203,6 +203,6 @@ export default function RolePermissionsEditor({ admin, role }: Props) {
           })}
         </div>
       )}
-    </div>
+    </ITStack>
   );
 }

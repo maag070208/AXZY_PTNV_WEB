@@ -120,7 +120,7 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
             <ITButton variant="outlined" color="secondary" onClick={fx.previousWeek} title={t("filters.previousWeek")}>
               <LuChevronLeft size={14} />
             </ITButton>
-            <div className="min-w-0 flex-1">
+            <ITFlex className="min-w-0 flex-1">
               <ITDatePicker
                 name="weeklyAttendanceWeek"
                 label={t("filters.week")}
@@ -129,7 +129,7 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
                 onChange={handleRange}
                 className="w-full min-w-0"
               />
-            </div>
+            </ITFlex>
             <ITButton variant="outlined" color="secondary" onClick={fx.nextWeek} title={t("filters.nextWeek")}>
               <LuChevronRight size={14} />
             </ITButton>
@@ -252,17 +252,17 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
           {/* Horas extra por departamento */}
           <ITBentoTile cols={5} rows={3} wide icon={<LuCalendarDays size={15} />} label={t("charts.extraByDepartment")}>
             {extraByDepartment.length === 0 ? (
-              <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("charts.noExtra")}</p>
+              <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("charts.noExtra")}</ITText>
             ) : (
               <div className="it-bento-bars mt-3 flex-1 content-around">
                 {extraByDepartment.map((row) => (
                   <div key={row.label} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
                     <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
-                    <span className="truncate">{row.label}</span>
-                    <span>
+                    <ITText as="span" className="truncate">{row.label}</ITText>
+                    <ITText as="span">
                       {hoursDecimal(row.minutes)} {t("hoursShort")}{" "}
-                      <span className="opacity-60">{Math.round((row.minutes / Math.max(1, extraTotalMin)) * 100)}%</span>
-                    </span>
+                      <ITText as="span" className="opacity-60">{Math.round((row.minutes / Math.max(1, extraTotalMin)) * 100)}%</ITText>
+                    </ITText>
                     <div className="it-bento-bar col-span-3">
                       <i style={{ "--it-bento-w": `${(row.minutes / deptMax) * 100}%`, background: row.color } as React.CSSProperties} />
                     </div>

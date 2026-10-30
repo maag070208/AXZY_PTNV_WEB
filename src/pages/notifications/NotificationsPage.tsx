@@ -1,4 +1,4 @@
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton, ITPage, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { LuBell, LuCheckCheck } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { NotificationItem, useNotificationsList, type NotificationFilter } from "@features/notification/list";
@@ -57,7 +57,7 @@ export default function NotificationsPage() {
         ) : undefined
       }
     >
-      <div className="flex flex-col gap-4">
+      <ITStack spacing={4}>
         <FilterPills items={filters} value={fx.filter} onChange={fx.setFilter} />
 
         <PanelCard>
@@ -75,10 +75,10 @@ export default function NotificationsPage() {
             <ul className="m-0 list-none p-0">
               {fx.groups.map((group) => (
                 <li key={group.key} className="list-none">
-                  <p className="m-0 px-1.5 pb-1 pt-3 text-[12px] font-semibold text-slate-500 first:pt-0">
+                  <ITText className="m-0 px-1.5 pb-1 pt-3 text-[12px] font-semibold text-slate-500 first:pt-0">
                     {dayLabel(group.date)}
-                  </p>
-                  <div className="flex flex-col">
+                  </ITText>
+                  <ITStack>
                     {group.items.map((n) => (
                       <NotificationItem
                         key={n.id}
@@ -87,13 +87,13 @@ export default function NotificationsPage() {
                         onDelete={fx.handleDelete}
                       />
                     ))}
-                  </div>
+                  </ITStack>
                 </li>
               ))}
             </ul>
           )}
         </PanelCard>
-      </div>
+      </ITStack>
     </ITPage>
   );
 }

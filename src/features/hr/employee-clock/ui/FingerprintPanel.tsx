@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaCheck, FaFingerprint } from "react-icons/fa";
-import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { timeClockApi, type FingerprintStatus } from "@entities/time-clock";
 import FingerprintEnrollDialog from "./FingerprintEnrollDialog";
 
@@ -53,18 +53,18 @@ export default function FingerprintPanel({ userId, userName, number, serial, clo
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+        <ITFlex align="center" gap={3}>
+          <ITText as="span" className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
             <FaFingerprint size={18} />
-          </span>
-          <div className="flex flex-col">
+          </ITText>
+          <ITStack>
             <ITText className="text-sm font-bold text-slate-900">{t("employeeClock.fingerprint.title")}</ITText>
             <ITText className="text-xs text-slate-500">{clockName}</ITText>
-          </div>
-        </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-bold tabular-nums ${full ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-700"}`}>
+          </ITStack>
+        </ITFlex>
+        <ITText as="span" className={`rounded-full px-3 py-1 text-xs font-bold tabular-nums ${full ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-700"}`}>
           {count} / {MAX_FINGERS}
-        </span>
+        </ITText>
       </header>
 
       <div className="grid grid-cols-5 gap-2">
@@ -87,7 +87,7 @@ export default function FingerprintPanel({ userId, userName, number, serial, clo
               }`}
             >
               {registered ? <FaCheck size={14} /> : <FaFingerprint size={16} className={isSelected ? "text-white" : "text-slate-400"} />}
-              <span>{fingerNo}</span>
+              <ITText as="span">{fingerNo}</ITText>
             </button>
           );
         })}

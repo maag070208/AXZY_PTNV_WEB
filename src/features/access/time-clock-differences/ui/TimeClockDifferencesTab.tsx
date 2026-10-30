@@ -102,7 +102,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
         <PanelCard title={`${t("differences.clock.title")} · ${clockVisible.length}`}>
           <ITFlex direction="column" gap={3}>
             <ITFlex align="center" wrap="wrap" gap={2}>
-              <div className="min-w-0 flex-1">
+              <ITFlex className="min-w-0 flex-1">
                 <ITInput
                   name="diferenciasReloj"
                   placeholder={t("differences.clock.search")}
@@ -110,7 +110,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
                   onChange={(e) => setQClock(e.target.value)}
                   className="w-full min-w-0"
                 />
-              </div>
+              </ITFlex>
               <ITChip
                 label={t("differences.clock.onlyMissing")}
                 selected={onlyMissing}
@@ -170,7 +170,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
         <PanelCard title={`${t("differences.people.title")} · ${peopleVisible.length}`}>
           <ITFlex direction="column" gap={3}>
             <ITFlex align="center" wrap="wrap" gap={2}>
-              <div className="min-w-0 flex-1">
+              <ITFlex className="min-w-0 flex-1">
                 <ITInput
                   name="diferenciasPersona"
                   placeholder={t("differences.people.search")}
@@ -178,7 +178,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
                   onChange={(e) => setQPerson(e.target.value)}
                   className="w-full min-w-0"
                 />
-              </div>
+              </ITFlex>
               <ITChip
                 label={t("differences.people.onlyFree")}
                 selected={onlyFree}

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useITAppearance } from "@axzydev/axzy_ui_system";
+import { useITAppearance, ITText } from "@axzydev/axzy_ui_system";
 
 export interface TabBarItem<T extends string> {
   id: T;
@@ -51,7 +51,7 @@ export default function TabBar<T extends string>({ items, value, onChange, size 
               {item.icon}
               {item.label}
               {item.count !== undefined && (
-                <span
+                <ITText as="span"
                   className="rounded-full px-1.5 text-[10px] tabular-nums"
                   style={{
                     backgroundColor: active
@@ -60,7 +60,7 @@ export default function TabBar<T extends string>({ items, value, onChange, size 
                   }}
                 >
                   {item.count}
-                </span>
+                </ITText>
               )}
               {item.dot && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />}
             </button>
@@ -90,7 +90,7 @@ export default function TabBar<T extends string>({ items, value, onChange, size 
             {item.icon}
             {item.label}
             {item.count !== undefined && (
-              <span
+              <ITText as="span"
                 className={`rounded-full px-1.5 text-[10px] tabular-nums ${
                   active
                     ? "bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[color:var(--color-primary)]"
@@ -98,7 +98,7 @@ export default function TabBar<T extends string>({ items, value, onChange, size 
                 }`}
               >
                 {item.count}
-              </span>
+              </ITText>
             )}
             {item.dot && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />}
           </button>

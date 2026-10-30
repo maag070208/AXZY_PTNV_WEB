@@ -192,7 +192,7 @@ function Section({
   return (
     <ITFlex direction="column" gap={2}>
       <ITText className="text-sm font-bold text-slate-700">
-        {title} <span className="font-normal text-slate-400">({count})</span>
+        {title} <ITText as="span" className="font-normal text-slate-400">({count})</ITText>
       </ITText>
       {count === 0 ? <ITText className="text-sm text-slate-400">{empty}</ITText> : children}
     </ITFlex>

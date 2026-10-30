@@ -159,7 +159,7 @@ export default function KanbanBoard({ fx }: Props) {
                     {dyn(tt)(`detail.taskStatusOptions.${col.status}`)}
                   </ITText>
                 </ITFlex>
-                <span
+                <ITText as="span"
                   className="min-w-6 rounded-full px-2 py-0.5 text-center text-[11px] font-bold tabular-nums"
                   style={{
                     background: `color-mix(in srgb, ${laneColor} 16%, transparent)`,
@@ -167,7 +167,7 @@ export default function KanbanBoard({ fx }: Props) {
                   }}
                 >
                   {count}
-                </span>
+                </ITText>
               </ITFlex>
 
               <div className="space-y-2 min-h-[120px]">
@@ -231,7 +231,7 @@ export default function KanbanBoard({ fx }: Props) {
                         </ITFlex>
 
                         <ITFlex justify="between" align="center" gap={2}>
-                          <span
+                          <ITText as="span"
                             className={`flex min-w-0 items-center gap-1 text-[11.5px] ${
                               overdue ? "font-semibold text-[color:var(--color-danger)]" : "text-slate-500"
                             }`}
@@ -239,15 +239,15 @@ export default function KanbanBoard({ fx }: Props) {
                             {a.dueDate ? (
                               <>
                                 <LuCalendarDays size={12} className="shrink-0" />
-                                <span className="truncate">{formatDate(a.dueDate)}</span>
+                                <ITText as="span" className="truncate">{formatDate(a.dueDate)}</ITText>
                               </>
                             ) : (
-                              <span className="truncate text-slate-400">#{a.ticketId.slice(0, 6).toUpperCase()}</span>
+                              <ITText as="span" className="truncate text-slate-400">#{a.ticketId.slice(0, 6).toUpperCase()}</ITText>
                             )}
-                          </span>
-                          <span title={a.user.name} className="inline-flex shrink-0">
+                          </ITText>
+                          <ITText as="span" title={a.user.name} className="inline-flex shrink-0">
                             <ProfileAvatar name={a.user.name} size="sm" />
-                          </span>
+                          </ITText>
                         </ITFlex>
                       </div>
                     );

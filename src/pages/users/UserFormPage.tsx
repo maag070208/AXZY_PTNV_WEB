@@ -1,6 +1,6 @@
 import { dyn } from "@shared/i18n";
 import type { KeyboardEvent } from "react";
-import { ITAlert, ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITPage, ITStack } from "@axzydev/axzy_ui_system";
 import { LuBuilding2, LuFileUp, LuIdCard, LuShieldCheck, LuUserPlus } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -210,7 +210,7 @@ export default function UserFormPage() {
 
 
       <div onKeyDown={handleEnter} className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="flex min-w-0 flex-col gap-5">
+        <ITStack className="min-w-0" spacing={5}>
           {steps.map((section, index) => (
             <FormSection
               key={section.label}
@@ -223,7 +223,7 @@ export default function UserFormPage() {
               {section.content}
             </FormSection>
           ))}
-        </div>
+        </ITStack>
 
         <LiveSummary total={steps.length} done={steps.filter((section) => section.complete).length}>
           <LiveSummaryRow label={tt("form.name")} value={fullName} />

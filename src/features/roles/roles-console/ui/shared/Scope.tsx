@@ -1,4 +1,4 @@
-import { ITSegmentedControl } from "@axzydev/axzy_ui_system";
+import { ITSegmentedControl, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import type { PermissionCatalog } from "@entities/permission";
 import type { PermissionScope } from "@entities/user";
@@ -9,11 +9,11 @@ import { SCOPE_STYLE } from "./tokens";
 export function ScopeChip({ scope, scoped = true }: { scope: PermissionScope; scoped?: boolean }) {
   const { t } = useTranslation("roles");
   return (
-    <span
+    <ITText as="span"
       className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold ${SCOPE_STYLE[scope]}`}
     >
       {scope === "NONE" ? t("scopePlain.NONE") : scoped ? t(`scopePlain.${scope}`) : t("matrix.granted")}
-    </span>
+    </ITText>
   );
 }
 

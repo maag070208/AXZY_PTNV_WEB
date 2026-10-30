@@ -113,7 +113,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const renderDays = (r: PeopleAttendanceRow) => (
     <div className={`flex items-center ${period === "WEEK" ? "gap-1" : "gap-0.5"}`}>
       {r.days.map((day) => (
-        <span
+        <ITText as="span"
           key={day.date}
           title={dayTooltip(day)}
           className={`inline-flex shrink-0 items-center justify-center ${
@@ -123,7 +123,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           {period === "WEEK"
             ? formatDay(day.date, { weekday: "narrow" }).toUpperCase()
             : null}
-        </span>
+        </ITText>
       ))}
     </div>
   );
@@ -207,10 +207,10 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
               name={r.employeeName}
               size="md"
             />
-            <div className="min-w-0">
+            <ITFlex className="min-w-0">
               <ITText className="truncate text-[13px] font-bold text-slate-800">{r.employeeName}</ITText>
               <ITText className="truncate text-[11px] text-slate-500">{subtitle}</ITText>
-            </div>
+            </ITFlex>
           </ITFlex>
         );
       },

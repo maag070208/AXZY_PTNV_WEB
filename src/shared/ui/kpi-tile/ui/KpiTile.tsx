@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ITCard } from "@axzydev/axzy_ui_system";
+import { ITCard, ITText } from "@axzydev/axzy_ui_system";
 import { parseAnimatedNumber, useCountUp } from "@shared/lib/useCountUp";
 import { KPI_TONES, type KpiTone } from "../model/tones";
 
@@ -71,9 +71,9 @@ export default function KpiTile({
           se recortaba); el espaciado de la escala sí llega al navegador. */}
       <div className={`relative z-10 flex flex-1 flex-col ${sm ? "gap-1.5 p-3" : "gap-2 p-5"}`}>
         <div className="flex w-full items-center justify-between gap-2">
-          <p className={`min-w-0 truncate font-semibold text-slate-800 ${sm ? "!text-[12px]" : "!text-[13px]"}`}>{label}</p>
+          <ITText className={`min-w-0 truncate font-semibold text-slate-800 ${sm ? "!text-[12px]" : "!text-[13px]"}`}>{label}</ITText>
           {icon && (
-            <span
+            <ITText as="span"
               className={`flex shrink-0 items-center justify-center rounded-full transition-colors ${sm ? "h-6 w-6" : "h-8 w-8"}`}
               style={{
                 color: accent,
@@ -82,20 +82,20 @@ export default function KpiTile({
               }}
             >
               {icon}
-            </span>
+            </ITText>
           )}
         </div>
         {visual && <div className="flex min-h-0 flex-1 items-center justify-center">{visual}</div>}
         {!visual && <div className="min-h-1 flex-1" />}
         {footer ? (
           <div className="w-full">
-            <p className={valueClass}>{shown}</p>
+            <ITText className={valueClass}>{shown}</ITText>
             <div className="mt-2">{footer}</div>
           </div>
         ) : (
           <div className="flex w-full items-baseline justify-between gap-2">
-            <p className={valueClass}>{shown}</p>
-            {hint && <span className={`min-w-0 truncate text-right !text-[11px] font-medium ${hintClass}`}>{hint}</span>}
+            <ITText className={valueClass}>{shown}</ITText>
+            {hint && <ITText as="span" className={`min-w-0 truncate text-right !text-[11px] font-medium ${hintClass}`}>{hint}</ITText>}
           </div>
         )}
       </div>

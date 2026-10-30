@@ -106,7 +106,7 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 
 /** Texto de lista vacía. */
 export function EmptyText({ children }: { children: ReactNode }) {
-  return <p className="m-0 py-2 text-[12px] text-slate-500">{children}</p>;
+  return <ITText className="m-0 py-2 text-[12px] text-slate-500">{children}</ITText>;
 }
 
 /** Contenedor de filas con scroll interno cuando la lista es larga. */
@@ -138,15 +138,15 @@ export function ListRow({ title, subtitle, right, avatarName, avatarPlaceholder,
         <ProfileAvatar size="sm" name={avatarName} />
       ) : (
         avatarPlaceholder && (
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+          <ITText as="span" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
             <LuUser size={14} />
-          </span>
+          </ITText>
         )
       )}
-      <div className="min-w-0 flex-1">
+      <ITFlex className="min-w-0 flex-1">
         <div className="truncate text-[13px] font-semibold text-slate-800">{title}</div>
         {subtitle && <div className="truncate text-[11px] text-slate-500">{subtitle}</div>}
-      </div>
+      </ITFlex>
       {right !== undefined && right !== null && <div className="shrink-0 text-right text-[12px] font-semibold text-slate-600">{right}</div>}
     </>
   );

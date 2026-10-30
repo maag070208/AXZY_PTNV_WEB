@@ -47,14 +47,14 @@ function PersonAvatar({ clockSerial, employeeNumber, name, hasFace }: { clockSer
 
 function Chip({ on, icon, label }: { on: boolean; icon: React.ReactNode; label: string }) {
   return (
-    <span
+    <ITText as="span"
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
         on ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-dashed border-slate-300 text-slate-500"
       }`}
     >
       {icon}
       {label}
-    </span>
+    </ITText>
   );
 }
 
@@ -106,13 +106,13 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
       filter: true,
       sortable: true,
       render: (row) => (
-        <div className="flex items-center gap-3">
+        <ITFlex align="center" gap={3}>
           <PersonAvatar clockSerial={fx.serial} employeeNumber={row.employeeNumber} name={row.name} hasFace={(row.faces ?? 0) > 0} />
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-slate-900">{row.name}</p>
-            <p className="font-mono text-xs text-slate-500">#{row.employeeNumber}</p>
-          </div>
-        </div>
+          <ITFlex className="min-w-0">
+            <ITText className="truncate font-semibold text-slate-900">{row.name}</ITText>
+            <ITText className="font-mono text-xs text-slate-500">#{row.employeeNumber}</ITText>
+          </ITFlex>
+        </ITFlex>
       ),
     },
     { key: "employeeNumber", type: "string", label: t("people.table.number"), width: 130, filter: true, sortable: true },
@@ -155,7 +155,7 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
         const done = progressOf(row);
         return (
           <div className="w-28">
-            <p className="text-xs text-slate-500">{t("people.view.progress", { done, total: TOTAL_CHECKS })}</p>
+            <ITText className="text-xs text-slate-500">{t("people.view.progress", { done, total: TOTAL_CHECKS })}</ITText>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
               <div className="h-full rounded-full bg-emerald-500" style={{ width: `${(done / TOTAL_CHECKS) * 100}%` }} />
             </div>
@@ -222,9 +222,9 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
         </ITFlex>
       </ITFlex>
 
-      {fx.error && <p role="alert" className="text-sm text-red-600">{fx.error}</p>}
-      {fx.biometricsError && <p role="alert" className="text-sm text-red-600">{fx.biometricsError}</p>}
-      {fx.toast && <p role="status" className="text-sm text-emerald-700" onClick={fx.dismissToast}>{fx.toast}</p>}
+      {fx.error && <ITText role="alert" className="text-sm text-red-600">{fx.error}</ITText>}
+      {fx.biometricsError && <ITText role="alert" className="text-sm text-red-600">{fx.biometricsError}</ITText>}
+      {fx.toast && <ITText role="status" className="text-sm text-emerald-700" onClick={fx.dismissToast}>{fx.toast}</ITText>}
 
       <ITDataTable
         columns={columns as unknown as Column<Record<string, unknown>>[]}

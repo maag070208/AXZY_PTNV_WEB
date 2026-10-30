@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITBentoGrid, ITBentoTile, ITButton, ITConfirmDialog, ITInput } from "@axzydev/axzy_ui_system";
+import { ITBentoGrid, ITBentoTile, ITButton, ITConfirmDialog, ITInput, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { LuCalendarDays, LuClock, LuPencil, LuSearch, LuTrash2, LuUsers } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { scheduleApi, type Schedule, type ScheduleDay } from "@entities/schedule";
@@ -99,7 +99,7 @@ export default function SchedulesBoard() {
   if (!rows) return <LangostinState kind="loading" />;
 
   return (
-    <div className="flex flex-col gap-4">
+    <ITStack spacing={4}>
       {/* Franja de resumen: totales reales, clic = filtra */}
       <ITBentoGrid>
         <ITBentoTile
@@ -137,7 +137,7 @@ export default function SchedulesBoard() {
       </ITBentoGrid>
 
       {/* Filtros en una fila */}
-      <div className="flex flex-wrap items-center gap-2">
+      <ITFlex align="center" wrap="wrap" gap={2}>
         <div className="min-w-[240px] flex-1">
           <ITInput
             name="schedules_search"
@@ -157,7 +157,7 @@ export default function SchedulesBoard() {
           value={filter}
           onChange={setFilter}
         />
-      </div>
+      </ITFlex>
 
       {visible.length === 0 ? (
         <LangostinState kind="empty" title={t("emptyTitle")} description={t("emptyHint")} />
@@ -184,7 +184,7 @@ export default function SchedulesBoard() {
                 value={`${weekly} h`}
                 caption={t("weekHours")}
                 aside={
-                  <span
+                  <ITText as="span"
                     className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
                     style={{
                       background: h.active ? "color-mix(in srgb, var(--color-success) 14%, transparent)" : "color-mix(in srgb, var(--color-text-muted) 14%, transparent)",
@@ -192,7 +192,7 @@ export default function SchedulesBoard() {
                     }}
                   >
                     {h.active ? t("active") : t("inactive")}
-                  </span>
+                  </ITText>
                 }
               >
                 <div className="mt-2 grid flex-1 grid-cols-2 gap-2">
@@ -205,7 +205,7 @@ export default function SchedulesBoard() {
                   {week.map((d) => {
                     const max = Math.max(1, ...week.map((x) => x.value));
                     return (
-                      <div key={d.label} className="flex flex-1 flex-col items-center gap-1">
+                      <ITStack alignItems="center" className="flex-1" key={d.label} spacing={1}>
                         <i
                           className="w-full rounded-t-[4px] rounded-b-[2px]"
                           style={{
@@ -213,17 +213,17 @@ export default function SchedulesBoard() {
                             background: d.value === 0 ? "color-mix(in srgb, currentColor 12%, transparent)" : "var(--color-primary-500)",
                           }}
                         />
-                        <span className="text-[9.5px]" style={{ color: "var(--it-bento-muted)" }}>
+                        <ITText as="span" className="text-[9.5px]" style={{ color: "var(--it-bento-muted)" }}>
                           {d.label}
-                        </span>
-                      </div>
+                        </ITText>
+                      </ITStack>
                     );
                   })}
                 </div>
 
-                <p className="m-0 mt-2 text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
+                <ITText className="m-0 mt-2 text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
                   {daySummary(h.days)} · E{h.entryToleranceMin}/S{h.exitToleranceMin} · {t("meal")} {h.mealBreakMin} · {t("minExtra")} {h.minOvertimeMin}
-                </p>
+                </ITText>
 
                 <div className="mt-2 flex items-center justify-end gap-1.5">
                   <ITButton variant="outlined" color="secondary" size="sm" onClick={() => navigate(`/schedules/${h.id}/edit`)} title={t("edit")}>
@@ -255,6 +255,6 @@ export default function SchedulesBoard() {
         cancelLabel={t("cancel")}
         loading={saving}
       />
-    </div>
+    </ITStack>
   );
 }

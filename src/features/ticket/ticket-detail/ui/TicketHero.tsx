@@ -1,4 +1,4 @@
-import { ITBentoSegments, ITBentoTile, ITButton, ITCard, ITSelect } from "@axzydev/axzy_ui_system";
+import { ITBentoSegments, ITBentoTile, ITButton, ITCard, ITSelect, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { LuBuilding2, LuCalendarClock, LuClock, LuListChecks, LuPencil, LuTimer, LuUser } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
@@ -34,39 +34,39 @@ export default function TicketHero({ fx, onEdit, canAssign }: Props) {
     <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
       <ITCard className="lg:col-span-6">
         <div className="flex h-full flex-col gap-4">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="m-0 text-[12px] font-semibold text-slate-500">{tt("detail.folio")}</p>
-              <p className="m-0 text-[26px] font-extrabold leading-tight tabular-nums text-slate-800">
+          <ITFlex align="start" justify="between" wrap="wrap" gap={2}>
+            <ITFlex className="min-w-0">
+              <ITText className="m-0 text-[12px] font-semibold text-slate-500">{tt("detail.folio")}</ITText>
+              <ITText className="m-0 text-[26px] font-extrabold leading-tight tabular-nums text-slate-800">
                 #{ticket.id.slice(0, 8).toUpperCase()}
-              </p>
-            </div>
+              </ITText>
+            </ITFlex>
             {onEdit && (
               // El testid va en el envoltorio: `ITButton` no reenvía props sueltas.
-              <span data-testid="editar-ticket" className="inline-flex">
+              <ITText as="span" data-testid="editar-ticket" className="inline-flex">
                 <ITButton variant="outlined" color="secondary" size="sm" onClick={onEdit} title={tt("detail.editTitle")}>
-                  <span className="flex items-center gap-1 text-[11px] font-bold">
+                  <ITText as="span" className="flex items-center gap-1 text-[11px] font-bold">
                     <LuPencil size={12} />
                     {tt("detail.edit")}
-                  </span>
+                  </ITText>
                 </ITButton>
-              </span>
+              </ITText>
             )}
-          </div>
+          </ITFlex>
 
-          <div className="flex flex-wrap gap-1.5">
+          <ITFlex wrap="wrap" gap={1.5}>
             <TicketChip tone={STATUS_TONE[ticket.status]} label={dyn(tt)(`statusLabels.${ticket.status}`)} />
             <TicketChip tone={PRIORITY_TONE[ticket.priority]} label={dyn(tt)(`priorityLabels.${ticket.priority}`)} />
             <TicketChip tone="primary" label={ticket.category?.name ?? "—"} />
             {ticket.deletedAt && <TicketChip label={tt("detail.deletedBadge")} />}
-          </div>
+          </ITFlex>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex min-w-0 flex-col gap-1.5">
-              <span className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-500">
+            <ITStack className="min-w-0" spacing={1.5}>
+              <ITText as="span" className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-500">
                 <LuUser size={13} />
                 {canAssign ? tt("detail.responsible") : tt("detail.assignedTo")}
-              </span>
+              </ITText>
               {canAssign ? (
                 <ITSelect
                   name="responsible"
@@ -77,23 +77,23 @@ export default function TicketHero({ fx, onEdit, canAssign }: Props) {
               ) : ticket.assignedTo ? (
                 <PersonLine name={ticket.assignedTo.name} sub={ticket.assignedTo.jobTitle} />
               ) : (
-                <span className="text-[13px] font-semibold text-slate-400">{tt("detail.unassigned")}</span>
+                <ITText as="span" className="text-[13px] font-semibold text-slate-400">{tt("detail.unassigned")}</ITText>
               )}
-            </div>
+            </ITStack>
 
-            <div className="flex min-w-0 flex-col gap-1.5">
-              <span className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-500">
+            <ITStack className="min-w-0" spacing={1.5}>
+              <ITText as="span" className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-500">
                 <LuCalendarClock size={13} />
                 {tt("detail.createdBy")}
-              </span>
+              </ITText>
               <PersonLine name={ticket.createdBy?.name ?? "—"} sub={formatDateTime(ticket.createdAt)} />
-            </div>
+            </ITStack>
           </div>
 
-          <p className="m-0 flex items-center gap-1.5 text-[12.5px] text-slate-500">
+          <ITText className="m-0 flex items-center gap-1.5 text-[12.5px] text-slate-500">
             <LuBuilding2 size={13} />
-            {tt("detail.department")}: <span className="font-semibold text-slate-700">{ticket.department?.name ?? "—"}</span>
-          </p>
+            {tt("detail.department")}: <ITText as="span" className="font-semibold text-slate-700">{ticket.department?.name ?? "—"}</ITText>
+          </ITText>
         </div>
       </ITCard>
 
@@ -141,12 +141,12 @@ export default function TicketHero({ fx, onEdit, canAssign }: Props) {
 
 function PersonLine({ name, sub }: { name: string; sub?: string | null }) {
   return (
-    <div className="flex min-w-0 items-center gap-2.5">
+    <ITFlex align="center" gap={2.5} className="min-w-0">
       <ProfileAvatar name={name} size="md" />
-      <div className="min-w-0">
-        <p className="m-0 truncate text-[13px] font-bold text-slate-800">{name}</p>
-        {sub && <p className="m-0 truncate text-[11.5px] text-slate-500">{sub}</p>}
-      </div>
-    </div>
+      <ITFlex className="min-w-0">
+        <ITText className="m-0 truncate text-[13px] font-bold text-slate-800">{name}</ITText>
+        {sub && <ITText className="m-0 truncate text-[11.5px] text-slate-500">{sub}</ITText>}
+      </ITFlex>
+    </ITFlex>
   );
 }

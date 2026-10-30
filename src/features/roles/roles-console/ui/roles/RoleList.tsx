@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITInput } from "@axzydev/axzy_ui_system";
+import { ITInput, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaSearch, FaUsers } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { RoleAdmin } from "@entities/permission";
@@ -52,11 +52,11 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
       />
       <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto">
         {groups.length === 0 && (
-          <p className="py-6 text-center text-[11px] italic text-slate-400">{t("matrix.noResults")}</p>
+          <ITText className="py-6 text-center text-[11px] italic text-slate-400">{t("matrix.noResults")}</ITText>
         )}
         {groups.map(([module, roles]) => (
-          <div key={module} className="flex flex-col gap-0.5">
-            <p className="px-2 text-[12px] font-semibold text-slate-400">{module}</p>
+          <ITStack key={module} spacing={0.5}>
+            <ITText className="px-2 text-[12px] font-semibold text-slate-400">{module}</ITText>
             {roles.map((key) => {
               const meta = metaOf(key);
               const selected = key === selectedRole;
@@ -73,30 +73,30 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
                   } ${meta && !meta.active ? "opacity-60" : ""}`}
                 >
                   <RoleAvatar role={key} size="sm" />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5">
-                      <span className={`truncate text-[12px] font-bold ${selected ? "text-primary-500" : "text-slate-800"}`}>
+                  <ITText as="span" className="min-w-0 flex-1">
+                    <ITText as="span" className="flex items-center gap-1.5">
+                      <ITText as="span" className={`truncate text-[12px] font-bold ${selected ? "text-primary-500" : "text-slate-800"}`}>
                         {roleLabel(key)}
-                      </span>
+                      </ITText>
                       {pending > 0 && (
                         <span
                           className="h-2 w-2 shrink-0 rounded-full bg-amber-500"
                           title={t("matrix.changeCount", { count: pending })}
                         />
                       )}
-                    </span>
-                    <span className="flex items-center gap-2 text-[10px] text-slate-400">
-                      <span>{t("roleList.permissions", { count: Object.keys(permissionsByRole[key] ?? {}).length })}</span>
-                      <span className="inline-flex items-center gap-1">
+                    </ITText>
+                    <ITText as="span" className="flex items-center gap-2 text-[10px] text-slate-400">
+                      <ITText as="span">{t("roleList.permissions", { count: Object.keys(permissionsByRole[key] ?? {}).length })}</ITText>
+                      <ITText as="span" className="inline-flex items-center gap-1">
                         <FaUsers size={9} /> {meta?.userCount ?? 0}
-                      </span>
-                      {meta && !meta.active && <span className="font-bold text-rose-500">{t("access.inactiveRole")}</span>}
-                    </span>
-                  </span>
+                      </ITText>
+                      {meta && !meta.active && <ITText as="span" className="font-bold text-rose-500">{t("access.inactiveRole")}</ITText>}
+                    </ITText>
+                  </ITText>
                 </button>
               );
             })}
-          </div>
+          </ITStack>
         ))}
       </div>
     </div>

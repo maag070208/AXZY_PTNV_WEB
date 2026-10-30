@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { FaIdBadge, FaUser, FaUserCog, FaUsers, FaUserShield, FaUserTie, FaUtensils } from "react-icons/fa";
 import { roleLabel } from "@entities/user";
 import { ROLE_TONES, roleTone } from "./tokens";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 /** Íconos de los roles base; los creados en `/roles` muestran sus iniciales. */
 const BASE_ICONS: Record<string, (size: number) => ReactNode> = {
@@ -36,13 +37,13 @@ export default function RoleAvatar({ role, size = "md" }: Props) {
   const tone = ROLE_TONES[roleTone(role)];
   const spec = SIZES[size];
   return (
-    <span
+    <ITText as="span"
       className={`flex shrink-0 items-center justify-center font-black ${spec.box} ${tone.soft}`}
       title={roleLabel(role)}
       aria-hidden
     >
       {icon ? icon(spec.icon) : initialsOf(role)}
-    </span>
+    </ITText>
   );
 }
 
@@ -67,7 +68,7 @@ export function RoleChip({ role, suffix, muted = false, onClick }: ChipProps) {
     >
       <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
       {roleLabel(role)}
-      {suffix && <span className="font-semibold text-slate-400">· {suffix}</span>}
+      {suffix && <ITText as="span" className="font-semibold text-slate-400">· {suffix}</ITText>}
     </Tag>
   );
 }

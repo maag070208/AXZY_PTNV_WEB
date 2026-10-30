@@ -46,9 +46,9 @@ export default function CollapsibleCard({
           </ITFlex>
           <ITFlex align="center" gap={2}>
             {right}
-            <span className="shrink-0 text-slate-400">
+            <ITText as="span" className="shrink-0 text-slate-400">
               {open ? <FaChevronUp size={11} /> : <FaChevronDown size={11} />}
-            </span>
+            </ITText>
           </ITFlex>
         </ITFlex>
       </button>

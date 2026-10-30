@@ -105,9 +105,9 @@ export default function AdminTasksTable({ fx, externalFilters = {}, toolbar }: P
         return (
           <ITFlex direction="column" gap={1}>
             <ITText className="whitespace-nowrap text-[11.5px] text-slate-500">
-              <b className="font-semibold text-slate-800">{row.startDate ? formatDate(row.startDate) : "—"}</b>
+              <ITText as="b" className="font-semibold text-slate-800">{row.startDate ? formatDate(row.startDate) : "—"}</ITText>
               {" → "}
-              <b className="font-semibold text-slate-800">{row.dueDate ? formatDate(row.dueDate) : "—"}</b>
+              <ITText as="b" className="font-semibold text-slate-800">{row.dueDate ? formatDate(row.dueDate) : "—"}</ITText>
             </ITText>
             {lateDays > 0 ? (
               <TicketChip tone="danger" label={tt("tasksTable.overdueDays", { days: lateDays })} />

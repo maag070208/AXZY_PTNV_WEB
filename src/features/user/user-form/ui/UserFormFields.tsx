@@ -26,10 +26,10 @@ function UniqueHint({ state }: { state?: UniqueState }) {
   const { t: tt } = useTranslation("users");
   if (state === "available") {
     return (
-      <span className="mt-1 flex items-center gap-1 text-[12px]" style={{ color: "var(--color-success)" }}>
+      <ITText as="span" className="mt-1 flex items-center gap-1 text-[12px]" style={{ color: "var(--color-success)" }}>
         <LuCircleCheck size={13} />
         {tt("form.available")}
-      </span>
+      </ITText>
     );
   }
   return null;
@@ -135,9 +135,9 @@ export default function UserFormFields({
             </ITGrid>
             <ITGrid item xs={12} md={4}>
               <ITFlex align="end" gap={2}>
-                <div className="flex-1">
+                <ITFlex className="flex-1">
                   <ITSelect name="u_role" label={tt("form.role")} options={roleOptions} value={form.role} onChange={(e) => onFieldChange("role", e.target.value as any)} required />
-                </div>
+                </ITFlex>
                 <ITButton variant="icon-only" size="sm" color="gray" onClick={() => setHelpOpen(true)} ariaLabel={tt("form.roleGuide")} title={tt("form.roleGuide")}>
                   <LuCircleHelp size={14} />
                 </ITButton>
@@ -226,8 +226,8 @@ export default function UserFormFields({
       <ITDialog isOpen={helpOpen} onClose={() => setHelpOpen(false)} className="max-w-md">
         <DialogHeader icon={<LuCircleHelp size={20} />} title={tt("form.roleGuide")} subtitle={roleLabel(form.role)} tone="info" />
         <div className="space-y-3">
-          <p className="m-0 text-[14px] font-bold text-slate-800">{roleGuidance.title}</p>
-          <p className="m-0 text-[13px] leading-5 text-slate-600">{roleGuidance.summary}</p>
+          <ITText className="m-0 text-[14px] font-bold text-slate-800">{roleGuidance.title}</ITText>
+          <ITText className="m-0 text-[13px] leading-5 text-slate-600">{roleGuidance.summary}</ITText>
           <ul className="m-0 list-none space-y-2 p-0 text-[13px] text-slate-600">
             {roleGuidance.actions.map((action) => (
               <li key={action} className="flex items-start gap-2">
@@ -236,9 +236,9 @@ export default function UserFormFields({
               </li>
             ))}
           </ul>
-          <p className="m-0 rounded-xl px-3 py-2 text-[12.5px] text-slate-500" style={{ background: "var(--color-secondary-100)" }}>
+          <ITText className="m-0 rounded-xl px-3 py-2 text-[12.5px] text-slate-500" style={{ background: "var(--color-secondary-100)" }}>
             {tt("form.roleVsPermissions")}
-          </p>
+          </ITText>
         </div>
       </ITDialog>
     </>

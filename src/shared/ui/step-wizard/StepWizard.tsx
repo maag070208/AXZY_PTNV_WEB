@@ -78,7 +78,7 @@ export default function StepWizard({
                 className={pill(state)}
                 aria-current={i === current ? "step" : undefined}
               >
-                <span className={circle(state)}>{i < current ? <FaCheck size={9} /> : i + 1}</span>
+                <ITText as="span" className={circle(state)}>{i < current ? <FaCheck size={9} /> : i + 1}</ITText>
                 <ITText
                   as="span"
                   className={[

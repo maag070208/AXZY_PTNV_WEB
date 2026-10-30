@@ -1,4 +1,4 @@
-import { ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile } from "@axzydev/axzy_ui_system";
+import { ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { LuClock, LuHeartPulse, LuMail, LuShieldCheck, LuWrench } from "react-icons/lu";
@@ -53,9 +53,9 @@ export default function SystemDashboard({ health }: Props) {
           {total > 0 ? (
             <ITBentoGauge value={fresh / total} color="var(--color-success)" trackColor="rgb(255 255 255 / 0.14)" />
           ) : (
-            <p className="m-0 text-center text-[12px] font-medium" style={{ color: "rgba(234,246,248,.6)" }}>
+            <ITText className="m-0 text-center text-[12px] font-medium" style={{ color: "rgba(234,246,248,.6)" }}>
               {t("system.noClocks")}
-            </p>
+            </ITText>
           )}
           <div className="mt-1 flex flex-wrap gap-1.5">
             <ITBentoPill dot="var(--color-success)">{t("system.synced", { count: fresh })}</ITBentoPill>
@@ -93,15 +93,15 @@ export default function SystemDashboard({ health }: Props) {
       >
         {audit ? (
           <div className="mt-2 flex flex-1 flex-col justify-center gap-1">
-            <p className="m-0 text-[13px] font-bold text-slate-900">{audit.title}</p>
-            <p className="m-0 text-[11.5px]" style={{ color: "var(--it-bento-muted)" }}>
+            <ITText className="m-0 text-[13px] font-bold text-slate-900">{audit.title}</ITText>
+            <ITText className="m-0 text-[11.5px]" style={{ color: "var(--it-bento-muted)" }}>
               {[audit.detail, formatDateTime(audit.at)].filter(Boolean).join(" · ")}
-            </p>
+            </ITText>
           </div>
         ) : (
-          <p className="m-0 mt-2 text-[12px] font-medium" style={{ color: "var(--it-bento-muted)" }}>
+          <ITText className="m-0 mt-2 text-[12px] font-medium" style={{ color: "var(--it-bento-muted)" }}>
             {t("system.auditNone")}
-          </p>
+          </ITText>
         )}
       </ITBentoTile>
 
@@ -114,9 +114,9 @@ export default function SystemDashboard({ health }: Props) {
         onClick={canConfigure ? () => navigate("/clocks") : undefined}
       >
         {total === 0 ? (
-          <p className="m-0 mt-2 text-[12px] font-medium" style={{ color: "var(--it-bento-muted)" }}>
+          <ITText className="m-0 mt-2 text-[12px] font-medium" style={{ color: "var(--it-bento-muted)" }}>
             {t("system.noClocks")}
-          </p>
+          </ITText>
         ) : (
           <ul className="m-0 mt-1.5 flex min-h-0 list-none flex-col gap-1 overflow-y-auto p-0">
             {clocks.map((c) => {
@@ -127,15 +127,15 @@ export default function SystemDashboard({ health }: Props) {
                     className="h-2 w-2 shrink-0 rounded-full"
                     style={{ background: isStale ? "var(--color-warning)" : "var(--color-success)" }}
                   />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12.5px] font-semibold">{c.name ?? c.serialNumber}</span>
-                    <span className="block truncate text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
+                  <ITText as="span" className="min-w-0 flex-1">
+                    <ITText as="span" className="block truncate text-[12.5px] font-semibold">{c.name ?? c.serialNumber}</ITText>
+                    <ITText as="span" className="block truncate text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
                       {c.syncedAt ? t("system.lastSyncShort", { when: formatDateTime(c.syncedAt) }) : t("system.neverSynced")}
-                    </span>
-                  </span>
-                  <span className="shrink-0 whitespace-nowrap text-[11px] font-semibold" style={{ color: isStale ? "var(--color-warning)" : "var(--color-success)" }}>
+                    </ITText>
+                  </ITText>
+                  <ITText as="span" className="shrink-0 whitespace-nowrap text-[11px] font-semibold" style={{ color: isStale ? "var(--color-warning)" : "var(--color-success)" }}>
                     {isStale ? t("system.staleOne") : t("system.okOne")}
-                  </span>
+                  </ITText>
                 </li>
               );
             })}
@@ -160,9 +160,9 @@ export default function SystemDashboard({ health }: Props) {
                 style={{ background: "color-mix(in srgb, currentColor 4%, transparent)" }}
               >
                 {item.label}
-                <span aria-hidden style={{ color: "var(--it-bento-muted)" }}>
+                <ITText as="span" aria-hidden style={{ color: "var(--it-bento-muted)" }}>
                   ›
-                </span>
+                </ITText>
               </button>
             </li>
           ))}

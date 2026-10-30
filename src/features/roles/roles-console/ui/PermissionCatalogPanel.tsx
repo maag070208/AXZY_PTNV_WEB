@@ -224,14 +224,14 @@ export default function PermissionCatalogPanel({ modules, onChanged }: Props) {
 
   return (
     <ITFlex direction="column" gap={3}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[11px] text-slate-500">{t("catalog.subtitle")}</p>
+      <ITFlex align="center" justify="between" wrap="wrap" gap={3}>
+        <ITText className="text-[11px] text-slate-500">{t("catalog.subtitle")}</ITText>
         <ITButton variant="filled" color="primary" size="sm" onClick={openCreate}>
-          <span className="flex items-center gap-1.5 text-[11px] font-bold">
+          <ITText as="span" className="flex items-center gap-1.5 text-[11px] font-bold">
             <FaPlus size={10} /> {t("catalog.new")}
-          </span>
+          </ITText>
         </ITButton>
-      </div>
+      </ITFlex>
 
       {error && !showForm && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>

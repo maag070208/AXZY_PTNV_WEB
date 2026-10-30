@@ -1,5 +1,5 @@
 import { Fragment, useMemo, useState } from "react";
-import { ITCheckbox, ITInput, ITSelect } from "@axzydev/axzy_ui_system";
+import { ITCheckbox, ITInput, ITSelect, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaChevronRight, FaLock, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { PermissionCatalog } from "@entities/permission";
@@ -78,8 +78,8 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
     });
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center gap-2">
+    <ITStack spacing={2}>
+      <ITFlex align="center" wrap="wrap" gap={2}>
         <div className="w-full max-w-[240px]">
           <ITInput
             name="matrix_search"
@@ -108,7 +108,7 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
           onChange={(checked) => setOnlyDiff(checked)}
           label={t("matrixView.onlyDiff")}
         />
-        <span className="ml-auto flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
+        <ITText as="span" className="ml-auto flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
           {(
             [
               ["✓", "ALL", t("matrixView.legend.yes")],
@@ -117,16 +117,16 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
               ["T", "ALL", t("scope.ALL")],
             ] as const
           ).map(([glyph, scope, label]) => (
-            <span key={label} className="inline-flex items-center gap-1">
-              <span className={`flex h-4 w-5 items-center justify-center rounded text-[9px] font-black ${scopeCellClass(scope)}`}>
+            <ITText as="span" key={label} className="inline-flex items-center gap-1">
+              <ITText as="span" className={`flex h-4 w-5 items-center justify-center rounded text-[9px] font-black ${scopeCellClass(scope)}`}>
                 {glyph}
-              </span>
+              </ITText>
               {label}
-            </span>
+            </ITText>
           ))}
-        </span>
-      </div>
-      <div className="flex flex-wrap items-center gap-1">
+        </ITText>
+      </ITFlex>
+      <ITFlex align="center" wrap="wrap" gap={1}>
         {allRoles.map((role) => {
           const off = hidden.has(role);
           const tone = ROLE_TONES[roleTone(role)];
@@ -145,8 +145,8 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
             </button>
           );
         })}
-        <span className="ml-auto text-[10px] italic text-slate-400">{t("matrixView.hint")}</span>
-      </div>
+        <ITText as="span" className="ml-auto text-[10px] italic text-slate-400">{t("matrixView.hint")}</ITText>
+      </ITFlex>
 
       <div className="max-h-[72vh] overflow-auto rounded-lg border border-slate-200 bg-[var(--it-card-bg)]">
         <table className="min-w-full border-separate border-spacing-0 text-[11px]">
@@ -169,9 +169,9 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
                       title={t("matrixView.openRole")}
                     >
                       <span className={`h-2 w-2 rounded-full ${ROLE_TONES[roleTone(role)].dot}`} />
-                      <span className={`text-center text-[10px] font-black leading-tight ${meta?.active === false ? "text-slate-400" : "text-slate-700"}`}>
+                      <ITText as="span" className={`text-center text-[10px] font-black leading-tight ${meta?.active === false ? "text-slate-400" : "text-slate-700"}`}>
                         {roleLabel(role)}
-                      </span>
+                      </ITText>
                     </button>
                   </th>
                 );
@@ -198,8 +198,8 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
                         className="flex w-full items-center gap-2 !bg-transparent text-left"
                       >
                         {isCollapsed ? <FaChevronRight size={9} className="text-slate-400" /> : <FaChevronDown size={9} className="text-slate-400" />}
-                        <span className="text-[12px] font-semibold text-slate-600">{module}</span>
-                        <span className="text-[10px] text-slate-400">{permissions.length}</span>
+                        <ITText as="span" className="text-[12px] font-semibold text-slate-600">{module}</ITText>
+                        <ITText as="span" className="text-[10px] text-slate-400">{permissions.length}</ITText>
                       </button>
                     </td>
                     {roles.map((role) => {
@@ -209,9 +209,9 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
                       const percent = coverage.total ? (coverage.granted / coverage.total) * 100 : 0;
                       return (
                         <td key={role} className="border-b border-slate-200 bg-slate-50 px-2 py-1.5" title={t(`level.${level}`)}>
-                          <span className="block h-1.5 overflow-hidden rounded-full bg-slate-200">
+                          <ITText as="span" className="block h-1.5 overflow-hidden rounded-full bg-slate-200">
                             <span className={`block h-full rounded-full ${levelBarClass(level)}`} style={{ width: `${percent}%` }} />
-                          </span>
+                          </ITText>
                         </td>
                       );
                     })}
@@ -220,12 +220,12 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
                     visibleRows.map((permission) => (
                       <tr key={permission.key} className="group">
                         <td className="sticky left-0 z-10 border-b border-r border-slate-100 bg-[var(--it-card-bg)] px-3 py-1 group-hover:bg-slate-50">
-                          <div className="flex items-center gap-1.5">
-                            <span title={permission.key} className={`text-[12px] font-semibold ${permission.active ? "text-slate-700" : "text-slate-400 line-through"}`}>
+                          <ITFlex align="center" gap={1.5}>
+                            <ITText as="span" title={permission.key} className={`text-[12px] font-semibold ${permission.active ? "text-slate-700" : "text-slate-400 line-through"}`}>
                               {permission.name}
-                            </span>
+                            </ITText>
                             {permission.sensitive && <FaLock size={8} className="text-amber-500" title={t("matrix.sensitive")} />}
-                          </div>
+                          </ITFlex>
                         </td>
                         {roles.map((role) => {
                           const value = scopeOf(role, permission.key);
@@ -258,6 +258,6 @@ export default function PermissionMatrixPanel({ admin, onOpenRole }: Props) {
           </tbody>
         </table>
       </div>
-    </div>
+    </ITStack>
   );
 }

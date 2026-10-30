@@ -86,7 +86,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
       <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
         <ITFlex align="center" gap={2}>
           <LuListChecks size={16} className="text-slate-400" />
-          <h3 className="m-0 !text-[16px] font-bold !text-slate-800">{tt("detail.tasksTitle")}</h3>
+          <ITText as="h3" className="m-0 !text-[16px] font-bold !text-slate-800">{tt("detail.tasksTitle")}</ITText>
           <TicketChip tone="primary" label={tt("detail.tasksCount", { count: tareas.length })} />
         </ITFlex>
         <ITFlex align="center" gap={2}>
@@ -105,15 +105,15 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
       </ITFlex>
 
       {tareas.length > 0 && (
-        <div className="flex flex-col gap-1.5">
+        <ITStack spacing={1.5}>
           <ITBentoSegments total={tareas.length} done={tareas.filter((a) => a.status === "COMPLETED").length} />
-          <p className="m-0 text-[12px] text-slate-500">
+          <ITText className="m-0 text-[12px] text-slate-500">
             {tt("detail.tasksProgress", {
               done: tareas.filter((a) => a.status === "COMPLETED").length,
               total: tareas.length,
             })}
-          </p>
-        </div>
+          </ITText>
+        </ITStack>
       )}
 
       {/* Tarea nueva: la arma Langostín en el chat de arriba de la lista. */}
@@ -206,25 +206,25 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                   </ITText>
                   <ITFlex align="center" gap={3} wrap="wrap" className="!text-[12px] text-slate-500">
                     {a.startDate && (
-                      <span className="flex items-center gap-1">
+                      <ITText as="span" className="flex items-center gap-1">
                         <LuCalendarDays size={12} />
                         {tt("detail.startShort")} {formatDate(a.startDate)}
-                      </span>
+                      </ITText>
                     )}
                     {a.dueDate && (
-                      <span className={`flex items-center gap-1 ${vencida ? "font-bold text-[color:var(--color-danger)]" : ""}`}>
+                      <ITText as="span" className={`flex items-center gap-1 ${vencida ? "font-bold text-[color:var(--color-danger)]" : ""}`}>
                         <LuCalendarDays size={12} />
                         {tt("detail.dueShort")} {formatDate(a.dueDate)}
-                      </span>
+                      </ITText>
                     )}
                     {vencida && (
                       <TicketChip tone="danger" label={tt("detail.overdue")} />
                     )}
                     {comentarios > 0 && (
-                      <span className="flex items-center gap-1">
+                      <ITText as="span" className="flex items-center gap-1">
                         <LuMessageSquare size={12} />
                         {tt("detail.assignmentComments", { count: comentarios })}
-                      </span>
+                      </ITText>
                     )}
                   </ITFlex>
                 </ITFlex>
@@ -339,7 +339,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                           )}
 
                           {canEditStatus && (
-                            <div className="flex items-end gap-2">
+                            <ITFlex align="end" gap={2}>
                               <ITInput
                                 name={`comment-${a.id}`}
                                 placeholder={tt("detail.addCommentPlaceholder")}
@@ -360,7 +360,7 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
                               >
                                 <LuSend size={12} />
                               </ITButton>
-                            </div>
+                            </ITFlex>
                           )}
                         </div>
                       )}

@@ -1,4 +1,4 @@
-import { ITButton, ITFlex, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITTextarea, ITText } from "@axzydev/axzy_ui_system";
 import { LuMessageSquare, LuSend } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { PanelCard } from "@shared/ui/panel-card";
@@ -32,11 +32,11 @@ export default function TicketComments({ fx }: Props) {
 
       {!isClosed && (
         <ITFlex align="center" justify="between" gap={2} className="mt-3">
-          <span className="text-[12px] text-slate-500">
+          <ITText as="span" className="text-[12px] text-slate-500">
             {fx.commentText.trim().length > 0
               ? tt("detail.charCount", { count: fx.commentText.trim().length })
               : tt("detail.publicFollowup")}
-          </span>
+          </ITText>
           <ITButton
             variant="filled"
             color="primary"
@@ -44,10 +44,10 @@ export default function TicketComments({ fx }: Props) {
             onClick={fx.handleAddComment}
             disabled={fx.sendingComment || !fx.commentText.trim()}
           >
-            <span className="flex items-center gap-1.5 text-[11px] font-bold">
+            <ITText as="span" className="flex items-center gap-1.5 text-[11px] font-bold">
               <LuSend size={12} />
               {fx.sendingComment ? tt("detail.sendingComment") : tt("detail.sendComment")}
-            </span>
+            </ITText>
           </ITButton>
         </ITFlex>
       )}

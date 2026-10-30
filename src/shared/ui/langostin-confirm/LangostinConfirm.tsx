@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { ITButton, ITDialog } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDialog, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { Langostin, type LangostinAnim } from "@shared/ui/langostin";
 import { usePrefersReducedMotion } from "@shared/lib/usePrefersReducedMotion";
@@ -71,13 +71,13 @@ export default function LangostinConfirm({
   return (
     <ITDialog isOpen={isOpen} onClose={onClose} className="max-w-md">
       <div className="flex items-start gap-4" role="alertdialog" aria-label={title ?? t("confirm.title")}>
-        <div className="shrink-0">
+        <ITFlex className="shrink-0">
           <Langostin anim={anim ?? ANIM_BY_VARIANT[variant]} size={64} animated={!reduced} label={t("guide.label")} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="m-0 text-lg font-bold text-slate-800 dark:text-white">{title ?? t("confirm.title")}</h3>
+        </ITFlex>
+        <ITFlex className="min-w-0 flex-1">
+          <ITText as="h3" className="m-0 text-lg font-bold text-slate-800 dark:text-white">{title ?? t("confirm.title")}</ITText>
           {message ? <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">{message}</div> : null}
-        </div>
+        </ITFlex>
       </div>
       {children ? <div className="mt-4">{children}</div> : null}
       <div ref={actionsRef} className="mt-6 flex justify-end gap-3">

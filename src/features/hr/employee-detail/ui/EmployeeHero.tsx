@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { LuBuilding2, LuBriefcase, LuCamera, LuCalendarClock, LuFolderCheck } from "react-icons/lu";
-import { ITBadget, ITBentoGrid, ITBentoTile, useITBentoCountUp } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITBentoGrid, ITBentoTile, useITBentoCountUp, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import type { PersonalProfile } from "@entities/hr";
 import { roleLabel } from "@entities/user";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
@@ -28,10 +28,10 @@ const monthsSince = (iso?: string | null): number | null => {
 
 function Fact({ label, value }: { label: string; value?: string | null }) {
   return (
-    <div className="min-w-0">
+    <ITFlex className="min-w-0">
       <dt className="text-[12px] opacity-60">{label}</dt>
       <dd className="m-0 truncate text-[13px] font-semibold">{value?.trim() ? value : "—"}</dd>
-    </div>
+    </ITFlex>
   );
 }
 
@@ -95,22 +95,22 @@ export default function EmployeeHero({ profile, onPhotoUpload, documents }: Prop
             />
           </div>
 
-          <div className="min-w-0 flex-1">
-            <h2 className="m-0 truncate text-2xl font-extrabold leading-tight">{profile.name}</h2>
-            <p className="m-0 mt-1 flex flex-wrap items-center gap-x-2 text-[13px] opacity-70">
-              <span className="inline-flex items-center gap-1.5"><LuBriefcase size={13} />{profile.jobTitle?.trim() || "—"}</span>
-              <span aria-hidden>·</span>
-              <span className="inline-flex items-center gap-1.5"><LuBuilding2 size={13} />{profile.department?.name ?? "—"}</span>
-            </p>
+          <ITFlex className="min-w-0 flex-1">
+            <ITText as="h2" className="m-0 truncate text-2xl font-extrabold leading-tight">{profile.name}</ITText>
+            <ITText className="m-0 mt-1 flex flex-wrap items-center gap-x-2 text-[13px] opacity-70">
+              <ITText as="span" className="inline-flex items-center gap-1.5"><LuBriefcase size={13} />{profile.jobTitle?.trim() || "—"}</ITText>
+              <ITText as="span" aria-hidden>·</ITText>
+              <ITText as="span" className="inline-flex items-center gap-1.5"><LuBuilding2 size={13} />{profile.department?.name ?? "—"}</ITText>
+            </ITText>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <ITBadget color={(ROLE_COLOR[profile.role] as any) ?? "gray"} size="lg">{roleLabel(profile.role)}</ITBadget>
               <ITBadget color={profile.active ? "success" : "danger"} size="lg">
                 {profile.active ? tt("detail.active") : tt("detail.inactive")}
               </ITBadget>
               {profile.employeeNumber && (
-                <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold" style={{ background: "var(--color-secondary-100)" }}>
+                <ITText as="span" className="rounded-full px-3 py-1 font-mono text-xs font-semibold" style={{ background: "var(--color-secondary-100)" }}>
                   #{profile.employeeNumber}
-                </span>
+                </ITText>
               )}
             </div>
             {facts.length > 0 && (
@@ -120,7 +120,7 @@ export default function EmployeeHero({ profile, onPhotoUpload, documents }: Prop
                 ))}
               </dl>
             )}
-          </div>
+          </ITFlex>
         </div>
       </ITBentoTile>
 

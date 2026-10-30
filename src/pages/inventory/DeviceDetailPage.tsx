@@ -214,19 +214,19 @@ export default function DeviceDetailPage() {
               <ITBentoGauge value={available / active} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
             )}
             <div className="mt-1 flex flex-wrap gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-2.5 py-1 text-[11.5px]">
+              <ITText as="span" className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-2.5 py-1 text-[11.5px]">
                 <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
                 {t("devices.chipAvailable", { pct: pct(available) })}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-2.5 py-1 text-[11.5px]">
+              </ITText>
+              <ITText as="span" className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-2.5 py-1 text-[11.5px]">
                 <b className="h-[7px] w-[7px] rounded-full bg-[color-mix(in_srgb,currentColor_45%,transparent)]" />
                 {t("devices.chipLoaned", { count: loaned })}
-              </span>
+              </ITText>
             </div>
             {(device.code || device.description) && (
-              <p className="m-0 mt-2 truncate text-[11.5px] opacity-70">
+              <ITText className="m-0 mt-2 truncate text-[11.5px] opacity-70">
                 {[device.code ? `${t("devices.codeShort")}: ${device.code}` : "", device.description].filter(Boolean).join(" · ")}
-              </p>
+              </ITText>
             )}
           </div>
         </ITBentoTile>
@@ -255,9 +255,9 @@ export default function DeviceDetailPage() {
           icon={<LuThumbsDown size={15} />}
           label={t("devices.damaged")}
           value={
-            <span style={damaged > 0 ? { color: "var(--color-danger)" } : undefined}>
+            <ITText as="span" style={damaged > 0 ? { color: "var(--color-danger)" } : undefined}>
               <Count value={damaged} />
-            </span>
+            </ITText>
           }
         />
         <ITBentoTile
@@ -282,16 +282,16 @@ export default function DeviceDetailPage() {
                     key={u.id}
                     className="flex items-center justify-between gap-3 rounded-[14px] px-2.5 py-2 transition-colors hover:bg-[color-mix(in_srgb,currentColor_6%,transparent)]"
                   >
-                    <div className="min-w-0">
-                      <p className="m-0 text-[12.5px] font-semibold">{u.assetTag}</p>
-                      <p className="m-0 flex flex-wrap gap-x-3 text-[11px] opacity-60">
-                        {device.type?.useSerialNumber && u.serialNumber && <span>{i18n.t("common:labels.serialNumber", { value: u.serialNumber })}</span>}
-                        {device.type?.useMac && u.macAddress && <span>MAC: {u.macAddress}</span>}
-                        {device.type?.useIp && u.ip && <span>IP: {u.ip}</span>}
-                        {device.type?.useHostname && u.hostname && <span>{i18n.t("common:labels.hostname", { value: u.hostname })}</span>}
-                        {!u.serialNumber && !u.macAddress && !u.ip && !u.hostname && <span>—</span>}
-                      </p>
-                    </div>
+                    <ITFlex className="min-w-0">
+                      <ITText className="m-0 text-[12.5px] font-semibold">{u.assetTag}</ITText>
+                      <ITText className="m-0 flex flex-wrap gap-x-3 text-[11px] opacity-60">
+                        {device.type?.useSerialNumber && u.serialNumber && <ITText as="span">{i18n.t("common:labels.serialNumber", { value: u.serialNumber })}</ITText>}
+                        {device.type?.useMac && u.macAddress && <ITText as="span">MAC: {u.macAddress}</ITText>}
+                        {device.type?.useIp && u.ip && <ITText as="span">IP: {u.ip}</ITText>}
+                        {device.type?.useHostname && u.hostname && <ITText as="span">{i18n.t("common:labels.hostname", { value: u.hostname })}</ITText>}
+                        {!u.serialNumber && !u.macAddress && !u.ip && !u.hostname && <ITText as="span">—</ITText>}
+                      </ITText>
+                    </ITFlex>
                     <ITChip size="sm" color={STATUS_COLOR[u.status]}>{t(`unitStatus.${u.status}`)}</ITChip>
                   </div>
                 ))}

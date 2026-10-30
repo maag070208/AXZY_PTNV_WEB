@@ -204,7 +204,7 @@ export default function MovementsPage() {
       sortable: false,
       render: (m: MovementRow) => (
         <ITText className="text-[11px] text-slate-600 truncate">
-          {m.name} {m.unit !== "—" && <b className="text-slate-800">· {m.unit}</b>}
+          {m.name} {m.unit !== "—" && <ITText as="b" className="text-slate-800">· {m.unit}</ITText>}
         </ITText>
       ),
     },

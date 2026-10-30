@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { FaCheck } from "react-icons/fa";
+import { ITText, ITFlex } from "@axzydev/axzy_ui_system";
 
 /** Sección de un formulario en pasos: número, pregunta en lenguaje simple y ayuda. */
 export function DialogSection({
@@ -15,17 +16,17 @@ export function DialogSection({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <div className="flex items-start gap-2">
+      <ITFlex align="start" gap={2}>
         {step !== undefined && (
-          <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-500 text-[10px] font-black text-white">
+          <ITText as="span" className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-500 text-[10px] font-black text-white">
             {step}
-          </span>
+          </ITText>
         )}
         <div>
-          <p className="text-[13px] font-bold text-slate-800">{title}</p>
-          {hint && <p className="text-[11px] text-slate-500">{hint}</p>}
+          <ITText className="text-[13px] font-bold text-slate-800">{title}</ITText>
+          {hint && <ITText className="text-[11px] text-slate-500">{hint}</ITText>}
         </div>
-      </div>
+      </ITFlex>
       <div className={step !== undefined ? "pl-7" : ""}>{children}</div>
     </section>
   );
@@ -68,20 +69,20 @@ export function ChoiceCard({
         selected ? TONE[tone].selected : "border-slate-200 !bg-[var(--it-card-bg)] hover:border-slate-300"
       }`}
     >
-      <span
+      <ITText as="span"
         className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
           selected ? `border-transparent ${TONE[tone].check} text-white` : "border-slate-300 bg-[var(--it-card-bg)]"
         }`}
       >
         {selected && <FaCheck size={7} />}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-1.5 text-[12px] font-bold text-slate-800">
+      </ITText>
+      <ITText as="span" className="min-w-0 flex-1">
+        <ITText as="span" className="flex items-center gap-1.5 text-[12px] font-bold text-slate-800">
           {icon}
           {title}
-        </span>
-        {description && <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">{description}</span>}
-      </span>
+        </ITText>
+        {description && <ITText as="span" className="mt-0.5 block text-[11px] leading-snug text-slate-500">{description}</ITText>}
+      </ITText>
     </button>
   );
 }
@@ -140,17 +141,17 @@ export function ToggleRow({
       onClick={() => onChange(!checked)}
       className="flex w-full items-start gap-3 rounded-xl border border-slate-200 !bg-[var(--it-card-bg)] px-3 py-2.5 text-left hover:border-slate-300 disabled:opacity-50"
     >
-      <span
+      <ITText as="span"
         className={`relative mt-0.5 h-4 w-7 shrink-0 rounded-full transition ${checked ? "bg-primary-500" : "bg-slate-300"}`}
       >
         <span
           className={`absolute top-0.5 h-3 w-3 rounded-full bg-[var(--it-card-bg)] shadow transition-all ${checked ? "left-3.5" : "left-0.5"}`}
         />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-[12px] font-bold text-slate-800">{title}</span>
-        {description && <span className="block text-[11px] leading-snug text-slate-500">{description}</span>}
-      </span>
+      </ITText>
+      <ITText as="span" className="min-w-0 flex-1">
+        <ITText as="span" className="block text-[12px] font-bold text-slate-800">{title}</ITText>
+        {description && <ITText as="span" className="block text-[11px] leading-snug text-slate-500">{description}</ITText>}
+      </ITText>
     </button>
   );
 }
@@ -160,7 +161,7 @@ export function DialogFooter({ left, children }: { left?: ReactNode; children: R
   return (
     <div className="mt-1 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
       <div>{left}</div>
-      <div className="flex items-center gap-2">{children}</div>
+      <ITFlex align="center" gap={2}>{children}</ITFlex>
     </div>
   );
 }
@@ -168,5 +169,5 @@ export function DialogFooter({ left, children }: { left?: ReactNode; children: R
 /** Mensaje de error bajo un campo. */
 export function FieldError({ message }: { message?: string | null }) {
   if (!message) return null;
-  return <p className="mt-1 text-[11px] font-semibold text-rose-600">{message}</p>;
+  return <ITText className="mt-1 text-[11px] font-semibold text-rose-600">{message}</ITText>;
 }

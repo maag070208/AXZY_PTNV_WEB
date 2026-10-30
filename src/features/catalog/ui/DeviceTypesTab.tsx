@@ -139,30 +139,30 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
               <ITInput name="prefix" label={t("types.prefix")} value={prefix} onChange={(e) => setPrefix(e.target.value)} placeholder="TAB" />
             </ITGrid>
             <ITGrid item xs={6} md={2}>
-              <label className="mt-6 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+              <ITText as="label" className="mt-6 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                 <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                 {t("types.active")}
-              </label>
+              </ITText>
             </ITGrid>
             <ITGrid item xs={12}>
               <ITText className="text-[12px] font-semibold text-slate-400">{t("types.fields")}</ITText>
               <ITFlex wrap="wrap" gap={4} className="mt-2">
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useSerialNumber} onChange={(e) => setUseSerialNumber(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   <FaTag size={11} className="text-slate-400" /> {t("devices.serialNumber")}
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                </ITText>
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useMac} onChange={(e) => setUseMac(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   {t("devices.mac")}
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                </ITText>
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useIp} onChange={(e) => setUseIp(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   {t("devices.ip")}
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                </ITText>
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useHostname} onChange={(e) => setUseHostname(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   {t("devices.hostname")}
-                </label>
+                </ITText>
               </ITFlex>
             </ITGrid>
             <ITGrid item xs={12}>

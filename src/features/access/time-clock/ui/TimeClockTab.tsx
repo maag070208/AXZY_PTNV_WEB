@@ -128,11 +128,11 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
         filter: "catalog",
         catalogOptions: { data: METHODS.map((m) => ({ id: m, name: t(`methods.${m}`) })) },
         render: (c) => (
-          <span title={c.method === "OTHER" ? t("otherHint", { minor: c.minor }) : undefined}>
+          <ITText as="span" title={c.method === "OTHER" ? t("otherHint", { minor: c.minor }) : undefined}>
             <ITBadget color={METHOD_COLOR[c.method]} size="lg">
               {t(`methods.${c.method}`)}
             </ITBadget>
-          </span>
+          </ITText>
         ),
       },
       {
@@ -144,9 +144,9 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
         filter: "catalog",
         catalogOptions: { data: (status?.devices ?? []).map((d) => ({ id: d.clockSerial, name: d.name })) },
         render: (c) => (
-          <span title={c.clockSerial}>
+          <ITText as="span" title={c.clockSerial}>
             <ITText className="text-[11px] font-bold text-slate-600">{c.clock ?? c.clockSerial}</ITText>
-          </span>
+          </ITText>
         ),
       },
       {
