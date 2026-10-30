@@ -273,7 +273,14 @@
     "greet": "Celebrate",
     "switchRole": "Change the role used for explanations",
     "pause": "Coffee break ☕",
-    "hello": "Hi! How can I help?"
+    "hello": "Hi! How can I help?",
+    "back": "Back to help",
+    "ticketTitle": "New ticket with Langostín",
+    "createTicket": "Create ticket here",
+    "agentTicket": "Create ticket here",
+    "ticketOffer": "I can create the new ticket myself, right here. Shall we?",
+    "ticketOfferBubble": "New ticket? I can create it right here.",
+    "later": "Not now"
   },
   "season": {
     "halloween": {

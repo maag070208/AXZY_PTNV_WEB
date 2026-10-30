@@ -11,6 +11,9 @@ import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { LangostinAvatar } from "@shared/ui/langostin";
 import { usePrefersReducedMotion } from "@shared/lib/usePrefersReducedMotion";
 import { helpScreenFor, isHelpHidden, type HelpAction } from "../model/helpRegistry";
+import { ITButton } from "@axzydev/axzy_ui_system";
+import { LuArrowLeft, LuSparkles } from "react-icons/lu";
+import { ASSISTANT_AGENTS, type AssistantAgent } from "../model/agents";
 import { useSeason } from "../model/useSeason";
 
 type Message = { id: number; from: "agent" | "user"; text: string };
@@ -21,14 +24,19 @@ type Message = { id: number; from: "agent" | "user"; text: string };
  * dónde ir según el rol. Es determinista (nivel 1): solo ofrece lo registrado en
  * `helpRegistry`, nunca inventa rutas y no ejecuta acciones que cambien datos.
  */
-export default function LangostinHelp() {
+export default function LangostinAssistant() {
   const { t } = useTranslation("langostin");
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const userName = useSelector((s: RootState) => s.auth.user?.name ?? "");
   const [open, setOpen] = useState(false);
+  // Formulario activo dentro del panel (null = modo ayuda). Cada formulario vive
+  // en su componente, así sus hooks sólo corren cuando está abierto.
+  const [agentId, setAgentId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [hintSeen, setHintSeen] = useState(true);
+  // El globo de "puedo darte de alta el ticket" se descarta al usarlo o al decir "después".
+  const [offerDismissed, setOfferDismissed] = useState(false);
   const seq = useRef(0);
   const screen = helpScreenFor(pathname);
   const hidden = isHelpHidden(pathname);
@@ -47,6 +55,10 @@ export default function LangostinHelp() {
     if (!open) return;
     setMessages([]);
     push({ from: "agent", text: t("help.context", { screen: screen.title, explain: screen.explain }) });
+    // En Tickets Langostín se ofrece a dar de alta el ticket él mismo.
+    if (screen.screenId === "tickets.list" && canCreateTicket) {
+      push({ from: "agent", text: t("help.ticketOffer") });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, screen.screenId]);
 
@@ -81,6 +93,18 @@ export default function LangostinHelp() {
     setOpen(true);
     dismissHint();
   };
+
+  const closePanel = () => {
+    setOpen(false);
+    setAgentId(null);
+  };
+
+  // Formularios disponibles aquí: con el permiso de la persona y en esta pantalla.
+  const canCreateTicket = useCan("tickets.create");
+  const availableAgents = ASSISTANT_AGENTS.filter(
+    (agent) => !agent.screens || agent.screens.includes(screen.screenId),
+  );
+  const activeAgent = availableAgents.find((agent) => agent.id === agentId) ?? null;
 
   // "Sorpréndeme": un consejo al azar de esta pantalla (o una pausa si no hay).
   const surprise = () => {
@@ -119,7 +143,11 @@ export default function LangostinHelp() {
         <div
           role="dialog"
           aria-label={t("help.title")}
-          className="fixed bottom-24 right-5 z-50 flex h-[min(600px,calc(100dvh-8rem))] w-[min(380px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-[28px] bg-[var(--it-card-bg)] shadow-[0_28px_70px_-18px_rgba(13,47,64,0.55)] ring-1 ring-black/5"
+          className={`fixed bottom-24 right-5 z-50 flex flex-col overflow-hidden rounded-[28px] bg-[var(--it-card-bg)] shadow-[0_28px_70px_-18px_rgba(13,47,64,0.55)] ring-1 ring-black/5 ${
+            activeAgent
+              ? "h-[min(760px,calc(100dvh-7rem))] w-[min(760px,calc(100vw-2.5rem))]"
+              : "h-[min(600px,calc(100dvh-8rem))] w-[min(380px,calc(100vw-2.5rem))]"
+          }`}
         >
           {season && !reduced && (
             <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -135,6 +163,26 @@ export default function LangostinHelp() {
             </div>
           )}
 
+          {activeAgent ? (
+            <>
+              <ITFlex align="center" gap={2} className="relative z-[1] border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-3">
+                <ITButton variant="text" color="secondary" size="sm" onClick={() => setAgentId(null)} ariaLabel={t("help.back")} title={t("help.back")}>
+                  <LuArrowLeft size={16} />
+                </ITButton>
+                <LuSparkles size={15} className="text-[color:var(--color-primary)]" />
+                <ITText className="!text-[13.5px] font-bold">{t(activeAgent.labelKey)}</ITText>
+              </ITFlex>
+              <div className="relative z-[1] min-h-0 flex-1 overflow-hidden">
+                <activeAgent.Component
+                  onDone={() => {
+                    setAgentId(null);
+                    setOpen(false);
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+          <>
           {/* Encabezado: mascota, nombre, estado con la temporada y acciones */}
           <ITFlex
             align="center"
@@ -163,7 +211,7 @@ export default function LangostinHelp() {
             </button>
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={closePanel}
               title={t("help.close")}
               aria-label={t("help.close")}
               className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-500 transition hover:bg-[color-mix(in_srgb,currentColor_8%,transparent)]"
@@ -241,6 +289,10 @@ export default function LangostinHelp() {
               {t("help.name")}
             </ITText>
             <ITFlex wrap="wrap" gap={1.5} className="mt-1.5">
+              {/* Formularios que Langostín puede hacer aquí (sólo con permiso). */}
+              {availableAgents.map((agent) => (
+                <AgentChip key={agent.id} agent={agent} onClick={() => setAgentId(agent.id)} />
+              ))}
               <ITChip size="lg" variant="outlined" color="gray" icon={<ITText as="span" aria-hidden>✨</ITText>} onClick={surprise}>
                 {t("help.surprise")}
               </ITChip>
@@ -249,11 +301,42 @@ export default function LangostinHelp() {
               </ITChip>
             </ITFlex>
           </div>
+          </>
+          )}
+        </div>
+      )}
+
+      {/* Oferta proactiva en Tickets: Langostín da de alta el ticket */}
+      {!open && screen.screenId === "tickets.list" && canCreateTicket && !offerDismissed && (
+        <div className="fixed bottom-24 right-6 z-50 flex w-[268px] flex-col gap-2 rounded-2xl rounded-br-sm bg-[var(--it-card-bg)] px-3.5 py-3 shadow-[0_18px_40px_-18px_rgba(13,47,64,0.5)] ring-1 ring-black/5">
+          <ITText className="!text-[12.5px] leading-snug">
+            {t("help.ticketOfferBubble")}
+          </ITText>
+          <ITFlex align="center" gap={1.5}>
+            <ITButton
+              variant="filled"
+              color="primary"
+              size="sm"
+              onClick={() => {
+                setOfferDismissed(true);
+                setOpen(true);
+                setAgentId("ticket");
+              }}
+            >
+              <ITFlex align="center" gap={1}>
+                <LuSparkles size={12} />
+                <ITText className="!text-[11px] font-bold">{t("help.agentTicket")}</ITText>
+              </ITFlex>
+            </ITButton>
+            <ITButton variant="text" color="secondary" size="sm" onClick={() => setOfferDismissed(true)}>
+              <ITText className="!text-[11px] font-semibold">{t("help.later")}</ITText>
+            </ITButton>
+          </ITFlex>
         </div>
       )}
 
       {/* Globo de la primera vez */}
-      {!open && !hintSeen && (
+      {!open && hintSeen === false && (
         <div className="fixed bottom-24 right-6 z-50 max-w-[240px] rounded-2xl rounded-br-sm bg-[var(--it-card-bg)] px-3 py-2 shadow-lg ring-1 ring-black/5">
           <ITText className="!text-[12px] font-semibold">{t("help.hint", { screen: screen.title })}</ITText>
         </div>
@@ -262,7 +345,7 @@ export default function LangostinHelp() {
       {/* Botón flotante (el anillo y el emoji cambian con la temporada) */}
       <button
         type="button"
-        onClick={open ? () => setOpen(false) : openPanel}
+        onClick={open ? closePanel : openPanel}
         aria-expanded={open}
         aria-label={open ? t("help.close") : t("help.open")}
         style={{ boxShadow: `0 10px 28px -8px rgba(13,47,64,0.5), 0 0 0 3px ${season?.ring ?? "var(--color-primary-600)"}` }}
@@ -276,6 +359,18 @@ export default function LangostinHelp() {
         )}
       </button>
     </>
+  );
+}
+
+/** Chip de un formulario que Langostín puede hacer aquí (filtra por permiso). */
+function AgentChip({ agent, onClick }: { agent: AssistantAgent; onClick: () => void }) {
+  const { t } = useTranslation("langostin");
+  const can = useCan(agent.permission);
+  if (!can) return null;
+  return (
+    <ITChip size="lg" color={agent.tone ?? "primary"} variant="soft" icon={<LuSparkles size={13} />} onClick={onClick}>
+      {t(agent.labelKey)}
+    </ITChip>
   );
 }
 

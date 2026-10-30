@@ -64,16 +64,6 @@ export default function KanbanPage() {
                 <ITText className="font-bold text-[11px]">{tt("kanban.newTask")}</ITText>
               </ITFlex>
             </ITButton>
-            <ITButton
-              variant="filled"
-              color="primary"
-              onClick={() => navigate("/tickets/new")}
-            >
-              <ITFlex align="center" gap={1}>
-                <LuPlus size={14} />
-                <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
-              </ITFlex>
-            </ITButton>
           </ITFlex>
         ) : undefined
       }

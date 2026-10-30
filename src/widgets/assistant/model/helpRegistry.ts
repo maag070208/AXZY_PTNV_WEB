@@ -71,7 +71,6 @@ export const HELP_SCREENS: HelpScreen[] = [
     actions: [
       { label: "¿Cómo filtro por estado?", answer: "Toca una de las cifras de arriba (Abiertos, En seguimiento, Sin asignar, Cerrados): la tabla se filtra y se vuelve a tocar para quitar el filtro." },
       { label: "¿Qué significa EXCELENTE o REGULAR?", answer: "Es el tiempo en espera de la tarea: EXCELENTE cuando se cerró dentro de los primeros días; REGULAR cuando tardó más." },
-      { label: "Crear un ticket", to: "/tickets/new", permission: "tickets.create" },
       { label: "Ver el tablero", to: "/tickets/kanban", permission: "tickets.view" },
     ],
     glossary: {

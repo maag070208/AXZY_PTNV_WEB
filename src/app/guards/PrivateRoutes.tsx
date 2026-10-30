@@ -21,7 +21,7 @@ import { API_CONSTANTS } from "@shared/api/constants/API_CONSTANTS";
 import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
 import ForcePasswordChange from "./ForcePasswordChange";
-import { LangostinHelp } from "@features/help/assistant";
+import { LangostinAssistant } from "@widgets/assistant";
 import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
 
 /** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
@@ -250,7 +250,7 @@ export default function PrivateRoutes() {
         <Outlet />
       </ITLayout>
       {/* Langostín de ayuda en todas las pantallas (se oculta donde ya hay chat). */}
-      <LangostinHelp />
+      <LangostinAssistant />
       {toast && (
         <ITToast
           message={toast}

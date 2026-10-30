@@ -36,11 +36,6 @@ export default function TicketSummaryPanel({
       title={t("new.summary.heading")}
       total={total}
       done={completed}
-      footer={
-        <ITText className="m-0 rounded-2xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-600">
-          <ITText as="strong" className="font-semibold text-slate-800">{t("new.why.title")}</ITText> {t("new.why.body")}
-        </ITText>
-      }
     >
       <ITText className="m-0 text-[12.5px] text-slate-500">{t("new.summary.sub")}</ITText>
       <ITText className={`m-0 text-[14px] font-bold ${title ? "text-slate-800" : "text-slate-400"}`}>

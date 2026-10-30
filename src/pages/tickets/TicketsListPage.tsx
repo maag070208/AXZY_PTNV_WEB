@@ -12,6 +12,14 @@ import type { ListSummaryItem } from "@shared/ui/list-summary-strip";
 import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 
 /** Color de cada cifra del resumen (punto de la tira y segmento de la barra). */
+/** Tono bento de cada cifra (el mismo lenguaje que el mosaico del inicio). */
+const STAT_TONE: Record<string, "sun" | "sea" | "lavender" | "mint"> = {
+  open: "sun",
+  followUp: "sea",
+  unassigned: "lavender",
+  closed: "mint",
+};
+
 const STAT_COLOR: Record<string, string> = {
   open: "var(--color-warning)",
   followUp: "var(--color-primary-600)",
@@ -62,16 +70,6 @@ export default function TicketsListPage() {
               <ITText className="font-bold text-[11px]">{tt("list.board")}</ITText>
             </ITFlex>
           </ITButton>
-          <ITButton
-              variant="filled"
-              color="primary"
-              onClick={() => navigate("/tickets/new")}
-            >
-              <ITFlex align="center" gap={1}>
-                <LuPlus size={14} />
-                <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
-              </ITFlex>
-            </ITButton>
         </ITFlex>
       }
     >
@@ -87,6 +85,7 @@ export default function TicketsListPage() {
               value: item.value,
               caption: item.caption,
               color: STAT_COLOR[item.id] ?? "var(--color-primary-500)",
+              tone: STAT_TONE[item.id] ?? "plain",
             }))}
             stackItems={summaryItems
               .filter((item) => ["open", "followUp", "closed"].includes(item.id))

@@ -273,7 +273,14 @@
     "greet": "Felicitar",
     "switchRole": "Cambiar el rol con el que se explica",
     "pause": "Pausa para un café ☕",
-    "hello": "¡Hola! ¿En qué te ayudo?"
+    "hello": "¡Hola! ¿En qué te ayudo?",
+    "back": "Volver a la ayuda",
+    "ticketTitle": "Nuevo ticket con Langostín",
+    "createTicket": "Crear ticket aquí",
+    "agentTicket": "Crear ticket aquí",
+    "ticketOffer": "Puedo darte de alta el ticket nuevo yo mismo, sin salir de esta pantalla. ¿Lo hacemos?",
+    "ticketOfferBubble": "¿Un ticket nuevo? Te lo levanto yo aquí mismo.",
+    "later": "Ahora no"
   },
   "season": {
     "halloween": {
