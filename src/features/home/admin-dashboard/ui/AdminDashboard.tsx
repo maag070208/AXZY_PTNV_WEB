@@ -102,13 +102,18 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
     };
   });
 
-  // Tickets por estado (los tres estados reales del resumen).
-  const statusRows = [
-    { label: t("adminDashboard.statusOpen"), value: summary.tickets.open, color: "var(--color-primary-500)" },
-    { label: t("adminDashboard.statusInProgress"), value: summary.tickets.inProgress, color: "var(--color-warning)" },
-    { label: t("adminDashboard.statusClosed"), value: summary.tickets.closed, color: "var(--color-success)" },
-  ];
-  const statusMax = Math.max(1, ...statusRows.map((r) => r.value));
+  // Dispositivos por categoría (tipo), de mayor a menor.
+  const categories = fx.deviceTypes
+    .map((type, i) => ({
+      label: type.name,
+      value: type.devices.reduce((acc, d) => acc + d.total, 0),
+      color: seriesColor(i),
+    }))
+    .filter((c) => c.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+  const categoryTotal = categories.reduce((acc, c) => acc + c.value, 0);
+  const categoryMax = Math.max(1, ...categories.map((c) => c.value));
 
   // Actividad agrupada por día para el hilo.
   const todayKey = dayKey(new Date().toISOString());
@@ -213,26 +218,36 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
         <ITBentoTile
           tone="mint"
           cols={5}
-          rows={2}
+          rows={1}
           wide
           icon={<LuListChecks size={15} />}
-          label={t("adminDashboard.resolvedTickets")}
-          value={
-            <>
-              <Big value={resolvedTasks} />
-              <span className="text-[15px] font-semibold opacity-60"> / {tasksTotal}</span>
-            </>
-          }
-          caption={t("adminDashboard.resolvedPending", { pending: pendingTasks })}
         >
-          <div className="mt-2 max-h-[34px] min-h-0 flex-1">
-            <ITBentoSegments total={tasksTotal} done={resolvedTasks} color="var(--color-success)" />
+          <div className="flex h-full min-h-0 items-center gap-3">
+            <div className="shrink-0">
+              <h3 className="it-bento-tile__label">
+                <LuListChecks size={15} />
+                {t("adminDashboard.resolvedTickets")}
+              </h3>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="it-bento-tile__value">
+                  <Big value={resolvedTasks} />
+                </span>
+                <span className="text-[15px] font-semibold opacity-60">/ {tasksTotal}</span>
+              </div>
+            </div>
+            <div className="max-h-[42px] min-h-0 flex-1">
+              <ITBentoSegments total={tasksTotal} done={resolvedTasks} color="var(--color-success)" />
+            </div>
+            <div className="shrink-0 text-right">
+              <div className="it-bento-tile__value !text-[22px]">{pendingTasks}</div>
+              <small className="it-bento-tile__caption">{t("adminDashboard.pendingLabel")}</small>
+            </div>
           </div>
         </ITBentoTile>
 
         {/* Actividad de la semana */}
-        <ITBentoTile cols={3} rows={2} wide icon={<LuActivity size={15} />} label={t("adminDashboard.weekActivity")}>
-          <div className="mt-2 h-[76px]">
+        <ITBentoTile cols={3} rows={1} wide icon={<LuActivity size={15} />} label={t("adminDashboard.weekActivity")}>
+          <div className="mt-1 h-[46px]">
             <ITBentoWeekBars items={week} color="var(--color-primary-500)" todayColor="var(--color-warning)" />
           </div>
         </ITBentoTile>
@@ -252,13 +267,14 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
             <div className="mt-2 flex items-center gap-3.5">
               <div className="shrink-0">
                 <ITBentoDonut
+                  size={132}
                   segments={efficiencySegments}
                   center={<Big value={efficiencyTotal} />}
                   caption={t("adminDashboard.resolvedCaption")}
                 />
               </div>
               <div className="grid min-w-0 flex-1 gap-2.5">
-                {efficiencySegments.slice(0, 3).map((sec) => {
+                {efficiencySegments.slice(0, 4).map((sec) => {
                   const pct = efficiencyTotal > 0 ? Math.round((sec.value / efficiencyTotal) * 100) : 0;
                   return (
                     <div key={sec.label} className="grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 text-[12.5px] font-medium">
@@ -287,29 +303,33 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
           </p>
         </ITBentoTile>
 
-        {/* Tickets por estado */}
+        {/* Dispositivos por categoría */}
         <ITBentoTile
           cols={4}
           rows={4}
           wide
-          icon={<LuTicket size={15} />}
-          label={t("adminDashboard.ticketsByStatus")}
-          onClick={() => navigate("/tickets")}
+          icon={<LuBox size={15} />}
+          label={t("adminDashboard.devicesByCategory")}
+          onClick={() => navigate("/inventory/device-types")}
         >
-          <div className="it-bento-bars mt-4 flex-1 content-center gap-6">
-            {statusRows.map((row) => (
-              <div key={row.label} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
-                <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
-                <span>{row.label}</span>
-                <span>
-                  {row.value} <span className="opacity-60">{Math.round((row.value / Math.max(1, summary.tickets.total)) * 100)}%</span>
-                </span>
-                <div className="it-bento-bar col-span-3">
-                  <i style={{ "--it-bento-w": `${(row.value / statusMax) * 100}%`, background: row.color } as React.CSSProperties} />
+          {categories.length === 0 ? (
+            <p className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noCategories")}</p>
+          ) : (
+            <div className="it-bento-bars mt-4 flex-1 content-around">
+              {categories.map((row) => (
+                <div key={row.label} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
+                  <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
+                  <span className="truncate lowercase first-letter:uppercase">{row.label}</span>
+                  <span>
+                    {row.value} <span className="opacity-60">{Math.round((row.value / Math.max(1, categoryTotal)) * 100)}%</span>
+                  </span>
+                  <div className="it-bento-bar col-span-3">
+                    <i style={{ "--it-bento-w": `${(row.value / categoryMax) * 100}%`, background: row.color } as React.CSSProperties} />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </ITBentoTile>
 
         {/* Actividad reciente */}
@@ -319,7 +339,7 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
           ) : (
             <div className="mt-1 min-h-0 flex-1">
               <ITBentoFeed
-                maxHeight={212}
+                maxHeight={236}
                 groups={activityGroups.map((g) => ({
                   key: g.key,
                   label: g.label,

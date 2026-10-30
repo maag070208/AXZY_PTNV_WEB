@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { dashboardApi, type DashboardActivity, type DashboardSummary } from "@entities/dashboard";
+import { inventoryApi, type DashboardByType } from "@entities/inventory";
 import { useAblyChannel } from "@shared/lib/ably";
 
 const MAX_LIVE_ACTIVITY = 20;
@@ -11,6 +12,8 @@ export const useAdminDashboard = (enabled: boolean = true) => {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [liveActivity, setLiveActivity] = useState<DashboardActivity[]>([]);
   const [error, setError] = useState<string | null>(null);
+  /** Dispositivos agrupados por tipo (categorías del inicio); vacío si no hay permiso. */
+  const [deviceTypes, setDeviceTypes] = useState<DashboardByType[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const load = useCallback(() => {
@@ -22,6 +25,11 @@ export const useAdminDashboard = (enabled: boolean = true) => {
         setError(null);
       })
       .catch((e: any) => setError(e.message ?? t("adminDashboard.errorLoad")));
+    // El desglose por categoría es opcional: sin permiso de inventario se omite.
+    inventoryApi
+      .dashboard()
+      .then((data) => setDeviceTypes(data.byType ?? []))
+      .catch(() => setDeviceTypes([]));
   }, [enabled, t]);
 
   useEffect(() => {
@@ -70,7 +78,7 @@ export const useAdminDashboard = (enabled: boolean = true) => {
     ),
   ].slice(0, MAX_LIVE_ACTIVITY);
 
-  return { t, summary, activity, error, setError };
+  return { t, summary, activity, deviceTypes, error, setError };
 };
 
 export type UseAdminDashboard = ReturnType<typeof useAdminDashboard>;

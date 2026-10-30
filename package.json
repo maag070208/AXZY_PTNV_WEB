@@ -32,7 +32,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@axzydev/axzy_ui_system": "1.8.2",
+    "@axzydev/axzy_ui_system": "1.8.4",
     "@blobatar/react": "2.7.0",
     "@react-pdf/renderer": "^4.6.1",
     "@reduxjs/toolkit": "^2.5.1",

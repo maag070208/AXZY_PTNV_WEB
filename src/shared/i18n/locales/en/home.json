@@ -45,6 +45,8 @@
     "statusClosed": "Closed",
     "tickets": "tickets",
     "efficiencyNote": "{{top}} resolved the most; {{none}} has no resolved tasks yet.",
-    "efficiencyNoteAll": "The whole team has resolved tasks."
+    "efficiencyNoteAll": "The whole team has resolved tasks.",
+    "devicesByCategory": "Devices by category",
+    "noCategories": "No devices yet."
   }
 }

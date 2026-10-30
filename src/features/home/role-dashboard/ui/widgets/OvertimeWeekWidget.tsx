@@ -6,7 +6,6 @@ import { dyn } from "@shared/i18n/dyn";
 import { CHART_STATUS, StackedBar } from "@shared/ui/charts";
 import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import { useWidgetData } from "../../model/useWidgetData";
-import { alarmTone } from "../../model/alarmTone";
 import WidgetCard, { EmptyText, ListRow, Metric, MetricGrid, RowList, SectionLabel } from "../WidgetCard";
 
 /** Horas extra de la semana: calculadas contra aprobadas contra no aprobadas (lo que compara RH). */
@@ -29,20 +28,20 @@ export default function OvertimeWeekWidget() {
       {data && (
         <>
           <MetricGrid>
-            <Metric value={hours(data.extraMin)} label={t("overtime.calculated")} />
+            <Metric value={hours(data.extraMin)} label={t("overtime.calculated")} tone="sky" />
             <Metric
               value={hours(data.approvedExtraMin)}
               label={t("overtime.approved")}
-              tone={alarmTone(data.approvedExtraMin, "emerald")}
+              tone="emerald"
               ratio={data.extraMin > 0 ? data.approvedExtraMin / data.extraMin : undefined}
             />
             <Metric
               value={hours(data.pendingExtraMin)}
               label={t("overtime.notApproved")}
-              tone={alarmTone(data.pendingExtraMin, "amber")}
+              tone="amber"
               ratio={data.extraMin > 0 ? data.pendingExtraMin / data.extraMin : undefined}
             />
-            <Metric value={hours(data.rejectedExtraMin)} label={t("overtime.rejected")} tone={alarmTone(data.rejectedExtraMin, "rose")} />
+            <Metric value={hours(data.rejectedExtraMin)} label={t("overtime.rejected")} tone="rose" />
           </MetricGrid>
           <SectionLabel>{t("overtime.chartTitle")}</SectionLabel>
           <StackedBar

@@ -45,6 +45,8 @@
     "statusClosed": "Cerrados",
     "tickets": "tickets",
     "efficiencyNote": "{{top}} resolvió más; {{none}} aún no tiene tareas resueltas.",
-    "efficiencyNoteAll": "Todo el equipo con tareas resueltas."
+    "efficiencyNoteAll": "Todo el equipo con tareas resueltas.",
+    "devicesByCategory": "Dispositivos por categoría",
+    "noCategories": "Sin dispositivos registrados."
   }
 }

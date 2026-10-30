@@ -33,7 +33,12 @@
     "uploadAction": "Subir archivo",
     "addAnother": "Agregar otro",
     "filesLabel": "Archivos",
-    "sections": {"activity": "Actividad", "documents": "Documentos", "clock": "Reloj checador", "info": "Datos del empleado"},
+    "sections": {
+      "activity": "Actividad",
+      "documents": "Documentos",
+      "clock": "Reloj checador",
+      "info": "Datos del empleado"
+    },
     "activity": {
       "loading": "Cargando actividad…",
       "error": "No se pudo cargar la actividad",
@@ -284,7 +289,8 @@
       "moreFields": "+{{count}} más",
       "notify": "Avisar faltantes",
       "open": "Abrir expediente",
-      "select": "Selecciona un empleado para ver su expediente"
+      "select": "Selecciona un empleado para ver su expediente",
+      "ofTotal": "de {{total}}"
     },
     "notify": "Avisar",
     "notified": "Se avisó a {{name}}",

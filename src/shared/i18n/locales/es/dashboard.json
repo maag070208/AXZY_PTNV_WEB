@@ -34,10 +34,13 @@
     "ownUnlinked": "Tu número del reloj no está vinculado; pide a RH que lo vincule",
     "viewReport": "Ver reporte semanal",
     "ofExpected": "de {{total}} esperados",
-    "chartTitle": "Cómo va el día"
+    "chartTitle": "Cómo va el día",
+    "followUp": "Seguimiento del día",
+    "viewAccess": "Ver bitácora de accesos",
+    "linkClocks": "Vincular personas al reloj"
   },
   "records": {
-    "title": "Expedientes",
+    "title": "Plantilla activa",
     "complete": "Completos",
     "missingRequired": "Sin documentos obligatorios",
     "missingDocuments": "Con documentos pendientes",
@@ -65,7 +68,16 @@
     "chartDepartments": "Sin obligatorios por departamento",
     "peopleUnit": "personas",
     "noDepartment": "Sin departamento",
-    "chartsTitle": "Pendientes de expedientes"
+    "chartsTitle": "Pendientes de expedientes",
+    "missingOf": "de {{total}} sin expediente completo",
+    "haveArrived": "{{count}} han llegado",
+    "followUp": "Seguimiento del día",
+    "kpis": {
+      "missingRequired": "Faltan obligatorios",
+      "complete": "Completos",
+      "incomplete": "Incompletos",
+      "active": "Plantilla activa"
+    }
   },
   "profileFields": {
     "curp": "CURP",
@@ -110,7 +122,8 @@
     "personalWithoutClock": "Personal sin vínculo al reloj",
     "personalWithoutSchedule": "Personal sin horario",
     "link": "Vincular",
-    "assign": "Asignar horario"
+    "assign": "Asignar horario",
+    "assignSchedule": "Asignar horarios"
   },
   "tickets": {
     "title": "Tickets",
@@ -154,7 +167,12 @@
     "ENTRY": "Entrada",
     "EXIT": "Salida",
     "since": "Desde {{time}}",
-    "openLog": "Abrir bitácora"
+    "openLog": "Abrir bitácora",
+    "ofEntries": "de {{total}} entradas",
+    "assignSchedule": "Asignar horarios",
+    "noEntries": "Sin accesos registrados hoy",
+    "nobodyInside": "Nadie dentro del hotel ahora",
+    "noRecords": "Todavía no hay registros hoy"
   },
   "system": {
     "title": "Salud del sistema",
@@ -165,7 +183,20 @@
     "neverSynced": "Nunca sincronizado",
     "noAttendance": "no cuenta asistencia",
     "failedEmails": "Correos fallidos (7 días)",
-    "pendingEmails": "Correos en cola"
+    "pendingEmails": "Correos en cola",
+    "mail": "Correos",
+    "ofClocks": "de {{total}} relojes",
+    "synced": "{{count}} sincronizados",
+    "stale": "{{count}} atrasados",
+    "noClocks": "Sin relojes registrados",
+    "lastSyncShort": "{{when}}",
+    "shortcuts": "Atajos de configuración",
+    "shortcutClocks": "Relojes",
+    "shortcutRoles": "Roles y permisos",
+    "shortcutCatalog": "Catálogos",
+    "shortcutAudit": "Auditoría de inventario",
+    "staleOne": "atrasado",
+    "okOne": "al día"
   },
   "operations": {
     "title": "Operación"

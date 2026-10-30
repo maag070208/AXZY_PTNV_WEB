@@ -33,7 +33,12 @@
     "uploadAction": "Upload file",
     "addAnother": "Add another",
     "filesLabel": "Files",
-    "sections": {"activity": "Activity", "documents": "Documents", "clock": "Time clock", "info": "Employee data"},
+    "sections": {
+      "activity": "Activity",
+      "documents": "Documents",
+      "clock": "Time clock",
+      "info": "Employee data"
+    },
     "activity": {
       "loading": "Loading activity…",
       "error": "Could not load the activity",
@@ -284,7 +289,8 @@
       "moreFields": "+{{count}} more",
       "notify": "Notify missing",
       "open": "Open record",
-      "select": "Select an employee to see their record"
+      "select": "Select an employee to see their record",
+      "ofTotal": "of {{total}}"
     },
     "notify": "Notify",
     "notified": "{{name}} was notified",

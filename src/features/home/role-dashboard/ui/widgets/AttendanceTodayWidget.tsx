@@ -8,18 +8,20 @@ import { CHART_STATUS, DonutChart } from "@shared/ui/charts";
 import { formatTimeInTZ } from "@shared/utils/dates";
 import { useWidgetData } from "../../model/useWidgetData";
 import type { KpiTone } from "@shared/ui/kpi-tile";
-import { alarmTone } from "../../model/alarmTone";
 import WidgetCard, { EmptyText, ListRow, Metric, MetricGrid, RowList, SectionLabel } from "../WidgetCard";
 
-/** Tono por estado; los que son alarma (tarde, sin llegar, sin vínculo) van neutrales en cero. */
+/**
+ * Tono por estado: el color identifica el estado (no la alarma), así los
+ * mosaicos del inicio se ven como el resto del tablero aunque el día esté en 0.
+ */
 const STATUS_TONE: Record<TodayStatus, KpiTone> = {
   PRESENT: "emerald",
   LATE: "amber",
   NOT_ARRIVED: "rose",
-  NOT_YET: "neutral",
+  NOT_YET: "sky",
   REST: "neutral",
   NO_SCHEDULE: "neutral",
-  UNLINKED: "amber",
+  UNLINKED: "violet",
 };
 
 const METRICS: TodayStatus[] = ["PRESENT", "LATE", "NOT_ARRIVED", "NOT_YET", "UNLINKED"];
@@ -99,7 +101,7 @@ export default function AttendanceTodayWidget() {
                   key={s}
                   value={data.counts[s]}
                   label={t(`attendance.status.${s}`)}
-                  tone={s === "PRESENT" ? "emerald" : alarmTone(data.counts[s], STATUS_TONE[s])}
+                  tone={STATUS_TONE[s]}
                   ratio={s === "PRESENT" && expected > 0 ? data.counts.PRESENT / expected : undefined}
                   hint={s === "PRESENT" && expected > 0 ? t("attendance.ofExpected", { total: expected }) : undefined}
                 />
@@ -108,7 +110,7 @@ export default function AttendanceTodayWidget() {
             </MetricGrid>
             <SectionLabel>{t("attendance.chartTitle")}</SectionLabel>
             <DonutChart
-              size={110}
+              size={126}
               segments={[
                 { label: t("attendance.status.PRESENT"), value: data.counts.PRESENT, color: CHART_STATUS.good },
                 { label: t("attendance.status.LATE"), value: data.counts.LATE, color: CHART_STATUS.warning },
@@ -116,16 +118,24 @@ export default function AttendanceTodayWidget() {
                 { label: t("attendance.status.NOT_YET"), value: data.counts.NOT_YET, color: CHART_STATUS.info },
               ]}
             />
-            <SectionLabel>{t("attendance.notArrivedList")}</SectionLabel>
-            {list(
-              data.rows.filter((r) => r.status === "NOT_ARRIVED"),
-              (r) => t("attendance.shift", { shift: r.shift ?? "—" })
-            )}
-            <SectionLabel>{t("attendance.lateList")}</SectionLabel>
-            {list(
-              data.rows.filter((r) => r.status === "LATE").sort((a, b) => b.lateMin - a.lateMin),
-              (r) => `${t("attendance.entry", { time: time(r.entryAt) })} · ${t("attendance.late", { minutes: r.lateMin })}`
-            )}
+            {/* Las dos listas van lado a lado: antes se apilaban y dejaban un hueco
+                grande cuando el día venía en cero. */}
+            <div className="mt-3 grid gap-4 md:!grid-cols-2">
+              <div>
+                <SectionLabel>{t("attendance.notArrivedList")}</SectionLabel>
+                {list(
+                  data.rows.filter((r) => r.status === "NOT_ARRIVED"),
+                  (r) => t("attendance.shift", { shift: r.shift ?? "—" })
+                )}
+              </div>
+              <div>
+                <SectionLabel>{t("attendance.lateList")}</SectionLabel>
+                {list(
+                  data.rows.filter((r) => r.status === "LATE").sort((a, b) => b.lateMin - a.lateMin),
+                  (r) => `${t("attendance.entry", { time: time(r.entryAt) })} · ${t("attendance.late", { minutes: r.lateMin })}`
+                )}
+              </div>
+            </div>
           </>
         )
       )}

@@ -8,11 +8,10 @@ import {
   ITChip,
   ITConfirmDialog,
   ITInput,
-  ITProgress,
   ITSearchSelect,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaBell, FaCheck, FaChevronRight, FaIdCard, FaSearch, FaTimes, FaUserCheck, FaUserClock } from "react-icons/fa";
+import { FaBell, FaChevronRight, FaIdCard, FaSearch, FaUserCheck, FaUserClock } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
@@ -54,6 +53,8 @@ function Progress({ done, total, label }: { done: number; total: number; label: 
 
 interface Props {
   fx: UseEmployeeRecords;
+  /** Oculta la franja de indicadores (el inicio ya la muestra en el mosaico). */
+  hideKpis?: boolean;
 }
 
 /**
@@ -61,7 +62,7 @@ interface Props {
  * obligatorios de cada quien, avance del expediente y de los datos personales,
  * y el detalle de la persona elegida para ver o subir documentos y avisarle.
  */
-export default function EmployeeRecordsBoard({ fx }: Props) {
+export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
   const { t } = fx;
   const navigate = useNavigate();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -104,15 +105,14 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Indicadores + aviso masivo */}
-      <div className="flex flex-wrap items-start gap-3">
-        <div className="grid flex-1 !grid-cols-2 gap-3 md:!grid-cols-4">
+      {/* Indicadores (el inicio los muestra en su propio mosaico) */}
+      {!hideKpis && (
+        <div className="grid gap-3 !grid-cols-2 md:!grid-cols-4">
           {kpis.map((k) => (
             <KpiTile key={k.key} size="sm" tone={k.tone} label={t(`records.kpis.${k.key}`)} value={k.value} icon={k.icon} />
           ))}
         </div>
-
-      </div>
+      )}
 
       {fx.error && (
         <ITAlert variant="error">{fx.error}</ITAlert>
@@ -277,48 +277,53 @@ export default function EmployeeRecordsBoard({ fx }: Props) {
             <div className="p-8 text-center text-[12px] text-slate-400">{t("records.detail.select")}</div>
           ) : (
             <>
-              <div className="border-b border-slate-100 p-4">
-                <div className="flex items-center gap-3">
+              <div className="p-1">
+                <div className="flex items-center gap-2.5">
                   <ProfileAvatar name={sel.name} size="md" />
                   <div className="min-w-0">
-                    <div className="truncate text-[13px] font-bold text-slate-900">{sel.name}</div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="line-clamp-2 text-[14px] font-bold leading-tight text-slate-900">{sel.name}</div>
+                    <div className="mt-0.5 text-[11.5px] text-slate-500">
                       {[sel.employeeNumber ? `#${sel.employeeNumber}` : "#—", sel.departmentName].filter(Boolean).join(" · ")}
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 flex justify-between text-[11px]">
-                  <span className="text-slate-600">{t("records.detail.total")}</span>
-                  <span className="font-bold text-slate-900">
-                    {t("records.progress", totalOf(sel))}
+
+                {/* Total del expediente: número grande a la derecha, como el diseño */}
+                <div className="mt-4 flex items-baseline justify-between gap-2">
+                  <span className="text-[13.5px] font-bold text-slate-900">{t("records.detail.total")}</span>
+                  <span className="flex items-baseline gap-1">
+                    <b className="text-[22px] font-extrabold leading-none tabular-nums text-slate-900">{totalOf(sel).done}</b>
+                    <span className="text-[12px] text-slate-500">{t("records.detail.ofTotal", { total: totalOf(sel).total })}</span>
                   </span>
                 </div>
-                <ITProgress value={percent(totalOf(sel).done, totalOf(sel).total)} size="sm" className="mt-1.5" />
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-[var(--color-primary-500)] transition-[width] duration-700"
+                    style={{ width: `${percent(totalOf(sel).done, totalOf(sel).total)}%` }}
+                  />
+                </div>
               </div>
 
-              <div className="flex-1 overflow-auto p-4">
-                <div className="text-[12px] font-bold text-orange-700">
+              <div className="min-h-0 flex-1 overflow-auto px-1 pt-4">
+                <div className="text-[13px] font-bold" style={{ color: "color-mix(in srgb, var(--color-warning) 42%, var(--color-text-default))" }}>
                   {t("records.detail.required", { done: done(sel.requiredDocuments), total: sel.requiredDocuments.length })}
                 </div>
-                <div className="mt-2 divide-y divide-slate-100">
+                <div className="mt-1 divide-y divide-slate-100">
                   {sel.requiredDocuments.map((d) => {
                     const file = fx.documentOf(d.id);
                     return (
-                      <div key={d.id} className="flex items-center gap-2.5 py-1">
+                      <div key={d.id} className="flex items-center gap-2.5 py-2">
                         <span
-                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                            d.delivered ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600"
-                          }`}
-                        >
-                          {d.delivered ? <FaCheck size={9} /> : <FaTimes size={9} />}
-                        </span>
-                        <span className="flex-1 text-[12px] text-slate-800">{d.name}</span>
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ background: d.delivered ? "var(--color-success)" : "var(--color-warning)" }}
+                        />
+                        <span className="flex-1 text-[12.5px] font-medium text-slate-800">{d.name}</span>
                         {d.delivered && file ? (
                           <ITButton variant="text" color="primary" size="sm" label={t("records.detail.view")} onClick={() => window.open(file.url, "_blank", "noopener")} />
                         ) : (
                           <ITButton
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             size="sm"
                             disabled={fx.uploading === d.id}
                             onClick={() => pickFile(d.id)}

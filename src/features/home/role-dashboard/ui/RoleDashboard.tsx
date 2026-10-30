@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { LuActivity, LuChefHat, LuClock, LuServer, LuUser, LuUsers } from "react-icons/lu";
 import { usePermissions, useCurrentRole } from "@entities/user";
 import { FEATURES } from "@shared/config/features";
+import { ITFlex } from "@axzydev/axzy_ui_system";
 import { TabBar } from "@shared/ui/tab-bar";
 import AccessTodayWidget from "./widgets/AccessTodayWidget";
 import AttendanceTodayWidget from "./widgets/AttendanceTodayWidget";
@@ -37,6 +38,9 @@ export type WidgetId =
  * del rol, no este catálogo.
  */
 export type WidgetGroup = "ops" | "people" | "clock" | "kitchen" | "system" | "mine";
+
+/** Orden fijo de las pestañas: Operación siempre primero. */
+const GROUP_ORDER: WidgetGroup[] = ["ops", "people", "clock", "kitchen", "system", "mine"];
 
 /** Ícono de línea de cada pestaña del tablero. */
 const GROUP_ICON: Record<WidgetGroup, ReactNode> = {
@@ -111,10 +115,14 @@ const DEFAULT_ORDER: WidgetId[] = [
 interface Props {
   /** Widgets que arma la página (p. ej. `operations` = el tablero de operación actual). */
   slots?: Partial<Record<WidgetId, ReactNode>>;
+  /** Pantalla completa por tema: reemplaza los widgets de esa pestaña (mosaico bento). */
+  panels?: Partial<Record<WidgetGroup, ReactNode>>;
+  /** Píldora "En vivo" que acompaña a las pestañas (solo si hay tablero en vivo). */
+  live?: ReactNode;
 }
 
 /** Tablero de inicio según el rol y los permisos de la sesión. */
-export default function RoleDashboard({ slots = {} }: Props) {
+export default function RoleDashboard({ slots = {}, panels = {}, live }: Props) {
   const permissions = usePermissions();
   const role = useCurrentRole();
   const { t } = useTranslation("home");
@@ -158,17 +166,25 @@ export default function RoleDashboard({ slots = {} }: Props) {
   // Un solo tema: como siempre, sin barra de pestañas (sería un solo botón).
   if (grupos.length === 1) return rejilla(grupos[0][1]);
 
+  // Orden de pestañas estable (Operación primero), sin depender del rol.
+  grupos.sort((a, b) => GROUP_ORDER.indexOf(a[0]) - GROUP_ORDER.indexOf(b[0]));
+
   const activo = grupo && grupos.some(([clave]) => clave === grupo) ? grupo : grupos[0][0];
   const widgets = grupos.find(([clave]) => clave === activo)?.[1] ?? [];
+  const panel = panels[activo];
 
   return (
     <div className="flex flex-col gap-4">
-      <TabBar
-        items={grupos.map(([clave]) => ({ id: clave, label: t(`groups.${clave}`), icon: GROUP_ICON[clave] }))}
-        value={activo}
-        onChange={setGrupo}
-      />
-      {rejilla(widgets)}
+      {/* Las pestañas van a la derecha, con la píldora "En vivo" antes de ellas. */}
+      <ITFlex align="center" justify="end" gap={3} wrap="wrap">
+        {live}
+        <TabBar
+          items={grupos.map(([clave]) => ({ id: clave, label: t(`groups.${clave}`), icon: GROUP_ICON[clave] }))}
+          value={activo}
+          onChange={setGrupo}
+        />
+      </ITFlex>
+      {panel ?? rejilla(widgets)}
     </div>
   );
 }
