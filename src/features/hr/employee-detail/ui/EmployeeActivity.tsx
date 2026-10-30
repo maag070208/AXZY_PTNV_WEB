@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { LuArrowLeftRight, LuBoxes, LuClipboardCheck, LuHistory, LuTicket, LuWrench } from "react-icons/lu";
 import { personalApi, type EmployeeOverview } from "@entities/hr";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { ITBentoGrid, ITBentoTile, ITEmptyState } from "@axzydev/axzy_ui_system";
 import { LangostinState } from "@shared/ui/langostin";
 import { PanelCard } from "@shared/ui/panel-card";
 import { dyn } from "@shared/i18n";
@@ -80,18 +80,53 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
 
   return (
     <ITStack spacing={5}>
-      <div className="grid grid-cols-2 gap-3 xl:!grid-cols-4">
+      {/* Indicadores compactos: una fila del mosaico, no tarjetas altas. */}
+      <ITBentoGrid>
         {inventory && (
           <>
-            <KpiTile icon={<LuBoxes size={15} />} tone="sky" label={t("detail.activity.kpi.units")} value={inventory.summary.borrowedUnits} hint={t("detail.activity.kpi.unitsHint", { count: inventory.summary.activeLoans })} />
-            <KpiTile icon={<LuClipboardCheck size={15} />} tone="violet" label={t("detail.activity.kpi.letters")} value={inventory.summary.activeLoans} hint={t("detail.activity.kpi.lettersHint")} />
+            <ITBentoTile
+              cols={3}
+              rows={1}
+              tone="sea"
+              icon={<LuBoxes size={14} />}
+              label={t("detail.activity.kpi.units")}
+              value={inventory.summary.borrowedUnits}
+              caption={t("detail.activity.kpi.unitsHint", { count: inventory.summary.activeLoans })}
+            />
+            <ITBentoTile
+              cols={3}
+              rows={1}
+              tone="lavender"
+              icon={<LuClipboardCheck size={14} />}
+              label={t("detail.activity.kpi.letters")}
+              value={inventory.summary.activeLoans}
+              caption={t("detail.activity.kpi.lettersHint")}
+            />
           </>
         )}
-        <KpiTile icon={<LuTicket size={15} />} tone={summary.openTickets ? "amber" : "neutral"} label={t("detail.activity.kpi.tickets")} value={summary.openTickets} hint={t("detail.activity.kpi.ticketsHint")} />
-        <KpiTile icon={<LuWrench size={15} />} tone={summary.pendingTasks ? "orange" : "neutral"} label={t("detail.activity.kpi.tasks")} value={summary.pendingTasks} hint={t("detail.activity.kpi.tasksHint")} />
-      </div>
+        <ITBentoTile
+          cols={inventory ? 3 : 6}
+          rows={1}
+          wide={!inventory}
+          tone={summary.openTickets ? "sun" : "mint"}
+          icon={<LuTicket size={14} />}
+          label={t("detail.activity.kpi.tickets")}
+          value={summary.openTickets}
+          caption={summary.openTickets ? t("detail.activity.kpi.ticketsHint") : t("detail.activity.kpi.none")}
+        />
+        <ITBentoTile
+          cols={inventory ? 3 : 6}
+          rows={1}
+          wide={!inventory}
+          tone={summary.pendingTasks ? "sun" : "mint"}
+          icon={<LuWrench size={14} />}
+          label={t("detail.activity.kpi.tasks")}
+          value={summary.pendingTasks}
+          caption={summary.pendingTasks ? t("detail.activity.kpi.tasksHint") : t("detail.activity.kpi.none")}
+        />
+      </ITBentoGrid>
 
-      <div className="grid grid-cols-1 gap-5 lg:!grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 lg:!grid-cols-2">
         {inventory && (
         <Card icon={<LuBoxes size={15} />} title={t("detail.activity.tabs.loans")} count={openLoans.length}>
           <ul className="divide-y divide-slate-100">
@@ -114,7 +149,7 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
               </li>
             ))}
           </ul>
-          {openLoans.length === 0 && <LangostinState kind="empty" size="sm" description={t("detail.activity.empty.loans")} />}
+          {openLoans.length === 0 && <ITEmptyState icon={<LuBoxes size={18} />} title={t("detail.activity.empty.loans")} className="!py-6" />}
         </Card>
         )}
 
@@ -130,7 +165,7 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
               </li>
             ))}
           </ul>
-          {tickets.length === 0 && <LangostinState kind="empty" size="sm" description={t("detail.activity.empty.tickets")} />}
+          {tickets.length === 0 && <ITEmptyState icon={<LuTicket size={18} />} title={t("detail.activity.empty.tickets")} className="!py-6" />}
         </Card>
 
         <Card icon={<LuWrench size={15} />} title={t("detail.activity.tabs.tasks")} count={tasks.length}>
@@ -147,11 +182,12 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
               </li>
             ))}
           </ul>
-          {tasks.length === 0 && <LangostinState kind="empty" size="sm" description={t("detail.activity.empty.tasks")} />}
+          {tasks.length === 0 && <ITEmptyState icon={<LuWrench size={18} />} title={t("detail.activity.empty.tasks")} className="!py-6" />}
         </Card>
 
         {inventory && (
         <Card icon={<LuHistory size={15} />} title={t("detail.activity.tabs.kardex")} count={inventory.kardex.length}>
+          {inventory.kardex.length > 0 && (
           <ul className="relative ml-4 border-l border-slate-200 py-2">
             {inventory.kardex.map((k, idx) => (
               <li key={`${k.number}-${idx}`} className="relative py-3 pl-6">
@@ -169,7 +205,8 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
               </li>
             ))}
           </ul>
-          {inventory.kardex.length === 0 && <LangostinState kind="empty" size="sm" description={t("detail.activity.empty.kardex")} />}
+          )}
+          {inventory.kardex.length === 0 && <ITEmptyState icon={<LuHistory size={18} />} title={t("detail.activity.empty.kardex")} className="!py-6" />}
         </Card>
         )}
       </div>

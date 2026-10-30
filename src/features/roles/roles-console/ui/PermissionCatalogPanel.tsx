@@ -239,7 +239,7 @@ export default function PermissionCatalogPanel({ modules, onChanged }: Props) {
         </ITAlert>
       )}
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}

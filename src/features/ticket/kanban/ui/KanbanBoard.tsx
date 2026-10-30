@@ -5,16 +5,20 @@ import {
   ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { LuCalendarDays, LuCircleCheck, LuRefreshCw, LuTicket } from "react-icons/lu";
+import { useEffect } from "react";
+import { LuCalendarDays, LuCircleCheck, LuMoveRight, LuRefreshCw, LuTicket } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import { formatDate } from "@shared/i18n";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
-import { ASSIGNMENT_TONE, PRIORITY_TONE, STATUS_TONE, TicketChip } from "@entities/ticket";
+import { PRIORITY_TONE, TicketChip } from "@entities/ticket";
 import type { UseKanban } from "../model/useKanban";
 
 interface Props {
   fx: UseKanban;
+  /** Animación guiada: cómo mover una tarjeta de columna. */
+  guideOpen?: boolean;
+  onGuideEnd?: () => void;
 }
 
 // Tono de cada carril: fondo pastel muy tenue (mezcla del token del tema).
@@ -25,8 +29,20 @@ const LANE_COLOR: Record<string, string> = {
   COMPLETED: "var(--color-success)",
 };
 
-export default function KanbanBoard({ fx }: Props) {
+export default function KanbanBoard({ fx, guideOpen = false, onGuideEnd }: Props) {
   const { t: tt } = useTranslation("tickets");
+
+  // La guía se cierra sola a los 7 s o al tocar en cualquier parte.
+  useEffect(() => {
+    if (!guideOpen) return;
+    const timer = window.setTimeout(() => onGuideEnd?.(), 7000);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onGuideEnd?.();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [guideOpen, onGuideEnd]);
 
   return (
     <>
@@ -119,6 +135,9 @@ export default function KanbanBoard({ fx }: Props) {
               {fx.error}
             </ITText>
           )}
+          <ITText muted className="hidden !text-[12px] lg:block">
+            {tt("kanban.dragHint")}
+          </ITText>
           <ITButton variant="outlined" onClick={fx.reload} className="!h-9">
             <ITFlex align="center" gap={1}>
               <LuRefreshCw size={13} className={fx.loading ? "animate-spin" : ""} />
@@ -128,14 +147,14 @@ export default function KanbanBoard({ fx }: Props) {
         </ITFlex>
       </ITFlex>
 
-      <ITFlex className="items-start gap-4 overflow-x-auto pb-3 -mx-2 px-2">
+      <ITFlex className="relative grid grid-cols-1 items-start gap-3 pb-3 md:!grid-cols-2 xl:!grid-cols-4">
         {fx.COLUMNS.map((col) => {
           const count = fx.byStatus[col.status].length;
           const laneColor = LANE_COLOR[col.status];
           return (
             <div
               key={col.status}
-              className="flex-none w-[300px] sm:w-[320px] rounded-[20px] p-3 transition-colors"
+              className="w-full rounded-[20px] p-3 transition-colors min-h-[280px]"
               style={{
                 background: `color-mix(in srgb, ${fx.dragOver === col.status ? "var(--color-primary)" : laneColor} ${fx.dragOver === col.status ? 12 : 7}%, transparent)`,
               }}
@@ -170,7 +189,7 @@ export default function KanbanBoard({ fx }: Props) {
                 </ITText>
               </ITFlex>
 
-              <div className="space-y-2 min-h-[120px]">
+              <div className="space-y-2 min-h-[160px]">
                 {count === 0 ? (
                   <div className="p-4 text-center">
                     <ITText className="text-xs text-slate-400">
@@ -215,21 +234,6 @@ export default function KanbanBoard({ fx }: Props) {
                           </ITText>
                         </ITFlex>
 
-                        <ITFlex align="center" gap={1} wrap="wrap" className="mb-2">
-                          <TicketChip
-                            label={dyn(tt)(`detail.taskStatusOptions.${a.status}`)}
-                            tone={ASSIGNMENT_TONE[a.status]}
-                          />
-                          <TicketChip
-                            label={dyn(tt)(`priorityLabels.${a.ticket.priority}`)}
-                            tone={PRIORITY_TONE[a.ticket.priority]}
-                          />
-                          <TicketChip
-                            label={dyn(tt)(`statusLabels.${a.ticket.status}`)}
-                            tone={STATUS_TONE[a.ticket.status]}
-                          />
-                        </ITFlex>
-
                         <ITFlex justify="between" align="center" gap={2}>
                           <ITText as="span"
                             className={`flex min-w-0 items-center gap-1 text-[11.5px] ${
@@ -245,9 +249,15 @@ export default function KanbanBoard({ fx }: Props) {
                               <ITText as="span" className="truncate text-slate-400">#{a.ticketId.slice(0, 6).toUpperCase()}</ITText>
                             )}
                           </ITText>
-                          <ITText as="span" title={a.user.name} className="inline-flex shrink-0">
-                            <ProfileAvatar name={a.user.name} size="sm" />
-                          </ITText>
+                          <ITFlex align="center" gap={1.5} className="shrink-0">
+                            <TicketChip
+                              label={dyn(tt)(`priorityLabels.${a.ticket.priority}`)}
+                              tone={PRIORITY_TONE[a.ticket.priority]}
+                            />
+                            <ITText as="span" title={a.user.name} className="inline-flex">
+                              <ProfileAvatar name={a.user.name} size="sm" />
+                            </ITText>
+                          </ITFlex>
                         </ITFlex>
                       </div>
                     );
@@ -258,6 +268,63 @@ export default function KanbanBoard({ fx }: Props) {
           );
         })}
       </ITFlex>
+
+      {/* Guía: cómo mover una tarjeta. Resalta las columnas y muestra una
+          tarjeta fantasma pasando de "En progreso" a "En revisión". */}
+      {guideOpen && (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-[color-mix(in_srgb,var(--color-slate-900)_45%,transparent)] px-4 backdrop-blur-[2px]"
+          role="dialog"
+          aria-label={tt("kanban.guideTitle")}
+          onClick={() => onGuideEnd?.()}
+        >
+          <ITFlex
+            direction="column"
+            gap={3}
+            className="w-full max-w-[520px] rounded-[26px] bg-[var(--it-card-bg)] px-6 py-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ITFlex align="center" gap={2}>
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_14%,transparent)] text-[color:var(--color-primary)]">
+                <LuMoveRight size={16} />
+              </span>
+              <ITFlex direction="column" gap={0}>
+                <ITText className="!text-[15px] font-bold">{tt("kanban.guideTitle")}</ITText>
+                <ITText muted className="!text-[12px]">
+                  {tt("kanban.guideHint")}
+                </ITText>
+              </ITFlex>
+            </ITFlex>
+
+            {/* Demostración: la tarjeta viaja de una columna a la siguiente */}
+            <ITFlex align="center" justify="center" gap={3} className="py-2">
+              <ITFlex direction="column" gap={1} className="kanban-guide-col">
+                <ITText muted className="!text-[11px] font-bold uppercase tracking-wide">
+                  {dyn(tt)("detail.taskStatusOptions.IN_PROGRESS")}
+                </ITText>
+                <ITText as="span" className="kanban-guide-card rounded-xl bg-[var(--it-card-bg)] px-3 py-2 !text-[12px] font-semibold shadow-md ring-1 ring-black/5">
+                  {tt("kanban.guideCard")}
+                </ITText>
+              </ITFlex>
+              <LuMoveRight size={18} className="kanban-guide-arrow shrink-0 text-[color:var(--color-primary)]" />
+              <ITFlex direction="column" gap={1} className="kanban-guide-col kanban-guide-target">
+                <ITText muted className="!text-[11px] font-bold uppercase tracking-wide">
+                  {dyn(tt)("detail.taskStatusOptions.IN_REVIEW")}
+                </ITText>
+                <ITText as="span" className="rounded-xl border border-dashed border-[color:var(--color-primary)] px-3 py-2 !text-[12px] font-semibold text-[color:var(--color-primary)]">
+                  {tt("kanban.guideDrop")}
+                </ITText>
+              </ITFlex>
+            </ITFlex>
+
+            <ITFlex justify="end">
+              <ITButton variant="filled" color="primary" size="sm" onClick={() => onGuideEnd?.()}>
+                <ITText className="!text-[11.5px] font-bold">{tt("kanban.guideDone")}</ITText>
+              </ITButton>
+            </ITFlex>
+          </ITFlex>
+        </div>
+      )}
     </>
   );
 }

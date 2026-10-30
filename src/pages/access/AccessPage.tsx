@@ -578,7 +578,7 @@ export default function AccessPage() {
         </ITFlex>
       </PanelCard>
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (

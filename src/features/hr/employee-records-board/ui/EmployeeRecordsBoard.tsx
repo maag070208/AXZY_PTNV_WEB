@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
+  ITBentoStatStrip,
   ITBadget,
   ITCard,
   ITButton,
@@ -11,11 +12,10 @@ import {
   ITInput,
   ITSearchSelect,
   ITToast, ITText } from "@axzydev/axzy_ui_system";
-import { FaBell, FaChevronRight, FaIdCard, FaSearch, FaUserCheck, FaUserClock } from "react-icons/fa";
+import { FaBell, FaChevronRight, FaSearch } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { RowAction } from "@shared/ui/row-action";
-import { KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
 import type { RecordGapsRow } from "@entities/dashboard";
 import { recordStatus, type RecordFilter, type RecordStatus, type UseEmployeeRecords } from "../model/useEmployeeRecords";
 
@@ -63,6 +63,14 @@ interface Props {
  * obligatorios de cada quien, avance del expediente y de los datos personales,
  * y el detalle de la persona elegida para ver o subir documentos y avisarle.
  */
+/** Tono del mosaico por indicador: plantilla, completo, lo que falta y lo incompleto. */
+const STAT_TONE: Record<string, "sea" | "mint" | "rose" | "sun"> = {
+  active: "sea",
+  complete: "mint",
+  missingRequired: "rose",
+  incomplete: "sun",
+};
+
 export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
   const { t } = fx;
   const navigate = useNavigate();
@@ -78,16 +86,11 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
   };
 
   // Indicadores con el mismo componente del resto de la app. En cero, neutro.
-  const kpis: Array<{ key: string; value: number; tone: KpiTone; icon: React.ReactNode }> = [
-    { key: "active", value: fx.counts.total, tone: "sky", icon: <FaIdCard size={14} /> },
-    { key: "complete", value: fx.counts.COMPLETE, tone: "emerald", icon: <FaUserCheck size={14} /> },
-    {
-      key: "missingRequired",
-      value: fx.counts.REQUIRED,
-      tone: fx.counts.REQUIRED > 0 ? "rose" : "neutral",
-      icon: <FaBell size={14} />,
-    },
-    { key: "incomplete", value: fx.counts.INCOMPLETE, tone: fx.counts.INCOMPLETE > 0 ? "amber" : "neutral", icon: <FaUserClock size={14} /> },
+  const kpis: Array<{ key: string; value: number }> = [
+    { key: "active", value: fx.counts.total },
+    { key: "complete", value: fx.counts.COMPLETE },
+    { key: "missingRequired", value: fx.counts.REQUIRED },
+    { key: "incomplete", value: fx.counts.INCOMPLETE },
   ];
 
   const done = (items: Array<{ delivered: boolean }>) => items.filter((i) => i.delivered).length;
@@ -106,13 +109,16 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Indicadores (el inicio los muestra en su propio mosaico) */}
+      {/* Indicadores en la tira del mosaico (una fila, tono por significado) */}
       {!hideKpis && (
-        <div className="grid gap-3 !grid-cols-2 md:!grid-cols-4">
-          {kpis.map((k) => (
-            <KpiTile key={k.key} size="sm" tone={k.tone} label={t(`records.kpis.${k.key}`)} value={k.value} icon={k.icon} />
-          ))}
-        </div>
+        <ITBentoStatStrip
+          items={kpis.map((k) => ({
+            id: k.key,
+            label: t(`records.kpis.${k.key}`),
+            value: k.value,
+            tone: STAT_TONE[k.key],
+          }))}
+        />
       )}
 
       {fx.error && (

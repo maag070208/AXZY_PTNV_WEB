@@ -123,7 +123,7 @@ export default function AdminTasksTable({ fx, externalFilters = {}, toolbar }: P
   return (
     <ITCard contentClassName="!p-0">
       {toolbar && <div className="border-b border-slate-100 px-4 py-3">{toolbar}</div>}
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       key={JSON.stringify(externalFilters)}
       externalFilters={externalFilters}
       columns={columns as unknown as Column<Record<string, unknown>>[]}

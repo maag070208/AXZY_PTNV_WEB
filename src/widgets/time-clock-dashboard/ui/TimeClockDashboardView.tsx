@@ -272,7 +272,7 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
 
       <div className="flex flex-col gap-2 border-t border-dashed border-slate-200 pt-4">
         <span className="text-xs font-semibold text-slate-500">{t("dashboard.recentPunches")}</span>
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           columns={columns as unknown as Column<Record<string, unknown>>[]}
           fetchData={
             fetchPunches as unknown as (p: ITDataTableFetchParams) => Promise<ITDataTableResponse<Record<string, unknown>>>

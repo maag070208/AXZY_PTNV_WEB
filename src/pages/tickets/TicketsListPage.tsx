@@ -1,5 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import { ITAlert, ITBentoStatStrip, ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { LuCircleCheck, LuClock, LuInbox, LuKanban, LuPlus, LuTicket, LuUserX } from "react-icons/lu";
+import { LuCircleCheck, LuClock, LuInbox, LuKanban, LuTicket, LuUserX } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
@@ -10,6 +11,7 @@ import {
 import { useGoBack } from "@shared/lib/useGoBack";
 import type { ListSummaryItem } from "@shared/ui/list-summary-strip";
 import { LangostinConfirm } from "@shared/ui/langostin-confirm";
+import { onAppEvent } from "@shared/lib/appEvents";
 
 /** Color de cada cifra del resumen (punto de la tira y segmento de la barra). */
 /** Tono bento de cada cifra (el mismo lenguaje que el mosaico del inicio). */
@@ -34,6 +36,24 @@ export default function TicketsListPage() {
   const canDelete = useCan("tickets.delete");
 
   const list = useTicketsList();
+  // Un ticket creado desde el bot (mismo layout, otra montura) avisa aquí:
+  // se recarga la tabla y la fila nueva entra animada.
+  const [flashNew, setFlashNew] = useState(false);
+  const flashTimer = useRef<number | null>(null);
+  useEffect(
+    () =>
+      onAppEvent("ticket:created", () => {
+        list.reload();
+        setFlashNew(true);
+        if (flashTimer.current) window.clearTimeout(flashTimer.current);
+        flashTimer.current = window.setTimeout(() => setFlashNew(false), 2600);
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+  useEffect(() => () => {
+    if (flashTimer.current) window.clearTimeout(flashTimer.current);
+  }, []);
 
   // Mismos totales y tonos que el Inicio; el clic filtra la tabla.
   const s = list.summary;
@@ -106,6 +126,7 @@ export default function TicketsListPage() {
         filterOptionsError={list.filterOptionsError}
         onView={(t) => navigate(`/tickets/${t.id}`)}
         onMarkForDelete={list.setTicketToDelete}
+        flashNew={flashNew}
       />
 
       {list.deleteError && (

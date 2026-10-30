@@ -280,7 +280,14 @@
     "agentTicket": "New ticket",
     "ticketOffer": "I can create the new ticket myself, right here. Shall we?",
     "ticketOfferBubble": "New ticket? I can create it right here.",
-    "later": "Not now"
+    "later": "Not now",
+    "agentTask": "Create task here",
+    "taskOffer": "I can create a task for any of these tickets, without leaving the board. Shall we?",
+    "taskOfferBubble": "New task? I can create it right here.",
+    "agentEmployee": "Find a person",
+    "agentEmployeeForm": "Fill it from here",
+    "agentAct": "New report here",
+    "actOfferBubble": "A new disciplinary report? I can start it right here."
   },
   "season": {
     "halloween": {

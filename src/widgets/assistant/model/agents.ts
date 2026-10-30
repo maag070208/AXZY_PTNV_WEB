@@ -1,8 +1,11 @@
 import type { ComponentType } from "react";
-import TicketAgentPanel from "../ui/agents/TicketAgentPanel";
+import EmployeeFinderAgent from "../ui/agents/EmployeeFinderAgent";
+import EmployeeFormAgent from "../ui/agents/EmployeeFormAgent";
+import TaskChatAgent from "../ui/agents/TaskChatAgent";
+import TicketChatAgent from "../ui/agents/TicketChatAgent";
 
 /** Claves de i18n de los formularios del panel (tipadas para `t()`). */
-export type AssistantAgentLabelKey = "help.agentTicket";
+export type AssistantAgentLabelKey = "help.agentTicket" | "help.agentTask" | "help.agentEmployee" | "help.agentEmployeeForm";
 
 /** Props que recibe todo formulario que vive dentro del panel de Langostín. */
 export interface AssistantAgentProps {
@@ -35,10 +38,39 @@ export interface AssistantAgent {
 
 export const ASSISTANT_AGENTS: AssistantAgent[] = [
   {
+    id: "employee",
+    labelKey: "help.agentEmployee",
+    permission: "hr.records",
+    // En Personal: buscar a una persona y llevar a su expediente o a editarla.
+    screens: ["employees.list", "employees.records"],
+    tone: "secondary",
+    Component: EmployeeFinderAgent,
+  },
+  {
+    id: "employeeForm",
+    labelKey: "help.agentEmployeeForm",
+    permission: "hr.records",
+    // En la edición de la persona: pregunta y llena el formulario en vivo.
+    screens: ["employees.edit"],
+    tone: "primary",
+    Component: EmployeeFormAgent,
+  },
+  {
+    id: "task",
+    labelKey: "help.agentTask",
+    permission: "tasks.assign",
+    // La tarea vive en el tablero, donde se ven las de todos los tickets.
+    screens: ["tickets.kanban", "tickets.tasks"],
+    tone: "success",
+    Component: TaskChatAgent,
+  },
+  {
     id: "ticket",
     labelKey: "help.agentTicket",
     permission: "tickets.create",
+    // Sólo en las pantallas de tickets: en RH o inventario no tiene sentido.
+    screens: ["tickets.list", "tickets.tasks", "tickets.kanban", "tickets.detail"],
     tone: "primary",
-    Component: TicketAgentPanel,
+    Component: TicketChatAgent,
   },
 ];

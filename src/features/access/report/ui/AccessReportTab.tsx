@@ -408,7 +408,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           />
         }
       >
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           key={fx.tableKey}
           columns={columns as unknown as Column<Record<string, unknown>>[]}
           fetchData={

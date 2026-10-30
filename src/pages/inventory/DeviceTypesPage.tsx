@@ -467,7 +467,7 @@ export default function DeviceTypesPage() {
                 />
               </div>
             ) : (
-              <ITDataTable
+              <ITDataTable showViewToggle={false}
                 key={`types:${filter}:${query}`}
                 columns={columns as unknown as Column<Record<string, unknown>>[]}
                 fetchData={fetchData as never}

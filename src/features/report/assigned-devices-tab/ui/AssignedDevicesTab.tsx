@@ -227,7 +227,7 @@ export default function AssignedDevicesTab({ fx }: { fx: UseAssignedDevicesRepor
         </ITButton>
       </ITFlex>
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (

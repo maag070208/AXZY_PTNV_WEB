@@ -251,7 +251,7 @@ export default function KitchenLedgerPanel() {
         </ITButton>
       </ITFlex>
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchData as never}
         reloadTrigger={reloadKey}

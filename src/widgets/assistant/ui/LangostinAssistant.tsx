@@ -15,6 +15,7 @@ import { ITButton } from "@axzydev/axzy_ui_system";
 import { LuArrowLeft, LuSparkles } from "react-icons/lu";
 import { ASSISTANT_AGENTS, type AssistantAgent } from "../model/agents";
 import { useSeason } from "../model/useSeason";
+import { emitAppEvent } from "@shared/lib/appEvents";
 
 type Message = { id: number; from: "agent" | "user"; text: string };
 
@@ -45,22 +46,57 @@ export default function LangostinAssistant() {
   const season = useSeason();
   const reduced = usePrefersReducedMotion();
 
+  const canCreateTicket = useCan("tickets.create");
+  const canAssignTasks = useCan("tasks.assign");
+  const canManageActs = useCan("hr.disciplinary_reports");
+
+  // Al cambiar de pantalla el asistente se **reinicia**: cierra el formulario
+  // que estuviera abierto y vuelve a ofrecerse desde cero. Así no se puede, por
+  // ejemplo, acabar de dar de alta un usuario con la conversación de tickets.
+  const lastScreenRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (lastScreenRef.current === screen.screenId) return;
+    lastScreenRef.current = screen.screenId;
+    setAgentId(null);
+    setOfferDismissed(false);
+  }, [screen.screenId]);
+
+  // Auto-scroll del chat de ayuda: cada pregunta que se toca deja la respuesta
+  // a la vista, igual que en el alta de ticket.
+  const helpThreadRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = helpThreadRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }, [messages.length, open]);
+
   const push = (message: Omit<Message, "id">) => {
     seq.current += 1;
     setMessages((prev) => [...prev, { ...message, id: seq.current }]);
   };
 
-  // Al abrir (o cambiar de pantalla) saluda con lo que se puede hacer ahí.
+  // Al abrir (o cambiar de pantalla) saluda **una sola vez**: el efecto se
+  // vuelve a correr (StrictMode / re-render) y duplicaba el mismo mensaje.
+  const greetedRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!open) return;
-    setMessages([]);
-    push({ from: "agent", text: t("help.context", { screen: screen.title, explain: screen.explain }) });
-    // En Tickets Langostín se ofrece a dar de alta el ticket él mismo.
-    if (screen.screenId === "tickets.list" && canCreateTicket) {
-      push({ from: "agent", text: t("help.ticketOffer") });
+    if (!open) {
+      greetedRef.current = null;
+      return;
     }
+    if (greetedRef.current === screen.screenId) return;
+    greetedRef.current = screen.screenId;
+    const greeting: Message[] = [
+      { id: ++seq.current, from: "agent", text: t("help.context", { screen: screen.title, explain: screen.explain }) },
+    ];
+    // Se ofrece a hacer el alta que corresponda a esta pantalla.
+    if (screen.screenId === "tickets.list" && canCreateTicket) {
+      greeting.push({ id: ++seq.current, from: "agent", text: t("help.ticketOffer") });
+    }
+    if ((screen.screenId === "tickets.kanban" || screen.screenId === "tickets.tasks") && canAssignTasks) {
+      greeting.push({ id: ++seq.current, from: "agent", text: t("help.taskOffer") });
+    }
+    setMessages(greeting);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, screen.screenId]);
+  }, [open, screen.screenId, canCreateTicket]);
 
   // El globo de "¿Te ayudo?" aparece la primera vez en la sesión.
   useEffect(() => {
@@ -100,31 +136,39 @@ export default function LangostinAssistant() {
   };
 
   // Formularios disponibles aquí: con el permiso de la persona y en esta pantalla.
-  const canCreateTicket = useCan("tickets.create");
   const availableAgents = ASSISTANT_AGENTS.filter(
     (agent) => !agent.screens || agent.screens.includes(screen.screenId),
   );
   const activeAgent = availableAgents.find((agent) => agent.id === agentId) ?? null;
 
-  // "Sorpréndeme": un consejo al azar de esta pantalla (o una pausa si no hay).
-  const surprise = () => {
-    const tips = screen.actions.filter((action) => !action.to && action.answer);
-    const tip = tips[Math.floor(Math.random() * Math.max(tips.length, 1))];
-    push({ from: "user", text: `✨ ${t("help.surprise")}` });
-    push({ from: "agent", text: tip?.answer ?? t("help.pause") });
-  };
+  // Oferta proactiva según la pantalla: en Tickets, el alta de ticket; en el
+  // tablero, la de tarea. Sólo aparece si el permiso de esa pantalla está.
+  const offerAgent =
+    screen.screenId === "tickets.list" && canCreateTicket
+      ? { agentId: "ticket", labelKey: "help.agentTicket" as const, bubbleKey: "help.ticketOfferBubble" as const }
+      : (screen.screenId === "tickets.kanban" || screen.screenId === "tickets.tasks") && canAssignTasks
+        ? { agentId: "task", labelKey: "help.agentTask" as const, bubbleKey: "help.taskOfferBubble" as const }
+        : screen.screenId === "employees.disciplinary" && canManageActs
+          ? { emit: "disciplinary:new" as const, labelKey: "help.agentAct" as const, bubbleKey: "help.actOfferBubble" as const }
+          : null;
 
-  // "Felicitar": el saludo de la temporada (o uno neutro fuera de temporada).
-  const greet = () => {
-    push({ from: "user", text: `${season?.emoji ?? "👋"} ${t("help.greet")}` });
-    push({ from: "agent", text: season ? t(`season.${season.key}.greeting`) : t("help.hello") });
-  };
+  // Las rutas del registro pueden traer `:id` (la ficha de una persona, por
+  // ejemplo): se rellena con el id de la pantalla actual.
+  const currentId = pathname.split("/").filter(Boolean)[1] ?? "";
+  const resolveTo = (to: string) => (to.includes(":id") ? to.split(":id").join(currentId) : to);
 
   const runAction = (action: HelpAction) => {
     push({ from: "user", text: action.label });
+    if (action.emit) {
+      // Aviso a la pantalla (animación guiada) y se cierra el panel para verla.
+      emitAppEvent(action.emit, {});
+      push({ from: "agent", text: action.answer ?? t("help.unknown") });
+      window.setTimeout(() => setOpen(false), 700);
+      return;
+    }
     if (action.to) {
       push({ from: "agent", text: t("help.going", { screen: action.label }) });
-      navigate(action.to);
+      navigate(resolveTo(action.to));
       setOpen(false);
       return;
     }
@@ -234,7 +278,10 @@ export default function LangostinAssistant() {
           </ITFlex>
 
           {/* Conversación */}
-          <div className="relative z-[1] flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-5 py-4">
+          <div
+            ref={helpThreadRef}
+            className="relative z-[1] flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-5 py-4"
+          >
             {messages.map((message) =>
               message.from === "agent" ? (
                 <ITText
@@ -293,12 +340,6 @@ export default function LangostinAssistant() {
               {availableAgents.map((agent) => (
                 <AgentChip key={agent.id} agent={agent} onClick={() => setAgentId(agent.id)} />
               ))}
-              <ITChip size="lg" variant="outlined" color="gray" icon={<ITText as="span" aria-hidden>✨</ITText>} onClick={surprise}>
-                {t("help.surprise")}
-              </ITChip>
-              <ITChip size="lg" variant="outlined" color="gray" icon={<ITText as="span" aria-hidden>{season?.emoji ?? "👋"}</ITText>} onClick={greet}>
-                {t("help.greet")}
-              </ITChip>
             </ITFlex>
           </div>
           </>
@@ -307,10 +348,10 @@ export default function LangostinAssistant() {
       )}
 
       {/* Oferta proactiva en Tickets: Langostín da de alta el ticket */}
-      {!open && screen.screenId === "tickets.list" && canCreateTicket && !offerDismissed && (
+      {!open && offerAgent && !offerDismissed && (
         <div className="fixed bottom-24 right-6 z-50 flex w-[268px] flex-col gap-2 rounded-2xl rounded-br-sm bg-[var(--it-card-bg)] px-3.5 py-3 shadow-[0_18px_40px_-18px_rgba(13,47,64,0.5)] ring-1 ring-black/5">
           <ITText className="!text-[12.5px] leading-snug">
-            {t("help.ticketOfferBubble")}
+            {t(offerAgent.bubbleKey)}
           </ITText>
           <ITFlex align="center" gap={1.5}>
             <ITButton
@@ -319,13 +360,19 @@ export default function LangostinAssistant() {
               size="sm"
               onClick={() => {
                 setOfferDismissed(true);
+                if ("emit" in offerAgent && offerAgent.emit) {
+                  // El formulario vive en la pantalla: se le avisa y el panel se cierra.
+                  emitAppEvent(offerAgent.emit, {});
+                  setOpen(false);
+                  return;
+                }
                 setOpen(true);
-                setAgentId("ticket");
+                setAgentId(offerAgent.agentId);
               }}
             >
               <ITFlex align="center" gap={1}>
                 <LuSparkles size={12} />
-                <ITText className="!text-[11px] font-bold">{t("help.agentTicket")}</ITText>
+                <ITText className="!text-[11px] font-bold">{t(offerAgent.labelKey)}</ITText>
               </ITFlex>
             </ITButton>
             <ITButton variant="text" color="secondary" size="sm" onClick={() => setOfferDismissed(true)}>
@@ -336,7 +383,7 @@ export default function LangostinAssistant() {
       )}
 
       {/* Globo de la primera vez */}
-      {!open && hintSeen === false && (
+      {!open && !offerAgent && hintSeen === false && (
         <div className="fixed bottom-24 right-6 z-50 max-w-[240px] rounded-2xl rounded-br-sm bg-[var(--it-card-bg)] px-3 py-2 shadow-lg ring-1 ring-black/5">
           <ITText className="!text-[12px] font-semibold">{t("help.hint", { screen: screen.title })}</ITText>
         </div>

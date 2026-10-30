@@ -1,13 +1,11 @@
-import { ITButton, ITFlex, ITPage, ITText, ITToast } from "@axzydev/axzy_ui_system";
-import { LuKanban, LuPlus, LuUserPlus } from "react-icons/lu";
+import { ITPage, ITToast } from "@axzydev/axzy_ui_system";
+import { LuKanban } from "react-icons/lu";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import TicketDetailModal from "@widgets/tickets/ticket-detail-modal";
-import {
-  KanbanBoard,
-  CreateTaskDialog,
-  useKanban,
-} from "@features/ticket/kanban";
+import { KanbanBoard, useKanban } from "@features/ticket/kanban";
+import { useEffect, useState } from "react";
+import { onAppEvent } from "@shared/lib/appEvents";
 import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function KanbanPage() {
@@ -18,6 +16,20 @@ export default function KanbanPage() {
   const ticketId = searchParams.get("ticketId") ?? undefined;
 
   const fx = useKanban(ticketId);
+  const [guideOpen, setGuideOpen] = useState(false);
+
+  // Alta de tarea desde el panel de Langostín: recarga el tablero.
+  useEffect(
+    () =>
+      onAppEvent("task:created", () => {
+        fx.reload();
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  // "Muéstrame cómo mover una tarea": animación guiada sobre el tablero.
+  useEffect(() => onAppEvent("kanban:guide", () => setGuideOpen(true)), []);
 
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -38,37 +50,8 @@ export default function KanbanPage() {
             ]
           : [{ label: tt("kanban.breadcrumb") }]),
       ]}
-      actions={
-        ticketId ? (
-          fx.canCreate ? (
-            <ITButton
-              variant="filled"
-              color="primary"
-              onClick={() => navigate(`/tickets/${ticketId}`)}
-            >
-              <ITFlex align="center" gap={1}>
-                <LuPlus size={14} />
-                <ITText className="font-bold text-[11px]">{tt("kanban.newTask")}</ITText>
-              </ITFlex>
-            </ITButton>
-          ) : undefined
-        ) : fx.canCreate ? (
-          <ITFlex align="center" gap={2}>
-            <ITButton
-              variant="outlined"
-              color="primary"
-              onClick={() => fx.setShowCreatePanel(true)}
-            >
-              <ITFlex align="center" gap={1}>
-                <LuUserPlus size={14} />
-                <ITText className="font-bold text-[11px]">{tt("kanban.newTask")}</ITText>
-              </ITFlex>
-            </ITButton>
-          </ITFlex>
-        ) : undefined
-      }
     >
-      <KanbanBoard fx={fx} />
+      <KanbanBoard fx={fx} guideOpen={guideOpen} onGuideEnd={() => setGuideOpen(false)} />
 
       <TicketDetailModal
         ticket={fx.modalTicket}
@@ -79,7 +62,6 @@ export default function KanbanPage() {
         onOpenFull={(id) => navigate(`/tickets/${id}`)}
       />
 
-      <CreateTaskDialog fx={fx} />
 
       {fx.toast && (
         <ITToast

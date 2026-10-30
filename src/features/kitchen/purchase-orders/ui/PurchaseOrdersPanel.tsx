@@ -126,7 +126,7 @@ export default function PurchaseOrdersPanel() {
 
   return (
     <ITFlex direction="column" gap={3}>
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={kitchenApi.purchaseOrdersTable as never}
         reloadTrigger={reloadKey}

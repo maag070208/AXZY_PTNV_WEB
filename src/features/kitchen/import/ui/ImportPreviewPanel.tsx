@@ -372,7 +372,7 @@ export default function ImportPreviewPanel({ fx }: { fx: UseKitchenImport }) {
           </>
         }
       >
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           columns={columns}
           fetchData={request as any}
           // La tabla no reacciona al cambio de `fetchData`: al re-resolver la

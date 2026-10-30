@@ -50,7 +50,8 @@
         "tickets": "Open tickets",
         "ticketsHint": "created or assigned",
         "tasks": "Pending tasks",
-        "tasksHint": "not completed"
+        "tasksHint": "not completed",
+        "none": "All clear"
       },
       "tabs": {
         "loans": "Equipment on loan",
@@ -198,16 +199,24 @@
       "months_one": "month with the company",
       "months_other": "months with the company",
       "plusMonths_one": "+ {{count}} month",
-      "plusMonths_other": "+ {{count}} months"
+      "plusMonths_other": "+ {{count}} months",
+      "addDate": "Add the hire date",
+      "months": "{{count}} month(s)",
+      "years": "{{count}} year(s)"
     },
     "documentsTile": {
       "label": "File",
       "ofTotal": "of {{total}} types",
       "complete": "Documents complete",
       "missing_one": "{{count}} document type missing",
-      "missing_other": "{{count}} document types missing"
+      "missing_other": "{{count}} document types missing",
+      "done": "With file",
+      "pending": "Missing"
     },
-    "noDocumentTypesHint": "Once they are set up, you will see them here to upload files."
+    "noDocumentTypesHint": "Once they are set up, you will see them here to upload files.",
+    "autosaving": "Saving…",
+    "autosaved": "Saved ✓",
+    "autosaveError": "Could not save"
   },
   "catalog": {
     "title": "Document Catalog",
@@ -342,5 +351,54 @@
   "empty": {
     "title": "No staff yet",
     "description": "Once someone is added, they will show up in this list."
+  },
+  "bot": {
+    "searchTitle": "Find a person",
+    "searchPlaceholder": "Name, username, number or role…",
+    "actionsTitle": "What now?",
+    "openRecord": "Open their record",
+    "edit": "Edit their details",
+    "searchAnother": "Search someone else",
+    "deactivateHint": "To deactivate them, open their record: the button lives there (and asks for confirmation).",
+    "pickHint": "Type to find them, then choose what to do.",
+    "tooltip": "Find a person",
+    "fill": {
+      "greeting": "I'll help you fill the form. I ask one field at a time and type it on screen; skip what doesn't apply.",
+      "name": "First name(s)?",
+      "nameHint": "Jose Amador",
+      "paternal": "Paternal surname?",
+      "maternal": "Maternal surname?",
+      "surnameHint": "Zuno",
+      "position": "What's their position?",
+      "positionHint": "Security",
+      "employeeNumber": "Employee number?",
+      "numberHint": "050909",
+      "phone": "Personal phone?",
+      "phoneHint": "627 123 4567",
+      "email": "Email?",
+      "emailHint": "person@puertonuevo.mx",
+      "progress": "Step {{current}} of {{total}}",
+      "skip": "Skip",
+      "next": "Continue",
+      "done": "Done — I put it in the form.",
+      "finished": "Finished: I filled {{count}} field(s). Review the screen and save when ready.",
+      "finishedShort": "Ready to save",
+      "restart": "Start over",
+      "tooltip": "Fill it from here",
+      "askWhat": "What do you want to edit?",
+      "choose": "Choose what to edit",
+      "saved": "Saved.",
+      "saveFailed": "Could not save; check the value.",
+      "groupName": "Name and surnames",
+      "groupWork": "Position and number",
+      "groupContact": "Contact",
+      "groupFiscal": "Tax data",
+      "rfc": "RFC?",
+      "rfcHint": "ZUBJ900101ABC",
+      "curp": "CURP?",
+      "curpHint": "ZUBJ900101HJCXXX01",
+      "nss": "Social security number?",
+      "nssHint": "12345678901"
+    }
   }
 }

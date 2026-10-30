@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@axzydev/axzy_ui_system':
-        specifier: 1.8.9
-        version: 1.8.9(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: 1.8.10
+        version: 1.8.10(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@blobatar/react':
         specifier: 2.7.0
         version: 2.7.0(blobatar@2.7.0(react@19.0.0))(react@19.0.0)
@@ -132,8 +132,8 @@ packages:
   '@ably/msgpack-js@0.4.1':
     resolution: {integrity: sha512-Sjxj6SOr17hExAVrsycN7u6oV4PhZcK7Z2S8dM71CH/butgO47cSo/TL6FJPCXUyDAzKkOWjMUpJGyZkEpyu4Q==}
 
-  '@axzydev/axzy_ui_system@1.8.9':
-    resolution: {integrity: sha512-p6eoCgoktMMbnEdYrFZx68O7F5ZHxfhipm7eNlRxT6xvQZclz7afXetAAKOHVFvd43c4z4XTnMQ2nrW1bIz8dQ==}
+  '@axzydev/axzy_ui_system@1.8.10':
+    resolution: {integrity: sha512-nq44d2NYeu0OQ1KHyTi7nRdSyEpQ8yKZnTNKKlPmT/DstFXW5i2kjJpcByADE6t7y2iRSisswPCUKTYJ2lX5Dg==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -2989,7 +2989,7 @@ snapshots:
     dependencies:
       bops: 1.0.1
 
-  '@axzydev/axzy_ui_system@1.8.9(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+  '@axzydev/axzy_ui_system@1.8.10(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       clsx: 2.1.1
       date-fns: 4.4.0

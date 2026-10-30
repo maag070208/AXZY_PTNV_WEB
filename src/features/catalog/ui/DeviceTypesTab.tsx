@@ -179,7 +179,7 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
         </div>
       </ITDialog>
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}

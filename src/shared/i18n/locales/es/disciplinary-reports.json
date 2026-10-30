@@ -85,7 +85,11 @@
       "back": "← Atrás",
       "useForm": "Prefiero llenar el formulario",
       "useChat": "Prefiero que Langostín me guíe"
-    }
+    },
+    "sectionIncident": "Incidente",
+    "sectionDetail": "Detalle",
+    "ready": "Listo para levantar el acta",
+    "required": "Faltan datos: persona, motivo, fecha y descripción"
   },
   "preview": {
     "title": "Vista previa del acta",

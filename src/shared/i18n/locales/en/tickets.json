@@ -107,7 +107,9 @@
       "forMe": "No, it's mine",
       "forOther": "Yes, someone else asked for it",
       "whoRequested": "Who asked for it?",
-      "searchPerson": "Search the person…"
+      "searchPerson": "Search the person…",
+      "sentOk": "Done — your ticket is in!",
+      "sendError": "Could not send. Please try again."
     },
     "suggestions": {
       "noPower": "Won't turn on",
@@ -324,7 +326,15 @@
     "taskDescription": "Description",
     "taskDescPlaceholder": "Task details...",
     "startDate": "Start date",
-    "dueDate": "Due date"
+    "dueDate": "Due date",
+    "guideTitle": "This is how a task moves",
+    "guideHint": "Grab the card and drop it on the column of the new status. It saves itself.",
+    "guideCard": "Computer cabling",
+    "guideDrop": "Drop it here",
+    "guideDone": "Got it",
+    "summaryCount": "{{count}} tasks on the board",
+    "summaryOverdue": "{{count}} overdue",
+    "dragHint": "Drag a card to another column to change its status"
   },
   "mytasks": {
     "title": "My Tasks",
@@ -444,7 +454,7 @@
     "name": "Langostín · Tasks",
     "helper": "Langostín helps you get the task ready",
     "typing": "Langostín is typing…",
-    "greeting": "Let’s do a task! Tell me how to set it up.",
+    "greeting": "Hi! Let's build the task together.",
     "askWho": "Who is in charge of the task?",
     "askWhat": "What needs to be done?",
     "askNotes": "Anything else I should know? Optional.",
@@ -452,7 +462,7 @@
     "done": "Done. I am assigning the task.",
     "searchEmployee": "Search the person…",
     "titlePlaceholder": "Write the task title…",
-    "notesPlaceholder": "Task details…",
+    "notesPlaceholder": "Details (optional)…",
     "noNotes": "No details",
     "send": "Send",
     "back": "Back",
@@ -473,7 +483,18 @@
       "done": "Done! I am creating the task.",
       "working": "Creating the task…",
       "sent": "Done! The task is already assigned.",
-      "error": "I could not create the task. Check the data and try again."
-    }
+      "error": "I could not create the task. Check the data and try again.",
+      "ticket": "Pick the ticket this task belongs to."
+    },
+    "askTicket": "Which ticket is the task for?",
+    "searchTicket": "Search the ticket…",
+    "whatPlaceholder": "What needs to be done?",
+    "continue": "Continue",
+    "sending": "Sending the task…",
+    "sentOk": "Done — the task is assigned!",
+    "sendError": "Could not create the task.",
+    "tooltip": "Create task here",
+    "offerBubble": "New task? I can create it right here.",
+    "searchPerson": "Search the person…"
   }
 }

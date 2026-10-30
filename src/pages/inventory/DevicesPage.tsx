@@ -240,7 +240,7 @@ export default function DevicesPage() {
       ) : (
         <>
           <ListSummaryStrip items={summary} activeId={filter} onSelect={(id) => setFilter(id as Filter)} />
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             columns={columns as any}
             fetchData={fetchData as any}
             reloadTrigger={filter}

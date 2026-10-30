@@ -216,7 +216,7 @@ export default function AccessActivityPanel({
           ]}
         />
       </ITFlex>
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         key={quickFilter}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={

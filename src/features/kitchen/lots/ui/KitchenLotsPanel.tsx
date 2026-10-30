@@ -107,7 +107,7 @@ export default function KitchenLotsPanel() {
   return (
     <ITFlex direction="column" gap={3}>
       <KitchenAlertKpis alerts={alerts} keys={["expiring", "expired"]} />
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={kitchenApi.lotsTable as never}
       size="lg"

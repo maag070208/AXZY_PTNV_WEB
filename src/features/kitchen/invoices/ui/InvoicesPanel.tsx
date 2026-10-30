@@ -101,7 +101,7 @@ export default function InvoicesPanel() {
 
   return (
     <ITFlex direction="column" gap={3}>
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={kitchenApi.invoicesTable as never}
         reloadTrigger={reloadKey}

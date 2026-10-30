@@ -1,5 +1,6 @@
 import {
   ITAlert,
+  ITBentoStatStrip,
   ITButton,
   ITFlex,
   ITInput,
@@ -7,11 +8,10 @@ import {
   ITText,
   useITBentoCountUp,
 } from "@axzydev/axzy_ui_system";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LuCalendarDays,
   LuClockAlert,
-  LuPlus,
   LuRotateCcw,
   LuScrollText,
   LuUserX,
@@ -19,7 +19,7 @@ import {
 import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 import { LangostinState } from "@shared/ui/langostin";
 import { FilterPills, type FilterPillItem } from "@shared/ui/filter-pills";
-import { ListSummaryStrip, type ListSummaryItem } from "@shared/ui/list-summary-strip";
+import { onAppEvent } from "@shared/lib/appEvents";
 import { PanelCard } from "@shared/ui/panel-card";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -51,6 +51,13 @@ export default function HrReportsPage() {
   // Consultar, levantar y eliminar actas piden el mismo permiso en la API.
   const canManage = useCan("hr.disciplinary_reports");
 
+  // "Nueva acta" desde el panel del bot: abre el mismo formulario de la pantalla.
+  useEffect(
+    () => onAppEvent("disciplinary:new", () => fx.setShowForm(true)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   const summary = fx.summary;
   const percentOf = (value: number) =>
     summary && summary.total > 0 ? Math.round((value / summary.total) * 100) : 0;
@@ -61,13 +68,14 @@ export default function HrReportsPage() {
   }, [i18n.language]);
 
   // Totales reales del endpoint de la lista; cada mosaico es un filtro rápido.
-  const summaryItems: ListSummaryItem[] = summary
+  type StripTone = "sea" | "mint" | "sun" | "lavender";
+  const summaryItems: Array<{ id: string; label: string; value: React.ReactNode; tone: StripTone; icon: React.ReactNode; caption?: string }> = summary
     ? [
         {
           id: "all",
           label: tt("summary.total"),
           value: <Big value={summary.total} />,
-          tone: "plain",
+          tone: "sea",
           icon: <LuScrollText size={15} />,
         },
         {
@@ -106,15 +114,6 @@ export default function HrReportsPage() {
     })),
   ];
 
-  const newReportButton = canManage ? (
-    <ITButton variant="filled" color="primary" onClick={() => fx.setShowForm(true)}>
-      <ITFlex align="center" gap={1}>
-        <LuPlus size={14} />
-        <ITText className="font-bold text-[12px]">{tt("newDisciplinaryReport")}</ITText>
-      </ITFlex>
-    </ITButton>
-  ) : undefined;
-
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -126,7 +125,6 @@ export default function HrReportsPage() {
         { label: tt("common:nav.home"), onClick: () => navigate("/") },
         { label: tt("breadcrumb") },
       ]}
-      actions={newReportButton}
     >
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
@@ -144,18 +142,22 @@ export default function HrReportsPage() {
             kind="empty"
             title={tt("empty.title")}
             description={tt("empty.description")}
-            action={newReportButton}
           />
         </PanelCard>
       ) : (
         <ITFlex direction="column" gap={4}>
           {summaryItems.length > 0 && (
-            <ListSummaryStrip
-              items={summaryItems}
+            <ITBentoStatStrip
+              stack
+              items={summaryItems.map((item) => ({
+                id: item.id,
+                label: item.label,
+                value: item.value,
+                caption: item.caption,
+                tone: item.tone,
+              }))}
               activeId={fx.quick}
               onSelect={(id) => fx.setQuick(id as DisciplinaryQuickFilter)}
-              // El CSS del kit (sin capa) gana el `grid-cols` base: el override lleva `!`.
-              className="lg:!grid-cols-4"
             />
           )}
 

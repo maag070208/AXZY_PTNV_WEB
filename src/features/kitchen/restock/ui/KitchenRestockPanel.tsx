@@ -144,7 +144,7 @@ export default function KitchenRestockPanel() {
         </ITFlex>
       )}
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchData as never}
         size="lg"

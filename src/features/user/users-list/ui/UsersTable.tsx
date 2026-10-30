@@ -198,7 +198,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
   ];
 
   return (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fx.fetchTableData as unknown as (

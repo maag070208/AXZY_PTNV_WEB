@@ -143,7 +143,7 @@ export default function ReturnsPage() {
         </ITButton>
       }
     >
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         size="lg"

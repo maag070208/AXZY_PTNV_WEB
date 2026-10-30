@@ -199,7 +199,7 @@ export default function DisciplinaryReportsTable({
   ];
 
   return (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       // Otro mosaico del resumen = otra lista: la tabla se remonta.
       key={tableKey ?? JSON.stringify(externalFilters ?? {})}
       externalFilters={externalFilters}

@@ -398,7 +398,7 @@ export default function KitchenItemsPanel({ newSignal = 0 }: { newSignal?: numbe
       )}
       <KitchenAlertKpis alerts={alerts} />
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={kitchenApi.itemsTable as never}
         reloadTrigger={reloadKey}

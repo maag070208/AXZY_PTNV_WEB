@@ -192,7 +192,7 @@ export default function MaterialOutputsTab({ fx }: { fx: UseMaterialOutputsRepor
         </ITButton>
       </ITFlex>
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={fetchTableData}
         externalFilters={externalFilters}

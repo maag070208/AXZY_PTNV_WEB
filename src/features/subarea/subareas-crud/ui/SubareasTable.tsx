@@ -113,7 +113,7 @@ export default function SubareasTable({
   ];
 
   return (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       columns={columns as any}
       fetchData={
         fetchData as unknown as (

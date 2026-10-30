@@ -207,7 +207,7 @@ export default function EmployeesTable({
 
   return (
     <>
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         // Otro mosaico del resumen = otra lista: la tabla se remonta.
         key={JSON.stringify(externalFilters ?? {})}
         externalFilters={externalFilters}

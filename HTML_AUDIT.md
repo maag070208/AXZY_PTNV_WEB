@@ -1,41 +1,36 @@
 # Auditoría de HTML a mano (solo UI system)
 
-**Estado 2026-10-29 (después del primer barrido):** 1 738 → **837** etiquetas
-(−52 %). Ya no queda ni un `<p>`: los 228 pasaron a `ITText`. Quedan 590 `<div>`
-(de los cuales 276 son layout puro), 79 `<span>` y 168 `style={{}}` (117 con
-apariencia). El detalle y los pendientes están abajo.
-
 Generado por `python3 -I web/scripts/audit-raw-html.py --report`.
 Mide etiquetas crudas donde el kit ya tiene componente, **sin** contar la landing
 pública, los generadores de PDF/HTML para imprimir ni cocina (oculta).
 
-**Total: 837 etiquetas crudas en 158 archivos**
-(div 590 · p 0 · span 79 · style 168).
+**Total: 840 etiquetas crudas en 160 archivos**
+(div 593 · p 0 · span 77 · style 170).
 
 ## Por categoría
 
 | Categoría | Cuántas | Reemplazo correcto |
 |---|---:|---|
-| Layout (`<div className="flex/grid…">`) | 276 | `ITFlex`, `ITStack`, `ITGrid` |
-| Texto (`<p>`, `<span>`, `<b>`, `<small>`, `<h1..6>`) | 84 | `ITText` (con `as`, `muted`) |
+| Layout (`<div className="flex/grid…">`) | 271 | `ITFlex`, `ITStack`, `ITGrid` |
+| Texto (`<p>`, `<span>`, `<b>`, `<small>`, `<h1..6>`) | 82 | `ITText` (con `as`, `muted`) |
 | Tablas (`<table>`, `<tr>`, `<td>`…) | 70 | `ITDataTable` |
-| Controles (`<button>`, `<input>`, `<select>`) | 103 | `ITButton`, `ITInput`, `ITSelect` |
-| Estilos de apariencia (`style={ color/bg/padding… }`) | 117 | tokens del kit o componente |
+| Controles (`<button>`, `<input>`, `<select>`) | 111 | `ITButton`, `ITInput`, `ITSelect` |
+| Estilos de apariencia (`style={ color/bg/padding… }`) | 120 | tokens del kit o componente |
 
 ## Por capa
 
 | Capa | Archivos | Etiquetas |
 |---|---:|---:|
-| `features` | 94 | 551 |
+| `features` | 92 | 530 |
 | `shared` | 36 | 128 |
 | `pages` | 20 | 120 |
-| `widgets` | 8 | 38 |
+| `widgets` | 12 | 62 |
 
 ## Archivos con más HTML a mano
 
 | Archivo | div | p | span | style | total |
 |---|---:|---:|---:|---:|---:|
-| `src/features/hr/employee-records-board/ui/EmployeeRecordsBoard.tsx` | 35 | 0 | 3 | 4 | 42 |
+| `src/features/hr/employee-records-board/ui/EmployeeRecordsBoard.tsx` | 34 | 0 | 3 | 4 | 41 |
 | `src/pages/inventory/NewMovementPage.tsx` | 19 | 0 | 2 | 17 | 38 |
 | `src/features/inventory/audit/ui/InventoryMismatchesBoard.tsx` | 5 | 0 | 27 | 0 | 32 |
 | `src/features/hr/employee-detail/ui/EmployeeProfileEditDialog.tsx` | 23 | 0 | 0 | 0 | 23 |
@@ -47,14 +42,14 @@ pública, los generadores de PDF/HTML para imprimir ni cocina (oculta).
 | `src/features/access/time-clock-people/ui/PersonDetailDialog.tsx` | 14 | 0 | 0 | 0 | 14 |
 | `src/features/roles/roles-console/ui/access/UserAccessExplorer.tsx` | 13 | 0 | 1 | 0 | 14 |
 | `src/features/roles/roles-console/ui/PolicyEditorDialog.tsx` | 12 | 0 | 1 | 0 | 13 |
+| `src/features/ticket/kanban/ui/KanbanBoard.tsx` | 5 | 0 | 2 | 4 | 11 |
 | `src/features/schedule/weekly-attendance/ui/WeeklyAttendancePanel.tsx` | 7 | 0 | 1 | 2 | 10 |
-| `src/features/ticket/create-ticket/ui/TicketAgent.tsx` | 5 | 0 | 3 | 2 | 10 |
+| `src/widgets/assistant/ui/LangostinAssistant.tsx` | 7 | 0 | 1 | 2 | 10 |
 | `src/pages/inventory/DeviceTypesPage.tsx` | 7 | 0 | 0 | 2 | 9 |
 | `src/pages/users/UserHistoryPage.tsx` | 7 | 0 | 0 | 2 | 9 |
 | `src/features/home/clock-dashboard/ui/ClockDashboard.tsx` | 5 | 0 | 0 | 4 | 9 |
 | `src/features/auth/login/ui/LoginBrandPanel.tsx` | 8 | 0 | 1 | 0 | 9 |
 | `src/features/langostin/gallery/ui/LangostinGallery.tsx` | 8 | 0 | 0 | 1 | 9 |
-| `src/features/ticket/kanban/ui/KanbanBoard.tsx` | 4 | 0 | 1 | 4 | 9 |
 | `src/shared/ui/langostin-chat/LangostinChat.tsx` | 4 | 0 | 2 | 3 | 9 |
 | `src/shared/ui/kpi-tile/ui/KpiTile.tsx` | 8 | 0 | 0 | 1 | 9 |
 | `src/pages/access/AccessPage.tsx` | 6 | 0 | 0 | 2 | 8 |
@@ -68,14 +63,12 @@ pública, los generadores de PDF/HTML para imprimir ni cocina (oculta).
 | `src/features/roles/roles-console/ui/shared/PendingChanges.tsx` | 6 | 0 | 2 | 0 | 8 |
 | `src/features/hr/employee-clock/ui/FingerprintEnrollDialog.tsx` | 4 | 0 | 2 | 2 | 8 |
 | `src/features/ticket/ticket-detail/ui/TaskAgentForm.tsx` | 5 | 0 | 2 | 1 | 8 |
-| `src/features/help/assistant/ui/LangostinHelp.tsx` | 5 | 0 | 1 | 2 | 8 |
 | `src/shared/ui/charts/StackedBar.tsx` | 4 | 0 | 1 | 3 | 8 |
 | `src/features/schedule/schedule-form/ui/ScheduleForm.tsx` | 7 | 0 | 0 | 0 | 7 |
 | `src/features/schedule/overtime-approval/ui/OvertimeApprovalTable.tsx` | 6 | 0 | 0 | 1 | 7 |
 | `src/features/roles/roles-console/ui/PermissionFormDialog.tsx` | 7 | 0 | 0 | 0 | 7 |
 | `src/features/roles/roles-console/ui/matrix/PermissionMatrixPanel.tsx` | 3 | 0 | 3 | 1 | 7 |
 | `src/features/department/departments-list/ui/DepartmentsCatalog.tsx` | 3 | 0 | 0 | 4 | 7 |
-| `src/features/hr/employee-detail/ui/EmployeeActivity.tsx` | 3 | 0 | 0 | 4 | 7 |
 | `src/widgets/loan-agent/ui/LoanAgent.tsx` | 7 | 0 | 0 | 0 | 7 |
 | `src/pages/inventory/DeviceDetailPage.tsx` | 6 | 0 | 0 | 0 | 6 |
 | `src/pages/employees/EmployeeProfileEditPage.tsx` | 3 | 0 | 0 | 3 | 6 |
@@ -85,8 +78,10 @@ pública, los generadores de PDF/HTML para imprimir ni cocina (oculta).
 | `src/features/roles/roles-console/ui/shared/DialogParts.tsx` | 5 | 0 | 1 | 0 | 6 |
 | `src/features/hr/employee-detail/ui/EmployeeDocumentsCard.tsx` | 3 | 0 | 0 | 3 | 6 |
 | `src/features/hr/employee-detail/ui/EmployeeInfoCards.tsx` | 4 | 0 | 0 | 2 | 6 |
+| `src/features/hr/employee-detail/ui/EmployeeActivity.tsx` | 2 | 0 | 0 | 4 | 6 |
 | `src/features/hr/disciplinary-reports/ui/DisciplinaryReportAgent.tsx` | 6 | 0 | 0 | 0 | 6 |
 | `src/features/ticket/ticket-detail/ui/TicketHero.tsx` | 6 | 0 | 0 | 0 | 6 |
+| `src/widgets/assistant/ui/agents/EmployeeFormAgent.tsx` | 3 | 0 | 0 | 3 | 6 |
 | `src/widgets/tickets/ticket-attachments/ui/TicketAttachments.tsx` | 5 | 0 | 0 | 1 | 6 |
 | `src/shared/ui/tab-bar/ui/TabBar.tsx` | 2 | 0 | 2 | 2 | 6 |
 | `src/shared/ui/charts/HBarChart.tsx` | 4 | 0 | 0 | 2 | 6 |

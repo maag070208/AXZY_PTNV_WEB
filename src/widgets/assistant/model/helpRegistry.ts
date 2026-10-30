@@ -22,6 +22,11 @@ export interface HelpAction {
   permission?: string;
   /** Palabras extra para la búsqueda del campo de texto. */
   keywords?: string;
+  /**
+   * Aviso que se dispara a la pantalla (p. ej. la animación guiada del tablero).
+   * El panel se cierra para que la persona vea la animación.
+   */
+  emit?: "kanban:guide" | "disciplinary:new";
 }
 
 export interface HelpScreen {
@@ -95,11 +100,17 @@ export const HELP_SCREENS: HelpScreen[] = [
   },
   {
     screenId: "tickets.kanban",
+    // Las opciones se ajustan abajo (necesitan el aviso de la guía).
     title: "Tablero de tareas",
     route: "/tickets/kanban",
     explain: "Las tareas en columnas por estado. Se mueven arrastrando la tarjeta a otra columna.",
     match: (p) => p.startsWith("/tickets/kanban"),
     actions: [
+      {
+        label: "Muéstrame cómo mover una tarea",
+        answer: "Mira las columnas: arrastra la tarjeta a la siguiente etapa.",
+        emit: "kanban:guide",
+      },
       { label: "¿Cómo cambio el estado de una tarea?", answer: "Arrastra la tarjeta a la columna del estado nuevo. El cambio se guarda solo." },
       { label: "Ver la lista de tareas", to: "/tickets/tasks", permission: "tasks.complete" },
     ],
@@ -153,6 +164,72 @@ export const HELP_SCREENS: HelpScreen[] = [
       { label: "¿Qué tipo de movimiento elijo?", answer: "Entrada suma piezas nuevas, baja retira una pieza, a mantenimiento la manda a reparar y el traspaso la cambia de lugar." },
       { label: "¿Se puede deshacer?", answer: "Solo el mantenimiento se revierte. La entrada y la baja no se deshacen; si te equivocas, avisa a Sistemas." },
     ],
+  },
+  {
+    screenId: "employees.list",
+    title: "Personal",
+    route: "/employees",
+    explain: "El directorio de personas: quién está activo, su puesto y su departamento. Desde aquí se busca a alguien y se abre su expediente.",
+    match: (p) => p === "/employees",
+    actions: [
+      { label: "¿Cómo doy de baja a una persona?", answer: "Abre su expediente y usa el botón de baja: pide confirmación y queda en la bitácora. Si solo quieres ocultarla de las listas, se marca como inactiva." },
+      { label: "¿Qué es el expediente?", answer: "Los documentos y datos de la persona: INE, comprobante, datos fiscales y médicos. Lo que falta se marca en rojo." },
+      { label: "Ver expedientes pendientes", to: "/employees/records", permission: "hr.records" },
+      { label: "Ver la bitácora de accesos", to: "/access", permission: "access.scan" },
+    ],
+    glossary: {
+      Activo: "Puede entrar al sistema y aparece en las listas.",
+      Inactivo: "Su cuenta está suspendida; conserva su expediente e historial.",
+    },
+  },
+  {
+    screenId: "employees.edit",
+    title: "Editar información del personal",
+    route: "/employees/:id/edit",
+    explain: "Aquí se corrigen los datos de la persona: nombre, contacto, domicilio, datos fiscales y médicos. Lo que falte o esté mal se marca antes de guardar.",
+    match: (p) => /^\/employees\/[^/]+\/edit$/.test(p),
+    actions: [
+      { label: "¿Qué es obligatorio?", answer: "El nombre y los apellidos. Lo demás se puede completar después; RH marca lo que falta en el expediente." },
+      { label: "¿Cómo lleno el formulario con el bot?", answer: "Usa «Rellenar desde aquí»: te pregunto campo por campo y lo escribo en la pantalla. Revisas y guardas." },
+      { label: "Ver su expediente", to: "/employees", permission: "hr.records" },
+    ],
+    glossary: {
+      "CURP": "Clave única de registro de población; se valida al guardar.",
+      "NSS": "Número de seguridad social, para nómina.",
+    },
+  },
+  {
+    screenId: "employees.disciplinary",
+    title: "Reportes de personal",
+    route: "/employees/disciplinary-reports",
+    explain: "Las cartas y actas administrativas de los empleados: motivo, sanción y quién la levantó. Arriba las cifras filtran por tipo.",
+    match: (p) => p.startsWith("/employees/disciplinary-reports"),
+    actions: [
+      { label: "Nueva acta", answer: "Te abro el alta de acta.", emit: "disciplinary:new", permission: "hr.disciplinary_reports" },
+      { label: "¿Qué es un acta administrativa?", answer: "El registro formal de una falta (inasistencia, retardo, conducta) con su sanción. Queda en la bitácora y en el expediente de la persona." },
+      { label: "Ver personal", to: "/employees", permission: "hr.records" },
+    ],
+    glossary: {
+      Inasistencia: "Falta sin justificar en un día laboral.",
+      Retardo: "Llegada después de la hora de entrada con la tolerancia del horario.",
+    },
+  },
+  {
+    screenId: "employees.detail",
+    title: "Información del personal",
+    route: "/employees/:id",
+    explain: "La ficha de la persona: puesto y estado, antigüedad, expediente, equipo, cartas, tickets y tareas. Arriba están credencial, baja, editar información y cuenta y acceso.",
+    match: (p) => /^\/employees\/[^/]+$/.test(p) && !p.startsWith("/employees/records"),
+    actions: [
+      { label: "Editar su información", to: "/employees/:id/edit", permission: "hr.records" },
+      { label: "Ver su cuenta y acceso", to: "/users/:id/edit", permission: "users.edit" },
+      { label: "¿Cómo lo doy de baja?", answer: "Usa «Dar de baja» arriba a la derecha: pide confirmación y queda en la bitácora. La persona deja de poder entrar, pero conserva expediente e historial." },
+      { label: "Ver expedientes pendientes", to: "/employees/records", permission: "hr.records" },
+    ],
+    glossary: {
+      Antigüedad: "Tiempo desde la fecha de ingreso; el medidor muestra lo que falta para el siguiente año.",
+      Expediente: "Documentos obligatorios y datos personales de la persona. La dona dice qué porcentaje está completo.",
+    },
   },
   {
     screenId: "employees.records",

@@ -50,7 +50,8 @@
         "tickets": "Tickets abiertos",
         "ticketsHint": "creados o asignados",
         "tasks": "Tareas pendientes",
-        "tasksHint": "sin completar"
+        "tasksHint": "sin completar",
+        "none": "Todo en orden"
       },
       "tabs": {
         "loans": "Equipo prestado",
@@ -198,16 +199,24 @@
       "months_one": "mes en la empresa",
       "months_other": "meses en la empresa",
       "plusMonths_one": "+ {{count}} mes",
-      "plusMonths_other": "+ {{count}} meses"
+      "plusMonths_other": "+ {{count}} meses",
+      "addDate": "Completa la fecha de ingreso",
+      "months": "{{count}} mes(es)",
+      "years": "{{count}} año(s)"
     },
     "documentsTile": {
       "label": "Expediente",
       "ofTotal": "de {{total}} tipos",
       "complete": "Documentos completos",
       "missing_one": "Falta {{count}} tipo de documento",
-      "missing_other": "Faltan {{count}} tipos de documento"
+      "missing_other": "Faltan {{count}} tipos de documento",
+      "done": "Con archivo",
+      "pending": "Falta"
     },
-    "noDocumentTypesHint": "Cuando se configuren, los verás aquí para subir los archivos."
+    "noDocumentTypesHint": "Cuando se configuren, los verás aquí para subir los archivos.",
+    "autosaving": "Guardando…",
+    "autosaved": "Guardado ✓",
+    "autosaveError": "No se pudo guardar"
   },
   "catalog": {
     "title": "Catálogo de Documentos",
@@ -342,5 +351,54 @@
   "empty": {
     "title": "Aún no hay personal",
     "description": "Cuando des de alta a alguien, aparecerá en esta lista."
+  },
+  "bot": {
+    "searchTitle": "Busca a una persona",
+    "searchPlaceholder": "Nombre, usuario, número o puesto…",
+    "actionsTitle": "¿Qué hacemos?",
+    "openRecord": "Ver su expediente",
+    "edit": "Editar sus datos",
+    "searchAnother": "Buscar otra persona",
+    "deactivateHint": "Para darla de baja, abre su expediente: el botón de baja está ahí (y pide confirmación).",
+    "pickHint": "Escribe para encontrarla y después elige qué hacer.",
+    "tooltip": "Buscar persona",
+    "fill": {
+      "greeting": "Te ayudo a llenar el formulario. Te pregunto uno por uno y lo voy escribiendo en la pantalla; si algo no aplica, lo saltas.",
+      "name": "¿Nombre(s)?",
+      "nameHint": "Jose Amador",
+      "paternal": "¿Apellido paterno?",
+      "maternal": "¿Apellido materno?",
+      "surnameHint": "Zuno",
+      "position": "¿Cuál es su puesto?",
+      "positionHint": "Seguridad",
+      "employeeNumber": "¿Número de empleado?",
+      "numberHint": "050909",
+      "phone": "¿Teléfono personal?",
+      "phoneHint": "627 123 4567",
+      "email": "¿Correo electrónico?",
+      "emailHint": "persona@puertonuevo.mx",
+      "progress": "Paso {{current}} de {{total}}",
+      "skip": "Omitir",
+      "next": "Continuar",
+      "done": "Listo, lo puse en el formulario.",
+      "finished": "Terminé: llené {{count}} campo(s). Revisa la pantalla y guarda cuando esté bien.",
+      "finishedShort": "Listo para guardar",
+      "restart": "Empezar de nuevo",
+      "tooltip": "Rellenar desde aquí",
+      "askWhat": "¿Qué quieres editar?",
+      "choose": "Elige qué editar",
+      "saved": "Guardado.",
+      "saveFailed": "No se pudo guardar; revisa el dato.",
+      "groupName": "Nombre y apellidos",
+      "groupWork": "Puesto y número",
+      "groupContact": "Contacto",
+      "groupFiscal": "Datos fiscales",
+      "rfc": "¿RFC?",
+      "rfcHint": "ZUBJ900101ABC",
+      "curp": "¿CURP?",
+      "curpHint": "ZUBJ900101HJCXXX01",
+      "nss": "¿Número de seguridad social?",
+      "nssHint": "12345678901"
+    }
   }
 }

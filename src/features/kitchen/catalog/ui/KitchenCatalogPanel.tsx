@@ -349,7 +349,7 @@ export default function KitchenCatalogPanel() {
           </ITAlert>
         )}
         {tab === "categories" ? (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="categories"
             columns={categoryColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchCategories as never}
@@ -363,7 +363,7 @@ export default function KitchenCatalogPanel() {
             virtualizedMaxHeight={460}
           />
         ) : tab === "taxRates" ? (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="taxRates"
             columns={taxColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchTaxRates as never}
@@ -377,7 +377,7 @@ export default function KitchenCatalogPanel() {
             virtualizedMaxHeight={460}
           />
         ) : tab === "costCenters" ? (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="costCenters"
             columns={costColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchCostCenters as never}
@@ -391,7 +391,7 @@ export default function KitchenCatalogPanel() {
             virtualizedMaxHeight={460}
           />
         ) : (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="units"
             columns={unitColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchUnits as never}

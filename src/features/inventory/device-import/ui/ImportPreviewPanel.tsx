@@ -303,7 +303,7 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
           </>
         }
       >
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           columns={columns}
           fetchData={request as any}
           defaultItemsPerPage={25}

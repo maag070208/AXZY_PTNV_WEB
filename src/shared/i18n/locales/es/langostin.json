@@ -280,7 +280,14 @@
     "agentTicket": "Nuevo ticket",
     "ticketOffer": "Puedo darte de alta el ticket nuevo yo mismo, sin salir de esta pantalla. ¿Lo hacemos?",
     "ticketOfferBubble": "¿Un ticket nuevo? Te lo levanto yo aquí mismo.",
-    "later": "Ahora no"
+    "later": "Ahora no",
+    "agentTask": "Crear tarea aquí",
+    "taskOffer": "Puedo darte de alta una tarea de cualquiera de estos tickets, sin salir del tablero. ¿La armamos?",
+    "taskOfferBubble": "¿Una tarea nueva? Te la levanto yo aquí mismo.",
+    "agentEmployee": "Buscar a una persona",
+    "agentEmployeeForm": "Rellenar desde aquí",
+    "agentAct": "Nueva acta aquí",
+    "actOfferBubble": "¿Un acta nueva? Te la levanto yo aquí mismo."
   },
   "season": {
     "halloween": {

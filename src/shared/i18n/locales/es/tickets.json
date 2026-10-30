@@ -107,7 +107,9 @@
       "forMe": "No, es mío",
       "forOther": "Sí, lo pidió otra persona",
       "whoRequested": "¿Quién lo pidió?",
-      "searchPerson": "Busca a la persona…"
+      "searchPerson": "Busca a la persona…",
+      "sentOk": "¡Listo, tu ticket entró!",
+      "sendError": "No se pudo enviar. Inténtalo otra vez."
     },
     "suggestions": {
       "noPower": "No enciende",
@@ -324,7 +326,15 @@
     "taskDescription": "Descripción",
     "taskDescPlaceholder": "Detalles de la tarea...",
     "startDate": "Fecha de inicio",
-    "dueDate": "Fecha límite"
+    "dueDate": "Fecha límite",
+    "guideTitle": "Así se mueve una tarea",
+    "guideHint": "Toma la tarjeta y suéltala en la columna del estado nuevo. Se guarda solo.",
+    "guideCard": "Cableado de computadoras",
+    "guideDrop": "Suéltala aquí",
+    "guideDone": "Entendido",
+    "summaryCount": "{{count}} tareas en el tablero",
+    "summaryOverdue": "{{count}} vencidas",
+    "dragHint": "Arrastra una tarjeta a otra columna para cambiar su estado"
   },
   "mytasks": {
     "title": "Mis Tareas",
@@ -444,7 +454,7 @@
     "name": "Langostín · Tareas",
     "helper": "Langostín te ayuda a dejar la tarea lista",
     "typing": "Langostín está escribiendo…",
-    "greeting": "¡Va de tarea! Dime cómo la armamos.",
+    "greeting": "¡Hola! Armo la tarea contigo.",
     "askWho": "¿Quién se encarga de la tarea?",
     "askWhat": "¿Qué hay que hacer?",
     "askNotes": "¿Algo más que deba saber? Es opcional.",
@@ -452,7 +462,7 @@
     "done": "Listo. Dejo la tarea asignada.",
     "searchEmployee": "Busca a la persona…",
     "titlePlaceholder": "Escribe el título de la tarea…",
-    "notesPlaceholder": "Detalles de la tarea…",
+    "notesPlaceholder": "Detalles (opcional)…",
     "noNotes": "Sin detalles",
     "send": "Enviar",
     "back": "Anterior",
@@ -473,7 +483,18 @@
       "done": "¡Listo! Dejo la tarea creada.",
       "working": "Creando la tarea…",
       "sent": "¡Listo! La tarea ya quedó asignada.",
-      "error": "No pude crear la tarea. Revisa los datos e inténtalo de nuevo."
-    }
+      "error": "No pude crear la tarea. Revisa los datos e inténtalo de nuevo.",
+      "ticket": "Elige el ticket al que pertenece la tarea."
+    },
+    "askTicket": "¿De qué ticket es la tarea?",
+    "searchTicket": "Busca el ticket…",
+    "whatPlaceholder": "¿Qué hay que hacer?",
+    "continue": "Continuar",
+    "sending": "Enviando la tarea…",
+    "sentOk": "¡Listo, la tarea quedó asignada!",
+    "sendError": "No se pudo crear la tarea.",
+    "tooltip": "Crear tarea aquí",
+    "offerBubble": "¿Una tarea nueva? Te la levanto yo aquí mismo.",
+    "searchPerson": "Busca a la persona…"
   }
 }

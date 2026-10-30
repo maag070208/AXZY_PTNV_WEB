@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { emitAppEvent, onAppEvent } from "@shared/lib/appEvents";
 import {
   ITAlert,
   ITButton,
   ITDatePicker,
   ITFlex,
   ITInput,
+  ITLoader,
   ITPage,
   ITSelect,
   ITText,
@@ -25,8 +27,7 @@ import {
   validatePostal,
   validateRfc,
 } from "@shared/validation";
-import { dyn, i18n } from "@shared/i18n";
-import { LangostinGuide, LangostinState } from "@shared/ui/langostin";
+import { i18n } from "@shared/i18n";
 import { FormSection } from "@shared/ui/form-section";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { StickyActions } from "@shared/ui/sticky-actions";
@@ -45,9 +46,6 @@ const localToDateStr = (value: Date): string => {
   const d = String(value.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 };
-
-/** Campos con guía de Langostin (por el `name` del input). */
-const HINT_FIELDS = new Set(["name", "paternalSurname", "maternalSurname", "employeeNumber", "jobTitle", "rfc", "curp", "nss", "personalPhone", "workPhone", "email", "postalCode", "emergencyContactPhone"]);
 
 interface AppStep {
   label: string;
@@ -125,6 +123,55 @@ export default function EmployeeProfileEditPage() {
     departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
   }, []);
 
+  // Autoguardado: lo que el bot escribe en el formulario se guarda solo (con un
+  // respiro de 900 ms por si llegan varios campos seguidos).
+  const [autoSave, setAutoSave] = useState<"idle" | "saving" | "ok" | "error">("idle");
+  const formRef = useRef<FormState>(form);
+  const autoTimer = useRef<number | null>(null);
+  const discountRef = useRef(detail.profile?.discounts ?? []);
+
+  useEffect(() => {
+    formRef.current = form;
+  }, [form]);
+  useEffect(() => {
+    discountRef.current = detail.profile?.discounts ?? [];
+  }, [detail.profile]);
+
+  const persist = async (value: FormState) => {
+    const normalized: FormState = Object.fromEntries(
+      Object.entries(value).map(([key, val]) => [
+        key,
+        typeof val === "string" && val.trim() === "" ? (key === "name" ? undefined : null) : val,
+      ]),
+    ) as FormState;
+    setAutoSave("saving");
+    const ok = await detail.saveProfile(normalized, discountRef.current);
+    setAutoSave(ok ? "ok" : "error");
+    emitAppEvent("employee:saved", { ok });
+    if (ok) window.setTimeout(() => setAutoSave("idle"), 2500);
+  };
+
+  // El bot de Personal pregunta y va llenando estos campos en vivo.
+  useEffect(
+    () =>
+      onAppEvent("employee:fill", ({ field, value }) => {
+        const next = { ...formRef.current, [field]: value };
+        formRef.current = next;
+        setForm(next);
+        if (autoTimer.current) window.clearTimeout(autoTimer.current);
+        autoTimer.current = window.setTimeout(() => void persist(next), 900);
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  useEffect(
+    () => () => {
+      if (autoTimer.current) window.clearTimeout(autoTimer.current);
+    },
+    [],
+  );
+
   const field =
     (name: keyof FormState) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -200,7 +247,8 @@ export default function EmployeeProfileEditPage() {
         icon={<LuUserRound size={20} />}
         breadcrumbs={[
           { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
-          { label: tt("detail.title") },
+          // Sin destino propio: vuelve a la pantalla anterior (la ficha).
+          { label: tt("detail.title"), onClick: () => navigate(-1) },
           { label: tt("detail.editInfo") },
         ]}
       >
@@ -209,7 +257,9 @@ export default function EmployeeProfileEditPage() {
             {detail.error}
           </ITAlert>
         ) : (
-          <LangostinState kind="loading" />
+          <ITFlex justify="center" className="py-16">
+            <ITLoader variant="spinner" size="lg" color="primary" />
+          </ITFlex>
         )}
       </ITPage>
     );
@@ -468,14 +518,6 @@ export default function EmployeeProfileEditPage() {
     },
   ];
 
-  const hasErrors = Object.keys(errors).length > 0;
-  // Pistas por campo (ya traducidas) para LangostinGuide.
-  const guideHints = Object.fromEntries(
-    Array.from(HINT_FIELDS, (name) => [name, dyn(tt)(`detail.guide.fields.${name}`)]),
-  );
-  const guideStatus = detail.saving ? "saving" : hasErrors ? "error" : "idle";
-  const guideStatusText = detail.saving ? tt("detail.guide.saving") : tt("detail.guide.fix");
-
   // Enter pasa al siguiente campo, como en el alta.
   const handleEnter = (event: KeyboardEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -497,7 +539,8 @@ export default function EmployeeProfileEditPage() {
       icon={<LuUserRound size={20} />}
       breadcrumbs={[
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
-        { label: tt("detail.title") },
+        // Sin destino propio: vuelve a la pantalla anterior (la ficha).
+        { label: tt("detail.title"), onClick: () => navigate(-1) },
         { label: tt("detail.editInfo") },
       ]}
     >
@@ -529,6 +572,19 @@ export default function EmployeeProfileEditPage() {
       </div>
 
       <StickyActions>
+        {autoSave !== "idle" && (
+          <ITText
+            className={`mr-auto !text-[11.5px] font-semibold ${
+              autoSave === "error" ? "text-[color:var(--color-danger)]" : "text-[color:var(--color-success)]"
+            }`}
+          >
+            {autoSave === "saving"
+              ? tt("detail.autosaving")
+              : autoSave === "ok"
+                ? tt("detail.autosaved")
+                : tt("detail.autosaveError")}
+          </ITText>
+        )}
         <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack(`/employees/${id}`)} disabled={detail.saving}>
           {tt("common:actions.cancel")}
         </ITButton>
@@ -537,14 +593,6 @@ export default function EmployeeProfileEditPage() {
         </ITButton>
       </StickyActions>
 
-      {/* Langostin flota abajo a la derecha: guía del campo actual y avisa mientras guarda. */}
-      <LangostinGuide
-        hints={guideHints}
-        status={guideStatus}
-        statusText={guideStatusText}
-        defaultText={tt("detail.guide.start")}
-        storageKey={`employee-profile-edit:${id ?? ""}`}
-      />
     </ITPage>
   );
 }

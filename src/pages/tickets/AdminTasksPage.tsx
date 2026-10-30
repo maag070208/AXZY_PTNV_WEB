@@ -11,6 +11,13 @@ import {
 import { useGoBack } from "@shared/lib/useGoBack";
 import { FilterPills } from "@shared/ui/filter-pills";
 
+/** Tono bento de cada cifra (mismo lenguaje que la lista de tickets). */
+const STAT_TONE: Record<string, "sea" | "rose" | "mint"> = {
+  all: "sea",
+  overdue: "rose",
+  ok: "mint",
+};
+
 export default function AdminTasksPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
@@ -83,9 +90,9 @@ export default function AdminTasksPage() {
         className="mb-4"
         stack
         items={[
-          { id: "all", label: tt("tasksTable.summaryTotal"), value: total, caption: tt("tasksTable.summaryTotalCaption"), color: "var(--color-primary-600)" },
-          { id: "overdue", label: tt("tasksTable.summaryOverdue"), value: overdue, caption: tt("tasksTable.pctOfTotal", { pct: pct(overdue) }), color: "var(--color-danger)" },
-          { id: "ok", label: tt("tasksTable.summaryOk"), value: ok, caption: tt("tasksTable.pctOfTotal", { pct: pct(ok) }), color: "var(--color-success)" },
+          { id: "all", label: tt("tasksTable.summaryTotal"), value: total, caption: tt("tasksTable.summaryTotalCaption"), color: "var(--color-primary-600)", tone: STAT_TONE.all },
+          { id: "overdue", label: tt("tasksTable.summaryOverdue"), value: overdue, caption: tt("tasksTable.pctOfTotal", { pct: pct(overdue) }), color: "var(--color-danger)", tone: STAT_TONE.overdue },
+          { id: "ok", label: tt("tasksTable.summaryOk"), value: ok, caption: tt("tasksTable.pctOfTotal", { pct: pct(ok) }), color: "var(--color-success)", tone: STAT_TONE.ok },
         ]}
         stackItems={[
           { id: "overdue", label: tt("tasksTable.summaryOverdue"), value: overdue, color: "var(--color-danger)" },

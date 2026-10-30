@@ -387,7 +387,7 @@ export default function TimeClockEmployeesTab({ fx, onSeeReport }: Props) {
           </ITAlert>
         )}
 
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           columns={columns as unknown as Column<Record<string, unknown>>[]}
           fetchData={
             fetchTableData as unknown as (

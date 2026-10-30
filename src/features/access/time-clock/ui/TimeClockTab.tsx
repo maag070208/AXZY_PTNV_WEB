@@ -310,7 +310,7 @@ export default function TimeClockTab({ fx }: { fx: UseTimeClock }) {
           )
         }
       >
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           columns={columns as unknown as Column<Record<string, unknown>>[]}
           fetchData={
             fetchTableData as unknown as (

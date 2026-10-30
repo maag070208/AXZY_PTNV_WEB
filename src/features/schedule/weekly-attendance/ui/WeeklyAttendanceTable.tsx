@@ -305,7 +305,7 @@ export default function WeeklyAttendanceTable({
   };
 
   return mode === "DETAIL" ? (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       key={`detail:${queryKey}`}
       columns={detailColumns as unknown as Column<Record<string, unknown>>[]}
       fetchData={detailFetch as never}
@@ -319,7 +319,7 @@ export default function WeeklyAttendanceTable({
       virtualizedMaxHeight={460}
     />
   ) : (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       key={`summary:${queryKey}`}
       columns={summaryColumns as unknown as Column<Record<string, unknown>>[]}
       fetchData={summaryFetch as never}

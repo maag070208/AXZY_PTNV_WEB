@@ -87,6 +87,8 @@ export const useTicketsList = () => {
     filterOptionsLoading: filterOptionsState === "loading",
     filterOptionsError: filterOptionsState === "error",
     reloadKey,
+    /** Recarga la tabla (y el resumen) sin remontar la pantalla. */
+    reload: () => setReloadKey((k) => k + 1),
     fetchTableData,
     ticketToDelete,
     setTicketToDelete,

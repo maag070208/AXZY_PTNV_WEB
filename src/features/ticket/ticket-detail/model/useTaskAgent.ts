@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export type TaskAgentStep = "who" | "what" | "notes" | "when" | "done";
+export type TaskAgentStep = "ticket" | "who" | "what" | "notes" | "when" | "done";
 
-// Orden en que el agente pregunta. "done" no es un paso pendiente.
+// Orden en que el agente pregunta. "done" no es un paso pendiente. El paso
+// "ticket" sólo aparece cuando la tarea se crea fuera del ticket (tablero).
 export const TASK_AGENT_STEPS: TaskAgentStep[] = ["who", "what", "notes", "when"];
+export const TASK_AGENT_STEPS_WITH_TICKET: TaskAgentStep[] = ["ticket", ...TASK_AGENT_STEPS];
 
 export interface TaskAgentMessage {
   id: number;
@@ -31,8 +33,13 @@ export interface WhenOption {
 }
 
 interface Options {
-  /** Crea la tarea; devuelve si se pudo. */
-  onCreate: (draft: TaskDraft) => Promise<boolean>;
+  /** Crea la tarea; devuelve si se pudo. Recibe el ticket elegido en el flujo. */
+  onCreate: (draft: TaskDraft, ticketId: string) => Promise<boolean>;
+  /**
+   * Preguntar primero de qué ticket es la tarea. Se usa cuando el chat se abre
+   * fuera del ticket (tablero de tareas): ahí hay tareas de varios tickets.
+   */
+  askTicket?: boolean;
 }
 
 // Estado antes de responder un paso; sirve para regresar.
@@ -40,6 +47,7 @@ interface Snapshot {
   step: TaskAgentStep;
   messages: TaskAgentMessage[];
   draft: TaskDraft;
+  ticketId: string;
 }
 
 /** Fecha local en formato yyyy-mm-dd (sin correr a UTC). */
@@ -62,9 +70,12 @@ const emptyDraft = (): TaskDraft => ({
  * Agente de tareas: el mismo chat de Langostín, pero para armar una tarea del
  * ticket (quién la hace, qué hay que hacer, detalles y fecha).
  */
-export const useTaskAgent = ({ onCreate }: Options) => {
+export const useTaskAgent = ({ onCreate, askTicket = false }: Options) => {
   const { t } = useTranslation("tickets");
-  const [step, setStep] = useState<TaskAgentStep>("who");
+  const steps = askTicket ? TASK_AGENT_STEPS_WITH_TICKET : TASK_AGENT_STEPS;
+  const [step, setStep] = useState<TaskAgentStep>(askTicket ? "ticket" : "who");
+  const [ticketId, setTicketId] = useState("");
+  const [ticketName, setTicketName] = useState("");
   const [messages, setMessages] = useState<TaskAgentMessage[]>([]);
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState<TaskDraft>(emptyDraft);
@@ -99,11 +110,11 @@ export const useTaskAgent = ({ onCreate }: Options) => {
 
   // Guarda cómo estaba todo antes de responder el paso actual.
   const remember = () =>
-    setHistory((h) => [...h, { step, messages, draft }]);
+    setHistory((h) => [...h, { step, messages, draft, ticketId }]);
 
   const greet = () => {
     say(t("taskAgent.greeting"), 250);
-    say(t("taskAgent.askWho"), 900);
+    say(askTicket ? t("taskAgent.askTicket") : t("taskAgent.askWho"), 900);
   };
 
   useEffect(() => {
@@ -121,6 +132,15 @@ export const useTaskAgent = ({ onCreate }: Options) => {
     { value: "in7", label: t("taskAgent.when.in7"), dueDate: localDate(7) },
     { value: "none", label: t("taskAgent.when.none"), dueDate: "" },
   ];
+
+  const pickTicket = (id: string, label: string) => {
+    remember();
+    sayUser(label);
+    setTicketId(id);
+    setTicketName(label);
+    setStep("who");
+    say(t("taskAgent.askWho"), 500);
+  };
 
   const pickUser = (userId: string, label: string) => {
     remember();
@@ -161,7 +181,7 @@ export const useTaskAgent = ({ onCreate }: Options) => {
   useEffect(() => {
     if (step !== "done" || sending) return;
     setSending(true);
-    onCreate(draft)
+    onCreate(draft, ticketId)
       .catch(() => false)
       .finally(() => setSending(false));
     // Solo al llegar a "done".
@@ -177,14 +197,17 @@ export const useTaskAgent = ({ onCreate }: Options) => {
     setMessages(previous.messages);
     setStep(previous.step);
     setDraft(previous.draft);
+    setTicketId(previous.ticketId);
   };
 
   const restart = () => {
     clearTimers();
     setHistory([]);
     setMessages([]);
-    setStep("who");
+    setStep(askTicket ? "ticket" : "who");
     setDraft(emptyDraft());
+    setTicketId("");
+    setTicketName("");
     greet();
   };
 
@@ -194,9 +217,14 @@ export const useTaskAgent = ({ onCreate }: Options) => {
     typing,
     draft,
     sending,
+    ticketId,
+    ticketName,
+    steps,
+    askTicket,
     canGoBack: history.length > 0,
-    completed: step === "done" ? TASK_AGENT_STEPS.length : TASK_AGENT_STEPS.indexOf(step),
+    completed: step === "done" ? steps.length : steps.indexOf(step),
     whenOptions,
+    pickTicket,
     pickUser,
     sendTitle,
     sendNotes,

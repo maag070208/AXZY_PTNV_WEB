@@ -44,6 +44,8 @@ interface Props {
   filterOptionsError: boolean;
   onView: (t: Ticket) => void;
   onMarkForDelete: (t: Ticket) => void;
+  /** Recién creado desde el bot: anima la primera fila al recargar. */
+  flashNew?: boolean;
 }
 
 export default function TicketsTable({
@@ -56,6 +58,7 @@ export default function TicketsTable({
   filterOptionsError,
   onView,
   onMarkForDelete,
+  flashNew = false,
 }: Props) {
   const { t: tt } = useTranslation("tickets");
   const catalog = (data: Array<{ id: string; name: string }>) => ({
@@ -206,8 +209,8 @@ export default function TicketsTable({
   ];
 
   return (
-    <ITCard>
-    <ITDataTable
+    <ITCard className={flashNew ? "ticket-row-flash" : undefined}>
+    <ITDataTable showViewToggle={false}
       key={JSON.stringify(externalFilters)}
       externalFilters={externalFilters}
       columns={columns as unknown as Column<Record<string, unknown>>[]}

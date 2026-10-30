@@ -201,7 +201,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
         </ITFlex>
       </ITDialog>
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
