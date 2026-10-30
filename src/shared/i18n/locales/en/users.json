@@ -48,7 +48,12 @@
     "forceDeleteQuestion": "Force deletion of {{username}}?",
     "reactivateQuestion": "Reactivate {{username}}?",
     "reactivateMsgShort": "They will be able to sign in again.",
-    "passwordHeading": "Change password"
+    "passwordHeading": "Change password",
+    "summary": {
+      "all": "Accounts",
+      "active": "Active",
+      "inactive": "Deactivated"
+    }
   },
   "form": {
     "titleNew": "New user",

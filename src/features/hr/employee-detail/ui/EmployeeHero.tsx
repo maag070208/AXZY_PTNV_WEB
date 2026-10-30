@@ -129,7 +129,7 @@ export default function EmployeeHero({ profile, onPhotoUpload, documents }: Prop
           </ITFlex>
 
           {facts.length > 0 && (
-            <ITFlex align="center" wrap="wrap" gap={4} className="w-full border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] pt-3">
+            <ITFlex align="center" wrap="wrap" gap={4} className="w-full   pt-3">
               {facts.map((f) => (
                 <ITFlex key={f.label} direction="column" gap={0} className="min-w-0">
                   <ITText muted className="!text-[11px]">

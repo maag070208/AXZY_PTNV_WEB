@@ -41,7 +41,8 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
   }, [data, rolesMeta, query, t]);
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-2 lg:sticky lg:top-4">
+    <ITCard contentClassName="!p-2" className="lg:sticky lg:top-4">
+      <ITFlex direction="column" gap={2}>
       <ITInput
         name="role_list_search"
         size="sm"
@@ -62,14 +63,14 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
               const selected = key === selectedRole;
               const pending = pendingByRole.get(key) ?? 0;
               return (
-                <button
+                <ITFlex
                   key={key}
-                  type="button"
+                  as="button"
+                  align="center"
+                  gap={2}
                   onClick={() => onSelect(key)}
-                  className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition ${
-                    selected
-                      ? "border-primary-500/40 !bg-primary-500/5 shadow-sm"
-                      : "border-transparent !bg-transparent hover:!bg-slate-50"
+                  className={`w-full rounded-lg px-2 py-1.5 text-left transition ${
+                    selected ? "bg-primary-600/10" : "hover:bg-slate-50"
                   } ${meta && !meta.active ? "opacity-60" : ""}`}
                 >
                   <RoleAvatar role={key} size="sm" />
@@ -79,9 +80,11 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
                         {roleLabel(key)}
                       </ITText>
                       {pending > 0 && (
-                        <span
-                          className="h-2 w-2 shrink-0 rounded-full bg-amber-500"
+                        <ITText
+                          as="span"
+                          aria-label={t("matrix.changeCount", { count: pending })}
                           title={t("matrix.changeCount", { count: pending })}
+                          className="h-2 w-2 shrink-0 rounded-full bg-amber-500"
                         />
                       )}
                     </ITText>
@@ -93,12 +96,13 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
                       {meta && !meta.active && <ITText as="span" className="font-bold text-rose-500">{t("access.inactiveRole")}</ITText>}
                     </ITText>
                   </ITText>
-                </button>
+                </ITFlex>
               );
             })}
           </ITStack>
         ))}
       </div>
-    </div>
+      </ITFlex>
+    </ITCard>
   );
 }

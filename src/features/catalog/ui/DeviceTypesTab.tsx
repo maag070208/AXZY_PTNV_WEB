@@ -3,6 +3,7 @@ import { ITAlert, ITBadget, ITButton, ITDataTable, ITDialog, ITFlex, ITGrid, ITI
 import { FaEdit, FaTag } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
+import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
 import { inventoryApi, type DeviceType } from "@entities/inventory";
 
 export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?: number }) {
@@ -178,6 +179,8 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
           </ITGrid>
         </div>
       </ITDialog>
+
+      <CatalogStatStrip load={() => inventoryApi.types()} reloadKey={reloadKey} />
 
       <ITDataTable showViewToggle={false}
         columns={columns as any}

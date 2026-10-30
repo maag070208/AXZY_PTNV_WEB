@@ -120,7 +120,17 @@
     "extraByDay": "Horas extra por día",
     "extraByDepartment": "Horas extra por departamento",
     "dayNote": "El día con más tiempo extra fue el {{day}}: {{hours}} h.",
-    "noExtra": "No hay horas extra calculadas esta semana."
+    "noExtra": "No hay horas extra calculadas esta semana.",
+    "weekTitle": "Horas extra de la semana",
+    "total": "{{hours}} h en total"
   },
-  "emptyHint": "Prueba con otra semana o quita los filtros."
+  "emptyHint": "Prueba con otra semana o quita los filtros.",
+  "short": {
+    "linked": "{{linked}} con reloj",
+    "scheduled": "{{hours}} programadas",
+    "worked": "{{hours}} trabajadas",
+    "calculated": "{{pct}}% de lo calculado",
+    "people": "de {{total}} personas"
+  },
+  "reportTitle": "Reporte semanal"
 }

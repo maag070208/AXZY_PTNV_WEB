@@ -226,7 +226,7 @@ export default function LangostinAssistant() {
 
           {activeAgent ? (
             <>
-              <ITFlex align="center" gap={2} className="relative z-[1] border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-3">
+              <ITFlex align="center" gap={2} className="relative z-[1] border-b border-slate-200/70 px-4 py-3">
                 <ITButton variant="text" color="secondary" size="sm" onClick={() => setAgentId(null)} ariaLabel={t("help.back")} title={t("help.back")}>
                   <LuArrowLeft size={16} />
                 </ITButton>
@@ -287,7 +287,7 @@ export default function LangostinAssistant() {
           <ITFlex
             align="center"
             gap={1.5}
-            className="relative z-[1] border-y border-[color-mix(in_srgb,currentColor_7%,transparent)] bg-[color-mix(in_srgb,currentColor_4%,transparent)] px-5 py-2.5"
+            className="relative z-[1] border-y border-slate-200/70 bg-[color-mix(in_srgb,currentColor_4%,transparent)] px-5 py-2.5"
           >
             <LuMapPin size={15} className="shrink-0 text-slate-400" />
             <ITText muted className="shrink-0 !text-[13px]">
@@ -322,7 +322,7 @@ export default function LangostinAssistant() {
           </div>
 
           {/* Opciones: a dónde ir, qué preguntar y los juegos de Langostín */}
-          <div className="relative z-[1] max-h-[46%] overflow-y-auto border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-3">
+          <div className="relative z-[1] max-h-[46%] overflow-y-auto   px-5 py-3">
             {navActions.length > 0 && (
               <>
                 <ITText muted className="!text-[11px] font-bold uppercase tracking-[0.06em]">

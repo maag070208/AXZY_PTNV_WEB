@@ -13,16 +13,13 @@ import {
   ITSearchSelect,
   ITText,
   ITTextarea,
-  ITToast, ITStack } from "@axzydev/axzy_ui_system";
+  ITToast } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaBuilding, FaCheck, FaCheckCircle, FaClock, FaTimes, FaTimesCircle } from "react-icons/fa";
+import { FaCheck, FaTimes } from "react-icons/fa";
 import type { OvertimeDayRow } from "@entities/overtime";
 import { punchTime, workedTime } from "@entities/schedule";
 import { dateLocale } from "@shared/i18n";
 import { dyn } from "@shared/i18n/dyn";
-import { KPI_TONES, KpiTile } from "@shared/ui/kpi-tile";
-import { WaveFill } from "@shared/ui/charts";
-import { PanelCard } from "@shared/ui/panel-card";
 import { PeriodPicker } from "@shared/ui/period-picker";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { TabBar } from "@shared/ui/tab-bar";
@@ -32,9 +29,6 @@ const TABS: StatusTab[] = ["PENDING", "APPROVED", "REJECTED", "ALL"];
 
 /** Zona del navegador mientras llega la del servidor en `summary.range`. */
 const BROWSER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-/** Departamentos que se listan en la tarjeta de resumen. */
-const TOP_DEPARTMENTS = 4;
 
 /** "Mié 07 oct" de una clave de día (`YYYY-MM-DD`), sin corrimiento de zona. */
 const dayLabel = (dayKey: string): string => {
@@ -80,12 +74,6 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
   const pendingDays = summary?.pendingDays ?? 0;
   const approvedDays = summary?.approvedDays ?? 0;
   const rejectedDays = summary?.rejectedDays ?? 0;
-  const totalMinutes =
-    (summary?.pendingMinutes ?? 0) + (summary?.approvedMinutes ?? 0) + (summary?.rejectedMinutes ?? 0);
-
-  const byDepartment = (summary?.byDepartment ?? []).slice(0, TOP_DEPARTMENTS);
-  const maxDepartment = Math.max(1, ...byDepartment.map((d) => d.minutes));
-
   const counts: Record<StatusTab, number> = {
     PENDING: pendingDays,
     APPROVED: approvedDays,
@@ -286,6 +274,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
       {/* Cifras del periodo: el total a aprobar, lo aprobado y lo rechazado.
           Tocarlas filtra la tabla por ese estatus. */}
       <ITBentoStatStrip
+        stack
         items={[
           {
             id: "PENDING",
@@ -293,6 +282,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
             value: workedTime(summary?.pendingMinutes ?? 0),
             caption: `${t("tiles.requests", { count: pendingDays })} · ${t("tiles.people", { count: summary?.peopleWithPending ?? 0 })}`,
             tone: "sun",
+            color: "var(--color-warning)",
           },
           {
             id: "APPROVED",
@@ -300,6 +290,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
             value: workedTime(summary?.approvedMinutes ?? 0),
             caption: t("tiles.requests", { count: approvedDays }),
             tone: "mint",
+            color: "var(--color-success)",
           },
           ...(canApprove
             ? [
@@ -309,8 +300,16 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
                   value: workedTime(summary?.rejectedMinutes ?? 0),
                   caption: t("tiles.requests", { count: rejectedDays }),
                   tone: "rose" as const,
+                  color: "var(--color-danger)",
                 },
               ]
+            : []),
+        ]}
+        stackItems={[
+          { id: "PENDING", label: t("tiles.pending"), value: pendingDays, color: "var(--color-warning)" },
+          { id: "APPROVED", label: t("tiles.approved"), value: approvedDays, color: "var(--color-success)" },
+          ...(canApprove
+            ? [{ id: "REJECTED", label: t("tiles.rejected"), value: rejectedDays, color: "var(--color-danger)" }]
             : []),
         ]}
         activeId={tab === "ALL" ? undefined : tab}
@@ -319,7 +318,7 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
 
       {/* Una sola tarjeta: filtros, estatus, acciones en lote y la tabla */}
       <ITCard contentClassName="!p-0">
-        <ITFlex wrap="wrap" align="end" gap={3} className="border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-4">
+        <ITFlex wrap="wrap" align="end" gap={3} className="border-b border-slate-200/70 px-5 py-4">
           <PeriodPicker
             name="overtime"
             period={fx.period}

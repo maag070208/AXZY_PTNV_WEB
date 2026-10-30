@@ -376,3 +376,19 @@ html {
     animation: none;
   }
 }
+
+/* La tira del mosaico ya se distingue por su tono y su color.
+   Sin contorno ni anillo: la cifra activa ya se ve en las pestañas, y el
+   anillo se leía como un borde (negro o del color del texto) sobre el mosaico. */
+.it-bento-statstrip__item,
+.it-bento-statstrip__item:hover,
+.it-bento-statstrip__item:focus-visible,
+.it-bento-statstrip__item.is-on {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.it-bento-statstrip__item:focus-visible {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 2px;
+}

@@ -24,6 +24,8 @@ export const useUsersList = () => {
   const { t: tt } = useTranslation("users");
   const [departments, setDepartments] = useState<Department[]>([]);
   const [total, setTotal] = useState(0);
+  // Totales para la tira del mosaico: todas, activas y dadas de baja.
+  const [counts, setCounts] = useState<{ total: number; active: number; inactive: number } | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [userToToggle, setUserToToggle] = useState<User | null>(null);
   const [userToReactivate, setUserToReactivate] = useState<User | null>(null);
@@ -34,6 +36,21 @@ export const useUsersList = () => {
     message: string;
     type: "error" | "success";
   } | null>(null);
+
+  // Tres consultas de una fila: es el total real de cada estado, no la página.
+  useEffect(() => {
+    let alive = true;
+    const count = (filters: Record<string, string | boolean>) =>
+      usersApi.table({ page: 1, limit: 1, filters, sort: {} as never });
+    Promise.all([count({}), count({ active: true }), count({ active: false })])
+      .then(([all, act, inact]) => {
+        if (alive) setCounts({ total: all.total, active: act.total, inactive: inact.total });
+      })
+      .catch(() => alive && setCounts(null));
+    return () => {
+      alive = false;
+    };
+  }, [reloadKey]);
 
   // Departamentos y subáreas para los filtros tipo catálogo (Depto / Subárea).
   useEffect(() => {
@@ -138,6 +155,7 @@ export const useUsersList = () => {
   return {
     departments,
     total,
+    counts,
     reloadKey,
     userToToggle,
     setUserToToggle,

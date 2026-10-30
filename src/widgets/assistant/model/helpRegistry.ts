@@ -401,6 +401,62 @@ export const HELP_SCREENS: HelpScreen[] = [
     ],
   },
   {
+    screenId: "catalogs",
+    title: "Catálogos",
+    route: "/catalogs",
+    explain: "Los catálogos que alimentan toda la app: departamentos, subáreas, tipos de dispositivo, documentos, géneros, tipos de sangre y categorías de ticket.",
+    match: (p) => p.startsWith("/catalogs"),
+    actions: [
+      { label: "¿Qué catalogo edito para…?", answer: "Departamento y subárea están en Organización; los documentos obligatorios y los datos personales, en Personal; las categorías de ticket, en Tickets." },
+      { label: "Ver usuarios", to: "/users", permission: "users.view" },
+      { label: "Ver consola de roles", to: "/roles", permission: "roles.manage" },
+    ],
+    glossary: {
+      Subárea: "La parte del departamento a la que pertenece la persona (p. ej. Almacén dentro de Operaciones).",
+    },
+  },
+  {
+    screenId: "roles",
+    title: "Roles y permisos",
+    route: "/roles",
+    explain: "La consola de control de acceso: qué puede hacer cada rol, qué ve cada persona y qué reglas se aplican.",
+    match: (p) => p.startsWith("/roles"),
+    actions: [
+      { label: "¿Dónde veo si alguien puede entrar a algo?", answer: "En la pestaña «Acceso por persona» eliges a la persona y ves su acceso efectivo, de dónde viene y el probador «¿Puede…?»." },
+      { label: "¿Qué es una política?", answer: "Una regla que se suma al rol: por ejemplo, pedir aprobación de gerencia por encima de cierto monto." },
+      { label: "Ver usuarios", to: "/users", permission: "users.view" },
+      { label: "Ver catálogos", to: "/catalogs", permission: "catalogs.manage" },
+    ],
+    glossary: {
+      Alcance: "Sobre qué datos aplica un permiso: lo propio, su área o todo.",
+      Sensible: "Permiso que solo puede otorgar un administrador.",
+    },
+  },
+  {
+    screenId: "timeclock.dashboard",
+    title: "Dashboard del reloj",
+    route: "/time-clocks/dashboard",
+    explain: "El estado de los relojes checadores: en línea, gente registrada, checadas de hoy y alertas.",
+    match: (p) => p.startsWith("/time-clocks/dashboard"),
+    actions: [
+      { label: "¿Por qué hay una alerta?", answer: "Suele ser un reloj sin conexión, con la hora desfasada o con gente sin vincular: entra al reloj para ver el detalle." },
+      { label: "Ver entradas y salidas", to: "/hr/time-clock/entries-exits", permission: "time_clock.view" },
+      { label: "Vincular personas", to: "/hr/time-clock/employees", permission: "time_clock.view" },
+      { label: "Ver relojes", to: "/time-clocks", permission: "time_clocks.manage" },
+    ],
+  },
+  {
+    screenId: "langostin",
+    title: "Langostin",
+    route: "/langostin",
+    explain: "La galería de la mascota: sus animaciones y los escenarios donde aparece.",
+    match: (p) => p.startsWith("/langostin"),
+    actions: [
+      { label: "¿De dónde salen sus animaciones?", answer: "Son 36 animaciones de la mascota y 8 escenarios dibujados en canvas; aquí se pueden ver una por una." },
+      { label: "Ir al inicio", to: "/" },
+    ],
+  },
+  {
     screenId: "default",
     title: "Puerto Nuevo",
     route: "/",

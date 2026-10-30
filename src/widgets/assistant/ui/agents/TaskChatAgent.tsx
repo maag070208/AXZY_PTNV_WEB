@@ -228,7 +228,7 @@ export default function TaskChatAgent({ onDone }: Props) {
       <ITFlex
         align="center"
         gap={2}
-        className="shrink-0 border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-2"
+        className="shrink-0 border-b border-slate-200/70 px-4 py-2"
       >
         <ITText className="rounded-full bg-[color-mix(in_srgb,currentColor_6%,transparent)] px-2 py-0.5 !text-[11px] font-bold">
           {t("new.guide.step", { current: stepNumber, total: agent.steps.length })}
@@ -324,7 +324,7 @@ export default function TaskChatAgent({ onDone }: Props) {
 
       {/* Opciones del paso */}
       {!agent.typing && agent.step !== "done" && (
-        <div className="shrink-0 border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-3">
+        <div className="shrink-0   px-4 py-3">
           {renderOptions()}
           {agent.canGoBack && (
             <ITFlex justify="start" className="mt-2">

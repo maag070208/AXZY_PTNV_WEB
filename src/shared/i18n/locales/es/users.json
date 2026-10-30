@@ -48,7 +48,12 @@
     "forceDeleteQuestion": "¿Forzar la eliminación de {{username}}?",
     "reactivateQuestion": "¿Reactivar a {{username}}?",
     "reactivateMsgShort": "Volverá a poder iniciar sesión.",
-    "passwordHeading": "Cambiar contraseña"
+    "passwordHeading": "Cambiar contraseña",
+    "summary": {
+      "all": "Cuentas",
+      "active": "Activas",
+      "inactive": "Dadas de baja"
+    }
   },
   "form": {
     "titleNew": "Nuevo usuario",

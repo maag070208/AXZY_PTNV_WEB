@@ -575,5 +575,15 @@
       "date": "Pick the expiry date",
       "save": "Could not save the exception"
     }
+  },
+  "summary": {
+    "roles": "Roles",
+    "rolesHint": "in the catalog",
+    "permissions": "Permissions",
+    "permissionsHint": "in the catalog",
+    "people": "People",
+    "peopleHint": "with access",
+    "policies": "Policies",
+    "policiesHint": "active rules"
   }
 }

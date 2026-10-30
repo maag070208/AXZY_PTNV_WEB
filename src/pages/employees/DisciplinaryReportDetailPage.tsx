@@ -136,7 +136,7 @@ export default function DisciplinaryReportDetailPage() {
                 <ITText className="mt-1 whitespace-pre-line !text-[13px] leading-relaxed">
                   {disciplinaryReport.description}
                 </ITText>
-                <ITFlex align="center" gap={2} className="mt-4 border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] pt-3">
+                <ITFlex align="center" gap={2} className="mt-4   pt-3">
                   <ITText muted className="!text-[11px] font-bold uppercase tracking-[0.06em]">
                     {tt("doc.sanction")}
                   </ITText>
@@ -171,7 +171,7 @@ export default function DisciplinaryReportDetailPage() {
                   {disciplinaryReport.user.name}
                 </ITText>
               </ITFlex>
-              <div className="overflow-hidden rounded-b-[20px] border-t border-[color-mix(in_srgb,currentColor_7%,transparent)]">
+              <div className="overflow-hidden rounded-b-[20px]  ">
                 <DisciplinaryReportPreview disciplinaryReport={disciplinaryReport} />
               </div>
             </ITCard>

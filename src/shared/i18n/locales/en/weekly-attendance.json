@@ -120,7 +120,17 @@
     "extraByDay": "Overtime by day",
     "extraByDepartment": "Overtime by department",
     "dayNote": "The day with the most overtime was {{day}}: {{hours}} h.",
-    "noExtra": "No overtime calculated this week."
+    "noExtra": "No overtime calculated this week.",
+    "weekTitle": "Overtime this week",
+    "total": "{{hours}} h total"
   },
-  "emptyHint": "Try another week or clear the filters."
+  "emptyHint": "Try another week or clear the filters.",
+  "short": {
+    "linked": "{{linked}} on clock",
+    "scheduled": "{{hours}} scheduled",
+    "worked": "{{hours}} worked",
+    "calculated": "{{pct}}% of calculated",
+    "people": "of {{total}} people"
+  },
+  "reportTitle": "Weekly report"
 }

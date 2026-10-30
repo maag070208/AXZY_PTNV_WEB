@@ -204,7 +204,7 @@ export default function EmployeeFormAgent({ onDone }: Props) {
   return (
     <ITFlex direction="column" className="h-full min-h-0">
       {/* Progreso */}
-      <ITFlex align="center" gap={2} className="shrink-0 border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-2">
+      <ITFlex align="center" gap={2} className="shrink-0 border-b border-slate-200/70 px-4 py-2">
         <ITText className="rounded-full bg-[color-mix(in_srgb,currentColor_6%,transparent)] px-2 py-0.5 !text-[11px] font-bold">
           {group
             ? t("bot.fill.progress", { current: Math.min(index + 1, group.fields.length), total: group.fields.length })
@@ -267,7 +267,7 @@ export default function EmployeeFormAgent({ onDone }: Props) {
 
       {/* Qué editar (chips) */}
       {!typing && !group && (
-        <div className="shrink-0 border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-3">
+        <div className="shrink-0   px-4 py-3">
           <ITFlex wrap="wrap" gap={1.5}>
             {GROUPS.map((g) => (
               <OptionChip key={g.id} emoji="✏️" label={t(g.labelKey)} onClick={() => pickGroup(g)} />
@@ -278,7 +278,7 @@ export default function EmployeeFormAgent({ onDone }: Props) {
 
       {/* Respuesta del campo actual */}
       {!typing && field && (
-        <div className="shrink-0 border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-3">
+        <div className="shrink-0   px-4 py-3">
           <ITTextarea
             name={`fill-${field.field}`}
             value={draft}

@@ -575,5 +575,15 @@
       "date": "Elige la fecha de vencimiento",
       "save": "No se pudo guardar la excepción"
     }
+  },
+  "summary": {
+    "roles": "Roles",
+    "rolesHint": "en el catálogo",
+    "permissions": "Permisos",
+    "permissionsHint": "en el catálogo",
+    "people": "Personas",
+    "peopleHint": "con acceso",
+    "policies": "Políticas",
+    "policiesHint": "reglas activas"
   }
 }

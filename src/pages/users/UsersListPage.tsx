@@ -1,4 +1,5 @@
 import {
+  ITBentoStatStrip,
   ITButton,
   ITDialog,
   ITFlex,
@@ -72,6 +73,17 @@ export default function UsersListPage() {
       }
       icon={<LuUserCog size={20} />}
     >
+      {/* Cifras reales de las cuentas, como en Personal */}
+      {fx.counts && (
+        <ITBentoStatStrip
+          items={[
+            { id: "all", label: tt("list.summary.all"), value: fx.counts.total, tone: "sea", color: "var(--color-primary-600)" },
+            { id: "active", label: tt("list.summary.active"), value: fx.counts.active, tone: "mint", color: "var(--color-success)" },
+            { id: "inactive", label: tt("list.summary.inactive"), value: fx.counts.inactive, tone: "sun", color: "var(--color-warning)" },
+          ]}
+        />
+      )}
+
       <UsersTable
         fx={fx}
         onView={(u) => navigate(`/employees/${u.id}`)}

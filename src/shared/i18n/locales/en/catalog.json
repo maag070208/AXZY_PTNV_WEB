@@ -76,5 +76,10 @@
       "FRIDAY": "Friday",
       "SATURDAY": "Saturday"
     }
+  },
+  "stats": {
+    "total": "Total",
+    "active": "Active",
+    "inactive": "Inactive"
   }
 }

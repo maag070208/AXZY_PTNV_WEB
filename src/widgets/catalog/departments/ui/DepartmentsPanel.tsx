@@ -15,6 +15,8 @@ import {
   DepartmentsTable,
   useDepartmentsCrud,
 } from "@features/department/departments-list";
+import { departmentsApi } from "@entities/department";
+import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
 
 export default function DepartmentsPanel({ openCreateSignal }: { openCreateSignal?: number }) {
   const navigate = useNavigate();
@@ -38,6 +40,8 @@ export default function DepartmentsPanel({ openCreateSignal }: { openCreateSigna
           {crud.error}
         </ITAlert>
       )}
+
+      <CatalogStatStrip load={() => departmentsApi.list(true)} reloadKey={crud.reloadKey} />
 
       <DepartmentsTable
         fetchData={crud.fetchTableData}

@@ -180,7 +180,7 @@ export default function ScheduleEditAgent({ onDone, targetId }: Props) {
 
   return (
     <ITFlex direction="column" className="relative h-full min-h-0">
-      <ITFlex align="center" gap={2} className="shrink-0 border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-2">
+      <ITFlex align="center" gap={2} className="shrink-0 border-b border-slate-200/70 px-4 py-2">
         <ITText className="min-w-0 flex-1 truncate !text-[12px] font-bold">
           {schedule ? schedule.name : t("editAgent.title")}
         </ITText>
@@ -245,7 +245,7 @@ export default function ScheduleEditAgent({ onDone, targetId }: Props) {
         </div>
       )}
 
-      <div className="shrink-0 border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-4 py-3">
+      <div className="shrink-0   px-4 py-3">
         {error && (
           <ITText className="mb-2 block !text-[11.5px] font-semibold text-[color:var(--color-danger)]">{error}</ITText>
         )}

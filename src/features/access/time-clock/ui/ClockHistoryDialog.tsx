@@ -124,7 +124,7 @@ export default function ClockHistoryDialog({
                 key={evento.id}
                 align="start"
                 gap={2}
-                className={`px-3.5 py-2.5 ${indice > 0 ? "border-t border-[color-mix(in_srgb,currentColor_8%,transparent)]" : ""}`}
+                className={`px-3.5 py-2.5 ${indice > 0 ? " " : ""}`}
               >
                 {evento.ok ? (
                   <LuCircleCheck size={14} className="mt-0.5 shrink-0 text-[color:var(--color-success)]" />

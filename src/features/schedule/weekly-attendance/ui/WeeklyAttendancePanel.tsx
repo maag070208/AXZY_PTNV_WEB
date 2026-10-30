@@ -2,38 +2,31 @@ import { useMemo, useState } from "react";
 import {
   ITAlert,
   ITBadget,
-  ITBentoGauge,
-  ITBentoGrid,
-  ITBentoTile,
-  ITBentoWaves,
+  ITBentoStatStrip,
   ITBentoWeekBars,
   ITButton,
+  ITCard,
   ITDatePicker,
   ITDialog,
   ITFlex,
+  ITGrid,
   ITInput,
   ITSearchSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import {
   LuBell,
-  LuBriefcaseBusiness,
-  LuCalendarDays,
   LuChartColumn,
   LuChevronLeft,
   LuChevronRight,
-  LuCircleCheck,
-  LuClock,
   LuFileText,
   LuInfo,
-  LuUserX,
-  LuUsers,
 } from "react-icons/lu";
 import { dyn } from "@shared/i18n/dyn";
 import { dateLocale } from "@shared/i18n";
 import { DialogHeader } from "@shared/ui/dialog-header";
 import { FilterPills } from "@shared/ui/filter-pills";
-import { InsightNote, Num } from "@shared/ui/bento-bits";
+import { Num } from "@shared/ui/bento-bits";
 import { LangostinState } from "@shared/ui/langostin";
 import { PanelCard } from "@shared/ui/panel-card";
 import { seriesColor } from "@shared/ui/charts";
@@ -99,7 +92,6 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
     return { extraByDay: byDay, extraByDepartment: byDept };
   }, [report]);
   const extraTotalMin = summary?.extraMin ?? 0;
-  const deptMax = Math.max(1, ...extraByDepartment.map((d) => d.minutes));
   const topIndex = extraByDay.reduce((best, d, i) => (d.value > (extraByDay[best]?.value ?? 0) ? i : best), 0);
   const topDay = {
     value: extraByDay[topIndex]?.value ?? 0,
@@ -113,12 +105,118 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
 
   return (
     <ITFlex direction="column" gap={4}>
-      {/* Filtros de la semana y acciones, en una sola fila */}
-      <PanelCard>
-        <div className="grid gap-3 lg:!grid-cols-[minmax(0,1.6fr)_minmax(0,1.2fr)_minmax(0,1fr)_auto] lg:items-end">
-          <ITFlex align="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" onClick={fx.previousWeek} title={t("filters.previousWeek")}>
-              <LuChevronLeft size={14} />
+      {/* Cifras de la semana: la tira del mosaico, como en Asistencias */}
+      {summary && (
+        <ITBentoStatStrip
+          stack
+          items={[
+            {
+              id: "people",
+              label: t("kpis.people"),
+              value: <Num value={summary.people} />,
+              caption: t("short.linked", { linked: summary.people - summary.unlinked }),
+              tone: "sea",
+              color: "var(--color-primary-500)",
+            },
+            {
+              id: "worked",
+              label: t("kpis.worked"),
+              value: hoursDecimal(summary.workedMin),
+              caption: t("short.scheduled", { hours: hoursDecimal(summary.scheduledMin) }),
+              tone: "plain",
+              color: "var(--color-primary-500)",
+            },
+            {
+              id: "overtime",
+              label: t("kpis.overtime"),
+              value: hoursDecimal(summary.extraMin),
+              caption: t("short.worked", { hours: hoursDecimal(summary.workedMin) }),
+              tone: "sun",
+              color: "var(--color-warning)",
+            },
+            {
+              id: "approved",
+              label: t("kpis.approved"),
+              value: hoursDecimal(summary.approvedExtraMin),
+              caption: t("short.calculated", {
+                pct: summary.extraMin > 0 ? Math.round((summary.approvedExtraMin / summary.extraMin) * 100) : 0,
+              }),
+              tone: "mint",
+              color: "var(--color-success)",
+            },
+            {
+              id: "absences",
+              label: t("kpis.absences"),
+              value: <Num value={summary.absences} />,
+              caption: t("short.people", { total: summary.people }),
+              tone: summary.absences > 0 ? "lavender" : "plain",
+              color: summary.absences > 0 ? "var(--color-danger)" : "var(--color-text-muted)",
+            },
+          ]}
+          stackItems={[
+            { id: "worked", label: t("kpis.worked"), value: summary.workedMin, color: "var(--color-primary-500)" },
+            { id: "overtime", label: t("kpis.overtime"), value: summary.extraMin, color: "var(--color-warning)" },
+            { id: "absences", label: t("kpis.absences"), value: summary.absences, color: "var(--color-danger)" },
+          ]}
+        />
+      )}
+
+      {fx.error && (
+        <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
+          {fx.error}
+        </ITAlert>
+      )}
+
+      {/* Igual que Asistencias: una sola tarjeta con el título, la vista, los
+          filtros debajo en una fila y el reporte. */}
+      <ITCard contentClassName="!p-0">
+        <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="px-5 py-3">
+          <ITFlex align="center" gap={2} className="min-w-0">
+            <ITText className="!text-[14px] font-bold">{t("reportTitle")}</ITText>
+            {report && (
+              <ITText as="span" className="rounded-full bg-[color-mix(in_srgb,currentColor_7%,transparent)] px-2 py-0.5 !text-[11px] font-bold tabular-nums">
+                {report.rows.length}
+              </ITText>
+            )}
+          </ITFlex>
+          <ITFlex align="center" gap={2}>
+            <FilterPills
+              items={[
+                { id: "SUMMARY" as WeeklyAttendanceMode, label: t("view.summary") },
+                { id: "DETAIL" as WeeklyAttendanceMode, label: t("view.detail") },
+              ]}
+              value={fx.mode}
+              onChange={fx.setMode}
+            />
+            <ITButton variant="raised-text" color="secondary" size="sm" onClick={() => setLegendOpen((open) => !open)}>
+              <ITFlex align="center" gap={1}>
+                <LuInfo size={12} />
+                <ITText className="text-[11px] font-bold">{t("legend")}</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
+        </ITFlex>
+
+        {legendOpen && (
+          <ITFlex align="center" wrap="wrap" gap={2} className="  px-5 py-2.5">
+            {WEEKLY_LEGEND.map((status) => (
+              <ITBadget key={status} color={WEEKLY_STATUS_BADGE[status]} size="sm">
+                {t(`status.${status}`)}
+              </ITBadget>
+            ))}
+            {report && (
+              <ITText muted className="ml-auto !text-[11px]">
+                {t("timezone", { tz: report.range.timezone })}
+              </ITText>
+            )}
+          </ITFlex>
+        )}
+
+        {/* Filtros: semana con anterior/siguiente, departamento, buscar y PDF */}
+        <ITFlex wrap="wrap" align="end" gap={3} className="  px-5 py-3">
+          <ITFlex align="end" gap={1.5} className="min-w-[250px] flex-[1.3]">
+            <ITButton variant="outlined" color="secondary" size="sm" onClick={fx.previousWeek} title={t("filters.previousWeek")}>
+              <LuChevronLeft size={13} />
             </ITButton>
             <ITFlex className="min-w-0 flex-1">
               <ITDatePicker
@@ -130,211 +228,127 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
                 className="w-full min-w-0"
               />
             </ITFlex>
-            <ITButton variant="outlined" color="secondary" onClick={fx.nextWeek} title={t("filters.nextWeek")}>
-              <LuChevronRight size={14} />
+            <ITButton variant="outlined" color="secondary" size="sm" onClick={fx.nextWeek} title={t("filters.nextWeek")}>
+              <LuChevronRight size={13} />
             </ITButton>
           </ITFlex>
 
-          <ITSearchSelect
-            name="weeklyAttendanceDepartment"
-            label={t("filters.department")}
-            options={[
-              { value: "", label: t("filters.allDepartments") },
-              ...fx.departments.data.map((d) => ({ value: d.id, label: d.name })),
-            ]}
-            value={fx.departmentId}
-            onChange={(value) => fx.setDepartmentId(String(value))}
-            className="w-full min-w-0"
-          />
+          <ITFlex className="min-w-[180px] flex-1">
+            <ITSearchSelect
+              name="weeklyAttendanceDepartment"
+              label={t("filters.department")}
+              options={[
+                { value: "", label: t("filters.allDepartments") },
+                ...fx.departments.data.map((d) => ({ value: d.id, label: d.name })),
+              ]}
+              value={fx.departmentId}
+              onChange={(value) => fx.setDepartmentId(String(value))}
+              className="w-full min-w-0"
+            />
+          </ITFlex>
 
-          <ITInput
-            name="weeklyAttendanceSearch"
-            label={t("filters.search")}
-            placeholder={t("filters.searchPlaceholder")}
-            value={fx.search}
-            onChange={(e) => fx.setSearch(e.target.value)}
-          />
+          <ITFlex className="min-w-[170px] flex-1">
+            <ITInput
+              name="weeklyAttendanceSearch"
+              label={t("filters.search")}
+              placeholder={t("filters.searchPlaceholder")}
+              value={fx.search}
+              onChange={(e) => fx.setSearch(e.target.value)}
+              className="w-full min-w-0"
+            />
+          </ITFlex>
 
-          <ITFlex align="center" gap={1} className="lg:pb-0.5">
+          <ITFlex align="center" gap={1.5} className="shrink-0">
             {noticesCount > 0 && (
-              <ITButton variant="outlined" color="warning" onClick={() => setNoticesOpen(true)} title={t("notices.title")}>
+              <ITButton variant="outlined" color="warning" size="sm" onClick={() => setNoticesOpen(true)} title={t("notices.title")}>
                 <ITFlex align="center" gap={1}>
-                  <LuBell size={14} />
+                  <LuBell size={13} />
                   <ITText className="text-[11px] font-bold">{noticesCount}</ITText>
                 </ITFlex>
               </ITButton>
             )}
-            <ITButton variant="filled" color="primary" onClick={fx.exportPdf} disabled={fx.exporting || !report || report.rows.length === 0}>
+            <ITButton variant="filled" color="primary" size="sm" onClick={fx.exportPdf} disabled={fx.exporting || !report || report.rows.length === 0}>
               <ITFlex align="center" gap={1}>
-                <LuFileText size={14} />
+                <LuFileText size={13} />
                 <ITText className="text-[11px] font-bold">{fx.exporting ? t("exporting") : t("exportPdf")}</ITText>
               </ITFlex>
             </ITButton>
           </ITFlex>
-        </div>
+        </ITFlex>
 
-      </PanelCard>
-
-      {summary && (
-        <ITBentoGrid>
-          <ITBentoTile
-            cols={2}
-            rows={2}
-            icon={<LuUsers size={15} />}
-            label={t("kpis.people")}
-            value={<Num value={summary.people} />}
-            caption={t("context.people", { linked: summary.people - summary.unlinked, total: summary.people })}
-          />
-          <ITBentoTile
-            tone="sea"
-            cols={3}
-            rows={2}
-            icon={<LuClock size={15} />}
-            label={t("kpis.worked")}
-            value={`${hoursDecimal(summary.workedMin)} ${t("hoursShort")}`}
-            caption={t("context.worked", { scheduled: `${hoursDecimal(summary.scheduledMin)} ${t("hoursShort")}` })}
-          >
-            {summary.scheduledMin > 0 && (
-              <div className="relative z-[1] my-1 flex min-h-0 flex-1 items-center justify-center">
-                <ITBentoGauge
-                  value={Math.min(1, summary.workedMin / summary.scheduledMin)}
-                  color="var(--color-warning)"
-                  trackColor="rgb(255 255 255 / 0.14)"
-                  size={150}
-                />
-              </div>
-            )}
-          </ITBentoTile>
-          <ITBentoTile
-            tone="sun"
-            cols={3}
-            rows={2}
-            icon={<LuBriefcaseBusiness size={15} />}
-            label={t("kpis.overtime")}
-            value={`${hoursDecimal(summary.extraMin)} ${t("hoursShort")}`}
-            caption={t("context.overtime", { worked: `${hoursDecimal(summary.workedMin)} ${t("hoursShort")}` })}
-          />
-          <ITBentoTile
-            tone="mint"
-            cols={2}
-            rows={2}
-            icon={<LuCircleCheck size={15} />}
-            label={t("kpis.approved")}
-            value={`${hoursDecimal(summary.approvedExtraMin)} ${t("hoursShort")}`}
-            caption={t("context.approved", {
-              pct: summary.extraMin > 0 ? Math.round((summary.approvedExtraMin / summary.extraMin) * 100) : 0,
-            })}
-          >
-            {summary.extraMin > 0 && summary.approvedExtraMin > 0 && (
-              <ITBentoWaves level={summary.approvedExtraMin / summary.extraMin} color="var(--color-success)" />
-            )}
-          </ITBentoTile>
-          <ITBentoTile
-            tone={summary.absences > 0 ? "lavender" : "plain"}
-            cols={2}
-            rows={2}
-            icon={<LuUserX size={15} />}
-            label={t("kpis.absences")}
-            value={<Num value={summary.absences} />}
-            caption={t("context.absences", { total: summary.people })}
-          />
-
-          {/* Horas extra por día de la semana */}
-          <ITBentoTile cols={7} rows={3} wide icon={<LuChartColumn size={15} />} label={t("charts.extraByDay")}>
-            <div className="mt-2 min-h-0 flex-1">
-              <ITBentoWeekBars items={extraByDay} color="var(--color-primary-500)" todayColor="var(--color-warning)" />
+        <div className=" ">
+          {fx.loading && !report ? (
+            <LangostinState kind="loading" />
+          ) : report && report.rows.length > 0 ? (
+            <div className={fx.loading ? "opacity-60 transition-opacity" : undefined}>
+              <WeeklyAttendanceTable
+                report={report}
+                mode={fx.mode}
+                groupByDepartment={!fx.departmentId}
+                t={fx.t}
+                onParamsChange={fx.setTableParams}
+                reloadTrigger={fx.reportVersion}
+                queryKey={fx.queryKey}
+              />
             </div>
-            <InsightNote className="mt-2">
-              {topDay.value > 0 ? t("charts.dayNote", { hours: topDay.value, day: topDay.label }) : t("charts.noExtra")}
-            </InsightNote>
-          </ITBentoTile>
-
-          {/* Horas extra por departamento */}
-          <ITBentoTile cols={5} rows={3} wide icon={<LuCalendarDays size={15} />} label={t("charts.extraByDepartment")}>
-            {extraByDepartment.length === 0 ? (
-              <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("charts.noExtra")}</ITText>
-            ) : (
-              <div className="it-bento-bars mt-3 flex-1 content-around">
-                {extraByDepartment.map((row) => (
-                  <div key={row.label} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
-                    <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
-                    <ITText as="span" className="truncate">{row.label}</ITText>
-                    <ITText as="span">
-                      {hoursDecimal(row.minutes)} {t("hoursShort")}{" "}
-                      <ITText as="span" className="opacity-60">{Math.round((row.minutes / Math.max(1, extraTotalMin)) * 100)}%</ITText>
-                    </ITText>
-                    <div className="it-bento-bar col-span-3">
-                      <i style={{ "--it-bento-w": `${(row.minutes / deptMax) * 100}%`, background: row.color } as React.CSSProperties} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ITBentoTile>
-        </ITBentoGrid>
-      )}
-
-      {fx.error && (
-        <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
-          {fx.error}
-        </ITAlert>
-      )}
-
-      {/* Vista del reporte y simbología (a pedido) */}
-      <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
-        <FilterPills
-          items={[
-            { id: "SUMMARY" as WeeklyAttendanceMode, label: t("view.summary") },
-            { id: "DETAIL" as WeeklyAttendanceMode, label: t("view.detail") },
-          ]}
-          value={fx.mode}
-          onChange={fx.setMode}
-        />
-        <ITButton variant="raised-text" color="secondary" onClick={() => setLegendOpen((open) => !open)}>
-          <ITFlex align="center" gap={1}>
-            <LuInfo size={13} />
-            <ITText className="text-[11px] font-bold">{t("legend")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
-
-      {legendOpen && (
-        <PanelCard>
-          <ITFlex align="center" wrap="wrap" gap={2}>
-            {WEEKLY_LEGEND.map((status) => (
-              <ITBadget key={status} color={WEEKLY_STATUS_BADGE[status]} size="sm">
-                {t(`status.${status}`)}
-              </ITBadget>
-            ))}
-            {report && (
-              <ITText className="ml-auto text-[11px] font-semibold text-slate-400">
-                {t("timezone", { tz: report.range.timezone })}
-              </ITText>
-            )}
-          </ITFlex>
-        </PanelCard>
-      )}
-
-      {fx.loading && !report ? (
-        <LangostinState kind="loading" />
-      ) : report && report.rows.length > 0 ? (
-        <div className={fx.loading ? "opacity-60 transition-opacity" : undefined}>
-          <WeeklyAttendanceTable
-            report={report}
-            mode={fx.mode}
-            groupByDepartment={!fx.departmentId}
-            t={fx.t}
-            onParamsChange={fx.setTableParams}
-            reloadTrigger={fx.reportVersion}
-            queryKey={fx.queryKey}
-          />
+          ) : (
+            !fx.loading && <LangostinState kind="noResults" title={t("empty")} description={t("emptyHint")} />
+          )}
         </div>
-      ) : (
-        !fx.loading && (
-          <PanelCard>
-            <LangostinState kind="noResults" title={t("empty")} description={t("emptyHint")} />
-          </PanelCard>
-        )
+      </ITCard>
+
+      {/* Horas extra de la semana: por día y por departamento */}
+      {summary && (
+        <PanelCard
+          title={t("charts.weekTitle")}
+          icon={<LuChartColumn size={16} />}
+          actions={
+            <ITText muted className="!text-[12px] font-semibold tabular-nums">
+              {t("charts.total", { hours: hoursDecimal(summary.extraMin) })}
+            </ITText>
+          }
+        >
+          {extraTotalMin === 0 ? (
+            <ITText muted className="!text-[12.5px]">
+              {t("charts.noExtra")}
+            </ITText>
+          ) : (
+            <ITGrid container columns={12} spacing={5}>
+              <ITGrid item xs={12} lg={7} className="min-w-0">
+                <ITText muted className="!text-[11px] font-bold uppercase tracking-[0.05em]">
+                  {t("charts.extraByDay")}
+                </ITText>
+                <div className="mt-2 h-[104px]">
+                  <ITBentoWeekBars items={extraByDay} color="var(--color-primary-500)" todayColor="var(--color-warning)" />
+                </div>
+                {topDay.value > 0 && (
+                  <ITText muted className="mt-2 block !text-[11.5px]">
+                    {t("charts.dayNote", { hours: topDay.value, day: topDay.label })}
+                  </ITText>
+                )}
+              </ITGrid>
+              <ITGrid item xs={12} lg={5} className="min-w-0">
+                <ITText muted className="!text-[11px] font-bold uppercase tracking-[0.05em]">
+                  {t("charts.extraByDepartment")}
+                </ITText>
+                <div className="mt-2 flex flex-col gap-2">
+                  {extraByDepartment.map((row) => (
+                    <div key={row.label} className="grid grid-cols-[9px_minmax(0,1fr)_auto] items-center gap-x-2.5 text-[12.5px] font-medium">
+                      <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
+                      <ITText as="span" className="truncate">{row.label}</ITText>
+                      <ITText as="span" className="whitespace-nowrap">
+                        {hoursDecimal(row.minutes)} {t("hoursShort")}{" "}
+                        <ITText as="span" className="opacity-60">
+                          {Math.round((row.minutes / Math.max(1, extraTotalMin)) * 100)}%
+                        </ITText>
+                      </ITText>
+                    </div>
+                  ))}
+                </div>
+              </ITGrid>
+            </ITGrid>
+          )}
+        </PanelCard>
       )}
 
       <ITDialog isOpen={noticesOpen} onClose={() => setNoticesOpen(false)}>

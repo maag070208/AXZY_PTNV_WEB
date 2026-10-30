@@ -221,7 +221,7 @@ export default function AssignSchedules() {
 
       {/* Una tarjeta: filtros arriba y las dos listas debajo */}
       <ITCard contentClassName="!p-0">
-        <ITFlex wrap="wrap" align="end" gap={3} className="border-b border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-4">
+        <ITFlex wrap="wrap" align="end" gap={3} className="border-b border-slate-200/70 px-5 py-4">
           <ITFlex className="min-w-[220px] flex-1">
             <ITSearchSelect
               name="schedule"
@@ -260,7 +260,7 @@ export default function AssignSchedules() {
 
         <ITGrid container columns={12} spacing={0}>
           {/* Por asignar */}
-          <ITGrid item xs={12} lg={6} className="min-w-0 lg:border-r lg:border-[color-mix(in_srgb,currentColor_7%,transparent)]">
+          <ITGrid item xs={12} lg={6} className="min-w-0 lg:border-r lg:border-slate-200/70">
             <ITFlex align="center" justify="between" gap={2} className="px-5 pb-2 pt-4">
               <ITFlex align="center" gap={1.5}>
                 <ITCheckbox
@@ -319,7 +319,7 @@ export default function AssignSchedules() {
               )}
             </ITFlex>
 
-            <ITFlex align="center" justify="between" gap={2} className="border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-3">
+            <ITFlex align="center" justify="between" gap={2} className="  px-5 py-3">
               <ITText muted className="!text-[11.5px]">
                 {t("assign.immediate")}
               </ITText>
@@ -400,7 +400,7 @@ export default function AssignSchedules() {
               )}
             </ITFlex>
 
-            <ITFlex align="center" justify="between" gap={2} className="border-t border-[color-mix(in_srgb,currentColor_7%,transparent)] px-5 py-3">
+            <ITFlex align="center" justify="between" gap={2} className="  px-5 py-3">
               <ITText muted className="!text-[11.5px]">
                 {t("assign.removeHint")}
               </ITText>

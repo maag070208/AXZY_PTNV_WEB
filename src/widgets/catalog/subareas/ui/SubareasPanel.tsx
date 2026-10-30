@@ -15,6 +15,8 @@ import {
   SubareasTable,
   useSubareasCrud,
 } from "@features/subarea/subareas-crud";
+import { subareaApi } from "@entities/subarea";
+import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
 
 export default function SubareasPanel({ openCreateSignal }: { openCreateSignal?: number }) {
   const { t: tt } = useTranslation(["subareas", "common"]);
@@ -42,6 +44,8 @@ export default function SubareasPanel({ openCreateSignal }: { openCreateSignal?:
           {crud.error}
         </ITAlert>
       )}
+
+      <CatalogStatStrip load={() => subareaApi.list({ includeInactive: true })} reloadKey={crud.reloadKey} />
 
       <SubareasTable
         departments={crud.allDepartments}
