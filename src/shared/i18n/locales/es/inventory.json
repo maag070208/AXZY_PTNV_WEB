@@ -266,7 +266,18 @@
     "addCardHint": "Nombre, prefijo y campos",
     "fields": "Campos de la unidad",
     "fieldsHint": "Qué campos aplican a las unidades de este tipo",
-    "saveError": "No se pudo guardar el tipo de dispositivo"
+    "saveError": "No se pudo guardar el tipo de dispositivo",
+    "colPrefix": "Prefijo",
+    "colNext": "Siguiente código",
+    "colDevices": "Dispositivos",
+    "colShare": "% inventario",
+    "colStatus": "Estado",
+    "colType": "Tipo",
+    "distribution": "Distribución del inventario",
+    "others": "Otros",
+    "devicesTotal": "{{count}} dispositivos",
+    "resultsShort": "{{shown}} de {{total}} tipos mostrados",
+    "addRow": "Agregar tipo · nombre, prefijo y campos"
   },
   "typeLabels": {
     "STOCK_IN": "Entrada",

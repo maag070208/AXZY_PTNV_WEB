@@ -1,4 +1,4 @@
-import { ITBentoFeed, ITBentoGauge, ITBentoGrid, ITBentoTile, useITBentoCountUp } from "@axzydev/axzy_ui_system";
+import { ITBentoFeed, ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile, useITBentoCountUp } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { LuClock, LuDoorOpen, LuWrench } from "react-icons/lu";
@@ -98,18 +98,9 @@ export default function ClockDashboard({ access, setup }: Props) {
             </p>
           )}
           <div className="mt-1 flex flex-wrap gap-1.5">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-              <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-success)]" />
-              {t("access.entries")} {entries}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-              <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
-              {t("access.exits")} {exits}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-              <b className="h-[7px] w-[7px] rounded-full bg-white/40" />
-              {t("access.mine")} {access?.registeredByMe ?? 0}
-            </span>
+            <ITBentoPill dot="var(--color-success)">{t("access.entries")} {entries}</ITBentoPill>
+            <ITBentoPill dot="var(--color-warning)">{t("access.exits")} {exits}</ITBentoPill>
+            <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("access.mine")} {access?.registeredByMe ?? 0}</ITBentoPill>
           </div>
         </div>
       </ITBentoTile>

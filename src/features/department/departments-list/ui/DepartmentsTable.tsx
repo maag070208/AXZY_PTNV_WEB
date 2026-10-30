@@ -1,6 +1,5 @@
 import {
   ITBadget,
-  ITButton,
   ITDataTable,
   ITFlex,
   ITText,
@@ -12,6 +11,7 @@ import type {
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department, Subarea } from "@entities/department";
+import { RowAction } from "@shared/ui/row-action";
 
 interface Props {
   fetchData: (
@@ -96,37 +96,9 @@ export default function DepartmentsTable({
       align: "right" as const,
       render: (d: Department) => (
         <ITFlex gap={1}>
-          <ITButton
-            variant="outlined"
-            size="lg"
-            color="secondary"
-            onClick={() => onView(d)}
-            title={tt("common:actions.view")}
-          >
-            <FaEye size={14} />
-          </ITButton>
-          {canManage && (
-            <ITButton
-              variant="outlined"
-              size="lg"
-              color="secondary"
-              onClick={() => onEdit(d)}
-              title={tt("list.editName")}
-            >
-              <FaEdit size={12} />
-            </ITButton>
-          )}
-          {canManage && (
-            <ITButton
-              variant="outlined"
-              size="lg"
-              color="error"
-              onClick={() => onDelete(d)}
-              title={tt("list.delete")}
-            >
-              <FaTrash size={12} />
-            </ITButton>
-          )}
+          <RowAction icon={<FaEye size={13} />} label={tt("common:actions.view")} tone="secondary" onClick={() => onView(d)} />
+          {canManage && <RowAction icon={<FaEdit size={13} />} label={tt("list.editName")} tone="primary" onClick={() => onEdit(d)} />}
+          {canManage && <RowAction icon={<FaTrash size={13} />} label={tt("list.delete")} tone="danger" onClick={() => onDelete(d)} />}
         </ITFlex>
       ),
     },

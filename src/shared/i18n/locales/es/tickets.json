@@ -48,7 +48,8 @@
       "clear": "Mostrar todos"
     },
     "confirmTrashTitle": "¿Mover a papelera?",
-    "confirmForeverTitle": "¿Eliminar definitivamente?"
+    "confirmForeverTitle": "¿Eliminar definitivamente?",
+    "view": "Ver ticket"
   },
   "new": {
     "title": "Nuevo Ticket",
@@ -375,7 +376,20 @@
     "overdue": "Vencida",
     "start": "Inicio: {{date}}",
     "end": "Fin: {{date}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "overdueDays": "Vencida · hace {{days}} d",
+    "onTime": "Cerrada a tiempo",
+    "summaryTotal": "Tareas",
+    "summaryTotalCaption": "en todos los tickets",
+    "summaryOverdue": "Vencidas",
+    "summaryOk": "Vigentes o completadas",
+    "pctOfTotal": "{{pct}}% del total",
+    "visible": "{{shown}} visibles · {{total}} en total",
+    "filterAll": "Todas",
+    "filterCompleted": "Completada",
+    "filterInReview": "En revisión",
+    "searchPlaceholder": "Buscar por tarea, empleado o ticket…",
+    "clear": "Quitar filtro"
   },
   "pdf": {
     "legend": "Reporte de Ticket",

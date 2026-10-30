@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
-  ITBentoGrid,
-  ITBentoTile,
   ITButton,
+  ITCard,
+  ITDataTable,
   ITCheckbox,
   ITChip,
   ITDialog,
@@ -13,18 +13,10 @@ import {
   ITInput,
   ITPage,
   ITText,
+  type Column,
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaPlus, FaTag } from "react-icons/fa";
-import {
-  LuArchive,
-  LuBoxes,
-  LuCircleCheck,
-  LuLayers,
-  LuListChecks,
-  LuRotateCcw,
-  LuSearch,
-  LuTag,
-} from "react-icons/lu";
+import { LuListChecks, LuSearch, LuTag } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type DeviceType } from "@entities/inventory";
 import { useCan } from "@entities/user";
@@ -33,19 +25,17 @@ import { usePrefersReducedMotion } from "@shared/lib/usePrefersReducedMotion";
 import { InsightNote, Num } from "@shared/ui/bento-bits";
 import { DialogHeader } from "@shared/ui/dialog-header";
 import { FilterPills, type FilterPillItem } from "@shared/ui/filter-pills";
+import { RowAction } from "@shared/ui/row-action";
 import { FormSection } from "@shared/ui/form-section";
 import { Langostin, LangostinState, type LangostinAnim } from "@shared/ui/langostin";
-import { ListSummaryStrip, type ListSummaryItem } from "@shared/ui/list-summary-strip";
+import { StackedBar, seriesColor } from "@shared/ui/charts";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 
 type StatusFilter = "all" | "active" | "inactive" | "withDevices";
 
 /** Campos de la unidad que un tipo puede habilitar (los cuatro del API). */
 const UNIT_FIELDS = 4;
-
-/** Foco visible para las tarjetas clicables (el mosaico del kit no lo trae). */
-const TILE_FOCUS =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2";
 
 /** Folio de activo fijo: `PREFIJO-0001`. Mismo formato que el API. */
 const formatAssetTag = (prefix: string, counter: number): string =>
@@ -194,45 +184,25 @@ export default function DeviceTypesPage() {
     return { total, activeCount, inactiveCount: total - activeCount, withDevices, devices };
   }, [types]);
 
-  const summary = useMemo<ListSummaryItem[]>(() => {
-    /** Proporción del catálogo, redondeada: solo se muestra si hay tipos. */
-    const share = (value: number): number =>
-      stats.total > 0 ? Math.round((value / stats.total) * 100) : 0;
-    return [
-      {
-        id: "all",
-        label: t("types.summaryTypes"),
-        value: <Num value={stats.total} />,
-        tone: "sea",
-        icon: <LuLayers size={15} />,
-        caption: t("types.devicesCount", { count: stats.devices }),
-      },
-      {
-        id: "active",
-        label: t("types.active"),
-        value: <Num value={stats.activeCount} />,
-        tone: "mint",
-        icon: <LuCircleCheck size={15} />,
-        caption: t("types.share", { percent: share(stats.activeCount) }),
-      },
-      {
-        id: "inactive",
-        label: t("types.inactive"),
-        value: <Num value={stats.inactiveCount} />,
-        tone: "lavender",
-        icon: <LuArchive size={15} />,
-        caption: t("types.share", { percent: share(stats.inactiveCount) }),
-      },
-      {
-        id: "withDevices",
-        label: t("types.withDevices"),
-        value: <Num value={stats.withDevices} />,
-        tone: stats.withDevices > 0 ? "sun" : "plain",
-        icon: <LuBoxes size={15} />,
-        caption: t("types.ofTypes", { count: stats.total }),
-      },
-    ];
-  }, [stats, t]);
+  /** Proporción del catálogo, redondeada: solo se muestra si hay tipos. */
+  const share = (value: number): number => (stats.total > 0 ? Math.round((value / stats.total) * 100) : 0);
+
+  // Distribución del inventario: los 7 tipos con más dispositivos + "Otros".
+  const distribution = useMemo(() => {
+    const rows = [...(types ?? [])].sort((a, b) => (b._count?.devices ?? 0) - (a._count?.devices ?? 0));
+    const top = rows.filter((tp) => (tp._count?.devices ?? 0) > 0).slice(0, 7);
+    const used = top.reduce((acc, tp) => acc + (tp._count?.devices ?? 0), 0);
+    const segments = top.map((tp, i) => ({
+      label: tp.assetTagPrefix,
+      value: tp._count?.devices ?? 0,
+      color: seriesColor(i),
+      display: String(tp._count?.devices ?? 0),
+    }));
+    if (stats.devices - used > 0) {
+      segments.push({ label: t("types.others"), value: stats.devices - used, color: "var(--color-secondary-300)", display: String(stats.devices - used) });
+    }
+    return segments;
+  }, [types, stats.devices, t]);
 
   const pills = useMemo<FilterPillItem<StatusFilter>[]>(
     () => [
@@ -254,12 +224,120 @@ export default function DeviceTypesPage() {
     });
   }, [types, filter, query]);
 
+  // Tabla del catálogo: mismas columnas y orden que el diseño de referencia.
+  const columns: Column<DeviceType>[] = useMemo(() => {
+    const maxDevices = Math.max(1, ...(types ?? []).map((tp) => tp._count?.devices ?? 0));
+    return [
+      {
+        key: "name",
+        label: t("types.colType"),
+        type: "string",
+        sortable: true,
+        render: (tp: DeviceType) => (
+          <ITFlex align="center" gap={2} className="min-w-0">
+            <span
+              aria-hidden
+              className="h-2.5 w-2.5 shrink-0 rounded-[3px]"
+              style={{ background: seriesColor((types ?? []).findIndex((x) => x.id === tp.id) % 7) }}
+            />
+            <ITText className="truncate font-semibold !text-[12.5px] tracking-[0.01em]">{tp.name}</ITText>
+          </ITFlex>
+        ),
+      },
+      {
+        key: "assetTagPrefix",
+        label: t("types.colPrefix"),
+        type: "string",
+        sortable: true,
+        render: (tp: DeviceType) => (
+          <ITChip size="sm" color="gray">
+            {tp.assetTagPrefix}
+          </ITChip>
+        ),
+      },
+      {
+        key: "next",
+        label: t("types.colNext"),
+        type: "string",
+        sortable: false,
+        render: (tp: DeviceType) => (
+          <ITText muted className="tabular-nums !text-[12px]">
+            {nextAssetTag(tp.assetTagPrefix, tp.counter)}
+          </ITText>
+        ),
+      },
+      {
+        key: "devices",
+        label: t("types.colDevices"),
+        type: "number",
+        sortable: true,
+        render: (tp: DeviceType) => {
+          const devices = tp._count?.devices ?? 0;
+          return (
+            <ITFlex align="center" gap={2} className="min-w-0">
+              <ITText className="w-6 shrink-0 text-right !text-[15px] font-extrabold tabular-nums !text-slate-900">
+                {devices}
+              </ITText>
+              <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[color-mix(in_srgb,currentColor_10%,transparent)]">
+                <div
+                  className="h-full rounded-full transition-[width] duration-700"
+                  style={{ width: `${Math.round((devices / maxDevices) * 100)}%`, background: "var(--color-primary-500)" }}
+                />
+              </div>
+            </ITFlex>
+          );
+        },
+      },
+      {
+        key: "share",
+        label: t("types.colShare"),
+        type: "number",
+        sortable: false,
+        render: (tp: DeviceType) => (
+          <ITText muted className="tabular-nums !text-[12px]">
+            {share(tp._count?.devices ?? 0)}%
+          </ITText>
+        ),
+      },
+      {
+        key: "active",
+        label: t("types.colStatus"),
+        type: "catalog",
+        sortable: true,
+        render: (tp: DeviceType) => (
+          <ITChip size="sm" color={tp.active ? "success" : "gray"}>
+            {tp.active ? t("types.active") : t("types.inactive")}
+          </ITChip>
+        ),
+      },
+      {
+        key: "actions",
+        label: "",
+        type: "actions",
+        width: 60,
+        actions: (tp: DeviceType) =>
+          canManage ? <RowAction icon={<FaEdit size={12} />} label={t("types.edit")} onClick={() => openEdit(tp)} /> : null,
+      },
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [types, canManage, t, share]);
+
+  // La tabla filtra y ordena en cliente sobre la lista ya filtrada por las píldoras.
+  const fetchData = useMemo(
+    () =>
+      makeClientTableFetch<DeviceType>(() => Promise.resolve(visible), {
+        name: { value: (tp) => tp.name },
+        assetTagPrefix: { value: (tp) => tp.assetTagPrefix },
+        devices: { value: (tp) => tp._count?.devices ?? 0 },
+        active: { match: "equals" },
+      }),
+    [visible]
+  );
+
   const clearFilters = () => {
     setFilter("all");
     setQuery("");
   };
-
-  const hasFilters = query.trim() !== "" || filter !== "all";
 
   const newButton = (
     <ITButton variant="filled" color="primary" onClick={openNew}>
@@ -315,140 +393,103 @@ export default function DeviceTypesPage() {
           action={canManage ? newButton : undefined}
         />
       ) : (
-        <div className="flex flex-col gap-4">
-          <ListSummaryStrip items={summary} activeId={filter} onSelect={(id) => setFilter(id as StatusFilter)} />
-
-          {/* Filtros en una fila: píldoras de estado + buscador. */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <FilterPills items={pills} value={filter} onChange={setFilter} />
-            <div className="w-full sm:ml-auto sm:w-72">
-              <ITInput
-                name="deviceTypeSearch"
-                placeholder={t("types.search")}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                iconLeft={<LuSearch size={14} />}
-                className="w-full min-w-0"
-              />
-            </div>
-          </div>
-
-          {hasFilters && (
-            <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
-              <ITText className="!text-[12px] text-slate-500">{t("types.results", { count: visible.length })}</ITText>
-              <ITButton variant="text" color="gray" size="sm" onClick={clearFilters}>
-                <ITFlex align="center" gap={1}>
-                  <LuRotateCcw size={12} />
-                  <ITText className="font-bold text-[11px]">{t("types.clearFilters")}</ITText>
-                </ITFlex>
-              </ITButton>
-            </ITFlex>
-          )}
-
-          {visible.length === 0 ? (
-            <LangostinState
-              kind="noResults"
-              size="sm"
-              action={
-                <ITButton variant="outlined" color="primary" onClick={clearFilters}>
-                  <ITText className="font-bold text-[11px]">{t("types.clearFilters")}</ITText>
-                </ITButton>
-              }
-            />
-          ) : (
-            <ITBentoGrid>
-              {/* Alta: tarjeta punteada, siempre a la vista al inicio del catálogo. */}
-              {canManage && (
-                <ITBentoTile
-                  cols={3}
-                  rows={2}
-                  tone="plain"
-                  onClick={openNew}
-                  className={`items-center justify-center gap-1 text-center ${TILE_FOCUS}`}
-                  style={{
-                    border: "1.5px dashed color-mix(in srgb, var(--color-primary) 45%, transparent)",
-                    background: "color-mix(in srgb, var(--color-primary) 5%, transparent)",
-                    boxShadow: "none",
-                  }}
+        <div className="flex flex-col gap-3">
+          {/* Resumen: una sola tarjeta con las cuatro cifras separadas por línea. */}
+          <ITCard contentClassName="!p-0">
+            <ITFlex className="!grid grid-cols-2 md:!grid-cols-4">
+              {[
+                { key: "all", label: t("types.summaryTypes"), value: stats.total, caption: t("types.devicesCount", { count: stats.devices }) },
+                { key: "active", label: t("types.active"), value: stats.activeCount, caption: t("types.share", { percent: share(stats.activeCount) }) },
+                { key: "inactive", label: t("types.inactive"), value: stats.inactiveCount, caption: t("types.share", { percent: share(stats.inactiveCount) }) },
+                { key: "withDevices", label: t("types.withDevices"), value: stats.withDevices, caption: t("types.ofTypes", { count: stats.total }) },
+              ].map((item, i) => (
+                <ITFlex
+                  key={item.key}
+                  direction="column"
+                  gap={1}
+                  className={`min-w-0 px-5 py-4 ${i > 0 ? "border-t border-slate-100 md:border-l md:border-t-0" : ""}`}
                 >
-                  <span
-                    className="flex h-10 w-10 items-center justify-center rounded-full"
-                    style={{ background: "var(--color-primary-soft)", color: "var(--color-primary)" }}
-                  >
-                    <FaPlus size={15} />
-                  </span>
-                  <span className="text-[13px] font-bold" style={{ color: "var(--color-primary)" }}>
-                    {t("types.addCard")}
-                  </span>
-                  <span className="text-[11.5px]" style={{ color: "var(--it-bento-muted)" }}>
-                    {t("types.addCardHint")}
-                  </span>
-                </ITBentoTile>
-              )}
+                  <ITText muted className="!text-[12.5px] font-semibold">
+                    {item.label}
+                  </ITText>
+                  <ITFlex align="baseline" gap={2} className="min-w-0">
+                    <ITText className="!text-[32px] font-extrabold leading-none tabular-nums !text-slate-900">
+                      <Num value={item.value} />
+                    </ITText>
+                    <ITText muted className="truncate !text-[12px]">
+                      {item.caption}
+                    </ITText>
+                  </ITFlex>
+                </ITFlex>
+              ))}
+            </ITFlex>
+          </ITCard>
 
-              {visible.map((tp) => {
-                const devices = tp._count?.devices ?? 0;
-                // Todas las tarjetas en blanco: el color va en el número y en el chip de
-                // estado, para que la rejilla no se vuelva un muro de un solo tono.
-                return (
-                  <ITBentoTile
-                    key={tp.id}
-                    cols={3}
-                    rows={2}
-                    tone="plain"
-                    label={<span className="line-clamp-2 leading-tight">{tp.name}</span>}
-                    icon={<LuTag size={13} />}
-                    onClick={canManage ? () => openEdit(tp) : undefined}
-                    value={
-                      <span style={{ color: tp.active && devices > 0 ? "var(--color-primary-500)" : "var(--it-bento-muted)" }}>
-                        {devices}
-                      </span>
-                    }
-                    caption={devices === 1 ? t("types.deviceUnit") : t("types.devicesUnit")}
-                    className={canManage ? TILE_FOCUS : undefined}
-                    aside={canManage ? <FaEdit size={12} className="mb-1 shrink-0 opacity-40" aria-hidden /> : undefined}
-                  >
-                    <div className="mt-2 flex min-w-0 items-center gap-1.5">
-                      <ITChip size="sm" color="gray">
-                        {tp.assetTagPrefix}
-                      </ITChip>
-                      <span
-                        className="min-w-0 flex-1 truncate text-[11.5px]"
-                        title={t("types.nextFolio", { folio: nextAssetTag(tp.assetTagPrefix, tp.counter) })}
-                        style={{ color: "var(--it-bento-muted)" }}
-                      >
-                        {nextAssetTag(tp.assetTagPrefix, tp.counter)}
-                      </span>
-                      <ITChip size="sm" color={tp.active ? "success" : "gray"}>
-                        {tp.active ? t("types.active") : t("types.inactive")}
-                      </ITChip>
-                    </div>
+          {/* Distribución del inventario por tipo, con su leyenda */}
+          <ITCard>
+            <ITFlex align="baseline" justify="between" gap={2} className="mb-3">
+              <ITText className="!text-[13px] font-bold !text-slate-800">{t("types.distribution")}</ITText>
+              <ITText muted className="!text-[12px]">
+                {t("types.devicesTotal", { count: stats.devices })}
+              </ITText>
+            </ITFlex>
+            <StackedBar segments={distribution} />
+          </ITCard>
 
-                    {/* Peso del tipo dentro del inventario: proporción real, no adorno. */}
-                    {stats.devices > 0 && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <div
-                          aria-hidden
-                          className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full"
-                          style={{ background: "color-mix(in srgb, currentColor 12%, transparent)" }}
-                        >
-                          <div
-                            className="h-full rounded-full"
-                            style={{
-                              width: `${Math.round((devices / stats.devices) * 100)}%`,
-                              background: "color-mix(in srgb, currentColor 55%, transparent)",
-                            }}
-                          />
-                        </div>
-                        <span className="shrink-0 text-[10.5px]" style={{ color: "var(--it-bento-muted)" }}>
-                          {t("types.shareOfDevices", { percent: Math.round((devices / stats.devices) * 100) })}
-                        </span>
-                      </div>
-                    )}
-                  </ITBentoTile>
-                );
-              })}
-            </ITBentoGrid>
+          {/* Catálogo en tabla, con filtros en una fila */}
+          <ITCard contentClassName="!p-0">
+            <ITFlex align="center" wrap="wrap" gap={2} className="px-4 py-3">
+              <FilterPills items={pills} value={filter} onChange={setFilter} />
+              <div className="w-full sm:ml-auto sm:w-72">
+                <ITInput
+                  name="deviceTypeSearch"
+                  placeholder={t("types.search")}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  iconLeft={<LuSearch size={14} />}
+                  className="w-full min-w-0"
+                />
+              </div>
+              <ITText muted className="whitespace-nowrap !text-[12px]">
+                {t("types.resultsShort", { shown: visible.length, total: types.length })}
+              </ITText>
+            </ITFlex>
+
+            {visible.length === 0 ? (
+              <div className="px-4 pb-4">
+                <LangostinState
+                  kind="noResults"
+                  size="sm"
+                  action={
+                    <ITButton variant="outlined" color="primary" onClick={clearFilters}>
+                      <ITText className="font-bold text-[11px]">{t("types.clearFilters")}</ITText>
+                    </ITButton>
+                  }
+                />
+              </div>
+            ) : (
+              <ITDataTable
+                key={`types:${filter}:${query}`}
+                columns={columns as unknown as Column<Record<string, unknown>>[]}
+                fetchData={fetchData as never}
+                defaultItemsPerPage={25}
+                itemsPerPageOptions={[25, 50, 100]}
+                layout="fixed"
+                density="compact"
+                rowHeight={50}
+                virtualized
+                virtualizedMaxHeight={460}
+              />
+            )}
+          </ITCard>
+
+          {canManage && (
+            <ITButton variant="outlined" color="primary" onClick={openNew} className="w-full">
+              <ITFlex align="center" gap={1}>
+                <FaPlus size={12} />
+                <ITText className="font-bold text-[11.5px]">{t("types.addRow")}</ITText>
+              </ITFlex>
+            </ITButton>
           )}
         </div>
       )}

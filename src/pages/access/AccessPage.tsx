@@ -15,6 +15,7 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
+  ITBentoPill,
   ITPage,
   ITSearchSelect,
   ITText,
@@ -31,7 +32,6 @@ import { LuBan, LuEye, LuFilter, LuListChecks, LuLogIn, LuLogOut, LuRadio, LuRot
 import { useTranslation } from "react-i18next";
 import { useCan, usePeopleOptions, type UserRole } from "@entities/user";
 import { formatDateTime } from "@shared/utils/dates";
-import { dyn } from "@shared/i18n/dyn";
 import { LocationMap } from "@shared/ui/location-map";
 import {
   accessApi,
@@ -480,20 +480,14 @@ export default function AccessPage() {
                 <ProfileAvatar name={lastEvent.employeeNameSnapshot ?? "—"} size="xl" />
                 <div className="min-w-0">
                   <div className="it-bento-tile__value truncate !text-[22px]">{lastEvent.employeeNameSnapshot ?? "—"}</div>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
+                  <ITFlex wrap="wrap" align="center" gap={1.5} className="mt-1">
+                    <ITBentoPill>
                       {lastEvent.type === "ENTRY" ? <LuLogIn size={12} /> : <LuLogOut size={12} />}
                       {tt(`types.${lastEvent.type}`)}
-                    </span>
-                    <span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                      {formatDateTime(lastEvent.occurredAt)}
-                    </span>
-                    {lastEvent.site?.name && (
-                      <span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                        {lastEvent.site.name}
-                      </span>
-                    )}
-                  </div>
+                    </ITBentoPill>
+                    <ITBentoPill>{formatDateTime(lastEvent.occurredAt)}</ITBentoPill>
+                    {lastEvent.site?.name && <ITBentoPill>{lastEvent.site.name}</ITBentoPill>}
+                  </ITFlex>
                 </div>
               </div>
               {stats && stats.entries + stats.exits > 0 && (

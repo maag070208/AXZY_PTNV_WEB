@@ -4,9 +4,11 @@ import {
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
+import type { ReactNode } from "react";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import type {
   Column,
+  ColumnFilters,
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
@@ -20,9 +22,13 @@ import type { UseAssignmentList } from "../model/useAssignmentList";
 
 interface Props {
   fx: UseAssignmentList;
+  /** Filtros de la barra (búsqueda, estado y filtro rápido del resumen). */
+  externalFilters?: ColumnFilters;
+  /** Barra de herramientas que arma la página (buscador, píldoras y conteo). */
+  toolbar?: ReactNode;
 }
 
-export default function AdminTasksTable({ fx }: Props) {
+export default function AdminTasksTable({ fx, externalFilters = {}, toolbar }: Props) {
   const { t: tt } = useTranslation("tickets");
   const navigate = useNavigate();
   const columns: Column<KanbanAssignment>[] = [
@@ -31,7 +37,6 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.task"),
       type: "string",
       width: 270,
-      filter: true,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
@@ -47,7 +52,6 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.employee"),
       type: "string",
       width: 240,
-      filter: true,
       sortable: false,
       render: (row) => (
         <ITFlex align="center" gap={2}>
@@ -66,7 +70,6 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.ticket"),
       type: "string",
       width: 250,
-      filter: true,
       sortable: false,
       render: (row) => (
         <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.title}</ITText>
@@ -77,7 +80,6 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.status"),
       type: "catalog",
       width: 180,
-      filter: "catalog",
       catalogOptions: {
         data: Object.keys(ASSIGNMENT_STATUS_BADGE).map((id) => ({
           id,
@@ -94,33 +96,36 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.dates"),
       type: "date",
       width: 220,
-      filter: "date-range",
       sortable: false,
-      render: (row) => (
-        <ITFlex direction="column" gap={0.5}>
-          {row.startDate && (
-            <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.start", { date: formatDate(row.startDate) })}
+      render: (row) => {
+        const due = row.dueDate ? new Date(row.dueDate) : null;
+        const lateDays = due && row.status !== "COMPLETED" && due < new Date()
+          ? Math.max(1, Math.round((Date.now() - due.getTime()) / 86_400_000))
+          : 0;
+        return (
+          <ITFlex direction="column" gap={1}>
+            <ITText className="whitespace-nowrap text-[11.5px] text-slate-500">
+              <b className="font-semibold text-slate-800">{row.startDate ? formatDate(row.startDate) : "—"}</b>
+              {" → "}
+              <b className="font-semibold text-slate-800">{row.dueDate ? formatDate(row.dueDate) : "—"}</b>
             </ITText>
-          )}
-          {row.dueDate && (
-            <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.end", { date: formatDate(row.dueDate) })}
-            </ITText>
-          )}
-          {row.dueDate &&
-            row.status !== "COMPLETED" &&
-            new Date(row.dueDate) < new Date() && (
-              <TicketChip tone="danger" label={tt("tasksTable.overdue")} />
+            {lateDays > 0 ? (
+              <TicketChip tone="danger" label={tt("tasksTable.overdueDays", { days: lateDays })} />
+            ) : (
+              <TicketChip tone="success" label={tt("tasksTable.onTime")} />
             )}
-        </ITFlex>
-      ),
+          </ITFlex>
+        );
+      },
     },
   ];
 
   return (
-    <ITCard>
+    <ITCard contentClassName="!p-0">
+      {toolbar && <div className="border-b border-slate-100 px-4 py-3">{toolbar}</div>}
     <ITDataTable
+      key={JSON.stringify(externalFilters)}
+      externalFilters={externalFilters}
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fx.fetchTableData as unknown as (

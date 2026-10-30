@@ -266,7 +266,18 @@
     "addCardHint": "Name, prefix and fields",
     "fields": "Unit fields",
     "fieldsHint": "Which fields apply to the units of this type",
-    "saveError": "Could not save the device type"
+    "saveError": "Could not save the device type",
+    "colPrefix": "Prefix",
+    "colNext": "Next code",
+    "colDevices": "Devices",
+    "colShare": "% inventory",
+    "colStatus": "Status",
+    "colType": "Type",
+    "distribution": "Inventory distribution",
+    "others": "Others",
+    "devicesTotal": "{{count}} devices",
+    "resultsShort": "{{shown}} of {{total}} types shown",
+    "addRow": "Add type · name, prefix and fields"
   },
   "typeLabels": {
     "STOCK_IN": "Entry",

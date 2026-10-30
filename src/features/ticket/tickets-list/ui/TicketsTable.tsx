@@ -1,5 +1,4 @@
 import {
-  ITButton,
   ITCard,
   ITDataTable,
   ITFlex,
@@ -16,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { dyn } from "@shared/i18n/dyn";
 import { formatDate } from "@shared/utils/dates";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { RowAction } from "@shared/ui/row-action";
 import {
   STATUS_BADGE,
   PRIORITY_BADGE,
@@ -190,25 +190,15 @@ export default function TicketsTable({
       type: "string",
       width: 110,
       render: (t) => (
-        <ITFlex gap={1}>
-          <ITButton
-            variant="outlined"
-            size="lg"
-            color="secondary"
-            onClick={() => onView(t)}
-          >
-            <LuEye size={14} />
-          </ITButton>
+        <ITFlex justify="end" gap={1}>
+          <RowAction icon={<LuEye size={13} />} label={tt("list.view")} tone="secondary" onClick={() => onView(t)} />
           {canDelete && (
-            <ITButton
-              variant="outlined"
-              size="lg"
-              color="error"
+            <RowAction
+              icon={t.deletedAt ? <LuUndo2 size={13} /> : <LuTrash2 size={13} />}
+              label={t.deletedAt ? tt("list.deleteForever") : tt("list.moveTrash")}
+              tone="danger"
               onClick={() => onMarkForDelete(t)}
-              title={t.deletedAt ? tt("list.deleteForever") : tt("list.moveTrash")}
-            >
-              {t.deletedAt ? <LuUndo2 size={14} /> : <LuTrash2 size={14} />}
-            </ITButton>
+            />
           )}
         </ITFlex>
       ),

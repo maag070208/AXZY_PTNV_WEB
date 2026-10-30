@@ -41,7 +41,7 @@ const customTheme: ITThemePalette = {
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <ITThemeProvider theme={customTheme} showFab={false} density={0.85} appearance="bento">
+      <ITThemeProvider theme={customTheme} showFab={false} density={0.80} appearance="bento">
         <ToastProvider>
           <HashRouter>
             <App />

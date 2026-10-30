@@ -48,7 +48,8 @@
       "clear": "Show all"
     },
     "confirmTrashTitle": "Move to trash?",
-    "confirmForeverTitle": "Delete permanently?"
+    "confirmForeverTitle": "Delete permanently?",
+    "view": "View ticket"
   },
   "new": {
     "title": "New Ticket",
@@ -375,7 +376,20 @@
     "overdue": "Overdue",
     "start": "Start: {{date}}",
     "end": "End: {{date}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "overdueDays": "Overdue · {{days}} d ago",
+    "onTime": "Closed on time",
+    "summaryTotal": "Tasks",
+    "summaryTotalCaption": "across all tickets",
+    "summaryOverdue": "Overdue",
+    "summaryOk": "Open or completed",
+    "pctOfTotal": "{{pct}}% of total",
+    "visible": "{{shown}} visible · {{total}} total",
+    "filterAll": "All",
+    "filterCompleted": "Completed",
+    "filterInReview": "In review",
+    "searchPlaceholder": "Search task, employee or ticket…",
+    "clear": "Clear filter"
   },
   "pdf": {
     "legend": "Ticket Report",

@@ -47,7 +47,8 @@ for base, _, files in os.walk(ROOT):
                     cnt["c"] += len(OVR.findall(line))
                 elif "!rounded-" in line or "!border" in line:
                     cnt["c"] += len(re.findall(r'!rounded-|!border', line))
-                cnt["d"] += len(UPT.findall(line))
+                if "<thead" not in line and "<th " not in line:
+                    cnt["d"] += len(UPT.findall(line))
                 if "ITCard" in line:
                     cnt["e"] += len(BRD.findall(line))
                 cnt["f"] += len(KPI.findall(line))

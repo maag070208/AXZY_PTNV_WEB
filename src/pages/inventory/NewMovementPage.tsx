@@ -5,6 +5,7 @@ import {
   ITBentoSegments,
   ITBentoTile,
   ITButton,
+  ITChip,
   ITInput,
   ITPage,
   ITSearchSelect,
@@ -130,16 +131,21 @@ const pillStyle = (tone: string, active: boolean): CSSProperties =>
       }
     : { background: "color-mix(in srgb, currentColor 6%, transparent)", color: "inherit", opacity: 0.75 };
 
-/** Chip pastel de estado: fondo tenue del tono y texto que contrasta en claro y oscuro. */
+/** Chip de estado con el componente del sistema (el tono se mapea a su color). */
+const CHIP_COLOR: Record<string, "success" | "warning" | "danger" | "info" | "gray"> = {
+  success: "success",
+  warning: "warning",
+  danger: "danger",
+  info: "info",
+  primary: "info",
+  secondary: "gray",
+};
+
 function StatusChip({ label, tone, icon }: { label: string; tone: string; icon?: ReactNode }) {
   return (
-    <span
-      className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-      style={pillStyle(tone, true)}
-    >
-      {icon}
+    <ITChip size="sm" color={CHIP_COLOR[tone] ?? "gray"} icon={icon}>
       {label}
-    </span>
+    </ITChip>
   );
 }
 

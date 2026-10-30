@@ -4,6 +4,7 @@ import {
   ITBentoFeed,
   ITBentoGauge,
   ITBentoGrid,
+  ITBentoPill,
   ITBentoSegments,
   ITBentoTile,
   ITBentoWaves,
@@ -154,14 +155,8 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
               <ITBentoGauge value={available / devicesTotal} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
             )}
             <div className="mt-1 flex flex-wrap gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
-                {t("adminDashboard.availableShort", { pct: availablePct })}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                <b className="h-[7px] w-[7px] rounded-full bg-white/40" />
-                {t("adminDashboard.onLoan", { count: onLoan })}
-              </span>
+              <ITBentoPill dot="var(--color-warning)">{t("adminDashboard.availableShort", { pct: availablePct })}</ITBentoPill>
+              <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("adminDashboard.onLoan", { count: onLoan })}</ITBentoPill>
             </div>
           </div>
         </ITBentoTile>

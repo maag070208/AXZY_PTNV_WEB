@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ITBentoGauge, ITBentoGrid, ITBentoTile } from "@axzydev/axzy_ui_system";
+import { ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MiniList, MiniStat, Num } from "@shared/ui/bento-bits";
@@ -83,18 +83,9 @@ export default function PersonalDashboard({ recordsCounts, attendance, overtime,
           <div className="relative z-[1] my-1 flex min-h-0 flex-1 flex-col justify-center">
             {total > 0 && <ITBentoGauge value={complete / total} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />}
             <div className="mt-1 flex flex-wrap gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
-                {t("records.kpis.missingRequired")} {required}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-success)]" />
-                {t("records.kpis.complete")} {complete}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                <b className="h-[7px] w-[7px] rounded-full bg-white/40" />
-                {t("records.kpis.incomplete")} {incomplete}
-              </span>
+              <ITBentoPill dot="var(--color-warning)">{t("records.kpis.missingRequired")} {required}</ITBentoPill>
+              <ITBentoPill dot="var(--color-success)">{t("records.kpis.complete")} {complete}</ITBentoPill>
+              <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("records.kpis.incomplete")} {incomplete}</ITBentoPill>
             </div>
           </div>
         </ITBentoTile>

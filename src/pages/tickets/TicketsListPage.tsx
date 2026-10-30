@@ -1,4 +1,4 @@
-import { ITAlert, ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITBentoStatStrip, ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { LuCircleCheck, LuClock, LuInbox, LuKanban, LuPlus, LuTicket, LuUserX } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -8,8 +8,16 @@ import {
   useTicketsList,
 } from "@features/ticket/tickets-list";
 import { useGoBack } from "@shared/lib/useGoBack";
-import { ListSummaryStrip, type ListSummaryItem } from "@shared/ui/list-summary-strip";
+import type { ListSummaryItem } from "@shared/ui/list-summary-strip";
 import { LangostinConfirm } from "@shared/ui/langostin-confirm";
+
+/** Color de cada cifra del resumen (punto de la tira y segmento de la barra). */
+const STAT_COLOR: Record<string, string> = {
+  open: "var(--color-warning)",
+  followUp: "var(--color-primary-600)",
+  unassigned: "var(--color-violet-500)",
+  closed: "var(--color-success)",
+};
 
 export default function TicketsListPage() {
   const navigate = useNavigate();
@@ -67,22 +75,25 @@ export default function TicketsListPage() {
         </ITFlex>
       }
     >
+      {/* Resumen: una tarjeta con las cuatro cifras clicables y la barra apilada,
+          igual que el diseño de referencia. */}
       {summaryItems.length > 0 && (
         <div className="mb-4">
-          <ListSummaryStrip
-            items={summaryItems}
+          <ITBentoStatStrip
+            stack
+            items={summaryItems.map((item) => ({
+              id: item.id,
+              label: item.label,
+              value: item.value,
+              caption: item.caption,
+              color: STAT_COLOR[item.id] ?? "var(--color-primary-500)",
+            }))}
+            stackItems={summaryItems
+              .filter((item) => ["open", "followUp", "closed"].includes(item.id))
+              .map((item) => ({ id: item.id, label: item.label, value: item.value, color: STAT_COLOR[item.id] ?? "var(--color-primary-500)" }))}
             activeId={list.quickFilter ?? undefined}
             onSelect={(id) => list.toggleQuickFilter(id as "open" | "followUp" | "unassigned" | "closed")}
           />
-          {list.quickFilter && (
-            <button
-              type="button"
-              onClick={list.clearQuickFilter}
-              className="mt-2 cursor-pointer text-xs font-medium text-slate-500 underline underline-offset-2 hover:text-slate-700"
-            >
-              {tt("list.summary.clear")}
-            </button>
-          )}
         </div>
       )}
 

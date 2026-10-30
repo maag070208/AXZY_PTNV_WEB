@@ -1,4 +1,4 @@
-import { ITBentoGauge, ITBentoGrid, ITBentoTile } from "@axzydev/axzy_ui_system";
+import { ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { LuClock, LuHeartPulse, LuMail, LuShieldCheck, LuWrench } from "react-icons/lu";
@@ -58,14 +58,8 @@ export default function SystemDashboard({ health }: Props) {
             </p>
           )}
           <div className="mt-1 flex flex-wrap gap-1.5">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-              <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-success)]" />
-              {t("system.synced", { count: fresh })}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-              <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
-              {t("system.stale", { count: stale })}
-            </span>
+            <ITBentoPill dot="var(--color-success)">{t("system.synced", { count: fresh })}</ITBentoPill>
+            <ITBentoPill dot="var(--color-warning)">{t("system.stale", { count: stale })}</ITBentoPill>
           </div>
         </div>
       </ITBentoTile>

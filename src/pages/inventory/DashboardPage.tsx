@@ -195,12 +195,12 @@ export default function DashboardPage() {
               <ITBentoGauge value={s.available / s.activeUnits} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
             )}
             <div className="mt-1 flex flex-wrap gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
+              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px]">
                 <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
                 {t("dashboard.availablePct", { pct: availablePct })}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11.5px]">
-                <b className="h-[7px] w-[7px] rounded-full bg-white/40" />
+              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11.5px]">
+                <b className="h-[7px] w-[7px] rounded-full bg-[color-mix(in_srgb,currentColor_45%,transparent)]" />
                 {t("dashboard.available")} {s.available}
               </span>
             </div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
           caption={t("dashboard.ofActive", { total: s.activeUnits })}
           onClick={() => navigate("/inventory/loans")}
         >
-          {s.loaned > 0 && <ITBentoWaves level={loanedPct} color="var(--color-violet-400, #a895e0)" />}
+          {s.loaned > 0 && <ITBentoWaves level={loanedPct} color="var(--color-violet-400)" />}
         </ITBentoTile>
 
         {/* Mantenimiento */}
@@ -253,7 +253,7 @@ export default function DashboardPage() {
           icon={<LuTriangleAlert size={15} />}
           label={t("dashboard.damaged")}
           value={
-            <span style={{ color: s.damaged > 0 ? "var(--color-danger, #e11d48)" : "var(--color-success)" }}>
+            <span style={{ color: s.damaged > 0 ? "var(--color-danger)" : "var(--color-success)" }}>
               <Num value={s.damaged} />
             </span>
           }

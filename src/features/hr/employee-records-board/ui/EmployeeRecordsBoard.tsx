@@ -6,6 +6,7 @@ import {
   ITCard,
   ITButton,
   ITChip,
+  ITFlex,
   ITConfirmDialog,
   ITInput,
   ITSearchSelect,
@@ -14,6 +15,7 @@ import {
 import { FaBell, FaChevronRight, FaIdCard, FaSearch, FaUserCheck, FaUserClock } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { RowAction } from "@shared/ui/row-action";
 import { KpiTile, type KpiTone } from "@shared/ui/kpi-tile";
 import type { RecordGapsRow } from "@entities/dashboard";
 import { recordStatus, type RecordFilter, type RecordStatus, type UseEmployeeRecords } from "../model/useEmployeeRecords";
@@ -237,31 +239,23 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
                         <ITBadget size="sm" className="whitespace-nowrap" color={STATUS_COLOR[status]} label={t(`records.status.${status}`)} />
                       </td>
                       <td className="px-3 py-3">
-                        <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                        <ITFlex justify="end" gap={1} onClick={(e) => e.stopPropagation()}>
                           {status !== "COMPLETE" && (
-                            <ITButton
-                              variant="text"
-                              color="secondary"
-                              size="sm"
+                            <RowAction
+                              icon={<FaBell size={12} />}
+                              label={t("records.notify")}
+                              tone="warning"
                               disabled={fx.notifying === r.userId}
                               onClick={() => void fx.notify(r)}
-                              title={t("records.notify")}
-                              ariaLabel={t("records.notify")}
-                            >
-                              <FaBell size={12} />
-                            </ITButton>
+                            />
                           )}
-                          <ITButton
-                            variant="text"
-                            color="secondary"
-                            size="sm"
+                          <RowAction
+                            icon={<FaChevronRight size={12} />}
+                            label={t("records.detail.open")}
+                            tone="primary"
                             onClick={() => navigate(`/employees/${r.userId}`)}
-                            title={t("records.detail.open")}
-                            ariaLabel={t("records.detail.open")}
-                          >
-                            <FaChevronRight size={11} />
-                          </ITButton>
-                        </div>
+                          />
+                        </ITFlex>
                       </td>
                     </tr>
                   );
