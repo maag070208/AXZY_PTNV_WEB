@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { FaFileInvoiceDollar, FaHeartbeat, FaMapMarkerAlt, FaPhoneAlt, FaUser } from "react-icons/fa";
-import { ITProgress } from "@axzydev/axzy_ui_system";
+import { LuHeartPulse, LuLandmark, LuMapPin, LuPhone, LuUserRound } from "react-icons/lu";
+import { ITBentoSegments, ITCard } from "@axzydev/axzy_ui_system";
 import type { PersonalProfile } from "@entities/hr";
 
 const formatDateOnly = (iso?: string | null): string => {
@@ -16,33 +16,42 @@ function Cell({ item }: { item: Item }) {
   const has = !!item.value?.trim();
   return (
     <div className={item.wide ? "sm:col-span-2" : ""}>
-      <dt className="text-[12px] font-bold text-slate-400">{item.label}</dt>
-      <dd className={`mt-0.5 break-words text-sm ${has ? "font-semibold text-slate-900" : "italic text-slate-300"}`}>
+      <dt className="text-[12px] text-slate-500">{item.label}</dt>
+      <dd className={`mt-0.5 break-words text-sm ${has ? "m-0 font-semibold text-slate-800" : "m-0 italic text-slate-400"}`}>
         {has ? item.value : tt("detail.noData")}
       </dd>
     </div>
   );
 }
 
-function InfoCard({ icon, tone, title, items }: { icon: React.ReactNode; tone: string; title: string; items: Item[] }) {
+function InfoCard({ icon, tone, title, items }: { icon: React.ReactNode; tone: "primary" | "info" | "warning" | "success" | "danger"; title: string; items: Item[] }) {
   const filled = items.filter((i) => i.value?.trim()).length;
+  const complete = filled === items.length;
   return (
-    <section className="rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
+    <ITCard>
       <header className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}>{icon}</span>
-          <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
+        <div className="flex min-w-0 items-center gap-3">
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: `var(--color-${tone}-soft)`, color: `var(--color-${tone})` }}
+          >
+            {icon}
+          </span>
+          <h3 className="m-0 truncate !text-[15px] font-bold !text-slate-800">{title}</h3>
         </div>
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${filled === items.length ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+        <span
+          className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums"
+          style={{ background: `var(--color-${complete ? "success" : "warning"}-soft)`, color: `var(--color-${complete ? "success" : "warning"})` }}
+        >
           {filled}/{items.length}
         </span>
       </header>
-      <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:!grid-cols-2">
+      <dl className="m-0 grid grid-cols-1 gap-x-6 gap-y-4 sm:!grid-cols-2">
         {items.map((i) => (
           <Cell key={i.label} item={i} />
         ))}
       </dl>
-    </section>
+    </ITCard>
   );
 }
 
@@ -60,14 +69,14 @@ export default function EmployeeInfoCards({ profile }: Props) {
   const sg = tt("detail.subGroups", { returnObjects: true }) as Record<string, string>;
 
   const groups = [
-    { icon: <FaUser size={14} />, tone: "bg-indigo-50 text-indigo-600", title: sg.identification, items: [
+    { icon: <LuUserRound size={16} />, tone: "primary" as const, title: sg.identification, items: [
       { label: f.secondName, value: profile.middleName },
       { label: f.paternalSurname, value: profile.paternalSurname },
       { label: f.maternalSurname, value: profile.maternalSurname },
       { label: f.birthDate, value: formatDateOnly(profile.birthDate) },
       { label: f.gender, value: profile.gender?.name },
     ] },
-    { icon: <FaPhoneAlt size={14} />, tone: "bg-sky-50 text-sky-600", title: sg.contact, items: [
+    { icon: <LuPhone size={16} />, tone: "info" as const, title: sg.contact, items: [
       { label: f.personalCell, value: profile.personalPhone },
       { label: f.companyCell, value: profile.workPhone },
       { label: f.email, value: profile.email, wide: true },
@@ -75,7 +84,7 @@ export default function EmployeeInfoCards({ profile }: Props) {
       { label: f.emergencyPhone, value: profile.emergencyContactPhone },
       { label: f.emergencyRelation, value: profile.emergencyContactRelationship },
     ] },
-    { icon: <FaMapMarkerAlt size={14} />, tone: "bg-orange-50 text-orange-600", title: sg.address, items: [
+    { icon: <LuMapPin size={16} />, tone: "warning" as const, title: sg.address, items: [
       { label: f.street, value: profile.streetAddress, wide: true },
       { label: f.colony, value: profile.neighborhood },
       { label: f.zip, value: profile.postalCode },
@@ -83,12 +92,12 @@ export default function EmployeeInfoCards({ profile }: Props) {
       { label: f.state, value: profile.addressState },
       { label: f.country, value: profile.country },
     ] },
-    { icon: <FaFileInvoiceDollar size={14} />, tone: "bg-emerald-50 text-emerald-600", title: sg.fiscal, items: [
+    { icon: <LuLandmark size={16} />, tone: "success" as const, title: sg.fiscal, items: [
       { label: f.rfc, value: profile.rfc },
       { label: f.curp, value: profile.curp },
       { label: f.nss, value: profile.nss },
     ] },
-    { icon: <FaHeartbeat size={14} />, tone: "bg-rose-50 text-rose-600", title: tt("detail.medicalTitle"), items: [
+    { icon: <LuHeartPulse size={16} />, tone: "danger" as const, title: tt("detail.medicalTitle"), items: [
       { label: f.bloodType, value: profile.bloodType?.name },
       { label: f.condition, value: profile.medicalConditions },
       { label: f.allergies, value: profile.allergies, wide: true },
@@ -100,17 +109,22 @@ export default function EmployeeInfoCards({ profile }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="flex flex-wrap items-center gap-6 rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-5 shadow-sm">
-        <div className="min-w-[240px] flex-1">
-          <p className="text-[12px] font-bold text-slate-400">{tt("detail.completeness")}</p>
-          <p className="mt-1 text-3xl font-black text-slate-900">
-            {filled}
-            <span className="text-lg font-semibold text-slate-400"> / {all.length}</span>
-          </p>
-          <ITProgress value={percent} color={percent === 100 ? "success" : "primary"} size="lg" className="mt-3" />
+      <ITCard>
+        <div className="flex flex-wrap items-center gap-6">
+          <div className="min-w-[240px] flex-1">
+            <p className="m-0 text-[13px] text-slate-500">{tt("detail.completeness")}</p>
+            <p className="m-0 mt-1 text-3xl font-extrabold text-slate-800">
+              {filled}
+              <span className="text-lg font-semibold text-slate-400"> / {all.length}</span>
+            </p>
+            <div className="mt-3">
+              <ITBentoSegments total={all.length} done={filled} />
+            </div>
+            <p className="m-0 mt-1 text-[12px] text-slate-500">{percent}%</p>
+          </div>
+          <p className="m-0 max-w-sm text-sm text-slate-500">{tt("detail.completenessHint")}</p>
         </div>
-        <p className="max-w-sm text-sm text-slate-500">{tt("detail.completenessHint")}</p>
-      </section>
+      </ITCard>
       <div className="grid grid-cols-1 gap-5 lg:!grid-cols-2 xl:!grid-cols-3">
         {groups.map((g) => (
           <InfoCard key={g.title} icon={g.icon} tone={g.tone} title={g.title} items={g.items} />

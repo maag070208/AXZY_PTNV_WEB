@@ -42,7 +42,13 @@
     "backToOfficeToast": "Usuario reasignado a Oficina",
     "backToOfficeError": "Error al reasignar a Oficina",
     "defaultDeactivationReason": "Baja sin motivo especificado",
-    "forceDeleteMessage": "{{username}} tiene historial ligado (tickets, cartas, comentarios, movimientos, etc.) que normalmente bloquea el borrado. Como administrador puedes forzar su eliminación: los registros con autor obligatorio se reasignarán a tu usuario y el resto quedará sin autor. Esta acción no se puede deshacer."
+    "forceDeleteMessage": "{{username}} tiene historial ligado (tickets, cartas, comentarios, movimientos, etc.) que normalmente bloquea el borrado. Como administrador puedes forzar su eliminación: los registros con autor obligatorio se reasignarán a tu usuario y el resto quedará sin autor. Esta acción no se puede deshacer.",
+    "deleteQuestion": "¿Eliminar a {{username}}?",
+    "deleteConsequence": "La cuenta se elimina y esta acción no se puede deshacer.",
+    "forceDeleteQuestion": "¿Forzar la eliminación de {{username}}?",
+    "reactivateQuestion": "¿Reactivar a {{username}}?",
+    "reactivateMsgShort": "Volverá a poder iniciar sesión.",
+    "passwordHeading": "Cambiar contraseña"
   },
   "form": {
     "titleNew": "Nuevo usuario",
@@ -54,8 +60,8 @@
     "buttonNew": "Crear usuario",
     "buttonEdit": "Guardar cambios",
     "saving": "Guardando…",
-    "created": "Usuario creado correctamente",
-    "updated": "Usuario actualizado correctamente",
+    "created": "Usuario guardado",
+    "updated": "Cambios guardados",
     "errorCreate": "Error al crear usuario",
     "errorUpdate": "Error al actualizar usuario",
     "errorMessages": "Corrige los campos marcados",
@@ -186,7 +192,6 @@
     "docsUploading": "Subiendo documentos…",
     "checking": "Verificando…",
     "available": "Disponible",
-    "saving": "Guardando…",
     "duplicate": {
       "username": "Ya existe un usuario con ese nombre de usuario",
       "email": "Ya existe un usuario con ese correo",
@@ -206,13 +211,12 @@
       "employeeNumber": "Número de empleado. Es único y lo usa el reloj para identificar a la persona.",
       "jobTitle": "Puesto que desempeña, por ejemplo: Recepcionista.",
       "username": "Nombre con el que inicia sesión. Debe ser único; yo reviso que esté libre.",
-      "role": "Rol principal: define lo que puede ver y hacer en el sistema.",
-      "password": "Contraseña inicial. Mínimo 6 caracteres; la persona la puede cambiar después."
+      "role": "Rol principal: define lo que puede ver y hacer en el sistema. Los permisos se afinan después sin cambiar el rol.",
+      "password": "Contraseña inicial. Mínimo 6 caracteres; la persona la puede cambiar después.",
+      "usernameFree": "Ese usuario está libre: puedes usarlo."
     },
     "guideLabel": "Langostin, guía del formulario",
     "ready": "¡Todo listo! Revisa los datos y crea el usuario.",
-    "created": "Usuario guardado",
-    "updated": "Cambios guardados",
     "validation": {
       "usernameRequired": "El usuario es obligatorio",
       "usernameMin": "El usuario debe tener al menos {{min}} caracteres",
@@ -233,7 +237,8 @@
     "personElsewhere": "Los datos de la persona (nombre, correo, domicilio, datos fiscales) se editan en su expediente de personal.",
     "openRecord": "Abrir expediente",
     "save": "Guardar cambios",
-    "saved": "Usuario actualizado correctamente"
+    "saved": "Usuario actualizado correctamente",
+    "roleVsPermissions": "El rol da los permisos base. Si a una persona le falta o le sobra algo, se ajusta aparte en Roles y permisos o con una excepción por persona."
   },
   "history": {
     "title": "Historial",

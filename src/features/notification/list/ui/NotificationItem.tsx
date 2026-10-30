@@ -1,28 +1,40 @@
-import { ITText } from "@axzydev/axzy_ui_system";
+import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  FaCheck,
-  FaComment,
-  FaFileUpload,
-  FaShieldAlt,
-  FaTicketAlt,
-  FaTrash,
-  FaUserPlus,
-  FaUserSlash,
-} from "react-icons/fa";
+  LuBell,
+  LuClipboardCheck,
+  LuFileUp,
+  LuMessageSquare,
+  LuTicket,
+  LuTrash2,
+  LuUserMinus,
+  LuUserPlus,
+} from "react-icons/lu";
 import type { Notification } from "@entities/notification";
-import { formatDateTime } from "@shared/utils/dates";
+import { formatTimeInTZ } from "@shared/utils/dates";
 
-const TYPE_STYLES: Record<string, { icon: React.ReactNode; color: string }> = {
-  COMMENT: { icon: <FaComment size={12} />, color: "bg-blue-500" },
-  ASSIGNED: { icon: <FaTicketAlt size={12} />, color: "bg-violet-500" },
-  TICKET_UPDATED: { icon: <FaTicketAlt size={12} />, color: "bg-amber-500" },
-  TICKET_CREATED: { icon: <FaTicketAlt size={12} />, color: "bg-emerald-500" },
-  USER_CREATED: { icon: <FaUserPlus size={12} />, color: "bg-emerald-500" },
-  USER_DEACTIVATED: { icon: <FaUserSlash size={12} />, color: "bg-red-500" },
-  EMPLOYEE_DOC_UPLOADED: { icon: <FaFileUpload size={12} />, color: "bg-blue-600" },
-  INVENTORY_AUDIT: { icon: <FaShieldAlt size={12} />, color: "bg-amber-600" },
+type Tone = "primary" | "success" | "warning" | "danger" | "info";
+
+/** Ícono de línea y chip pastel por tipo de notificación. */
+const TYPE_STYLES: Record<string, { icon: ReactNode; tone: Tone }> = {
+  COMMENT: { icon: <LuMessageSquare size={15} />, tone: "info" },
+  ASSIGNED: { icon: <LuTicket size={15} />, tone: "primary" },
+  TICKET_UPDATED: { icon: <LuTicket size={15} />, tone: "warning" },
+  TICKET_CREATED: { icon: <LuTicket size={15} />, tone: "success" },
+  USER_CREATED: { icon: <LuUserPlus size={15} />, tone: "success" },
+  USER_DEACTIVATED: { icon: <LuUserMinus size={15} />, tone: "danger" },
+  EMPLOYEE_DOC_UPLOADED: { icon: <LuFileUp size={15} />, tone: "info" },
+  INVENTORY_AUDIT: { icon: <LuClipboardCheck size={15} />, tone: "warning" },
+  KITCHEN_ALERTS: { icon: <LuBell size={15} />, tone: "warning" },
 };
 
+const FALLBACK = TYPE_STYLES.TICKET_UPDATED;
+
+/**
+ * Fila del feed de notificaciones: chip pastel por tipo, título (en negritas si
+ * no se ha leído), detalle, hora y borrar. Se dibuja igual que `ITBentoFeed`
+ * (que no admite acciones por fila ni marca de no leído).
+ */
 export default function NotificationItem({
   notification,
   onSlotClick,
@@ -32,53 +44,50 @@ export default function NotificationItem({
   onSlotClick: (n: Notification) => void;
   onDelete: (id: string, e: React.MouseEvent) => void;
 }) {
+  const { t } = useTranslation(["notifications", "common"]);
   const n = notification;
-  const typeInfo = TYPE_STYLES[n.type] ?? TYPE_STYLES.TICKET_UPDATED;
+  const style = TYPE_STYLES[n.type] ?? FALLBACK;
 
   return (
-    <div
-      onClick={() => onSlotClick(n)}
-      className={`flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-        n.read ? "bg-[var(--it-card-bg)] hover:bg-slate-50" : "bg-blue-50/60 hover:bg-blue-50"
-      } border ${n.read ? "border-slate-100" : "border-blue-100"}`}
-    >
-      <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-white shrink-0 ${typeInfo.color}`}
+    <div className="group flex items-center gap-1 rounded-[11px] hover:bg-[color-mix(in_srgb,currentColor_6%,transparent)]">
+      <button
+        type="button"
+        onClick={() => onSlotClick(n)}
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[11px] !border-0 !bg-transparent px-1.5 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]"
       >
-        {typeInfo.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <ITText
-            className={`text-[11px] leading-tight ${
-              n.read ? "text-slate-600" : "text-slate-800 font-bold"
-            }`}
-          >
+        <span
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px]"
+          style={{ background: `var(--color-${style.tone}-soft)`, color: `var(--color-${style.tone})` }}
+        >
+          {style.icon}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className={`block truncate text-[13px] ${n.read ? "font-medium text-slate-600" : "font-bold text-slate-800"}`}>
             {n.title}
-          </ITText>
+          </span>
+          {n.detail && <span className="block truncate text-[12px] text-slate-500">{n.detail}</span>}
+        </span>
+        <span className="flex shrink-0 items-center gap-2">
+          <span className="text-[11.5px] tabular-nums text-slate-400">{formatTimeInTZ(n.createdAt)}</span>
           {!n.read && (
-            <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1" />
-          )}
-        </div>
-        {n.detail && (
-          <ITText className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">
-            {n.detail}
-          </ITText>
-        )}
-        <div className="flex items-center justify-between mt-1.5">
-          <ITText className="text-[9px] text-slate-400 tabular-nums">
-            {formatDateTime(n.createdAt)}
-          </ITText>
-          <div className="flex items-center gap-1">
-            {n.read && <FaCheck size={8} className="text-emerald-400" />}
-            <FaTrash
-              size={10}
-              className="text-slate-300 hover:text-red-400 cursor-pointer"
-              onClick={(e) => onDelete(n.id, e)}
+            <span
+              role="img"
+              aria-label={t("unread")}
+              className="h-2 w-2 rounded-full"
+              style={{ background: "var(--color-primary)" }}
             />
-          </div>
-        </div>
-      </div>
+          )}
+        </span>
+      </button>
+      <button
+        type="button"
+        onClick={(e) => onDelete(n.id, e)}
+        title={t("common:actions.delete")}
+        aria-label={t("common:actions.delete")}
+        className="mr-1 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full !border-0 !bg-transparent text-slate-300 transition hover:text-[color:var(--color-danger)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]"
+      >
+        <LuTrash2 size={15} />
+      </button>
     </div>
   );
 }

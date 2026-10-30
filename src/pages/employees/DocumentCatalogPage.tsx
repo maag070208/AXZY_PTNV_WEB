@@ -5,7 +5,6 @@ import {
   ITBadget,
   ITButton,
   ITCard,
-  ITConfirmDialog,
   ITDataTable,
   ITFlex,
   ITGrid,
@@ -15,6 +14,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaFileAlt, FaPlus, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { useGoBack } from "@shared/lib/useGoBack";
@@ -267,7 +267,7 @@ export default function DocumentCatalogPage() {
         virtualizedMaxHeight={460}
       />
 
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={!!toDelete}
         onClose={() => setToDelete(null)}
         onConfirm={confirmDelete}

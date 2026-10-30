@@ -1,9 +1,7 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
-import { Fragment, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
   ITAlert,
   ITButton,
-  ITCard,
   ITDatePicker,
   ITFlex,
   ITInput,
@@ -12,7 +10,7 @@ import {
   ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
-import { FaCamera, FaIdCard, FaMapMarkerAlt, FaPhoneAlt, FaUserTie } from "react-icons/fa";
+import { LuCamera, LuIdCard, LuMapPin, LuPhone, LuUserRound } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEmployeeDetail } from "@features/hr/employee-detail";
@@ -29,7 +27,10 @@ import {
   validateRfc,
 } from "@shared/validation";
 import { dyn, i18n } from "@shared/i18n";
-import { LangostinGuide } from "@shared/ui/langostin";
+import { LangostinGuide, LangostinState } from "@shared/ui/langostin";
+import { FormSection } from "@shared/ui/form-section";
+import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
+import { StickyActions } from "@shared/ui/sticky-actions";
 import { useGoBack } from "@shared/lib/useGoBack";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
@@ -51,6 +52,8 @@ const HINT_FIELDS = new Set(["name", "paternalSurname", "maternalSurname", "empl
 
 interface AppStep {
   label: string;
+  /** Sección con lo esencial capturado y sin errores (palomita en la insignia). */
+  complete: boolean;
   content: React.ReactNode;
   icon?: React.ReactNode;
 }
@@ -195,7 +198,7 @@ export default function EmployeeProfileEditPage() {
         noPadding
         title={tt("detail.editInfo")}
         backAction={() => goBack(`/employees/${id}`)}
-        icon={<FaUserTie size={20} />}
+        icon={<LuUserRound size={20} />}
         breadcrumbs={[
           { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
           { label: tt("detail.title") },
@@ -207,9 +210,7 @@ export default function EmployeeProfileEditPage() {
             {detail.error}
           </ITAlert>
         ) : (
-          <ITFlex justify="center">
-            <LottieLoader size="lg" />
-          </ITFlex>
+          <LangostinState kind="loading" />
         )}
       </ITPage>
     );
@@ -220,7 +221,8 @@ export default function EmployeeProfileEditPage() {
   const steps: AppStep[] = [
     {
       label: tt("detail.stepper.photoPersonal"),
-      icon: <FaUserTie size={13} />,
+      complete: !!form.name?.trim() && !errors.name,
+      icon: <LuUserRound size={15} />,
       content: (
         <ITFlex direction="column" gap={5}>
           <ITFlex align="center" gap={4}>
@@ -230,9 +232,11 @@ export default function EmployeeProfileEditPage() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title={tt("detail.changePhoto")}
-                className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-md hover:bg-blue-700"
+                aria-label={tt("detail.changePhoto")}
+                style={{ backgroundColor: "var(--it-bento-ink-bg, var(--color-primary))", color: "var(--it-bento-ink-text, white)" }}
+                className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full !border-0 transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2"
               >
-                <FaCamera size={10} />
+                <LuCamera size={14} />
               </button>
               <input
                 ref={fileInputRef}
@@ -252,7 +256,7 @@ export default function EmployeeProfileEditPage() {
               size="sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              <ITText className="font-bold text-[11px]">{tt("detail.changePhoto")}</ITText>
+              <ITText className="font-bold text-[12px]">{tt("detail.changePhoto")}</ITText>
             </ITButton>
           </ITFlex>
 
@@ -318,7 +322,8 @@ export default function EmployeeProfileEditPage() {
     },
     {
       label: tt("detail.stepper.employment"),
-      icon: <FaIdCard size={13} />,
+      complete: !!form.employeeNumber?.trim() && !!form.jobTitle?.trim() && !!form.departmentId && !errors.employeeNumber && !errors.jobTitle && !errors.rfc && !errors.curp && !errors.nss,
+      icon: <LuIdCard size={15} />,
       content: (
         <ITFlex direction="column" gap={4}>
           <Row>
@@ -391,7 +396,8 @@ export default function EmployeeProfileEditPage() {
     },
     {
       label: tt("detail.stepper.contact"),
-      icon: <FaPhoneAlt size={13} />,
+      complete: !!(form.personalPhone?.trim() || form.workPhone?.trim() || form.email?.trim()) && !errors.personalPhone && !errors.workPhone && !errors.email && !errors.postalCode && !errors.emergencyContactPhone,
+      icon: <LuPhone size={15} />,
       content: (
         <ITFlex direction="column" gap={4}>
           <Row>
@@ -409,9 +415,12 @@ export default function EmployeeProfileEditPage() {
             </Cell>
           </Row>
           <ITFlex align="center" gap={2}>
-            <ITFlex align="center" justify="center" className="h-8 w-8 rounded-lg bg-orange-50">
-              <FaMapMarkerAlt size={12} className="text-orange-600" />
-            </ITFlex>
+            <span
+              className="flex h-8 w-8 items-center justify-center rounded-lg"
+              style={{ background: "var(--color-warning-soft)", color: "var(--color-warning)" }}
+            >
+              <LuMapPin size={14} />
+            </span>
             <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.addressTitle")}
             </ITText>
@@ -486,7 +495,7 @@ export default function EmployeeProfileEditPage() {
       title={tt("detail.editInfo")}
       description={profile.name}
       backAction={() => goBack(`/employees/${id}`)}
-      icon={<FaUserTie size={20} />}
+      icon={<LuUserRound size={20} />}
       breadcrumbs={[
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
         { label: tt("detail.title") },
@@ -499,30 +508,35 @@ export default function EmployeeProfileEditPage() {
         </ITAlert>
       )}
 
-      <ITFlex justify="end" align="center" gap={3} className="mb-6">
-        <ITButton variant="outlined" color="secondary" onClick={() => goBack(`/employees/${id}`)} disabled={detail.saving}>
+      <div onKeyDown={handleEnter} className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="flex min-w-0 flex-col gap-5">
+          {steps.map((section, index) => (
+            <FormSection key={section.label} number={index + 1} title={section.label} icon={section.icon} complete={section.complete}>
+              {section.content}
+            </FormSection>
+          ))}
+        </div>
+
+        <LiveSummary total={steps.length} done={steps.filter((section) => section.complete).length}>
+          <LiveSummaryRow
+            label={tt("detail.fields.name")}
+            value={[form.name, form.paternalSurname, form.maternalSurname].map((part) => part?.trim()).filter(Boolean).join(" ")}
+          />
+          <LiveSummaryRow label={tt("detail.fields.employeeNo")} value={form.employeeNumber?.trim()} />
+          <LiveSummaryRow label={tt("detail.fields.position")} value={form.jobTitle?.trim()} />
+          <LiveSummaryRow label={tt("detail.fields.department")} value={departments.find((d) => d.id === form.departmentId)?.name} />
+          <LiveSummaryRow label={tt("detail.fields.hireDate")} value={form.hireDate ? form.hireDate.split("-").reverse().join("/") : undefined} />
+        </LiveSummary>
+      </div>
+
+      <StickyActions>
+        <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack(`/employees/${id}`)} disabled={detail.saving}>
           {tt("common:actions.cancel")}
         </ITButton>
-        <ITButton variant="raised-text" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>
-          {tt("detail.save")}
+        <ITButton variant="rounded" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>
+          {detail.saving ? tt("detail.saving") : tt("detail.save")}
         </ITButton>
-      </ITFlex>
-
-      <div onKeyDown={handleEnter}>
-        <ITFlex direction="column" gap={6}>
-          {steps.map((section) => (
-            <Fragment key={section.label}>
-              <ITCard>
-                <header className="mb-5 flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">{section.icon}</span>
-                  <h3 className="text-sm font-semibold text-slate-700">{section.label}</h3>
-                </header>
-                {section.content}
-              </ITCard>
-            </Fragment>
-          ))}
-        </ITFlex>
-      </div>
+      </StickyActions>
 
       {/* Langostin flota abajo a la derecha: guía del campo actual y avisa mientras guarda. */}
       <LangostinGuide

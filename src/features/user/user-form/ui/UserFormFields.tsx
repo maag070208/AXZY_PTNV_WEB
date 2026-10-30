@@ -13,27 +13,32 @@ import {
   ITSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import {
-  FaBuilding,
-  FaFileUpload,
-  FaIdCard,
-  FaLock,
-  FaQuestion,
-  FaShieldAlt,
-} from "react-icons/fa";
+import { LuCircleCheck, LuCircleHelp, LuLock } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
 import { roleLabel } from "@entities/user";
+import { DialogHeader } from "@shared/ui/dialog-header";
 import type { UserFormValues } from "../model/useUserForm";
 import type { UniqueState, UniqueField } from "../model/useUserForm";
 
 /** Aviso debajo de un dato único: "Disponible" cuando está libre. Mientras verifica, Langostin flota abajo a la derecha. */
 function UniqueHint({ state }: { state?: UniqueState }) {
   const { t: tt } = useTranslation("users");
-  if (state === "available") return <span className="mt-1 block text-[11px] text-emerald-600">{tt("form.available")}</span>;
+  if (state === "available") {
+    return (
+      <span className="mt-1 flex items-center gap-1 text-[12px]" style={{ color: "var(--color-success)" }}>
+        <LuCircleCheck size={13} />
+        {tt("form.available")}
+      </span>
+    );
+  }
   return null;
 }
 
+/**
+ * Campos de un paso del formulario de usuario. No dibujan tarjeta ni título:
+ * la página los envuelve en `FormSection` y el diálogo en un bloque simple.
+ */
 interface Props {
   step: "personal" | "access" | "org" | "docs";
   uniqueness?: Record<UniqueField, UniqueState>;
@@ -61,30 +66,6 @@ interface Props {
   docsFiles?: Record<string, File | null>;
   onPickDoc?: (key: string, file: File) => void;
   docsError?: string | null;
-}
-
-function SectionHeader({
-  icon,
-  iconBg,
-  title,
-  hint,
-}: {
-  icon: React.ReactNode;
-  iconBg: string;
-  title: string;
-  hint: string;
-}) {
-  return (
-    <ITFlex align="center" gap={3} className="mb-5">
-      <ITFlex align="center" justify="center" className={`h-10 w-10 shrink-0 rounded-xl shadow-sm ${iconBg}`}>
-        {icon}
-      </ITFlex>
-      <ITFlex direction="column" gap={0.25}>
-        <ITText className="text-[12px] font-semibold text-slate-700">{title}</ITText>
-        <ITText className="text-[10px] text-slate-400">{hint}</ITText>
-      </ITFlex>
-    </ITFlex>
-  );
 }
 
 export default function UserFormFields({
@@ -116,13 +97,7 @@ export default function UserFormFields({
   return (
     <>
       {step === "personal" && personFields && (
-        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
-          <SectionHeader
-            icon={<FaIdCard size={15} className="text-blue-600" />}
-            iconBg="bg-blue-50"
-            title={tt("form.sectionPersonal")}
-            hint={tt("form.sectionPersonalHint")}
-          />
+        <>
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_name" label={tt("form.name")} value={form.name} onChange={(e) => onFieldChange("name", e.target.value)} onBlur={blob("name")} required error={fieldError("name")} />
@@ -148,17 +123,11 @@ export default function UserFormFields({
               <ITInput name="u_jobTitle" label={tt("form.position")} value={form.jobTitle} onChange={(e) => onFieldChange("jobTitle", e.target.value)} onBlur={blob("jobTitle")} error={fieldError("jobTitle")} />
             </ITGrid>
           </ITGrid>
-        </section>
+        </>
       )}
 
       {step === "access" && (
-        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
-          <SectionHeader
-            icon={<FaShieldAlt size={15} className="text-violet-600" />}
-            iconBg="bg-violet-50"
-            title={tt("form.sectionAccess")}
-            hint={tt("form.sectionAccessHint")}
-          />
+        <>
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={4}>
               <ITInput name="u_username" label={tt("form.username")} value={form.username} onChange={(e) => onFieldChange("username", e.target.value)} onBlur={blob("username")} required error={fieldError("username")} />
@@ -170,7 +139,7 @@ export default function UserFormFields({
                   <ITSelect name="u_role" label={tt("form.role")} options={roleOptions} value={form.role} onChange={(e) => onFieldChange("role", e.target.value as any)} required />
                 </div>
                 <ITButton variant="icon-only" size="sm" color="gray" onClick={() => setHelpOpen(true)} ariaLabel={tt("form.roleGuide")} title={tt("form.roleGuide")}>
-                  <FaQuestion size={11} />
+                  <LuCircleHelp size={14} />
                 </ITButton>
               </ITFlex>
             </ITGrid>
@@ -178,17 +147,17 @@ export default function UserFormFields({
               <ITInput name="u_password" type="password" label={`${tt("form.password")} ${!isEdit ? "*" : ""}`} value={form.password} onChange={(e) => onFieldChange("password", e.target.value)} onBlur={blob("password")} required={!isEdit} placeholder={isEdit ? tt("form.passwordPlaceholder") : ""} error={fieldError("password")} />
               {isEdit && (
                 <ITFlex align="center" gap={2} className="mt-1">
-                  <FaLock size={9} className="text-slate-400" />
-                  <ITText className="text-[10px] text-slate-500">{tt("form.passwordEditHint")}</ITText>
+                  <LuLock size={11} className="text-slate-400" />
+                  <ITText className="text-[12px] text-slate-500">{tt("form.passwordEditHint")}</ITText>
                 </ITFlex>
               )}
             </ITGrid>
             <ITGrid item xs={12}>
               <ITFlex direction="column" gap={2}>
-                <ITText className="text-[12px] font-semibold text-slate-500">
+                <ITText className="text-[13px] font-semibold text-slate-600">
                   {tt("form.extraRoles")}
                 </ITText>
-                <ITText className="text-[10px] text-slate-400">
+                <ITText className="text-[12px] text-slate-500">
                   {tt("form.extraRolesHint")}
                 </ITText>
                 <ITFlex align="center" gap={4} wrap="wrap">
@@ -205,17 +174,11 @@ export default function UserFormFields({
               </ITFlex>
             </ITGrid>
           </ITGrid>
-        </section>
+        </>
       )}
 
       {step === "org" && (
-        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
-          <SectionHeader
-            icon={<FaBuilding size={15} className="text-emerald-600" />}
-            iconBg="bg-emerald-50"
-            title={tt("form.sectionOrganization")}
-            hint={tt("form.sectionOrganizationHint")}
-          />
+        <>
           <ITGrid container columns={12} spacing={4}>
             <ITGrid item xs={12} md={6}>
               <ITSearchSelect name="u_dept" label={tt("form.department")} options={activeDepartments.map((d) => ({ value: d.id, label: d.name }))} value={form.departmentId} onChange={(value) => onDepartmentChange(String(value))} />
@@ -224,17 +187,11 @@ export default function UserFormFields({
               <ITSearchSelect name="u_sub" label={tt("form.subarea")} options={(selectedDept?.subareas ?? []).map((s) => ({ value: s.id, label: s.name }))} value={form.subareaId} onChange={(value) => onFieldChange("subareaId", String(value))} />
             </ITGrid>
           </ITGrid>
-        </section>
+        </>
       )}
 
       {step === "docs" && (
-        <section className="rounded-[24px] border border-slate-200 bg-[var(--it-card-bg)] p-6 shadow-sm">
-          <SectionHeader
-            icon={<FaFileUpload size={15} className="text-amber-600" />}
-            iconBg="bg-amber-50"
-            title={tt("form.stepDocs")}
-            hint={tt("form.docsHint", { docs: (requiredDocs ?? []).map((d) => d.label).join(", ") })}
-          />
+        <>
           {docsError && (
             <ITFlex className="mb-3">
               <ITAlert variant="error" dismissible={false}>
@@ -246,7 +203,7 @@ export default function UserFormFields({
             {(requiredDocs ?? []).map((doc) => (
               <ITGrid item xs={12} md={6} key={doc.key}>
                 <ITFlex direction="column" gap={1}>
-                  <ITText className="text-[11px] font-bold text-slate-600">{doc.label}</ITText>
+                  <ITText className="text-[13px] font-semibold text-slate-600">{doc.label}</ITText>
                   <ITDropfile
                     autoUpload
                     onFileSelect={() => undefined}
@@ -263,29 +220,25 @@ export default function UserFormFields({
               </ITGrid>
             ))}
           </ITGrid>
-        </section>
+        </>
       )}
 
-      <ITDialog
-        isOpen={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        title={tt("form.roleGuide")}
-        useFormHeader
-      >
-        <div className="space-y-3 p-5">
-          <ITFlex align="center" gap={2}>
-            <ITText className="rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700">{roleLabel(form.role)}</ITText>
-          </ITFlex>
-          <ITText className="text-[12px] font-black text-slate-700">{roleGuidance.title}</ITText>
-          <ITText className="text-[11px] leading-5 text-slate-600">{roleGuidance.summary}</ITText>
-          <ul className="space-y-2 text-[10px] font-bold text-slate-600">
+      <ITDialog isOpen={helpOpen} onClose={() => setHelpOpen(false)} className="max-w-md">
+        <DialogHeader icon={<LuCircleHelp size={20} />} title={tt("form.roleGuide")} subtitle={roleLabel(form.role)} tone="info" />
+        <div className="space-y-3">
+          <p className="m-0 text-[14px] font-bold text-slate-800">{roleGuidance.title}</p>
+          <p className="m-0 text-[13px] leading-5 text-slate-600">{roleGuidance.summary}</p>
+          <ul className="m-0 list-none space-y-2 p-0 text-[13px] text-slate-600">
             {roleGuidance.actions.map((action) => (
               <li key={action} className="flex items-start gap-2">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "var(--color-primary)" }} />
                 {action}
               </li>
             ))}
           </ul>
+          <p className="m-0 rounded-xl px-3 py-2 text-[12.5px] text-slate-500" style={{ background: "var(--color-secondary-100)" }}>
+            {tt("form.roleVsPermissions")}
+          </p>
         </div>
       </ITDialog>
     </>

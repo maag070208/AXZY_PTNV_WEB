@@ -189,7 +189,25 @@
     "validation": {
       "employeeNoMax": "The employee number cannot exceed {{max}} characters",
       "jobTitleMax": "The job title cannot exceed {{max}} characters"
-    }
+    },
+    "tenure": {
+      "label": "Seniority",
+      "none": "No hire date",
+      "years_one": "year with the company",
+      "years_other": "years with the company",
+      "months_one": "month with the company",
+      "months_other": "months with the company",
+      "plusMonths_one": "+ {{count}} month",
+      "plusMonths_other": "+ {{count}} months"
+    },
+    "documentsTile": {
+      "label": "File",
+      "ofTotal": "of {{total}} types",
+      "complete": "Documents complete",
+      "missing_one": "{{count}} document type missing",
+      "missing_other": "{{count}} document types missing"
+    },
+    "noDocumentTypesHint": "Once they are set up, you will see them here to upload files."
   },
   "catalog": {
     "title": "Document Catalog",
@@ -221,7 +239,9 @@
   "deactivate": {
     "reasonMin": "The reason must have at least {{min}} characters",
     "reasonLabel": "Deactivation reason",
-    "reasonPlaceholder": "Briefly describe the reason..."
+    "reasonPlaceholder": "Briefly describe the reason...",
+    "title": "Deactivate {{name}}?",
+    "consequence": "They will no longer be able to sign in. You can reactivate them later."
   },
   "credential": {
     "title": "EMPLOYEE BADGE",
@@ -313,5 +333,14 @@
       "emergencyContactName": "Emergency contact",
       "emergencyContactPhone": "Emergency phone"
     }
+  },
+  "summary": {
+    "all": "All staff",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "empty": {
+    "title": "No staff yet",
+    "description": "Once someone is added, they will show up in this list."
   }
 }

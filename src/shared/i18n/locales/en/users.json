@@ -42,7 +42,13 @@
     "backToOfficeToast": "User reassigned to Office",
     "backToOfficeError": "Error reassigning to Office",
     "defaultDeactivationReason": "Deactivated without a stated reason",
-    "forceDeleteMessage": "{{username}} has linked history (tickets, letters, comments, movements, etc.) that normally blocks deletion. As an administrator you can force the deletion: records with a mandatory author will be reassigned to your user and the rest will be left without an author. This action cannot be undone."
+    "forceDeleteMessage": "{{username}} has linked history (tickets, letters, comments, movements, etc.) that normally blocks deletion. As an administrator you can force the deletion: records with a mandatory author will be reassigned to your user and the rest will be left without an author. This action cannot be undone.",
+    "deleteQuestion": "Delete {{username}}?",
+    "deleteConsequence": "The account is deleted and this cannot be undone.",
+    "forceDeleteQuestion": "Force deletion of {{username}}?",
+    "reactivateQuestion": "Reactivate {{username}}?",
+    "reactivateMsgShort": "They will be able to sign in again.",
+    "passwordHeading": "Change password"
   },
   "form": {
     "titleNew": "New user",
@@ -54,8 +60,8 @@
     "buttonNew": "Create user",
     "buttonEdit": "Save changes",
     "saving": "Saving…",
-    "created": "User created successfully",
-    "updated": "User updated successfully",
+    "created": "User saved",
+    "updated": "Changes saved",
     "errorCreate": "Error creating user",
     "errorUpdate": "Error updating user",
     "errorMessages": "Fix the highlighted fields",
@@ -186,7 +192,6 @@
     "docsUploading": "Uploading documents…",
     "checking": "Checking…",
     "available": "Available",
-    "saving": "Saving…",
     "duplicate": {
       "username": "A user with that username already exists",
       "email": "A user with that email already exists",
@@ -206,13 +211,12 @@
       "employeeNumber": "Employee number. It is unique and the clock uses it to identify the person.",
       "jobTitle": "Job title, for example: Receptionist.",
       "username": "Username used to sign in. It must be unique; I check it is free.",
-      "role": "Main role: defines what the person can see and do in the system.",
-      "password": "Initial password. At least 6 characters; the person can change it later."
+      "role": "Main role: defines what they can see and do. Permissions can be fine-tuned later without changing the role.",
+      "password": "Initial password. At least 6 characters; the person can change it later.",
+      "usernameFree": "That username is free: you can use it."
     },
     "guideLabel": "Langostin, form guide",
     "ready": "All set! Review the details and create the user.",
-    "created": "User saved",
-    "updated": "Changes saved",
     "validation": {
       "usernameRequired": "Username is required",
       "usernameMin": "Username must have at least {{min}} characters",
@@ -233,7 +237,8 @@
     "personElsewhere": "The person's data (name, email, address, tax data) is edited in their HR record.",
     "openRecord": "Open HR record",
     "save": "Save changes",
-    "saved": "User updated successfully"
+    "saved": "User updated successfully",
+    "roleVsPermissions": "The role gives the base permissions. If a person needs more or less, adjust it separately in Roles and permissions or with a per-person exception."
   },
   "history": {
     "title": "History",

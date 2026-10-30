@@ -1,13 +1,13 @@
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITFlex,
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaPlus, FaScroll } from "react-icons/fa6";
 import { useState } from "react";
+import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { DisciplinaryReport } from "@entities/hr";
@@ -65,7 +65,7 @@ export default function HrReportsPage() {
         onSave={(input) => void fx.createDisciplinaryReport(input)}
       />
 
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={!!disciplinaryReportToDelete}
         onClose={() => setDisciplinaryReportToDelete(null)}
         onConfirm={() => {

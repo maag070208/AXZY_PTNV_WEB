@@ -10,7 +10,7 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaEye, FaKey, FaTrash, FaUndo } from "react-icons/fa";
+import { LuEye, LuKeyRound, LuPencil, LuTrash2, LuUndo2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { roleLabel, useRolesCatalog, type User } from "@entities/user";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
@@ -68,7 +68,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[12px] font-black text-slate-700">@{u.username}</ITText>
+        <ITText className="text-[12px] font-semibold text-slate-600">@{u.username}</ITText>
       ),
     },
     {
@@ -112,7 +112,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[11px] text-slate-600">{u.employeeNumber ?? "—"}</ITText>
+        <ITText className="text-[12px] text-slate-600">{u.employeeNumber ?? "—"}</ITText>
       ),
     },
     {
@@ -157,10 +157,10 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
             color="secondary"
             title={tt("common:actions.view")}
           >
-            <FaEye size={14} />
+            <LuEye size={15} />
           </ITButton>
-          <ITButton onClick={() => onEdit(u)} size="lg" color="gray">
-            <FaEdit size={14} />
+          <ITButton onClick={() => onEdit(u)} size="lg" color="gray" title={tt("common:actions.edit")}>
+            <LuPencil size={15} />
           </ITButton>
           <ITButton
             onClick={() => {
@@ -169,24 +169,27 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
             }}
             size="lg"
             color="success"
+            title={tt("list.passwordHeading")}
           >
-            <FaKey size={14} />
+            <LuKeyRound size={15} />
           </ITButton>
           <ITButton
             onClick={() => fx.setUserToToggle(u)}
             size="lg"
             variant={u.active ? "outlined" : "filled"}
             color={u.active ? "error" : "danger"}
+            title={u.active ? tt("list.confirmDeactivateBtn") : tt("list.confirmDeleteBtn")}
           >
-            <FaTrash size={14} />
+            <LuTrash2 size={15} />
           </ITButton>
           {!u.active && (
             <ITButton
               onClick={() => fx.setUserToReactivate(u)}
               size="lg"
               color="success"
+              title={tt("list.reactivateBtn")}
             >
-              <FaUndo size={14} />
+              <LuUndo2 size={15} />
             </ITButton>
           )}
         </ITFlex>

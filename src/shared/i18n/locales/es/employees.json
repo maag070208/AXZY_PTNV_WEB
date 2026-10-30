@@ -189,7 +189,25 @@
     "validation": {
       "employeeNoMax": "El número de empleado no puede pasar de {{max}} caracteres",
       "jobTitleMax": "El puesto no puede pasar de {{max}} caracteres"
-    }
+    },
+    "tenure": {
+      "label": "Antigüedad",
+      "none": "Sin fecha de ingreso",
+      "years_one": "año en la empresa",
+      "years_other": "años en la empresa",
+      "months_one": "mes en la empresa",
+      "months_other": "meses en la empresa",
+      "plusMonths_one": "+ {{count}} mes",
+      "plusMonths_other": "+ {{count}} meses"
+    },
+    "documentsTile": {
+      "label": "Expediente",
+      "ofTotal": "de {{total}} tipos",
+      "complete": "Documentos completos",
+      "missing_one": "Falta {{count}} tipo de documento",
+      "missing_other": "Faltan {{count}} tipos de documento"
+    },
+    "noDocumentTypesHint": "Cuando se configuren, los verás aquí para subir los archivos."
   },
   "catalog": {
     "title": "Catálogo de Documentos",
@@ -221,7 +239,9 @@
   "deactivate": {
     "reasonMin": "El motivo debe tener al menos {{min}} caracteres",
     "reasonLabel": "Motivo de la baja",
-    "reasonPlaceholder": "Describe brevemente el motivo..."
+    "reasonPlaceholder": "Describe brevemente el motivo...",
+    "title": "¿Dar de baja a {{name}}?",
+    "consequence": "Dejará de poder iniciar sesión. Podrás reactivarla más adelante."
   },
   "credential": {
     "title": "CREDENCIAL DE EMPLEADO",
@@ -313,5 +333,14 @@
       "emergencyContactName": "Contacto de emergencia",
       "emergencyContactPhone": "Teléfono de emergencia"
     }
+  },
+  "summary": {
+    "all": "Todo el personal",
+    "active": "Activos",
+    "inactive": "Inactivos"
+  },
+  "empty": {
+    "title": "Aún no hay personal",
+    "description": "Cuando des de alta a alguien, aparecerá en esta lista."
   }
 }

@@ -1,9 +1,7 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
-import Langostin from "@shared/ui/langostin/Langostin";
 import { dyn } from "@shared/i18n";
-import { Fragment, useState, type FocusEvent, type KeyboardEvent } from "react";
-import { ITAlert, ITButton, ITFlex, ITPage } from "@axzydev/axzy_ui_system";
-import { FaBuilding, FaFileUpload, FaIdCard, FaShieldAlt, FaUserPlus } from "react-icons/fa";
+import type { KeyboardEvent } from "react";
+import { ITAlert, ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { LuBuilding2, LuFileUp, LuIdCard, LuShieldCheck, LuUserPlus } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -11,9 +9,15 @@ import {
   useUserForm,
 } from "@features/user/user-form";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { FormSection } from "@shared/ui/form-section";
+import { LangostinGuide, LangostinState, type LangostinGuideStatus } from "@shared/ui/langostin";
+import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
+import { StickyActions } from "@shared/ui/sticky-actions";
 
 interface AppStep {
   label: string;
+  description?: string;
+  complete: boolean;
   content: React.ReactNode;
   icon?: React.ReactNode;
 }
@@ -35,8 +39,6 @@ const HINT_KEYS: Record<string, string> = {
 export default function UserFormPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
-  // Langostin sigue el campo donde está el cursor: cada input tiene su propia guía.
-  const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const { t: tt } = useTranslation(["users", "common"]);
 
   const userForm = useUserForm();
@@ -77,15 +79,13 @@ export default function UserFormPage() {
         description={description}
         loading
         backAction={() => goBack("/users")}
-        icon={<FaUserPlus size={20} />}
+        icon={<LuUserPlus size={20} />}
         breadcrumbs={[
           { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
           { label: breadcrumb },
         ]}
       >
-        <ITFlex justify="center" align="center">
-          <LottieLoader size="lg" />
-        </ITFlex>
+        <LangostinState kind="loading" />
       </ITPage>
     );
   }
@@ -113,16 +113,7 @@ export default function UserFormPage() {
 
   // Lo que Langostin le dice al usuario según el estado del formulario.
   const hasErrors = Object.keys(userForm.errors).length > 0 || Boolean(userForm.docsError);
-  const focusedHint = focusedInput && HINT_KEYS[focusedInput] ? dyn(tt)(`form.hints.${HINT_KEYS[focusedInput]}`) : null;
   const checking = Object.values(userForm.uniqueness).includes("checking");
-  const guide = userForm.saving
-    ? tt("form.saving")
-    : checking
-      ? tt("form.checking")
-      : hasErrors
-        ? tt("form.guideFix")
-        : (focusedHint ?? tt("form.guideStart"));
-  const langostinAnim = userForm.saving || checking ? "work" : "wave";
   const complete =
     !!userForm.form.name.trim() &&
     !!userForm.form.paternalSurname.trim() &&
@@ -133,6 +124,15 @@ export default function UserFormPage() {
     !hasErrors &&
     !checking &&
     (!userForm.requiresDocs || userForm.requiredDocs.every((d) => userForm.docsFiles[d.key]));
+
+  // Pistas por campo (ya traducidas) para LangostinGuide; la de usuario avisa si está libre.
+  const guideHints: Record<string, string> = Object.fromEntries(
+    Object.entries(HINT_KEYS).map(([input, key]) => [input, dyn(tt)(`form.hints.${key}`)])
+  );
+  if (userForm.uniqueness.username === "available") guideHints.u_username = tt("form.hints.usernameFree");
+  const guideStatus: LangostinGuideStatus = userForm.saving || checking ? "saving" : hasErrors ? "error" : "idle";
+  const guideStatusText = userForm.saving ? tt("form.saving") : checking ? tt("form.checking") : tt("form.guideFix");
+  const defaultText = !isEdit && complete ? tt("form.ready") : tt("form.guideStart");
 
   // Enter pasa al siguiente campo del formulario, como en un formulario normal.
   const handleEnter = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -147,37 +147,44 @@ export default function UserFormPage() {
     next.focus();
   };
 
-  const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
-    const name = (event.target as HTMLInputElement).name;
-    if (name) setFocusedInput(name);
-  };
-
+  const f = userForm.form;
   const steps: AppStep[] = [
     {
       label: tt("form.sectionPersonal"),
-      icon: <FaIdCard size={13} />,
+      description: tt("form.sectionPersonalHint"),
+      icon: <LuIdCard size={15} />,
+      complete: !!f.name.trim() && !!f.paternalSurname.trim() && !!f.email.trim() && !!f.employeeNumber.trim() && !hasErrors,
       content: <UserFormFields step="personal" {...fieldsProps} />,
     },
     {
       label: tt("form.sectionAccess"),
-      icon: <FaShieldAlt size={13} />,
+      description: tt("form.sectionAccessHint"),
+      icon: <LuShieldCheck size={15} />,
+      complete: !!f.username.trim() && (isEdit || !!f.password) && !!f.role && !hasErrors,
       content: <UserFormFields step="access" {...fieldsProps} />,
     },
     {
       label: tt("form.sectionOrganization"),
-      icon: <FaBuilding size={13} />,
+      description: tt("form.sectionOrganizationHint"),
+      icon: <LuBuilding2 size={15} />,
+      complete: !!f.departmentId,
       content: <UserFormFields step="org" {...fieldsProps} />,
     },
     ...(userForm.requiresDocs
       ? [
           {
             label: tt("form.stepDocs"),
-            icon: <FaFileUpload size={13} />,
+            description: tt("form.docsHint", { docs: userForm.requiredDocs.map((d) => d.label).join(", ") }),
+            icon: <LuFileUp size={15} />,
+            complete: userForm.requiredDocs.every((d) => userForm.docsFiles[d.key]) && !userForm.docsError,
             content: <UserFormFields step="docs" {...fieldsProps} />,
           },
         ]
       : []),
   ];
+  const roleName = userForm.ROLE_OPTIONS.find((option) => option.value === f.role)?.label;
+  const departmentName = userForm.departments.find((d) => d.id === f.departmentId)?.name;
+  const fullName = [f.name, f.paternalSurname, f.maternalSurname].map((part) => part.trim()).filter(Boolean).join(" ");
 
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -185,7 +192,7 @@ export default function UserFormPage() {
       title={title}
       description={description}
       backAction={() => goBack("/users")}
-      icon={<FaUserPlus size={20} />}
+      icon={<LuUserPlus size={20} />}
       breadcrumbs={[
         { label: tt("list.breadcrumb"), onClick: () => navigate("/users") },
         { label: breadcrumb },
@@ -202,37 +209,48 @@ export default function UserFormPage() {
       )}
 
 
-      <ITFlex justify="end" align="center" gap={3} className="mb-6">
-        <ITButton variant="outlined" color="secondary" onClick={() => goBack("/users")} disabled={userForm.saving}>
+      <div onKeyDown={handleEnter} className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="flex min-w-0 flex-col gap-5">
+          {steps.map((section, index) => (
+            <FormSection
+              key={section.label}
+              number={index + 1}
+              title={section.label}
+              description={section.description}
+              icon={section.icon}
+              complete={section.complete}
+            >
+              {section.content}
+            </FormSection>
+          ))}
+        </div>
+
+        <LiveSummary total={steps.length} done={steps.filter((section) => section.complete).length}>
+          <LiveSummaryRow label={tt("form.name")} value={fullName} />
+          <LiveSummaryRow label={tt("form.username")} value={f.username.trim() ? `@${f.username.trim()}` : undefined} />
+          <LiveSummaryRow label={tt("form.role")} value={roleName} />
+          <LiveSummaryRow label={tt("form.department")} value={departmentName} />
+          <LiveSummaryRow label={tt("form.email")} value={f.email.trim()} />
+        </LiveSummary>
+      </div>
+
+      <StickyActions>
+        <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack("/users")} disabled={userForm.saving}>
           {tt("form.cancel")}
         </ITButton>
-        <ITButton variant="raised-text" color="primary" onClick={handleFinish} disabled={userForm.saving}>
-          {isEdit ? tt("form.save") : tt("form.create")}
+        <ITButton variant="rounded" color="primary" onClick={handleFinish} disabled={userForm.saving}>
+          {userForm.saving ? tt("form.saving") : isEdit ? tt("form.save") : tt("form.create")}
         </ITButton>
-      </ITFlex>
+      </StickyActions>
 
-      <div onKeyDown={handleEnter} onFocus={handleFocus}>
-        <ITFlex direction="column" gap={6}>
-          {steps.map((section) => (
-            <Fragment key={section.label}>{section.content}</Fragment>
-          ))}
-        </ITFlex>
-      </div>
-
-      {/* Langostin flota abajo a la derecha: guía, avisa mientras verifica y anima mientras guarda. */}
-      <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex items-end gap-3">
-        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-[var(--it-card-bg)] px-4 py-3 text-sm text-slate-600 shadow-lg">
-          <p>{!userForm.saving && !isEdit && complete ? tt("form.ready") : guide}</p>
-          {!userForm.saving && !isEdit && complete && (
-            <ITButton variant="raised-text" color="primary" className="mt-3 w-full" onClick={handleFinish}>
-              {tt("form.create")}
-            </ITButton>
-          )}
-        </div>
-        <div className="pointer-events-auto drop-shadow-lg">
-          <Langostin anim={langostinAnim} size={72} label={tt("form.guideLabel")} />
-        </div>
-      </div>
+      {/* Langostin flota abajo a la derecha: explica el campo enfocado y avisa mientras verifica o guarda. */}
+      <LangostinGuide
+        hints={guideHints}
+        status={guideStatus}
+        statusText={guideStatusText}
+        defaultText={defaultText}
+        storageKey={`user-form:${isEdit ? "edit" : "new"}`}
+      />
     </ITPage>
-  );
+    );
 }

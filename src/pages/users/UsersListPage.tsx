@@ -1,6 +1,5 @@
 import {
   ITButton,
-  ITConfirmDialog,
   ITDialog,
   ITFlex,
   ITInput,
@@ -8,7 +7,7 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
-import { FaFileExcel, FaPlus, FaUserShield } from "react-icons/fa";
+import { LuFileSpreadsheet, LuKeyRound, LuPlus, LuUserCog } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
@@ -19,6 +18,8 @@ import {
 import { UserEditDialog } from "@features/user/user-form";
 import { DeactivateDialog } from "@features/hr/employee-detail";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 
 export default function UsersListPage() {
   const navigate = useNavigate();
@@ -52,8 +53,8 @@ export default function UsersListPage() {
               onClick={() => navigate("/users/import")}
             >
               <ITFlex align="center" gap={1}>
-                <FaFileExcel size={12} />
-                <ITText className="font-bold text-[11px]">{tt("list.importExcel")}</ITText>
+                <LuFileSpreadsheet size={14} />
+                <ITText className="font-bold text-[12px]">{tt("list.importExcel")}</ITText>
               </ITFlex>
             </ITButton>
             <ITButton
@@ -62,14 +63,14 @@ export default function UsersListPage() {
               onClick={() => navigate("/users/new")}
             >
               <ITFlex align="center" gap={1}>
-                <FaPlus size={12} />
-                <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
+                <LuPlus size={14} />
+                <ITText className="font-bold text-[12px]">{tt("list.new")}</ITText>
               </ITFlex>
             </ITButton>
           </ITFlex>
         ) : undefined
       }
-      icon={<FaUserShield size={20} />}
+      icon={<LuUserCog size={20} />}
     >
       <UsersTable
         fx={fx}
@@ -92,72 +93,81 @@ export default function UsersListPage() {
       />
 
       {/* Para usuarios ya inactivos, confirmación de borrado físico */}
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={!!fx.userToToggle && !fx.userToToggle.active}
         onClose={() => fx.setUserToToggle(null)}
         onConfirm={() => fx.handleToggleActive(canManageUsers)}
-        title={tt("list.confirmDeleteTitle")}
-        message={tt("list.confirmDeleteMsg", {
-          username: fx.userToToggle?.username ?? "",
-        })}
+        title={tt("list.deleteQuestion", { username: fx.userToToggle?.username ?? "" })}
+        message={tt("list.deleteConsequence")}
         confirmLabel={tt("list.confirmDeleteBtn")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />
 
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={!!fx.userToForceDelete}
         onClose={() => fx.setUserToForceDelete(null)}
         onConfirm={fx.handleForceDelete}
-        title={tt("list.forceDeleteTitle")}
+        title={tt("list.forceDeleteQuestion", { username: fx.userToForceDelete?.username ?? "" })}
         message={tt("list.forceDeleteMessage", { username: fx.userToForceDelete?.username ?? "" })}
         confirmLabel={tt("list.forceDeleteBtn")}
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />
 
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={!!fx.userToReactivate}
         onClose={() => fx.setUserToReactivate(null)}
         onConfirm={fx.handleReactivate}
-        title={tt("list.reactivateTitle")}
-        message={tt("list.reactivateMsg", {
-          username: fx.userToReactivate?.username ?? "",
-        })}
+        title={tt("list.reactivateQuestion", { username: fx.userToReactivate?.username ?? "" })}
+        message={tt("list.reactivateMsgShort")}
         confirmLabel={tt("list.reactivateBtn")}
         cancelLabel={tt("common:actions.cancel")}
         variant="success"
       />
 
+      {/* Contraseña nueva: modal M2 con encabezado y pie fijo. Enter guarda. */}
       <ITDialog
         isOpen={!!fx.userToPassword}
         onClose={() => fx.setUserToPassword(null)}
-        className="it-dialog-panel"
-        title={tt("list.passwordTitle", {
-          username: fx.userToPassword?.username ?? "",
-        })}
+        className="max-w-md"
       >
+        <DialogHeader
+          icon={<LuKeyRound size={20} />}
+          tone="success"
+          title={tt("list.passwordHeading")}
+          subtitle={fx.userToPassword ? `@${fx.userToPassword.username}` : undefined}
+        />
         <ITFlex direction="column" gap={3}>
-          <ITInput
-            name="newPassword"
-            type="password"
-            label={tt("list.passwordLabel")}
-            value={fx.newPassword}
-            onChange={(e) => fx.setNewPassword(e.target.value)}
-            placeholder={tt("list.passwordPlaceholder")}
-            autoFocus
-          />
-          <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" onClick={() => fx.setUserToPassword(null)}>
+          <div
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && fx.newPassword.trim()) {
+                event.preventDefault();
+                void fx.handleChangePassword();
+              }
+            }}
+          >
+            <ITInput
+              name="newPassword"
+              type="password"
+              label={tt("list.passwordLabel")}
+              value={fx.newPassword}
+              onChange={(e) => fx.setNewPassword(e.target.value)}
+              placeholder={tt("list.passwordPlaceholder")}
+              autoFocus
+            />
+          </div>
+          <ITFlex justify="end" gap={2} className="pt-2">
+            <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => fx.setUserToPassword(null)}>
               {tt("common:actions.cancel")}
             </ITButton>
             <ITButton
-              variant="filled"
+              variant="rounded"
               color="primary"
               onClick={fx.handleChangePassword}
               disabled={!fx.newPassword.trim()}
             >
-              <ITText className="font-bold text-[11px]">{tt("list.passwordBtn")}</ITText>
+              <ITText className="font-bold text-[12px]">{tt("list.passwordBtn")}</ITText>
             </ITButton>
           </ITFlex>
         </ITFlex>
