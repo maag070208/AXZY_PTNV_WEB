@@ -320,7 +320,13 @@ export default function TicketAgent({
   return (
     <ITGrid container columns={12} spacing={6}>
       <ITGrid item xs={12} lg={7}>
-        <ITCard className="flex h-[min(72vh,680px)] min-h-[480px] flex-col overflow-hidden !p-0">
+        {/* La altura va en línea a propósito: las clases arbitrarias del tipo
+            `h-[min(72vh,680px)]` no se aplican en el CSS servido, y sin altura
+            fija el hilo del chat no tiene scroll propio (ni auto-scroll). */}
+        <ITCard
+          className="flex flex-col overflow-hidden !p-0"
+          style={{ height: "min(72vh, 680px)", minHeight: 480 }}
+        >
           <header className="flex items-center justify-between gap-3 px-5 py-4">
             <ITFlex align="center" gap={3}>
               <LangostinAvatar anim="idle" size={36} animated={false} />
