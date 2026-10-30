@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useGoBack } from "@shared/lib/useGoBack";
 import { useKitchenImport } from "../model/useKitchenImport";
 import ImportPreviewPanel from "./ImportPreviewPanel";
 import ImportResultCard from "./ImportResultCard";
@@ -12,14 +13,15 @@ import ImportUploadCard from "./ImportUploadCard";
  */
 export default function KitchenImportPanel() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useKitchenImport();
 
   if (fx.step === "done") {
     return (
       <ImportResultCard
         fx={fx}
-        onGoToItems={() => navigate("/kitchen/items")}
-        onGoToMovements={() => navigate("/kitchen/movements")}
+        onGoToItems={() => goBack("/kitchen/items")}
+        onGoToMovements={() => navigate("/kitchen/movements", { replace: true })}
       />
     );
   }

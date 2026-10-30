@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ITAlert, ITInput, ITSearchSelect, ITSelect } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITInput, ITSearchSelect, ITSelect, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { FaCheck, FaCheckCircle, FaIdCard, FaKey, FaMinus, FaTimes, FaTimesCircle, FaUserShield } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type {
@@ -54,12 +54,12 @@ function Step({
   }[state];
   return (
     <div className={`relative flex flex-col gap-1.5 rounded-xl border p-3 ${style.ring}`}>
-      <div className="flex items-center gap-2">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">{icon}</span>
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{index}</span>
-        <span className="text-[12px] font-black text-slate-700">{title}</span>
-        <span className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full ${style.badge}`}>{style.icon}</span>
-      </div>
+      <ITFlex align="center" gap={2}>
+        <ITText as="span" className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--it-card-bg)] text-slate-500 shadow-sm">{icon}</ITText>
+        <ITText as="span" className="text-[12px] font-semibold text-slate-400">{index}</ITText>
+        <ITText as="span" className="text-[12px] font-black text-slate-700">{title}</ITText>
+        <ITText as="span" className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full ${style.badge}`}>{style.icon}</ITText>
+      </ITFlex>
       <div className="text-[11px] leading-relaxed text-slate-600">{children}</div>
     </div>
   );
@@ -123,50 +123,50 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
   const subjectMember = members.find((member) => member.id === subject);
 
   const rbacDetail = (sim: AccessSimulation) => {
-    if (!sim.rbac.permissionActive) return <p>{t("simulator.rbac.inactivePermission")}</p>;
+    if (!sim.rbac.permissionActive) return <ITText>{t("simulator.rbac.inactivePermission")}</ITText>;
     if (sim.rbac.exception) {
       return (
-        <div className="flex flex-col gap-1">
-          <p>{t("simulator.rbac.exception")}</p>
-          <div className="flex flex-wrap items-center gap-1.5">
+        <ITStack spacing={1}>
+          <ITText>{t("simulator.rbac.exception")}</ITText>
+          <ITFlex align="center" wrap="wrap" gap={1.5}>
             <ScopeChip scope={sim.rbac.exception.scope} scoped={scoped} />
-            {sim.rbac.exception.reason && <span className="italic">“{sim.rbac.exception.reason}”</span>}
-          </div>
-        </div>
+            {sim.rbac.exception.reason && <ITText as="span" className="italic">“{sim.rbac.exception.reason}”</ITText>}
+          </ITFlex>
+        </ITStack>
       );
     }
     const sources = Object.entries(sim.rbac.byRole);
     if (sources.length === 0) {
       const roles = subjectMember ? memberRoles(subjectMember).map(roleLabel).join(", ") : "";
-      return <p>{t("simulator.rbac.noRole", { roles })}</p>;
+      return <ITText>{t("simulator.rbac.noRole", { roles })}</ITText>;
     }
     return (
-      <div className="flex flex-col gap-1.5">
-        <p>{t("simulator.rbac.grantedBy")}</p>
-        <div className="flex flex-wrap gap-1.5">
+      <ITStack spacing={1.5}>
+        <ITText>{t("simulator.rbac.grantedBy")}</ITText>
+        <ITFlex wrap="wrap" gap={1.5}>
           {sources.map(([role, scope]) => (
-            <span key={role} className="inline-flex items-center gap-1">
+            <ITText as="span" key={role} className="inline-flex items-center gap-1">
               <RoleChip role={role} />
               <ScopeChip scope={scope} scoped={scoped} />
-            </span>
+            </ITText>
           ))}
-        </div>
-      </div>
+        </ITFlex>
+      </ITStack>
     );
   };
 
   const abacDetail = (sim: AccessSimulation) => {
-    if (!sim.identity.ok || !sim.rbac.ok) return <p>{t("simulator.abac.notEvaluated")}</p>;
-    if (!sim.abac.hasRules) return <p>{t("simulator.abac.noRules")}</p>;
+    if (!sim.identity.ok || !sim.rbac.ok) return <ITText>{t("simulator.abac.notEvaluated")}</ITText>;
+    if (!sim.abac.hasRules) return <ITText>{t("simulator.abac.noRules")}</ITText>;
     const decided = sim.abac.explanation?.decidedBy;
-    if (!decided) return <p>{t("simulator.abac.noneMatched")}</p>;
+    if (!decided) return <ITText>{t("simulator.abac.noneMatched")}</ITText>;
     return (
-      <p>
+      <ITText>
         {t("simulator.abac.decidedBy", { name: decided.name })}{" "}
-        <span className={`font-black ${decided.effect === "DENY" ? "text-rose-600" : "text-emerald-600"}`}>
+        <ITText as="span" className={`font-black ${decided.effect === "DENY" ? "text-rose-600" : "text-emerald-600"}`}>
           {t(`policies.effect.${decided.effect}`)}
-        </span>
-      </p>
+        </ITText>
+      </ITText>
     );
   };
 
@@ -174,31 +174,31 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
     <li
       key={rule.id}
       className={`rounded-xl border px-3 py-2 ${
-        rule.id === decidedId ? "border-[#0D5777] bg-[#0D5777]/5" : "border-slate-200 bg-white"
+        rule.id === decidedId ? "border-primary-500 bg-primary-500/5" : "border-slate-200 bg-[var(--it-card-bg)]"
       } ${rule.active ? "" : "opacity-50"}`}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded bg-slate-100 px-1.5 text-[10px] font-black text-slate-500">#{rule.priority}</span>
-        <span className="text-[12px] font-bold text-slate-700">{rule.name}</span>
-        <span
-          className={`rounded px-1.5 py-0.5 text-[9px] font-black uppercase ${
+      <ITFlex align="center" wrap="wrap" gap={2}>
+        <ITText as="span" className="rounded bg-slate-100 px-1.5 text-[10px] font-black text-slate-500">#{rule.priority}</ITText>
+        <ITText as="span" className="text-[12px] font-bold text-slate-700">{rule.name}</ITText>
+        <ITText as="span"
+          className={`rounded px-1.5 py-0.5 text-[12px] font-semibold ${
             rule.effect === "DENY" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"
           }`}
         >
           {t(`policies.effect.${rule.effect}`)}
-        </span>
-        {!rule.active && <span className="text-[10px] font-bold text-amber-600">{t("policies.inactive")}</span>}
-        <span className={`text-[10px] font-bold ${rule.appliesToUser ? "text-emerald-600" : "text-slate-400"}`}>
+        </ITText>
+        {!rule.active && <ITText as="span" className="text-[10px] font-bold text-amber-600">{t("policies.inactive")}</ITText>}
+        <ITText as="span" className={`text-[10px] font-bold ${rule.appliesToUser ? "text-emerald-600" : "text-slate-400"}`}>
           {rule.appliesToUser ? t("simulator.trace.appliesToRole") : t("simulator.trace.notForRole")}
-        </span>
-        <span className="ml-auto text-[10px] font-black">
+        </ITText>
+        <ITText as="span" className="ml-auto text-[10px] font-black">
           {rule.matches ? (
-            <span className="text-[#0D5777]">{rule.id === decidedId ? t("simulator.trace.decides") : t("simulator.trace.matches")}</span>
+            <ITText as="span" className="text-primary-500">{rule.id === decidedId ? t("simulator.trace.decides") : t("simulator.trace.matches")}</ITText>
           ) : (
-            <span className="text-slate-400">{t("simulator.trace.noMatch")}</span>
+            <ITText as="span" className="text-slate-400">{t("simulator.trace.noMatch")}</ITText>
           )}
-        </span>
-      </div>
+        </ITText>
+      </ITFlex>
       {rule.conditions.length > 0 && (
         <ul className="mt-1.5 flex flex-col gap-1">
           {rule.conditions.map((condition, index) => {
@@ -210,10 +210,10 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
                 ) : (
                   <FaTimesCircle size={11} className="text-slate-300" />
                 )}
-                <span className="font-bold text-slate-700">{field?.label ?? condition.field}</span>
-                <span className="text-slate-500">{tt(`policies.operator.${condition.operator}`)}</span>
-                {condition.value != null && <span className="font-bold text-[#0D5777]">{valueText(condition.value)}</span>}
-                <span className="text-slate-400">
+                <ITText as="span" className="font-bold text-slate-700">{field?.label ?? condition.field}</ITText>
+                <ITText as="span" className="text-slate-500">{tt(`policies.operator.${condition.operator}`)}</ITText>
+                {condition.value != null && <ITText as="span" className="font-bold text-primary-500">{valueText(condition.value)}</ITText>}
+                <ITText as="span" className="text-slate-400">
                   ({t("simulator.trace.actual")}:{" "}
                   {field?.type === "user" && condition.actual === subject
                     ? t("policies.ref.userId")
@@ -221,7 +221,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
                       ? t("simulator.other")
                       : formatValue(condition.actual)}
                   )
-                </span>
+                </ITText>
               </li>
             );
           })}
@@ -231,9 +231,9 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
   );
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-[11px] text-slate-500">{t("simulator.subtitle")}</p>
-      <div className="grid gap-4 md:grid-cols-2">
+    <ITStack spacing={4}>
+      <ITText className="text-[11px] text-slate-500">{t("simulator.subtitle")}</ITText>
+      <div className="grid gap-4 md:!grid-cols-2">
         <DialogSection step={1} title={t("simulator.who")}>
           <ITSearchSelect
             name="simulator_person"
@@ -260,7 +260,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
 
       {action && action.fields.length > 0 && (
         <DialogSection step={3} title={t("simulator.context")} hint={t("simulator.contextHint")}>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:!grid-cols-2">
             {action.fields.map((field) =>
               field.type === "number" ? (
                 <ITInput
@@ -302,9 +302,9 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
       )}
 
       {(!subject || !permission) && (
-        <p className="rounded-lg bg-slate-50 px-3 py-3 text-center text-[11px] text-slate-500">{t("simulator.pickBoth")}</p>
+        <ITText className="rounded-lg bg-slate-50 px-3 py-3 text-center text-[11px] text-slate-500">{t("simulator.pickBoth")}</ITText>
       )}
-      {simulator.running && !result && <p className="text-center text-[11px] text-slate-400">{t("simulator.running")}</p>}
+      {simulator.running && !result && <ITText className="text-center text-[11px] text-slate-400">{t("simulator.running")}</ITText>}
 
       {simulator.error && (
         <ITAlert variant="error" dismissible onDismiss={reset}>
@@ -313,7 +313,7 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
       )}
 
       {result && (
-        <div className="flex flex-col gap-3">
+        <ITStack spacing={3}>
           <div
             className={`flex items-center gap-3 rounded-xl border px-3 py-2 ${
               result.allowed ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"
@@ -325,18 +325,18 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
               <FaTimesCircle size={18} className="text-rose-500" />
             )}
             <div>
-              <p className={`text-[13px] font-black ${result.allowed ? "text-emerald-700" : "text-rose-700"}`}>
+              <ITText className={`text-[13px] font-black ${result.allowed ? "text-emerald-700" : "text-rose-700"}`}>
                 {result.allowed ? t("simulator.allowed") : t("simulator.denied")}
-              </p>
-              <p className="text-[11px] text-slate-600">
+              </ITText>
+              <ITText className="text-[11px] text-slate-600">
                 {result.allowed
                   ? t("simulator.allowedDetail", { permission: nameOf(permission), scope: t(`scopePlain.${result.rbac.scope}`) })
                   : result.abac.explanation?.decision.reason ?? t("simulator.deniedDetail", { permission: nameOf(permission) })}
-              </p>
+              </ITText>
             </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:!grid-cols-3">
             <Step index={1} title={t("simulator.steps.identity")} icon={<FaIdCard size={12} />} state={result.identity.ok ? "ok" : "fail"}>
               {result.identity.ok ? t("simulator.identity.active") : t("simulator.identity.inactive")}
             </Step>
@@ -359,20 +359,20 @@ export default function AccessSimulator({ catalog, actions, initialUserId = null
           </div>
 
           {result.identity.ok && !result.rbac.ok && result.rbac.permissionActive && (
-            <p className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] text-amber-800">{t("simulator.howToGrant")}</p>
+            <ITText className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] text-amber-800">{t("simulator.howToGrant")}</ITText>
           )}
 
           {result.abac.explanation && result.abac.explanation.rules.length > 0 && (
             <div>
-              <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-400">{t("simulator.trace.title")}</p>
+              <ITText className="mb-2 text-[12px] font-semibold text-slate-400">{t("simulator.trace.title")}</ITText>
               <ol className="flex flex-col gap-2">
                 {result.abac.explanation.rules.map((rule) => traceRow(rule, result.abac.explanation?.decidedBy?.id))}
               </ol>
-              <p className="mt-2 text-[10px] italic text-slate-400">{t("policies.priorityHint")}</p>
+              <ITText className="mt-2 text-[10px] italic text-slate-400">{t("policies.priorityHint")}</ITText>
             </div>
           )}
-        </div>
+        </ITStack>
       )}
-    </div>
+    </ITStack>
   );
 }

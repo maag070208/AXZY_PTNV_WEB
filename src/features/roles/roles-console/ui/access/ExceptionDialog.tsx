@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ITButton, ITDialog, ITInput } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDialog, ITInput, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import type { PermissionCatalog } from "@entities/permission";
 import { usersApi, type PermissionScope } from "@entities/user";
@@ -91,12 +91,12 @@ export default function ExceptionDialog({ isOpen, userId, personName, permission
       }
       useFormHeader
     >
-      <div className="flex flex-col gap-4">
+      <ITStack spacing={4}>
         <div className="rounded-lg bg-slate-50 px-3 py-2">
-          <p className="text-[13px] font-bold text-slate-800">{permission.name}</p>
-          <p className="text-[11px] text-slate-500">
+          <ITText className="text-[13px] font-bold text-slate-800">{permission.name}</ITText>
+          <ITText className="text-[11px] text-slate-500">
             {mode === "revoke" ? t("exception.revokeIntro", { name: firstName }) : t("exception.grantIntro", { name: firstName })}
-          </p>
+          </ITText>
         </div>
 
         {mode === "grant" && isScopedPermission(permission) && (
@@ -129,7 +129,7 @@ export default function ExceptionDialog({ isOpen, userId, personName, permission
         </DialogSection>
 
         <DialogSection step={mode === "grant" && isScopedPermission(permission) ? 3 : 2} title={t("exception.expiryQuestion")}>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-2 sm:!grid-cols-3">
             <ChoiceCard
               selected={expiry === "default"}
               onClick={() => setExpiry("default")}
@@ -155,24 +155,24 @@ export default function ExceptionDialog({ isOpen, userId, personName, permission
               value={date}
               min={new Date().toISOString().slice(0, 10)}
               onChange={(event) => setDate(event.target.value)}
-              className="mt-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-[12px] text-slate-700 focus:border-[#0D5777] focus:outline-none"
+              className="mt-2 rounded-lg border border-slate-300 bg-[var(--it-card-bg)] px-3 py-1.5 text-[12px] text-slate-700 focus:border-primary-500 focus:outline-none"
             />
           )}
         </DialogSection>
 
-        {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-[11px] font-semibold text-rose-700">{error}</p>}
+        {error && <ITText className="rounded-lg bg-rose-50 px-3 py-2 text-[11px] font-semibold text-rose-700">{error}</ITText>}
 
         <DialogFooter>
           <ITButton variant="outlined" color="secondary" onClick={onClose}>
-            <span className="text-[11px] font-bold">{t("roleDialog.cancel")}</span>
+            <ITText as="span" className="text-[11px] font-bold">{t("roleDialog.cancel")}</ITText>
           </ITButton>
           <ITButton variant="filled" color={mode === "revoke" ? "danger" : "primary"} onClick={save} disabled={saving}>
-            <span className="text-[11px] font-bold">
+            <ITText as="span" className="text-[11px] font-bold">
               {saving ? t("roleDialog.saving") : mode === "revoke" ? t("exception.revokeConfirm") : t("exception.grantConfirm")}
-            </span>
+            </ITText>
           </ITButton>
         </DialogFooter>
-      </div>
+      </ITStack>
     </ITDialog>
   );
 }

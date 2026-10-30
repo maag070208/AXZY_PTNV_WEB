@@ -1,12 +1,12 @@
 import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaSearch } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { TimeClockInspectView } from "@features/access/time-clock-inspect";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function TimeClockInspectPage() {
   const { t } = useTranslation("time-clock");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
 
   return (
     <ITPage
@@ -15,7 +15,7 @@ export default function TimeClockInspectPage() {
       description={t("inspect.description")}
       icon={<FaSearch size={20} />}
       breadcrumbs={[{ label: t("inspect.title") }]}
-      backAction={() => navigate("/time-clocks")}
+      backAction={() => goBack("/time-clocks")}
     >
       <TimeClockInspectView />
     </ITPage>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useWeeklyAttendance, WeeklyAttendancePanel } from "@features/schedule";
 import { downloadWeeklyAttendancePdf } from "@widgets/reports";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /**
  * Nómina: el reporte semanal de asistencia (entradas, salidas, horas y tiempo
@@ -13,6 +14,7 @@ import { downloadWeeklyAttendancePdf } from "@widgets/reports";
 export default function PayrollPage() {
   const { t } = useTranslation(["weekly-attendance", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useWeeklyAttendance({ downloadPdf: downloadWeeklyAttendancePdf });
 
   return (
@@ -28,7 +30,7 @@ export default function PayrollPage() {
         { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
         { label: t("title") },
       ]}
-      backAction={() => navigate("/employees")}
+      backAction={() => goBack("/employees")}
     >
       <WeeklyAttendancePanel fx={fx} />
     </ITPage>

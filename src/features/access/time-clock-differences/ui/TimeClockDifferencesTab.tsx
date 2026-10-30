@@ -9,6 +9,7 @@ import {
   ITText,
   ITToast,
 } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaLink, FaUnlink } from "react-icons/fa";
 import type { User } from "@entities/user";
 import { PanelCard } from "@shared/ui/panel-card";
@@ -34,8 +35,8 @@ function Fila({ seleccionada, onClick, testid, children }: FilaProps) {
       onClick={onClick}
       className={`w-full rounded-xl border p-3 text-left transition ${
         seleccionada
-          ? "border-[#0D5777] !bg-[#0D5777]/5"
-          : "border-slate-200 !bg-white hover:border-slate-300 hover:!bg-slate-50"
+          ? "border-primary-500 !bg-primary-500/5"
+          : "border-slate-200 !bg-[var(--it-card-bg)] hover:border-slate-300 hover:!bg-slate-50"
       }`}
     >
       {children}
@@ -101,7 +102,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
         <PanelCard title={`${t("differences.clock.title")} · ${clockVisible.length}`}>
           <ITFlex direction="column" gap={3}>
             <ITFlex align="center" wrap="wrap" gap={2}>
-              <div className="min-w-0 flex-1">
+              <ITFlex className="min-w-0 flex-1">
                 <ITInput
                   name="diferenciasReloj"
                   placeholder={t("differences.clock.search")}
@@ -109,7 +110,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
                   onChange={(e) => setQClock(e.target.value)}
                   className="w-full min-w-0"
                 />
-              </div>
+              </ITFlex>
               <ITChip
                 label={t("differences.clock.onlyMissing")}
                 selected={onlyMissing}
@@ -129,6 +130,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
                   onClick={() => setClockSel(r)}
                 >
                   <ITFlex align="center" justify="between" gap={2}>
+                    <ProfileAvatar name={r.name} size="sm" />
                     <ITFlex direction="column" gap={0.5} className="min-w-0">
                       <ITFlex align="center" gap={2} className="min-w-0">
                         <ITText className="text-[12px] font-black whitespace-nowrap text-slate-800">
@@ -168,7 +170,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
         <PanelCard title={`${t("differences.people.title")} · ${peopleVisible.length}`}>
           <ITFlex direction="column" gap={3}>
             <ITFlex align="center" wrap="wrap" gap={2}>
-              <div className="min-w-0 flex-1">
+              <ITFlex className="min-w-0 flex-1">
                 <ITInput
                   name="diferenciasPersona"
                   placeholder={t("differences.people.search")}
@@ -176,7 +178,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
                   onChange={(e) => setQPerson(e.target.value)}
                   className="w-full min-w-0"
                 />
-              </div>
+              </ITFlex>
               <ITChip
                 label={t("differences.people.onlyFree")}
                 selected={onlyFree}
@@ -198,6 +200,7 @@ export default function TimeClockDifferencesTab({ fx }: { fx: UseTimeClockDiffer
                     onClick={() => setPersonSel(p)}
                   >
                     <ITFlex align="center" justify="between" gap={2}>
+                      <ProfileAvatar name={p.name} size="sm" />
                       <ITFlex direction="column" gap={0.5} className="min-w-0">
                         <ITText className="truncate text-[12px] font-bold text-slate-800">
                           {p.name}

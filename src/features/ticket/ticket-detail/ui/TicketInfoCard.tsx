@@ -1,175 +1,33 @@
-import { ITBadget, ITButton, ITFlex, ITGrid, ITSelect, ITStack, ITText } from "@axzydev/axzy_ui_system";
-import { FaPen } from "react-icons/fa";
-import { formatDateTime } from "@shared/utils/dates";
+import { ITCard, ITText } from "@axzydev/axzy_ui_system";
+import { LuFileText } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
-import { dyn } from "@shared/i18n/dyn";
-import { PRIORITY_BADGE, STATUS_BADGE } from "@entities/ticket";
-import { calculateEfficacy } from "../model/timeline";
 import type { UseTicketDetail } from "../model/useTicketDetail";
 
 interface Props {
   fx: UseTicketDetail;
   attachments: React.ReactNode;
-  /** Abre el diálogo de edición; sin él (cerrado o sin permiso) no se pinta. */
-  onEdit?: () => void;
-  /** Permite elegir el responsable aquí mismo, sin pasar por el diálogo. */
-  canAssign?: boolean;
 }
 
-export default function TicketInfoCard({ fx, attachments, onEdit, canAssign }: Props) {
+/** Descripción del ticket y sus archivos (el héroe lleva estado, personas y fechas). */
+export default function TicketInfoCard({ fx, attachments }: Props) {
   const { t: tt } = useTranslation("tickets");
   const ticket = fx.ticket;
   if (!ticket) return null;
 
-  const efficacy = calculateEfficacy(ticket);
-
   return (
-    <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
-      <ITStack direction="column" spacing={5} className="w-full">
-        <ITFlex align="center" justify="between" gap={2} wrap="wrap">
-          <ITFlex gap={2} wrap="wrap">
-            <ITBadget color={(STATUS_BADGE[ticket.status]?.color as any) ?? "default"} size="lg">
-              {dyn(tt)(`statusLabels.${ticket.status}`)}
-            </ITBadget>
-            <ITBadget color={(PRIORITY_BADGE[ticket.priority]?.color as any) ?? "default"} size="lg">
-              {dyn(tt)(`priorityLabels.${ticket.priority}`)}
-            </ITBadget>
-            <ITBadget color="primary" size="lg">
-              {ticket.category?.name ?? "—"}
-            </ITBadget>
-            {ticket.deletedAt && (
-              <ITBadget color="gray" size="lg">
-                {tt("detail.deletedBadge")}
-              </ITBadget>
-            )}
-          </ITFlex>
-          {onEdit && (
-            // El testid va en el envoltorio: `ITButton` no reenvía props sueltas.
-            <span data-testid="editar-ticket" className="inline-flex">
-              <ITButton variant="outlined" color="secondary" size="sm" onClick={onEdit} title={tt("detail.editTitle")}>
-                <ITFlex align="center" gap={1}>
-                  <FaPen size={10} />
-                  <ITText className="!text-[11px] font-bold">{tt("detail.edit")}</ITText>
-                </ITFlex>
-              </ITButton>
-            </span>
-          )}
-        </ITFlex>
-
-        <ITStack direction="column" spacing={2}>
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-            {tt("detail.description")}
+    <ITCard>
+      <div className="flex w-full flex-col gap-4">
+        <ITText as="h3" className="m-0 flex items-center gap-2 !text-[16px] font-bold !text-slate-800">
+          <ITText as="span" className="flex items-center text-slate-400">
+            <LuFileText size={16} />
           </ITText>
-          <ITText className="text-[13px] text-slate-700 whitespace-pre-wrap break-words leading-relaxed">
-            {ticket.description}
-          </ITText>
-        </ITStack>
-
+          {tt("detail.description")}
+        </ITText>
+        <ITText className="m-0 whitespace-pre-wrap break-words text-[13.5px] leading-relaxed text-slate-700">
+          {ticket.description || tt("detail.noDescription")}
+        </ITText>
         {attachments}
-
-        <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12} sm={6} md={4}>
-            <ITStack direction="column" spacing={1}>
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                {tt("detail.createdBy")}
-              </ITText>
-              <ITText className="text-[12px] font-bold text-slate-700 truncate">
-                {ticket.createdBy?.name ?? "—"}
-              </ITText>
-              <ITText className="text-[9px] text-slate-400">
-                {formatDateTime(ticket.createdAt)}
-              </ITText>
-            </ITStack>
-          </ITGrid>
-          <ITGrid item xs={12} sm={6} md={4}>
-            {canAssign ? (
-              <ITSelect
-                name="responsible"
-                label={tt("detail.responsible")}
-                options={[{ value: "", label: tt("detail.noResponsible") }, ...fx.assigneeOptions]}
-                value={ticket.assignedToId ?? ""}
-                onChange={(e) => fx.handleResponsibleChange(e.target.value)}
-              />
-            ) : (
-              <ITStack direction="column" spacing={1}>
-                <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                  {tt("detail.assignedTo")}
-                </ITText>
-                <ITText className="text-[12px] font-bold text-slate-700 truncate">
-                  {ticket.assignedTo?.name ?? tt("detail.unassigned")}
-                </ITText>
-              </ITStack>
-            )}
-          </ITGrid>
-          <ITGrid item xs={12} sm={6} md={4}>
-            <ITStack direction="column" spacing={1}>
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                {tt("detail.department")}
-              </ITText>
-              <ITText className="text-[12px] font-bold text-slate-700 truncate">
-                {ticket.department?.name ?? "—"}
-              </ITText>
-            </ITStack>
-          </ITGrid>
-        </ITGrid>
-
-        {efficacy && (
-          <ITFlex className="mt-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <ITStack direction="column" spacing={1} className="flex-1">
-              <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                {tt("detail.efficacyTitle")}
-              </ITText>
-              <ITFlex align="center" gap={2}>
-                <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${
-                      efficacy.score === 100
-                        ? "bg-emerald-500"
-                        : efficacy.score === 80
-                        ? "bg-blue-500"
-                        : efficacy.score === 60
-                        ? "bg-amber-500"
-                        : "bg-red-500"
-                    }`}
-                    style={{ width: `${efficacy.score}%` }}
-                  />
-                </div>
-                <ITFlex align="center" gap={1}>
-                  <ITText
-                    className={`text-[13px] font-black ${
-                      efficacy.score === 100
-                        ? "text-emerald-600"
-                        : efficacy.score === 80
-                        ? "text-blue-600"
-                        : efficacy.score === 60
-                        ? "text-amber-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {efficacy.score}%
-                  </ITText>
-                  <ITText
-                    className={`text-[9px] font-bold ${
-                      efficacy.score === 100
-                        ? "text-emerald-500"
-                        : efficacy.score === 80
-                        ? "text-blue-500"
-                        : efficacy.score === 60
-                        ? "text-amber-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {dyn(tt)(`detail.efficacyLabels.${efficacy.label}`)}
-                  </ITText>
-                </ITFlex>
-              </ITFlex>
-              <ITText className="text-[9px] text-slate-400">
-                {tt("detail.resolvedIn", { hours: efficacy.hours })}
-              </ITText>
-            </ITStack>
-          </ITFlex>
-        )}
-      </ITStack>
-    </ITFlex>
+      </div>
+    </ITCard>
   );
 }

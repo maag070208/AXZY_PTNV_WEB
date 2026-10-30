@@ -1,8 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
-import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
-import { ticketsApi, type Ticket, type TicketFilterOptions } from "@entities/ticket";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ColumnFilters, ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
+import { ticketsApi, UNASSIGNED, type Ticket, type TicketFilterOptions } from "@entities/ticket";
 
 const NO_OPTIONS: TicketFilterOptions = { categories: [], creators: [], assignees: [] };
+
+/** Mosaicos de la franja de resumen; cada uno aplica un filtro a la tabla. */
+export type QuickFilter = "open" | "followUp" | "unassigned" | "closed";
+
+const QUICK_FILTERS: Record<QuickFilter, ColumnFilters> = {
+  open: { status: "OPEN" },
+  followUp: { status: "IN_PROGRESS" },
+  unassigned: { assignedToId: UNASSIGNED },
+  closed: { status: "CLOSED" },
+};
+
+export type TicketSummary = Record<QuickFilter, number>;
 
 export const useTicketsList = () => {
   const [filterOptions, setFilterOptions] = useState<TicketFilterOptions>(NO_OPTIONS);
@@ -10,6 +22,8 @@ export const useTicketsList = () => {
   const [reloadKey, setReloadKey] = useState(0);
   const [ticketToDelete, setTicketToDelete] = useState<Ticket | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [quickFilter, setQuickFilter] = useState<QuickFilter | null>(null);
+  const [summary, setSummary] = useState<TicketSummary | null>(null);
 
   // Opciones de Categoría, Creador y Responsable: salen de los tickets
   // visibles, así cada opción tiene resultados. Se recargan con la tabla.
@@ -22,6 +36,24 @@ export const useTicketsList = () => {
         setFilterOptionsState("ready");
       })
       .catch(() => setFilterOptionsState("error"));
+  }, [reloadKey]);
+
+  // Totales de la franja: el `total` de la misma consulta de la tabla con cada
+  // filtro rápido, así el número del mosaico es exactamente lo que filtra.
+  useEffect(() => {
+    let cancelled = false;
+    const keys = Object.keys(QUICK_FILTERS) as QuickFilter[];
+    Promise.all(keys.map((k) => ticketsApi.table({ page: 1, limit: 1, filters: QUICK_FILTERS[k] })))
+      .then((results) => {
+        if (cancelled) return;
+        setSummary(Object.fromEntries(keys.map((k, i) => [k, results[i].total])) as TicketSummary);
+      })
+      .catch(() => {
+        if (!cancelled) setSummary(null);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [reloadKey]);
 
   const confirmDeleteTicket = async () => {
@@ -43,16 +75,30 @@ export const useTicketsList = () => {
     };
   }, []);
 
+  // Clic en el mosaico activo = quitar el filtro.
+  const toggleQuickFilter = useCallback((id: QuickFilter) => {
+    setQuickFilter((cur) => (cur === id ? null : id));
+  }, []);
+
+  const externalFilters = useMemo<ColumnFilters>(() => (quickFilter ? QUICK_FILTERS[quickFilter] : {}), [quickFilter]);
+
   return {
     filterOptions,
     filterOptionsLoading: filterOptionsState === "loading",
     filterOptionsError: filterOptionsState === "error",
     reloadKey,
+    /** Recarga la tabla (y el resumen) sin remontar la pantalla. */
+    reload: () => setReloadKey((k) => k + 1),
     fetchTableData,
     ticketToDelete,
     setTicketToDelete,
     confirmDeleteTicket,
     deleteError,
     setDeleteError,
+    summary,
+    quickFilter,
+    toggleQuickFilter,
+    clearQuickFilter: () => setQuickFilter(null),
+    externalFilters,
   };
 };

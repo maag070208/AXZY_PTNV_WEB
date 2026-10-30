@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITButton, ITDialog, ITInput, ITSelect, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDialog, ITInput, ITSelect, ITTextarea, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaBan, FaCheckCircle, FaChevronDown, FaChevronRight, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type {
@@ -256,7 +256,7 @@ export default function PolicyEditorDialog({
       title={policy ? t("policies.editTitle") : t("policies.newTitle")}
       useFormHeader
     >
-      <div className="flex flex-col gap-4">
+      <ITStack spacing={4}>
         <DialogSection step={1} title={t("policies.wizard.action")} hint={t("policies.wizard.actionHint")}>
           <ITSelect
             name="policy_action"
@@ -268,7 +268,7 @@ export default function PolicyEditorDialog({
         </DialogSection>
 
         <DialogSection step={2} title={t("policies.wizard.effect")}>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 sm:!grid-cols-2">
             <ChoiceCard
               tone="danger"
               selected={form.effect === "DENY"}
@@ -289,18 +289,18 @@ export default function PolicyEditorDialog({
         </DialogSection>
 
         <DialogSection step={3} title={t("policies.wizard.when")} hint={t("policies.wizard.whenHint")}>
-          <div className="flex flex-col gap-2">
+          <ITStack spacing={2}>
             {form.conditions.length === 0 && (
-              <p className="rounded-lg bg-slate-50 px-3 py-2 text-[11px] text-slate-500">{t("policies.noConditions")}</p>
+              <ITText className="rounded-lg bg-slate-50 px-3 py-2 text-[11px] text-slate-500">{t("policies.noConditions")}</ITText>
             )}
             {form.conditions.map((condition, index) => {
               const field = fieldOf(condition.field);
               const operators = OPERATORS_BY_TYPE[field?.type ?? "string"];
               return (
                 <div key={index} className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 px-2 py-1.5">
-                  <span className="w-6 text-[10px] font-black text-slate-400">
+                  <ITText as="span" className="w-6 text-[10px] font-black text-slate-400">
                     {index === 0 ? t("policies.if") : t("policies.and")}
-                  </span>
+                  </ITText>
                   <div className="w-40">
                     <ITSelect
                       name={`cond_field_${index}`}
@@ -346,16 +346,16 @@ export default function PolicyEditorDialog({
             <button
               type="button"
               onClick={addCondition}
-              className="flex w-fit items-center gap-1.5 !bg-transparent text-[11px] font-bold text-[#0D5777] hover:underline"
+              className="flex w-fit items-center gap-1.5 !bg-transparent text-[11px] font-bold text-primary-500 hover:underline"
             >
               <FaPlus size={9} /> {t("policies.addCondition")}
             </button>
             <FieldError message={errors.conditions} />
-          </div>
+          </ITStack>
         </DialogSection>
 
         <DialogSection step={4} title={t("policies.wizard.who")}>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 sm:!grid-cols-2">
             <ChoiceCard
               selected={form.allRoles}
               onClick={() => update({ allRoles: true })}
@@ -381,10 +381,10 @@ export default function PolicyEditorDialog({
                       type="button"
                       onClick={() => toggleRole(role.key)}
                       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
-                        selected ? "border-[#0D5777] !bg-[#0D5777] text-white" : "border-slate-200 !bg-white text-slate-600 hover:border-slate-300"
+                        selected ? "border-primary-500 !bg-primary-500 text-white" : "border-slate-200 !bg-[var(--it-card-bg)] text-slate-600 hover:border-slate-300"
                       }`}
                     >
-                      <span className={`h-2 w-2 rounded-full ${selected ? "bg-white" : ROLE_TONES[roleTone(role.key)].dot}`} />
+                      <span className={`h-2 w-2 rounded-full ${selected ? "bg-[var(--it-card-bg)]" : ROLE_TONES[roleTone(role.key)].dot}`} />
                       {role.name}
                     </button>
                   );
@@ -393,8 +393,8 @@ export default function PolicyEditorDialog({
           )}
         </DialogSection>
 
-        <div className="rounded-xl border border-[#0D5777]/20 bg-[#0D5777]/5 px-3 py-2">
-          <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-[#0D5777]">{t("policies.wizard.preview")}</p>
+        <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 px-3 py-2">
+          <ITText className="mb-1 text-[12px] font-semibold text-primary-500">{t("policies.wizard.preview")}</ITText>
           <PolicySentence policy={{ effect: form.effect, roles, conditions: form.conditions }} action={action} />
         </div>
 
@@ -435,7 +435,7 @@ export default function PolicyEditorDialog({
                   value={form.priority}
                   onChange={(event) => update({ priority: event.target.value, priorityTouched: true })}
                 />
-                <p className="mt-1 text-[10px] text-slate-400">{t("policies.priorityHint")}</p>
+                <ITText className="mt-1 text-[10px] text-slate-400">{t("policies.priorityHint")}</ITText>
               </div>
               <ToggleRow
                 checked={form.active}
@@ -451,15 +451,15 @@ export default function PolicyEditorDialog({
           left={
             policy && !policy.key ? (
               confirmDelete ? (
-                <span className="flex items-center gap-2">
-                  <span className="text-[11px] text-rose-600">{t("policies.deleteConfirm", { name: policy.name })}</span>
+                <ITText as="span" className="flex items-center gap-2">
+                  <ITText as="span" className="text-[11px] text-rose-600">{t("policies.deleteConfirm", { name: policy.name })}</ITText>
                   <ITButton variant="filled" color="danger" size="sm" disabled={saving} onClick={handleDelete}>
-                    <span className="text-[11px] font-bold">{t("policies.deleteTitle")}</span>
+                    <ITText as="span" className="text-[11px] font-bold">{t("policies.deleteTitle")}</ITText>
                   </ITButton>
                   <ITButton variant="outlined" color="secondary" size="sm" onClick={() => setConfirmDelete(false)}>
-                    <span className="text-[11px] font-bold">{t("common:actions.cancel")}</span>
+                    <ITText as="span" className="text-[11px] font-bold">{t("common:actions.cancel")}</ITText>
                   </ITButton>
-                </span>
+                </ITText>
               ) : (
                 <button
                   type="button"
@@ -473,13 +473,13 @@ export default function PolicyEditorDialog({
           }
         >
           <ITButton variant="outlined" color="secondary" onClick={onClose}>
-            <span className="text-[11px] font-bold">{t("common:actions.cancel")}</span>
+            <ITText as="span" className="text-[11px] font-bold">{t("common:actions.cancel")}</ITText>
           </ITButton>
           <ITButton variant="filled" color="primary" onClick={handleSave} disabled={saving}>
-            <span className="text-[11px] font-bold">{saving ? t("policies.saving") : t("policies.save")}</span>
+            <ITText as="span" className="text-[11px] font-bold">{saving ? t("policies.saving") : t("policies.save")}</ITText>
           </ITButton>
         </DialogFooter>
-      </div>
+      </ITStack>
     </ITDialog>
   );
 }

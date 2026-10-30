@@ -51,7 +51,7 @@ export default function ClockCard({ fx, clock, onOpen }: Props) {
   })();
 
   return (
-    <ITCard onClick={onOpen} className="border border-slate-200">
+    <ITCard onClick={onOpen}>
       <ITFlex direction="column" gap={3}>
         <ITFlex align="center" wrap="wrap" gap={2}>
           <ITText className="text-[15px] font-black text-slate-800">{clock.name}</ITText>
@@ -102,7 +102,7 @@ export default function ClockCard({ fx, clock, onOpen }: Props) {
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <ITFlex direction="column" gap={0.5} className="min-w-0">
-      <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+      <ITText className="text-[12px] font-semibold text-slate-400">
         {label}
       </ITText>
       <ITText className="text-[12px] font-bold text-slate-800 break-words">{value}</ITText>

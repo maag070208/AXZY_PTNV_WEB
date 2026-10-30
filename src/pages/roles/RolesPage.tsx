@@ -1,14 +1,16 @@
 import { useEffect } from "react";
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton, ITPage, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import { FaPlus, FaQuestionCircle, FaUserShield } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
 import { RolesWorkspace, useRolesWorkspace } from "@features/roles/roles-console";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** Consola de control de acceso: roles, matriz, acceso por persona, políticas, catálogo y actividad. */
 function RolesConsole() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t } = useTranslation(["roles", "common"]);
   const workspace = useRolesWorkspace();
 
@@ -17,25 +19,25 @@ function RolesConsole() {
       noPadding
       title={t("title")}
       description={t("description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaUserShield size={20} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("title") },
       ]}
       actions={
-        <div className="flex items-center gap-2">
+        <ITFlex align="center" gap={2}>
           <ITButton variant="outlined" color="secondary" onClick={() => workspace.setHelpOpen(true)}>
-            <span className="flex items-center gap-1.5 text-[11px] font-bold">
+            <ITText as="span" className="flex items-center gap-1.5 text-[11px] font-bold">
               <FaQuestionCircle size={12} /> {t("help.open")}
-            </span>
+            </ITText>
           </ITButton>
           <ITButton variant="filled" color="primary" onClick={workspace.openCreateRole}>
-            <span className="flex items-center gap-1.5 text-[11px] font-bold">
+            <ITText as="span" className="flex items-center gap-1.5 text-[11px] font-bold">
               <FaPlus size={11} /> {t("access.newRole")}
-            </span>
+            </ITText>
           </ITButton>
-        </div>
+        </ITFlex>
       }
     >
       <RolesWorkspace workspace={workspace} />

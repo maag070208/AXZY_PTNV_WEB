@@ -3,6 +3,7 @@ import { ITAlert, ITBadget, ITButton, ITDataTable, ITDialog, ITFlex, ITGrid, ITI
 import { FaEdit, FaTag } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
+import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
 import { inventoryApi, type DeviceType } from "@entities/inventory";
 
 export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?: number }) {
@@ -139,30 +140,30 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
               <ITInput name="prefix" label={t("types.prefix")} value={prefix} onChange={(e) => setPrefix(e.target.value)} placeholder="TAB" />
             </ITGrid>
             <ITGrid item xs={6} md={2}>
-              <label className="mt-6 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+              <ITText as="label" className="mt-6 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                 <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                 {t("types.active")}
-              </label>
+              </ITText>
             </ITGrid>
             <ITGrid item xs={12}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("types.fields")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{t("types.fields")}</ITText>
               <ITFlex wrap="wrap" gap={4} className="mt-2">
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useSerialNumber} onChange={(e) => setUseSerialNumber(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   <FaTag size={11} className="text-slate-400" /> {t("devices.serialNumber")}
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                </ITText>
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useMac} onChange={(e) => setUseMac(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   {t("devices.mac")}
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                </ITText>
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useIp} onChange={(e) => setUseIp(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   {t("devices.ip")}
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
+                </ITText>
+                <ITText as="label" className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700">
                   <input type="checkbox" checked={useHostname} onChange={(e) => setUseHostname(e.target.checked)} className="h-4 w-4 accent-emerald-600" />
                   {t("devices.hostname")}
-                </label>
+                </ITText>
               </ITFlex>
             </ITGrid>
             <ITGrid item xs={12}>
@@ -179,16 +180,20 @@ export default function DeviceTypesTab({ openCreateSignal }: { openCreateSignal?
         </div>
       </ITDialog>
 
-      <ITDataTable
+      <CatalogStatStrip load={() => inventoryApi.types()} reloadKey={reloadKey} />
+
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
         rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </>
   );

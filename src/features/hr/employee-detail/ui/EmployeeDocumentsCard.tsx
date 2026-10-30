@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { ITDropfile, ITProgress, FileTypeEnum } from "@axzydev/axzy_ui_system";
-import { FaCheckCircle, FaFileAlt, FaFilePdf, FaHourglassHalf, FaTimes } from "react-icons/fa";
+import { ITBentoGrid, ITBentoSegments, ITBentoTile, ITCard, ITDropfile, FileTypeEnum, useITBentoCountUp, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
+import { LuCircleCheck, LuFileImage, LuFileText, LuFiles, LuHourglass, LuX } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import type { EmployeeDocument, DocumentType } from "@entities/hr";
+import { LangostinState } from "@shared/ui/langostin";
 
 interface Props {
   documentTypes: DocumentType[];
@@ -37,77 +38,75 @@ export default function EmployeeDocumentsCard({
   const pendingCount = Math.max(requiredCount - uploadedCount, 0);
   const percent = requiredCount > 0 ? Math.round((uploadedCount / requiredCount) * 100) : 0;
 
+  const uploadedShown = useITBentoCountUp(uploadedCount);
+  const pendingShown = useITBentoCountUp(pendingCount);
+  const filesShown = useITBentoCountUp(documents.length);
+
   return (
-    <div className="flex flex-col gap-5">
-      <section className="flex flex-wrap items-center gap-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="min-w-[240px] flex-1">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{tt("detail.documentsTitle")}</p>
-          <p className="mt-1 text-3xl font-black text-slate-900">
-            {uploadedCount}
-            <span className="text-lg font-semibold text-slate-400"> / {requiredCount}</span>
-          </p>
-          <ITProgress value={percent} color={percent === 100 ? "success" : "primary"} size="lg" className="mt-3" />
-        </div>
-        <dl className="grid grid-cols-3 gap-6 text-center">
-          <div>
-            <dd className="text-2xl font-black text-emerald-600">{uploadedCount}</dd>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{tt("detail.uploaded")}</dt>
+    <ITStack spacing={5}>
+      <ITBentoGrid>
+        <ITBentoTile
+          cols={6}
+          rows={2}
+          wide
+          tone="plain"
+          icon={<LuFiles size={15} />}
+          label={tt("detail.documentsTitle")}
+          value={uploadedShown}
+          aside={`/ ${requiredCount} (${percent}%)`}
+        >
+          <div className="mt-2">
+            <ITBentoSegments total={Math.max(requiredCount, 1)} done={uploadedCount} />
           </div>
-          <div>
-            <dd className="text-2xl font-black text-amber-600">{pendingCount}</dd>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{tt("detail.pending")}</dt>
-          </div>
-          <div>
-            <dd className="text-2xl font-black text-slate-700">{documents.length}</dd>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{tt("detail.filesLabel")}</dt>
-          </div>
-        </dl>
-      </section>
+        </ITBentoTile>
+        <ITBentoTile cols={3} rows={2} wide tone="sun" icon={<LuHourglass size={15} />} label={tt("detail.pending")} value={pendingShown} />
+        <ITBentoTile cols={3} rows={2} wide tone="lavender" icon={<LuFileText size={15} />} label={tt("detail.filesLabel")} value={filesShown} />
+      </ITBentoGrid>
 
       {documentTypes.length === 0 && (
-        <p className="py-6 text-center text-sm text-slate-400">{tt("detail.noDocumentTypes")}</p>
+        <LangostinState kind="empty" size="sm" title={tt("detail.noDocumentTypes")} description={tt("detail.noDocumentTypesHint")} />
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:!grid-cols-2 xl:!grid-cols-3">
         {documentTypes.map((type) => {
           const files = byType.get(type.id) ?? [];
           const covered = files.length > 0;
           return (
-            <article
-              key={type.id}
-              className={`flex flex-col rounded-2xl border bg-white p-4 shadow-sm ${covered ? "border-emerald-200" : "border-dashed border-slate-300"}`}
-            >
+            <ITCard key={type.id} className="flex flex-col">
               <header className="flex items-start gap-3">
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${covered ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
-                  {covered ? <FaCheckCircle size={15} /> : <FaHourglassHalf size={14} />}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm font-bold text-slate-900">{type.name}</h3>
-                  <p className={`text-xs font-medium ${covered ? "text-emerald-600" : "text-amber-600"}`}>
+                <ITText as="span"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                  style={{ background: `var(--color-${covered ? "success" : "warning"}-soft)`, color: `var(--color-${covered ? "success" : "warning"})` }}
+                >
+                  {covered ? <LuCircleCheck size={16} /> : <LuHourglass size={15} />}
+                </ITText>
+                <ITFlex className="min-w-0 flex-1">
+                  <ITText as="h3" className="m-0 truncate !text-[14px] font-bold !text-slate-800">{type.name}</ITText>
+                  <ITText className="m-0 text-xs font-medium" style={{ color: `var(--color-${covered ? "success" : "warning"})` }}>
                     {covered ? tt("detail.uploaded") : tt("detail.pendingOne")}
-                  </p>
-                </div>
+                  </ITText>
+                </ITFlex>
               </header>
 
               {files.length > 0 && (
                 <ul className="mt-3 flex flex-col gap-1">
                   {files.map((file) => (
-                    <li key={file.id} className="group flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-2">
-                      <a href={file.url} target="_blank" rel="noreferrer" className="flex min-w-0 items-center gap-2 text-slate-700 hover:text-blue-600">
+                    <li key={file.id} className="group flex items-center justify-between gap-2 rounded-lg px-3 py-2" style={{ background: "var(--color-secondary-100)" }}>
+                      <a href={file.url} target="_blank" rel="noreferrer" className="flex min-w-0 items-center gap-2 text-slate-700 hover:text-[color:var(--color-primary)]">
                         {file.mimeType === "application/pdf" ? (
-                          <FaFilePdf size={12} className="shrink-0 text-red-500" />
+                          <LuFileText size={14} className="shrink-0 text-[color:var(--color-danger)]" />
                         ) : (
-                          <FaFileAlt size={12} className="shrink-0 text-slate-400" />
+                          <LuFileImage size={14} className="shrink-0 text-slate-400" />
                         )}
-                        <span className="truncate text-xs font-medium group-hover:underline">{file.originalName}</span>
+                        <ITText as="span" className="truncate text-xs font-medium group-hover:underline">{file.originalName}</ITText>
                       </a>
                       <button
                         type="button"
                         onClick={() => onRemove(file.id)}
                         title={tt("common:actions.delete")}
-                        className="shrink-0 rounded-full p-1.5 text-slate-300 transition hover:bg-red-50 hover:text-red-600"
+                        className="shrink-0 cursor-pointer rounded-full !border-0 !bg-transparent p-1.5 text-slate-400 transition hover:text-[color:var(--color-danger)]"
                       >
-                        <FaTimes size={11} />
+                        <LuX size={13} />
                       </button>
                     </li>
                   ))}
@@ -129,11 +128,11 @@ export default function EmployeeDocumentsCard({
                   acceptedFileTypes={[FileTypeEnum.PNG, FileTypeEnum.JPG, FileTypeEnum.JPEG, FileTypeEnum.PDF]}
                 />
               </div>
-            </article>
+            </ITCard>
           );
         })}
       </div>
 
-    </div>
+    </ITStack>
   );
 }

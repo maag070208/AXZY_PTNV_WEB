@@ -1,17 +1,17 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
-import { Fragment, useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { emitAppEvent, onAppEvent } from "@shared/lib/appEvents";
 import {
   ITAlert,
   ITButton,
   ITDatePicker,
   ITFlex,
   ITInput,
+  ITLoader,
   ITPage,
   ITSelect,
   ITText,
-  ITTextarea,
-} from "@axzydev/axzy_ui_system";
-import { FaCamera, FaIdCard, FaMapMarkerAlt, FaPhoneAlt, FaUserTie } from "react-icons/fa";
+  ITTextarea, ITStack } from "@axzydev/axzy_ui_system";
+import { LuCamera, LuIdCard, LuMapPin, LuPhone, LuUserRound } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEmployeeDetail } from "@features/hr/employee-detail";
@@ -27,8 +27,11 @@ import {
   validatePostal,
   validateRfc,
 } from "@shared/validation";
-import { dyn, i18n } from "@shared/i18n";
-import Langostin from "@shared/ui/langostin/Langostin";
+import { i18n } from "@shared/i18n";
+import { FormSection } from "@shared/ui/form-section";
+import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
+import { StickyActions } from "@shared/ui/sticky-actions";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** "YYYY-MM-DD" <-> Date local (sin pasar por UTC, para no correr el día). */
 const dateStrToLocal = (value?: string | null): Date | undefined => {
@@ -44,11 +47,10 @@ const localToDateStr = (value: Date): string => {
   return `${y}-${m}-${d}`;
 };
 
-/** Campos con guía de Langostin (por el `name` del input). */
-const HINT_FIELDS = new Set(["name", "paternalSurname", "maternalSurname", "employeeNumber", "jobTitle", "rfc", "curp", "nss", "personalPhone", "workPhone", "email", "postalCode", "emergencyContactPhone"]);
-
 interface AppStep {
   label: string;
+  /** Sección con lo esencial capturado y sin errores (palomita en la insignia). */
+  complete: boolean;
   content: React.ReactNode;
   icon?: React.ReactNode;
 }
@@ -104,11 +106,10 @@ function Cell({ children, min = 200 }: { children: React.ReactNode; min?: number
 export default function EmployeeProfileEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["employees", "common"]);
 
   const detail = useEmployeeDetail(id);
-  // Langostin sigue el campo donde está el cursor.
-  const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -121,6 +122,55 @@ export default function EmployeeProfileEditPage() {
   useEffect(() => {
     departmentsApi.list().then(setDepartments).catch(() => setDepartments([]));
   }, []);
+
+  // Autoguardado: lo que el bot escribe en el formulario se guarda solo (con un
+  // respiro de 900 ms por si llegan varios campos seguidos).
+  const [autoSave, setAutoSave] = useState<"idle" | "saving" | "ok" | "error">("idle");
+  const formRef = useRef<FormState>(form);
+  const autoTimer = useRef<number | null>(null);
+  const discountRef = useRef(detail.profile?.discounts ?? []);
+
+  useEffect(() => {
+    formRef.current = form;
+  }, [form]);
+  useEffect(() => {
+    discountRef.current = detail.profile?.discounts ?? [];
+  }, [detail.profile]);
+
+  const persist = async (value: FormState) => {
+    const normalized: FormState = Object.fromEntries(
+      Object.entries(value).map(([key, val]) => [
+        key,
+        typeof val === "string" && val.trim() === "" ? (key === "name" ? undefined : null) : val,
+      ]),
+    ) as FormState;
+    setAutoSave("saving");
+    const ok = await detail.saveProfile(normalized, discountRef.current);
+    setAutoSave(ok ? "ok" : "error");
+    emitAppEvent("employee:saved", { ok });
+    if (ok) window.setTimeout(() => setAutoSave("idle"), 2500);
+  };
+
+  // El bot de Personal pregunta y va llenando estos campos en vivo.
+  useEffect(
+    () =>
+      onAppEvent("employee:fill", ({ field, value }) => {
+        const next = { ...formRef.current, [field]: value };
+        formRef.current = next;
+        setForm(next);
+        if (autoTimer.current) window.clearTimeout(autoTimer.current);
+        autoTimer.current = window.setTimeout(() => void persist(next), 900);
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  useEffect(
+    () => () => {
+      if (autoTimer.current) window.clearTimeout(autoTimer.current);
+    },
+    [],
+  );
 
   const field =
     (name: keyof FormState) =>
@@ -185,7 +235,7 @@ export default function EmployeeProfileEditPage() {
       ])
     ) as FormState;
     const ok = await detail.saveProfile(normalized, detail.profile?.discounts ?? []);
-    if (ok) navigate(`/employees/${id}`);
+    if (ok) goBack(`/employees/${id}`);
   };
 
   if (detail.loading || !detail.profile) {
@@ -193,11 +243,12 @@ export default function EmployeeProfileEditPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.editInfo")}
-        backAction={() => navigate(-1)}
-        icon={<FaUserTie size={20} />}
+        backAction={() => goBack(`/employees/${id}`)}
+        icon={<LuUserRound size={20} />}
         breadcrumbs={[
           { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
-          { label: tt("detail.title") },
+          // Sin destino propio: vuelve a la pantalla anterior (la ficha).
+          { label: tt("detail.title"), onClick: () => navigate(-1) },
           { label: tt("detail.editInfo") },
         ]}
       >
@@ -206,8 +257,8 @@ export default function EmployeeProfileEditPage() {
             {detail.error}
           </ITAlert>
         ) : (
-          <ITFlex justify="center">
-            <LottieLoader size="lg" />
+          <ITFlex justify="center" className="py-16">
+            <ITLoader variant="spinner" size="lg" color="primary" />
           </ITFlex>
         )}
       </ITPage>
@@ -215,30 +266,26 @@ export default function EmployeeProfileEditPage() {
   }
 
   const profile = detail.profile;
-  const initials = profile.name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase();
 
   const steps: AppStep[] = [
     {
       label: tt("detail.stepper.photoPersonal"),
-      icon: <FaUserTie size={13} />,
+      complete: !!form.name?.trim() && !errors.name,
+      icon: <LuUserRound size={15} />,
       content: (
         <ITFlex direction="column" gap={5}>
           <ITFlex align="center" gap={4}>
             <div className="relative inline-block shrink-0">
-              <ProfileAvatar photoUrl={profile.photoUrl} initials={initials} alt={profile.name} size="xl" />
+              <ProfileAvatar photoUrl={profile.photoUrl} name={profile.name} size="xl" />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title={tt("detail.changePhoto")}
-                className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-md hover:bg-blue-700"
+                aria-label={tt("detail.changePhoto")}
+                style={{ backgroundColor: "var(--it-bento-ink-bg, var(--color-primary))", color: "var(--it-bento-ink-text, white)" }}
+                className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full !border-0 transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2"
               >
-                <FaCamera size={10} />
+                <LuCamera size={14} />
               </button>
               <input
                 ref={fileInputRef}
@@ -258,14 +305,14 @@ export default function EmployeeProfileEditPage() {
               size="sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              <ITText className="font-bold text-[11px]">{tt("detail.changePhoto")}</ITText>
+              <ITText className="font-bold text-[12px]">{tt("detail.changePhoto")}</ITText>
             </ITButton>
           </ITFlex>
 
           <Row>
             <Cell>
               <ITInput name="name" label={tt("detail.fields.name")} value={form.name ?? ""} onChange={field("name")} aria-invalid={!!errors.name} required />
-              {errors.name && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.name}</span>}
+              {errors.name && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.name}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="middleName" label={tt("detail.fields.secondName")} value={form.middleName ?? ""} onChange={field("middleName")} />
@@ -324,17 +371,18 @@ export default function EmployeeProfileEditPage() {
     },
     {
       label: tt("detail.stepper.employment"),
-      icon: <FaIdCard size={13} />,
+      complete: !!form.employeeNumber?.trim() && !!form.jobTitle?.trim() && !!form.departmentId && !errors.employeeNumber && !errors.jobTitle && !errors.rfc && !errors.curp && !errors.nss,
+      icon: <LuIdCard size={15} />,
       content: (
         <ITFlex direction="column" gap={4}>
           <Row>
             <Cell>
               <ITInput name="employeeNumber" label={tt("detail.fields.employeeNo")} value={form.employeeNumber ?? ""} onChange={field("employeeNumber")} aria-invalid={!!errors.employeeNumber} />
-              {errors.employeeNumber && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.employeeNumber}</span>}
+              {errors.employeeNumber && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.employeeNumber}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="jobTitle" label={tt("detail.fields.position")} value={form.jobTitle ?? ""} onChange={field("jobTitle")} aria-invalid={!!errors.jobTitle} />
-              {errors.jobTitle && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.jobTitle}</span>}
+              {errors.jobTitle && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.jobTitle}</ITText>}
             </Cell>
           </Row>
           <Row>
@@ -379,17 +427,17 @@ export default function EmployeeProfileEditPage() {
             </Cell>
             <Cell>
               <ITInput name="rfc" label={tt("detail.fields.rfc")} value={form.rfc ?? ""} onChange={field("rfc")} aria-invalid={!!errors.rfc} />
-              {errors.rfc && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.rfc}</span>}
+              {errors.rfc && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.rfc}</ITText>}
             </Cell>
           </Row>
           <Row>
             <Cell>
               <ITInput name="curp" label={tt("detail.fields.curp")} value={form.curp ?? ""} onChange={field("curp")} aria-invalid={!!errors.curp} />
-              {errors.curp && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.curp}</span>}
+              {errors.curp && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.curp}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="nss" label={tt("detail.fields.nss")} value={form.nss ?? ""} onChange={field("nss")} aria-invalid={!!errors.nss} />
-              {errors.nss && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.nss}</span>}
+              {errors.nss && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.nss}</ITText>}
             </Cell>
           </Row>
         </ITFlex>
@@ -397,28 +445,32 @@ export default function EmployeeProfileEditPage() {
     },
     {
       label: tt("detail.stepper.contact"),
-      icon: <FaPhoneAlt size={13} />,
+      complete: !!(form.personalPhone?.trim() || form.workPhone?.trim() || form.email?.trim()) && !errors.personalPhone && !errors.workPhone && !errors.email && !errors.postalCode && !errors.emergencyContactPhone,
+      icon: <LuPhone size={15} />,
       content: (
         <ITFlex direction="column" gap={4}>
           <Row>
             <Cell>
               <ITInput name="personalPhone" label={tt("detail.fields.personalCell")} value={form.personalPhone ?? ""} onChange={field("personalPhone")} aria-invalid={!!errors.personalPhone} />
-              {errors.personalPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</span>}
+              {errors.personalPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="workPhone" label={tt("detail.fields.companyCell")} value={form.workPhone ?? ""} onChange={field("workPhone")} aria-invalid={!!errors.workPhone} />
-              {errors.workPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</span>}
+              {errors.workPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="email" type="email" label={tt("detail.fields.email")} value={form.email ?? ""} onChange={field("email")} aria-invalid={!!errors.email} />
-              {errors.email && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</span>}
+              {errors.email && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</ITText>}
             </Cell>
           </Row>
           <ITFlex align="center" gap={2}>
-            <ITFlex align="center" justify="center" className="h-8 w-8 rounded-lg bg-orange-50">
-              <FaMapMarkerAlt size={12} className="text-orange-600" />
-            </ITFlex>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText as="span"
+              className="flex h-8 w-8 items-center justify-center rounded-lg"
+              style={{ background: "var(--color-warning-soft)", color: "var(--color-warning)" }}
+            >
+              <LuMapPin size={14} />
+            </ITText>
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.addressTitle")}
             </ITText>
           </ITFlex>
@@ -431,7 +483,7 @@ export default function EmployeeProfileEditPage() {
             </Cell>
             <Cell min={120}>
               <ITInput name="postalCode" label={tt("detail.fields.zip")} value={form.postalCode ?? ""} onChange={field("postalCode")} aria-invalid={!!errors.postalCode} />
-              {errors.postalCode && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</span>}
+              {errors.postalCode && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</ITText>}
             </Cell>
           </Row>
           <Row>
@@ -446,7 +498,7 @@ export default function EmployeeProfileEditPage() {
             </Cell>
           </Row>
 
-          <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 pt-2">
+          <ITText className="text-[12px] font-semibold text-slate-400 pt-2">
             {tt("detail.emergencyContactTitle")}
           </ITText>
           <Row>
@@ -455,7 +507,7 @@ export default function EmployeeProfileEditPage() {
             </Cell>
             <Cell>
               <ITInput name="emergencyContactPhone" label={tt("detail.fields.emergencyPhone")} value={form.emergencyContactPhone ?? ""} onChange={field("emergencyContactPhone")} aria-invalid={!!errors.emergencyContactPhone} />
-              {errors.emergencyContactPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</span>}
+              {errors.emergencyContactPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</ITText>}
             </Cell>
             <Cell>
               <ITInput name="emergencyContactRelationship" label={tt("detail.fields.emergencyRelation")} value={form.emergencyContactRelationship ?? ""} onChange={field("emergencyContactRelationship")} />
@@ -465,16 +517,6 @@ export default function EmployeeProfileEditPage() {
       ),
     },
   ];
-
-  const hasErrors = Object.keys(errors).length > 0;
-  const hintKey = focusedInput && HINT_FIELDS.has(focusedInput) ? focusedInput : null;
-  const guide = detail.saving
-    ? tt("detail.guide.saving")
-    : hasErrors
-      ? tt("detail.guide.fix")
-      : hintKey
-        ? dyn(tt)(`detail.guide.fields.${hintKey}`)
-        : tt("detail.guide.start");
 
   // Enter pasa al siguiente campo, como en el alta.
   const handleEnter = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -488,21 +530,17 @@ export default function EmployeeProfileEditPage() {
     event.preventDefault();
     next.focus();
   };
-  const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
-    const name = (event.target as HTMLInputElement).name;
-    if (name) setFocusedInput(name);
-  };
-
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("detail.editInfo")}
       description={profile.name}
-      backAction={() => navigate(-1)}
-      icon={<FaUserTie size={20} />}
+      backAction={() => goBack(`/employees/${id}`)}
+      icon={<LuUserRound size={20} />}
       breadcrumbs={[
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
-        { label: tt("detail.title") },
+        // Sin destino propio: vuelve a la pantalla anterior (la ficha).
+        { label: tt("detail.title"), onClick: () => navigate(-1) },
         { label: tt("detail.editInfo") },
       ]}
     >
@@ -512,40 +550,49 @@ export default function EmployeeProfileEditPage() {
         </ITAlert>
       )}
 
-      <ITFlex justify="end" align="center" gap={3} className="mb-6">
-        <ITButton variant="outlined" color="secondary" onClick={() => navigate(-1)} disabled={detail.saving}>
+      <div onKeyDown={handleEnter} className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <ITStack className="min-w-0" spacing={5}>
+          {steps.map((section, index) => (
+            <FormSection key={section.label} number={index + 1} title={section.label} icon={section.icon} complete={section.complete}>
+              {section.content}
+            </FormSection>
+          ))}
+        </ITStack>
+
+        <LiveSummary total={steps.length} done={steps.filter((section) => section.complete).length}>
+          <LiveSummaryRow
+            label={tt("detail.fields.name")}
+            value={[form.name, form.paternalSurname, form.maternalSurname].map((part) => part?.trim()).filter(Boolean).join(" ")}
+          />
+          <LiveSummaryRow label={tt("detail.fields.employeeNo")} value={form.employeeNumber?.trim()} />
+          <LiveSummaryRow label={tt("detail.fields.position")} value={form.jobTitle?.trim()} />
+          <LiveSummaryRow label={tt("detail.fields.department")} value={departments.find((d) => d.id === form.departmentId)?.name} />
+          <LiveSummaryRow label={tt("detail.fields.hireDate")} value={form.hireDate ? form.hireDate.split("-").reverse().join("/") : undefined} />
+        </LiveSummary>
+      </div>
+
+      <StickyActions>
+        {autoSave !== "idle" && (
+          <ITText
+            className={`mr-auto !text-[11.5px] font-semibold ${
+              autoSave === "error" ? "text-[color:var(--color-danger)]" : "text-[color:var(--color-success)]"
+            }`}
+          >
+            {autoSave === "saving"
+              ? tt("detail.autosaving")
+              : autoSave === "ok"
+                ? tt("detail.autosaved")
+                : tt("detail.autosaveError")}
+          </ITText>
+        )}
+        <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack(`/employees/${id}`)} disabled={detail.saving}>
           {tt("common:actions.cancel")}
         </ITButton>
-        <ITButton variant="raised-text" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>
-          {tt("detail.save")}
+        <ITButton variant="rounded" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>
+          {detail.saving ? tt("detail.saving") : tt("detail.save")}
         </ITButton>
-      </ITFlex>
+      </StickyActions>
 
-      <div onKeyDown={handleEnter} onFocus={handleFocus}>
-        <ITFlex direction="column" gap={6}>
-          {steps.map((section) => (
-            <Fragment key={section.label}>
-              <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <header className="mb-5 flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">{section.icon}</span>
-                  <h3 className="text-sm font-black uppercase tracking-wide text-slate-700">{section.label}</h3>
-                </header>
-                {section.content}
-              </section>
-            </Fragment>
-          ))}
-        </ITFlex>
-      </div>
-
-      {/* Langostin flota abajo a la derecha: guía del campo actual y avisa mientras guarda. */}
-      <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex items-end gap-3">
-        <div className="pointer-events-auto max-w-xs rounded-2xl rounded-br-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-lg">
-          {guide}
-        </div>
-        <div className="pointer-events-auto drop-shadow-lg">
-          <Langostin anim={detail.saving ? "work" : "wave"} size={72} label={tt("detail.guide.label")} />
-        </div>
-      </div>
     </ITPage>
   );
 }

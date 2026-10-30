@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaFingerprint, FaIdCard, FaSyncAlt, FaUserCheck, FaUserSlash } from "react-icons/fa";
 import { ITButton, ITDataTable, ITDialog, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
 import type { Column, ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { useTimeClockPeople } from "../model/useTimeClockPeople";
 import PersonDetailDialog from "./PersonDetailDialog";
@@ -13,14 +14,6 @@ import { useCan } from "@entities/user";
 /** Persona con su presencia de rostro y huellas (null mientras se leen los conteos). */
 type Row = TimeClockPerson & { faces: number | null; fingerprints: number | null };
 const yesNo = (n: number | null): string | null => (n === null ? null : n > 0 ? "true" : "false");
-const TONES = [
-  "bg-blue-100 text-blue-700",
-  "bg-orange-100 text-orange-700",
-  "bg-emerald-100 text-emerald-700",
-  "bg-violet-100 text-violet-700",
-  "bg-pink-100 text-pink-700",
-  "bg-cyan-100 text-cyan-700",
-];
 const TOTAL_CHECKS = 3;
 
 interface Props {
@@ -28,11 +21,7 @@ interface Props {
   clockSerial?: string;
 }
 
-const initials = (name: string): string =>
-  name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
-const toneOf = (key: string): string => TONES[[...key].reduce((sum, c) => sum + c.charCodeAt(0), 0) % TONES.length];
-
-/** Foto de la persona si tiene rostro registrado; si no, sus iniciales. Libera la URL al salir. */
+/** Foto de la persona si tiene rostro registrado; si no, un Blobatar. Libera la URL al salir. */
 function PersonAvatar({ clockSerial, employeeNumber, name, hasFace }: { clockSerial: string; employeeNumber: string; name: string; hasFace: boolean }) {
   const [src, setSrc] = useState<string | null>(null);
   useEffect(() => {
@@ -53,24 +42,19 @@ function PersonAvatar({ clockSerial, employeeNumber, name, hasFace }: { clockSer
       setSrc(null);
     };
   }, [clockSerial, employeeNumber, hasFace]);
-  if (src) return <img src={src} alt={name} className="h-10 w-10 shrink-0 rounded-full border border-slate-200 object-cover" />;
-  return (
-    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${toneOf(employeeNumber)}`}>
-      {initials(name)}
-    </span>
-  );
+  return <ProfileAvatar photoUrl={src} name={name} size="md" alt={name} />;
 }
 
 function Chip({ on, icon, label }: { on: boolean; icon: React.ReactNode; label: string }) {
   return (
-    <span
+    <ITText as="span"
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
         on ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-dashed border-slate-300 text-slate-500"
       }`}
     >
       {icon}
       {label}
-    </span>
+    </ITText>
   );
 }
 
@@ -122,13 +106,13 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
       filter: true,
       sortable: true,
       render: (row) => (
-        <div className="flex items-center gap-3">
+        <ITFlex align="center" gap={3}>
           <PersonAvatar clockSerial={fx.serial} employeeNumber={row.employeeNumber} name={row.name} hasFace={(row.faces ?? 0) > 0} />
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-slate-900">{row.name}</p>
-            <p className="font-mono text-xs text-slate-500">#{row.employeeNumber}</p>
-          </div>
-        </div>
+          <ITFlex className="min-w-0">
+            <ITText className="truncate font-semibold text-slate-900">{row.name}</ITText>
+            <ITText className="font-mono text-xs text-slate-500">#{row.employeeNumber}</ITText>
+          </ITFlex>
+        </ITFlex>
       ),
     },
     { key: "employeeNumber", type: "string", label: t("people.table.number"), width: 130, filter: true, sortable: true },
@@ -171,7 +155,7 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
         const done = progressOf(row);
         return (
           <div className="w-28">
-            <p className="text-xs text-slate-500">{t("people.view.progress", { done, total: TOTAL_CHECKS })}</p>
+            <ITText className="text-xs text-slate-500">{t("people.view.progress", { done, total: TOTAL_CHECKS })}</ITText>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
               <div className="h-full rounded-full bg-emerald-500" style={{ width: `${(done / TOTAL_CHECKS) * 100}%` }} />
             </div>
@@ -238,26 +222,26 @@ export default function TimeClockPeopleView({ clockSerial }: Props) {
         </ITFlex>
       </ITFlex>
 
-      {fx.error && <p role="alert" className="text-sm text-red-600">{fx.error}</p>}
-      {fx.biometricsError && <p role="alert" className="text-sm text-red-600">{fx.biometricsError}</p>}
-      {fx.toast && <p role="status" className="text-sm text-emerald-700" onClick={fx.dismissToast}>{fx.toast}</p>}
+      {fx.error && <ITText role="alert" className="text-sm text-red-600">{fx.error}</ITText>}
+      {fx.biometricsError && <ITText role="alert" className="text-sm text-red-600">{fx.biometricsError}</ITText>}
+      {fx.toast && <ITText role="status" className="text-sm text-emerald-700" onClick={fx.dismissToast}>{fx.toast}</ITText>}
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchData as unknown as (p: ITDataTableFetchParams) => Promise<ITDataTableResponse<Record<string, unknown>>>
         }
         reloadTrigger={`${fx.version}-${fx.biometrics?.updatedAt ?? ""}`}
-        layout="fixed"
-        density="comfortable"
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 200]}
         debounceMs={350}
         variant="bordered"
-        virtualized
-        virtualizedMaxHeight={560}
-        rowHeight={64}
         onRowClick={(row) => openFicha(row as unknown as Row)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
 
       {viewing && (

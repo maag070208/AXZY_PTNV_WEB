@@ -9,8 +9,9 @@ import {
   ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
-import { FaUserPlus } from "react-icons/fa";
+import { LuUserPlus } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
+import { DialogHeader } from "@shared/ui/dialog-header";
 import type { UseKanban } from "../model/useKanban";
 
 interface Props {
@@ -29,17 +30,7 @@ export default function CreateTaskDialog({ fx }: Props) {
         fx.resetCreateForm();
       }}
     >
-      <div className="pb-3 mb-3 border-b border-slate-100 pr-6">
-        <ITFlex align="center" gap={2}>
-          <FaUserPlus size={14} className="text-emerald-500" />
-          <ITText className="text-lg font-black text-slate-800">
-            {tt("kanban.newTask")}
-          </ITText>
-        </ITFlex>
-        <ITText className="text-[11px] text-slate-400 mt-1">
-          {tt("kanban.subtitle")}
-        </ITText>
-      </div>
+      <DialogHeader icon={<LuUserPlus size={20} />} title={tt("kanban.newTask")} subtitle={tt("kanban.subtitle")} tone="success" />
       <ITGrid container columns={12} spacing={2}>
         <ITGrid item xs={12}>
           <ITSearchSelect
@@ -133,7 +124,7 @@ export default function CreateTaskDialog({ fx }: Props) {
               }
             >
               <ITFlex align="center" gap={1}>
-                <FaUserPlus size={11} />
+                <LuUserPlus size={13} />
                 <ITText className="font-bold text-[10px]">
                   {fx.creatingTask ? tt("kanban.assigning") : tt("kanban.assignTask")}
                 </ITText>

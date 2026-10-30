@@ -1,15 +1,18 @@
 import {
-  ITBadget,
+  ITCard,
   ITDataTable,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
+import type { ReactNode } from "react";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import type {
   Column,
+  ColumnFilters,
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import type { KanbanAssignment } from "@entities/ticket";
+import { ASSIGNMENT_TONE, TicketChip, type KanbanAssignment } from "@entities/ticket";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/i18n";
@@ -19,9 +22,13 @@ import type { UseAssignmentList } from "../model/useAssignmentList";
 
 interface Props {
   fx: UseAssignmentList;
+  /** Filtros de la barra (búsqueda, estado y filtro rápido del resumen). */
+  externalFilters?: ColumnFilters;
+  /** Barra de herramientas que arma la página (buscador, píldoras y conteo). */
+  toolbar?: ReactNode;
 }
 
-export default function AdminTasksTable({ fx }: Props) {
+export default function AdminTasksTable({ fx, externalFilters = {}, toolbar }: Props) {
   const { t: tt } = useTranslation("tickets");
   const navigate = useNavigate();
   const columns: Column<KanbanAssignment>[] = [
@@ -30,7 +37,6 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.task"),
       type: "string",
       width: 270,
-      filter: true,
       sortable: false,
       render: (row) => (
         <ITFlex direction="column" gap={0.5}>
@@ -46,14 +52,16 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.employee"),
       type: "string",
       width: 240,
-      filter: true,
       sortable: false,
       render: (row) => (
-        <ITFlex direction="column" gap={0.5}>
-          <ITText className="text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
-          {row.user.employeeNumber && (
-            <ITText className="text-[9px] text-slate-400">{tt("tasksTable.employeeNo", { number: row.user.employeeNumber })}</ITText>
-          )}
+        <ITFlex align="center" gap={2}>
+          <ProfileAvatar name={row.user.name} size="sm" />
+          <ITFlex direction="column" gap={0.5} className="min-w-0">
+            <ITText className="truncate text-[11px] font-bold text-slate-700">{row.user.name}</ITText>
+            {row.user.employeeNumber && (
+              <ITText className="text-[10px] text-slate-500">{tt("tasksTable.employeeNo", { number: row.user.employeeNumber })}</ITText>
+            )}
+          </ITFlex>
         </ITFlex>
       ),
     },
@@ -62,7 +70,6 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.ticket"),
       type: "string",
       width: 250,
-      filter: true,
       sortable: false,
       render: (row) => (
         <ITText className="text-[11px] font-bold text-slate-600">{row.ticket.title}</ITText>
@@ -73,7 +80,6 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.status"),
       type: "catalog",
       width: 180,
-      filter: "catalog",
       catalogOptions: {
         data: Object.keys(ASSIGNMENT_STATUS_BADGE).map((id) => ({
           id,
@@ -82,9 +88,7 @@ export default function AdminTasksTable({ fx }: Props) {
       },
       sortable: false,
       render: (row) => (
-        <ITBadget color={(ASSIGNMENT_STATUS_BADGE[row.status]?.color as any) ?? "gray"} size="lg">
-          {dyn(tt)(`detail.taskStatusOptions.${row.status}`)}
-        </ITBadget>
+        <TicketChip tone={ASSIGNMENT_TONE[row.status]} label={dyn(tt)(`detail.taskStatusOptions.${row.status}`)} />
       ),
     },
     {
@@ -92,32 +96,36 @@ export default function AdminTasksTable({ fx }: Props) {
       label: tt("tasksTable.dates"),
       type: "date",
       width: 220,
-      filter: "date-range",
       sortable: false,
-      render: (row) => (
-        <ITFlex direction="column" gap={0.5}>
-          {row.startDate && (
-            <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.start", { date: formatDate(row.startDate) })}
+      render: (row) => {
+        const due = row.dueDate ? new Date(row.dueDate) : null;
+        const lateDays = due && row.status !== "COMPLETED" && due < new Date()
+          ? Math.max(1, Math.round((Date.now() - due.getTime()) / 86_400_000))
+          : 0;
+        return (
+          <ITFlex direction="column" gap={1}>
+            <ITText className="whitespace-nowrap text-[11.5px] text-slate-500">
+              <ITText as="b" className="font-semibold text-slate-800">{row.startDate ? formatDate(row.startDate) : "—"}</ITText>
+              {" → "}
+              <ITText as="b" className="font-semibold text-slate-800">{row.dueDate ? formatDate(row.dueDate) : "—"}</ITText>
             </ITText>
-          )}
-          {row.dueDate && (
-            <ITText className="text-[9px] text-slate-500">
-              {tt("tasksTable.end", { date: formatDate(row.dueDate) })}
-            </ITText>
-          )}
-          {row.dueDate &&
-            row.status !== "COMPLETED" &&
-            new Date(row.dueDate) < new Date() && (
-              <ITBadget color="danger" size="lg">{tt("tasksTable.overdue")}</ITBadget>
+            {lateDays > 0 ? (
+              <TicketChip tone="danger" label={tt("tasksTable.overdueDays", { days: lateDays })} />
+            ) : (
+              <TicketChip tone="success" label={tt("tasksTable.onTime")} />
             )}
-        </ITFlex>
-      ),
+          </ITFlex>
+        );
+      },
     },
   ];
 
   return (
-    <ITDataTable
+    <ITCard contentClassName="!p-0">
+      {toolbar && <div className="border-b border-slate-100 px-4 py-3">{toolbar}</div>}
+    <ITDataTable showViewToggle={false}
+      key={JSON.stringify(externalFilters)}
+      externalFilters={externalFilters}
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fx.fetchTableData as unknown as (
@@ -125,14 +133,15 @@ export default function AdminTasksTable({ fx }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
+      onRowClick={(row) => navigate(`/tickets/${(row as unknown as KanbanAssignment).ticketId}`)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
       layout="fixed"
       density="compact"
-      virtualized
-      virtualizedMaxHeight={420}
       rowHeight={50}
-      onRowClick={(row) => navigate(`/tickets/${(row as unknown as KanbanAssignment).ticketId}`)}
+      virtualized
+      virtualizedMaxHeight={460}
     />
+    </ITCard>
   );
 }

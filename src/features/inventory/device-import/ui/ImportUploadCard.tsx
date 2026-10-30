@@ -44,8 +44,8 @@ export default function ImportUploadCard({ fx }: { fx: UseDeviceImport }) {
       >
         <div className="grid gap-3 sm:!grid-cols-2 lg:!grid-cols-5">
           {columns.map((column) => (
-            <div key={column.name} className="rounded-xl border border-slate-200 !bg-white p-3">
-              <ITText className="!text-[10px] font-black uppercase tracking-wider text-slate-700">
+            <div key={column.name} className="rounded-xl border border-slate-200 !bg-[var(--it-card-bg)] p-3">
+              <ITText className="!text-[12px] font-semibold text-slate-700">
                 {column.name}
                 {column.required ? " *" : ""}
               </ITText>
@@ -73,9 +73,9 @@ export default function ImportUploadCard({ fx }: { fx: UseDeviceImport }) {
           gap={3}
           className="rounded-2xl border border-dashed border-slate-300 !bg-slate-50/60 px-6 py-8"
         >
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff7ed] text-[#ea580c]">
+          <ITText as="span" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-warning-soft)] text-[color:color-mix(in_srgb,var(--color-warning)_70%,black)]">
             <FaFileExcel size={20} />
-          </span>
+          </ITText>
           <ITText className="!text-[12px] font-semibold text-slate-600">
             {fx.file ? t("import.file", { name: fx.file.name }) : t("import.dropHint")}
           </ITText>

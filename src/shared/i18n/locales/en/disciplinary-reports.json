@@ -11,13 +11,31 @@
     "NONCOMPLIANCE": "Failure to comply with duties",
     "OTHER": "Other"
   },
+  "summary": {
+    "total": "Total",
+    "month": "This month",
+    "absences": "Absences",
+    "tardiness": "Tardiness",
+    "share": "{{percent}}% of the total"
+  },
+  "filters": {
+    "all": "All",
+    "searchPlaceholder": "Search by employee, number or description",
+    "clear": "Clear filters"
+  },
+  "empty": {
+    "title": "No records yet",
+    "description": "The first administrative record filed will show up here."
+  },
   "table": {
+    "title": "Filed records",
     "date": "Incident date",
     "reason": "Reason",
     "employee": "Employee",
     "jobTitle": "Position",
     "description": "Description",
     "sanction": "Penalty",
+    "noSanction": "No penalty",
     "createdBy": "Created by"
   },
   "form": {
@@ -35,7 +53,37 @@
     "emptyEmployee": "Select an employee",
     "emptyReason": "Select a reason",
     "emptyDescription": "Write the incident description",
-    "deleteConfirm": "Delete the administrative record for {{name}}? This action cannot be undone."
+    "deleteConfirm": "Delete the administrative record for {{name}}? This action cannot be undone.",
+    "agent": {
+      "greeting": "I'll help you file the report with a few questions. Only facts are recorded.",
+      "askEmployee": "Who is the report for?",
+      "searchEmployee": "Search by name or employee number…",
+      "askReason": "What's the reason?",
+      "askDate": "When did it happen?",
+      "askDescription": "Tell me what happened, facts only.",
+      "askSanction": "What action was taken? Optional.",
+      "noSanction": "No sanction for now",
+      "closing": "Got it. Filing the report now.",
+      "continue": "Continue",
+      "progress": "Step {{current}} of {{total}}",
+      "step": {
+        "employee": "The person",
+        "reason": "The reason",
+        "date": "Incident date",
+        "description": "The facts",
+        "sanction": "Action taken",
+        "done": "Filing the report"
+      },
+      "saving": "Filing the report…",
+      "savedOk": "Done — the report is filed!",
+      "saveError": "Could not file it. Please try again.",
+      "restart": "Start over",
+      "tooltip": "New report here"
+    },
+    "sectionIncident": "Incident",
+    "sectionDetail": "Detail",
+    "ready": "Ready to file the report",
+    "required": "Missing: person, reason, date and description"
   },
   "preview": {
     "title": "Record preview",
@@ -64,6 +112,7 @@
     "closing": "This administrative record is raised for the relevant legal and labor effects, and to be kept in the worker's file.",
     "signatureEmployee": "Employee",
     "signatureHead": "Immediate supervisor",
-    "signatureRh": "Human Resources"
+    "signatureRh": "Human Resources",
+    "createdBy": "Filed by"
   }
 }

@@ -2,24 +2,15 @@ import { useMemo } from "react";
 import {
   ITAlert,
   ITBadget,
-  ITCard,
+  ITBentoStatStrip,
   ITCheckbox,
-  ITChip,
   ITDataTable,
   ITFlex,
   ITInput,
-  ITProgress,
   ITSearchSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import {
-  FaCheckCircle,
-  FaClock,
-  FaDoorOpen,
-  FaExclamationTriangle,
-  FaRegCircle,
-} from "react-icons/fa";
 import {
   type AttendanceDayStatus,
   type PeopleAttendanceDay,
@@ -27,7 +18,8 @@ import {
   type PeopleAttendanceView,
 } from "@entities/access";
 import { punchTime, workedTime } from "@entities/schedule";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { Num } from "@shared/ui/bento-bits";
+import { FilterPills } from "@shared/ui/filter-pills";
 import { PeriodPicker } from "@shared/ui/period-picker";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
@@ -49,26 +41,18 @@ const DAYS_COLUMN_WIDTH: Record<"WEEK" | "FORTNIGHT" | "MONTH", number> = {
   MONTH: 380,
 };
 
-/** Color del marcador de cada día (hex exactos: el tema redefine las paletas de Tailwind). */
+/** Marcador de cada día: tonos semánticos del tema (no hex sueltos). */
 const DAY_STYLE: Record<AttendanceDayStatus, string> = {
-  ATTENDED: "!bg-[#0D5777] text-white",
-  LATE: "!bg-[#f97316] text-white",
-  ABSENCE: "border-[1.5px] border-dashed border-slate-400 !bg-white text-slate-500",
+  ATTENDED: "!bg-primary-500 text-white",
+  LATE: "!bg-[var(--color-warning)] !text-slate-900",
+  ABSENCE: "border-[1.5px] border-dashed border-slate-400 !bg-[var(--it-card-bg)] text-slate-500",
   REST: "!bg-slate-100 text-slate-400",
   PENDING: "!bg-slate-100 text-slate-400",
   NO_INFO: "!bg-slate-100 text-slate-400",
 };
 
 /** Anillo del día de hoy. */
-const TODAY_RING = "ring-2 ring-[#0D5777]/30 ring-offset-1";
-
-/** Iniciales para el avatar: primera letra de la primera y de la última palabra. */
-const initialsOf = (name: string): string => {
-  const words = name.split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  const first = words[0].charAt(0);
-  return words.length === 1 ? first : first + words[words.length - 1].charAt(0);
-};
+const TODAY_RING = "ring-2 ring-primary-500/30 ring-offset-1";
 
 /** Fecha de una clave de día (`YYYY-MM-DD`) con las opciones dadas, sin corrimiento de zona. */
 const formatDay = (dayKey: string, options: Intl.DateTimeFormatOptions): string =>
@@ -126,7 +110,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const renderDays = (r: PeopleAttendanceRow) => (
     <div className={`flex items-center ${period === "WEEK" ? "gap-1" : "gap-0.5"}`}>
       {r.days.map((day) => (
-        <span
+        <ITText as="span"
           key={day.date}
           title={dayTooltip(day)}
           className={`inline-flex shrink-0 items-center justify-center ${
@@ -136,7 +120,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           {period === "WEEK"
             ? formatDay(day.date, { weekday: "narrow" }).toUpperCase()
             : null}
-        </span>
+        </ITText>
       ))}
     </div>
   );
@@ -202,7 +186,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "employeeName",
       label: t("columns.employee"),
       type: "string",
-      width: 280,
+      width: 300,
       sortable: false,
       render: (r) => {
         const subtitle = [
@@ -217,14 +201,13 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
         return (
           <ITFlex align="center" gap={3}>
             <ProfileAvatar
-              initials={initialsOf(r.employeeName)}
+              name={r.employeeName}
               size="md"
-              className="!bg-slate-100 !text-slate-600"
             />
-            <div className="min-w-0">
+            <ITFlex className="min-w-0">
               <ITText className="truncate text-[13px] font-bold text-slate-800">{r.employeeName}</ITText>
               <ITText className="truncate text-[11px] text-slate-500">{subtitle}</ITText>
-            </div>
+            </ITFlex>
           </ITFlex>
         );
       },
@@ -247,7 +230,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
             key: "focusEntry",
             label: focusIsToday ? t("focus.entryToday") : t("focus.entry"),
             type: "string" as const,
-            width: 110,
+            width: 100,
             sortable: false,
             render: (r: PeopleAttendanceRow) => renderPunch(r.days[focusIndex]?.entryAt, r.days[focusIndex]),
           },
@@ -255,7 +238,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
             key: "focusExit",
             label: focusIsToday ? t("focus.exitToday") : t("focus.exit"),
             type: "string" as const,
-            width: 110,
+            width: 100,
             sortable: false,
             render: (r: PeopleAttendanceRow) => renderPunch(r.days[focusIndex]?.exitAt, r.days[focusIndex]),
           },
@@ -277,7 +260,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
       key: "state",
       label: t("columns.status"),
       type: "string",
-      width: 200,
+      width: 80,
       sortable: false,
       render: renderState,
     },
@@ -288,7 +271,6 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const withRecords = summary?.withRecords ?? 0;
   const withoutRecords = summary?.withoutRecords ?? 0;
   const workedMinutes = summary?.workedMinutes ?? 0;
-  const recordsPercent = people > 0 ? Math.round((withRecords * 100) / people) : 0;
   const hoursValue = `${Math.floor(workedMinutes / 60).toLocaleString(dateLocale())}:${String(
     workedMinutes % 60
   ).padStart(2, "0")}`;
@@ -306,9 +288,71 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
 
   return (
     <ITFlex direction="column" gap={4}>
-      {/* Filtros */}
-      <ITCard className="!p-5 border border-slate-200">
-        <ITFlex direction="column" gap={4}>
+      {fx.error && (
+        <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
+          {fx.error}
+        </ITAlert>
+      )}
+
+      {/* Cifras del periodo en la tira del mosaico: cada una aplica su vista. */}
+      <ITBentoStatStrip
+        items={[
+          {
+            id: "onSite",
+            label: t("tiles.onSite"),
+            value: <Num value={summary?.onSite ?? 0} />,
+            caption: t("tiles.onSiteHint"),
+            tone: "sea",
+          },
+          {
+            id: "withRecords",
+            label: t("tiles.withRecords"),
+            value: <Num value={withRecords} />,
+            caption: t("tiles.ofTotal", { total: people }),
+            tone: "lavender",
+          },
+          {
+            id: "withoutRecords",
+            label: t("tiles.withoutRecords"),
+            value: <Num value={withoutRecords} />,
+            caption: withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded"),
+            tone: "plain",
+          },
+          {
+            id: "hours",
+            label: t("tiles.hours"),
+            value: hoursValue,
+            caption: t("tiles.hoursHint"),
+            tone: "mint",
+          },
+          {
+            id: "incidents",
+            label: t("tiles.incidents"),
+            value: <Num value={incidentsTotal} />,
+            caption: incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear"),
+            tone: incidentsTotal > 0 ? "sun" : "plain",
+          },
+        ]}
+        activeId={view === "ON_SITE" ? "onSite" : view === "WITHOUT_RECORDS" ? "withoutRecords" : view === "INCIDENTS" ? "incidents" : "withRecords"}
+        onSelect={(id: string) =>
+          setView(
+            id === "onSite" ? "ON_SITE" : id === "withoutRecords" ? "WITHOUT_RECORDS" : id === "incidents" ? "INCIDENTS" : "ALL"
+          )
+        }
+      />
+
+      {/* Una sola tarjeta: filtros del periodo arriba y la tabla debajo. */}
+      <PanelCard
+        title={t("table.title", { count: fx.total })}
+        actions={
+          <FilterPills
+            items={VIEWS.map((value) => ({ id: value, label: tt(`views.${value}`) }))}
+            value={view}
+            onChange={setView}
+          />
+        }
+      >
+        <ITFlex direction="column" gap={4} className="pb-4">
           <ITFlex align="end" wrap="wrap" gap={3}>
             <PeriodPicker
               name="accessReport"
@@ -321,7 +365,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
               onNext={fx.nextPeriod}
               labels={periodLabels}
             />
-            <div className="min-w-[200px] flex-1">
+            <ITFlex className="min-w-[200px] flex-1">
               <ITSearchSelect
                 name="accessReportDepartment"
                 label={t("filters.department")}
@@ -330,8 +374,8 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
                 onChange={(value) => fx.setDepartmentId(String(value))}
                 className="w-full min-w-0"
               />
-            </div>
-            <div className="min-w-[220px] flex-1">
+            </ITFlex>
+            <ITFlex className="min-w-[220px] flex-1">
               <ITInput
                 name="accessReportEmployee"
                 label={t("filters.employee")}
@@ -340,87 +384,17 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
                 onChange={(e) => fx.setSearch(e.target.value)}
                 className="w-full min-w-0"
               />
-            </div>
+            </ITFlex>
+            <ITCheckbox
+              name="accessReportIncludeInactive"
+              label={t("filters.includeInactive")}
+              checked={fx.includeInactive}
+              onChange={fx.setIncludeInactive}
+            />
           </ITFlex>
-          <ITCheckbox
-            name="accessReportIncludeInactive"
-            label={t("filters.includeInactive")}
-            checked={fx.includeInactive}
-            onChange={fx.setIncludeInactive}
-          />
         </ITFlex>
-      </ITCard>
 
-      {/* Indicadores */}
-      <div className="grid !grid-cols-1 gap-3 sm:!grid-cols-2 lg:!grid-cols-5">
-        <KpiTile
-          label={t("tiles.onSite")}
-          value={summary?.onSite ?? 0}
-          hint={t("tiles.onSiteHint")}
-          tone="emerald"
-          icon={<FaDoorOpen size={16} />}
-          onClick={() => setView("ON_SITE")}
-        />
-        <KpiTile
-          label={t("tiles.withRecords")}
-          value={
-            <>
-              {withRecords}
-              <span className="ml-1.5 !text-[12px] font-semibold text-slate-400">
-                {t("tiles.ofTotal", { total: people })}
-              </span>
-            </>
-          }
-          footer={<ITProgress value={recordsPercent} size="sm" color="info" />}
-          tone="sky"
-          icon={<FaCheckCircle size={16} />}
-        />
-        <KpiTile
-          label={t("tiles.withoutRecords")}
-          value={withoutRecords}
-          hint={withoutRecords > 0 ? t("tiles.viewWho") : t("tiles.allRecorded")}
-          tone="neutral"
-          icon={<FaRegCircle size={16} />}
-          onClick={() => setView("WITHOUT_RECORDS")}
-        />
-        <KpiTile
-          label={t("tiles.hours")}
-          value={hoursValue}
-          hint={t("tiles.hoursHint")}
-          tone="neutral"
-          icon={<FaClock size={16} />}
-        />
-        <KpiTile
-          label={t("tiles.incidents")}
-          value={incidentsTotal}
-          hint={incidentsTotal > 0 ? incidentParts.join(" · ") : t("tiles.allClear")}
-          tone={incidentsTotal > 0 ? "amber" : "neutral"}
-          icon={<FaExclamationTriangle size={16} />}
-          onClick={() => setView("INCIDENTS")}
-        />
-      </div>
-
-      {fx.error && (
-        <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
-          {fx.error}
-        </ITAlert>
-      )}
-
-      <PanelCard
-        title={t("table.title", { count: fx.total })}
-        actions={VIEWS.map((value) => (
-          <ITChip
-            key={value}
-            label={tt(`views.${value}`)}
-            selected={view === value}
-            onClick={() => setView(value)}
-            color="primary"
-            variant="outlined"
-            size="sm"
-          />
-        ))}
-      >
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           key={fx.tableKey}
           columns={columns as unknown as Column<Record<string, unknown>>[]}
           fetchData={
@@ -432,6 +406,10 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           defaultItemsPerPage={25}
           itemsPerPageOptions={[25, 50, 100]}
           layout="fixed"
+          density="compact"
+          rowHeight={50}
+          virtualized
+          virtualizedMaxHeight={460}
         />
 
         {multiDay && (

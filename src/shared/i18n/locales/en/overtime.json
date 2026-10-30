@@ -100,5 +100,6 @@
     "approved": "{{count}} day(s) approved",
     "rejected": "{{count}} day(s) rejected",
     "error": "Could not save the decision"
-  }
+  },
+  "howTo": "Tick the hours that were actually worked and approve them; the rest is rejected."
 }

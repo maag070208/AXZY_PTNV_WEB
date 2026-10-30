@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   kitchenApi,
@@ -9,6 +8,7 @@ import {
 } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { emptyStockInLine, isStockInLineComplete, localDay, type StockInLine } from "./types";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /**
  * Estado y acciones del alta de una entrada de almacén: datos generales,
@@ -16,7 +16,7 @@ import { emptyStockInLine, isStockInLineComplete, localDay, type StockInLine } f
  */
 export const useStockIn = () => {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const requestKey = useRequestKey();
 
   const items = useKitchenItemOptions();
@@ -74,7 +74,7 @@ export const useStockIn = () => {
 
   const removeLine = (key: number) => setLines((current) => current.filter((line) => line.key !== key));
 
-  const cancel = () => navigate("/kitchen/items");
+  const cancel = () => goBack("/kitchen/items");
 
   const submit = async () => {
     if (!allComplete) {
@@ -99,7 +99,7 @@ export const useStockIn = () => {
     try {
       await kitchenApi.stockIn(input, requestKey(input));
       setToast(t("stockIn.success"));
-      setTimeout(() => navigate("/kitchen/items"), 600);
+      setTimeout(() => goBack("/kitchen/items"), 600);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("common.error"));
     } finally {

@@ -11,7 +11,7 @@ export default function ImportPanel({ fx }: Props) {
   const { t: tt } = useTranslation("users");
 
   return (
-    <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px] mb-6">
+    <ITCard className="p-6 mb-6">
       <ITFlex direction="column" gap={4}>
         <div>
           <input

@@ -1,5 +1,7 @@
-export { default as SchedulesTable } from "./schedules-table/ui/SchedulesTable";
+export { default as SchedulesBoard } from "./schedules-table/ui/SchedulesBoard";
 export { default as ScheduleForm } from "./schedule-form/ui/ScheduleForm";
+export { default as ScheduleChat } from "./schedule-form/ui/ScheduleAgent";
+export type { ScheduleAgentPatch } from "./schedule-form/ui/ScheduleAgent";
 export { default as AssignSchedules } from "./assign/ui/AssignSchedules";
 export { default as OvertimeApprovalTable } from "./overtime-approval/ui/OvertimeApprovalTable";
 export { default as OvertimeExportActions } from "./overtime-approval/ui/OvertimeExportActions";

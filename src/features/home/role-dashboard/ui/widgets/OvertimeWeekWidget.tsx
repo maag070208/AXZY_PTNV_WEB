@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { ITFlex, ITText } from "@axzydev/axzy_ui_system";
-import { FaBusinessTime } from "react-icons/fa";
+import { ITBadget } from "@axzydev/axzy_ui_system";
+import { LuTimer } from "react-icons/lu";
 import { dashboardApi } from "@entities/dashboard";
 import { dyn } from "@shared/i18n/dyn";
 import { CHART_STATUS, StackedBar } from "@shared/ui/charts";
 import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import { useWidgetData } from "../../model/useWidgetData";
-import WidgetCard, { Metric, SectionLabel } from "../WidgetCard";
+import WidgetCard, { EmptyText, ListRow, Metric, MetricGrid, RowList, SectionLabel } from "../WidgetCard";
 
 /** Horas extra de la semana: calculadas contra aprobadas contra no aprobadas (lo que compara RH). */
 export default function OvertimeWeekWidget() {
@@ -18,8 +18,7 @@ export default function OvertimeWeekWidget() {
   return (
     <WidgetCard
       title={t("overtime.title")}
-      icon={<FaBusinessTime size={14} />}
-      iconClass="bg-emerald-700"
+      icon={<LuTimer size={16} />}
       to="/schedules/overtime/approval"
       toLabel={t("overtime.review")}
       loading={loading}
@@ -28,12 +27,22 @@ export default function OvertimeWeekWidget() {
     >
       {data && (
         <>
-          <ITFlex wrap="wrap" gap={2}>
-            <Metric value={hours(data.extraMin)} label={t("overtime.calculated")} />
-            <Metric value={hours(data.approvedExtraMin)} label={t("overtime.approved")} tone="text-emerald-700" />
-            <Metric value={hours(data.pendingExtraMin)} label={t("overtime.notApproved")} tone="text-amber-600" />
-            <Metric value={hours(data.rejectedExtraMin)} label={t("overtime.rejected")} tone="text-rose-600" />
-          </ITFlex>
+          <MetricGrid>
+            <Metric value={hours(data.extraMin)} label={t("overtime.calculated")} tone="sky" />
+            <Metric
+              value={hours(data.approvedExtraMin)}
+              label={t("overtime.approved")}
+              tone="emerald"
+              ratio={data.extraMin > 0 ? data.approvedExtraMin / data.extraMin : undefined}
+            />
+            <Metric
+              value={hours(data.pendingExtraMin)}
+              label={t("overtime.notApproved")}
+              tone="amber"
+              ratio={data.extraMin > 0 ? data.pendingExtraMin / data.extraMin : undefined}
+            />
+            <Metric value={hours(data.rejectedExtraMin)} label={t("overtime.rejected")} tone="rose" />
+          </MetricGrid>
           <SectionLabel>{t("overtime.chartTitle")}</SectionLabel>
           <StackedBar
             segments={[
@@ -44,17 +53,23 @@ export default function OvertimeWeekWidget() {
           />
           <SectionLabel>{t("overtime.topPending")}</SectionLabel>
           {data.topPending.length === 0 ? (
-            <ITText className="text-[11px] text-slate-400">{t("empty")}</ITText>
+            <EmptyText>{t("empty")}</EmptyText>
           ) : (
-            data.topPending.map((p) => (
-              <ITFlex key={p.userId} justify="between" className="border-b border-slate-100 py-1">
-                <div>
-                  <div className="text-[11px] font-bold text-slate-800">{p.name}</div>
-                  <div className="text-[9px] uppercase text-slate-400">{p.departmentName ?? "—"}</div>
-                </div>
-                <ITText className="text-[11px] font-black text-amber-600">{hours(p.pendingExtraMin)}</ITText>
-              </ITFlex>
-            ))
+            <RowList>
+              {data.topPending.map((p) => (
+                <ListRow
+                  key={p.userId}
+                  avatarName={p.name}
+                  title={p.name}
+                  subtitle={p.departmentName ?? "—"}
+                  right={
+                    <ITBadget color="warning" size="sm">
+                      {hours(p.pendingExtraMin)}
+                    </ITBadget>
+                  }
+                />
+              ))}
+            </RowList>
           )}
         </>
       )}

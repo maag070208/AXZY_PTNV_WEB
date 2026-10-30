@@ -101,7 +101,7 @@ export default function PurchaseOrderReceiveDialog({ open, order, busy, onClose,
                   <ITFlex align="center" justify="between" gap={2} className="mb-2">
                     <ITFlex align="center" gap={2}>
                       <ITText className="text-[12px] font-black text-slate-800">{line.item.name}</ITText>
-                      <ITText className="text-[10px] font-bold uppercase text-slate-400">{line.item.unit.name}</ITText>
+                      <ITText className="text-[12px] font-bold text-slate-400">{line.item.unit.name}</ITText>
                     </ITFlex>
                     <ITText className="text-[11px] text-slate-500">
                       {t("purchaseOrders.columns.pending")}: {fmtQty(line.pendingQuantity)}

@@ -33,10 +33,14 @@
     "ownRest": "Today is your day off",
     "ownUnlinked": "Your time clock number is not linked; ask HR to link it",
     "viewReport": "View weekly report",
-    "chartTitle": "How the day is going"
+    "ofExpected": "of {{total}} expected",
+    "chartTitle": "How the day is going",
+    "followUp": "Today's follow-up",
+    "viewAccess": "Open access log",
+    "linkClocks": "Link people to clocks"
   },
   "records": {
-    "title": "Employee records",
+    "title": "Active staff",
     "complete": "Complete",
     "missingRequired": "Missing required documents",
     "missingDocuments": "With pending documents",
@@ -64,7 +68,16 @@
     "chartDepartments": "Missing required by department",
     "peopleUnit": "people",
     "noDepartment": "No department",
-    "chartsTitle": "Record gaps"
+    "chartsTitle": "Record gaps",
+    "missingOf": "of {{total}} without a complete record",
+    "haveArrived": "{{count}} arrived",
+    "followUp": "Today's follow-up",
+    "kpis": {
+      "missingRequired": "Missing required",
+      "complete": "Complete",
+      "incomplete": "Incomplete",
+      "active": "Active staff"
+    }
   },
   "profileFields": {
     "curp": "CURP",
@@ -109,7 +122,8 @@
     "personalWithoutClock": "Staff not linked to the time clock",
     "personalWithoutSchedule": "Staff without schedule",
     "link": "Link",
-    "assign": "Assign schedule"
+    "assign": "Assign schedule",
+    "assignSchedule": "Assign schedules"
   },
   "tickets": {
     "title": "Tickets",
@@ -121,7 +135,8 @@
     "unassigned": "Unassigned",
     "stale": "Open for more than {{days}} days",
     "byAssignee": "Open by assignee",
-    "unassignedLabel": "Unassigned"
+    "unassignedLabel": "Unassigned",
+    "ofTotal": "of {{total}}"
   },
   "tasks": {
     "title": "Tasks",
@@ -133,7 +148,8 @@
     "completed": "Completed",
     "overdue": "Overdue",
     "byUser": "Pending by person",
-    "due": "Due {{date}}"
+    "due": "Due {{date}}",
+    "ofTotal": "of {{total}}"
   },
   "equipment": {
     "title": "My assigned equipment",
@@ -151,7 +167,12 @@
     "ENTRY": "Entry",
     "EXIT": "Exit",
     "since": "Since {{time}}",
-    "openLog": "Open log"
+    "openLog": "Open log",
+    "ofEntries": "of {{total}} entries",
+    "assignSchedule": "Assign schedules",
+    "noEntries": "No access logged today",
+    "nobodyInside": "Nobody inside the hotel right now",
+    "noRecords": "No records yet today"
   },
   "system": {
     "title": "System health",
@@ -162,7 +183,20 @@
     "neverSynced": "Never synced",
     "noAttendance": "does not count attendance",
     "failedEmails": "Failed emails (7 days)",
-    "pendingEmails": "Queued emails"
+    "pendingEmails": "Queued emails",
+    "mail": "Email",
+    "ofClocks": "of {{total}} clocks",
+    "synced": "{{count}} synced",
+    "stale": "{{count}} stale",
+    "noClocks": "No clocks yet",
+    "lastSyncShort": "{{when}}",
+    "shortcuts": "Configuration shortcuts",
+    "shortcutClocks": "Clocks",
+    "shortcutRoles": "Roles and permissions",
+    "shortcutCatalog": "Catalogs",
+    "shortcutAudit": "Inventory audit",
+    "staleOne": "stale",
+    "okOne": "up to date"
   },
   "operations": {
     "title": "Operations"

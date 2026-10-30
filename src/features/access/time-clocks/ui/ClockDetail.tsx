@@ -124,7 +124,7 @@ export default function ClockDetail({ fx, clock, config, onBack }: Props) {
         </ITFlex>
       </ITFlex>
 
-      <ITCard className="!p-5 border border-slate-200">
+      <ITCard className="!p-5">
         <Section title={t("clocks.sync.title")}>
           <Datum label={t("clocks.sync.punches")} value={number(clock.punches)} />
           <Datum
@@ -139,7 +139,7 @@ export default function ClockDetail({ fx, clock, config, onBack }: Props) {
         </Section>
       </ITCard>
 
-      <ITCard className="!p-5 border border-slate-200">
+      <ITCard className="!p-5">
         <Section
           title={t("clocks.config.title")}
           note={
@@ -253,7 +253,7 @@ function Section({
   return (
     <ITFlex direction="column" gap={2}>
       <ITFlex align="baseline" wrap="wrap" gap={2}>
-        <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+        <ITText className="text-[12px] font-semibold text-slate-500">
           {title}
         </ITText>
         {note && <ITText className="text-[11px] text-slate-400">{note}</ITText>}
@@ -279,7 +279,7 @@ function Datum({
   return (
     <ITGrid item xs={12} md={md}>
       <ITFlex direction="column" gap={0.5} className="min-w-0">
-        <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <ITText className="text-[12px] font-semibold text-slate-400">
           {label}
         </ITText>
         <ITText className="text-[12px] font-bold text-slate-800 break-words">{value}</ITText>

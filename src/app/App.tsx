@@ -51,7 +51,6 @@ import UserFormPage from "@pages/users/UserFormPage";
 import UserHistoryPage from "@pages/users/UserHistoryPage";
 import UserImportPage from "@pages/users/UserImportPage";
 import TicketsListPage from "@pages/tickets/TicketsListPage";
-import NewTicketPage from "@pages/tickets/NewTicketPage";
 import TicketDetailPage from "@pages/tickets/TicketDetailPage";
 import EditTicketPage from "@pages/tickets/EditTicketPage";
 import KanbanPage from "@pages/tickets/KanbanPage";
@@ -227,7 +226,8 @@ export default function App() {
             </RequiresPermission>
           }
         />
-        <Route path="/tickets/new" element={<NewTicketPage />} />
+        {/* El alta de ticket vive en el panel de Langostín: la ruta antigua redirige. */}
+        <Route path="/tickets/new" element={<Navigate to="/tickets" replace />} />
         <Route
           path="/tickets/:id/edit"
           element={

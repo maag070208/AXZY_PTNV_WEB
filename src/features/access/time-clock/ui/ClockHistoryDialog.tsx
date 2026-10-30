@@ -1,7 +1,7 @@
-import { ITBadget, ITButton, ITDialog, ITFlex, ITLoader, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITButton, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaArrowsRotate, FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
+import { LuCircleCheck, LuCircleX, LuHistory, LuRefreshCw } from "react-icons/lu";
 import {
   timeClockApi,
   type TimeClockDevice,
@@ -10,6 +10,8 @@ import {
   type TimeClockSyncTrigger,
 } from "@entities/time-clock";
 import { formatDateTime } from "@shared/utils/dates";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { LangostinState } from "@shared/ui/langostin";
 
 /**
  * Timeline de sincronización de un reloj: cada intento con su hora, si conectó,
@@ -62,22 +64,25 @@ export default function ClockHistoryDialog({
     <ITDialog
       isOpen={device !== null}
       onClose={onClose}
-      title={device ? t("history.title", { name: device.name }) : ""}
       className="max-w-2xl"
     >
-      <ITFlex direction="column" gap={3} className="mt-2">
+      <DialogHeader
+        icon={<LuHistory />}
+        title={device ? t("history.title", { name: device.name }) : ""}
+        subtitle={device?.url}
+      />
+      <ITFlex direction="column" gap={3}>
         <ITFlex align="center" wrap="wrap" gap={2}>
-          <ITText className="text-[11px] font-bold text-slate-500 break-words">{device?.url}</ITText>
           <ITButton variant="text" size="sm" className="ml-auto" disabled={cargando} onClick={() => void cargar()}>
             <ITFlex align="center" gap={1}>
-              <FaArrowsRotate size={11} className={cargando ? "animate-spin" : undefined} />
+              <LuRefreshCw size={12} className={cargando ? "animate-spin" : undefined} />
               <ITText className="text-[11px] font-bold">{t("history.refresh")}</ITText>
             </ITFlex>
           </ITButton>
         </ITFlex>
 
         {resumen && (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:!grid-cols-3">
             <Indicador
               titulo={t("history.attempts")}
               valor={`${resumen.okCount} / ${resumen.attempts}`}
@@ -98,35 +103,33 @@ export default function ClockHistoryDialog({
         )}
 
         {resumen?.lastError && (
-          <div className="rounded-lg border border-solid border-red-200 bg-red-50 px-3 py-2">
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-red-700">
+          <div className="rounded-2xl px-3.5 py-2.5" style={{ background: "var(--color-danger-soft)" }}>
+            <ITText className="text-[12px] font-semibold text-[color:var(--color-danger)]">
               {t("history.lastError")}
             </ITText>
-            <ITText className="text-[11px] text-red-800 break-words">{resumen.lastError}</ITText>
+            <ITText className="text-[11px] text-slate-700 break-words">{resumen.lastError}</ITText>
           </div>
         )}
 
         {cargando && !historial ? (
-          <div className="flex justify-center py-6">
-            <ITLoader />
-          </div>
+          <LangostinState kind="loading" size="sm" />
         ) : error ? (
-          <ITText className="text-[12px] text-red-700">{t("history.loadError")}</ITText>
+          <LangostinState kind="error" size="sm" description={t("history.loadError")} />
         ) : historial && historial.events.length === 0 ? (
-          <ITText className="text-[12px] text-slate-500">{t("history.empty")}</ITText>
+          <LangostinState kind="empty" size="sm" description={t("history.empty")} />
         ) : (
-          <div className="max-h-80 overflow-y-auto rounded-lg border border-solid border-slate-200">
+          <div className="max-h-80 overflow-y-auto rounded-2xl bg-[color-mix(in_srgb,currentColor_5%,transparent)]">
             {historial?.events.map((evento, indice) => (
               <ITFlex
                 key={evento.id}
                 align="start"
                 gap={2}
-                className={`px-3 py-2 ${indice > 0 ? "border-t border-slate-100" : ""}`}
+                className={`px-3.5 py-2.5 ${indice > 0 ? " " : ""}`}
               >
                 {evento.ok ? (
-                  <FaCircleCheck size={13} className="mt-0.5 shrink-0 text-emerald-500" />
+                  <LuCircleCheck size={14} className="mt-0.5 shrink-0 text-[color:var(--color-success)]" />
                 ) : (
-                  <FaCircleXmark size={13} className="mt-0.5 shrink-0 text-red-500" />
+                  <LuCircleX size={14} className="mt-0.5 shrink-0 text-[color:var(--color-danger)]" />
                 )}
                 <ITFlex direction="column" gap={0.5} className="min-w-0 flex-1">
                   <ITFlex align="center" wrap="wrap" gap={1}>
@@ -146,7 +149,7 @@ export default function ClockHistoryDialog({
                       {t("history.read", { read: evento.readCount, new: evento.newCount })}
                     </ITText>
                   ) : (
-                    <ITText className="text-[11px] text-red-700 break-words">{evento.error}</ITText>
+                    <ITText className="text-[11px] text-[color:var(--color-danger)] break-words">{evento.error}</ITText>
                   )}
                 </ITFlex>
               </ITFlex>
@@ -173,9 +176,12 @@ function Indicador({
   alerta?: boolean;
 }) {
   return (
-    <div className={`rounded-lg border border-solid px-3 py-2 ${alerta ? "border-red-200 bg-red-50" : "border-slate-200 bg-slate-50"}`}>
-      <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{titulo}</ITText>
-      <ITText className={`text-[13px] font-black ${alerta ? "text-red-700" : "text-slate-800"}`}>{valor}</ITText>
+    <div
+      className={`rounded-2xl px-3.5 py-2.5 ${alerta ? "" : "bg-[color-mix(in_srgb,currentColor_5%,transparent)]"}`}
+      style={alerta ? { background: "var(--color-danger-soft)" } : undefined}
+    >
+      <ITText className="text-[12px] font-semibold text-slate-400">{titulo}</ITText>
+      <ITText className={`text-[13px] font-black ${alerta ? "text-[color:var(--color-danger)]" : "text-slate-800"}`}>{valor}</ITText>
       {detalle && <ITText className="text-[10px] text-slate-500">{detalle}</ITText>}
     </div>
   );

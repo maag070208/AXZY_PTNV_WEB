@@ -1,17 +1,22 @@
 import {
+  ITAlert,
   ITBadget,
+  ITBentoGauge,
+  ITBentoGrid,
+  ITBentoTile,
   ITButton,
-  ITCard,
   ITDataTable,
-  ITDatePicker,
   ITFlex,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaExclamationTriangle, FaFilePdf, FaSync, FaUndo } from "react-icons/fa";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { LuBox, LuFileText, LuHandshake, LuPackageCheck, LuPackageX, LuRefreshCw, LuTriangleAlert } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import type { Column } from "@axzydev/axzy_ui_system";
 import type { DeviceReportRow } from "@entities/report";
 import type { UseDevicesReport } from "../model/useDevicesReport";
+import { Num } from "@shared/ui/bento-bits";
+import { ReportPeriodBar } from "@shared/ui/report-period-bar";
 
 export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
   const navigate = useNavigate();
@@ -28,15 +33,6 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
     handleDownloadPdf,
     fetchTableData,
   } = fx;
-
-  const handleDateRange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } }
-  ) => {
-    const value = e.target.value;
-    if (Array.isArray(value)) setDateRange(value);
-  };
 
   const STATUS_LABELS: Record<string, string> = {
     ASSIGNED: t("devices.assignedStatus"),
@@ -70,7 +66,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
             {r.assetTag}
           </ITText>
           {r.quantity > 1 && (
-            <ITText className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
+            <ITText className="text-[12px] font-semibold text-emerald-600">
               {t("devices.batchTag", { count: r.quantity })}
             </ITText>
           )}
@@ -89,7 +85,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           <ITText className="text-[11px] font-bold text-slate-700">
             {r.description}
           </ITText>
-          <ITText className="text-[9px] uppercase tracking-widest text-slate-400">
+          <ITText className="text-[12px] text-slate-400">
             {r.type} · {r.brand} {r.model}
           </ITText>
         </ITFlex>
@@ -129,15 +125,18 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       sortable: false,
       render: (r) =>
         r.status === "ASSIGNED" ? (
-          <ITFlex direction="column" gap={0.5}>
-            <ITText className="text-[11px] text-slate-700">
-              {r.custodian ?? "—"}
-            </ITText>
-            {r.employeeNumber && (
-              <ITText className="text-[9px] text-slate-400">
-                No. {r.employeeNumber}
+          <ITFlex align="center" gap={2}>
+            <ProfileAvatar name={r.custodian ?? "—"} size="xs" />
+            <ITFlex direction="column" gap={0.5} className="min-w-0">
+              <ITText className="truncate text-[11px] text-slate-700">
+                {r.custodian ?? "—"}
               </ITText>
-            )}
+              {r.employeeNumber && (
+                <ITText className="text-[10px] text-slate-500">
+                  No. {r.employeeNumber}
+                </ITText>
+              )}
+            </ITFlex>
           </ITFlex>
         ) : (
           <ITText className="text-[10px] text-slate-300">—</ITText>
@@ -152,7 +151,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       catalogOptions: fx.departmentOptions,
       sortable: false,
       render: (r) => (
-        <ITText className="text-[10px] uppercase text-slate-500">
+        <ITText className="text-[12px] text-slate-500">
           {r.status === "ASSIGNED" ? r.department ?? "—" : "—"}
         </ITText>
       ),
@@ -199,102 +198,74 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
       filter: true,
       sortable: false,
       render: (r) => (
-        <ITText className="text-[10px] uppercase text-slate-500">{r.area}</ITText>
+        <ITText className="text-[12px] text-slate-500">{r.area}</ITText>
       ),
     },
   ];
 
   return (
     <ITFlex direction="column" gap={4}>
-      <ITFlex align="end" wrap="wrap" gap={3}>
-        <div className="min-w-[240px] max-w-[340px] flex-1">
-          <ITDatePicker
-            name="devicesDateRange"
-            label={t("filters.dateRange")}
-            range
-            value={dateRange}
-            onChange={handleDateRange}
-            className="w-full min-w-0"
-          />
-        </div>
-        <ITButton
-          variant="text"
-          color="gray"
-          size="sm"
-          onClick={() => setDateRange([null, null])}
-          disabled={!dateRange[0] && !dateRange[1]}
+      <ReportPeriodBar name="devicesDateRange" dateRange={dateRange} setDateRange={setDateRange} />
+
+      <ITBentoGrid>
+        <ITBentoTile
+          tone="sea"
+          cols={4}
+          rows={2}
+          icon={<LuBox size={15} />}
+          label={t("devices.statDevices")}
+          value={<Num value={stats?.total ?? 0} />}
         >
-          <ITFlex align="center" gap={1}>
-            <FaUndo size={11} />
-            <ITText className="font-bold text-[11px]">{t("filters.clear")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
+          {(stats?.total ?? 0) > 0 && (
+            <div className="relative z-[1] my-1 flex min-h-0 flex-1 items-center justify-center">
+              <ITBentoGauge
+                value={(stats?.available ?? 0) / (stats?.total ?? 1)}
+                color="var(--color-warning)"
+                trackColor="rgb(255 255 255 / 0.14)"
+                size={150}
+              />
+            </div>
+          )}
+        </ITBentoTile>
+        <ITBentoTile
+          tone="mint"
+          cols={2}
+          rows={2}
+          icon={<LuPackageCheck size={15} />}
+          label={t("devices.availableStat")}
+          value={<Num value={stats?.available ?? 0} />}
+        />
+        <ITBentoTile
+          tone="lavender"
+          cols={2}
+          rows={2}
+          icon={<LuHandshake size={15} />}
+          label={t("devices.statAssigned")}
+          value={<Num value={stats?.assigned ?? 0} />}
+        />
+        <ITBentoTile
+          tone={(stats?.over30 ?? 0) > 0 ? "sun" : "plain"}
+          cols={2}
+          rows={2}
+          icon={<LuTriangleAlert size={15} />}
+          label={t("devices.statOver30")}
+          value={<Num value={stats?.over30 ?? 0} />}
+        />
+        <ITBentoTile
+          cols={2}
+          rows={2}
+          icon={<LuPackageX size={15} />}
+          label={t("devices.statRetirements")}
+          value={<Num value={stats?.retired ?? 0} />}
+        />
+      </ITBentoGrid>
 
-      <ITFlex gap={3} wrap="wrap">
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-slate-800 leading-none">
-              {stats?.total ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statDevices")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-emerald-700 leading-none">
-              {stats?.available ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.availableStat")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-amber-700 leading-none">
-              {stats?.assigned ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statAssigned")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-red-600 leading-none">
-              {stats?.over30 ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statOver30")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
-        <ITCard className="!p-3 border border-slate-200 flex-1 min-w-[130px]">
-          <ITFlex direction="column" gap={0}>
-            <ITText className="text-[18px] font-black text-slate-600 leading-none">
-              {stats?.retired ?? 0}
-            </ITText>
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-              {t("devices.statRetirements")}
-            </ITText>
-          </ITFlex>
-        </ITCard>
-      </ITFlex>
-
-      {error && (
-        <ITFlex align="center" gap={2} className="text-red-600">
-          <FaExclamationTriangle size={12} />
-          <ITText className="text-[11px] font-bold">{error}</ITText>
-        </ITFlex>
-      )}
+      {error && <ITAlert variant="error">{error}</ITAlert>}
 
       <ITFlex justify="end" align="center" wrap="wrap" gap={2}>
         <ITButton variant="outlined" onClick={() => setReloadKey((k) => k + 1)}>
           <ITFlex align="center" gap={1}>
-            <FaSync size={11} />
+            <LuRefreshCw size={13} />
             <ITText className="font-bold text-[11px]">
               {t("devices.refresh")}
             </ITText>
@@ -307,7 +278,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
           disabled={exporting || (stats?.total ?? 0) === 0}
         >
           <ITFlex align="center" gap={1}>
-            <FaFilePdf className="text-red-600" size={13} />
+            <LuFileText size={14} />
             <ITText className="font-bold text-[11px]">
               {exporting ? t("devices.exporting") : t("devices.export")}
             </ITText>
@@ -315,7 +286,7 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         </ITButton>
       </ITFlex>
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (
@@ -327,14 +298,14 @@ export default function DevicesTab({ fx }: { fx: UseDevicesReport }) {
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
+        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as DeviceReportRow).deviceId}`)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
-        virtualized
-        virtualizedMaxHeight={420}
         rowHeight={50}
-        onRowClick={(row) => navigate(`/inventory/devices/${(row as unknown as DeviceReportRow).deviceId}`)}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITFlex>
   );

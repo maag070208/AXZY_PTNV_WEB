@@ -16,9 +16,12 @@ import type { AppDispatch, RootState } from "@app/store";
 import { logout, meThunk, setRolesCatalog } from "@entities/user";
 import { APP_SCREENS, isScreenVisible, permissionApi, type AppScreen } from "@entities/permission";
 import { fetchUnreadCount, markNotificationRead, notificationRoute } from "@entities/notification";
+import { blobatarDataUri } from "@shared/lib/blobatar";
+import { API_CONSTANTS } from "@shared/api/constants/API_CONSTANTS";
 import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
 import ForcePasswordChange from "./ForcePasswordChange";
+import { LangostinAssistant } from "@widgets/assistant";
 import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
 
 /** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
@@ -200,15 +203,33 @@ export default function PrivateRoutes() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    // `replace`: tras salir, "atrás" no debe devolver a la pantalla protegida.
+    navigate("/login", { replace: true });
   };
 
   const sidebar: ITSidebarProps = {
     navigationItems,
     isCollapsed: true,
+    // Panel flotante con la persona al pie (mismo lenguaje bento del resto).
+    variant: "bento",
+    // La tarjeta flota separada del borde (el kit respeta el className desde 1.8.14).
+    className: "p-2",
+    profile: user
+      ? {
+          name: user.name ?? user.username,
+          detail: unreadCount > 0 ? tt("nav.notifications", { count: unreadCount }) : user.username,
+          image: user.photoUrl
+            ? `${API_CONSTANTS.BASE_URL}${user.photoUrl}`
+            : blobatarDataUri(user.name ?? user.username),
+          label: tt("nav.accountMenu"),
+          // La tarjeta lleva a la cuenta de la persona (si puede editarla).
+          onClick: (permissions?.["users.edit"] ?? "NONE") !== "NONE" ? () => navigate(`/users/${user.id}/edit`) : undefined,
+        }
+      : undefined,
   };
 
   const topBar = {
+    variant: "bento" as const,
     logo: (
       <img
         src={logoUrl}
@@ -221,6 +242,11 @@ export default function PrivateRoutes() {
       ? {
         userName: user.name ?? "—",
         userEmail: user.username,
+        // Foto del expediente si existe; si no, el mismo Blobatar del resto de
+        // la app (la barra solo acepta una URL de imagen).
+        userImage: user.photoUrl
+          ? `${API_CONSTANTS.BASE_URL}${user.photoUrl}`
+          : blobatarDataUri(user.name ?? user.username),
         menuItems: [
           {
             label:
@@ -237,9 +263,11 @@ export default function PrivateRoutes() {
 
   return (
     <>
-      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-screen! m-0! !px-2">
+      <ITLayout topBar={topBar} sidebar={sidebar} sidebarFullHeight contentClassName="max-w-screen! m-0! !px-2">
         <Outlet />
       </ITLayout>
+      {/* Langostín de ayuda en todas las pantallas (se oculta donde ya hay chat). */}
+      <LangostinAssistant />
       {toast && (
         <ITToast
           message={toast}

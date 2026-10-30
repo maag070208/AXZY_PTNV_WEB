@@ -200,15 +200,15 @@ export default function EmployeeProfileEditDialog({
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[200px]">
           <ITInput name="rfc" label={tt("detail.fields.rfc")} value={form.rfc ?? ""} onChange={field("rfc")} aria-invalid={!!errors.rfc} />
-          {errors.rfc && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.rfc}</span>}
+          {errors.rfc && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.rfc}</ITText>}
         </div>
         <div className="flex-1 min-w-[200px]">
           <ITInput name="curp" label={tt("detail.fields.curp")} value={form.curp ?? ""} onChange={field("curp")} aria-invalid={!!errors.curp} />
-          {errors.curp && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.curp}</span>}
+          {errors.curp && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.curp}</ITText>}
         </div>
         <div className="flex-1 min-w-[200px]">
           <ITInput name="nss" label={tt("detail.fields.nss")} value={form.nss ?? ""} onChange={field("nss")} aria-invalid={!!errors.nss} />
-          {errors.nss && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.nss}</span>}
+          {errors.nss && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.nss}</ITText>}
         </div>
       </ITFlex>
     </ITFlex>
@@ -223,7 +223,7 @@ export default function EmployeeProfileEditDialog({
         </div>
         <div className="flex-1 min-w-[120px]">
           <ITInput name="postalCode" label={tt("detail.fields.zip")} value={form.postalCode ?? ""} onChange={field("postalCode")} aria-invalid={!!errors.postalCode} />
-          {errors.postalCode && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</span>}
+          {errors.postalCode && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.postalCode}</ITText>}
         </div>
       </ITFlex>
       <ITFlex gap={4} wrap="wrap">
@@ -245,18 +245,18 @@ export default function EmployeeProfileEditDialog({
       <ITFlex gap={4} wrap="wrap">
         <div className="flex-1 min-w-[200px]">
           <ITInput name="personalPhone" label={tt("detail.fields.personalCell")} value={form.personalPhone ?? ""} onChange={field("personalPhone")} aria-invalid={!!errors.personalPhone} />
-          {errors.personalPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</span>}
+          {errors.personalPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.personalPhone}</ITText>}
         </div>
         <div className="flex-1 min-w-[200px]">
           <ITInput name="workPhone" label={tt("detail.fields.companyCell")} value={form.workPhone ?? ""} onChange={field("workPhone")} aria-invalid={!!errors.workPhone} />
-          {errors.workPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</span>}
+          {errors.workPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.workPhone}</ITText>}
         </div>
         <div className="flex-1 min-w-[200px]">
           <ITInput name="email" type="email" label={tt("detail.fields.email")} value={form.email ?? ""} onChange={field("email")} aria-invalid={!!errors.email} />
-          {errors.email && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</span>}
+          {errors.email && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.email}</ITText>}
         </div>
       </ITFlex>
-      <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400 pt-2">
+      <ITText className="text-[12px] font-semibold text-slate-400 pt-2">
         {tt("detail.emergencyContactTitle")}
       </ITText>
       <ITFlex gap={4} wrap="wrap">
@@ -265,7 +265,7 @@ export default function EmployeeProfileEditDialog({
         </div>
         <div className="flex-1 min-w-[200px]">
           <ITInput name="emergencyContactPhone" label={tt("detail.fields.emergencyPhone")} value={form.emergencyContactPhone ?? ""} onChange={field("emergencyContactPhone")} aria-invalid={!!errors.emergencyContactPhone} />
-          {errors.emergencyContactPhone && <span role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</span>}
+          {errors.emergencyContactPhone && <ITText as="span" role="alert" className="text-red-500 text-xs mt-1 block">{errors.emergencyContactPhone}</ITText>}
         </div>
         <div className="flex-1 min-w-[200px]">
           <ITInput name="emergencyContactRelationship" label={tt("detail.fields.emergencyRelation")} value={form.emergencyContactRelationship ?? ""} onChange={field("emergencyContactRelationship")} />

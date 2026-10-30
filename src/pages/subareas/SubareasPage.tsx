@@ -16,9 +16,11 @@ import {
   SubareasTable,
   useSubareasCrud,
 } from "@features/subarea/subareas-crud";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function SubareasPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["subareas", "common"]);
 
   const crud = useSubareasCrud();
@@ -33,7 +35,7 @@ export default function SubareasPage() {
       noPadding
       title={tt("list.title")}
       description={tt("list.description")}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/")}
       icon={<FaMapMarkerAlt size={20} />}
       breadcrumbs={[
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },

@@ -1,10 +1,22 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import {
+  ITAlert,
+  ITBadget,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITPage,
+  ITText,
+  ITToast,
+} from "@axzydev/axzy_ui_system";
 import { FaBoxOpen, FaCheckCircle, FaChevronDown, FaChevronRight, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceUnitStatus, type DeviceUnit } from "@entities/inventory";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 const STATUS_COLOR: Record<DeviceUnitStatus, "success" | "warning" | "danger" | "gray"> = {
   AVAILABLE: "success",
@@ -25,6 +37,7 @@ export default function EditDevicePage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [device, setDevice] = useState<Device | null>(null);
   const [units, setUnits] = useState<DeviceUnit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,7 +101,7 @@ export default function EditDevicePage() {
         notes: form.notes || undefined,
       });
       setToast({ message: t("devices.savedEdit"), type: "success" });
-      setTimeout(() => navigate(`/inventory/devices/${id}`), 1000);
+      setTimeout(() => goBack(`/inventory/devices/${id}`), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -127,7 +140,7 @@ export default function EditDevicePage() {
   if (loading || !device) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("devices.edit")} backAction={() => navigate(-1)}>
+        noPadding title={t("devices.edit")} backAction={() => goBack(`/inventory/devices/${id}`)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -141,7 +154,7 @@ export default function EditDevicePage() {
       title={t("devices.edit")}
       description={device.name}
       icon={<FaBoxOpen size={20} />}
-      backAction={() => navigate(`/inventory/devices/${device.id}`)}
+      backAction={() => goBack(`/inventory/devices/${device.id}`)}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("dashboard.title"), onClick: () => navigate("/inventory") },
@@ -161,13 +174,13 @@ export default function EditDevicePage() {
       <ITGrid container columns={12} spacing={6}>
         {/* Main form */}
         <ITGrid item xs={12} lg={8}>
-          <ITFlex as="section" direction="column" gap={5} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-5">
             <ITFlex direction="column" gap={1}>
-              <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("devices.type")}</ITText>
+              <ITText className="text-[12px] font-semibold text-slate-400">{t("devices.type")}</ITText>
               <ITFlex align="center" gap={2} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
                 <FaBoxOpen className="text-slate-400" size={13} />
                 <ITText className="text-sm font-semibold text-slate-700">{device.type?.name ?? ""}</ITText>
-                {device.type?.assetTagPrefix && <ITText className="text-[10px] font-bold uppercase text-slate-400">{device.type.assetTagPrefix}</ITText>}
+                {device.type?.assetTagPrefix && <ITText className="text-[12px] font-bold text-slate-400">{device.type.assetTagPrefix}</ITText>}
               </ITFlex>
             </ITFlex>
 
@@ -195,12 +208,12 @@ export default function EditDevicePage() {
             <ITAlert variant="info" dismissible={false}>
               {t("devices.editHint")}
             </ITAlert>
-          </ITFlex>
+          </ITCard>
         </ITGrid>
 
         {/* Units sidebar */}
         <ITGrid item xs={12} lg={4}>
-          <ITFlex as="section" direction="column" gap={3} className="h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-3 h-full">
             <ITFlex align="center" justify="between" gap={2}>
               <ITFlex align="center" gap={2}>
                 <ITText className="text-sm font-bold text-slate-800">{t("devices.unitSidebar")}</ITText>
@@ -214,7 +227,7 @@ export default function EditDevicePage() {
                   for (const u of units) map[u.id] = next === true ? true : false;
                   setExpanded(map);
                 }}>
-                  <ITText className="text-[10px] font-bold uppercase">{allExpanded ? t("devices.collapseAll") : t("devices.expandAll")}</ITText>
+                  <ITText className="text-[12px] font-bold">{allExpanded ? t("devices.collapseAll") : t("devices.expandAll")}</ITText>
                 </ITButton>
               )}
             </ITFlex>
@@ -241,7 +254,7 @@ export default function EditDevicePage() {
                     >
                       <ITFlex align="center" gap={2} className="min-w-0">
                         {isOpen ? <FaChevronDown className="shrink-0 text-slate-400" size={11} /> : <FaChevronRight className="shrink-0 text-slate-400" size={11} />}
-                        <ITText className="truncate text-[11px] font-black uppercase tracking-tight text-emerald-700">{u.assetTag}</ITText>
+                        <ITText className="truncate text-[12px] font-semibold text-emerald-700">{u.assetTag}</ITText>
                         {dirty && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400" title={t("devices.unsaved")} />}
                       </ITFlex>
                       <ITBadget color={STATUS_COLOR[u.status]} size="lg">{t(`unitStatus.${u.status}`)}</ITBadget>
@@ -307,7 +320,7 @@ export default function EditDevicePage() {
               })}
               {units.length === 0 && <ITText className="py-8 text-center text-sm text-slate-400">{t("devices.noUnits")}</ITText>}
             </div>
-          </ITFlex>
+          </ITCard>
         </ITGrid>
       </ITGrid>
 

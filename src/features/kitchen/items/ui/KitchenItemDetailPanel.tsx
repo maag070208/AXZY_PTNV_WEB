@@ -17,7 +17,7 @@ import { dyn } from "@shared/i18n/dyn";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { PanelCard } from "@shared/ui/panel-card";
 
-const th = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+const th = "text-[12px] font-semibold text-slate-400";
 const LOT_GRID = "grid grid-cols-[1.4fr_1fr_1.4fr_1fr_auto] items-center gap-3";
 const MOVE_GRID = "grid grid-cols-[auto_1.2fr_1fr_1fr_1.2fr] items-center gap-3";
 const money = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
@@ -66,7 +66,7 @@ export default function KitchenItemDetailPanel() {
               </ITBadget>
             )}
           </ITFlex>
-          <ITText className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+          <ITText className="text-[12px] font-bold text-slate-400">
             <span className="font-mono">{item.code}</span> · {item.category.name} · {dyn(t)(`kinds.${item.kind}`)} · {dyn(t)(`storages.${item.storage}`)}
           </ITText>
         </ITFlex>

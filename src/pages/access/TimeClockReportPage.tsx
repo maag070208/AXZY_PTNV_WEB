@@ -11,6 +11,7 @@ import {
 import { LinksSummary } from "@features/access/time-clock-employees";
 import { timeClockApi } from "@entities/time-clock";
 import { downloadTimeClockReportPdf } from "@widgets/reports";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** El mismo reporte de entradas/salidas, alimentado por las checadas del reloj. */
 const TIME_CLOCK_SOURCE: AccessReportSource = {
@@ -22,6 +23,7 @@ const TIME_CLOCK_SOURCE: AccessReportSource = {
 export default function TimeClockReportPage() {
   const { t } = useTranslation(["time-clock", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const fx = useAccessReport({ download: downloadTimeClockReportPdf, source: TIME_CLOCK_SOURCE });
 
   return (
@@ -35,7 +37,7 @@ export default function TimeClockReportPage() {
         { label: t("common:nav.hr"), onClick: () => navigate("/employees") },
         { label: t("report.title") },
       ]}
-      backAction={() => navigate("/hr/time-clock")}
+      backAction={() => goBack("/hr/time-clock")}
       actions={<AccessReportExportActions fx={fx} />}
     >
       <ITFlex direction="column" gap={4}>

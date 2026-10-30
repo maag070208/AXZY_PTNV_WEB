@@ -101,7 +101,7 @@ export default function SupplierDetailPanel({ id }: { id?: string }) {
                   {c.isPrimary && <FaStar size={11} className="text-amber-500" />}
                   <ITText className="text-[12px] font-bold text-slate-800">{c.name}</ITText>
                 </ITFlex>
-                {c.position && <ITText className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{c.position}</ITText>}
+                {c.position && <ITText className="text-[12px] font-bold text-slate-400">{c.position}</ITText>}
                 <ITFlex direction="column" gap={1} className="mt-2">
                   {c.phone && (
                     <a className="flex items-center gap-2 text-[11px] text-sky-700" href={`tel:${c.phone}`}>

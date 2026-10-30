@@ -32,11 +32,13 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@axzydev/axzy_ui_system": "1.7.4",
+    "@axzydev/axzy_ui_system": "1.8.14",
+    "@blobatar/react": "2.7.0",
     "@react-pdf/renderer": "^4.6.1",
     "@reduxjs/toolkit": "^2.5.1",
     "ably": "^2.27.0",
     "axios": "^1.7.9",
+    "blobatar": "2.7.0",
     "file-saver": "^2.0.5",
     "i18next": "^26.4.2",
     "lottie-react": "^3.1.2",

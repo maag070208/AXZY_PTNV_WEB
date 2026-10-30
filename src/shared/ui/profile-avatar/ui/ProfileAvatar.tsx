@@ -1,34 +1,40 @@
+import { Blobatar } from "@blobatar/react";
 import { useState } from "react";
+import { ITText } from "@axzydev/axzy_ui_system";
 
 const SIZE_MAP = {
-  xs: "w-6 h-6 text-[10px]",
-  sm: "w-8 h-8 text-xs",
-  md: "w-10 h-10 text-sm",
-  lg: "w-12 h-12 text-base",
-  xl: "w-16 h-16 text-xl",
+  xs: "w-6 h-6",
+  sm: "w-8 h-8",
+  md: "w-10 h-10",
+  lg: "w-12 h-12",
+  xl: "w-16 h-16",
 } as const;
+
+/** Resolución del Blobatar (px); cubre el tamaño más grande (xl / h-28). */
+const BLOBATAR_SIZE = 128;
 
 export interface ProfileAvatarProps {
   photoUrl?: string | null;
-  initials: string;
+  /** Nombre de la persona: semilla del Blobatar de fallback y `alt` por defecto. */
+  name: string;
   alt?: string;
   size?: keyof typeof SIZE_MAP;
   className?: string;
 }
 
 /**
- * Avatar circular con fallback garantizado a iniciales.
+ * Avatar circular con fallback garantizado a un Blobatar determinista.
  *
  * Bypassea al `ITAvatar` del kit porque su rama de fallback usa un ternario
- * mutuamente excluyente (`src ? <img onError=hide> : <span>initials</span>`):
- * cuando el `<img>` falla, la `<span>` de iniciales no se renderiza y el
- * contenedor queda en blanco. Aquí siempre se renderizan las iniciales como
- * capa de fondo y el `<img>` como overlay; en error de carga el `<img>` se
- * desmonta y las iniciales permanecen visibles.
+ * mutuamente excluyente (`src ? <img onError=hide> : <ITText as="span">fallback</ITText>`):
+ * cuando el `<img>` falla, el fallback no se renderiza y el contenedor queda
+ * en blanco. Aquí el Blobatar (generado a partir de `name`) siempre se
+ * renderiza como capa de fondo y la foto como overlay; en error de carga la
+ * foto se desmonta y el Blobatar permanece visible.
  */
 export default function ProfileAvatar({
   photoUrl,
-  initials,
+  name,
   alt,
   size = "xl",
   className,
@@ -38,17 +44,21 @@ export default function ProfileAvatar({
 
   return (
     <div
-      className={`relative inline-flex items-center justify-center rounded-full overflow-hidden bg-primary-600 text-white font-bold tracking-wide flex-shrink-0 ${SIZE_MAP[size]} ${className ?? ""}`}
-      role={alt ? "img" : undefined}
-      aria-label={alt}
+      className={`relative inline-flex items-center justify-center rounded-full overflow-hidden bg-slate-100 flex-shrink-0 ${SIZE_MAP[size]} ${className ?? ""}`}
+      role="img"
+      aria-label={alt ?? name}
     >
-      <span className="absolute inset-0 flex items-center justify-center select-none">
-        {initials.slice(0, 2).toUpperCase()}
-      </span>
+      <Blobatar
+        name={name}
+        size={BLOBATAR_SIZE}
+        background="square"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover select-none"
+      />
       {showImg && (
         <img
           src={photoUrl!}
-          alt={alt ?? ""}
+          alt={alt ?? name}
           className="absolute inset-0 w-full h-full object-cover"
           onError={() => setErrored(true)}
         />

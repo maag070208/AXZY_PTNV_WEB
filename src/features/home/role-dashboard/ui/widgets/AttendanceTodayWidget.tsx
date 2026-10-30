@@ -1,22 +1,27 @@
 import { useTranslation } from "react-i18next";
 import { ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
-import { FaUserClock } from "react-icons/fa";
+import { LuUserCheck } from "react-icons/lu";
 import { dashboardApi, type AttendanceTodayRow, type TodayStatus } from "@entities/dashboard";
 import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { CHART_STATUS, DonutChart } from "@shared/ui/charts";
 import { formatTimeInTZ } from "@shared/utils/dates";
 import { useWidgetData } from "../../model/useWidgetData";
-import WidgetCard, { Metric, SectionLabel } from "../WidgetCard";
+import type { KpiTone } from "@shared/ui/kpi-tile";
+import WidgetCard, { EmptyText, ListRow, Metric, MetricGrid, RowList, SectionLabel } from "../WidgetCard";
 
-const STATUS_TONE: Record<TodayStatus, string> = {
-  PRESENT: "text-emerald-700",
-  LATE: "text-amber-600",
-  NOT_ARRIVED: "text-rose-600",
-  NOT_YET: "text-slate-500",
-  REST: "text-slate-500",
-  NO_SCHEDULE: "text-slate-500",
-  UNLINKED: "text-yellow-700",
+/**
+ * Tono por estado: el color identifica el estado (no la alarma), así los
+ * mosaicos del inicio se ven como el resto del tablero aunque el día esté en 0.
+ */
+const STATUS_TONE: Record<TodayStatus, KpiTone> = {
+  PRESENT: "emerald",
+  LATE: "amber",
+  NOT_ARRIVED: "rose",
+  NOT_YET: "sky",
+  REST: "neutral",
+  NO_SCHEDULE: "neutral",
+  UNLINKED: "violet",
 };
 
 const METRICS: TodayStatus[] = ["PRESENT", "LATE", "NOT_ARRIVED", "NOT_YET", "UNLINKED"];
@@ -37,20 +42,17 @@ export default function AttendanceTodayWidget() {
 
   const list = (rows: AttendanceTodayRow[], detail: (r: AttendanceTodayRow) => string) =>
     rows.length === 0 ? (
-      <ITText className="text-[11px] text-slate-400">{t("empty")}</ITText>
+      <EmptyText>{t("empty")}</EmptyText>
     ) : (
-      <div className="max-h-[180px] overflow-auto">
+      <RowList maxHeight={200}>
         {rows.map((r) => (
-          <ITFlex key={r.userId} align="center" justify="between" className="border-b border-slate-100 py-1">
-            <div>
-              <div className="text-[11px] font-bold text-slate-800">{r.name}</div>
-              <div className="text-[9px] uppercase text-slate-400">{r.departmentName ?? "—"}</div>
-            </div>
-            <ITText className="text-[10px] font-bold text-slate-600">{detail(r)}</ITText>
-          </ITFlex>
+          <ListRow key={r.userId} avatarName={r.name} title={r.name} subtitle={r.departmentName ?? "—"} right={detail(r)} />
         ))}
-      </div>
+      </RowList>
     );
+
+  // Proporción real del día: quienes ya llegaron entre quienes se esperaban a esta hora.
+  const expected = data ? data.counts.PRESENT + data.counts.LATE + data.counts.NOT_ARRIVED + data.counts.NOT_YET : 0;
 
   // Vista del propio empleado: su día en una línea.
   const own = data && data.scope === "OWN" ? data.rows[0] : null;
@@ -75,8 +77,7 @@ export default function AttendanceTodayWidget() {
   return (
     <WidgetCard
       title={title}
-      icon={<FaUserClock size={14} />}
-      iconClass="bg-emerald-600"
+      icon={<LuUserCheck size={16} />}
       to={canPayroll ? "/schedules/payroll" : undefined}
       toLabel={t("attendance.viewReport")}
       loading={loading}
@@ -94,15 +95,22 @@ export default function AttendanceTodayWidget() {
       ) : (
         data && (
           <>
-            <ITFlex wrap="wrap" gap={2}>
+            <MetricGrid>
               {METRICS.map((s) => (
-                <Metric key={s} value={data.counts[s]} label={t(`attendance.status.${s}`)} tone={STATUS_TONE[s]} />
+                <Metric
+                  key={s}
+                  value={data.counts[s]}
+                  label={t(`attendance.status.${s}`)}
+                  tone={STATUS_TONE[s]}
+                  ratio={s === "PRESENT" && expected > 0 ? data.counts.PRESENT / expected : undefined}
+                  hint={s === "PRESENT" && expected > 0 ? t("attendance.ofExpected", { total: expected }) : undefined}
+                />
               ))}
-              <Metric value={data.counts.onSite} label={t("attendance.onSite")} tone="text-[#0D5777]" />
-            </ITFlex>
+              <Metric value={data.counts.onSite} label={t("attendance.onSite")} tone="sky" />
+            </MetricGrid>
             <SectionLabel>{t("attendance.chartTitle")}</SectionLabel>
             <DonutChart
-              size={110}
+              size={126}
               segments={[
                 { label: t("attendance.status.PRESENT"), value: data.counts.PRESENT, color: CHART_STATUS.good },
                 { label: t("attendance.status.LATE"), value: data.counts.LATE, color: CHART_STATUS.warning },
@@ -110,16 +118,24 @@ export default function AttendanceTodayWidget() {
                 { label: t("attendance.status.NOT_YET"), value: data.counts.NOT_YET, color: CHART_STATUS.info },
               ]}
             />
-            <SectionLabel>{t("attendance.notArrivedList")}</SectionLabel>
-            {list(
-              data.rows.filter((r) => r.status === "NOT_ARRIVED"),
-              (r) => t("attendance.shift", { shift: r.shift ?? "—" })
-            )}
-            <SectionLabel>{t("attendance.lateList")}</SectionLabel>
-            {list(
-              data.rows.filter((r) => r.status === "LATE").sort((a, b) => b.lateMin - a.lateMin),
-              (r) => `${t("attendance.entry", { time: time(r.entryAt) })} · ${t("attendance.late", { minutes: r.lateMin })}`
-            )}
+            {/* Las dos listas van lado a lado: antes se apilaban y dejaban un hueco
+                grande cuando el día venía en cero. */}
+            <div className="mt-3 grid gap-4 md:!grid-cols-2">
+              <div>
+                <SectionLabel>{t("attendance.notArrivedList")}</SectionLabel>
+                {list(
+                  data.rows.filter((r) => r.status === "NOT_ARRIVED"),
+                  (r) => t("attendance.shift", { shift: r.shift ?? "—" })
+                )}
+              </div>
+              <div>
+                <SectionLabel>{t("attendance.lateList")}</SectionLabel>
+                {list(
+                  data.rows.filter((r) => r.status === "LATE").sort((a, b) => b.lateMin - a.lateMin),
+                  (r) => `${t("attendance.entry", { time: time(r.entryAt) })} · ${t("attendance.late", { minutes: r.lateMin })}`
+                )}
+              </div>
+            </div>
           </>
         )
       )}

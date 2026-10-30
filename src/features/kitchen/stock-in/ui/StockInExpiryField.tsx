@@ -19,7 +19,7 @@ export default function StockInExpiryField({ line, item, onPatch }: Props) {
   if (item && !item.tracksExpiry) {
     return (
       <div className="flex h-[42px] flex-col justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 px-3">
-        <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+        <span className="text-[12px] font-semibold text-slate-400">
           {t("stockIn.expiresAt")}
         </span>
         <span className="mt-0.5 text-[11px] font-medium text-slate-500">{t("stockIn.noExpiry")}</span>

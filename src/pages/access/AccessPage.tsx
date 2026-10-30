@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { PanelCard } from "@shared/ui/panel-card";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
@@ -12,6 +13,8 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
+  ITBentoPill,
+  ITBentoStatStrip,
   ITPage,
   ITSearchSelect,
   ITText,
@@ -23,20 +26,11 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import {
-  FaBan,
-  FaDoorOpen,
-  FaEye,
-  FaFileCsv,
-  FaListUl,
-  FaSignInAlt,
-  FaSignOutAlt,
-  FaUndo,
-} from "react-icons/fa";
+import { FaDoorOpen, FaFileCsv } from "react-icons/fa";
+import { LuBan, LuEye, LuFilter, LuListChecks, LuLogIn, LuLogOut, LuRadio, LuRotateCcw } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { useCan, usePeopleOptions, type UserRole } from "@entities/user";
 import { formatDateTime } from "@shared/utils/dates";
-import { dyn } from "@shared/i18n/dyn";
 import { LocationMap } from "@shared/ui/location-map";
 import {
   accessApi,
@@ -46,6 +40,12 @@ import {
   type Site,
 } from "@entities/access";
 import { fileName } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
+import { FilterPills } from "@shared/ui/filter-pills";
+import type { ListSummaryItem } from "@shared/ui/list-summary-strip";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { Num } from "@shared/ui/bento-bits";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
 
@@ -67,9 +67,12 @@ const formatCoords = (lat: number | null, lng: number | null): string =>
 
 const GUARD_ROLES: UserRole[] = ["GUARD"];
 
+type RangePreset = "today" | "yesterday" | "last7";
+
 export default function AccessPage() {
   const { t: tt } = useTranslation(["access", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canVoid = useCan("access.void");
 
   const [sites, setSites] = useState<Site[]>([]);
@@ -82,6 +85,9 @@ export default function AccessPage() {
   const [typeFilter, setTypeFilter] = useState("");
   const [includeVoided, setIncludeVoided] = useState(false);
   const [stats, setStats] = useState<AccessStats | null>(null);
+  // Última checada registrada (sin filtros): el "escaneo en vivo" del héroe.
+  const [lastEvent, setLastEvent] = useState<AccessEvent | null>(null);
+  const [preset, setPreset] = useState<RangePreset | "custom">("today");
   const [exporting, setExporting] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
@@ -141,6 +147,21 @@ export default function AccessPage() {
     };
   }, [externalFilters, reloadKey]);
 
+  useEffect(() => {
+    let active = true;
+    accessApi
+      .table({ page: 1, limit: 1, filters: {}, sort: { key: "occurredAt", direction: "desc" } })
+      .then((res) => {
+        if (active) setLastEvent(res.data[0] ?? null);
+      })
+      .catch(() => {
+        if (active) setLastEvent(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [reloadKey]);
+
   const fetchTableData = useCallback(async (params: ITDataTableFetchParams) => {
     const res = await accessApi.table({
       page: params.page,
@@ -154,14 +175,15 @@ export default function AccessPage() {
     };
   }, []);
 
-  const applyRange = (preset: "today" | "yesterday" | "last7") => {
+  const applyRange = (value: RangePreset) => {
+    setPreset(value);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (preset === "today") {
+    if (value === "today") {
       setDateRange([today, today]);
       return;
     }
-    if (preset === "yesterday") {
+    if (value === "yesterday") {
       const y = new Date(today);
       y.setDate(y.getDate() - 1);
       setDateRange([y, y]);
@@ -173,6 +195,7 @@ export default function AccessPage() {
   };
 
   const clearFilters = () => {
+    setPreset("today");
     setDateRange([new Date(), new Date()]);
     setEmployeeQuery("");
     setTypeFilter("");
@@ -185,7 +208,10 @@ export default function AccessPage() {
       | { target: { name: string; value: Date | [Date | null, Date | null] } }
   ) => {
     const value = e.target.value;
-    if (Array.isArray(value)) setDateRange(value);
+    if (Array.isArray(value)) {
+      setPreset("custom");
+      setDateRange(value);
+    }
   };
 
   const handleExportCsv = async () => {
@@ -278,11 +304,34 @@ export default function AccessPage() {
     [tt]
   );
 
-  const kpis = [
-    { key: "total", value: stats?.total ?? 0, tint: "bg-[#0D5777]/10", color: "text-[#0D5777]", icon: <FaListUl size={15} /> },
-    { key: "entries", value: stats?.entries ?? 0, tint: "bg-emerald-50", color: "text-emerald-600", icon: <FaSignInAlt size={15} /> },
-    { key: "exits", value: stats?.exits ?? 0, tint: "bg-amber-50", color: "text-amber-600", icon: <FaSignOutAlt size={15} /> },
-    { key: "voided", value: stats?.voided ?? 0, tint: "bg-rose-50", color: "text-rose-600", icon: <FaBan size={15} /> },
+  // Franja de resumen: totales del rango; el clic filtra la bitácora.
+  const summaryItems: ListSummaryItem[] = [
+    { id: "all", label: tt("kpis.total"), value: stats?.total ?? 0, icon: <LuListChecks size={15} /> },
+    { id: "ENTRY", label: tt("kpis.entries"), value: stats?.entries ?? 0, tone: "mint", icon: <LuLogIn size={15} /> },
+    { id: "EXIT", label: tt("kpis.exits"), value: stats?.exits ?? 0, tone: "sun", icon: <LuLogOut size={15} /> },
+    {
+      id: "voided",
+      label: tt("kpis.voided"),
+      value: stats?.voided ?? 0,
+      tone: (stats?.voided ?? 0) > 0 ? "lavender" : "plain",
+      icon: <LuBan size={15} />,
+    },
+  ];
+  const activeSummary = includeVoided && !typeFilter ? "voided" : typeFilter || "all";
+  const selectSummary = (id: string) => {
+    if (id === "voided") {
+      setTypeFilter("");
+      setIncludeVoided((v) => !v);
+      return;
+    }
+    setTypeFilter(id === "all" ? "" : id);
+    setIncludeVoided(false);
+  };
+
+  const presetItems = [
+    { id: "today" as const, label: tt("presets.today") },
+    { id: "yesterday" as const, label: tt("presets.yesterday") },
+    { id: "last7" as const, label: tt("presets.last7") },
   ];
 
   const columns: Column<AccessEvent>[] = [
@@ -313,7 +362,7 @@ export default function AccessPage() {
           <ITText className="text-[12px] font-black text-slate-800">
             {e.employeeNameSnapshot ?? "—"}
           </ITText>
-          <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+          <ITText className="text-[12px] font-bold text-slate-400">
             {e.employeeNumberSnapshot ? `#${e.employeeNumberSnapshot}` : "—"}
           </ITText>
         </ITFlex>
@@ -379,7 +428,7 @@ export default function AccessPage() {
             title={tt("actions.view")}
             onClick={() => void openDetail(e)}
           >
-            <FaEye size={12} />
+            <LuEye size={14} />
           </ITButton>
         </ITFlex>
       ),
@@ -396,7 +445,17 @@ export default function AccessPage() {
         { label: tt("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: tt("title") },
       ]}
-      backAction={() => navigate("/")}
+      backAction={() => goBack("/")}
+      actions={
+        <ITButton variant="outlined" size="lg" color="secondary" onClick={handleExportCsv} disabled={exporting}>
+          <ITFlex align="center" gap={1}>
+            <FaFileCsv className="text-emerald-600" size={13} />
+            <ITText className="font-bold text-[11px]">
+              {exporting ? tt("actions.exporting") : tt("actions.exportCsv")}
+            </ITText>
+          </ITFlex>
+        </ITButton>
+      }
     >
       {sitesError && (
         <ITAlert variant="warning" dismissible onDismiss={() => setSitesError(false)}>
@@ -404,25 +463,61 @@ export default function AccessPage() {
         </ITAlert>
       )}
 
-      {/* Filtros */}
-      <ITCard title={tt("toolbar.title")} className="!p-5 border border-slate-200">
+      {/* Última checada: una fila normal (no el hueco de valor grande del mosaico,
+          que aplastaba el texto cuando no hay checadas). */}
+      <ITCard contentClassName="!p-0">
+        <ITFlex align="center" gap={3} wrap="wrap" className="px-5 py-3">
+          <ITFlex align="center" gap={1.5} className="shrink-0">
+            <ITText as="span" style={{ color: "var(--color-primary)" }}>
+              <LuRadio size={15} />
+            </ITText>
+            <ITText className="!text-[12px] font-bold uppercase tracking-[0.04em] text-slate-500">
+              {tt("live.title")}
+            </ITText>
+          </ITFlex>
+          {lastEvent ? (
+            <ITFlex align="center" gap={2.5} className="min-w-0 flex-1">
+              <ProfileAvatar name={lastEvent.employeeNameSnapshot ?? "—"} size="sm" />
+              <ITText className="min-w-0 truncate !text-[15px] font-bold">
+                {lastEvent.employeeNameSnapshot ?? "—"}
+              </ITText>
+              <ITBentoPill>
+                {lastEvent.type === "ENTRY" ? <LuLogIn size={12} /> : <LuLogOut size={12} />}
+                {tt(`types.${lastEvent.type}`)}
+              </ITBentoPill>
+              <ITBentoPill>{formatDateTime(lastEvent.occurredAt)}</ITBentoPill>
+              {lastEvent.site?.name && <ITBentoPill>{lastEvent.site.name}</ITBentoPill>}
+            </ITFlex>
+          ) : (
+            <ITText muted className="min-w-0 flex-1 !text-[13px]">
+              {tt("live.none")}
+            </ITText>
+          )}
+        </ITFlex>
+      </ITCard>
+
+      <ITBentoStatStrip
+        items={summaryItems.map((item) => ({
+          id: item.id,
+          label: item.label,
+          value: <Num value={Number(item.value)} />,
+          tone: (item.tone ?? "plain") as "plain" | "sea" | "lavender" | "mint" | "sun",
+        }))}
+        activeId={activeSummary}
+        onSelect={selectSummary}
+      />
+
+      {/* Filtros y tabla en una sola tarjeta */}
+      <PanelCard title={tt("toolbar.title")} icon={<LuFilter size={16} />}>
         <ITFlex direction="column" gap={3}>
           <ITFlex align="center" wrap="wrap" gap={2}>
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <ITText className="text-[12px] font-semibold text-slate-400">
               {tt("presets.title")}
             </ITText>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => applyRange("today")}>
-              {tt("presets.today")}
-            </ITButton>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => applyRange("yesterday")}>
-              {tt("presets.yesterday")}
-            </ITButton>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={() => applyRange("last7")}>
-              {tt("presets.last7")}
-            </ITButton>
+            <FilterPills items={presetItems} value={preset as RangePreset} onChange={applyRange} />
             <ITButton variant="text" color="gray" size="sm" onClick={clearFilters} className="ml-auto">
               <ITFlex align="center" gap={1}>
-                <FaUndo size={11} />
+                <LuRotateCcw size={12} />
                 <ITText className="font-bold text-[11px]">{tt("filters.clear")}</ITText>
               </ITFlex>
             </ITButton>
@@ -475,47 +570,7 @@ export default function AccessPage() {
             </ITGrid>
           </ITGrid>
         </ITFlex>
-      </ITCard>
-
-      {/* KPIs + exportar */}
-      <ITFlex wrap="wrap" gap={3}>
-        {kpis.map((k) => (
-          <ITFlex
-            key={k.key}
-            grow={1}
-            basis="160px"
-            align="center"
-            gap={3}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-          >
-            <ITFlex
-              align="center"
-              justify="center"
-              className={`h-10 w-10 shrink-0 rounded-xl ${k.tint} ${k.color}`}
-            >
-              {k.icon}
-            </ITFlex>
-            <ITFlex direction="column" gap={0} className="min-w-0">
-              <ITText className="text-xl font-black leading-none text-slate-800">{k.value}</ITText>
-              <ITText className="truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                {dyn(tt)(`kpis.${k.key}`)}
-              </ITText>
-            </ITFlex>
-          </ITFlex>
-        ))}
-        <ITFlex align="center" justify="center" className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <ITButton variant="outlined" color="gray" onClick={handleExportCsv} disabled={exporting}>
-            <ITFlex align="center" gap={1}>
-              <FaFileCsv className="text-emerald-600" size={13} />
-              <ITText className="font-bold text-[11px]">
-                {exporting ? tt("actions.exporting") : tt("actions.exportCsv")}
-              </ITText>
-            </ITFlex>
-          </ITButton>
-        </ITFlex>
-      </ITFlex>
-
-      <ITDataTable
+        <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={
           fetchTableData as unknown as (
@@ -524,15 +579,18 @@ export default function AccessPage() {
         }
         externalFilters={externalFilters}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[10, 25, 50]}
         debounceMs={350}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
-        rowHeight={50}
         onRowClick={(row) => void openDetail(row as unknown as AccessEvent)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
+      </PanelCard>
 
       <ITDialog
         isOpen={!!detail}
@@ -546,27 +604,26 @@ export default function AccessPage() {
         )}
         {detail && (
           <div style={{ minWidth: "100%" }}>
-            {/* Header */}
-            <div className="pb-4 pr-8 mb-5" style={{ borderBottom: "1px solid #f1f5f9" }}>
-              <ITFlex align="center" wrap="wrap" gap={2} className="mb-1.5">
-                <ITBadget color={TYPE_COLOR[detail.type]} size="lg">
-                  {tt(`types.${detail.type}`)}
-                </ITBadget>
-                <ITBadget color={detail.voidedAt ? "danger" : "success"} size="lg">
-                  {detail.voidedAt ? tt("status.voided") : tt("status.active")}
-                </ITBadget>
-                <span className="text-xs text-slate-400">
-                  · {formatDateTime(detail.occurredAt)}
-                </span>
-              </ITFlex>
-              <ITText className="text-xl font-bold leading-tight text-slate-900">
-                {detail.employeeNameSnapshot ?? "—"}
-              </ITText>
-              {detail.employeeNumberSnapshot && (
-                <ITText className="text-xs text-slate-400">
-                  #{detail.employeeNumberSnapshot}
+            {/* Encabezado héroe */}
+            <div className="mb-5 flex items-center gap-3 pr-8">
+              <ProfileAvatar name={detail.employeeNameSnapshot ?? "—"} size="lg" />
+              <ITFlex className="min-w-0">
+                <ITText as="h2" className="m-0 truncate !text-[18px] font-bold leading-tight !text-slate-800">
+                  {detail.employeeNameSnapshot ?? "—"}
                 </ITText>
-              )}
+                <ITFlex align="center" wrap="wrap" gap={2} className="mt-1">
+                  <ITBadget color={TYPE_COLOR[detail.type]} size="lg">
+                    {tt(`types.${detail.type}`)}
+                  </ITBadget>
+                  <ITBadget color={detail.voidedAt ? "danger" : "success"} size="lg">
+                    {detail.voidedAt ? tt("status.voided") : tt("status.active")}
+                  </ITBadget>
+                  <ITText as="span" className="text-xs text-slate-500">
+                    {formatDateTime(detail.occurredAt)}
+                    {detail.employeeNumberSnapshot ? ` · #${detail.employeeNumberSnapshot}` : ""}
+                  </ITText>
+                </ITFlex>
+              </ITFlex>
             </div>
 
             {/* Cuerpo */}
@@ -656,7 +713,7 @@ export default function AccessPage() {
             </div>
 
             {/* Footer */}
-            <ITFlex justify="end" gap={2} className="mt-5 pt-4" style={{ borderTop: "1px solid #f1f5f9" }}>
+            <ITFlex justify="end" gap={2} className="mt-5">
               {canVoid && !detail.voidedAt && (
                 <ITButton
                   variant="outlined"
@@ -667,7 +724,7 @@ export default function AccessPage() {
                   }}
                 >
                   <ITFlex align="center" gap={1}>
-                    <FaBan size={12} />
+                    <LuBan size={13} />
                     <ITText className="font-bold text-[11px]">{tt("actions.void")}</ITText>
                   </ITFlex>
                 </ITButton>
@@ -683,10 +740,10 @@ export default function AccessPage() {
       <ITDialog
         isOpen={!!voidTarget}
         onClose={() => setVoidTarget(null)}
-        title={tt("void.title")}
         className="max-w-md"
       >
-        <ITFlex direction="column" gap={3} className="mt-2">
+        <DialogHeader icon={<LuBan />} tone="danger" title={tt("void.title")} subtitle={tt("void.subtitle")} />
+        <ITFlex direction="column" gap={3}>
           <ITText className="text-[12px] text-slate-600">{tt("void.message")}</ITText>
           <ITTextarea
             name="voidReason"
@@ -729,13 +786,8 @@ export default function AccessPage() {
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <ITFlex
-      direction="column"
-      gap={1}
-      className="py-3"
-      style={{ borderTop: "1px solid #f1f5f9" }}
-    >
-      <ITText className="text-xs text-slate-400">{label}</ITText>
+    <ITFlex direction="column" gap={1} className="rounded-2xl bg-[color-mix(in_srgb,currentColor_5%,transparent)] px-3.5 py-2.5">
+      <ITText className="text-xs text-slate-500">{label}</ITText>
       <ITText className="text-sm font-semibold text-slate-800 break-words">{value}</ITText>
     </ITFlex>
   );

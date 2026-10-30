@@ -20,7 +20,7 @@ import PurchaseOrderStatusBadge from "./PurchaseOrderStatusBadge";
 import PurchaseOrderReceiveDialog from "./PurchaseOrderReceiveDialog";
 import PurchaseOrderEmailDialog from "./PurchaseOrderEmailDialog";
 
-const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+const HEAD = "text-[12px] font-semibold text-slate-400";
 const money = fmtMoney;
 /** Columnas del detalle: artículo · pedido · recibido · pendiente · costo · IVA · subtotal · importe. */
 const LINE_GRID = "grid grid-cols-[minmax(200px,2.4fr)_1fr_.9fr_.9fr_1fr_.7fr_1fr_1.1fr] items-center gap-3";

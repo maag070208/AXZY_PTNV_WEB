@@ -8,6 +8,7 @@ import {
   ImportResultCard,
   ImportUploadCard,
 } from "@features/inventory/device-import";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /**
  * Carga masiva de dispositivos desde Excel.
@@ -19,6 +20,7 @@ import {
  */
 export default function DeviceImportPage() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t } = useTranslation(["inventory", "common"]);
   const fx = useDeviceImport();
 
@@ -28,10 +30,10 @@ export default function DeviceImportPage() {
       title={t("inventory:import.title")}
       description={t("inventory:import.description")}
       icon={<FaFileExcel size={20} />}
-      backAction={() => navigate("/inventory/devices")}
+      backAction={() => goBack("/inventory/devices")}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
-        { label: t("inventory:devices.title"), onClick: () => navigate("/inventory/devices") },
+        { label: t("inventory:devices.title"), onClick: () => navigate("/inventory/devices", { replace: true }) },
         { label: t("inventory:import.breadcrumb") },
       ]}
     >
@@ -40,8 +42,8 @@ export default function DeviceImportPage() {
       {fx.step === "done" && (
         <ImportResultCard
           fx={fx}
-          onGoToDevices={() => navigate("/inventory/devices")}
-          onGoToMovements={() => navigate("/inventory/movements")}
+          onGoToDevices={() => goBack("/inventory/devices")}
+          onGoToMovements={() => navigate("/inventory/movements", { replace: true })}
         />
       )}
     </ITPage>

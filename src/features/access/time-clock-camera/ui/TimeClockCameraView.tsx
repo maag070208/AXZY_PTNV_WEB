@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { timeClockApi, type TimeClockCamera } from "@entities/time-clock";
+import { ITText, ITStack } from "@axzydev/axzy_ui_system";
 
 /** Cámara de la terminal: reproduce el video si el navegador puede; si es RTSP, informa la ruta sin credenciales. */
 export default function TimeClockCameraView({ clockSerial }: { clockSerial: string }) {
@@ -17,11 +18,11 @@ export default function TimeClockCameraView({ clockSerial }: { clockSerial: stri
       .catch((e: unknown) => setError(e instanceof Error ? e.message : t("camera.errors.read")));
   }, [clockSerial, t]);
 
-  if (error) return <p role="alert" className="text-sm text-red-600">{error}</p>;
-  if (!camera) return <p className="text-sm text-slate-400">{t("camera.loading")}</p>;
+  if (error) return <ITText role="alert" className="text-sm text-red-600">{error}</ITText>;
+  if (!camera) return <ITText className="text-sm text-slate-400">{t("camera.loading")}</ITText>;
 
   return (
-    <div className="flex flex-col gap-4">
+    <ITStack spacing={4}>
       {camera.playback.mode === "http" ? (
         <video
           key={camera.playback.url}
@@ -34,15 +35,15 @@ export default function TimeClockCameraView({ clockSerial }: { clockSerial: stri
         </video>
       ) : (
         <div className="max-w-2xl rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          <p className="font-semibold">{t("camera.rtsp.title")}</p>
-          <p className="mt-1">{t("camera.rtsp.body")}</p>
+          <ITText className="font-semibold">{t("camera.rtsp.title")}</ITText>
+          <ITText className="mt-1">{t("camera.rtsp.body")}</ITText>
           {camera.playback.rtspPath && (
-            <p className="mt-2 font-mono text-xs text-amber-900">{camera.playback.rtspPath}</p>
+            <ITText className="mt-2 font-mono text-xs text-amber-900">{camera.playback.rtspPath}</ITText>
           )}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-[var(--it-card-bg)]">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>
@@ -69,6 +70,6 @@ export default function TimeClockCameraView({ clockSerial }: { clockSerial: stri
           </tbody>
         </table>
       </div>
-    </div>
+    </ITStack>
   );
 }

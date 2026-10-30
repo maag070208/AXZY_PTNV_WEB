@@ -13,6 +13,8 @@ import {
 import { FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
+import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
+import { RowAction } from "@shared/ui/row-action";
 
 interface SimpleCatalogTabProps<T extends { id: string; name: string; active: boolean }> {
   list: (includeInactive?: boolean) => Promise<T[]>;
@@ -138,29 +140,16 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
       label: "",
       width: 140,
       render: (item: T) => (
-        <ITFlex align="center" gap={2}>
-          <ITButton variant="outlined" color="primary" size="lg" onClick={() => openEdit(item)}>
-            <FaEdit size={12} />
-          </ITButton>
-          <ITButton
-            variant="outlined"
-            color={item.active ? "secondary" : "success"}
-            size="lg"
+        <ITFlex align="center" gap={1.5}>
+          <RowAction icon={<FaEdit size={11} />} label={t("edit")} tone="primary" onClick={() => openEdit(item)} />
+          <RowAction
+            icon={item.active ? <FaTrash size={11} /> : <FaTrashRestore size={11} />}
+            label={item.active ? t("deactivate") : t("activate")}
+            tone={item.active ? "secondary" : "success"}
             onClick={() => toggleActive(item)}
-            title={item.active ? t("deactivate") : t("activate")}
-          >
-            {item.active ? <FaTrash size={12} /> : <FaTrashRestore size={12} />}
-          </ITButton>
+          />
           {!item.active && (
-            <ITButton
-              variant="outlined"
-              color="error"
-              size="lg"
-              onClick={() => setToDelete(item)}
-              title={t("deleteForever")}
-            >
-              <FaTrash size={12} />
-            </ITButton>
+            <RowAction icon={<FaTrash size={11} />} label={t("deleteForever")} tone="error" onClick={() => setToDelete(item)} />
           )}
         </ITFlex>
       ),
@@ -201,16 +190,20 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
         </ITFlex>
       </ITDialog>
 
-      <ITDataTable
+      <CatalogStatStrip load={() => list(true)} reloadKey={reloadKey} />
+
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
         rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
 
       <ITConfirmDialog

@@ -1,40 +1,82 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITBadget, ITButton, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { FaBoxOpen, FaCheckCircle, FaEdit, FaHistory, FaPlusCircle, FaThumbsDown, FaToolbox, FaUserTie } from "react-icons/fa";
+import {
+  ITBentoFeed,
+  ITBentoGauge,
+  ITBentoGrid,
+  ITBentoTile,
+  ITButton,
+  ITChip,
+  ITFlex,
+  ITPage,
+  ITText,
+  useITBentoCountUp,
+} from "@axzydev/axzy_ui_system";
+import { FaBoxOpen, FaEdit, FaPlusCircle } from "react-icons/fa";
+import {
+  LuArrowLeftRight,
+  LuArrowUpRight,
+  LuBox,
+  LuCircleCheck,
+  LuHandHelping,
+  LuHistory,
+  LuLayers,
+  LuPackagePlus,
+  LuRotateCcw,
+  LuSlidersHorizontal,
+  LuThumbsDown,
+  LuTrash2,
+  LuUndo2,
+  LuWrench,
+} from "react-icons/lu";
 import { useTranslation } from "react-i18next";
-import { formatDateTime } from "@shared/utils/dates";
-import { inventoryApi, type Device, type Stock, type StockLedgerRow, type MovementType, type DeviceUnit } from "@entities/inventory";
-import { StatCard } from "@shared/ui/stat-card";
+import { formatDate, formatTimeInTZ } from "@shared/utils/dates";
+import { inventoryApi, type Device, type Stock, type StockLedgerRow, type MovementType, type DeviceUnit, type DeviceUnitStatus } from "@entities/inventory";
 import { useCan } from "@entities/user";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
+import { LangostinState } from "@shared/ui/langostin";
+import { FilterPills } from "@shared/ui/filter-pills";
 
-const STATUS_COLOR: Record<string, "success" | "warning" | "danger" | "gray"> = {
+const STATUS_COLOR: Record<DeviceUnitStatus, "success" | "warning" | "danger" | "info" | "gray"> = {
   AVAILABLE: "success",
   ON_LOAN: "warning",
   DAMAGED: "danger",
-  IN_MAINTENANCE: "gray",
-  RETIRED: "danger",
+  IN_MAINTENANCE: "info",
+  RETIRED: "gray",
 };
 
-const TYPE_BADGE_COLOR: Record<MovementType, "success" | "warning" | "danger" | "gray" | "info"> = {
-  STOCK_IN: "success",
-  LOAN: "warning",
-  RETURN: "info",
-  RETIREMENT: "danger",
-  TRANSFER: "info",
-  ADJUSTMENT_IN: "success",
-  ADJUSTMENT_OUT: "warning",
-  MAINTENANCE_IN: "gray",
-  MAINTENANCE_OUT: "info",
-  REVERSAL: "danger",
+const STATUS_ORDER: DeviceUnitStatus[] = ["AVAILABLE", "ON_LOAN", "DAMAGED", "IN_MAINTENANCE", "RETIRED"];
+
+const MOVEMENT_ICON: Record<MovementType, ReactNode> = {
+  STOCK_IN: <LuPackagePlus size={13} />,
+  LOAN: <LuArrowUpRight size={13} />,
+  RETURN: <LuUndo2 size={13} />,
+  RETIREMENT: <LuTrash2 size={13} />,
+  TRANSFER: <LuArrowLeftRight size={13} />,
+  ADJUSTMENT_IN: <LuSlidersHorizontal size={13} />,
+  ADJUSTMENT_OUT: <LuSlidersHorizontal size={13} />,
+  MAINTENANCE_IN: <LuWrench size={13} />,
+  MAINTENANCE_OUT: <LuWrench size={13} />,
+  REVERSAL: <LuRotateCcw size={13} />,
 };
+
+const dayKey = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+};
+
+/** Número grande de un mosaico: sube de 0 al valor al montar. */
+function Count({ value }: { value: number }) {
+  const shown = useITBentoCountUp(value, 1200, 0);
+  return <>{Math.round(shown).toLocaleString("es-MX")}</>;
+}
 
 export default function DeviceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   /** Mismo permiso que `POST /inventory/movements` (dar entrada/baja). */
   const canEditUnits = useCan("devices.edit");
   const [device, setDevice] = useState<Device | null>(null);
@@ -43,6 +85,7 @@ export default function DeviceDetailPage() {
   const [stockLedger, setStockLedger] = useState<StockLedgerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [unitFilter, setUnitFilter] = useState<"all" | DeviceUnitStatus>("all");
 
   useEffect(() => {
     if (!id) return;
@@ -59,14 +102,38 @@ export default function DeviceDetailPage() {
       .finally(() => setLoading(false));
   }, [id, t]);
 
+  // Historial (kardex) agrupado por día, del más reciente al más antiguo.
+  const feedGroups = useMemo(() => {
+    const sorted = [...stockLedger].sort((a, b) => +new Date(b.date) - +new Date(a.date));
+    const todayKey = dayKey(new Date().toISOString());
+    const yesterdayKey = dayKey(new Date(Date.now() - 86_400_000).toISOString());
+    const groups: { key: string; label: string; items: { id: string; icon: ReactNode; title: string; meta: string; tone: "success" | "violet" | "neutral" }[] }[] = [];
+    sorted.forEach((r, i) => {
+      const key = dayKey(r.date);
+      let group = groups[groups.length - 1];
+      if (!group || group.key !== key) {
+        const label = key === todayKey ? t("ui.today") : key === yesterdayKey ? t("ui.yesterday") : formatDate(r.date);
+        group = { key, label, items: [] };
+        groups.push(group);
+      }
+      const qty = r.stockIn ? `+${r.stockIn}` : r.stockOut ? `−${r.stockOut}` : "";
+      group.items.push({
+        id: `${r.date}-${i}`,
+        icon: MOVEMENT_ICON[r.type],
+        title: `${t(`typeLabels.${r.type}`)}${qty ? ` ${qty}` : ""}`,
+        meta: [formatTimeInTZ(r.date), t("ui.balance", { n: r.balance }), r.reason].filter(Boolean).join(" · "),
+        tone: r.type === "LOAN" || r.type === "RETURN" ? "violet" : r.stockIn ? "success" : "neutral",
+      });
+    });
+    return groups;
+  }, [stockLedger, t]);
+
   // Sin dispositivo (no existe o falló la carga): el error, no un cargador infinito.
   if (!loading && !device) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("devices.detail")} backAction={() => navigate("/inventory/devices")}>
-        <ITAlert variant="error" dismissible={false}>
-          {error ?? t("common:errors.load")}
-        </ITAlert>
+        noPadding title={t("devices.detail")} backAction={() => goBack("/inventory/devices")}>
+        <LangostinState kind="error" description={error ?? t("common:errors.load")} />
       </ITPage>
     );
   }
@@ -74,15 +141,26 @@ export default function DeviceDetailPage() {
   if (loading || !device) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("devices.detail")} backAction={() => navigate(-1)}>
-        <ITFlex justify="center" align="center" className="py-20">
-          <LottieLoader size="lg" />
-        </ITFlex>
+        noPadding title={t("devices.detail")} backAction={() => goBack("/inventory/devices")}>
+        <LangostinState kind="loading" />
       </ITPage>
     );
   }
 
   const s = stock;
+  const active = s?.active ?? 0;
+  const available = s?.AVAILABLE ?? 0;
+  const loaned = s?.ON_LOAN ?? 0;
+  const damaged = s?.DAMAGED ?? 0;
+  const maintenance = s?.IN_MAINTENANCE ?? 0;
+  const pct = (n: number) => (active > 0 ? Math.round((n / active) * 100) : 0);
+
+  const unitCounts = units.reduce<Record<string, number>>((acc, u) => ({ ...acc, [u.status]: (acc[u.status] ?? 0) + 1 }), {});
+  const filterItems = [
+    { id: "all" as const, label: t("devices.unitsAll"), count: units.length },
+    ...STATUS_ORDER.filter((st) => unitCounts[st]).map((st) => ({ id: st, label: t(`unitStatus.${st}`), count: unitCounts[st] })),
+  ];
+  const shownUnits = unitFilter === "all" ? units : units.filter((u) => u.status === unitFilter);
 
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -91,7 +169,7 @@ export default function DeviceDetailPage() {
       description={`${device.brand} ${device.model}`}
       icon={<FaBoxOpen size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title"), onClick: () => navigate("/inventory/devices") }, { label: device.name }]}
-      backAction={() => navigate("/inventory/devices")}
+      backAction={() => goBack("/inventory/devices")}
       actions={
         <ITFlex align="center" gap={2} wrap="wrap">
           {/* "Llegaron más piezas": abre el alta de ENTRADA con este
@@ -119,124 +197,120 @@ export default function DeviceDetailPage() {
         </ITFlex>
       }
     >
-      {/* Hero */}
-      <ITFlex
-        as="section"
-        direction="column"
-        gap={4}
-        className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm"
-      >
-        <ITFlex align="center" justify="between" gap={4} wrap="wrap">
-          <ITFlex align="center" gap={4} className="min-w-0">
-            <ITFlex align="center" justify="center" className="h-16 w-16 shrink-0 rounded-2xl bg-slate-800 text-white shadow-md">
-              <FaBoxOpen size={26} />
-            </ITFlex>
-            <ITFlex direction="column" gap={1} className="min-w-0">
-              <ITFlex align="center" gap={2} wrap="wrap">
-                <ITText className="text-2xl font-black text-slate-900">{device.name}</ITText>
-                <ITBadget color="gray" size="lg">{device.type?.name ?? ""}</ITBadget>
-              </ITFlex>
-              <ITText className="text-sm text-slate-500">
-                {device.brand} · {device.model}
-                {device.description ? ` · ${device.description}` : ""}
-                {device.code ? ` · ${t("devices.codeShort")}: ${device.code}` : ""}
+      <ITBentoGrid>
+        {/* Héroe: tipo, piezas activas y disponibilidad */}
+        <ITBentoTile
+          tone="sea"
+          cols={4}
+          rows={3}
+          wide
+          icon={<LuBox size={15} />}
+          label={device.type?.name ?? t("devices.active")}
+          value={<Count value={active} />}
+          caption={t("devices.units", { total: s?.historical ?? 0 })}
+        >
+          <div className="relative z-[1] my-1 flex min-h-0 flex-1 flex-col justify-center">
+            {active > 0 && (
+              <ITBentoGauge value={available / active} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
+            )}
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <ITText as="span" className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-2.5 py-1 text-[11.5px]">
+                <b className="h-[7px] w-[7px] rounded-full bg-[var(--color-warning)]" />
+                {t("devices.chipAvailable", { pct: pct(available) })}
               </ITText>
-            </ITFlex>
-          </ITFlex>
-          <ITFlex direction="column" align="end" gap={1}>
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("devices.active")}</ITText>
-            <ITText className="text-4xl font-black text-slate-900 leading-none">{s?.active ?? 0}</ITText>
-            <ITText className="text-[11px] text-slate-400">{t("devices.units", { total: s?.historical ?? 0 })}</ITText>
-          </ITFlex>
-        </ITFlex>
-      </ITFlex>
+              <ITText as="span" className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-2.5 py-1 text-[11.5px]">
+                <b className="h-[7px] w-[7px] rounded-full bg-[color-mix(in_srgb,currentColor_45%,transparent)]" />
+                {t("devices.chipLoaned", { count: loaned })}
+              </ITText>
+            </div>
+            {(device.code || device.description) && (
+              <ITText className="m-0 mt-2 truncate text-[11.5px] opacity-70">
+                {[device.code ? `${t("devices.codeShort")}: ${device.code}` : "", device.description].filter(Boolean).join(" · ")}
+              </ITText>
+            )}
+          </div>
+        </ITBentoTile>
 
-      {/* Stats */}
-      <ITGrid container columns={12} spacing={4}>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaCheckCircle size={16} className="text-white" />} circleClass="bg-emerald-500" value={s?.AVAILABLE ?? 0} label={t("devices.avail")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaUserTie size={16} className="text-white" />} circleClass="bg-amber-500" value={s?.ON_LOAN ?? 0} label={t("devices.loaned")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaThumbsDown size={16} className="text-white" />} circleClass="bg-orange-500" value={s?.DAMAGED ?? 0} label={t("devices.damaged")} />
-        </ITGrid>
-        <ITGrid item xs={6} md={3}>
-          <StatCard size="lg" icon={<FaToolbox size={16} className="text-white" />} circleClass="bg-slate-500" value={s?.IN_MAINTENANCE ?? 0} label={t("devices.maintenance")} />
-        </ITGrid>
-      </ITGrid>
+        <ITBentoTile
+          tone="mint"
+          cols={4}
+          rows={2}
+          icon={<LuCircleCheck size={15} />}
+          label={t("devices.avail")}
+          value={<Count value={available} />}
+          caption={t("devices.ofActive", { pct: pct(available) })}
+        />
+        <ITBentoTile
+          tone="sun"
+          cols={4}
+          rows={2}
+          icon={<LuHandHelping size={15} />}
+          label={t("devices.loaned")}
+          value={<Count value={loaned} />}
+          caption={t("devices.ofActive", { pct: pct(loaned) })}
+        />
+        <ITBentoTile
+          cols={4}
+          rows={1}
+          icon={<LuThumbsDown size={15} />}
+          label={t("devices.damaged")}
+          value={
+            <ITText as="span" style={damaged > 0 ? { color: "var(--color-danger)" } : undefined}>
+              <Count value={damaged} />
+            </ITText>
+          }
+        />
+        <ITBentoTile
+          tone="lavender"
+          cols={4}
+          rows={1}
+          icon={<LuWrench size={15} />}
+          label={t("devices.maintenance")}
+          value={<Count value={maintenance} />}
+        />
 
-      <ITGrid container columns={12} spacing={6}>
-        {/* Unidades */}
-        <ITGrid item xs={12} lg={5}>
-          <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <ITFlex align="center" justify="between" gap={2}>
-              <ITText className="text-sm font-bold text-slate-800">{t("devices.deviceUnits")}</ITText>
-              <ITBadget color="gray" size="lg">{units.length}</ITBadget>
-            </ITFlex>
-            <div className="max-h-[420px] overflow-y-auto rounded-xl border border-slate-100">
-              {units.map((u) => (
-                <ITFlex key={u.id} align="center" justify="between" gap={3} className="border-b border-slate-100 px-3 py-2.5 last:border-0 hover:bg-slate-50/60">
-                  <ITFlex direction="column" gap={0.5} className="min-w-0">
-                    <ITText className="font-black text-emerald-700 text-[12px] uppercase tracking-tight">{u.assetTag}</ITText>
-                    <ITFlex gap={2} wrap="wrap" className="text-[10px] text-slate-400">
-                      {device.type?.useSerialNumber && u.serialNumber && <span>{i18n.t("common:labels.serialNumber", { value: u.serialNumber })}</span>}
-                      {device.type?.useMac && u.macAddress && <span>MAC: {u.macAddress}</span>}
-                      {device.type?.useIp && u.ip && <span>IP: {u.ip}</span>}
-                      {device.type?.useHostname && u.hostname && <span>{i18n.t("common:labels.hostname", { value: u.hostname })}</span>}
-                      {!u.serialNumber && !u.macAddress && !u.ip && !u.hostname && <span>—</span>}
+        {/* Unidades físicas */}
+        <ITBentoTile cols={5} rows={5} wide icon={<LuLayers size={15} />} label={t("devices.deviceUnits")}>
+          {units.length === 0 ? (
+            <LangostinState kind="empty" size="sm" title={t("devices.noUnits")} description={t("devices.noUnitsHint")} />
+          ) : (
+            <div className="mt-2 flex min-h-0 flex-1 flex-col gap-2">
+              {filterItems.length > 2 && <FilterPills items={filterItems} value={unitFilter} onChange={setUnitFilter} />}
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                {shownUnits.map((u) => (
+                  <div
+                    key={u.id}
+                    className="flex items-center justify-between gap-3 rounded-[14px] px-2.5 py-2 transition-colors hover:bg-[color-mix(in_srgb,currentColor_6%,transparent)]"
+                  >
+                    <ITFlex className="min-w-0">
+                      <ITText className="m-0 text-[12.5px] font-semibold">{u.assetTag}</ITText>
+                      <ITText className="m-0 flex flex-wrap gap-x-3 text-[11px] opacity-60">
+                        {device.type?.useSerialNumber && u.serialNumber && <ITText as="span">{i18n.t("common:labels.serialNumber", { value: u.serialNumber })}</ITText>}
+                        {device.type?.useMac && u.macAddress && <ITText as="span">MAC: {u.macAddress}</ITText>}
+                        {device.type?.useIp && u.ip && <ITText as="span">IP: {u.ip}</ITText>}
+                        {device.type?.useHostname && u.hostname && <ITText as="span">{i18n.t("common:labels.hostname", { value: u.hostname })}</ITText>}
+                        {!u.serialNumber && !u.macAddress && !u.ip && !u.hostname && <ITText as="span">—</ITText>}
+                      </ITText>
                     </ITFlex>
-                  </ITFlex>
-                  <ITBadget color={STATUS_COLOR[u.status]} size="lg">{t(`unitStatus.${u.status}`)}</ITBadget>
-                </ITFlex>
-              ))}
-              {units.length === 0 && <ITText className="py-8 text-center text-sm text-slate-400">{t("devices.noUnits")}</ITText>}
+                    <ITChip size="sm" color={STATUS_COLOR[u.status]}>{t(`unitStatus.${u.status}`)}</ITChip>
+                  </div>
+                ))}
+              </div>
             </div>
-          </ITFlex>
-        </ITGrid>
+          )}
+        </ITBentoTile>
 
-        {/* Kardex */}
-        <ITGrid item xs={12} lg={7}>
-          <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <ITFlex align="center" gap={2}>
-              <FaHistory className="text-slate-400" size={14} />
-              <ITText className="text-sm font-bold text-slate-800">{t("devices.stockLedger")}</ITText>
-            </ITFlex>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[520px] text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">
-                    <th className="px-3 py-2.5">{t("stockLedger.date")}</th>
-                    <th className="px-3 py-2.5">{t("stockLedger.movement")}</th>
-                    <th className="px-3 py-2.5 text-right">{t("stockLedger.entry")}</th>
-                    <th className="px-3 py-2.5 text-right">{t("stockLedger.exit")}</th>
-                    <th className="px-3 py-2.5 text-right">{t("stockLedger.balance")}</th>
-                    <th className="px-3 py-2.5">{t("stockLedger.reason")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stockLedger.map((r, i) => (
-                    <tr key={i} className={`border-b border-slate-100 ${i % 2 === 1 ? "bg-slate-50/40" : ""}`}>
-                      <td className="px-3 py-2 text-[11px] text-slate-500 whitespace-nowrap">{formatDateTime(r.date)}</td>
-                      <td className="px-3 py-2">
-                        <ITBadget color={TYPE_BADGE_COLOR[r.type]} size="lg">{t(`typeLabels.${r.type}`)}</ITBadget>
-                      </td>
-                      <td className="px-3 py-2 text-right text-[12px] font-bold text-emerald-600">{r.stockIn ? `+${r.stockIn}` : ""}</td>
-                      <td className="px-3 py-2 text-right text-[12px] font-bold text-red-500">{r.stockOut ? `−${r.stockOut}` : ""}</td>
-                      <td className="px-3 py-2 text-right text-[12px] font-black text-slate-800">{r.balance}</td>
-                      <td className="px-3 py-2 text-[11px] text-slate-400">{r.reason ?? ""}</td>
-                    </tr>
-                  ))}
-                  {stockLedger.length === 0 && (
-                    <tr><td colSpan={6} className="py-8 text-center text-sm text-slate-400">{t("devices.noMovements")}</td></tr>
-                  )}
-                </tbody>
-              </table>
+        {/* Historial (kardex) en feed por día */}
+        <ITBentoTile cols={7} rows={5} wide icon={<LuHistory size={15} />} label={t("devices.stockLedger")}>
+          {feedGroups.length === 0 ? (
+            <LangostinState kind="empty" size="sm" title={t("devices.noMovements")} description={t("devices.noMovementsHint")} />
+          ) : (
+            <div className="mt-1 min-h-0 flex-1">
+              <ITBentoFeed maxHeight={340} groups={feedGroups} />
             </div>
-          </ITFlex>
-        </ITGrid>
-      </ITGrid>
+          )}
+        </ITBentoTile>
+      </ITBentoGrid>
     </ITPage>
   );
 }

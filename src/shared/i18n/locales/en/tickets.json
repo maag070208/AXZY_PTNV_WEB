@@ -38,7 +38,18 @@
       "GOOD": "GOOD",
       "REGULAR": "FAIR",
       "POOR": "BAD"
-    }
+    },
+    "summary": {
+      "open": "Open",
+      "followUp": "In follow-up",
+      "unassigned": "Unassigned",
+      "closed": "Closed",
+      "ofTotal": "of {{total}} tickets",
+      "clear": "Show all"
+    },
+    "confirmTrashTitle": "Move to trash?",
+    "confirmForeverTitle": "Delete permanently?",
+    "view": "View ticket"
   },
   "new": {
     "title": "New Ticket",
@@ -96,7 +107,9 @@
       "forMe": "No, it's mine",
       "forOther": "Yes, someone else asked for it",
       "whoRequested": "Who asked for it?",
-      "searchPerson": "Search the person…"
+      "searchPerson": "Search the person…",
+      "sentOk": "Done — your ticket is in!",
+      "sendError": "Could not send. Please try again."
     },
     "suggestions": {
       "noPower": "Won't turn on",
@@ -265,7 +278,21 @@
     "newTaskHint": "Langostín helps you get it ready: answer what it asks you.",
     "noTasksHint": "Use “New task” to assign the first one.",
     "overdue": "Overdue",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "by": "by {{name}}",
+    "commentLabel": "Comment",
+    "folio": "Reference",
+    "tasksTile": "Tasks",
+    "tasksDone": "completed",
+    "noAssignmentsShort": "no tasks yet",
+    "daysOpen": "Time open",
+    "sinceCreated": "since it was created",
+    "tasksProgress": "{{done}} of {{total}} tasks completed",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "noHistoryHint": "Changes and comments on the ticket will show up here.",
+    "confirmTrashTitle": "Move this ticket to trash?",
+    "confirmForeverTitle": "Delete this ticket permanently?"
   },
   "kanban": {
     "byTicket": "Ticket tasks",
@@ -299,7 +326,15 @@
     "taskDescription": "Description",
     "taskDescPlaceholder": "Task details...",
     "startDate": "Start date",
-    "dueDate": "Due date"
+    "dueDate": "Due date",
+    "guideTitle": "This is how a task moves",
+    "guideHint": "Grab the card and drop it on the column of the new status. It saves itself.",
+    "guideCard": "Computer cabling",
+    "guideDrop": "Drop it here",
+    "guideDone": "Got it",
+    "summaryCount": "{{count}} tasks on the board",
+    "summaryOverdue": "{{count}} overdue",
+    "dragHint": "Drag a card to another column to change its status"
   },
   "mytasks": {
     "title": "My Tasks",
@@ -310,7 +345,27 @@
     "viewBoard": "View kanban board",
     "viewBoardTitle": "View in kanban board",
     "loadError": "Unable to load your tasks",
-    "overdueTasks": "{{count}} overdue"
+    "overdueTasks": "{{count}} overdue",
+    "greeting": "Hi, {{name}}",
+    "summary_one": "You have {{count}} pending task",
+    "summary_other": "You have {{count}} pending tasks",
+    "summaryNone": "You have no pending tasks",
+    "dueTodayCount_one": "{{count}} due today",
+    "dueTodayCount_other": "{{count}} due today",
+    "filterAll": "All",
+    "emptyTitle": "No tasks assigned",
+    "emptyDescription": "When someone assigns you a task on a ticket, it will show up here.",
+    "groups": {
+      "overdue": "Overdue",
+      "today": "Due today",
+      "week": "This week",
+      "later": "Later",
+      "noDate": "No due date"
+    },
+    "dueToday": "Due today",
+    "overdueOn": "Was due {{date}}",
+    "dueOn": "Due {{date}}",
+    "noDueDate": "No due date"
   },
   "admintasks": {
     "title": "Task management",
@@ -331,7 +386,20 @@
     "overdue": "Overdue",
     "start": "Start: {{date}}",
     "end": "End: {{date}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "overdueDays": "Overdue · {{days}} d ago",
+    "onTime": "Closed on time",
+    "summaryTotal": "Tasks",
+    "summaryTotalCaption": "across all tickets",
+    "summaryOverdue": "Overdue",
+    "summaryOk": "Open or completed",
+    "pctOfTotal": "{{pct}}% of total",
+    "visible": "{{shown}} visible · {{total}} total",
+    "filterAll": "All",
+    "filterCompleted": "Completed",
+    "filterInReview": "In review",
+    "searchPlaceholder": "Search task, employee or ticket…",
+    "clear": "Clear filter"
   },
   "pdf": {
     "legend": "Ticket Report",
@@ -373,7 +441,8 @@
     "empty": "No files",
     "uploadEvidence": "Upload evidence",
     "uploadTicketFiles": "Upload ticket files",
-    "fallbackExt": "FILE"
+    "fallbackExt": "FILE",
+    "uploadHint": "Images, PDF or video up to 50 MB."
   },
   "form": {
     "validation": {
@@ -385,7 +454,7 @@
     "name": "Langostín · Tasks",
     "helper": "Langostín helps you get the task ready",
     "typing": "Langostín is typing…",
-    "greeting": "Let’s do a task! Tell me how to set it up.",
+    "greeting": "Hi! Let's build the task together.",
     "askWho": "Who is in charge of the task?",
     "askWhat": "What needs to be done?",
     "askNotes": "Anything else I should know? Optional.",
@@ -393,7 +462,7 @@
     "done": "Done. I am assigning the task.",
     "searchEmployee": "Search the person…",
     "titlePlaceholder": "Write the task title…",
-    "notesPlaceholder": "Task details…",
+    "notesPlaceholder": "Details (optional)…",
     "noNotes": "No details",
     "send": "Send",
     "back": "Back",
@@ -414,7 +483,18 @@
       "done": "Done! I am creating the task.",
       "working": "Creating the task…",
       "sent": "Done! The task is already assigned.",
-      "error": "I could not create the task. Check the data and try again."
-    }
+      "error": "I could not create the task. Check the data and try again.",
+      "ticket": "Pick the ticket this task belongs to."
+    },
+    "askTicket": "Which ticket is the task for?",
+    "searchTicket": "Search the ticket…",
+    "whatPlaceholder": "What needs to be done?",
+    "continue": "Continue",
+    "sending": "Sending the task…",
+    "sentOk": "Done — the task is assigned!",
+    "sendError": "Could not create the task.",
+    "tooltip": "Create task here",
+    "offerBubble": "New task? I can create it right here.",
+    "searchPerson": "Search the person…"
   }
 }

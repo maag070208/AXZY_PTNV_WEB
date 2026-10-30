@@ -1,6 +1,6 @@
 import {
   ITButton,
-  ITConfirmDialog,
+  ITCard,
   ITFlex,
   ITGrid,
   ITPage,
@@ -8,13 +8,13 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import {
-  FaFilePdf,
-  FaTicketAlt,
-  FaTimesCircle,
-  FaTrash,
-  FaTrashRestore,
-  FaTrello,
-} from "react-icons/fa";
+  LuCircleCheck,
+  LuFileDown,
+  LuKanban,
+  LuTicket,
+  LuTrash2,
+  LuUndo2,
+} from "react-icons/lu";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -24,23 +24,28 @@ import {
   useTicketDetail,
   buildTimeline,
   TicketHistoryAside,
+  TicketHero,
   TicketInfoCard,
   TicketEditDialog,
   TicketComments,
   TasksGraph,
 } from "@features/ticket/ticket-detail";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
+import { LangostinState } from "@shared/ui/langostin";
+import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 
 export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const [editOpen, setEditOpen] = useState(false);
 
   const fx = useTicketDetail({
     id,
     download: downloadTicketPDF,
-    onDeleted: () => navigate("/tickets"),
+    onDeleted: () => goBack("/tickets"),
   });
 
   const renderAssignmentAttachments = ({
@@ -74,14 +79,14 @@ export default function TicketDetailPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.title")}
-        backAction={() => navigate(-1)}
-        icon={<FaTicketAlt size={20} />}
+        backAction={() => goBack("/tickets")}
+        icon={<LuTicket size={20} />}
         breadcrumbs={[
-          { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets") },
+          { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets", { replace: true }) },
           { label: tt("detail.title") },
         ]}
       >
-        <ITText className="text-slate-400">{tt("detail.loading")}</ITText>
+        <LangostinState kind="loading" title={tt("detail.loading")} description="" />
       </ITPage>
     );
   }
@@ -91,12 +96,12 @@ export default function TicketDetailPage() {
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
-      title={ticket.title}
-      backAction={() => navigate(-1)}
-      icon={<FaTicketAlt size={20} />}
+      title={ticket.title.charAt(0).toUpperCase() + ticket.title.slice(1)}
+      backAction={() => goBack("/tickets")}
+      icon={<LuTicket size={20} />}
       breadcrumbs={[
-        { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets") },
-        { label: ticket.title },
+        { label: tt("detail.ticketBreadcrumb"), onClick: () => navigate("/tickets", { replace: true }) },
+        { label: tt("detail.title") },
       ]}
       actions={
         <ITFlex gap={2} wrap="wrap">
@@ -109,7 +114,7 @@ export default function TicketDetailPage() {
               title={tt("detail.kanbanTitle")}
             >
               <ITFlex align="center" gap={1}>
-                <FaTrello size={12} />
+                <LuKanban size={14} />
                 <ITText className="font-bold text-[11px]">{tt("detail.kanban")}</ITText>
               </ITFlex>
             </ITButton>
@@ -122,7 +127,7 @@ export default function TicketDetailPage() {
             disabled={fx.downloadingPDF}
           >
             <ITFlex align="center" gap={1}>
-              <FaFilePdf className="text-red-600" size={13} />
+              <LuFileDown size={14} />
               <ITText className="font-bold text-[11px]">
                 {fx.downloadingPDF ? tt("detail.pdfGenerating") : tt("detail.pdf")}
               </ITText>
@@ -132,11 +137,11 @@ export default function TicketDetailPage() {
             <ITButton
               variant="filled"
               size="lg"
-              color="error"
+              color="primary"
               onClick={() => fx.handleStatusChange("CLOSED")}
             >
               <ITFlex align="center" gap={1}>
-                <FaTimesCircle size={12} />
+                <LuCircleCheck size={14} />
                 <ITText className="font-bold text-[11px]">{tt("detail.finish")}</ITText>
               </ITFlex>
             </ITButton>
@@ -149,30 +154,33 @@ export default function TicketDetailPage() {
               onClick={() => fx.setDeleteOpen(true)}
               title={ticket.deletedAt ? tt("detail.deleteForever") : tt("detail.moveTrash")}
             >
-              {ticket.deletedAt ? <FaTrashRestore size={12} /> : <FaTrash size={12} />}
+              {ticket.deletedAt ? <LuUndo2 size={14} /> : <LuTrash2 size={14} />}
             </ITButton>
           )}
         </ITFlex>
       }
     >
+      <div className="mb-5">
+        <TicketHero
+          fx={fx}
+          onEdit={fx.canEditTicket && !fx.isClosed ? () => setEditOpen(true) : undefined}
+          canAssign={fx.canEditTicket && !fx.isClosed}
+        />
+      </div>
+
       <ITGrid container columns={12} spacing={5} className="items-start">
         {/* Columna izquierda: contenido principal (2/3) */}
         <ITGrid item xs={12} md={8} className="flex flex-col gap-5 min-w-0">
-          <TicketInfoCard
-            fx={fx}
-            attachments={renderTicketAttachments}
-            onEdit={fx.canEditTicket && !fx.isClosed ? () => setEditOpen(true) : undefined}
-            canAssign={fx.canEditTicket && !fx.isClosed}
-          />
+          <TicketInfoCard fx={fx} attachments={renderTicketAttachments} />
 
           {(fx.canEditTicket || fx.canCreateTasks || fx.isInvolved) && (
-            <ITFlex className="bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-6 lg:p-8">
+            <ITCard>
               <TasksGraph
                 fx={fx}
                 canManage={fx.canEditTicket || fx.canCreateTasks}
                 renderAssignmentAttachments={renderAssignmentAttachments}
               />
-            </ITFlex>
+            </ITCard>
           )}
 
           <TicketComments fx={fx} />
@@ -196,11 +204,11 @@ export default function TicketDetailPage() {
 
       <TicketEditDialog fx={fx} open={editOpen} onClose={() => setEditOpen(false)} />
 
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={fx.deleteOpen}
         onClose={() => fx.setDeleteOpen(false)}
         onConfirm={fx.handleDeleteTicket}
-        title={ticket.deletedAt ? tt("detail.deleteForever") : tt("detail.moveTrash")}
+        title={ticket.deletedAt ? tt("detail.confirmForeverTitle") : tt("detail.confirmTrashTitle")}
         message={
           ticket.deletedAt
             ? i18n.t("tickets:detail.confirmHardDelete", { title: ticket.title })

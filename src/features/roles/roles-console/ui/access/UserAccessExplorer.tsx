@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITAlert, ITButton, ITCheckbox, ITConfirmDialog, ITDropdownMenu, ITInput, ITSelect } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITCheckbox, ITConfirmDialog, ITDropdownMenu, ITInput, ITSelect, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import type { ITDropdownMenuItem } from "@axzydev/axzy_ui_system";
 import {
   FaBan,
@@ -19,7 +19,7 @@ import { roleLabel, useCan, usersApi } from "@entities/user";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { formatDate } from "@shared/i18n/format";
 import { groupByModule, isScopedPermission, matchesPermission } from "../../model/access-levels";
-import { initialsOfName, matchesMember, memberRoles, type AccessMembersState } from "../../model/useAccessMembers";
+import { matchesMember, memberRoles, type AccessMembersState } from "../../model/useAccessMembers";
 import { isLockedCell, type RolesAdminState } from "../../model/useRolesAdmin";
 import { useUserAccess } from "../../model/useUserAccess";
 import { RoleChip } from "../shared/RoleAvatar";
@@ -27,6 +27,7 @@ import { ScopeChip } from "../shared/Scope";
 import ScreensAccessList from "../shared/ScreensAccessList";
 import SidebarPreview from "../shared/SidebarPreview";
 import { TabBar } from "@shared/ui/tab-bar";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import ExceptionDialog from "./ExceptionDialog";
 
 interface Props {
@@ -194,21 +195,21 @@ export default function UserAccessExplorer({
     const scoped = isScopedPermission(permission);
     if (row.exception) {
       return (
-        <span className="text-violet-700" title={row.exception.reason ?? undefined}>
+        <ITText as="span" className="text-violet-700" title={row.exception.reason ?? undefined}>
           {row.exception.scope === "NONE" ? t("explorer.source.exceptionRemoved") : t("explorer.source.exception")}
           {row.exception.expiresAt && ` · ${t("explorer.until", { date: formatDate(row.exception.expiresAt) })}`}
-        </span>
+        </ITText>
       );
     }
     const entries = Object.entries(row.byRole);
-    if (entries.length === 0) return <span className="text-slate-400">{t("explorer.source.none")}</span>;
+    if (entries.length === 0) return <ITText as="span" className="text-slate-400">{t("explorer.source.none")}</ITText>;
     return (
-      <span className="text-slate-500">
+      <ITText as="span" className="text-slate-500">
         {t("explorer.source.byRole")}{" "}
         {entries
           .map(([role, scope]) => (scoped ? `${roleLabel(role)} (${t(`scope.${scope}`)})` : roleLabel(role)))
           .join(", ")}
-      </span>
+      </ITText>
     );
   };
 
@@ -245,9 +246,9 @@ export default function UserAccessExplorer({
     }));
 
   return (
-    <div className="grid items-start gap-3 lg:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="grid items-start gap-3 lg:!grid-cols-[240px_minmax(0,1fr)]">
       {/* Personas */}
-      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 lg:sticky lg:top-4">
+      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-2 lg:sticky lg:top-4">
         <ITInput
           name="explorer_search"
           size="sm"
@@ -281,18 +282,16 @@ export default function UserAccessExplorer({
                   setSearch("");
                 }}
                 className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition ${
-                  selected ? "border-[#0D5777]/40 !bg-[#0D5777]/5" : "border-transparent !bg-transparent hover:!bg-slate-50"
+                  selected ? "border-primary-500/40 !bg-primary-500/5" : "border-transparent !bg-transparent hover:!bg-slate-50"
                 } ${member.active ? "" : "opacity-60"}`}
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0D5777]/10 text-[10px] font-black text-[#0D5777]">
-                  {initialsOfName(member.name)}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className={`block truncate text-[12px] font-bold ${selected ? "text-[#0D5777]" : "text-slate-800"}`}>
+                <ProfileAvatar name={member.name} size="sm" className="h-7! w-7!" />
+                <ITText as="span" className="min-w-0 flex-1">
+                  <ITText as="span" className={`block truncate text-[12px] font-bold ${selected ? "text-primary-500" : "text-slate-800"}`}>
                     {member.name}
-                  </span>
-                  <span className="block truncate text-[10px] text-slate-400">{memberRoles(member).map(roleLabel).join(" · ")}</span>
-                </span>
+                  </ITText>
+                  <ITText as="span" className="block truncate text-[10px] text-slate-400">{memberRoles(member).map(roleLabel).join(" · ")}</ITText>
+                </ITText>
                 {member.exceptions > 0 && (
                   <span className="h-2 w-2 shrink-0 rounded-full bg-violet-500" title={t("members.exceptions", { count: member.exceptions })} />
                 )}
@@ -303,12 +302,12 @@ export default function UserAccessExplorer({
       </div>
 
       {/* Acceso de la persona */}
-      <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-[var(--it-card-bg)] p-4">
         {!userId && (
           <div className="flex flex-col items-center gap-2 py-14 text-center">
             <FaUserSecret size={28} className="text-slate-300" />
-            <p className="text-[13px] font-bold text-slate-700">{t("explorer.emptyTitle")}</p>
-            <p className="max-w-md text-[11px] text-slate-500">{t("explorer.emptyBody")}</p>
+            <ITText className="text-[13px] font-bold text-slate-700">{t("explorer.emptyTitle")}</ITText>
+            <ITText className="max-w-md text-[11px] text-slate-500">{t("explorer.emptyBody")}</ITText>
           </div>
         )}
 
@@ -327,34 +326,32 @@ export default function UserAccessExplorer({
         {userId && access && (
           <>
             {/* Quién es y qué roles tiene */}
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D5777] text-[12px] font-black text-white">
-                {initialsOfName(access.user.name)}
-              </span>
+            <ITFlex align="center" wrap="wrap" gap={3}>
+              <ProfileAvatar name={access.user.name} size="md" className="h-9! w-9!" />
               <div className="min-w-[200px] flex-1">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <h2 className="text-[15px] font-black text-slate-900">{access.user.name}</h2>
+                <ITFlex align="center" wrap="wrap" gap={1.5}>
+                  <ITText as="h2" className="text-[15px] font-black text-slate-900">{access.user.name}</ITText>
                   {!access.user.active && (
-                    <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-rose-600">{t("members.inactive")}</span>
+                  <ITText as="span" className="rounded bg-rose-50 px-1.5 py-0.5 text-[12px] font-bold text-rose-600">{t("members.inactive")}</ITText>
                   )}
-                </div>
-                <p className="truncate text-[11px] text-slate-500">
+                </ITFlex>
+                <ITText className="truncate text-[11px] text-slate-500">
                   @{access.user.username}
                   {access.user.employeeNumber && <> · #{access.user.employeeNumber}</>}
                   {access.user.department && <> · {access.user.department}</>}
-                </p>
+                </ITText>
               </div>
               <ITButton variant="outlined" color="primary" size="sm" onClick={() => navigate(`/users/${access.user.id}/edit`)}>
-                <span className="flex items-center gap-1 text-[11px] font-bold">
+                <ITText as="span" className="flex items-center gap-1 text-[11px] font-bold">
                   <FaExternalLinkAlt size={8} /> {t("explorer.openProfile")}
-                </span>
+                </ITText>
               </ITButton>
-            </div>
+            </ITFlex>
 
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="mr-1 text-[11px] font-bold text-slate-500">{t("explorer.rolesLabel")}</span>
+            <ITFlex align="center" wrap="wrap" gap={1.5}>
+              <ITText as="span" className="mr-1 text-[11px] font-bold text-slate-500">{t("explorer.rolesLabel")}</ITText>
               {access.roles.map((role) => (
-                <span key={role.key} className="inline-flex items-center">
+                <ITText as="span" key={role.key} className="inline-flex items-center">
                   <RoleChip
                     role={role.key}
                     muted={!role.active}
@@ -371,21 +368,21 @@ export default function UserAccessExplorer({
                       <FaTimes size={8} />
                     </button>
                   )}
-                </span>
+                </ITText>
               ))}
               {addRoleItems.length > 0 && (
                 <ITDropdownMenu
                   placement="bottom-start"
                   triggerLabel={t("explorer.addRole")}
                   trigger={
-                    <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-[11px] font-bold text-slate-500 hover:border-[#0D5777] hover:text-[#0D5777]">
+                    <ITText as="span" className="inline-flex items-center gap-1 rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-[11px] font-bold text-slate-500 hover:border-primary-500 hover:text-primary-500">
                       <FaPlus size={8} /> {t("explorer.addRole")}
-                    </span>
+                    </ITText>
                   }
                   items={addRoleItems}
                 />
               )}
-            </div>
+            </ITFlex>
 
             <TabBar
               size="sm"
@@ -399,7 +396,7 @@ export default function UserAccessExplorer({
 
             {section === "permissions" && (
               <>
-                <div className="flex flex-wrap items-center gap-2">
+                <ITFlex align="center" wrap="wrap" gap={2}>
                   <div className="min-w-[240px] flex-1">
                     <ITInput
                       name="explorer_question"
@@ -411,7 +408,7 @@ export default function UserAccessExplorer({
                     />
                   </div>
                   {!searching && (
-                    <div className="flex items-center gap-1">
+                    <ITFlex align="center" gap={1}>
                       {(
                         [
                           ["can", t("explorer.view.can", { count: canCount })],
@@ -425,26 +422,26 @@ export default function UserAccessExplorer({
                           onClick={() => setView(id)}
                           className={`rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
                             view === id
-                              ? "border-[#0D5777] !bg-[#0D5777] text-white"
-                              : "border-slate-200 !bg-white text-slate-600 hover:border-slate-300"
+                              ? "border-primary-500 !bg-primary-500 text-white"
+                              : "border-slate-200 !bg-[var(--it-card-bg)] text-slate-600 hover:border-slate-300"
                           }`}
                         >
                           {label}
                         </button>
                       ))}
-                    </div>
+                    </ITFlex>
                   )}
-                </div>
+                </ITFlex>
 
                 {groups.length === 0 ? (
-                  <p className="py-8 text-center text-[12px] italic text-slate-400">
+                  <ITText className="py-8 text-center text-[12px] italic text-slate-400">
                     {searching ? t("matrix.noResults") : view === "can" ? t("explorer.nothingCan") : t("explorer.nothingCannot")}
-                  </p>
+                  </ITText>
                 ) : (
                   <div className="overflow-hidden rounded-lg border border-slate-200">
                     {groups.map(({ module, rows }, groupIndex) => (
                       <div key={module} className={groupIndex > 0 ? "border-t border-slate-200" : ""}>
-                        <p className="bg-slate-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">{module}</p>
+                        <ITText className="bg-slate-50 px-3 py-1 text-[12px] font-semibold text-slate-500">{module}</ITText>
                         {rows.map((permission) => {
                           const row = byKey.get(permission.key);
                           if (!row) return null;
@@ -459,27 +456,27 @@ export default function UserAccessExplorer({
                                 <FaBan size={12} className="shrink-0 text-slate-300" title={t("explorer.cannot")} />
                               )}
                               <div className="min-w-[200px] flex-1">
-                                <p className={`text-[12px] font-semibold ${granted ? "text-slate-800" : "text-slate-500"}`}>
+                                <ITText className={`text-[12px] font-semibold ${granted ? "text-slate-800" : "text-slate-500"}`}>
                                   {permission.name}
                                   {granted && isScopedPermission(permission) && (
-                                    <span className="ml-1.5 align-middle">
+                                    <ITText as="span" className="ml-1.5 align-middle">
                                       <ScopeChip scope={row.effective} />
-                                    </span>
+                                    </ITText>
                                   )}
-                                </p>
-                                <p className="text-[10px]">{sourceText(row, permission)}</p>
+                                </ITText>
+                                <ITText className="text-[10px]">{sourceText(row, permission)}</ITText>
                               </div>
                               {pending && (
-                                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                                <ITText as="span" className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
                                   {t("explorer.pending")}
-                                </span>
+                                </ITText>
                               )}
                               {ruledActions.has(permission.key) && (
                                 <button
                                   type="button"
                                   onClick={() => onTest(access.user.id, permission.key)}
                                   title={t("explorer.hasRulesHint")}
-                                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 !bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:border-[#0D5777] hover:text-[#0D5777]"
+                                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 !bg-[var(--it-card-bg)] px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:border-primary-500 hover:text-primary-500"
                                 >
                                   <FaGavel size={8} /> {t("explorer.hasRules")}
                                 </button>
@@ -489,16 +486,16 @@ export default function UserAccessExplorer({
                                   placement="bottom-end"
                                   triggerLabel={granted ? t("explorer.fix.remove") : t("explorer.fix.give")}
                                   trigger={
-                                    <span
+                                    <ITText as="span"
                                       className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-bold ${
                                         granted
                                           ? "border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-600"
-                                          : "border-[#0D5777]/30 text-[#0D5777] hover:border-[#0D5777]"
+                                          : "border-primary-500/30 text-primary-500 hover:border-primary-500"
                                       }`}
                                     >
                                       {granted ? t("explorer.fix.remove") : t("explorer.fix.give")}
                                       <FaChevronDown size={7} />
-                                    </span>
+                                    </ITText>
                                   }
                                   items={items}
                                 />
@@ -510,12 +507,12 @@ export default function UserAccessExplorer({
                     ))}
                   </div>
                 )}
-                <p className="text-[10px] text-slate-400">{t("explorer.howResolved")}</p>
+                <ITText className="text-[10px] text-slate-400">{t("explorer.howResolved")}</ITText>
               </>
             )}
 
             {section === "screens" && (
-              <div className="grid items-start gap-3 lg:grid-cols-[230px_minmax(0,1fr)]">
+              <div className="grid items-start gap-3 lg:!grid-cols-[230px_minmax(0,1fr)]">
                 <SidebarPreview permissions={effective} role={access.user.role} title={access.user.name} />
                 <ScreensAccessList permissions={effective} role={access.user.role} catalog={catalog} />
               </div>

@@ -68,7 +68,7 @@ export default function PeriodPicker({
         <ITButton variant="outlined" color="gray" onClick={onPrevious} title={labels.previous}>
           <FaChevronLeft size={11} />
         </ITButton>
-        <div className="min-w-0 flex-1">
+        <ITFlex className="min-w-0 flex-1">
           {period === "DAY" ? (
             <ITDatePicker
               name={`${name}Date`}
@@ -87,7 +87,7 @@ export default function PeriodPicker({
               className="w-full min-w-0"
             />
           )}
-        </div>
+        </ITFlex>
         <ITButton variant="outlined" color="gray" onClick={onNext} title={labels.next}>
           <FaChevronRight size={11} />
         </ITButton>

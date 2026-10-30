@@ -1,45 +1,63 @@
 import { useNavigate } from "react-router-dom";
-import { ITCard, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import {
-  FaBoxOpen,
-  FaChevronRight,
-  FaClock,
-  FaFileSignature,
-  FaTicketAlt,
-  FaTrashAlt,
-} from "react-icons/fa";
-import { formatDateTime } from "@shared/utils/dates";
+  ITBentoDonut,
+  ITBentoFeed,
+  ITBentoGauge,
+  ITBentoGrid,
+  ITBentoPill,
+  ITBentoSegments,
+  ITBentoTile,
+  ITBentoWaves,
+  ITBentoWeekBars,
+  useITBentoCountUp, ITText, ITFlex } from "@axzydev/axzy_ui_system";
+import {
+  LuBox,
+  LuChartPie,
+  LuActivity,
+  LuClock,
+  LuFileText,
+  LuListChecks,
+  LuTicket,
+  LuTrash2,
+} from "react-icons/lu";
+import { formatDate, formatTimeInTZ } from "@shared/utils/dates";
 import type { DashboardActivity } from "@entities/dashboard";
 import type { UseAdminDashboard } from "../model/useAdminDashboard";
 import { activityHref } from "../model/activityLinks";
-import { DonutChart } from "@shared/ui/charts";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { seriesColor } from "@shared/ui/charts";
+import { InsightNote } from "@shared/ui/bento-bits";
 
 const SCOPE_ICON: Record<DashboardActivity["scope"], React.ReactNode> = {
-  devices: <FaBoxOpen size={11} />,
-  tickets: <FaTicketAlt size={11} />,
-  custodyLetters: <FaFileSignature size={11} />,
-  materialOutputs: <FaTrashAlt size={11} />,
-  inventory: <FaFileSignature size={11} />,
+  devices: <LuBox size={13} />,
+  tickets: <LuTicket size={13} />,
+  custodyLetters: <LuFileText size={13} />,
+  materialOutputs: <LuTrash2 size={13} />,
+  inventory: <LuFileText size={13} />,
 };
 
-const SCOPE_COLOR: Record<DashboardActivity["scope"], string> = {
-  devices: "bg-blue-500",
-  tickets: "bg-amber-500",
-  custodyLetters: "bg-emerald-500",
-  materialOutputs: "bg-rose-500",
-  inventory: "bg-indigo-500",
+/** Número grande de una tarjeta: sube de 0 al valor al montar. */
+function Big({ value, decimals = 0, suffix }: { value: number; decimals?: number; suffix?: string }) {
+  const shown = useITBentoCountUp(value, 1400, decimals);
+  return (
+    <>
+      {decimals > 0 ? shown.toFixed(decimals) : Math.round(shown).toLocaleString("es-MX")}
+      {suffix}
+    </>
+  );
+}
+
+const dayKey = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 };
 
-const AGENT_COLORS = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+const WEEK_LABELS = ["L", "M", "X", "J", "V", "S", "D"];
 
 /**
- * Panel de operación del inicio (`dashboard.view`).
- *
- * A propósito NO repite lo que ya muestran los tableros de Tickets y Tareas (sus
- * contadores, los tickets por estado y los más viejos salían aquí dos y tres
- * veces). Lo que queda es lo que solo vive aquí: el inventario, la resolución
- * promedio, la eficiencia del equipo y la actividad reciente.
+ * Panel de operación del inicio (`dashboard.view`) con el mosaico bento: una
+ * tarjeta principal oscura con medidor, olas para las cartas, el avance de tareas
+ * en segmentos, la eficiencia del equipo y la actividad reciente. Solo datos
+ * reales del resumen; si una proporción es cero, el visual no se dibuja.
  */
 export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
   const { t, summary, activity, error } = fx;
@@ -49,130 +67,291 @@ export default function AdminDashboard({ fx }: { fx: UseAdminDashboard }) {
 
   const avgDays = summary.ticketMetrics.avgResolutionDays;
   const damaged = summary.materialOutputs.damaged;
+  const { resolvedTasks, pendingTasks } = summary.ticketMetrics;
+
+  const devicesTotal = summary.devices.total;
+  const available = summary.devices.available;
+  const onLoan = summary.devices.assigned;
+  const availablePct = devicesTotal > 0 ? Math.round((available / devicesTotal) * 100) : 0;
+
+  const custodyTotal = summary.custodyLetters.total;
+  const custodyActive = summary.custodyLetters.active;
+  const custodyPct = custodyTotal > 0 ? custodyActive / custodyTotal : 0;
+
+  const tasksTotal = resolvedTasks + pendingTasks;
+
   const efficiencySegments = summary.ticketEfficiency.map((e, i) => ({
     label: e.user.name,
     value: e.resolved,
-    color: AGENT_COLORS[i % AGENT_COLORS.length],
+    color: seriesColor(i),
   }));
+  const efficiencyTotal = efficiencySegments.reduce((acc, e) => acc + e.value, 0);
+  const topPerson = [...summary.ticketEfficiency].sort((a, b) => b.resolved - a.resolved)[0];
+  const withoutTasks = summary.ticketEfficiency.filter((e) => e.resolved === 0).map((e) => e.user.name);
+
+  // Actividad de los últimos 7 días (los mismos eventos del hilo de abajo).
+  const today = new Date();
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(today);
+    day.setDate(today.getDate() - (6 - i));
+    const key = dayKey(day.toISOString());
+    const value = activity.filter((a) => dayKey(a.at) === key).length;
+    return {
+      label: WEEK_LABELS[(day.getDay() + 6) % 7],
+      value,
+      tone: i === 6 ? ("today" as const) : ("past" as const),
+    };
+  });
+
+  // Dispositivos por categoría (tipo), de mayor a menor.
+  const categories = fx.deviceTypes
+    .map((type, i) => ({
+      label: type.name,
+      value: type.devices.reduce((acc, d) => acc + d.total, 0),
+      color: seriesColor(i),
+    }))
+    .filter((c) => c.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+  const categoryTotal = categories.reduce((acc, c) => acc + c.value, 0);
+  const categoryMax = Math.max(1, ...categories.map((c) => c.value));
+
+  // Actividad agrupada por día para el hilo.
+  const todayKey = dayKey(new Date().toISOString());
+  const yesterdayKey = dayKey(new Date(Date.now() - 86_400_000).toISOString());
+  const activityGroups: { key: string; label: string; items: DashboardActivity[] }[] = [];
+  for (const a of activity) {
+    const key = dayKey(a.at);
+    let group = activityGroups[activityGroups.length - 1];
+    if (!group || group.key !== key) {
+      const label =
+        key === todayKey ? t("adminDashboard.today") : key === yesterdayKey ? t("adminDashboard.yesterday") : formatDate(a.at);
+      group = { key, label, items: [] };
+      activityGroups.push(group);
+    }
+    group.items.push(a);
+  }
 
   return (
-    <ITFlex direction="column" gap={4}>
-      <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
-        <ITText className="text-[13px] font-black uppercase tracking-widest text-slate-600">
-          {t("adminDashboard.title")}
-        </ITText>
-        <ITFlex align="center" gap={1.5}>
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <ITText className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">
-            {t("adminDashboard.live")}
-          </ITText>
-        </ITFlex>
-      </ITFlex>
+    <>
+      {error && <ITText className="m-0 text-[11px] font-bold text-red-600">{error}</ITText>}
 
-      {error && <ITText className="text-[11px] font-bold text-red-600">{error}</ITText>}
-
-      <div className="!grid gap-4 sm:!grid-cols-2 xl:!grid-cols-5">
-        <KpiTile
+      <ITBentoGrid>
+        {/* Dispositivos: tarjeta oscura con medidor de disponibilidad */}
+        <ITBentoTile
+          tone="sea"
+          cols={4}
+          rows={3}
+          wide
+          icon={<LuBox size={15} />}
           label={t("adminDashboard.devices")}
-          value={summary.devices.total}
-          icon={<FaBoxOpen size={16} />}
-          tone="sky"
-        />
-        <KpiTile
+          value={<Big value={devicesTotal} />}
+          caption={t("adminDashboard.devicesAvailable", { available })}
+          onClick={() => navigate("/inventory/devices")}
+        >
+          <div className="relative z-[1] my-1 flex min-h-0 flex-1 flex-col justify-center">
+            {devicesTotal > 0 && (
+              <ITBentoGauge value={available / devicesTotal} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
+            )}
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <ITBentoPill dot="var(--color-warning)">{t("adminDashboard.availableShort", { pct: availablePct })}</ITBentoPill>
+              <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("adminDashboard.onLoan", { count: onLoan })}</ITBentoPill>
+            </div>
+          </div>
+        </ITBentoTile>
+
+        {/* Cartas activas: olas animadas */}
+        <ITBentoTile
+          tone="lavender"
+          cols={3}
+          rows={2}
+          icon={<LuFileText size={15} />}
           label={t("adminDashboard.activeCustodyLetters")}
-          value={summary.custodyLetters.active}
-          icon={<FaFileSignature size={16} />}
-          tone="violet"
-        />
-        <KpiTile
+          value={<Big value={custodyActive} />}
+          caption={t("adminDashboard.custodyOfTotal", { total: custodyTotal })}
+          onClick={() => navigate("/inventory/loans")}
+        >
+          <ITBentoWaves level={custodyPct} color="var(--color-violet-400, #a895e0)" />
+        </ITBentoTile>
+
+        {/* Salidas dañadas */}
+        <ITBentoTile
+          cols={2}
+          rows={2}
+          icon={<LuTrash2 size={15} />}
           label={t("adminDashboard.damagedExits")}
-          value={damaged}
-          icon={<FaTrashAlt size={16} />}
-          tone={damaged > 0 ? "rose" : "neutral"}
-        />
-        <KpiTile
-          label={t("adminDashboard.avgResolution")}
-          value={avgDays !== null ? `${avgDays} d` : "—"}
-          icon={<FaClock size={16} />}
-          tone="neutral"
-        />
-        <KpiTile
-          label={t("adminDashboard.resolvedTickets")}
-          value={summary.ticketMetrics.resolvedTasks}
-          icon={<FaTicketAlt size={16} />}
-          tone="emerald"
-        />
-      </div>
-
-      {/* El donut va en una tarjeta angosta (antes ocupaba media pantalla para un
-          gráfico de 128 px) y la actividad se queda con el resto del ancho. */}
-      <div className="!grid gap-4 lg:!grid-cols-3">
-        <ITCard className="!p-5 border border-slate-200">
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
-            {t("adminDashboard.teamEfficiency")}
-          </ITText>
-          {efficiencySegments.length === 0 ? (
-            <ITText className="text-[12px] font-bold text-slate-400">
-              {t("adminDashboard.noEfficiency")}
+          value={
+            <ITText as="span" style={{ color: damaged > 0 ? "var(--color-danger, #e11d48)" : "var(--color-success)" }}>
+              <Big value={damaged} />
             </ITText>
-          ) : (
-            <DonutChart segments={efficiencySegments} size={148} />
+          }
+          caption={t("adminDashboard.damagedOfTotal", { total: summary.materialOutputs.total })}
+          onClick={() => navigate("/inventory/movements")}
+        >
+          {damaged === 0 && (
+            <ITText as="span" className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[color:var(--color-success)]">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m4 12 5 5L20 6" />
+              </svg>
+              {t("adminDashboard.noDamage")}
+            </ITText>
           )}
-        </ITCard>
+        </ITBentoTile>
 
-        <ITCard className="!p-5 border border-slate-200 lg:!col-span-2">
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
-            {t("adminDashboard.recentActivity")}
-          </ITText>
-          {activity.length === 0 ? (
-            <ITText className="text-[12px] font-bold text-slate-400">
-              {t("adminDashboard.noActivity")}
-            </ITText>
+        {/* Resolución promedio */}
+        <ITBentoTile
+          tone="sun"
+          cols={3}
+          rows={2}
+          icon={<LuClock size={15} />}
+          label={t("adminDashboard.avgResolution")}
+          value={avgDays !== null ? <Big value={avgDays} decimals={1} suffix=" d" /> : "—"}
+          caption={t("adminDashboard.perTask")}
+        />
+
+        {/* Tareas resueltas: segmentos que se levantan */}
+        <ITBentoTile
+          tone="mint"
+          cols={5}
+          rows={1}
+          wide
+          icon={<LuListChecks size={15} />}
+        >
+          <div className="flex h-full min-h-0 items-center gap-3">
+            <ITFlex className="shrink-0">
+              <ITText as="h3" className="it-bento-tile__label">
+                <LuListChecks size={15} />
+                {t("adminDashboard.resolvedTickets")}
+              </ITText>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <ITText as="span" className="it-bento-tile__value">
+                  <Big value={resolvedTasks} />
+                </ITText>
+                <ITText as="span" className="text-[15px] font-semibold opacity-60">/ {tasksTotal}</ITText>
+              </div>
+            </ITFlex>
+            <div className="max-h-[42px] min-h-0 flex-1">
+              <ITBentoSegments total={tasksTotal} done={resolvedTasks} color="var(--color-success)" />
+            </div>
+            <div className="shrink-0 text-right">
+              <div className="it-bento-tile__value !text-[22px]">{pendingTasks}</div>
+              <ITText as="small" className="it-bento-tile__caption">{t("adminDashboard.pendingLabel")}</ITText>
+            </div>
+          </div>
+        </ITBentoTile>
+
+        {/* Actividad de la semana */}
+        <ITBentoTile cols={3} rows={1} wide icon={<LuActivity size={15} />} label={t("adminDashboard.weekActivity")}>
+          <div className="mt-1 h-[46px]">
+            <ITBentoWeekBars items={week} color="var(--color-primary-500)" todayColor="var(--color-warning)" />
+          </div>
+        </ITBentoTile>
+
+        {/* Eficiencia del equipo */}
+        <ITBentoTile
+          cols={4}
+          rows={4}
+          wide
+          icon={<LuChartPie size={15} />}
+          label={t("adminDashboard.teamEfficiency")}
+          onClick={() => navigate("/tickets")}
+        >
+          {efficiencySegments.length === 0 ? (
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noEfficiency")}</ITText>
           ) : (
-            <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto pr-1">
-              {activity.map((a) => {
-                const href = activityHref(a);
-                const row = (
-                  <>
-                    <ITFlex
-                      align="center"
-                      justify="center"
-                      className={`w-6 h-6 shrink-0 rounded-full text-white ${SCOPE_COLOR[a.scope]}`}
-                    >
-                      {SCOPE_ICON[a.scope]}
-                    </ITFlex>
-                    <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
-                      <ITText className="text-[11px] font-bold text-slate-700 truncate">
-                        {a.message}
+            <div className="mt-2 flex items-center gap-3.5">
+              <ITFlex className="shrink-0">
+                <ITBentoDonut
+                  size={132}
+                  segments={efficiencySegments}
+                  center={<Big value={efficiencyTotal} />}
+                  caption={t("adminDashboard.resolvedCaption")}
+                />
+              </ITFlex>
+              <div className="grid min-w-0 flex-1 gap-2.5">
+                {efficiencySegments.slice(0, 4).map((sec) => {
+                  const pct = efficiencyTotal > 0 ? Math.round((sec.value / efficiencyTotal) * 100) : 0;
+                  return (
+                    <div key={sec.label} className="grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 text-[12.5px] font-medium">
+                      <ITText as="span" className="truncate">{sec.label}</ITText>
+                      <ITText as="span">
+                        {sec.value} <ITText as="span" className="opacity-60">{pct}%</ITText>
                       </ITText>
-                      <ITText className="text-[9px] text-slate-400">
-                        {formatDateTime(a.at)}
-                      </ITText>
-                    </ITFlex>
-                    {href && <FaChevronRight size={9} className="text-slate-300 shrink-0" />}
-                  </>
-                );
-                return href ? (
-                  <button
-                    key={a.id}
-                    className="flex items-center gap-2 rounded-lg px-1.5 py-1 text-left hover:bg-slate-100 cursor-pointer transition-colors"
-                    onClick={() => navigate(href)}
-                  >
-                    {row}
-                  </button>
-                ) : (
-                  <ITFlex key={a.id} align="center" gap={2}>
-                    {row}
-                  </ITFlex>
-                );
-              })}
+                      <div className="it-bento-bar col-span-2">
+                        <i style={{ "--it-bento-w": `${pct}%`, background: sec.color } as React.CSSProperties} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
-        </ITCard>
-      </div>
-    </ITFlex>
+          <InsightNote className="mt-auto">
+            {topPerson
+              ? withoutTasks.length > 0
+                ? t("adminDashboard.efficiencyNote", { top: topPerson.user.name, none: withoutTasks[0] })
+                : t("adminDashboard.efficiencyNoteAll")
+              : t("adminDashboard.noEfficiency")}
+          </InsightNote>
+        </ITBentoTile>
+
+        {/* Dispositivos por categoría */}
+        <ITBentoTile
+          cols={4}
+          rows={4}
+          wide
+          icon={<LuBox size={15} />}
+          label={t("adminDashboard.devicesByCategory")}
+          onClick={() => navigate("/inventory/device-types")}
+        >
+          {categories.length === 0 ? (
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noCategories")}</ITText>
+          ) : (
+            <div className="it-bento-bars mt-4 flex-1 content-around">
+              {categories.map((row) => (
+                <div key={row.label} className="grid grid-cols-[auto_1fr_auto] items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium">
+                  <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: row.color }} />
+                  <ITText as="span" className="truncate lowercase first-letter:uppercase">{row.label}</ITText>
+                  <ITText as="span">
+                    {row.value} <ITText as="span" className="opacity-60">{Math.round((row.value / Math.max(1, categoryTotal)) * 100)}%</ITText>
+                  </ITText>
+                  <div className="it-bento-bar col-span-3">
+                    <i style={{ "--it-bento-w": `${(row.value / categoryMax) * 100}%`, background: row.color } as React.CSSProperties} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ITBentoTile>
+
+        {/* Actividad reciente */}
+        <ITBentoTile cols={4} rows={4} wide icon={<LuActivity size={15} />} label={t("adminDashboard.recentActivity")}>
+          {activityGroups.length === 0 ? (
+            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("adminDashboard.noActivity")}</ITText>
+          ) : (
+            <div className="mt-1 min-h-0 flex-1">
+              <ITBentoFeed
+                maxHeight={236}
+                groups={activityGroups.map((g) => ({
+                  key: g.key,
+                  label: g.label,
+                  items: g.items.map((a) => ({
+                    id: a.id,
+                    icon: SCOPE_ICON[a.scope],
+                    title: a.message,
+                    meta: formatTimeInTZ(a.at),
+                    tone: a.scope === "custodyLetters" ? "violet" : "success",
+                    href: activityHref(a) ?? undefined,
+                  })),
+                }))}
+                onItemClick={(item) => {
+                  if (item.href) navigate(item.href);
+                }}
+              />
+            </div>
+          )}
+        </ITBentoTile>
+      </ITBentoGrid>
+    </>
   );
 }

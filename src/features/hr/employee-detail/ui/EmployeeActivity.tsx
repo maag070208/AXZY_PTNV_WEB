@@ -1,56 +1,53 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { FaBoxOpen, FaClipboardCheck, FaExchangeAlt, FaHistory, FaTicketAlt, FaTools } from "react-icons/fa";
-import { ITText } from "@axzydev/axzy_ui_system";
+import { LuArrowLeftRight, LuBoxes, LuClipboardCheck, LuHistory, LuTicket, LuWrench } from "react-icons/lu";
 import { personalApi, type EmployeeOverview } from "@entities/hr";
-import { KpiTile } from "@shared/ui/kpi-tile";
+import { ITBentoGrid, ITBentoTile, ITEmptyState } from "@axzydev/axzy_ui_system";
+import { LangostinState } from "@shared/ui/langostin";
+import { PanelCard } from "@shared/ui/panel-card";
 import { dyn } from "@shared/i18n";
 import { formatDateTime } from "@shared/utils/dates";
+import { ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 
-const STATUS_TONE: Record<string, string> = {
-  OPEN: "border-amber-200 bg-amber-50 text-amber-700",
-  IN_PROGRESS: "border-sky-200 bg-sky-50 text-sky-700",
-  IN_REVIEW: "border-violet-200 bg-violet-50 text-violet-700",
-  CLOSED: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  COMPLETED: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  PENDING: "border-amber-200 bg-amber-50 text-amber-700",
-  ACTIVE: "border-sky-200 bg-sky-50 text-sky-700",
-  PARTIAL: "border-amber-200 bg-amber-50 text-amber-700",
-  RETURNED: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  CANCELLED: "border-slate-200 bg-slate-50 text-slate-500",
+type Tone = "primary" | "success" | "warning" | "danger" | "info" | "secondary";
+
+/** Tono pastel por estado (tokens del kit, sin colores propios). */
+const STATUS_TONE: Record<string, Tone> = {
+  OPEN: "warning",
+  IN_PROGRESS: "info",
+  IN_REVIEW: "primary",
+  CLOSED: "success",
+  COMPLETED: "success",
+  PENDING: "warning",
+  ACTIVE: "info",
+  PARTIAL: "warning",
+  RETURNED: "success",
+  CANCELLED: "secondary",
 };
 
 function Pill({ value, label }: { value: string; label: string }) {
+  const tone = STATUS_TONE[value] ?? "secondary";
   return (
-    <span className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium ${STATUS_TONE[value] ?? "border-slate-200 text-slate-600"}`}>
+    <ITText as="span"
+      className="inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold"
+      style={{ background: `var(--color-${tone}-soft, var(--color-secondary-100))`, color: `var(--color-${tone})` }}
+    >
       {label}
-    </span>
+    </ITText>
   );
 }
 
-function Empty({ icon, text }: { icon: React.ReactNode; text: string }) {
+/** Tarjeta de una sección de actividad: `PanelCard` con ícono y conteo; cuerpo con altura máxima. */
+function Card({ icon, title, count, children }: { icon: React.ReactNode; title: string; count: number; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center gap-2 px-2 py-10 text-slate-300">
-      <span className="text-2xl">{icon}</span>
-      <p className="text-sm text-slate-400">{text}</p>
-    </div>
-  );
-}
-
-/** Tarjeta de una sección de actividad: encabezado con ícono y conteo, cuerpo con altura máxima. */
-function Card({ icon, tone, title, count, children, wide = false }: { icon: React.ReactNode; tone: string; title: string; count: number; children: React.ReactNode; wide?: boolean }) {
-  return (
-    <section className={`flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white shadow-sm ${wide ? "lg:col-span-2" : ""}`}>
-      <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
-        <div className="flex items-center gap-3">
-          <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}>{icon}</span>
-          <h3 className="text-sm font-black uppercase tracking-wide text-slate-700">{title}</h3>
-        </div>
-        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">{count}</span>
-      </header>
-      <div className="max-h-[22rem] overflow-y-auto px-3 py-1">{children}</div>
-    </section>
+    <PanelCard
+      icon={icon}
+      title={title}
+      actions={<ITText as="span" className="rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums" style={{ background: "var(--color-secondary-100)" }}>{count}</ITText>}
+    >
+      <div className="-mx-2 max-h-[22rem] overflow-y-auto">{children}</div>
+    </PanelCard>
   );
 }
 
@@ -72,8 +69,8 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
     };
   }, [userId, t]);
 
-  if (error) return <p role="alert" className="text-sm text-red-600">{error}</p>;
-  if (!data) return <ITText className="text-sm text-slate-400">{t("detail.activity.loading")}</ITText>;
+  if (error) return <LangostinState kind="error" description={error} />;
+  if (!data) return <LangostinState kind="loading" title={t("detail.activity.loading")} />;
   const { summary, inventory } = data;
   const openLoans = inventory ? inventory.loans.filter((l) => l.status === "ACTIVE" || l.status === "PARTIAL") : [];
   const label = (key: string) => dyn(t)(`detail.activity.status.${key}`);
@@ -82,100 +79,137 @@ export default function EmployeeActivity({ userId }: { userId: string }) {
   const tasks = [...data.tasks].sort((a, b) => Number(a.status === "COMPLETED") - Number(b.status === "COMPLETED"));
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <ITStack spacing={5}>
+      {/* Indicadores compactos: una fila del mosaico, no tarjetas altas. */}
+      <ITBentoGrid>
         {inventory && (
           <>
-            <KpiTile icon={<FaBoxOpen size={14} />} tone="sky" label={t("detail.activity.kpi.units")} value={inventory.summary.borrowedUnits} hint={t("detail.activity.kpi.unitsHint", { count: inventory.summary.activeLoans })} />
-            <KpiTile icon={<FaClipboardCheck size={14} />} tone="violet" label={t("detail.activity.kpi.letters")} value={inventory.summary.activeLoans} hint={t("detail.activity.kpi.lettersHint")} />
+            <ITBentoTile
+              cols={3}
+              rows={1}
+              tone="sea"
+              icon={<LuBoxes size={14} />}
+              label={t("detail.activity.kpi.units")}
+              value={inventory.summary.borrowedUnits}
+              caption={t("detail.activity.kpi.unitsHint", { count: inventory.summary.activeLoans })}
+            />
+            <ITBentoTile
+              cols={3}
+              rows={1}
+              tone="lavender"
+              icon={<LuClipboardCheck size={14} />}
+              label={t("detail.activity.kpi.letters")}
+              value={inventory.summary.activeLoans}
+              caption={t("detail.activity.kpi.lettersHint")}
+            />
           </>
         )}
-        <KpiTile icon={<FaTicketAlt size={14} />} tone={summary.openTickets ? "amber" : "neutral"} label={t("detail.activity.kpi.tickets")} value={summary.openTickets} hint={t("detail.activity.kpi.ticketsHint")} />
-        <KpiTile icon={<FaTools size={14} />} tone={summary.pendingTasks ? "orange" : "neutral"} label={t("detail.activity.kpi.tasks")} value={summary.pendingTasks} hint={t("detail.activity.kpi.tasksHint")} />
-      </div>
+        <ITBentoTile
+          cols={inventory ? 3 : 6}
+          rows={1}
+          wide={!inventory}
+          tone={summary.openTickets ? "sun" : "mint"}
+          icon={<LuTicket size={14} />}
+          label={t("detail.activity.kpi.tickets")}
+          value={summary.openTickets}
+          caption={summary.openTickets ? t("detail.activity.kpi.ticketsHint") : t("detail.activity.kpi.none")}
+        />
+        <ITBentoTile
+          cols={inventory ? 3 : 6}
+          rows={1}
+          wide={!inventory}
+          tone={summary.pendingTasks ? "sun" : "mint"}
+          icon={<LuWrench size={14} />}
+          label={t("detail.activity.kpi.tasks")}
+          value={summary.pendingTasks}
+          caption={summary.pendingTasks ? t("detail.activity.kpi.tasksHint") : t("detail.activity.kpi.none")}
+        />
+      </ITBentoGrid>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 lg:!grid-cols-2">
         {inventory && (
-        <Card icon={<FaBoxOpen size={14} />} tone="bg-sky-50 text-sky-600" title={t("detail.activity.tabs.loans")} count={openLoans.length}>
+        <Card icon={<LuBoxes size={15} />} title={t("detail.activity.tabs.loans")} count={openLoans.length}>
           <ul className="divide-y divide-slate-100">
             {openLoans.map((l) => (
               <li key={l.id} className="px-2 py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold text-slate-900">{l.number}</p>
+                <ITFlex align="center" justify="between" gap={3}>
+                  <ITText className="font-semibold text-slate-900">{l.number}</ITText>
                   <Pill value={l.status} label={label(l.status)} />
-                </div>
-                <p className="text-xs text-slate-500">{formatDateTime(l.date)}</p>
+                </ITFlex>
+                <ITText className="text-xs text-slate-500">{formatDateTime(l.date)}</ITText>
                 <ul className="mt-2 flex flex-col gap-1">
                   {l.items.map((i, idx) => (
-                    <li key={idx} className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-sm text-slate-700">
-                      <span className="font-bold text-slate-900">{i.quantity - i.returned}×</span>
-                      <span className="truncate">{i.device}</span>
-                      {i.returned > 0 && <span className="ml-auto text-xs text-emerald-600">{t("detail.activity.returnedCount", { count: i.returned })}</span>}
+                    <li key={idx} className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-slate-700" style={{ background: "var(--color-secondary-100)" }}>
+                      <ITText as="span" className="font-bold text-slate-900">{i.quantity - i.returned}×</ITText>
+                      <ITText as="span" className="truncate">{i.device}</ITText>
+                      {i.returned > 0 && <ITText as="span" className="ml-auto text-xs text-[color:var(--color-success)]">{t("detail.activity.returnedCount", { count: i.returned })}</ITText>}
                     </li>
                   ))}
                 </ul>
               </li>
             ))}
-            {openLoans.length === 0 && <Empty icon={<FaBoxOpen />} text={t("detail.activity.empty.loans")} />}
           </ul>
+          {openLoans.length === 0 && <ITEmptyState icon={<LuBoxes size={18} />} title={t("detail.activity.empty.loans")} className="!py-6" />}
         </Card>
         )}
 
-        <Card icon={<FaTicketAlt size={14} />} tone="bg-amber-50 text-amber-600" title={t("detail.activity.tabs.tickets")} count={tickets.length}>
+        <Card icon={<LuTicket size={15} />} title={t("detail.activity.tabs.tickets")} count={tickets.length}>
           <ul className="divide-y divide-slate-100">
             {tickets.map((tk) => (
-              <li key={tk.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-slate-50" onClick={() => navigate(`/tickets/${tk.id}`)}>
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-900">{tk.title}</p>
-                  <p className="text-xs text-slate-500">{dyn(t)(`detail.activity.relation.${tk.relation}`)} · {formatDateTime(tk.createdAt)}</p>
-                </div>
+              <li key={tk.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-[color-mix(in_srgb,currentColor_6%,transparent)]" onClick={() => navigate(`/tickets/${tk.id}`)}>
+                <ITFlex className="min-w-0">
+                  <ITText className="truncate font-semibold text-slate-900">{tk.title}</ITText>
+                  <ITText className="text-xs text-slate-500">{dyn(t)(`detail.activity.relation.${tk.relation}`)} · {formatDateTime(tk.createdAt)}</ITText>
+                </ITFlex>
                 <Pill value={tk.status} label={label(tk.status)} />
               </li>
             ))}
-            {tickets.length === 0 && <Empty icon={<FaTicketAlt />} text={t("detail.activity.empty.tickets")} />}
           </ul>
+          {tickets.length === 0 && <ITEmptyState icon={<LuTicket size={18} />} title={t("detail.activity.empty.tickets")} className="!py-6" />}
         </Card>
 
-        <Card icon={<FaTools size={14} />} tone="bg-orange-50 text-orange-600" title={t("detail.activity.tabs.tasks")} count={tasks.length}>
+        <Card icon={<LuWrench size={15} />} title={t("detail.activity.tabs.tasks")} count={tasks.length}>
           <ul className="divide-y divide-slate-100">
             {tasks.map((tk) => (
-              <li key={tk.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-slate-50" onClick={() => navigate(`/tickets/${tk.ticketId}`)}>
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-900">{tk.title}</p>
-                  <p className="truncate text-xs text-slate-500">
+              <li key={tk.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-3 transition hover:bg-[color-mix(in_srgb,currentColor_6%,transparent)]" onClick={() => navigate(`/tickets/${tk.ticketId}`)}>
+                <ITFlex className="min-w-0">
+                  <ITText className="truncate font-semibold text-slate-900">{tk.title}</ITText>
+                  <ITText className="truncate text-xs text-slate-500">
                     {tk.ticketTitle}{tk.dueDate ? ` · ${t("detail.activity.due", { date: formatDateTime(tk.dueDate) })}` : ""}
-                  </p>
-                </div>
+                  </ITText>
+                </ITFlex>
                 <Pill value={tk.status} label={label(tk.status)} />
               </li>
             ))}
-            {tasks.length === 0 && <Empty icon={<FaTools />} text={t("detail.activity.empty.tasks")} />}
           </ul>
+          {tasks.length === 0 && <ITEmptyState icon={<LuWrench size={18} />} title={t("detail.activity.empty.tasks")} className="!py-6" />}
         </Card>
 
         {inventory && (
-        <Card icon={<FaHistory size={14} />} tone="bg-violet-50 text-violet-600" title={t("detail.activity.tabs.kardex")} count={inventory.kardex.length}>
+        <Card icon={<LuHistory size={15} />} title={t("detail.activity.tabs.kardex")} count={inventory.kardex.length}>
+          {inventory.kardex.length > 0 && (
           <ul className="relative ml-4 border-l border-slate-200 py-2">
             {inventory.kardex.map((k, idx) => (
               <li key={`${k.number}-${idx}`} className="relative py-3 pl-6">
-                <span className={`absolute -left-3.5 top-3.5 flex h-7 w-7 items-center justify-center rounded-full ring-4 ring-white ${k.type === "LOAN" ? "bg-sky-100 text-sky-600" : "bg-emerald-100 text-emerald-600"}`}>
-                  <FaExchangeAlt size={11} />
-                </span>
-                <p className="font-semibold text-slate-900">
+                <ITText as="span" className={`absolute -left-3.5 top-3.5 flex h-7 w-7 items-center justify-center rounded-full ring-4 ring-[var(--it-card-bg)]`} style={{ background: `var(--color-${k.type === "LOAN" ? "info" : "success"}-soft)`, color: `var(--color-${k.type === "LOAN" ? "info" : "success"})` }}>
+                  <LuArrowLeftRight size={12} />
+                </ITText>
+                <ITText className="font-semibold text-slate-900">
                   {dyn(t)(`detail.activity.kardex.${k.type}`)} · {k.number}
-                  {k.loanNumber ? <span className="font-normal text-slate-500"> ({k.loanNumber})</span> : null}
-                </p>
-                <p className="text-xs text-slate-500">{formatDateTime(k.date)}</p>
-                <p className="mt-1 text-sm text-slate-700">
+                  {k.loanNumber ? <ITText as="span" className="font-normal text-slate-500"> ({k.loanNumber})</ITText> : null}
+                </ITText>
+                <ITText className="text-xs text-slate-500">{formatDateTime(k.date)}</ITText>
+                <ITText className="mt-1 text-sm text-slate-700">
                   {k.items.map((i) => `${i.quantity}× ${i.device}${i.condition ? ` · ${i.condition}` : ""}`).join(", ")}
-                </p>
+                </ITText>
               </li>
             ))}
           </ul>
-          {inventory.kardex.length === 0 && <Empty icon={<FaHistory />} text={t("detail.activity.empty.kardex")} />}
+          )}
+          {inventory.kardex.length === 0 && <ITEmptyState icon={<LuHistory size={18} />} title={t("detail.activity.empty.kardex")} className="!py-6" />}
         </Card>
         )}
       </div>
-    </div>
+    </ITStack>
   );
 }

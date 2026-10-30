@@ -22,9 +22,12 @@ export default defineConfig({
 
   use: {
     baseURL: E2E.webUrl,
+    // Con `E2E_CHANNEL=chrome` se usa el Chrome instalado en lugar del Chromium
+    // que descarga Playwright (útil en una máquina sin ese binario).
+    channel: (process.env.E2E_CHANNEL ?? undefined) as "chrome" | undefined,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    video: process.env.E2E_CHANNEL ? "off" : "retain-on-failure",
     // La app escribe montos y fechas en español; fijarlo evita diferencias de formato.
     locale: "es-MX",
     // Mismo huso que resuelve la API por defecto (`America/Mexico_City`): con el

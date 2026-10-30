@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ITInput } from "@axzydev/axzy_ui_system";
+import { ITInput, ITText } from "@axzydev/axzy_ui_system";
 import { FaCalendarAlt } from "react-icons/fa";
 import { usePopoverPosition } from "./usePopoverPosition";
 import { i18n } from "@shared/i18n";
@@ -116,14 +116,14 @@ export default function DatePickerPortal({
               top: placement.top,
               left: placement.left,
               zIndex: 9999,
-              background: "white",
-              border: "1px solid #e2e8f0",
+              background: "var(--it-card-bg, #ffffff)",
+              color: "var(--color-text-default)",
+              border: "1px solid var(--it-card-border, #e2e8f0)",
               borderRadius: 12,
               boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
               padding: 12,
               width: 280,
             }}
-            className="dark:bg-slate-800 dark:border-slate-700"
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
               <button
@@ -131,20 +131,20 @@ export default function DatePickerPortal({
                 onClick={() =>
                   setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
                 }
-                style={{ fontSize: 18, color: "#64748b", padding: "4px 8px" }}
+                style={{ fontSize: 18, color: "var(--color-text-muted, #64748b)", padding: "4px 8px" }}
                 aria-label={i18n.t("common:datePicker.previousMonth")}
               >
                 ‹
               </button>
-              <span style={{ fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
+              <ITText as="span" style={{ fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>
                 {monthLabel}
-              </span>
+              </ITText>
               <button
                 type="button"
                 onClick={() =>
                   setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
                 }
-                style={{ fontSize: 18, color: "#64748b", padding: "4px 8px" }}
+                style={{ fontSize: 18, color: "var(--color-text-muted, #64748b)", padding: "4px 8px" }}
                 aria-label={i18n.t("common:datePicker.nextMonth")}
               >
                 ›
@@ -156,7 +156,7 @@ export default function DatePickerPortal({
                 gridTemplateColumns: "repeat(7, 1fr)",
                 gap: 4,
                 fontSize: 10,
-                color: "#64748b",
+                color: "var(--color-text-muted, #64748b)",
                 marginBottom: 4,
                 textTransform: "uppercase",
               }}
@@ -184,16 +184,16 @@ export default function DatePickerPortal({
                     style={{
                       padding: "6px 0",
                       borderRadius: 6,
-                      border: isToday && !isSel ? "1px solid #94a3b8" : "1px solid transparent",
+                      border: isToday && !isSel ? "1px solid var(--color-text-muted, #94a3b8)" : "1px solid transparent",
                       cursor: disabled ? "not-allowed" : "pointer",
-                      background: isSel ? "#2563eb" : "transparent",
-                      color: isSel ? "white" : disabled ? "#cbd5e1" : cell.inMonth ? "#1e293b" : "#94a3b8",
+                      background: isSel ? "var(--color-primary)" : "transparent",
+                      color: isSel ? "#ffffff" : disabled || !cell.inMonth ? "var(--color-text-muted, #94a3b8)" : "var(--color-text-default, #1e293b)",
                       fontWeight: isSel ? 700 : 500,
                       opacity: disabled ? 0.4 : 1,
                     }}
                     onMouseEnter={(e) => {
                       if (!isSel && !disabled)
-                        (e.currentTarget as HTMLElement).style.background = "#e0e7ff";
+                        (e.currentTarget as HTMLElement).style.background = "var(--color-primary-soft)";
                     }}
                     onMouseLeave={(e) => {
                       if (!isSel && !disabled)
@@ -209,14 +209,14 @@ export default function DatePickerPortal({
               <button
                 type="button"
                 onClick={() => emit(new Date())}
-                style={{ fontSize: 11, color: "#475569" }}
+                style={{ fontSize: 11, color: "var(--color-text-default, #475569)" }}
               >
                 {i18n.t("common:datePicker.today")}
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                style={{ fontSize: 11, color: "#475569" }}
+                style={{ fontSize: 11, color: "var(--color-text-default, #475569)" }}
               >
                 {i18n.t("common:datePicker.close")}
               </button>

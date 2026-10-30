@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITButton, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITCard, ITFlex, ITGrid, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import {
   FaBuilding,
   FaTint,
@@ -56,12 +56,8 @@ export default function CatalogTabs() {
       </ITGrid>
 
       <ITGrid item xs={4} sm={3} md={3} className="min-w-0">
-        <ITStack
-          as="nav"
-          direction="column"
-          spacing={0}
-          className="sticky top-24 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-lg shadow-slate-200/50"
-        >
+        <ITCard contentClassName="!p-2" className="sticky top-24">
+          <ITStack as="nav" direction="column" spacing={0}>
           {current.canCreate && (
             <ITButton
               variant="filled"
@@ -99,8 +95,8 @@ export default function CatalogTabs() {
                     onClick={() => setActive(item.id)}
                     className={`group w-full rounded-lg px-2.5 py-2 text-left text-[12px] font-semibold transition-colors ${
                       isActive
-                        ? "bg-[#0D5777]/10 text-[#0D5777]"
-                        : "text-slate-600 hover:bg-[#0D5777]/5"
+                        ? "bg-primary-600/10 text-primary-600"
+                        : "text-slate-600 hover:bg-primary-600/5"
                     }`}
                   >
                     <ITFlex
@@ -108,22 +104,23 @@ export default function CatalogTabs() {
                       justify="center"
                       className={`h-6 w-6 shrink-0 rounded-md transition-colors ${
                         isActive
-                          ? "bg-[#0D5777] text-white"
-                          : "bg-slate-100 text-slate-500 group-hover:bg-[#0D5777]/10 group-hover:text-[#0D5777]"
+                          ? "bg-primary-600 text-white"
+                          : "bg-slate-100 text-slate-500 group-hover:bg-primary-600/10 group-hover:text-primary-600"
                       }`}
                     >
                       {item.icon}
                     </ITFlex>
                     <ITText className="truncate">{item.label}</ITText>
                     {isActive && (
-                      <ITFlex className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D5777]" />
+                      <ITFlex className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-primary-600" />
                     )}
                   </ITFlex>
                 );
               })}
             </ITStack>
           ))}
-        </ITStack>
+          </ITStack>
+        </ITCard>
       </ITGrid>
     </ITGrid>
   );

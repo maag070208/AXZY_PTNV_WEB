@@ -1,4 +1,5 @@
 import type { Permission, PermissionScope, UserRole } from "@entities/user";
+import { FEATURES } from "@shared/config/features";
 
 /**
  * Catálogo de pantallas de la app, en el mismo orden que el menú lateral.
@@ -99,7 +100,8 @@ export interface AppScreen {
   readonly children?: readonly AppScreen[];
 }
 
-export const APP_SCREENS: readonly AppScreen[] = [
+/** Catálogo completo, apagados incluidos (el menú usa `APP_SCREENS`). */
+const ALL_SCREENS: readonly AppScreen[] = [
   {
     id: "start",
     labelKey: "nav.home",
@@ -217,6 +219,15 @@ export const APP_SCREENS: readonly AppScreen[] = [
     actions: [],
   },
 ];
+
+/**
+ * Menú y resúmenes de pantallas. Un módulo apagado en `FEATURES` desaparece de
+ * aquí (menú, resumen por rol y consola de roles); sus rutas también se apagan
+ * en `App.tsx`.
+ */
+export const APP_SCREENS: readonly AppScreen[] = FEATURES.kitchen
+  ? ALL_SCREENS
+  : ALL_SCREENS.filter((screen) => screen.id !== "kitchen");
 
 /** Mapa clave → alcance tal como lo entrega `/auth/me` (solo los ≠ NONE). */
 export type PermissionMap = Partial<Record<Permission, PermissionScope>>;

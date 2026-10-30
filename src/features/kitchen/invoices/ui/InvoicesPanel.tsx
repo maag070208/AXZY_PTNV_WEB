@@ -101,17 +101,17 @@ export default function InvoicesPanel() {
 
   return (
     <ITFlex direction="column" gap={3}>
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
         fetchData={kitchenApi.invoicesTable as never}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={50}
-        itemsPerPageOptions={[10, 25, 50, 100]}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
+        rowHeight={50}
         virtualized
-        virtualizedMaxHeight={560}
-        rowHeight={54}
+        virtualizedMaxHeight={460}
       />
     </ITFlex>
   );

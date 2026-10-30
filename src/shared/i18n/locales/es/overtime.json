@@ -100,5 +100,6 @@
     "approved": "{{count}} día(s) aprobado(s)",
     "rejected": "{{count}} día(s) rechazado(s)",
     "error": "No se pudo guardar la decisión"
-  }
+  },
+  "howTo": "Marca las horas que sí se trabajaron y apruébalas; el resto se rechaza."
 }

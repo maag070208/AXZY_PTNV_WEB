@@ -4,7 +4,7 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITConfirmDialog,
+  ITCard,
   ITDataTable,
   ITFlex,
   ITGrid,
@@ -14,12 +14,15 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaEdit, FaFileAlt, FaPlus, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { personalApi, type DocumentType } from "@entities/hr";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function DocumentCatalogPage() {
   const { t: tt } = useTranslation(["employees", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [reloadKey, setReloadKey] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<DocumentType | null>(null);
@@ -199,7 +202,7 @@ export default function DocumentCatalogPage() {
       title={tt("catalog.title")}
       description={tt("catalog.description")}
       icon={<FaFileAlt size={20} />}
-      backAction={() => navigate(-1)}
+      backAction={() => goBack("/employees")}
       breadcrumbs={[
         { label: tt("common:nav.home"), onClick: () => navigate("/") },
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
@@ -221,7 +224,7 @@ export default function DocumentCatalogPage() {
       )}
 
       {showForm && (
-        <ITFlex as="section" direction="column" gap={3} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mb-4">
+        <ITCard contentClassName="flex flex-col gap-3 mb-4">
           <ITText className="text-sm font-bold text-slate-800">
             {editing ? tt("catalog.edit") : tt("catalog.new")}
           </ITText>
@@ -247,22 +250,24 @@ export default function DocumentCatalogPage() {
               </ITFlex>
             </ITGrid>
           </ITGrid>
-        </ITFlex>
+        </ITCard>
       )}
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={20}
-        itemsPerPageOptions={[10, 20, 50]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
         rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
 
-      <ITConfirmDialog
+      <LangostinConfirm
         isOpen={!!toDelete}
         onClose={() => setToDelete(null)}
         onConfirm={confirmDelete}

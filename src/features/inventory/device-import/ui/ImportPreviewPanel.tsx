@@ -233,17 +233,17 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
       )}
 
       <div className="grid gap-3 sm:!grid-cols-2 lg:!grid-cols-5">
-        <KpiTile label={t("import.statRows")} value={summary.rows} icon={<FaListOl size={16} />} tone="sky" />
-        <KpiTile label={t("import.statValid")} value={summary.valid} icon={<FaCheckCircle size={16} />} tone="emerald" />
-        <KpiTile
+        <KpiTile size="sm" label={t("import.statRows")} value={summary.rows} icon={<FaListOl size={16} />} tone="sky" />
+        <KpiTile size="sm" label={t("import.statValid")} value={summary.valid} icon={<FaCheckCircle size={16} />} tone="emerald" />
+        <KpiTile size="sm"
           label={t("import.statInvalid")}
           value={summary.invalid}
           icon={<FaTimesCircle size={16} />}
           tone={summary.invalid > 0 ? "rose" : "neutral"}
           hint={summary.invalid > 0 ? t("import.statusError") : undefined}
         />
-        <KpiTile label={t("import.statUnits")} value={summary.units} icon={<FaLayerGroup size={16} />} tone="orange" />
-        <KpiTile
+        <KpiTile size="sm" label={t("import.statUnits")} value={summary.units} icon={<FaLayerGroup size={16} />} tone="orange" />
+        <KpiTile size="sm"
           label={t("import.statNew")}
           value={summary.newDevices}
           icon={<FaPlus size={16} />}
@@ -303,16 +303,16 @@ export default function ImportPreviewPanel({ fx }: { fx: UseDeviceImport }) {
           </>
         }
       >
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           columns={columns}
           fetchData={request as any}
-          defaultItemsPerPage={50}
+          defaultItemsPerPage={25}
           itemsPerPageOptions={[25, 50, 100]}
           layout="fixed"
           density="compact"
+          rowHeight={50}
           virtualized
-          virtualizedMaxHeight={420}
-          rowHeight={56}
+          virtualizedMaxHeight={460}
         />
       </PanelCard>
     </ITFlex>

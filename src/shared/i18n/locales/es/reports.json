@@ -8,7 +8,11 @@
   },
   "filters": {
     "dateRange": "Rango de fechas",
-    "clear": "Limpiar"
+    "clear": "Limpiar",
+    "presetAll": "Todo",
+    "preset7": "7 días",
+    "preset30": "30 días",
+    "presetMonth": "Este mes"
   },
   "assigned": {
     "statAssigned": "Asignados",

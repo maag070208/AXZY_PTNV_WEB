@@ -5,4 +5,4 @@ export * from "./model/labels";
 export * from "./model/waitRating";
 export * from "./model/ticket.slice";
 export { default } from "./model/ticket.slice";
-export { ticketsApi } from "./api/ticketApi";
+export { ticketsApi } from "./api/ticketApi";export { default as TicketChip, type TicketChipTone } from "./ui/TicketChip";

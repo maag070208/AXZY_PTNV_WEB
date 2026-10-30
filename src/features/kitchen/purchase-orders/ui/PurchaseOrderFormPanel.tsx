@@ -27,7 +27,7 @@ const suggestedFor = (item: KitchenItemRow): number => {
 /** Columnas del detalle: artículo · cantidad · costo · IVA · subtotal · IVA $ · importe · quitar. */
 const DETAIL_GRID =
   "grid grid-cols-[minmax(220px,2.4fr)_minmax(110px,1fr)_minmax(120px,1fr)_minmax(120px,1fr)_minmax(90px,.8fr)_minmax(80px,.7fr)_minmax(100px,.9fr)_40px] items-start gap-3";
-const TH = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+const TH = "text-[12px] font-semibold text-slate-400";
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (

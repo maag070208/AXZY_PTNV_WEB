@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton, ITPage, ITFlex } from "@axzydev/axzy_ui_system";
 import { useCan } from "@entities/user";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -41,6 +41,7 @@ import {
 import { InvoiceDetailPanel, InvoiceFormPanel, InvoicesPanel } from "@features/kitchen/invoices";
 import { downloadPurchaseOrderPdf, buildPurchaseOrderPdf } from "@widgets/purchase-order-pdf";
 import { SupplierDetailPanel, SupplierFormPanel, SuppliersPanel } from "@features/kitchen/suppliers";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** Botón principal de la cabecera (mismo estilo que "Nuevo empleado" en Personal). */
 const newButton = (label: string, onClick: () => void) => (
@@ -64,6 +65,7 @@ const crumbs = (
 export function KitchenOverviewPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -71,7 +73,7 @@ export function KitchenOverviewPage() {
       description={t("overview.description")}
       icon={<FaUtensils size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("overview.title"))}
-      backAction={() => navigate("/")}
+      backAction={() => goBack("/")}
     >
       <KitchenOverviewPanel />
     </ITPage>
@@ -81,6 +83,7 @@ export function KitchenOverviewPage() {
 export function KitchenItemsPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canManage = useCan("kitchen.manage");
   const canIn = useCan("kitchen.stock_in");
   const canOut = useCan("kitchen.stock_out");
@@ -93,9 +96,9 @@ export function KitchenItemsPage() {
       description={t("items.description")}
       icon={<FaBoxes size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("items.title"))}
-      backAction={() => navigate("/kitchen")}
+      backAction={() => goBack("/kitchen")}
       actions={
-        <div className="flex flex-wrap items-center gap-2">
+        <ITFlex align="center" wrap="wrap" gap={2}>
           {canIn && (
             <ITButton variant="outlined" color="success" icon={<FaArrowDown size={11} />} label={t("items.quick.stockIn")} onClick={() => navigate("/kitchen/stock-in")} />
           )}
@@ -115,7 +118,7 @@ export function KitchenItemsPage() {
             />
           )}
           {canManage && newButton(t("items.new"), () => setNewSignal((n) => n + 1))}
-        </div>
+        </ITFlex>
       }
     >
       <KitchenItemsPanel newSignal={newSignal} />
@@ -126,13 +129,14 @@ export function KitchenItemsPage() {
 export function KitchenItemDetailPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("items.detail")}
       icon={<FaBoxes size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("items.detail"))}
-      backAction={() => navigate("/kitchen/items")}
+      backAction={() => goBack("/kitchen/items")}
     >
       <KitchenItemDetailPanel />
     </ITPage>
@@ -142,6 +146,7 @@ export function KitchenItemDetailPage() {
 export function KitchenItemImportPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -155,7 +160,7 @@ export function KitchenItemImportPage() {
         t("import.title"),
         { label: t("items.title"), path: "/kitchen/items" }
       )}
-      backAction={() => navigate("/kitchen/items")}
+      backAction={() => goBack("/kitchen/items")}
     >
       <KitchenImportPanel />
     </ITPage>
@@ -165,6 +170,7 @@ export function KitchenItemImportPage() {
 export function KitchenLotsPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -172,7 +178,7 @@ export function KitchenLotsPage() {
       description={t("lots.description")}
       icon={<FaListAlt size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("lots.title"))}
-      backAction={() => navigate("/kitchen")}
+      backAction={() => goBack("/kitchen")}
     >
       <KitchenLotsPanel />
     </ITPage>
@@ -182,6 +188,7 @@ export function KitchenLotsPage() {
 export function KitchenStockInPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -189,7 +196,7 @@ export function KitchenStockInPage() {
       description={t("stockIn.description")}
       icon={<FaArrowDown size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("stockIn.title"), { label: t("items.title"), path: "/kitchen/items" })}
-      backAction={() => navigate("/kitchen/items")}
+      backAction={() => goBack("/kitchen/items")}
     >
       <KitchenStockInPanel />
     </ITPage>
@@ -199,6 +206,7 @@ export function KitchenStockInPage() {
 export function KitchenStockOutPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -206,7 +214,7 @@ export function KitchenStockOutPage() {
       description={t("stockOut.description")}
       icon={<FaArrowUp size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("stockOut.title"), { label: t("items.title"), path: "/kitchen/items" })}
-      backAction={() => navigate("/kitchen/items")}
+      backAction={() => goBack("/kitchen/items")}
     >
       <KitchenStockOutPanel />
     </ITPage>
@@ -216,6 +224,7 @@ export function KitchenStockOutPage() {
 export function KitchenLedgerPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -223,7 +232,7 @@ export function KitchenLedgerPage() {
       description={t("ledger.description")}
       icon={<FaBook size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("ledger.title"))}
-      backAction={() => navigate("/kitchen")}
+      backAction={() => goBack("/kitchen")}
     >
       <KitchenLedgerPanel />
     </ITPage>
@@ -233,6 +242,7 @@ export function KitchenLedgerPage() {
 export function KitchenCountPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -240,7 +250,7 @@ export function KitchenCountPage() {
       description={t("count.description")}
       icon={<FaClipboardCheck size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("count.title"), { label: t("items.title"), path: "/kitchen/items" })}
-      backAction={() => navigate("/kitchen/items")}
+      backAction={() => goBack("/kitchen/items")}
     >
       <KitchenCountPanel />
     </ITPage>
@@ -250,6 +260,7 @@ export function KitchenCountPage() {
 export function KitchenRestockPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -257,7 +268,7 @@ export function KitchenRestockPage() {
       description={t("restock.description")}
       icon={<FaTruckLoading size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("restock.title"))}
-      backAction={() => navigate("/kitchen")}
+      backAction={() => goBack("/kitchen")}
     >
       <KitchenRestockPanel />
     </ITPage>
@@ -267,6 +278,7 @@ export function KitchenRestockPage() {
 export function KitchenCatalogPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -274,7 +286,7 @@ export function KitchenCatalogPage() {
       description={t("catalog.description")}
       icon={<FaTags size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("catalog.title"))}
-      backAction={() => navigate("/kitchen")}
+      backAction={() => goBack("/kitchen")}
     >
       <KitchenCatalogPanel />
     </ITPage>
@@ -284,6 +296,7 @@ export function KitchenCatalogPage() {
 export function KitchenPurchaseOrdersPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canCreate = useCan("purchase_orders.create");
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -292,7 +305,7 @@ export function KitchenPurchaseOrdersPage() {
       description={t("purchaseOrders.description")}
       icon={<FaShoppingCart size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
-      backAction={() => navigate("/kitchen/restock")}
+      backAction={() => goBack("/kitchen/restock")}
       actions={canCreate ? newButton(t("purchaseOrders.new"), () => navigate("/kitchen/purchase-orders/new")) : undefined}
     >
       <PurchaseOrdersPanel />
@@ -303,6 +316,7 @@ export function KitchenPurchaseOrdersPage() {
 export function KitchenPurchaseOrderFormPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { id } = useParams();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -311,7 +325,7 @@ export function KitchenPurchaseOrderFormPage() {
       description={t("purchaseOrders.description")}
       icon={<FaClipboardList size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
-      backAction={() => navigate("/kitchen/purchase-orders")}
+      backAction={() => goBack("/kitchen/purchase-orders")}
     >
       <PurchaseOrderFormPanel id={id} />
     </ITPage>
@@ -321,6 +335,7 @@ export function KitchenPurchaseOrderFormPage() {
 export function KitchenPurchaseOrderDetailPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { id } = useParams();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -328,7 +343,7 @@ export function KitchenPurchaseOrderDetailPage() {
       title={t("purchaseOrders.detail")}
       icon={<FaShoppingCart size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("purchaseOrders.title"))}
-      backAction={() => navigate("/kitchen/purchase-orders")}
+      backAction={() => goBack("/kitchen/purchase-orders")}
     >
       <PurchaseOrderDetailPanel id={id} onDownloadPdf={downloadPurchaseOrderPdf} buildPdf={buildPurchaseOrderPdf} />
     </ITPage>
@@ -338,6 +353,7 @@ export function KitchenPurchaseOrderDetailPage() {
 export function KitchenCostCenterSpendingPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -345,7 +361,7 @@ export function KitchenCostCenterSpendingPage() {
       description={t("costCenterSpending.description")}
       icon={<FaBuilding size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("costCenterSpending.title"))}
-      backAction={() => navigate("/kitchen/purchase-orders")}
+      backAction={() => goBack("/kitchen/purchase-orders")}
     >
       <CostCenterSpendingPanel />
     </ITPage>
@@ -355,6 +371,7 @@ export function KitchenCostCenterSpendingPage() {
 export function KitchenInvoicesPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canRegister = useCan("invoices.register");
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -363,7 +380,7 @@ export function KitchenInvoicesPage() {
       icon={<FaFileInvoice size={20} />}
       noPadding
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
-      backAction={() => navigate("/kitchen/purchase-orders")}
+      backAction={() => goBack("/kitchen/purchase-orders")}
       actions={canRegister ? newButton(t("invoices.new"), () => navigate("/kitchen/invoices/new")) : undefined}
     >
       <InvoicesPanel />
@@ -374,6 +391,7 @@ export function KitchenInvoicesPage() {
 export function KitchenInvoiceFormPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -381,7 +399,7 @@ export function KitchenInvoiceFormPage() {
       description={t("invoices.description")}
       icon={<FaFileInvoice size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
-      backAction={() => navigate("/kitchen/invoices")}
+      backAction={() => goBack("/kitchen/invoices")}
     >
       <InvoiceFormPanel />
     </ITPage>
@@ -391,6 +409,7 @@ export function KitchenInvoiceFormPage() {
 export function KitchenInvoiceDetailPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { id } = useParams();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -398,7 +417,7 @@ export function KitchenInvoiceDetailPage() {
       title={t("invoices.detail")}
       icon={<FaFileInvoice size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("invoices.title"))}
-      backAction={() => navigate("/kitchen/invoices")}
+      backAction={() => goBack("/kitchen/invoices")}
     >
       <InvoiceDetailPanel id={id} />
     </ITPage>
@@ -408,6 +427,7 @@ export function KitchenInvoiceDetailPage() {
 export function KitchenSuppliersPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const canManage = useCan("kitchen.manage");
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -416,7 +436,7 @@ export function KitchenSuppliersPage() {
       description={t("suppliers.description")}
       icon={<FaTruck size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("suppliers.title"))}
-      backAction={() => navigate("/kitchen")}
+      backAction={() => goBack("/kitchen")}
       actions={canManage ? newButton(t("suppliers.new"), () => navigate("/kitchen/suppliers/new")) : undefined}
     >
       <SuppliersPanel />
@@ -427,6 +447,7 @@ export function KitchenSuppliersPage() {
 export function KitchenSupplierFormPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { id } = useParams();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -435,7 +456,7 @@ export function KitchenSupplierFormPage() {
       description={t("suppliers.description")}
       icon={<FaTruck size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("suppliers.title"))}
-      backAction={() => navigate(id ? `/kitchen/suppliers/${id}` : "/kitchen/suppliers")}
+      backAction={() => goBack(id ? `/kitchen/suppliers/${id}` : "/kitchen/suppliers")}
     >
       <SupplierFormPanel id={id} />
     </ITPage>
@@ -445,6 +466,7 @@ export function KitchenSupplierFormPage() {
 export function KitchenSupplierDetailPage() {
   const { t } = useTranslation(["kitchen", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { id } = useParams();
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -452,7 +474,7 @@ export function KitchenSupplierDetailPage() {
       title={t("suppliers.detail")}
       icon={<FaTruck size={20} />}
       breadcrumbs={crumbs(navigate, t("common:breadcrumbs.home"), t("common:nav.kitchen"), t("suppliers.title"))}
-      backAction={() => navigate("/kitchen/suppliers")}
+      backAction={() => goBack("/kitchen/suppliers")}
     >
       <SupplierDetailPanel id={id} />
     </ITPage>

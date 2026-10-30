@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITBadget,
@@ -30,6 +29,7 @@ import {
 } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { dyn } from "@shared/i18n/dyn";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 interface Line {
   key: number;
@@ -37,7 +37,7 @@ interface Line {
   quantity: string;
 }
 
-const HEAD = "text-[10px] font-black uppercase tracking-widest text-slate-400";
+const HEAD = "text-[12px] font-semibold text-slate-400";
 const emptyDraft = (key: number): Line => ({ key, itemId: "", quantity: "" });
 
 /**
@@ -47,7 +47,7 @@ const emptyDraft = (key: number): Line => ({ key, itemId: "", quantity: "" });
  */
 export default function KitchenStockOutPanel() {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const requestKey = useRequestKey();
   const items = useKitchenItemOptions();
   const itemById = useMemo(() => new Map(items.data.map((i) => [i.id, i])), [items.data]);
@@ -125,7 +125,7 @@ export default function KitchenStockOutPanel() {
     try {
       await kitchenApi.stockOut(input, requestKey(input));
       setToast(t("stockOut.success"));
-      setTimeout(() => navigate("/kitchen/items"), 600);
+      setTimeout(() => goBack("/kitchen/items"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -141,7 +141,7 @@ export default function KitchenStockOutPanel() {
         </ITAlert>
       )}
 
-      <ITCard title={t("stockOut.dataTitle")} className="!p-5 border border-slate-200">
+      <ITCard title={t("stockOut.dataTitle")} className="!p-5">
         <ITGrid container columns={12} spacing={4}>
           <ITGrid item xs={12} md={3}>
             <ITSelect
@@ -184,7 +184,7 @@ export default function KitchenStockOutPanel() {
         </ITGrid>
       </ITCard>
 
-      <ITCard title={t("stockOut.itemsTitle")} className="!p-5 border border-slate-200">
+      <ITCard title={t("stockOut.itemsTitle")} className="!p-5">
         <ITFlex direction="column" gap={4}>
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <ITText className={`${HEAD} block mb-3`}>{t("stockOut.addTitle")}</ITText>

@@ -56,7 +56,7 @@ export default function KitchenOverviewPanel() {
                   key={q.key}
                   type="button"
                   onClick={() => navigate(q.to)}
-                  className="group flex items-center gap-3 rounded-xl border border-slate-200 !bg-white p-3 text-left transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                  className="group flex items-center gap-3 rounded-xl border border-slate-200 !bg-[var(--it-card-bg)] p-3 text-left transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
                 >
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${q.tone}`}>{q.icon}</span>
                   <span className="min-w-0">
@@ -130,14 +130,14 @@ function UseFirstCard({ alerts, onViewAll }: { alerts: KitchenAlerts; onViewAll:
             return (
               <ITFlex key={l.id} align="center" justify="between" gap={2} className="border-b border-slate-100 py-2.5 last:border-0">
                 <ITFlex align="center" gap={3}>
-                  <span className={`h-9 w-1.5 rounded-full ${expired ? "bg-rose-500" : "bg-[#fb923c]"}`} />
+                  <span className={`h-9 w-1.5 rounded-full ${expired ? "bg-rose-500" : "bg-[var(--color-orange-400)]"}`} />
                   <ITFlex direction="column" gap={0}>
                     <ITText className="text-[12px] font-black text-slate-800">{l.item.name}</ITText>
                     <ITText className="text-[10px] font-mono text-slate-400">{l.lotCode}</ITText>
                   </ITFlex>
                 </ITFlex>
                 <ITFlex direction="column" gap={0} className="items-end">
-                  <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${expired ? "bg-rose-50 text-rose-700" : "bg-[#fff7ed] text-[#c2410c]"}`}>{label}</span>
+                  <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${expired ? "bg-rose-50 text-rose-700" : "bg-[var(--color-orange-50)] text-[color:var(--color-orange-700)]"}`}>{label}</span>
                   <ITText className="mt-0.5 text-[11px] text-slate-500">
                     {fmtQty(l.onHand)} {l.item.unit.name}
                   </ITText>

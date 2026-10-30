@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITBadget, ITButton, ITDataTable, ITFlex, ITGrid, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITChip, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
 import { FaArrowDown, FaArrowRight, FaArrowUp, FaExchangeAlt, FaFilePdf, FaHistory, FaPlus, FaTrash, FaUndoAlt, FaWrench } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
@@ -8,8 +8,10 @@ import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type Movement, type MovementType } from "@entities/inventory";
 import { TYPE_BADGE_COLOR } from "@entities/inventory/model/movementColors";
 import { downloadMovementPdf, downloadReportMovementsPdf } from "@widgets/movement-pdf";
-import { StatCard } from "@shared/ui/stat-card";
+import { ListSummaryStrip } from "@shared/ui/list-summary-strip";
+import { LuHistory, LuTrash2, LuWrench } from "react-icons/lu";
 import { i18n } from "@shared/i18n";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 interface StatCounts {
   total: number;
@@ -37,7 +39,6 @@ const ACTION_VISUAL: Record<MovementType, { icon: ReactNode; color: ActionColor 
   MAINTENANCE_OUT: { icon: <FaWrench size={12} />, color: "warning" },
   REVERSAL: { icon: <FaUndoAlt size={12} />, color: "danger" },
 };
-const ACTION_DEFAULT: ActionColor = "warning";
 
 /** Tipos de movimiento, para el filtro tipo catálogo. */
 const MOVEMENT_TYPES = Object.keys(ACTION_VISUAL) as MovementType[];
@@ -101,6 +102,7 @@ function flattenMovements(list: Movement[]): MovementRow[] {
 export default function MovementsPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [reloadKey, setReloadKey] = useState(0);
   const [typeFilter, setTypeFilter] = useState<TypeGroup | null>(null);
   const [stats, setStats] = useState<StatCounts>({ total: 0, retirements: 0, maintenance: 0 });
@@ -141,16 +143,6 @@ export default function MovementsPage() {
     setReloadKey((k) => k + 1);
   };
 
-  const revert = async (movementId: string) => {
-    if (!window.confirm(t("movements.confirmRevert"))) return;
-    try {
-      await inventoryApi.revert(movementId);
-      setReloadKey((k) => k + 1);
-    } catch (e: any) {
-      window.alert(e.message || "Error");
-    }
-  };
-
   const generateReport = async () => {
     setGeneratingPdf(true);
     try {
@@ -162,8 +154,6 @@ export default function MovementsPage() {
       setGeneratingPdf(false);
     }
   };
-
-  const statCardActive = (group: TypeGroup | null) => typeFilter === group;
 
   /** Abre el PDF del movimiento de la fila (el botón "Reporte" es el global). */
   const openMovementPdf = async (movementId: string) => {
@@ -200,9 +190,9 @@ export default function MovementsPage() {
         error: false,
       },
       render: (m: MovementRow) => (
-        <ITBadget color={TYPE_BADGE_COLOR[m.type]} size="lg">
+        <ITChip size="sm" color={TYPE_BADGE_COLOR[m.type]}>
           {t(`typeLabels.${m.type}`)}
-        </ITBadget>
+        </ITChip>
       ),
     },
     {
@@ -214,7 +204,7 @@ export default function MovementsPage() {
       sortable: false,
       render: (m: MovementRow) => (
         <ITText className="text-[11px] text-slate-600 truncate">
-          {m.name} {m.unit !== "—" && <b className="text-slate-800">· {m.unit}</b>}
+          {m.name} {m.unit !== "—" && <ITText as="b" className="text-slate-800">· {m.unit}</ITText>}
         </ITText>
       ),
     },
@@ -249,11 +239,11 @@ export default function MovementsPage() {
       },
       render: (m: MovementRow) =>
         m.status === "CANCELLED" ? (
-          <ITBadget color="danger" size="lg">{t("movements.cancelled")}</ITBadget>
+          <ITChip size="sm" color="danger">{t("movements.cancelled")}</ITChip>
         ) : m.type === "RETIREMENT" ? (
-          <ITBadget color="warning" size="lg">{t("movements.retiredLabel")}</ITBadget>
+          <ITChip size="sm" color="warning">{t("movements.retiredLabel")}</ITChip>
         ) : (
-          <ITBadget color="success" size="lg">{t("movements.activeLabel")}</ITBadget>
+          <ITChip size="sm" color="success">{t("movements.activeLabel")}</ITChip>
         ),
     },
   ];
@@ -265,7 +255,7 @@ export default function MovementsPage() {
       description={t("movements.description")}
       icon={<FaHistory size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("movements.title") }]}
-      backAction={() => navigate("/inventory")}
+      backAction={() => goBack("/inventory")}
       actions={
         <ITFlex align="center" gap={2}>
           <ITButton variant="outlined" color="primary" onClick={generateReport} disabled={generatingPdf}>
@@ -283,51 +273,28 @@ export default function MovementsPage() {
         </ITFlex>
       }
     >
-      <ITGrid container columns={12} spacing={4}>
-        <ITGrid item xs={6} md={4}>
-          <StatCard
-            size="lg"
-            icon={<FaHistory size={16} className="text-white" />}
-            circleClass={statCardActive(null) ? "bg-slate-800 ring-4 ring-slate-200" : "bg-slate-800"}
-            value={stats.total}
-            label={t("movements.stats.total")}
-            onClick={() => applyFilter(null)}
-          />
-        </ITGrid>
-        <ITGrid item xs={6} md={4}>
-          <StatCard
-            size="lg"
-            icon={<FaTrash size={16} className="text-white" />}
-            circleClass={statCardActive("retirements") ? "bg-red-500 ring-4 ring-red-200" : "bg-red-500"}
-            value={stats.retirements}
-            label={t("movements.stats.retirements")}
-            onClick={() => applyFilter("retirements")}
-          />
-        </ITGrid>
-        <ITGrid item xs={6} md={4}>
-          <StatCard
-            size="lg"
-            icon={<FaWrench size={16} className="text-white" />}
-            circleClass={statCardActive("maintenance") ? "bg-sky-500 ring-4 ring-sky-200" : "bg-sky-500"}
-            value={stats.maintenance}
-            label={t("movements.stats.maintenance")}
-            onClick={() => applyFilter("maintenance")}
-          />
-        </ITGrid>
-      </ITGrid>
+      <ListSummaryStrip
+        activeId={typeFilter ?? "all"}
+        onSelect={(id) => applyFilter(id === "all" ? null : (id as TypeGroup))}
+        items={[
+          { id: "all", label: t("movements.stats.total"), value: stats.total, tone: "sea", icon: <LuHistory size={15} /> },
+          { id: "retirements", label: t("movements.stats.retirements"), value: stats.retirements, tone: "sun", icon: <LuTrash2 size={15} /> },
+          { id: "maintenance", label: t("movements.stats.maintenance"), value: stats.maintenance, tone: "lavender", icon: <LuWrench size={15} /> },
+        ]}
+      />
 
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
         reloadTrigger={reloadKey}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
+        onRowClick={(row) => void openMovementPdf((row as unknown as MovementRow).movementId)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
         layout="fixed"
         density="compact"
-        virtualized
-        virtualizedMaxHeight={420}
         rowHeight={50}
-        onRowClick={(row) => void openMovementPdf((row as unknown as MovementRow).movementId)}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITPage>
   );

@@ -29,11 +29,11 @@ export default function StockInFooter({
   });
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-md sm:px-6">
+    <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-[var(--it-card-bg)]/95 px-4 py-3 shadow-lg backdrop-blur-md sm:px-6">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         <div className="flex items-center gap-4 sm:gap-6">
           <div className="flex flex-col">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            <span className="text-[12px] font-semibold text-slate-400">
               {t("stockIn.summary")}
             </span>
             <span className="text-xs font-medium text-slate-700">
@@ -42,7 +42,7 @@ export default function StockInFooter({
           </div>
           {totalCost > 0 && (
             <div className="hidden border-l border-slate-200 pl-4 sm:flex sm:flex-col">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <span className="text-[12px] font-semibold text-slate-400">
                 {t("stockIn.totalCost")}
               </span>
               <span className="text-sm font-bold text-slate-900">${formattedCost}</span>

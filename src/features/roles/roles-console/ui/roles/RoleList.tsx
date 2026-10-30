@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { ITInput } from "@axzydev/axzy_ui_system";
+import { ITCard, ITFlex, ITInput, ITStack, ITText } from "@axzydev/axzy_ui_system";
 import { FaSearch, FaUsers } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { RoleAdmin } from "@entities/permission";
 import { roleLabel } from "@entities/user";
 import { normalizeText } from "../../model/access-levels";
 import type { RolesAdminState } from "../../model/useRolesAdmin";
+import { ROLE_TONES, roleTone } from "../shared/tokens";
 import RoleAvatar from "../shared/RoleAvatar";
 
 interface Props {
@@ -19,6 +20,7 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
   const { t } = useTranslation("roles");
   const [query, setQuery] = useState("");
   const { data, rolesMeta, permissionsByRole, changeDetails } = admin;
+  const catalogTotal = data?.catalog.length ?? 0;
 
   const metaOf = (key: string): RoleAdmin | undefined => rolesMeta.find((role) => role.key === key);
   const pendingByRole = useMemo(() => {
@@ -41,7 +43,8 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
   }, [data, rolesMeta, query, t]);
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 lg:sticky lg:top-4">
+    <ITCard contentClassName="!p-2" className="lg:sticky lg:top-4">
+      <ITFlex direction="column" gap={2}>
       <ITInput
         name="role_list_search"
         size="sm"
@@ -52,53 +55,66 @@ export default function RoleList({ admin, selectedRole, onSelect }: Props) {
       />
       <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto">
         {groups.length === 0 && (
-          <p className="py-6 text-center text-[11px] italic text-slate-400">{t("matrix.noResults")}</p>
+          <ITText className="py-6 text-center text-[11px] italic text-slate-400">{t("matrix.noResults")}</ITText>
         )}
         {groups.map(([module, roles]) => (
-          <div key={module} className="flex flex-col gap-0.5">
-            <p className="px-2 text-[9px] font-black uppercase tracking-widest text-slate-400">{module}</p>
+          <ITStack key={module} spacing={0.5}>
+            <ITText className="px-2 text-[12px] font-semibold text-slate-400">{module}</ITText>
             {roles.map((key) => {
               const meta = metaOf(key);
               const selected = key === selectedRole;
               const pending = pendingByRole.get(key) ?? 0;
               return (
-                <button
+                <ITFlex
                   key={key}
-                  type="button"
+                  as="button"
+                  align="center"
+                  gap={2}
                   onClick={() => onSelect(key)}
-                  className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition ${
-                    selected
-                      ? "border-[#0D5777]/40 !bg-[#0D5777]/5 shadow-sm"
-                      : "border-transparent !bg-transparent hover:!bg-slate-50"
+                  className={`w-full rounded-lg px-2 py-1.5 text-left transition ${
+                    selected ? "bg-primary-600/10" : "hover:bg-slate-50"
                   } ${meta && !meta.active ? "opacity-60" : ""}`}
                 >
                   <RoleAvatar role={key} size="sm" />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5">
-                      <span className={`truncate text-[12px] font-bold ${selected ? "text-[#0D5777]" : "text-slate-800"}`}>
+                  <ITText as="span" className="min-w-0 flex-1">
+                    <ITText as="span" className="flex items-center gap-1.5">
+                      <ITText as="span" className={`truncate text-[12px] font-bold ${selected ? "text-primary-500" : "text-slate-800"}`}>
                         {roleLabel(key)}
-                      </span>
+                      </ITText>
                       {pending > 0 && (
-                        <span
-                          className="h-2 w-2 shrink-0 rounded-full bg-amber-500"
+                        <ITText
+                          as="span"
+                          aria-label={t("matrix.changeCount", { count: pending })}
                           title={t("matrix.changeCount", { count: pending })}
+                          className="h-2 w-2 shrink-0 rounded-full bg-amber-500"
                         />
                       )}
-                    </span>
-                    <span className="flex items-center gap-2 text-[10px] text-slate-400">
-                      <span>{t("roleList.permissions", { count: Object.keys(permissionsByRole[key] ?? {}).length })}</span>
-                      <span className="inline-flex items-center gap-1">
+                    </ITText>
+                    <ITText as="span" className="flex items-center gap-2 text-[10px] text-slate-400">
+                      <ITText as="span">{t("roleList.permissions", { count: Object.keys(permissionsByRole[key] ?? {}).length })}</ITText>
+                      <ITText as="span" className="inline-flex items-center gap-1">
                         <FaUsers size={9} /> {meta?.userCount ?? 0}
-                      </span>
-                      {meta && !meta.active && <span className="font-bold text-rose-500">{t("access.inactiveRole")}</span>}
-                    </span>
-                  </span>
-                </button>
+                      </ITText>
+                      {meta && !meta.active && <ITText as="span" className="font-bold text-rose-500">{t("access.inactiveRole")}</ITText>}
+                    </ITText>
+                    {/* Cobertura del rol sobre el catálogo de permisos */}
+                    <ITText as="span" className="mt-1 block h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                      <ITText
+                        as="span"
+                        className={`block h-1 rounded-full ${ROLE_TONES[roleTone(key)].dot}`}
+                        style={{
+                          width: `${Math.round((Object.keys(permissionsByRole[key] ?? {}).length / Math.max(1, catalogTotal)) * 100)}%`,
+                        }}
+                      />
+                    </ITText>
+                  </ITText>
+                </ITFlex>
               );
             })}
-          </div>
+          </ITStack>
         ))}
       </div>
-    </div>
+      </ITFlex>
+    </ITCard>
   );
 }

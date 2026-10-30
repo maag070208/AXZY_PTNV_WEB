@@ -133,10 +133,9 @@
     "title": "Asistencias",
     "description": "Jornadas armadas con las checadas del reloj y relacionadas con cada empleado por su número en el reloj.",
     "pdfTitle": "Entradas y salidas — Reloj checador",
-    "links": "{{linkedCount}} de {{total}} empleados del reloj vinculados",
-    "withoutLink": "Los {{count}} sin vincular salen con el nombre del reloj y la marca «Sin vincular».",
-    "goToLink": "Vincular empleados",
-    "rule": "El reloj no distingue entrada de salida: las checadas se alternan, las repetidas en menos de 5 min se ignoran y una jornada dura máximo 13 h."
+    "noEmployees": "El reloj todavía no tiene empleados: las checadas no se pueden asociar a una persona.",
+    "unlinkedNotice": "{{count}} de {{total}} empleados del reloj no están vinculados a una persona: sus checadas salen con el nombre del reloj y la marca «Sin vincular».",
+    "link": "Vincular"
   },
   "employees": {
     "title": "Empleados del reloj",
@@ -484,9 +483,11 @@
     }
   },
   "people": {
-
     "view": {
-      "columns": {"person": "Persona", "progress": "Avance"},
+      "columns": {
+        "person": "Persona",
+        "progress": "Avance"
+      },
       "count": "{{count}} persona(s) en el reloj",
       "title": "Personas del reloj",
       "connected": "Reloj conectado",
@@ -777,7 +778,12 @@
     }
   },
   "employeeClock": {
-    "tiles": {"faces":"Rostros","fingers":"Huellas","cards":"Tarjetas","punches":"Checadas hoy"},
+    "tiles": {
+      "faces": "Rostros",
+      "fingers": "Huellas",
+      "cards": "Tarjetas",
+      "punches": "Checadas hoy"
+    },
     "notEnrolled": "Todavía no está dada de alta en este reloj.",
     "title": "Reloj checador",
     "description": "Alta de la persona en los relojes. Por ahora solo escribe en el reloj de prueba.",
@@ -873,5 +879,13 @@
     "altaPending": "{{clock}} es de solo lectura: el alta queda pendiente ahí",
     "altaRequestFailed": "No se pudo dar de alta en los relojes",
     "failed": "No se pudo actualizar {{clock}}"
+  },
+  "summary": {
+    "punches": "Checadas",
+    "clocks": "Relojes",
+    "connected": "{{count}} conectados",
+    "problems": "Con problemas",
+    "problemsHint": "No conectan: revisa su detalle",
+    "allOk": "Todos conectan"
   }
 }

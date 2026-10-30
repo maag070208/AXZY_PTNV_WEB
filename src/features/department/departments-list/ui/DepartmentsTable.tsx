@@ -1,6 +1,5 @@
 import {
   ITBadget,
-  ITButton,
   ITDataTable,
   ITFlex,
   ITText,
@@ -12,6 +11,7 @@ import type {
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { Department, Subarea } from "@entities/department";
+import { RowAction } from "@shared/ui/row-action";
 
 interface Props {
   fetchData: (
@@ -44,11 +44,11 @@ export default function DepartmentsTable({
       filter: true,
       render: (d: Department) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="font-black text-slate-800 uppercase text-[12px] tracking-tight">
+          <ITText className="font-semibold text-slate-800 text-[12px]">
             {d.name}
           </ITText>
           {!d.active && (
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
+            <ITText className="text-[12px] font-bold text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
               {tt("list.inactive")}
             </ITText>
           )}
@@ -63,7 +63,7 @@ export default function DepartmentsTable({
       filter: true,
       render: (d: Department) =>
         d.subareas.length === 0 ? (
-          <ITText className="text-[10px] font-bold text-slate-400 uppercase">
+          <ITText className="text-[12px] font-bold text-slate-400">
             {tt("list.noAreas")}
           </ITText>
         ) : (
@@ -96,44 +96,16 @@ export default function DepartmentsTable({
       align: "right" as const,
       render: (d: Department) => (
         <ITFlex gap={1}>
-          <ITButton
-            variant="outlined"
-            size="lg"
-            color="secondary"
-            onClick={() => onView(d)}
-            title={tt("common:actions.view")}
-          >
-            <FaEye size={14} />
-          </ITButton>
-          {canManage && (
-            <ITButton
-              variant="outlined"
-              size="lg"
-              color="secondary"
-              onClick={() => onEdit(d)}
-              title={tt("list.editName")}
-            >
-              <FaEdit size={12} />
-            </ITButton>
-          )}
-          {canManage && (
-            <ITButton
-              variant="outlined"
-              size="lg"
-              color="error"
-              onClick={() => onDelete(d)}
-              title={tt("list.delete")}
-            >
-              <FaTrash size={12} />
-            </ITButton>
-          )}
+          <RowAction icon={<FaEye size={13} />} label={tt("common:actions.view")} tone="secondary" onClick={() => onView(d)} />
+          {canManage && <RowAction icon={<FaEdit size={13} />} label={tt("list.editName")} tone="primary" onClick={() => onEdit(d)} />}
+          {canManage && <RowAction icon={<FaTrash size={13} />} label={tt("list.delete")} tone="danger" onClick={() => onDelete(d)} />}
         </ITFlex>
       ),
     },
   ];
 
   return (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       columns={columns as any}
       fetchData={
         fetchData as unknown as (
@@ -141,13 +113,15 @@ export default function DepartmentsTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
-      virtualized
-      virtualizedMaxHeight={420}
-      rowHeight={50}
       onRowClick={(row) => onView(row as unknown as Department)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={50}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

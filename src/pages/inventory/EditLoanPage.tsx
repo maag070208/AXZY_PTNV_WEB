@@ -1,7 +1,18 @@
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ITAlert, ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import {
+  ITAlert,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITPage,
+  ITSearchSelect,
+  ITText,
+  ITToast,
+} from "@axzydev/axzy_ui_system";
 import { FaFileSignature, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type Loan, type DeviceType } from "@entities/inventory";
@@ -11,11 +22,13 @@ import { usersApi, type User } from "@entities/user";
 import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 import { UnitPicker, useSelectableUnits } from "@features/inventory/unit-picker";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function EditLoanPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
@@ -172,7 +185,7 @@ export default function EditLoanPage() {
         ...(resourceChanged && !lockedResource ? { deviceId, unitIds: selectedUnitIds } : {}),
       });
       setToast({ message: t("loans.savedEdit"), type: "success" });
-      setTimeout(() => navigate(`/inventory/loans/${id}`), 1000);
+      setTimeout(() => goBack(`/inventory/loans/${id}`), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -183,7 +196,7 @@ export default function EditLoanPage() {
   if (loading || !loan) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("loans.edit")} backAction={() => navigate(-1)}>
+        noPadding title={t("loans.edit")} backAction={() => goBack("/inventory/loans")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
@@ -198,7 +211,7 @@ export default function EditLoanPage() {
       description={`${loan.number}`}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.edit") }]}
-      backAction={() => navigate(`/inventory/loans/${loan.id}`)}
+      backAction={() => goBack(`/inventory/loans/${loan.id}`)}
       actions={
         <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
           <ITFlex align="center" gap={1}>
@@ -216,7 +229,7 @@ export default function EditLoanPage() {
 
       <ITGrid container columns={12} spacing={6}>
         <ITGrid item xs={12} lg={6}>
-          <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-4">
             <ITFlex as="fieldset" direction="column" gap={2}>
               <ITSearchSelect
                 name="loanAssignment"
@@ -303,14 +316,14 @@ export default function EditLoanPage() {
             </ITGrid>
 
             <ITInput name="notes" label={t("loans.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
-          </ITFlex>
+          </ITCard>
         </ITGrid>
 
         <ITGrid item xs={12} lg={6}>
-          <ITFlex as="section" direction="column" gap={2} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <ITCard contentClassName="flex flex-col gap-2">
             <ITText className="text-sm font-bold text-slate-800">{t("loans.preview")}</ITText>
             <CustodyLetterPreview loan={draftPreview as never} />
-          </ITFlex>
+          </ITCard>
         </ITGrid>
       </ITGrid>
 

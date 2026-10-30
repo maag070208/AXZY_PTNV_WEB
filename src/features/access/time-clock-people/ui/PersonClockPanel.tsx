@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FaClock, FaFingerprint, FaIdCard, FaUserCheck } from "react-icons/fa";
 import { dateLocale } from "@shared/i18n/format";
 import { timeClockApi, type TimeClockPersonDetail, type TimeClockPunch } from "@entities/time-clock";
+import { ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 
 
 interface Props {
@@ -18,10 +19,10 @@ interface Props {
 function Tile({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
     <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
-      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm">{icon}</span>
+      <ITText as="span" className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--it-card-bg)] text-slate-500 shadow-sm">{icon}</ITText>
       <div>
-        <p className="text-xl font-black leading-none text-slate-900">{value}</p>
-        <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+        <ITText className="text-xl font-black leading-none text-slate-900">{value}</ITText>
+        <ITText className="mt-1 text-[12px] font-semibold text-slate-400">{label}</ITText>
       </div>
     </div>
   );
@@ -79,13 +80,13 @@ export default function PersonClockPanel({ clockSerial, employeeNumber, editable
     }
   };
 
-  if (error && !detail) return <p role="alert" className="text-sm text-red-600">{error}</p>;
-  if (!detail) return <p className="text-sm text-slate-400">{t("employeeClock.summary.loading")}</p>;
+  if (error && !detail) return <ITText role="alert" className="text-sm text-red-600">{error}</ITText>;
+  if (!detail) return <ITText className="text-sm text-slate-400">{t("employeeClock.summary.loading")}</ITText>;
 
   return (
-    <div className="flex flex-col gap-5">
-      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <ITStack spacing={5}>
+      {error && <ITText role="alert" className="text-sm text-red-600">{error}</ITText>}
+      <div className="grid grid-cols-2 gap-3 lg:!grid-cols-4">
         <Tile icon={<FaUserCheck size={14} />} label={t("employeeClock.tiles.faces")} value={detail.faces.count} />
         <Tile icon={<FaFingerprint size={14} />} label={t("employeeClock.tiles.fingers")} value={detail.fingerprints.length} />
         <Tile icon={<FaIdCard size={14} />} label={t("employeeClock.tiles.cards")} value={detail.cards.length} />
@@ -94,10 +95,10 @@ export default function PersonClockPanel({ clockSerial, employeeNumber, editable
 
       {detail.cards.length > 0 && (
         <section>
-          <h4 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{t("person.cards")}</h4>
-          <div className="flex flex-wrap gap-2">
+          <ITText as="h4" className="mb-2 text-xs font-bold text-slate-500">{t("person.cards")}</ITText>
+          <ITFlex wrap="wrap" gap={2}>
             {detail.cards.map((c) => (
-              <span key={c} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 font-mono text-xs text-slate-800">
+              <ITText as="span" key={c} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 font-mono text-xs text-slate-800">
                 {c}
                 {editable && (
                   <button type="button" className="text-slate-300 hover:text-red-600" disabled={busy} title={t("people.actions.removeCard")}
@@ -105,22 +106,22 @@ export default function PersonClockPanel({ clockSerial, employeeNumber, editable
                     ×
                   </button>
                 )}
-              </span>
+              </ITText>
             ))}
-          </div>
+          </ITFlex>
         </section>
       )}
 
-      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-        <div className="min-w-0">{aside}</div>
+      <div className="grid grid-cols-1 items-start gap-6 md:!grid-cols-2">
+        <ITFlex className="min-w-0">{aside}</ITFlex>
         <section className="min-w-0 rounded-2xl border border-slate-200">
           <header className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
-            <h4 className="text-sm font-black uppercase tracking-wide text-slate-700">{t("person.punches")}</h4>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">{punches?.length ?? 0}</span>
+            <ITText as="h4" className="text-sm font-semibold text-slate-700">{t("person.punches")}</ITText>
+            <ITText as="span" className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">{punches?.length ?? 0}</ITText>
           </header>
           <div className="max-h-[22rem] overflow-y-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-white text-left text-[10px] uppercase tracking-wide text-slate-400">
+              <thead className="sticky top-0 bg-[var(--it-card-bg)] text-left text-[10px] uppercase tracking-wide text-slate-400">
                 <tr>
                   <th className="px-5 py-2 font-semibold">{t("person.punchDate")}</th>
                   <th className="px-3 py-2 font-semibold">{t("person.punchTime")}</th>
@@ -135,9 +136,9 @@ export default function PersonClockPanel({ clockSerial, employeeNumber, editable
                       <td className="px-5 py-2 text-slate-700">{when.toLocaleDateString(dateLocale(), { day: "2-digit", month: "short", year: "numeric" })}</td>
                       <td className="px-3 py-2 font-mono text-slate-700">{when.toLocaleTimeString(dateLocale(), { hour: "2-digit", minute: "2-digit" })}</td>
                       <td className="px-3 py-2">
-                        <span className="rounded-full border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                        <ITText as="span" className="rounded-full border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">
                           {t(`methods.${p.method}`, { defaultValue: p.method })}
-                        </span>
+                        </ITText>
                       </td>
                     </tr>
                   );
@@ -150,6 +151,6 @@ export default function PersonClockPanel({ clockSerial, employeeNumber, editable
           </div>
         </section>
       </div>
-    </div>
+    </ITStack>
   );
 }

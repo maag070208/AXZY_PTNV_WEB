@@ -1,15 +1,18 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITBadget, ITButton, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITChip, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaFileSignature, FaUndoAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { inventoryApi, type LoanReturn } from "@entities/inventory";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 export default function ReturnsPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
 
   const fetchData = useMemo(
     () =>
@@ -67,11 +70,15 @@ export default function ReturnsPage() {
       width: 200,
       filter: true,
       sortable: false,
-      render: (d: LoanReturn) => (
-        <ITText className="text-[11px] text-slate-600">
-          {d.loan?.custodian?.name ?? d.loan?.department?.name ?? "—"}
-        </ITText>
-      ),
+      render: (d: LoanReturn) => {
+        const name = d.loan?.custodian?.name ?? d.loan?.department?.name ?? "—";
+        return (
+          <ITFlex align="center" gap={2} className="min-w-0">
+            {d.loan?.custodian?.name && <ProfileAvatar name={name} size="xs" />}
+            <ITText className="truncate text-[11px] text-slate-600">{name}</ITText>
+          </ITFlex>
+        );
+      },
     },
     {
       type: "date",
@@ -94,13 +101,13 @@ export default function ReturnsPage() {
           {d.items.map((x) => (
             <ITFlex key={x.id} align="center" gap={1.5} className="min-w-0">
               <ITText className="text-[11px] text-slate-600 truncate">{x.device?.name ?? "—"}</ITText>
-              <ITBadget color="gray" size="lg">×{x.quantity}</ITBadget>
-              <ITBadget
-                size="lg"
-                color={x.condition === "GOOD" ? "success" : x.condition === "FAIR" ? "warning" : x.condition === "POOR" ? "warning" : "danger"}
+              <ITChip size="sm" color="gray">×{x.quantity}</ITChip>
+              <ITChip
+                size="sm"
+                color={x.condition === "GOOD" ? "success" : x.condition === "FAIR" ? "info" : x.condition === "POOR" ? "warning" : "danger"}
               >
                 {t(`loanReturn.conditionLabels.${x.condition}`)}
-              </ITBadget>
+              </ITChip>
             </ITFlex>
           ))}
         </ITFlex>
@@ -126,7 +133,7 @@ export default function ReturnsPage() {
       description={t("loanReturn.description")}
       icon={<FaUndoAlt size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loanReturn.title") }]}
-      backAction={() => navigate("/inventory")}
+      backAction={() => goBack("/inventory")}
       actions={
         <ITButton variant="filled" color="primary" onClick={() => navigate("/inventory/returns/new")}>
           <ITFlex align="center" gap={1}>
@@ -136,16 +143,18 @@ export default function ReturnsPage() {
         </ITButton>
       }
     >
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
         columns={columns as any}
         fetchData={fetchData as any}
-        defaultItemsPerPage={100}
-        itemsPerPageOptions={[50, 100, 150]}
         size="lg"
-        virtualized
-        virtualizedMaxHeight={420}
-        rowHeight={50}
         onRowClick={(row) => navigate(`/inventory/loans/${(row as unknown as LoanReturn).loanId}`)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </ITPage>
   );

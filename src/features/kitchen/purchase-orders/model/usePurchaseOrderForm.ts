@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@app/store";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ import {
   type SupplierItem,
 } from "@entities/kitchen";
 import { emptyOrderDraftLine, localDay, type OrderDraftLine } from "./types";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /**
  * Formulario de una orden de compra (crear o editar en borrador). Se puede
@@ -21,7 +22,7 @@ import { emptyOrderDraftLine, localDay, type OrderDraftLine } from "./types";
  */
 export const usePurchaseOrderForm = (id?: string) => {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const location = useLocation();
   const items = useKitchenItemOptions();
   const suppliers = useSupplierOptions();
@@ -181,7 +182,7 @@ export const usePurchaseOrderForm = (id?: string) => {
       if (id) await kitchenApi.updatePurchaseOrder(id, input);
       else await kitchenApi.createPurchaseOrder(input);
       setToast(t(id ? "purchaseOrders.saved" : "purchaseOrders.created"));
-      setTimeout(() => navigate("/kitchen/purchase-orders"), 600);
+      setTimeout(() => goBack("/kitchen/purchase-orders"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -223,7 +224,7 @@ export const usePurchaseOrderForm = (id?: string) => {
     setToast,
     save,
     canSave,
-    cancel: () => navigate("/kitchen/purchase-orders"),
+    cancel: () => goBack("/kitchen/purchase-orders"),
   };
 };
 

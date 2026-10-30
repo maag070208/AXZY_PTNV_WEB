@@ -10,11 +10,12 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaUserTie } from "react-icons/fa";
+import { LuPencil, LuUserRound } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import type { Department } from "@entities/department";
 import type { PersonalProfile } from "@entities/hr";
 import { roleLabel, useRolesCatalog } from "@entities/user";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 
 const roleBadge = (role: string, label: string) => (
   <ITBadget
@@ -40,6 +41,8 @@ interface Props {
     params: ITDataTableFetchParams
   ) => Promise<ITDataTableResponse<Record<string, unknown>>>;
   reloadKey: number;
+  /** Filtros que vienen de fuera de la tabla (mosaicos del resumen). */
+  externalFilters?: Record<string, string>;
   onView: (u: PersonalProfile) => void;
   onEdit: (u: PersonalProfile) => void;
   /** Tras una asignación en lote: la lista vuelve a pedir sus datos. */
@@ -51,6 +54,7 @@ export default function EmployeesTable({
   canEdit,
   fetchData,
   reloadKey,
+  externalFilters,
   onView,
   onEdit,
 }: Props) {
@@ -76,7 +80,7 @@ export default function EmployeesTable({
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[11px] font-black text-slate-700">
+        <ITText className="text-[12px] font-semibold text-slate-600">
           {u.employeeNumber ?? "—"}
         </ITText>
       ),
@@ -89,15 +93,14 @@ export default function EmployeesTable({
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITFlex
-          direction="column"
-          gap={0.5}
-          className="cursor-pointer"
-        >
-          <ITText className="text-[12px] font-black text-slate-800">{u.name}</ITText>
-          <ITText className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            @{u.username}
-          </ITText>
+        <ITFlex align="center" gap={2} className="cursor-pointer">
+          <ProfileAvatar photoUrl={u.photoUrl} name={u.name} size="sm" />
+          <ITFlex direction="column" gap={0.5} className="min-w-0">
+            <ITText className="truncate text-[13px] font-semibold text-slate-800">{u.name}</ITText>
+            <ITText className="text-[12px] text-slate-400">
+              @{u.username}
+            </ITText>
+          </ITFlex>
         </ITFlex>
       ),
     },
@@ -140,7 +143,7 @@ export default function EmployeesTable({
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[11px] font-bold text-slate-600">{u.jobTitle ?? "—"}</ITText>
+        <ITText className="text-[12px] text-slate-600">{u.jobTitle ?? "—"}</ITText>
       ),
     },
     {
@@ -152,7 +155,7 @@ export default function EmployeesTable({
       sortable: false,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
-        <ITText className="text-[10px] font-black text-slate-600 uppercase">
+        <ITText className="text-[12px] text-slate-600">
           {u.department?.name ?? "—"}
         </ITText>
       ),
@@ -166,7 +169,7 @@ export default function EmployeesTable({
       sortable: false,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
-        <ITText className="text-[10px] font-bold text-slate-500 uppercase">
+        <ITText className="text-[12px] text-slate-500">
           {u.subarea?.name ?? "—"}
         </ITText>
       ),
@@ -185,7 +188,7 @@ export default function EmployeesTable({
             color="secondary"
             title={tt("table.viewProfile")}
           >
-            <FaUserTie size={14} />
+            <LuUserRound size={15} />
           </ITButton>
           {canEdit && (
             <ITButton
@@ -194,7 +197,7 @@ export default function EmployeesTable({
               color="gray"
               title={tt("table.editEmployee")}
             >
-              <FaEdit size={14} />
+              <LuPencil size={15} />
             </ITButton>
           )}
         </ITFlex>
@@ -204,7 +207,10 @@ export default function EmployeesTable({
 
   return (
     <>
-      <ITDataTable
+      <ITDataTable showViewToggle={false}
+        // Otro mosaico del resumen = otra lista: la tabla se remonta.
+        key={JSON.stringify(externalFilters ?? {})}
+        externalFilters={externalFilters}
         columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fetchData as unknown as (
@@ -212,14 +218,14 @@ export default function EmployeesTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
-      layout="fixed"
-      density="compact"
-      virtualized
-      virtualizedMaxHeight={420}
-      rowHeight={50}
       onRowClick={(row) => onView(row as unknown as PersonalProfile)}
+        defaultItemsPerPage={25}
+        itemsPerPageOptions={[25, 50, 100]}
+        layout="fixed"
+        density="compact"
+        rowHeight={50}
+        virtualized
+        virtualizedMaxHeight={460}
       />
     </>
   );

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITBadget,
@@ -23,11 +22,12 @@ import {
   type KitchenLotRow,
 } from "@entities/kitchen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** Conteo físico: captura lo que hay por lote; la diferencia se ajusta. */
 export default function KitchenCountPanel() {
   const { t } = useTranslation("kitchen");
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const requestKey = useRequestKey();
   const categories = useKitchenCategoryOptions();
   const [categoryId, setCategoryId] = useState("");
@@ -91,7 +91,7 @@ export default function KitchenCountPanel() {
         await kitchenApi.adjust(input, requestKey(input));
       }
       setToast(t("count.success"));
-      setTimeout(() => navigate("/kitchen/items"), 600);
+      setTimeout(() => goBack("/kitchen/items"), 600);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -138,17 +138,17 @@ export default function KitchenCountPanel() {
         ) : (
           <ITFlex direction="column" gap={3}>
             <ITGrid container columns={12} spacing={3} className="border-b border-slate-100 pb-2">
-              <ITGrid item xs={5}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.item")}</ITText></ITGrid>
-              <ITGrid item xs={3}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.lot")}</ITText></ITGrid>
-              <ITGrid item xs={2}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.system")}</ITText></ITGrid>
-              <ITGrid item xs={2}><ITText className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("count.counted")}</ITText></ITGrid>
+              <ITGrid item xs={5}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.item")}</ITText></ITGrid>
+              <ITGrid item xs={3}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.lot")}</ITText></ITGrid>
+              <ITGrid item xs={2}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.system")}</ITText></ITGrid>
+              <ITGrid item xs={2}><ITText className="text-[12px] font-semibold text-slate-400">{t("count.counted")}</ITText></ITGrid>
             </ITGrid>
             {lots.map((l) => (
               <ITGrid key={l.id} container columns={12} spacing={3} className="items-center">
                 <ITGrid item xs={5}>
                   <ITFlex direction="column" gap={0}>
                     <ITText className="text-[12px] font-black text-slate-800">{l.item.name}</ITText>
-                    <ITText className="text-[9px] font-bold uppercase tracking-widest text-slate-400">{l.item.code}</ITText>
+                    <ITText className="text-[12px] font-bold text-slate-400">{l.item.code}</ITText>
                   </ITFlex>
                 </ITGrid>
                 <ITGrid item xs={3}>

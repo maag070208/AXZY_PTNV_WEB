@@ -44,11 +44,11 @@ export default function SubareasTable({
       filter: true,
       render: (s: Subarea) => (
         <ITFlex direction="column" gap={0.5}>
-          <ITText className="font-black text-slate-800 uppercase text-[12px] tracking-tight">
+          <ITText className="font-semibold text-slate-800 text-[12px]">
             {s.name}
           </ITText>
           {!s.active && (
-            <ITText className="text-[9px] font-bold uppercase tracking-widest text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
+            <ITText className="text-[12px] font-bold text-rose-500 border border-rose-200 rounded-full px-2 py-0.5 w-fit">
               {tt("list.inactive")}
             </ITText>
           )}
@@ -64,7 +64,7 @@ export default function SubareasTable({
       filter: "search",
       catalogOptions: { data: departments.map((d) => ({ id: d.id, name: d.name })) },
       render: (s: Subarea) => (
-        <ITText className="text-[11px] font-black uppercase tracking-wide text-slate-600">
+        <ITText className="text-[12px] font-semibold text-slate-600">
           {s.department?.name ?? "—"}
         </ITText>
       ),
@@ -113,7 +113,7 @@ export default function SubareasTable({
   ];
 
   return (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       columns={columns as any}
       fetchData={
         fetchData as unknown as (
@@ -121,13 +121,15 @@ export default function SubareasTable({
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
       size="lg"
-      virtualized
-      virtualizedMaxHeight={420}
-      rowHeight={50}
       onRowClick={(row) => onEdit(row as unknown as Subarea)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={50}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

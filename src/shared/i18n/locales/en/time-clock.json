@@ -133,10 +133,9 @@
     "title": "Attendance",
     "description": "Shifts built from the time clock punches and matched to each employee by their time clock number.",
     "pdfTitle": "Entries and exits — Time clock",
-    "links": "{{linkedCount}} of {{total}} time clock employees linked",
-    "withoutLink": "The {{count}} unlinked ones show the time clock name and the “Not linked” mark.",
-    "goToLink": "Link employees",
-    "rule": "The time clock does not tell entries from exits: punches alternate, repeats within 5 min are ignored and a shift lasts at most 13 h."
+    "noEmployees": "The clock has no employees yet: punches cannot be matched to a person.",
+    "unlinkedNotice": "{{count}} of {{total}} clock employees are not linked to a person: their clock-ins show the clock name and the “Not linked” mark.",
+    "link": "Link"
   },
   "employees": {
     "title": "Time clock employees",
@@ -484,9 +483,11 @@
     }
   },
   "people": {
-
     "view": {
-      "columns": {"person": "Person", "progress": "Progress"},
+      "columns": {
+        "person": "Person",
+        "progress": "Progress"
+      },
       "count": "{{count}} person(s) on the clock",
       "title": "People on the clock",
       "connected": "Clock connected",
@@ -777,7 +778,12 @@
     }
   },
   "employeeClock": {
-    "tiles": {"faces":"Faces","fingers":"Fingerprints","cards":"Cards","punches":"Punches today"},
+    "tiles": {
+      "faces": "Faces",
+      "fingers": "Fingerprints",
+      "cards": "Cards",
+      "punches": "Punches today"
+    },
     "notEnrolled": "Not enrolled on this clock yet.",
     "title": "Time clock",
     "description": "Add this person to the clocks. For now it only writes to the test clock.",
@@ -873,5 +879,13 @@
     "altaPending": "{{clock}} is read-only: the addition stays pending there",
     "altaRequestFailed": "Could not enroll in the clocks",
     "failed": "Could not update {{clock}}"
+  },
+  "summary": {
+    "punches": "Punches",
+    "clocks": "Clocks",
+    "connected": "{{count}} connected",
+    "problems": "With problems",
+    "problemsHint": "Not connecting: check their detail",
+    "allOk": "All connecting"
   }
 }

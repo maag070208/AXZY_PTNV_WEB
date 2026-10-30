@@ -77,7 +77,8 @@
     "confirm": "Void event",
     "cancel": "Cancel",
     "success": "The event was voided successfully",
-    "error": "The event could not be voided"
+    "error": "The event could not be voided",
+    "subtitle": "This action is kept in the log."
   },
   "errors": {
     "load": "Could not load access events",
@@ -105,5 +106,9 @@
   },
   "toolbar": {
     "title": "Filters"
+  },
+  "live": {
+    "title": "Latest scan",
+    "none": "No scans recorded yet."
   }
 }

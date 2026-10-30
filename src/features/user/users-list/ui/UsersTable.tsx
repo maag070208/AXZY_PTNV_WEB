@@ -10,9 +10,10 @@ import type {
   ITDataTableFetchParams,
   ITDataTableResponse,
 } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaEye, FaKey, FaTrash, FaUndo } from "react-icons/fa";
+import { LuEye, LuKeyRound, LuPencil, LuTrash2, LuUndo2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { roleLabel, useRolesCatalog, type User } from "@entities/user";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import type { UseUsersList } from "../model/useUsersList";
 import { i18n } from "@shared/i18n";
 
@@ -67,7 +68,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[12px] font-black text-slate-700">@{u.username}</ITText>
+        <ITText className="text-[12px] font-semibold text-slate-600">@{u.username}</ITText>
       ),
     },
     {
@@ -78,11 +79,14 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITFlex align="center" gap={1}>
-          <ITText className="text-[12px] text-slate-800">{u.name}</ITText>
-          {!u.active && (
-            <ITBadget color="danger" size="lg">{i18n.t("common:labels.inactive")}</ITBadget>
-          )}
+        <ITFlex align="center" gap={2}>
+          <ProfileAvatar name={u.name} size="sm" />
+          <ITFlex align="center" gap={1} className="min-w-0">
+            <ITText className="truncate text-[12px] text-slate-800">{u.name}</ITText>
+            {!u.active && (
+              <ITBadget color="danger" size="lg">{i18n.t("common:labels.inactive")}</ITBadget>
+            )}
+          </ITFlex>
         </ITFlex>
       ),
     },
@@ -108,7 +112,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       filter: true,
       sortable: false,
       render: (u) => (
-        <ITText className="text-[11px] text-slate-600">{u.employeeNumber ?? "—"}</ITText>
+        <ITText className="text-[12px] text-slate-600">{u.employeeNumber ?? "—"}</ITText>
       ),
     },
     {
@@ -120,7 +124,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       sortable: false,
       catalogOptions: { data: departmentOptions, loading: false, error: false },
       render: (u) => (
-        <ITText className="text-[10px] uppercase text-slate-500">
+        <ITText className="text-[12px] text-slate-500">
           {(u as any).department?.name ?? "—"}
         </ITText>
       ),
@@ -134,7 +138,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
       sortable: false,
       catalogOptions: { data: subareaOptions, loading: false, error: false },
       render: (u) => (
-        <ITText className="text-[10px] uppercase text-slate-500">
+        <ITText className="text-[12px] text-slate-500">
           {(u as any).subarea?.name ?? "—"}
         </ITText>
       ),
@@ -153,10 +157,10 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
             color="secondary"
             title={tt("common:actions.view")}
           >
-            <FaEye size={14} />
+            <LuEye size={15} />
           </ITButton>
-          <ITButton onClick={() => onEdit(u)} size="lg" color="gray">
-            <FaEdit size={14} />
+          <ITButton onClick={() => onEdit(u)} size="lg" color="gray" title={tt("common:actions.edit")}>
+            <LuPencil size={15} />
           </ITButton>
           <ITButton
             onClick={() => {
@@ -165,24 +169,27 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
             }}
             size="lg"
             color="success"
+            title={tt("list.passwordHeading")}
           >
-            <FaKey size={14} />
+            <LuKeyRound size={15} />
           </ITButton>
           <ITButton
             onClick={() => fx.setUserToToggle(u)}
             size="lg"
             variant={u.active ? "outlined" : "filled"}
             color={u.active ? "error" : "danger"}
+            title={u.active ? tt("list.confirmDeactivateBtn") : tt("list.confirmDeleteBtn")}
           >
-            <FaTrash size={14} />
+            <LuTrash2 size={15} />
           </ITButton>
           {!u.active && (
             <ITButton
               onClick={() => fx.setUserToReactivate(u)}
               size="lg"
               color="success"
+              title={tt("list.reactivateBtn")}
             >
-              <FaUndo size={14} />
+              <LuUndo2 size={15} />
             </ITButton>
           )}
         </ITFlex>
@@ -191,7 +198,7 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
   ];
 
   return (
-    <ITDataTable
+    <ITDataTable showViewToggle={false}
       columns={columns as unknown as Column<Record<string, unknown>>[]}
       fetchData={
         fx.fetchTableData as unknown as (
@@ -199,14 +206,14 @@ export default function UsersTable({ fx, onView, onEdit }: Props) {
         ) => Promise<ITDataTableResponse<Record<string, unknown>>>
       }
       reloadTrigger={fx.reloadKey}
-      defaultItemsPerPage={100}
-      itemsPerPageOptions={[50, 100, 150]}
+      onRowClick={(row) => onView(row as unknown as User)}
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
       layout="fixed"
       density="compact"
-      virtualized
-      virtualizedMaxHeight={420}
       rowHeight={50}
-      onRowClick={(row) => onView(row as unknown as User)}
+      virtualized
+      virtualizedMaxHeight={460}
     />
   );
 }

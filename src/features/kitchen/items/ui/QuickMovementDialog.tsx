@@ -216,7 +216,7 @@ export default function QuickMovementDialog({ item, mode, onClose, onDone }: Pro
               <ITText className="text-[12px] text-rose-600">{t("items.quick.noStock")}</ITText>
             ) : (
               <>
-                <ITText className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-400">{t("items.quick.willTake")}</ITText>
+                <ITText className="mb-1 block text-[12px] font-semibold text-slate-400">{t("items.quick.willTake")}</ITText>
                 {plan.allocations.map((a) => (
                   <ITFlex key={a.lotId} justify="between" className="py-0.5">
                     <ITText className="font-mono text-[11px] text-slate-600">

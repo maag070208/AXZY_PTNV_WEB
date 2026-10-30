@@ -190,7 +190,7 @@ export default function KitchenCatalogPanel() {
       width: 120,
       filter: true,
       sortable: false,
-      render: (u) => <ITText className="font-mono text-[12px] font-bold uppercase text-slate-700">{u.code}</ITText>,
+      render: (u) => <ITText className="font-mono text-[12px] font-bold text-slate-700">{u.code}</ITText>,
     },
     {
       key: "name",
@@ -282,7 +282,7 @@ export default function KitchenCatalogPanel() {
       width: 120,
       filter: true,
       sortable: false,
-      render: (c) => <ITText className="font-mono text-[12px] font-bold uppercase text-slate-700">{c.code}</ITText>,
+      render: (c) => <ITText className="font-mono text-[12px] font-bold text-slate-700">{c.code}</ITText>,
     },
     {
       key: "name",
@@ -349,40 +349,60 @@ export default function KitchenCatalogPanel() {
           </ITAlert>
         )}
         {tab === "categories" ? (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="categories"
             columns={categoryColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchCategories as never}
-            defaultItemsPerPage={25}
-            itemsPerPageOptions={[10, 25, 50]}
             size="lg"
+            defaultItemsPerPage={25}
+            itemsPerPageOptions={[25, 50, 100]}
+            layout="fixed"
+            density="compact"
+            rowHeight={50}
+            virtualized
+            virtualizedMaxHeight={460}
           />
         ) : tab === "taxRates" ? (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="taxRates"
             columns={taxColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchTaxRates as never}
-            defaultItemsPerPage={25}
-            itemsPerPageOptions={[10, 25, 50]}
             size="lg"
+            defaultItemsPerPage={25}
+            itemsPerPageOptions={[25, 50, 100]}
+            layout="fixed"
+            density="compact"
+            rowHeight={50}
+            virtualized
+            virtualizedMaxHeight={460}
           />
         ) : tab === "costCenters" ? (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="costCenters"
             columns={costColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchCostCenters as never}
-            defaultItemsPerPage={25}
-            itemsPerPageOptions={[10, 25, 50]}
             size="lg"
+            defaultItemsPerPage={25}
+            itemsPerPageOptions={[25, 50, 100]}
+            layout="fixed"
+            density="compact"
+            rowHeight={50}
+            virtualized
+            virtualizedMaxHeight={460}
           />
         ) : (
-          <ITDataTable
+          <ITDataTable showViewToggle={false}
             key="units"
             columns={unitColumns as unknown as Column<Record<string, unknown>>[]}
             fetchData={fetchUnits as never}
-            defaultItemsPerPage={25}
-            itemsPerPageOptions={[10, 25, 50]}
             size="lg"
+            defaultItemsPerPage={25}
+            itemsPerPageOptions={[25, 50, 100]}
+            layout="fixed"
+            density="compact"
+            rowHeight={50}
+            virtualized
+            virtualizedMaxHeight={460}
           />
         )}
       </ITGrid>
@@ -392,7 +412,7 @@ export default function KitchenCatalogPanel() {
           as="nav"
           direction="column"
           spacing={0}
-          className="sticky top-24 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-lg shadow-slate-200/50"
+          className="sticky top-24 overflow-hidden rounded-2xl border border-slate-200 bg-[var(--it-card-bg)] p-2 shadow-lg shadow-slate-200/50"
         >
           <ITButton variant="filled" color="primary" size="lg" onClick={openNew} className="mb-1 w-full">
             <ITFlex align="center" justify="center" gap={1}>
@@ -400,7 +420,7 @@ export default function KitchenCatalogPanel() {
               <ITText className="font-bold text-[11px]">{tab === "categories" ? t("catalog.newCategory") : tab === "units" ? t("catalog.newUnit") : tab === "costCenters" ? t("catalog.newCostCenter") : t("catalog.newTaxRate")}</ITText>
             </ITFlex>
           </ITButton>
-          <ITText as="p" className="px-2.5 pb-1 pt-3 text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <ITText as="p" className="px-2.5 pb-1 pt-3 text-[12px] font-semibold text-slate-400">
             {t("catalog.title")}
           </ITText>
           {nav.map((item) => {
@@ -413,14 +433,14 @@ export default function KitchenCatalogPanel() {
                 gap={2.5}
                 onClick={() => setTab(item.id)}
                 className={`group w-full rounded-lg px-2.5 py-2 text-left text-[12px] font-semibold transition-colors ${
-                  active ? "bg-[#0D5777]/10 text-[#0D5777]" : "text-slate-600 hover:bg-[#0D5777]/5"
+                  active ? "bg-primary-500/10 text-primary-500" : "text-slate-600 hover:bg-primary-500/5"
                 }`}
               >
                 <ITFlex
                   align="center"
                   justify="center"
                   className={`h-6 w-6 shrink-0 rounded-md transition-colors ${
-                    active ? "bg-[#0D5777] text-white" : "bg-slate-100 text-slate-500 group-hover:bg-[#0D5777]/10 group-hover:text-[#0D5777]"
+                    active ? "bg-primary-500 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-primary-500/10 group-hover:text-primary-500"
                   }`}
                 >
                   {item.icon}
@@ -429,7 +449,7 @@ export default function KitchenCatalogPanel() {
                   <span className="block truncate">{item.label}</span>
                   <span className="block truncate text-[10px] font-normal text-slate-400">{item.hint}</span>
                 </span>
-                {active && <ITFlex className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D5777]" />}
+                {active && <ITFlex className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500" />}
               </ITFlex>
             );
           })}

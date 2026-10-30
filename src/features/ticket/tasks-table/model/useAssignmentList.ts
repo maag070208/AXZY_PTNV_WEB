@@ -41,6 +41,11 @@ export const useAssignmentList = (loadErrorKey: string) => {
         status: { match: "equals" },
         // Coincide si el inicio o la entrega caen en el rango; ordena por entrega.
         dates: { value: (r) => [r.startDate, r.dueDate], match: "date", sortValue: (r) => r.dueDate },
+        // Filtro rápido del resumen: vencidas (atrasadas) o vigentes/completadas.
+        overdue: {
+          match: "equals",
+          value: (r) => r.status !== "COMPLETED" && !!r.dueDate && new Date(r.dueDate) < new Date(),
+        },
       }),
     [rows]
   );

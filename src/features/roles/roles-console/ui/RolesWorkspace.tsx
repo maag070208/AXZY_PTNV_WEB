@@ -1,4 +1,4 @@
-import { ITAlert, ITDialog, ITToast } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITToast, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaGavel, FaHistory, FaListUl, FaTable, FaUserShield, FaUsersCog } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { LottieLoader } from "@shared/ui/lottie-loader";
@@ -10,6 +10,7 @@ import PermissionMatrixPanel from "./matrix/PermissionMatrixPanel";
 import PermissionCatalogPanel from "./PermissionCatalogPanel";
 import PoliciesPanel from "./policies/PoliciesPanel";
 import RoleDetail from "./roles/RoleDetail";
+import RolesSummary from "./roles/RolesSummary";
 import RoleList from "./roles/RoleList";
 import RoleEditorDialog from "./RoleEditorDialog";
 import RolesHelpDialog from "./RolesHelpDialog";
@@ -58,7 +59,15 @@ export default function RolesWorkspace({ workspace }: Props) {
   ];
 
   return (
-    <div className="flex flex-col gap-3">
+    <ITStack spacing={3}>
+      {/* Resumen del control de acceso en una sola tarjeta */}
+      <RolesSummary
+        rolesMeta={rolesMeta}
+        catalogTotal={data.catalog.length}
+        people={members.members.length}
+        policiesCount={policies.data?.policies.length ?? 0}
+      />
+
       <TabBar items={tabs} value={tab} onChange={setTab} />
 
       {admin.roleError && tab === "roles" && !workspace.roleDialog.open && (
@@ -68,7 +77,7 @@ export default function RolesWorkspace({ workspace }: Props) {
       )}
 
       {tab === "roles" && (
-        <div className="grid items-start gap-3 lg:grid-cols-[240px_minmax(0,1fr)]">
+        <div className="grid items-start gap-3 lg:!grid-cols-[240px_minmax(0,1fr)]">
           <RoleList admin={admin} selectedRole={workspace.selectedRole} onSelect={workspace.openRole} />
           {workspace.selectedRole && selectedMeta ? (
             <RoleDetail
@@ -84,7 +93,7 @@ export default function RolesWorkspace({ workspace }: Props) {
               notify={workspace.notify}
             />
           ) : (
-            <p className="py-16 text-center text-[12px] italic text-slate-400">{t("roleList.pick")}</p>
+            <ITText className="py-16 text-center text-[12px] italic text-slate-400">{t("roleList.pick")}</ITText>
           )}
         </div>
       )}
@@ -192,6 +201,6 @@ export default function RolesWorkspace({ workspace }: Props) {
           onClose={workspace.clearToast}
         />
       )}
-    </div>
+    </ITStack>
   );
 }

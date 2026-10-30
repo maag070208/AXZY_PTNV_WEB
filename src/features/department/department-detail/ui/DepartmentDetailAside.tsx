@@ -24,19 +24,19 @@ function AsideSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="w-full min-w-0 bg-white rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-5">
+    <div className="w-full min-w-0 bg-[var(--it-card-bg)] rounded-2xl md:rounded-[24px] shadow-xl shadow-slate-200/40 border border-slate-100 p-4 sm:p-5">
       <ITFlex justify="between" align="center" gap={2} className="mb-4">
         <ITFlex align="center" gap={2}>
           <div className={`w-8 h-8 rounded-xl flex items-center justify-center shadow-sm shrink-0 ${iconBg}`}>
             {icon}
           </div>
-          <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500 truncate">
+            <ITText className="text-[12px] font-semibold text-slate-500 truncate">
             {title}
           </ITText>
         </ITFlex>
-        <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-black shrink-0">
+        <ITText as="span" className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-black shrink-0">
           {count}
-        </span>
+        </ITText>
       </ITFlex>
       {children}
     </div>

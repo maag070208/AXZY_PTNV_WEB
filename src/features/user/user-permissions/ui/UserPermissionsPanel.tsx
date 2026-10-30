@@ -4,19 +4,15 @@ import {
   ITBadget,
   ITButton,
   ITDialog,
-  ITFlex,
   ITInput,
   ITSelect,
-  ITText,
-  ITToast,
-} from "@axzydev/axzy_ui_system";
-import { FaSlidersH, FaUndo } from "react-icons/fa";
+  ITToast, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
+import { FaUndo } from "react-icons/fa";
+import { LuShieldCheck } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
-import {
-  usersApi,
-  type PermissionScope,
-  type UserPermissionView,
-} from "@entities/user";
+import { usersApi, type PermissionScope, type UserPermissionView } from "@entities/user";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { LangostinState } from "@shared/ui/langostin";
 
 const FOLLOW_ROLE = "__role__";
 
@@ -117,7 +113,7 @@ export default function UserPermissionsPanel({ userId }: Props) {
   };
 
   if (loading) {
-    return <ITText className="p-6 text-xs text-slate-400">{t("common:labels.loading", { defaultValue: "Cargando…" })}</ITText>;
+    return <LangostinState kind="loading" size="sm" />;
   }
 
   if (error) {
@@ -129,81 +125,68 @@ export default function UserPermissionsPanel({ userId }: Props) {
   }
 
   return (
-    <ITFlex direction="column" gap={3}>
-      <ITFlex align="center" gap={2}>
-        <FaSlidersH size={12} className="text-slate-400" />
-        <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
-          {t("form.permissions.title")}
-        </ITText>
-      </ITFlex>
-      <ITText className="text-[11px] text-slate-500">{t("form.permissions.subtitle")}</ITText>
-
+    <ITStack spacing={4}>
       {byModule.map(([module, permissions]) => (
-        <div key={module} className="overflow-hidden rounded-xl border border-slate-200">
-          <div className="border-b border-slate-100 bg-slate-50/60 px-4 py-2">
-            <ITText className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              {module}
-            </ITText>
-          </div>
-          {permissions.map((row, index) => (
-            <ITFlex
-              key={row.permission}
-              align="center"
-              justify="between"
-              gap={3}
-              wrap="wrap"
-              className={`px-4 py-2.5 ${index % 2 === 1 ? "bg-slate-50/40" : ""}`}
-            >
-              <ITFlex direction="column" gap={0} className="min-w-[220px] flex-1">
-                <ITFlex align="center" gap={2} wrap="wrap">
-                  <ITText className="text-[12px] font-bold text-slate-800">{row.name}</ITText>
-                  {row.sensitive && (
-                    <ITBadget color="warning" size="sm">
-                      {t("roles:matrix.sensitive")}
-                    </ITBadget>
-                  )}
-                  {row.exception && (
-                    <ITBadget color="info" size="sm">
-                      {t("form.permissions.hasException")}
-                    </ITBadget>
-                  )}
-                </ITFlex>
-                <ITText className="font-mono text-[10px] text-slate-400">{row.permission}</ITText>
-              </ITFlex>
-
-              <ITFlex align="center" gap={3}>
-                <ITText className="text-[10px] text-slate-400">
-                  {t("form.permissions.roleScope", { scope: t(`roles:scope.${row.roleScope}`) })}
-                </ITText>
-                <ITBadget color={row.effective === "NONE" ? "gray" : "success"} size="sm">
-                  {t(`roles:scopePlain.${row.effective}`)}
-                </ITBadget>
-                <div className="w-40">
-                  <ITSelect
-                    name={`perm_${row.permission}`}
-                    size="sm"
-                    options={optionsFor(row)}
-                    value={row.exception ? row.exception.scope : FOLLOW_ROLE}
-                    disabled={saving}
-                    onChange={(e) => onChange(row, e.target.value)}
-                  />
+        <section key={module} className="flex flex-col gap-1.5">
+          <ITText className="m-0 text-[12px] font-semibold" style={{ color: "var(--it-bento-muted)" }}>
+            {module}
+          </ITText>
+          <ITStack spacing={1.5}>
+            {permissions.map((row) => (
+              <div
+                key={row.permission}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] px-3 py-2.5"
+                style={{ background: "color-mix(in srgb, currentColor 4%, transparent)" }}
+              >
+                <div className="min-w-[200px] flex-1">
+                  <ITFlex align="center" wrap="wrap" gap={2}>
+                    <ITText className="m-0 text-[12.5px] font-bold text-slate-800 dark:text-slate-100">{row.name}</ITText>
+                    {row.sensitive && (
+                      <ITBadget color="warning" size="sm">
+                        {t("roles:matrix.sensitive")}
+                      </ITBadget>
+                    )}
+                    {row.exception && (
+                      <ITBadget color="info" size="sm">
+                        {t("form.permissions.hasException")}
+                      </ITBadget>
+                    )}
+                  </ITFlex>
+                  <ITText className="m-0 font-mono text-[10px] text-slate-400">{row.permission}</ITText>
                 </div>
-              </ITFlex>
-            </ITFlex>
-          ))}
-        </div>
+
+                <ITFlex align="center" wrap="wrap" gap={3}>
+                  <ITText className="m-0 text-[10px] text-slate-400">
+                    {t("form.permissions.roleScope", { scope: t(`roles:scope.${row.roleScope}`) })}
+                  </ITText>
+                  <ITBadget color={row.effective === "NONE" ? "gray" : "success"} size="sm">
+                    {t(`roles:scopePlain.${row.effective}`)}
+                  </ITBadget>
+                  <div className="w-40 max-w-full">
+                    <ITSelect
+                      name={`perm_${row.permission}`}
+                      size="sm"
+                      options={optionsFor(row)}
+                      value={row.exception ? row.exception.scope : FOLLOW_ROLE}
+                      disabled={saving}
+                      onChange={(e) => onChange(row, e.target.value)}
+                    />
+                  </div>
+                </ITFlex>
+              </div>
+            ))}
+          </ITStack>
+        </section>
       ))}
 
-      <ITDialog
-        isOpen={editing !== null}
-        onClose={() => setEditing(null)}
-        title={t("form.permissions.dialogTitle", { permission: editing?.row.name ?? "" })}
-        useFormHeader
-      >
-        <ITFlex direction="column" gap={4}>
-          <ITText className="text-[12px] text-slate-600">
-            {t("form.permissions.dialogIntro", { scope: t(`roles:scope.${editing?.scope ?? "NONE"}`) })}
-          </ITText>
+      <ITDialog isOpen={editing !== null} onClose={() => setEditing(null)} className="max-w-md">
+        <DialogHeader
+          icon={<LuShieldCheck size={20} />}
+          title={t("form.permissions.dialogTitle", { permission: editing?.row.name ?? "" })}
+          subtitle={t("form.permissions.dialogIntro", { scope: t(`roles:scope.${editing?.scope ?? "NONE"}`) })}
+          tone="warning"
+        />
+        <ITStack spacing={4}>
           <ITInput
             name="exception_reason"
             label={t("form.permissions.reason")}
@@ -221,16 +204,16 @@ export default function UserPermissionsPanel({ userId }: Props) {
           />
           <ITFlex justify="end" gap={2}>
             <ITButton variant="outlined" color="secondary" onClick={() => setEditing(null)}>
-              <ITText className="font-bold text-[11px]">{t("common:actions.cancel")}</ITText>
+              <ITText as="span" className="font-bold text-[11px]">{t("common:actions.cancel")}</ITText>
             </ITButton>
             <ITButton variant="filled" color="primary" onClick={confirm} disabled={saving}>
-              <ITFlex align="center" gap={1}>
+              <ITText as="span" className="flex items-center gap-1">
                 <FaUndo size={10} />
-                <ITText className="font-bold text-[11px]">{t("common:actions.save")}</ITText>
-              </ITFlex>
+                <ITText as="span" className="font-bold text-[11px]">{t("common:actions.save")}</ITText>
+              </ITText>
             </ITButton>
           </ITFlex>
-        </ITFlex>
+        </ITStack>
       </ITDialog>
 
       {toast && (
@@ -242,6 +225,6 @@ export default function UserPermissionsPanel({ userId }: Props) {
           onClose={() => setToast(null)}
         />
       )}
-    </ITFlex>
+    </ITStack>
   );
 }

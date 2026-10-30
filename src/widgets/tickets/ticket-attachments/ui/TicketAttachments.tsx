@@ -1,8 +1,9 @@
 import { FileTypeEnum, ITButton, ITDialog, ITDropfile, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useEffect, useState } from "react";
-import { FaCamera, FaFileAlt, FaFilePdf, FaPlay } from "react-icons/fa";
+import { LuCamera, LuFileText, LuPlay, LuUpload } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { ticketsApi, type TicketAttachment } from "@entities/ticket";
+import { DialogHeader } from "@shared/ui/dialog-header";
 
 type Props = {
   ticketId: string;
@@ -20,7 +21,6 @@ function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number 
   const [broken, setBroken] = useState(false);
   const isImage = item.mimeType.startsWith("image/");
   const isVideo = item.mimeType.startsWith("video/");
-  const isPdf = item.mimeType === "application/pdf";
   const iconSize = size >= 64 ? 20 : 15;
 
   return (
@@ -29,7 +29,7 @@ function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number 
       target="_blank"
       rel="noreferrer"
       title={item.originalName}
-      className="group relative block shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+      className="group relative block shrink-0 overflow-hidden rounded-2xl bg-slate-100 transition-all hover:-translate-y-0.5"
       style={{ width: size, height: size }}
     >
       {isImage && !broken ? (
@@ -50,20 +50,20 @@ function AttachmentThumb({ item, size }: { item: TicketAttachment; size: number 
             className="h-full w-full object-cover bg-slate-900"
           />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/35">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow">
-              <FaPlay size={8} className="ml-0.5" />
-            </span>
+            <ITText as="span" className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--it-card-bg)] text-slate-800">
+              <LuPlay size={10} className="ml-0.5" />
+            </ITText>
           </div>
         </>
       ) : (
         <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-1 text-slate-400">
-          {isPdf ? <FaFilePdf size={iconSize} /> : <FaFileAlt size={iconSize} />}
-          <span className="w-full truncate px-0.5 text-center text-[8px] font-bold leading-none">
+          <LuFileText size={iconSize} />
+          <ITText as="span" className="w-full truncate px-0.5 text-center text-[9px] font-bold leading-none">
             {item.originalName.split(".").pop()?.toUpperCase() ?? tt("attachments.fallbackExt")}
-          </span>
+          </ITText>
         </div>
       )}
-      <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-black/5" />
+      <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5" />
     </a>
   );
 }
@@ -113,11 +113,11 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
   const thumbSize = compact ? 48 : 68;
 
   return (
-    <div className={compact ? "mt-2" : "rounded-xl border border-slate-200 bg-slate-50 p-3.5"}>
+    <div className={compact ? "mt-2" : "pt-2"}>
       <ITFlex justify="between" align="center" gap={2}>
         <ITFlex align="center" gap={1.5}>
-          {assignmentId ? <FaCamera size={11} className="text-emerald-600" /> : <FaFileAlt size={11} className="text-blue-600" />}
-          <ITText className="text-[12px] font-bold text-slate-500">
+          <ITText as="span" className="flex items-center text-slate-400">{assignmentId ? <LuCamera size={14} /> : <LuFileText size={14} />}</ITText>
+          <ITText className="text-[12px] font-semibold text-slate-500">
             {assignmentId ? tt("attachments.evidenceTitle", { count: items.length }) : tt("attachments.photosTitle", { count: items.length })}
           </ITText>
         </ITFlex>
@@ -129,11 +129,9 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
       </ITFlex>
 
       {loading ? <ITText className="text-[11px] text-slate-400 mt-2">{tt("attachments.loading")}</ITText> : null}
-      {error ? <ITText className="text-[11px] text-red-600 mt-2">{error}</ITText> : null}
+      {error ? <ITText className="mt-2 text-[12px] text-[color:var(--color-danger)]">{error}</ITText> : null}
       {!loading && items.length === 0 && !error ? (
-        <div className="mt-2.5 rounded-lg border border-dashed border-slate-300 py-3 text-center">
-          <ITText className="text-[11px] text-slate-400">{tt("attachments.empty")}</ITText>
-        </div>
+        <ITText className="mt-1.5 text-[12px] text-slate-400">{tt("attachments.empty")}</ITText>
       ) : null}
 
       {items.length > 0 && (
@@ -147,9 +145,13 @@ export default function TicketAttachments({ ticketId, assignmentId, canUpload, c
       <ITDialog
         isOpen={uploadOpen}
         onClose={() => setUploadOpen(false)}
-        title={assignmentId ? tt("attachments.uploadEvidence") : tt("attachments.uploadTicketFiles")}
         className="max-w-xl"
       >
+        <DialogHeader
+          icon={<LuUpload size={20} />}
+          title={assignmentId ? tt("attachments.uploadEvidence") : tt("attachments.uploadTicketFiles")}
+          subtitle={tt("attachments.uploadHint")}
+        />
         <ITDropfile
           key={dropfileKey}
           onFileSelect={() => {}}

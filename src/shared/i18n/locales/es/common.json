@@ -1,5 +1,6 @@
 {
   "actions": {
+    "open": "Abrir",
     "new": "Nuevo",
     "edit": "Editar",
     "delete": "Eliminar",
@@ -78,7 +79,8 @@
     "settings": "Configuración",
     "kitchenSuppliers": "Proveedores",
     "kitchenCostCenters": "Gasto por centro de costo",
-    "langostin": "Langostin"
+    "langostin": "Langostin",
+    "accountMenu": "Cuenta de {{name}}"
   },
   "files": {
     "access": "accesos",
@@ -153,5 +155,12 @@
     "PC": "PC de escritorio",
     "TABLET": "Tablet",
     "LAPTOP": "Laptop"
+  },
+  "formSection": {
+    "complete": "Completa"
+  },
+  "liveSummary": {
+    "title": "Resumen",
+    "progress": "{{done}} de {{total}} secciones completas"
   }
 }

@@ -1,4 +1,3 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useState } from "react";
 import {
   ITAlert,
@@ -7,7 +6,7 @@ import {
   ITPage,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import { FaChartLine, FaClock, FaFileAlt, FaIdCard, FaPencilAlt, FaUserCog, FaUserSlash, FaUserTie } from "react-icons/fa";
+import { LuActivity, LuClock, LuFileText, LuIdCard, LuPencil, LuUserCog, LuUserRound, LuUserX } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -21,12 +20,16 @@ import {
 import { EmployeeCredentialDialog } from "@widgets/employee-credential";
 import { useCan } from "@entities/user";
 import { EmployeeClockSection } from "@widgets/employee-clock";
+import { useGoBack } from "@shared/lib/useGoBack";
+import { LangostinState } from "@shared/ui/langostin";
+import { TabBar, type TabBarItem } from "@shared/ui/tab-bar";
 
 type Section = "activity" | "documents" | "clock" | "info";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { t: tt } = useTranslation(["employees", "common"]);
   const [credentialOpen, setCredentialOpen] = useState(false);
   const [section, setSection] = useState<Section>("activity");
@@ -44,8 +47,8 @@ export default function EmployeeDetailPage() {
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.loadingTitle")}
-        backAction={() => navigate(-1)}
-        icon={<FaUserTie size={20} />}
+        backAction={() => goBack("/employees")}
+        icon={<LuUserRound size={20} />}
         breadcrumbs={[
           { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
           { label: tt("detail.loadingTitle") },
@@ -56,20 +59,20 @@ export default function EmployeeDetailPage() {
             {detail.error}
           </ITAlert>
         ) : (
-          <ITFlex justify="center">
-            <LottieLoader size="lg" />
-          </ITFlex>
+          <LangostinState kind="loading" />
         )}
       </ITPage>
     );
   }
 
   const profile = detail.profile;
-  const sections: Array<{ id: Section; label: string; icon: React.ReactNode }> = [
-    { id: "activity", label: tt("detail.sections.activity"), icon: <FaChartLine size={12} /> },
-    { id: "documents", label: tt("detail.sections.documents"), icon: <FaFileAlt size={12} /> },
-    ...(canManageClock ? [{ id: "clock" as Section, label: tt("detail.sections.clock"), icon: <FaClock size={12} /> }] : []),
-    { id: "info", label: tt("detail.sections.info"), icon: <FaIdCard size={12} /> },
+  // Documentos del expediente: tipos con al menos un archivo, del total de tipos.
+  const docTypesDone = detail.documentTypes.filter((type) => detail.documents.some((d) => d.documentTypeId === type.id)).length;
+  const sections: TabBarItem<Section>[] = [
+    { id: "activity", label: tt("detail.sections.activity"), icon: <LuActivity size={13} /> },
+    { id: "documents", label: tt("detail.sections.documents"), icon: <LuFileText size={13} /> },
+    ...(canManageClock ? [{ id: "clock" as Section, label: tt("detail.sections.clock"), icon: <LuClock size={13} /> }] : []),
+    { id: "info", label: tt("detail.sections.info"), icon: <LuIdCard size={13} /> },
   ];
 
   return (
@@ -77,8 +80,8 @@ export default function EmployeeDetailPage() {
       noPadding
       title={tt("detail.title")}
       description={tt("detail.subtitle")}
-      backAction={() => navigate(-1)}
-      icon={<FaUserTie size={20} />}
+      backAction={() => goBack("/employees")}
+      icon={<LuUserRound size={20} />}
       breadcrumbs={[
         { label: tt("breadcrumb"), onClick: () => navigate("/employees") },
         { label: profile.name },
@@ -87,26 +90,26 @@ export default function EmployeeDetailPage() {
         <ITFlex align="center" gap={2}>
           <ITButton variant="outlined" color="primary" size="lg" onClick={() => setCredentialOpen(true)}>
             <ITFlex align="center" gap={1}>
-              <FaIdCard size={11} />
-              <ITText className="font-bold text-[11px]">{tt("detail.credential")}</ITText>
+              <LuIdCard size={13} />
+              <ITText className="font-bold text-[12px]">{tt("detail.credential")}</ITText>
             </ITFlex>
           </ITButton>
           {profile.active ? (
             <ITButton variant="outlined" color="error" size="lg" onClick={() => detail.setDeactivateOpen(true)}>
               <ITFlex align="center" gap={1}>
-                <FaUserSlash size={11} />
-                <ITText className="font-bold text-[11px]">{tt("detail.deactivate")}</ITText>
+                <LuUserX size={13} />
+                <ITText className="font-bold text-[12px]">{tt("detail.deactivate")}</ITText>
               </ITFlex>
             </ITButton>
           ) : (
             <ITButton variant="outlined" color="success" size="lg" onClick={detail.reactivate}>
-              <ITText className="font-bold text-[11px]">{tt("detail.reactivate")}</ITText>
+              <ITText className="font-bold text-[12px]">{tt("detail.reactivate")}</ITText>
             </ITButton>
           )}
           <ITButton variant="filled" color="primary" size="lg" onClick={() => navigate(`/employees/${id}/edit`)}>
             <ITFlex align="center" gap={1}>
-              <FaPencilAlt size={11} />
-              <ITText className="font-bold text-[11px]">{tt("detail.editInfo")}</ITText>
+              <LuPencil size={13} />
+              <ITText className="font-bold text-[12px]">{tt("detail.editInfo")}</ITText>
             </ITFlex>
           </ITButton>
           {/* El expediente edita a la persona; la cuenta (usuario, contraseña,
@@ -114,8 +117,8 @@ export default function EmployeeDetailPage() {
           {canEditUser && (
             <ITButton variant="outlined" color="secondary" size="lg" onClick={() => navigate(`/users/${id}/edit`)}>
               <ITFlex align="center" gap={1}>
-                <FaUserCog size={11} />
-                <ITText className="font-bold text-[11px]">{tt("detail.editAccount")}</ITText>
+                <LuUserCog size={13} />
+                <ITText className="font-bold text-[12px]">{tt("detail.editAccount")}</ITText>
               </ITFlex>
             </ITButton>
           )}
@@ -134,25 +137,13 @@ export default function EmployeeDetailPage() {
       )}
 
       <ITFlex direction="column" gap={5}>
-        <EmployeeHero profile={profile} onPhotoUpload={detail.uploadPhoto} />
+        <EmployeeHero
+          profile={profile}
+          onPhotoUpload={detail.uploadPhoto}
+          documents={{ done: docTypesDone, total: detail.documentTypes.length }}
+        />
 
-        <nav role="tablist" className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-          {sections.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              role="tab"
-              aria-selected={section === s.id}
-              onClick={() => setSection(s.id)}
-              className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                section === s.id ? "bg-slate-900 text-white shadow" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-              }`}
-            >
-              {s.icon}
-              {s.label}
-            </button>
-          ))}
-        </nav>
+        <TabBar items={sections} value={section} onChange={setSection} />
 
         {section === "activity" && <EmployeeActivity userId={profile.id} />}
         {section === "documents" && (

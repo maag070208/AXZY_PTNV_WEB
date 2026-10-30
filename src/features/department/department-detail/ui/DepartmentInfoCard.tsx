@@ -34,14 +34,14 @@ export default function DepartmentInfoCard({
 }: Props) {
   const { t: tt } = useTranslation(["departments"]);
   return (
-    <ITCard className="p-6 shadow-xl shadow-slate-200/40 border border-slate-100 rounded-[24px]">
+    <ITCard className="p-6">
       <ITGrid container columns={12} spacing={4}>
         <ITGrid item xs={12} md={5}>
           <ITFlex direction="column" gap={1}>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.department")}
             </ITText>
-            <ITText className="font-bold uppercase tracking-tight text-slate-800">
+            <ITText className="font-bold text-slate-800">
               {dept.name}
             </ITText>
           </ITFlex>
@@ -49,7 +49,7 @@ export default function DepartmentInfoCard({
 
         <ITGrid item xs={12} md={3}>
           <ITFlex direction="column" gap={1}>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.status")}
             </ITText>
             <ITFlex align="center" gap={2}>
@@ -62,7 +62,7 @@ export default function DepartmentInfoCard({
 
         <ITGrid item xs={12} md={4}>
           <ITFlex direction="column" gap={1}>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.users")}
             </ITText>
             <ITFlex align="center" gap={2} className="text-slate-600">
@@ -74,7 +74,7 @@ export default function DepartmentInfoCard({
 
         <ITGrid item xs={12}>
           <ITFlex direction="column" gap={2}>
-            <ITText className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+            <ITText className="text-[12px] font-semibold text-slate-500">
               {tt("detail.areas")}
             </ITText>
             {dept.subareas.length === 0 ? (
@@ -94,11 +94,11 @@ export default function DepartmentInfoCard({
                         : "bg-rose-50 text-rose-400 px-3 py-1.5 rounded-full border border-rose-200"
                     }
                   >
-                    <ITText className="text-[11px] font-black uppercase tracking-wide">
+                    <ITText className="text-[12px] font-semibold">
                       {s.name}
                     </ITText>
                     {!s.active && (
-                      <ITText className="text-[9px] font-bold uppercase tracking-widest">
+                      <ITText className="text-[10px] font-semibold">
                         {tt("detail.subareaInactive")}
                       </ITText>
                     )}

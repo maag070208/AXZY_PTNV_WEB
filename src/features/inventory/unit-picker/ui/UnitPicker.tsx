@@ -77,19 +77,19 @@ export default function UnitPicker({ units, selected, onChange, loading, error, 
               }`}
             >
               {/* El checkbox tiene su propio label: su clic no debe volver a llegar a la fila. */}
-              <span onClick={(e) => e.stopPropagation()}>
+              <ITText as="span" onClick={(e) => e.stopPropagation()}>
                 <ITCheckbox
                   name={`unit-${u.id}`}
                   checked={selectedSet.has(u.id)}
                   onChange={(checked) => toggle(u.id, checked)}
-                  label={<span className="sr-only">{u.assetTag}</span>}
+                  label={<ITText as="span" className="sr-only">{u.assetTag}</ITText>}
                 />
-              </span>
+              </ITText>
               <ITFlex direction="column" className="min-w-0">
                 <ITFlex align="center" gap={2}>
                   <ITText className="text-[12px] font-bold text-slate-800">{u.assetTag}</ITText>
                   {current.has(u.id) && (
-                    <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600">{t("units.inThisLoan")}</span>
+                    <ITText as="span" className="rounded bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600">{t("units.inThisLoan")}</ITText>
                   )}
                 </ITFlex>
                 <ITText className={`text-[11px] ${u.serialNumber ? "text-slate-600" : "italic text-slate-400"}`}>

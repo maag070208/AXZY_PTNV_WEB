@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaChartArea, FaChartBar, FaClock, FaExclamationTriangle, FaFingerprint, FaServer, FaSyncAlt, FaUsers, FaVideo, FaWifi, FaChartLine } from "react-icons/fa";
-import { ITButton, ITDataTable, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
+import { FaChartArea, FaChartBar, FaClock, FaFingerprint, FaServer, FaSyncAlt, FaUsers, FaVideo, FaChartLine } from "react-icons/fa";
+import { ITBentoStatStrip, ITButton, ITDataTable, ITFlex, ITSearchSelect, ITText } from "@axzydev/axzy_ui_system";
 import type { Column, ITDataTableFetchParams, ITDataTableResponse } from "@axzydev/axzy_ui_system";
 import { dateLocale } from "@shared/i18n/format";
 import { makeClientTableFetch } from "@shared/api/clientTable";
-import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import type { ClockAlert, SummaryClock, TimeClockSummary } from "@entities/time-clock";
 import { timeClockApi, type TimeClockPerson } from "@entities/time-clock";
@@ -225,7 +224,7 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
         </span>
       }
     >
-      <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4 md:!grid-cols-4">
         <Metric label={t("dashboard.people")} value={clock.counts?.people ?? "—"} />
         <Metric label={t("dashboard.cards")} value={clock.counts?.cards ?? "—"} />
         <Metric label={t("dashboard.punchesToday")} value={clock.punchesToday} accent />
@@ -272,21 +271,24 @@ function DevicePanel({ clock, onOpenPerson }: { clock: SummaryClock; onOpenPerso
 
       <div className="flex flex-col gap-2 border-t border-dashed border-slate-200 pt-4">
         <span className="text-xs font-semibold text-slate-500">{t("dashboard.recentPunches")}</span>
-        <ITDataTable
+        <ITDataTable showViewToggle={false}
           columns={columns as unknown as Column<Record<string, unknown>>[]}
           fetchData={
             fetchPunches as unknown as (p: ITDataTableFetchParams) => Promise<ITDataTableResponse<Record<string, unknown>>>
           }
-          layout="fixed"
-          density="compact"
-          defaultItemsPerPage={8}
-          itemsPerPageOptions={[8, 25]}
           debounceMs={350}
           variant="bordered"
           onRowClick={(row) => {
             const punch = row as unknown as Punch;
             if (punch.employeeNumber) onOpenPerson({ serial: clock.serial, employeeNumber: punch.employeeNumber });
           }}
+          defaultItemsPerPage={25}
+          itemsPerPageOptions={[25, 50, 100]}
+          layout="fixed"
+          density="compact"
+          rowHeight={50}
+          virtualized
+          virtualizedMaxHeight={460}
         />
       </div>
     </PanelCard>
@@ -380,22 +382,47 @@ function Estado({ data, visibleClocks, serial, onSeeAll, onOpenPerson }: {
 
   return (
     <ITFlex direction="column" gap={6}>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiTile icon={<FaWifi size={14} />} tone="emerald" label={t("dashboard.kpi.online")} value={`${online} / ${data.clocks.length}`} hint={t("dashboard.kpi.onlineHint")} />
-        <KpiTile icon={<FaUsers size={14} />} tone="sky" label={t("dashboard.kpi.people")} value={people} hint={t("dashboard.kpi.peopleHint")} />
-        <KpiTile icon={<FaClock size={14} />} tone="orange" label={t("dashboard.kpi.punches")} value={punches} hint={t("dashboard.kpi.punchesHint")} />
-        <KpiTile
-          icon={<FaExclamationTriangle size={14} />}
-          tone={alerts.length > 0 ? "amber" : "neutral"}
-          label={t("dashboard.kpi.alerts")}
-          value={alerts.length}
-          hint={alerts.length > 0 ? t("dashboard.kpi.alertsHint") : t("dashboard.kpi.allGood")}
-        />
-      </div>
+      {/* Cifras del reloj en la tira del mosaico, como el resto del sistema */}
+      <ITBentoStatStrip
+        items={[
+          {
+            id: "online",
+            label: t("dashboard.kpi.online"),
+            value: `${online} / ${data.clocks.length}`,
+            caption: t("dashboard.kpi.onlineHint"),
+            tone: "mint",
+            color: "var(--color-success)",
+          },
+          {
+            id: "people",
+            label: t("dashboard.kpi.people"),
+            value: people,
+            caption: t("dashboard.kpi.peopleHint"),
+            tone: "sea",
+            color: "var(--color-primary-600)",
+          },
+          {
+            id: "punches",
+            label: t("dashboard.kpi.punches"),
+            value: punches,
+            caption: t("dashboard.kpi.punchesHint"),
+            tone: "sun",
+            color: "var(--color-warning)",
+          },
+          {
+            id: "alerts",
+            label: t("dashboard.kpi.alerts"),
+            value: alerts.length,
+            caption: alerts.length > 0 ? t("dashboard.kpi.alertsHint") : t("dashboard.kpi.allGood"),
+            tone: alerts.length > 0 ? "rose" : "plain",
+            color: alerts.length > 0 ? "var(--color-danger)" : "var(--color-text-muted)",
+          },
+        ]}
+      />
 
       {data.alerts.length > 0 && (
         <PanelCard title={t("dashboard.alertsTitle")}>
-          <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-2 md:!grid-cols-2">
             {data.alerts.map((a) => (
               <AlertLine key={`g-${a.code}`} alert={a} />
             ))}
@@ -403,7 +430,7 @@ function Estado({ data, visibleClocks, serial, onSeeAll, onOpenPerson }: {
         </PanelCard>
       )}
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:!grid-cols-3">
         <div className="flex flex-col gap-6 xl:col-span-2">
           {visibleClocks.map((c) => (
             <DevicePanel key={c.serial} clock={c} onOpenPerson={onOpenPerson} />

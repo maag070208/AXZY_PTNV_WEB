@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { ITButton, ITDialog, ITFlex, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITTextarea } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
-import { i18n } from "@shared/i18n";
+import { LangostinConfirm } from "@shared/ui/langostin-confirm";
 
 interface Props {
   isOpen: boolean;
@@ -11,11 +11,12 @@ interface Props {
 }
 
 /**
- * Diálogo para capturar el motivo de baja de un usuario. Mínimo 3 caracteres;
- * envía `onConfirm(reason)` con el motivo en texto plano.
+ * Confirmación M1 de baja con motivo: `LangostinConfirm` (variante `danger`, foco
+ * en Cancelar) con el campo del motivo como contenido y Confirmar bloqueado hasta
+ * tener 3 caracteres. Envía `onConfirm(reason)` con el motivo en texto plano.
  */
 export default function DeactivateDialog({ isOpen, onClose, onConfirm, userName }: Props) {
-  const { t: tt } = useTranslation(["employees", "users", "common"]);
+  const { t: tt } = useTranslation(["employees", "users", "common", "langostin"]);
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -28,7 +29,7 @@ export default function DeactivateDialog({ isOpen, onClose, onConfirm, userName 
 
   const trimmed = reason.trim();
   const isValid = trimmed.length >= 3;
-  const errorMsg = !isValid && reason.length > 0 ? i18n.t("employees:deactivate.reasonMin", { min: 3 }) : null;
+  const errorMsg = !isValid && reason.length > 0 ? tt("employees:deactivate.reasonMin", { min: 3 }) : null;
 
   const handleConfirm = async () => {
     if (!isValid) return;
@@ -41,44 +42,29 @@ export default function DeactivateDialog({ isOpen, onClose, onConfirm, userName 
   };
 
   return (
-    <ITDialog
+    <LangostinConfirm
       isOpen={isOpen}
       onClose={() => !submitting && onClose()}
-      title={tt("employees:detail.deactivate")}
-      className="max-w-md"
+      onConfirm={handleConfirm}
+      title={tt("employees:deactivate.title", { name: userName ?? "" })}
+      message={tt("employees:deactivate.consequence")}
+      confirmLabel={submitting ? tt("common:labels.processing") : tt("employees:detail.deactivate")}
+      cancelLabel={tt("common:actions.cancel")}
+      variant="danger"
+      anim="help"
+      loading={submitting}
+      confirmDisabled={!isValid}
     >
-      <ITFlex direction="column" gap={4} className="pt-2">
-        <ITText className="text-[12px] text-slate-600">
-          {tt("employees:detail.deactivateConfirm", { name: userName ?? "" })}
-        </ITText>
-        <div>
-          <ITTextarea
-            name="deactivate_reason"
-            label={i18n.t("employees:deactivate.reasonLabel")}
-            value={reason}
-            onChange={setReason}
-            placeholder={i18n.t("employees:deactivate.reasonPlaceholder")}
-            rows={3}
-            error={errorMsg ?? undefined}
-            disabled={submitting}
-          />
-        </div>
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" onClick={onClose} disabled={submitting}>
-            <ITText className="font-bold text-[11px]">{tt("common:actions.cancel")}</ITText>
-          </ITButton>
-          <ITButton
-            variant="filled"
-            color="error"
-            onClick={handleConfirm}
-            disabled={!isValid || submitting}
-          >
-            <ITText className="font-bold text-[11px]">
-              {submitting ? i18n.t("common:labels.processing") : tt("employees:detail.deactivate")}
-            </ITText>
-          </ITButton>
-        </ITFlex>
-      </ITFlex>
-    </ITDialog>
+      <ITTextarea
+        name="deactivate_reason"
+        label={tt("employees:deactivate.reasonLabel")}
+        value={reason}
+        onChange={setReason}
+        placeholder={tt("employees:deactivate.reasonPlaceholder")}
+        rows={3}
+        error={errorMsg ?? undefined}
+        disabled={submitting}
+      />
+    </LangostinConfirm>
   );
 }

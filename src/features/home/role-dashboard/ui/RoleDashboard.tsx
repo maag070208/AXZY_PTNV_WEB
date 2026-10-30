@@ -1,6 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { LuActivity, LuChefHat, LuClock, LuServer, LuUser, LuUsers } from "react-icons/lu";
 import { usePermissions, useCurrentRole } from "@entities/user";
+import { FEATURES } from "@shared/config/features";
+import { ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { TabBar } from "@shared/ui/tab-bar";
 import AccessTodayWidget from "./widgets/AccessTodayWidget";
 import AttendanceTodayWidget from "./widgets/AttendanceTodayWidget";
@@ -35,6 +38,19 @@ export type WidgetId =
  * del rol, no este catálogo.
  */
 export type WidgetGroup = "ops" | "people" | "clock" | "kitchen" | "system" | "mine";
+
+/** Orden fijo de las pestañas: Operación siempre primero. */
+const GROUP_ORDER: WidgetGroup[] = ["ops", "people", "clock", "kitchen", "system", "mine"];
+
+/** Ícono de línea de cada pestaña del tablero. */
+const GROUP_ICON: Record<WidgetGroup, ReactNode> = {
+  ops: <LuActivity size={15} />,
+  people: <LuUsers size={15} />,
+  clock: <LuClock size={15} />,
+  kitchen: <LuChefHat size={15} />,
+  system: <LuServer size={15} />,
+  mine: <LuUser size={15} />,
+};
 
 /**
  * Catálogo de widgets: qué permiso pide cada uno (la API vuelve a validarlo y
@@ -99,16 +115,22 @@ const DEFAULT_ORDER: WidgetId[] = [
 interface Props {
   /** Widgets que arma la página (p. ej. `operations` = el tablero de operación actual). */
   slots?: Partial<Record<WidgetId, ReactNode>>;
+  /** Pantalla completa por tema: reemplaza los widgets de esa pestaña (mosaico bento). */
+  panels?: Partial<Record<WidgetGroup, ReactNode>>;
+  /** Píldora "En vivo" que acompaña a las pestañas (solo si hay tablero en vivo). */
+  live?: ReactNode;
 }
 
 /** Tablero de inicio según el rol y los permisos de la sesión. */
-export default function RoleDashboard({ slots = {} }: Props) {
+export default function RoleDashboard({ slots = {}, panels = {}, live }: Props) {
   const permissions = usePermissions();
   const role = useCurrentRole();
   const { t } = useTranslation("home");
   const [grupo, setGrupo] = useState<WidgetGroup | null>(null);
 
   const allowed = (id: WidgetId) => {
+    // Un módulo apagado no pinta su pestaña ni su tarjeta en el inicio.
+    if (id === "kitchen" && !FEATURES.kitchen) return false;
     const permission = WIDGETS[id].permission;
     return (permission === null || (permissions[permission] ?? "NONE") !== "NONE") && (!!WIDGETS[id].render || !!slots[id]);
   };
@@ -125,7 +147,7 @@ export default function RoleDashboard({ slots = {} }: Props) {
   }
 
   const rejilla = (delGrupo: WidgetId[]) => (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid items-start gap-4 lg:!grid-cols-2">
       {delGrupo.map((id) =>
         slots[id] ? (
           <div key={id} className="lg:col-span-2">
@@ -144,17 +166,25 @@ export default function RoleDashboard({ slots = {} }: Props) {
   // Un solo tema: como siempre, sin barra de pestañas (sería un solo botón).
   if (grupos.length === 1) return rejilla(grupos[0][1]);
 
+  // Orden de pestañas estable (Operación primero), sin depender del rol.
+  grupos.sort((a, b) => GROUP_ORDER.indexOf(a[0]) - GROUP_ORDER.indexOf(b[0]));
+
   const activo = grupo && grupos.some(([clave]) => clave === grupo) ? grupo : grupos[0][0];
   const widgets = grupos.find(([clave]) => clave === activo)?.[1] ?? [];
+  const panel = panels[activo];
 
   return (
-    <div className="flex flex-col gap-4">
-      <TabBar
-        items={grupos.map(([clave]) => ({ id: clave, label: t(`groups.${clave}`) }))}
-        value={activo}
-        onChange={setGrupo}
-      />
-      {rejilla(widgets)}
-    </div>
+    <ITStack spacing={4}>
+      {/* Las pestañas van a la derecha, con la píldora "En vivo" antes de ellas. */}
+      <ITFlex align="center" justify="end" gap={3} wrap="wrap">
+        {live}
+        <TabBar
+          items={grupos.map(([clave]) => ({ id: clave, label: t(`groups.${clave}`), icon: GROUP_ICON[clave] }))}
+          value={activo}
+          onChange={setGrupo}
+        />
+      </ITFlex>
+      {panel ?? rejilla(widgets)}
+    </ITStack>
   );
 }

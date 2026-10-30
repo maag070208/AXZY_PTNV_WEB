@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ITAlert, ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import {
+  ITAlert,
+  ITButton,
+  ITCard,
+  ITFlex,
+  ITText,
+} from "@axzydev/axzy_ui_system";
 import { FaCheckCircle, FaExclamationTriangle, FaShieldAlt, FaSyncAlt } from "react-icons/fa";
 import { formatDateTime } from "@shared/utils/dates";
 import { useInventoryAudit } from "../model/useInventoryAudit";
@@ -27,12 +33,7 @@ export default function InventoryAuditCard() {
     navigate("/inventory/audit/mismatches", { state: movementItemId ? { movementItemId } : undefined });
 
   return (
-    <ITFlex
-      as="section"
-      direction="column"
-      gap={3}
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
+    <ITCard contentClassName="flex flex-col gap-3">
       <ITFlex align="center" justify="between" wrap="wrap" gap={2}>
         <ITFlex align="center" gap={2} className="min-w-0">
           <FaShieldAlt className="shrink-0 text-slate-400" size={16} />
@@ -76,9 +77,9 @@ export default function InventoryAuditCard() {
                 <ITFlex align="center" gap={2} wrap="wrap">
                   <FaExclamationTriangle className="shrink-0 text-amber-600" size={12} />
                   <ITText className="text-[12px] font-bold text-amber-900">{t(`audit.checks.${c.key}`)}</ITText>
-                  <span className="rounded-full bg-amber-200/70 px-2 py-0.5 text-[10px] font-bold text-amber-900">
+                  <ITText as="span" className="rounded-full bg-amber-200/70 px-2 py-0.5 text-[10px] font-bold text-amber-900">
                     {t("audit.cases", { count: c.count })}
-                  </span>
+                  </ITText>
                 </ITFlex>
                 {c.rows?.length ? (
                   <ITFlex direction="column" gap={2}>
@@ -88,40 +89,40 @@ export default function InventoryAuditCard() {
                         align="center"
                         gap={2}
                         wrap="wrap"
-                        className="rounded-lg border border-amber-200/70 bg-white/70 px-3 py-2"
+                        className="rounded-lg border border-amber-200/70 bg-[var(--it-card-bg)]/70 px-3 py-2"
                       >
-                        <span className="rounded-full bg-amber-200/70 px-2 py-0.5 text-[10px] font-bold text-amber-900">
+                        <ITText as="span" className="rounded-full bg-amber-200/70 px-2 py-0.5 text-[10px] font-bold text-amber-900">
                           {row.movementType}
-                        </span>
+                        </ITText>
                         <ITText className="text-[11px] text-slate-500">{formatDay(row.date)}</ITText>
                         <ITText className="text-[12px] font-semibold text-slate-800">{row.device}</ITText>
                         {row.quantity !== undefined && row.linked !== undefined && (
                           <ITFlex align="center" gap={1} wrap="wrap">
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                            <ITText as="span" className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
                               {t("audit.chipSays", { n: row.quantity })}
-                            </span>
-                            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+                            </ITText>
+                            <ITText as="span" className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
                               {t("audit.chipLinked", { n: row.linked })}
-                            </span>
+                            </ITText>
                             {row.quantity > row.linked ? (
-                              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                              <ITText as="span" className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
                                 {t("audit.chipMissing", { n: row.quantity - row.linked })}
-                              </span>
+                              </ITText>
                             ) : (
-                              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                              <ITText as="span" className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
                                 {t("audit.chipExtra", { n: row.linked - row.quantity })}
-                              </span>
+                              </ITText>
                             )}
                           </ITFlex>
                         )}
                         {row.available !== undefined && row.ledger !== undefined && (
                           <ITFlex align="center" gap={1} wrap="wrap">
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                            <ITText as="span" className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
                               {t("audit.chipLedger", { n: row.ledger })}
-                            </span>
-                            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+                            </ITText>
+                            <ITText as="span" className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
                               {t("audit.chipAvailable", { n: row.available })}
-                            </span>
+                            </ITText>
                           </ITFlex>
                         )}
                         {row.movementItemId && (
@@ -163,6 +164,6 @@ export default function InventoryAuditCard() {
           {t("audit.checkedAt", { date: formatDateTime(audit.checkedAt) })}
         </ITText>
       )}
-    </ITFlex>
+    </ITCard>
   );
 }

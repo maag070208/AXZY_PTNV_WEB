@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITButton, ITDialog, ITInput, ITSelect, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITButton, ITDialog, ITInput, ITSelect, ITTextarea, ITText, ITStack } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaChevronRight, FaClone, FaLock, FaRegFile } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { RoleAdmin, RoleCreateDto, RoleUpdateDto } from "@entities/permission";
@@ -183,7 +183,7 @@ export default function RoleEditorDialog({
       title={editing ? t("roleDialog.editTitle") : copyFrom ? t("roleDialog.duplicateTitle") : t("roleDialog.newTitle")}
       useFormHeader
     >
-      <div className="flex flex-col gap-4">
+      <ITStack spacing={4}>
         <DialogSection step={editing ? undefined : 1} title={t("roleDialog.nameQuestion")} hint={t("roleDialog.nameHint")}>
           <ITInput
             name="role_name"
@@ -195,14 +195,14 @@ export default function RoleEditorDialog({
           />
           <FieldError message={errors.name} />
           {editing && role.system && (
-            <p className="mt-1 flex items-center gap-1 text-[10px] text-slate-400">
+            <ITText className="mt-1 flex items-center gap-1 text-[10px] text-slate-400">
               <FaLock size={8} /> {t("roleDialog.systemLocked")}
-            </p>
+            </ITText>
           )}
           {!editing && form.key && (
-            <p className="mt-1 text-[10px] text-slate-400">
-              {t("roleDialog.keyPreview")} <span className="font-mono font-bold text-slate-500">{form.key}</span>
-            </p>
+            <ITText className="mt-1 text-[10px] text-slate-400">
+              {t("roleDialog.keyPreview")} <ITText as="span" className="font-mono font-bold text-slate-500">{form.key}</ITText>
+            </ITText>
           )}
         </DialogSection>
 
@@ -218,7 +218,7 @@ export default function RoleEditorDialog({
 
         {!editing && (
           <DialogSection step={3} title={t("roleDialog.startQuestion")}>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2 sm:!grid-cols-2">
               <ChoiceCard
                 selected={form.start === "blank"}
                 onClick={() => setForm((previous) => ({ ...previous, start: "blank" }))}
@@ -281,7 +281,7 @@ export default function RoleEditorDialog({
             {t("roleDialog.moreOptions")}
           </button>
           {showMore && (
-            <div className="mt-2 grid gap-3 rounded-xl bg-slate-50 p-3 sm:grid-cols-2">
+            <div className="mt-2 grid gap-3 rounded-xl bg-slate-50 p-3 sm:!grid-cols-2">
               <div>
                 <ITInput
                   name="role_key"
@@ -293,7 +293,7 @@ export default function RoleEditorDialog({
                   }
                 />
                 <FieldError message={errors.key} />
-                <p className="mt-1 text-[10px] text-slate-400">{t("roleDialog.keyHint")}</p>
+                <ITText className="mt-1 text-[10px] text-slate-400">{t("roleDialog.keyHint")}</ITText>
               </div>
               <div>
                 <ITInput
@@ -303,7 +303,7 @@ export default function RoleEditorDialog({
                   value={form.sortOrder}
                   onChange={(event) => setForm((previous) => ({ ...previous, sortOrder: event.target.value }))}
                 />
-                <p className="mt-1 text-[10px] text-slate-400">{t("roleDialog.orderHint")}</p>
+                <ITText className="mt-1 text-[10px] text-slate-400">{t("roleDialog.orderHint")}</ITText>
               </div>
             </div>
           )}
@@ -311,15 +311,15 @@ export default function RoleEditorDialog({
 
         <DialogFooter>
           <ITButton variant="outlined" color="secondary" onClick={onClose}>
-            <span className="text-[11px] font-bold">{t("roleDialog.cancel")}</span>
+            <ITText as="span" className="text-[11px] font-bold">{t("roleDialog.cancel")}</ITText>
           </ITButton>
           <ITButton variant="filled" color="primary" onClick={handleSave} disabled={saving || !dirty}>
-            <span className="text-[11px] font-bold">
+            <ITText as="span" className="text-[11px] font-bold">
               {saving ? t("roleDialog.saving") : editing ? t("roleDialog.saveChanges") : t("roleDialog.create")}
-            </span>
+            </ITText>
           </ITButton>
         </DialogFooter>
-      </div>
+      </ITStack>
     </ITDialog>
   );
 }

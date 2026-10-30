@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { kitchenApi, useKitchenItemOptions, type SupplierFields, type SupplierInput } from "@entities/kitchen";
+import { useGoBack } from "@shared/lib/useGoBack";
 
 /** Renglones en edición (las cantidades y días se capturan como texto). */
 export interface ContactDraft {
@@ -53,6 +54,7 @@ const intOrNull = (v: string) => (v.trim() === "" ? null : Math.max(0, Math.trun
 export const useSupplierForm = (id?: string) => {
   const { t } = useTranslation("kitchen");
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const items = useKitchenItemOptions(true);
   const itemById = useMemo(() => new Map(items.data.map((i) => [i.id, i])), [items.data]);
 
@@ -202,7 +204,7 @@ export const useSupplierForm = (id?: string) => {
     try {
       const saved = id ? await kitchenApi.updateSupplier(id, input) : await kitchenApi.createSupplier(input);
       setToast(t(id ? "suppliers.saved" : "suppliers.created"));
-      setTimeout(() => navigate(`/kitchen/suppliers/${saved.id}`), 500);
+      setTimeout(() => navigate(`/kitchen/suppliers/${saved.id}`, { replace: true }), 500);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -233,7 +235,7 @@ export const useSupplierForm = (id?: string) => {
     toast,
     setToast,
     save,
-    cancel: () => navigate(id ? `/kitchen/suppliers/${id}` : "/kitchen/suppliers"),
+    cancel: () => goBack(id ? `/kitchen/suppliers/${id}` : "/kitchen/suppliers"),
   };
 };
 

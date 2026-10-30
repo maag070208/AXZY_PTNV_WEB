@@ -1,8 +1,15 @@
-import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITButton, ITFlex, ITGrid, ITInput, ITPage, ITSearchSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
-import { FaFileSignature, FaSave } from "react-icons/fa";
+import {
+  ITButton,
+  ITFlex,
+  ITGrid,
+  ITInput,
+  ITPage,
+  ITSearchSelect,
+  ITToast, ITText, ITStack } from "@axzydev/axzy_ui_system";
+import { FaFileSignature } from "react-icons/fa";
+import { LuFileText, LuMessageCircle, LuPackageOpen, LuUser } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceType } from "@entities/inventory";
 import { departmentsApi, type Department } from "@entities/department";
@@ -11,11 +18,30 @@ import { usersApi, type User } from "@entities/user";
 import { CustodyLetterPreview } from "@widgets/custody-letter";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 import { UnitPicker, useSelectableUnits } from "@features/inventory/unit-picker";
+import { LoanAgent, type LoanAgentItem } from "@widgets/loan-agent";
 import { useRequestKey } from "@shared/lib/useRequestKey";
+import { useGoBack } from "@shared/lib/useGoBack";
+import { FormSection } from "@shared/ui/form-section";
+import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
+import { PanelCard } from "@shared/ui/panel-card";
+import { StickyActions } from "@shared/ui/sticky-actions";
+import { LangostinState } from "@shared/ui/langostin";
+
+const MODE_KEY = "ptnv.newLoan.mode";
+
+// Preferencia por persona (chat con Langostín o formulario clásico); por defecto, chat.
+const readMode = (): "chat" | "form" => {
+  try {
+    return localStorage.getItem(MODE_KEY) === "form" ? "form" : "chat";
+  } catch {
+    return "chat";
+  }
+};
 
 export default function NewLoanPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const requestKey = useRequestKey();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -35,6 +61,18 @@ export default function NewLoanPage() {
   const [deviceId, setDeviceId] = useState("");
   const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
+  const [mode, setModeState] = useState<"chat" | "form">(readMode);
+  // Equipos armados en la conversación (el formulario clásico usa deviceId + selectedUnitIds).
+  const [chatItems, setChatItems] = useState<LoanAgentItem[]>([]);
+
+  const setMode = (next: "chat" | "form") => {
+    setModeState(next);
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* sin almacenamiento: la preferencia solo dura la sesión */
+    }
+  };
 
   useEffect(() => {
     Promise.all([inventoryApi.types(), inventoryApi.devices(), usersApi.employees(), departmentsApi.list(), subareaApi.list()])
@@ -73,10 +111,9 @@ export default function NewLoanPage() {
 
   const quantityNum = selectedUnits.length;
 
-  const isValid =
-    (assignment === "EMPLOYEE" ? !!custodianId : !!departmentId) &&
-    !!deviceId &&
-    quantityNum >= 1;
+  const whoDone = assignment === "EMPLOYEE" ? !!custodianId : !!departmentId;
+  const whatDone = !!deviceId && quantityNum >= 1;
+  const isValid = whoDone && whatDone;
 
   const draftLoan = useMemo(
     () => ({
@@ -106,7 +143,16 @@ export default function NewLoanPage() {
         : null,
       status: "ACTIVE" as const,
       notes: notes || null,
-      items: deviceId
+      items: mode === "chat"
+        ? chatItems.map((ci, idx) => ({
+            id: `item-${idx}`,
+            deviceId: ci.device.id,
+            device: ci.device,
+            quantity: ci.units.length || 1,
+            returnedQuantity: 0,
+            units: ci.units.map((u) => ({ id: u.id, deviceUnit: u })),
+          }))
+        : deviceId
         ? [
             {
               id: "item",
@@ -119,7 +165,7 @@ export default function NewLoanPage() {
           ]
         : [],
     }),
-    [assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, selectedUnits, notes]
+    [mode, chatItems, assignment, custodianId, departmentId, subareaId, subareasDept, departments, custodians, deviceId, devices, quantityNum, selectedUnits, notes]
   );
 
   // El preview se actualiza con debounce para no parpadear en cada tecla.
@@ -133,11 +179,14 @@ export default function NewLoanPage() {
         departmentId: assignment === "DEPARTMENT" ? departmentId : undefined,
         subareaId: assignment === "DEPARTMENT" ? subareaId || undefined : undefined,
         notes: notes || undefined,
-        items: [{ deviceId, unitIds: selectedUnits.map((u) => u.id) }],
+        items:
+          mode === "chat"
+            ? chatItems.map((ci) => ({ deviceId: ci.device.id, unitIds: ci.units.map((u) => u.id) }))
+            : [{ deviceId, unitIds: selectedUnits.map((u) => u.id) }],
       };
       await inventoryApi.createLoan(payload, requestKey(payload));
       setToast({ message: t("loans.saved"), type: "success" });
-      setTimeout(() => navigate("/inventory/loans"), 1000);
+      setTimeout(() => goBack("/inventory/loans"), 1000);
     } catch (e: any) {
       setToast({ message: e.message || t("messages.errorRegistering"), type: "error" });
     } finally {
@@ -148,10 +197,8 @@ export default function NewLoanPage() {
   if (loading) {
     return (
       <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
-        noPadding title={t("loans.new")} backAction={() => navigate(-1)}>
-        <ITFlex justify="center" align="center" className="py-20">
-          <LottieLoader size="lg" />
-        </ITFlex>
+        noPadding title={t("loans.new")} backAction={() => goBack("/inventory/loans")}>
+        <LangostinState kind="loading" />
       </ITPage>
     );
   }
@@ -163,66 +210,114 @@ export default function NewLoanPage() {
       description={t("loans.formSub")}
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.new") }]}
-      backAction={() => navigate("/inventory/loans")}
-      actions={
-        <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
+      backAction={() => goBack("/inventory/loans")}
+    >
+      {mode === "chat" ? (
+        <LoanAgent
+          assignment={assignment}
+          setAssignment={setAssignment}
+          custodianId={custodianId}
+          setCustodianId={setCustodianId}
+          departmentId={departmentId}
+          setDepartmentId={setDepartmentId}
+          subareaId={subareaId}
+          setSubareaId={setSubareaId}
+          notes={notes}
+          setNotes={setNotes}
+          items={chatItems}
+          setItems={setChatItems}
+          custodians={custodians}
+          departments={departments}
+          subareas={subareas}
+          devices={devices}
+          saving={saving}
+          onSubmit={handleSubmit}
+          onUseForm={() => setMode("form")}
+        />
+      ) : (
+      <>
+      <ITFlex justify="end">
+        <ITButton variant="text" color="secondary" size="sm" onClick={() => {
+            // El chat arranca limpio: no hereda lo que quedó a medias en el formulario.
+            setAssignment("EMPLOYEE");
+            setCustodianId("");
+            setDepartmentId("");
+            setSubareaId("");
+            setNotes("");
+            setChatItems([]);
+            setMode("chat");
+          }} disabled={saving}>
           <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("loans.save")}</ITText>
+            <LuMessageCircle size={14} />
+            <ITText as="span" className="text-[11px] font-bold">{t("loans.agent.useChat")}</ITText>
           </ITFlex>
         </ITButton>
-      }
-    >
-      <ITGrid container columns={12} spacing={6}>
-        <ITGrid item xs={12} lg={6}>
-          <ITFlex as="section" direction="column" gap={4} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            {/* Asignación a personal o departamento */}
-            <ITFlex as="fieldset" direction="column" gap={2}>
-              <ITSearchSelect
-                name="loanAssignment"
-                label={t("loans.assignment")}
-                options={[
-                  { value: "EMPLOYEE", label: t("loans.toEmployee") },
-                  { value: "DEPARTMENT", label: t("loans.toDepartment") },
-                ]}
-                value={assignment}
-                onChange={(v) => setAssignment(String(v) as "EMPLOYEE" | "DEPARTMENT")}
-              />
-            </ITFlex>
-
-            {assignment === "EMPLOYEE" ? (
-              <ITSearchSelect
-                label={t("loans.custodian")}
-                placeholder={t("loans.custodianPlaceholder")}
-                options={custodians.map((u) => ({ value: u.id, label: u.name }))}
-                value={custodianId}
-                onChange={(v) => setCustodianId(String(v))}
-              />
-            ) : (
-              <>
+      </ITFlex>
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
+          <FormSection
+            number={1}
+            icon={<LuUser size={16} />}
+            title={t("loans.sectionWho")}
+            description={t("loans.sectionWhoHint")}
+            complete={whoDone}
+          >
+            <ITStack spacing={4}>
+              {/* Asignación a personal o departamento */}
+              <ITFlex as="fieldset" direction="column" gap={2}>
                 <ITSearchSelect
-                  label={t("loans.department")}
-                  placeholder={t("loans.departmentPlaceholder")}
-                  options={departments.map((d) => ({ value: d.id, label: d.name }))}
-                  value={departmentId}
-                  onChange={(v) => {
-                    setDepartmentId(String(v));
-                    setSubareaId("");
-                  }}
+                  name="loanAssignment"
+                  label={t("loans.assignment")}
+                  options={[
+                    { value: "EMPLOYEE", label: t("loans.toEmployee") },
+                    { value: "DEPARTMENT", label: t("loans.toDepartment") },
+                  ]}
+                  value={assignment}
+                  onChange={(v) => setAssignment(String(v) as "EMPLOYEE" | "DEPARTMENT")}
                 />
-                {subareasDept.length > 0 && (
-                  <ITSearchSelect
-                    label={t("loans.subarea")}
-                    placeholder={t("loans.subareaPlaceholder")}
-                    options={subareasDept.map((s) => ({ value: s.id, label: s.name }))}
-                    value={subareaId}
-                    onChange={(v) => setSubareaId(String(v))}
-                  />
-                )}
-              </>
-            )}
+              </ITFlex>
 
-            <ITText className="text-sm font-semibold text-slate-700">{t("loans.resource")}</ITText>
+              {assignment === "EMPLOYEE" ? (
+                <ITSearchSelect
+                  label={t("loans.custodian")}
+                  placeholder={t("loans.custodianPlaceholder")}
+                  options={custodians.map((u) => ({ value: u.id, label: u.name }))}
+                  value={custodianId}
+                  onChange={(v) => setCustodianId(String(v))}
+                />
+              ) : (
+                <>
+                  <ITSearchSelect
+                    label={t("loans.department")}
+                    placeholder={t("loans.departmentPlaceholder")}
+                    options={departments.map((d) => ({ value: d.id, label: d.name }))}
+                    value={departmentId}
+                    onChange={(v) => {
+                      setDepartmentId(String(v));
+                      setSubareaId("");
+                    }}
+                  />
+                  {subareasDept.length > 0 && (
+                    <ITSearchSelect
+                      label={t("loans.subarea")}
+                      placeholder={t("loans.subareaPlaceholder")}
+                      options={subareasDept.map((s) => ({ value: s.id, label: s.name }))}
+                      value={subareaId}
+                      onChange={(v) => setSubareaId(String(v))}
+                    />
+                  )}
+                </>
+              )}
+            </ITStack>
+          </FormSection>
+
+          <FormSection
+            number={2}
+            icon={<LuPackageOpen size={16} />}
+            title={t("loans.sectionWhat")}
+            description={t("loans.sectionWhatHint")}
+            complete={whatDone}
+          >
             <ITGrid container columns={12} spacing={4}>
               <ITGrid item xs={12}>
                 <ITSearchSelect
@@ -256,19 +351,45 @@ export default function NewLoanPage() {
                   />
                 </ITGrid>
               )}
+              <ITGrid item xs={12}>
+                <ITInput name="notes" label={t("loans.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
+              </ITGrid>
             </ITGrid>
+          </FormSection>
+        </div>
 
-            <ITInput name="notes" label={t("loans.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
-          </ITFlex>
-        </ITGrid>
+        {/* Resumen vivo: lo capturado hasta ahora */}
+        <LiveSummary
+          title={t("loans.summaryTitle")}
+          total={2}
+          done={(whoDone ? 1 : 0) + (whatDone ? 1 : 0)}
+        >
+          <LiveSummaryRow label={t("loans.summaryTo")} value={draftLoan.custodian?.name ?? draftLoan.department?.name} />
+          <LiveSummaryRow label={t("loans.summaryDevice")} value={draftLoan.items[0]?.device?.name} />
+          <LiveSummaryRow label={t("loans.summaryPieces")} value={quantityNum > 0 ? quantityNum : undefined} />
+        </LiveSummary>
+      </div>
 
-        <ITGrid item xs={12} lg={6}>
-          <ITFlex as="section" direction="column" gap={2} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <ITText className="text-sm font-bold text-slate-800">{t("loans.preview")}</ITText>
-            <CustodyLetterPreview loan={draftPreview as never} />
-          </ITFlex>
-        </ITGrid>
-      </ITGrid>
+      </>
+      )}
+
+      <PanelCard title={t("loans.preview")} icon={<LuFileText size={16} />}>
+        <CustodyLetterPreview loan={draftPreview as never} />
+      </PanelCard>
+
+      {mode === "form" && (
+      <StickyActions>
+        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/loans")} disabled={saving} />
+        <ITButton
+          label={saving ? t("new.saving") : t("loans.save")}
+          variant="rounded"
+          color="primary"
+          size="sm"
+          onClick={handleSubmit}
+          disabled={saving || !isValid}
+        />
+      </StickyActions>
+      )}
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

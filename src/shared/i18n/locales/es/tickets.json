@@ -38,7 +38,18 @@
       "GOOD": "BUENO",
       "REGULAR": "REGULAR",
       "POOR": "MALO"
-    }
+    },
+    "summary": {
+      "open": "Abiertos",
+      "followUp": "En seguimiento",
+      "unassigned": "Sin asignar",
+      "closed": "Cerrados",
+      "ofTotal": "de {{total}} tickets",
+      "clear": "Mostrar todos"
+    },
+    "confirmTrashTitle": "¿Mover a papelera?",
+    "confirmForeverTitle": "¿Eliminar definitivamente?",
+    "view": "Ver ticket"
   },
   "new": {
     "title": "Nuevo Ticket",
@@ -96,7 +107,9 @@
       "forMe": "No, es mío",
       "forOther": "Sí, lo pidió otra persona",
       "whoRequested": "¿Quién lo pidió?",
-      "searchPerson": "Busca a la persona…"
+      "searchPerson": "Busca a la persona…",
+      "sentOk": "¡Listo, tu ticket entró!",
+      "sendError": "No se pudo enviar. Inténtalo otra vez."
     },
     "suggestions": {
       "noPower": "No enciende",
@@ -265,7 +278,21 @@
     "newTaskHint": "Langostín te ayuda a dejarla lista: contesta lo que te pregunte.",
     "noTasksHint": "Usa «Nueva tarea» para asignar la primera.",
     "overdue": "Vencida",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "by": "por {{name}}",
+    "commentLabel": "Comentario",
+    "folio": "Folio",
+    "tasksTile": "Tareas",
+    "tasksDone": "completadas",
+    "noAssignmentsShort": "sin tareas aún",
+    "daysOpen": "Tiempo abierto",
+    "sinceCreated": "desde que se levantó",
+    "tasksProgress": "{{done}} de {{total}} tareas completadas",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "noHistoryHint": "Aquí verás los cambios y comentarios del ticket.",
+    "confirmTrashTitle": "¿Mover este ticket a papelera?",
+    "confirmForeverTitle": "¿Eliminar este ticket definitivamente?"
   },
   "kanban": {
     "byTicket": "Tareas del ticket",
@@ -299,7 +326,15 @@
     "taskDescription": "Descripción",
     "taskDescPlaceholder": "Detalles de la tarea...",
     "startDate": "Fecha de inicio",
-    "dueDate": "Fecha límite"
+    "dueDate": "Fecha límite",
+    "guideTitle": "Así se mueve una tarea",
+    "guideHint": "Toma la tarjeta y suéltala en la columna del estado nuevo. Se guarda solo.",
+    "guideCard": "Cableado de computadoras",
+    "guideDrop": "Suéltala aquí",
+    "guideDone": "Entendido",
+    "summaryCount": "{{count}} tareas en el tablero",
+    "summaryOverdue": "{{count}} vencidas",
+    "dragHint": "Arrastra una tarjeta a otra columna para cambiar su estado"
   },
   "mytasks": {
     "title": "Mis Tareas",
@@ -310,7 +345,27 @@
     "viewBoard": "Ver tablero kanban",
     "viewBoardTitle": "Ver en el tablero kanban",
     "loadError": "No se pudieron cargar tus tareas",
-    "overdueTasks": "{{count}} vencida(s)"
+    "overdueTasks": "{{count}} vencida(s)",
+    "greeting": "Hola, {{name}}",
+    "summary_one": "Tienes {{count}} tarea pendiente",
+    "summary_other": "Tienes {{count}} tareas pendientes",
+    "summaryNone": "No tienes tareas pendientes",
+    "dueTodayCount_one": "{{count}} vence hoy",
+    "dueTodayCount_other": "{{count}} vencen hoy",
+    "filterAll": "Todas",
+    "emptyTitle": "Sin tareas asignadas",
+    "emptyDescription": "Cuando te asignen una tarea en un ticket, aparecerá aquí.",
+    "groups": {
+      "overdue": "Vencidas",
+      "today": "Para hoy",
+      "week": "Esta semana",
+      "later": "Más adelante",
+      "noDate": "Sin fecha límite"
+    },
+    "dueToday": "Vence hoy",
+    "overdueOn": "Venció el {{date}}",
+    "dueOn": "Vence el {{date}}",
+    "noDueDate": "Sin fecha límite"
   },
   "admintasks": {
     "title": "Administración de tareas",
@@ -331,7 +386,20 @@
     "overdue": "Vencida",
     "start": "Inicio: {{date}}",
     "end": "Fin: {{date}}",
-    "employeeNo": "No. {{number}}"
+    "employeeNo": "No. {{number}}",
+    "overdueDays": "Vencida · hace {{days}} d",
+    "onTime": "Cerrada a tiempo",
+    "summaryTotal": "Tareas",
+    "summaryTotalCaption": "en todos los tickets",
+    "summaryOverdue": "Vencidas",
+    "summaryOk": "Vigentes o completadas",
+    "pctOfTotal": "{{pct}}% del total",
+    "visible": "{{shown}} visibles · {{total}} en total",
+    "filterAll": "Todas",
+    "filterCompleted": "Completada",
+    "filterInReview": "En revisión",
+    "searchPlaceholder": "Buscar por tarea, empleado o ticket…",
+    "clear": "Quitar filtro"
   },
   "pdf": {
     "legend": "Reporte de Ticket",
@@ -373,7 +441,8 @@
     "empty": "Sin archivos",
     "uploadEvidence": "Subir evidencia",
     "uploadTicketFiles": "Subir archivos del ticket",
-    "fallbackExt": "ARCHIVO"
+    "fallbackExt": "ARCHIVO",
+    "uploadHint": "Imágenes, PDF o video de hasta 50 MB."
   },
   "form": {
     "validation": {
@@ -385,7 +454,7 @@
     "name": "Langostín · Tareas",
     "helper": "Langostín te ayuda a dejar la tarea lista",
     "typing": "Langostín está escribiendo…",
-    "greeting": "¡Va de tarea! Dime cómo la armamos.",
+    "greeting": "¡Hola! Armo la tarea contigo.",
     "askWho": "¿Quién se encarga de la tarea?",
     "askWhat": "¿Qué hay que hacer?",
     "askNotes": "¿Algo más que deba saber? Es opcional.",
@@ -393,7 +462,7 @@
     "done": "Listo. Dejo la tarea asignada.",
     "searchEmployee": "Busca a la persona…",
     "titlePlaceholder": "Escribe el título de la tarea…",
-    "notesPlaceholder": "Detalles de la tarea…",
+    "notesPlaceholder": "Detalles (opcional)…",
     "noNotes": "Sin detalles",
     "send": "Enviar",
     "back": "Anterior",
@@ -414,7 +483,18 @@
       "done": "¡Listo! Dejo la tarea creada.",
       "working": "Creando la tarea…",
       "sent": "¡Listo! La tarea ya quedó asignada.",
-      "error": "No pude crear la tarea. Revisa los datos e inténtalo de nuevo."
-    }
+      "error": "No pude crear la tarea. Revisa los datos e inténtalo de nuevo.",
+      "ticket": "Elige el ticket al que pertenece la tarea."
+    },
+    "askTicket": "¿De qué ticket es la tarea?",
+    "searchTicket": "Busca el ticket…",
+    "whatPlaceholder": "¿Qué hay que hacer?",
+    "continue": "Continuar",
+    "sending": "Enviando la tarea…",
+    "sentOk": "¡Listo, la tarea quedó asignada!",
+    "sendError": "No se pudo crear la tarea.",
+    "tooltip": "Crear tarea aquí",
+    "offerBubble": "¿Una tarea nueva? Te la levanto yo aquí mismo.",
+    "searchPerson": "Busca a la persona…"
   }
 }
