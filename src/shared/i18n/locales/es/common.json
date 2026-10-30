@@ -79,7 +79,8 @@
     "settings": "Configuración",
     "kitchenSuppliers": "Proveedores",
     "kitchenCostCenters": "Gasto por centro de costo",
-    "langostin": "Langostin"
+    "langostin": "Langostin",
+    "accountMenu": "Cuenta de {{name}}"
   },
   "files": {
     "access": "accesos",

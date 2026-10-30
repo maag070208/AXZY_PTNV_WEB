@@ -210,9 +210,26 @@ export default function PrivateRoutes() {
   const sidebar: ITSidebarProps = {
     navigationItems,
     isCollapsed: true,
+    // Panel flotante con la persona al pie (mismo lenguaje bento del resto).
+    variant: "bento",
+    // La tarjeta flota separada del borde (el kit respeta el className desde 1.8.14).
+    className: "p-2",
+    profile: user
+      ? {
+          name: user.name ?? user.username,
+          detail: unreadCount > 0 ? tt("nav.notifications", { count: unreadCount }) : user.username,
+          image: user.photoUrl
+            ? `${API_CONSTANTS.BASE_URL}${user.photoUrl}`
+            : blobatarDataUri(user.name ?? user.username),
+          label: tt("nav.accountMenu"),
+          // La tarjeta lleva a la cuenta de la persona (si puede editarla).
+          onClick: (permissions?.["users.edit"] ?? "NONE") !== "NONE" ? () => navigate(`/users/${user.id}/edit`) : undefined,
+        }
+      : undefined,
   };
 
   const topBar = {
+    variant: "bento" as const,
     logo: (
       <img
         src={logoUrl}
@@ -246,7 +263,7 @@ export default function PrivateRoutes() {
 
   return (
     <>
-      <ITLayout topBar={topBar} sidebar={sidebar} contentClassName="max-w-screen! m-0! !px-2">
+      <ITLayout topBar={topBar} sidebar={sidebar} sidebarFullHeight contentClassName="max-w-screen! m-0! !px-2">
         <Outlet />
       </ITLayout>
       {/* Langostín de ayuda en todas las pantallas (se oculta donde ya hay chat). */}

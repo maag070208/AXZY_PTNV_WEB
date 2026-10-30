@@ -33,16 +33,16 @@ export default function LoginForm({
   const { t: tt } = useTranslation(["auth"]);
   return (
     <>
-      <section className="login-form-panel flex flex-1 items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
-        <div className="w-full max-w-md">
-          <ITText as="span" className="login-badge inline-block rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-widest">
+      <section className="login-form-panel flex flex-1 items-center justify-center px-6 py-12 sm:px-12 lg:px-16 lg:py-16">
+        <div className="w-full max-w-lg">
+          <ITText as="span" className="login-badge inline-block rounded-full px-4 py-2 text-[11.5px] font-bold uppercase tracking-widest">
             {tt("login.badge")}
           </ITText>
 
-          <ITText as="h1" className="login-heading mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          <ITText as="h1" className="login-heading mt-6 text-[2rem] font-extrabold tracking-tight sm:text-[2.6rem] sm:leading-[1.05]">
             {tt("login.title")}
           </ITText>
-          <ITText className="login-muted mt-2 text-sm sm:text-base">{tt("login.subtitle")}</ITText>
+          <ITText className="login-muted mt-3 block text-[15px] sm:text-[16px]">{tt("login.subtitle")}</ITText>
 
           {deactivatedMsg && (
             <div className="mt-6">
@@ -50,7 +50,7 @@ export default function LoginForm({
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="mt-8 space-y-5" noValidate>
+          <form onSubmit={onSubmit} className="mt-10 space-y-6" noValidate>
             <div>
               <ITInput
                 name="username"
@@ -99,7 +99,7 @@ export default function LoginForm({
             </ITButton>
           </form>
 
-          <footer className="login-muted mt-10 flex items-center justify-between text-xs">
+          <footer className="login-muted mt-12 flex items-center justify-between text-[12.5px]">
             <ITText as="span">{tt("login.footer")}</ITText>
             <ITText as="span" className="font-medium">v{__APP_VERSION__}</ITText>
           </footer>

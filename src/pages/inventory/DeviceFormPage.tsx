@@ -23,7 +23,7 @@ import { useGoBack } from "@shared/lib/useGoBack";
 import { FormSection } from "@shared/ui/form-section";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { StickyActions } from "@shared/ui/sticky-actions";
-import { LangostinGuide, LangostinState, type LangostinGuideStatus } from "@shared/ui/langostin";
+import { LangostinState } from "@shared/ui/langostin";
 
 export default function DeviceFormPage() {
   const { t } = useTranslation(["inventory", "common"]);
@@ -124,23 +124,6 @@ export default function DeviceFormPage() {
   const sectionsDone = (isValid ? 1 : 0) + (pieceSectionDone ? 1 : 0);
 
   // Pistas de Langostín por campo (clave = atributo `name` del input).
-  const hints: Record<string, string> = {
-    type: t("devices.hints.type"),
-    name: t("devices.hints.name"),
-    brand: t("devices.hints.brand"),
-    model: t("devices.hints.model"),
-    code: t("devices.hints.code"),
-    description: t("devices.hints.description"),
-    quantity: t("devices.hints.quantity"),
-  };
-  const guideStatus: LangostinGuideStatus = saving
-    ? "saving"
-    : toast?.type === "success"
-      ? "saved"
-      : toast?.type === "error"
-        ? "error"
-        : "idle";
-
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -261,7 +244,6 @@ export default function DeviceFormPage() {
         />
       </StickyActions>
 
-      <LangostinGuide storageKey="inventory-device-new" hints={hints} status={guideStatus} />
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

@@ -37,8 +37,9 @@ export default function FormSection({ number, title, description, icon, complete
         >
           {complete ? <LuCheck size={16} strokeWidth={3} /> : number}
         </ITText>
-        <ITFlex className="min-w-0 flex-1">
-          <ITFlex align="center" gap={2}>
+        {/* Título arriba y descripción debajo: en fila se pegaban. */}
+        <ITFlex direction="column" gap={0} className="min-w-0 flex-1">
+          <ITFlex align="center" gap={2} className="min-w-0">
             {icon && <ITText as="span" className="flex shrink-0 items-center text-slate-400">{icon}</ITText>}
             <ITText as="h3" className="m-0 truncate !text-[16px] font-bold !text-slate-800">{title}</ITText>
           </ITFlex>

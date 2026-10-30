@@ -34,7 +34,7 @@ import { newId } from "@shared/lib/newId";
 import { useGoBack } from "@shared/lib/useGoBack";
 import { InsightNote, MiniList, Num } from "@shared/ui/bento-bits";
 import { FormSection } from "@shared/ui/form-section";
-import { LangostinGuide, LangostinState, type LangostinGuideStatus } from "@shared/ui/langostin";
+import { LangostinState } from "@shared/ui/langostin";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { StickyActions } from "@shared/ui/sticky-actions";
 /** Nombre de cada estado de pieza, ya traducido por el namespace de inventario. */
@@ -437,24 +437,6 @@ export default function NewMovementPage() {
       </ITPage>
     );
   }
-
-  // Pistas de Langostín por campo (clave = atributo `name` del input).
-  const hints: Record<string, string> = {};
-  for (const r of rows) {
-    hints[`typeFilter-${r.key}`] = t("new.hints.typeFilter");
-    hints[`device-${r.key}`] = t("new.hints.device");
-    hints[`unit-${r.key}`] = t("new.hints.unit");
-    hints[`quantity-${r.key}`] = t("new.hints.quantity");
-    hints[`reason-${r.key}`] = t("new.hints.reason");
-    hints[`notes-${r.key}`] = t("new.hints.notes");
-  }
-  const guideStatus: LangostinGuideStatus = saving
-    ? "saving"
-    : toast?.type === "success"
-      ? "saved"
-      : toast?.type === "error" || Object.keys(errors).length > 0
-        ? "error"
-        : "idle";
 
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
@@ -870,12 +852,6 @@ export default function NewMovementPage() {
         />
       </StickyActions>
 
-      <LangostinGuide
-        storageKey="inventory-movement-new"
-        hints={hints}
-        status={guideStatus}
-        defaultText={t("new.hints.default")}
-      />
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

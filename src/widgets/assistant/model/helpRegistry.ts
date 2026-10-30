@@ -1,4 +1,13 @@
 import type { ReactNode } from "react";
+import { APP_SCREENS, type AppScreen } from "@entities/permission";
+import { i18n } from "@shared/i18n";
+
+/** Traduce una clave de menú (`nav.*`) del namespace `common`. */
+const navLabel = (labelKey: string): string => {
+  // La clave viene del catálogo tipado; i18next no acepta plantillas en `t`.
+  const translate = i18n.getFixedT(null, "common") as unknown as (key: string) => string;
+  return String(translate(labelKey));
+};
 import type { AppEventMap } from "@shared/lib/appEvents";
 
 /**
@@ -156,7 +165,7 @@ export const HELP_SCREENS: HelpScreen[] = [
     title: "Dispositivos",
     route: "/inventory/devices",
     explain: "El catálogo de equipos y sus piezas físicas, con disponibilidad y estado.",
-    match: (p) => p.startsWith("/inventory/devices"),
+    match: (p) => p === "/inventory/devices",
     actions: [
       { label: "¿Qué es una unidad disponible?", answer: "Una pieza física lista para prestarse. Cuando sale en préstamo deja de estar disponible." },
       { label: "Registrar un movimiento", to: "/inventory/movements/new", permission: "movements.create" },
@@ -168,7 +177,7 @@ export const HELP_SCREENS: HelpScreen[] = [
     title: "Movimientos de inventario",
     route: "/inventory/movements",
     explain: "Entradas, bajas, mantenimientos y traspasos; cada pieza queda con su motivo en la bitácora.",
-    match: (p) => p.startsWith("/inventory/movements"),
+    match: (p) => p.startsWith("/inventory/movements") && p !== "/inventory/movements/new",
     actions: [
       { label: "¿Qué tipo de movimiento elijo?", answer: "Entrada suma piezas nuevas, baja retira una pieza, a mantenimiento la manda a reparar y el traspaso la cambia de lugar." },
       { label: "¿Se puede deshacer?", answer: "Solo el mantenimiento se revierte. La entrada y la baja no se deshacen; si te equivocas, avisa a Sistemas." },
@@ -457,6 +466,93 @@ export const HELP_SCREENS: HelpScreen[] = [
     ],
   },
   {
+    screenId: "inventory.newReturn",
+    title: "Nueva devolución",
+    route: "/inventory/returns/new",
+    explain: "Devuelves piezas de una carta responsiva: eliges el préstamo, marcas lo que regresa y su condición.",
+    match: (p) => p.startsWith("/inventory/returns/new"),
+    actions: [
+      { label: "¿Cómo marco una pieza rota?", answer: "Marca la pieza, elige «Roto» y escribe el comentario: se da de baja del inventario automáticamente y queda el motivo en la bitácora." },
+      { label: "¿Qué pasa si no devuelvo todo?", answer: "Puedes devolver solo algunas piezas: la carta queda como parcial con el pendiente de cada renglón." },
+      { label: "Ver devoluciones", to: "/inventory/returns", permission: "loans.view" },
+      { label: "Ver préstamos", to: "/inventory/loans", permission: "loans.view" },
+    ],
+    glossary: {
+      "Bueno": "La pieza regresa en condiciones de uso.",
+      "Aceptable": "Regresa con desgaste normal.",
+      "Malo": "Regresa dañada; pide comentario y no vuelve a prestarse.",
+      "Roto": "Se da de baja del inventario automáticamente.",
+    },
+  },
+  {
+    screenId: "inventory.newLoan",
+    title: "Nuevo préstamo",
+    route: "/inventory/loans/new",
+    explain: "Armas una carta responsiva: eliges a la persona, las piezas exactas y el encargado que firma.",
+    match: (p) => p.startsWith("/inventory/loans/new"),
+    actions: [
+      { label: "¿Qué es una carta responsiva?", answer: "El documento con el que una persona recibe equipo bajo su responsabilidad. Imprime el acta y fírmala." },
+      { label: "¿Cómo elijo las piezas?", answer: "Busca el dispositivo, elige las unidades (activo fijo y serie) y agrega el renglón. Solo aparecen las disponibles." },
+      { label: "Ver préstamos", to: "/inventory/loans", permission: "loans.view" },
+    ],
+  },
+  {
+    screenId: "inventory.movementNew",
+    title: "Nuevo movimiento",
+    route: "/inventory/movements/new",
+    explain: "Entradas, salidas de mantenimiento y bajas de equipo, con su motivo y sus piezas.",
+    match: (p) => p.startsWith("/inventory/movements/new"),
+    actions: [
+      { label: "¿Qué tipo elijo?", answer: "Entrada al dar de alta equipo, mantenimiento cuando sale y regresa, y baja cuando se retira del inventario." },
+      { label: "Ver movimientos", to: "/inventory/movements", permission: "devices.view" },
+    ],
+  },
+  {
+    screenId: "inventory.deviceForm",
+    title: "Dispositivo",
+    route: "/inventory/devices/new",
+    explain: "Alta y edición de un dispositivo del catálogo: tipo, marca, modelo y cuántas piezas tiene.",
+    match: (p) => p === "/inventory/devices/new" || p.startsWith("/inventory/devices/import"),
+    actions: [
+      { label: "¿Cómo cargo varios de golpe?", answer: "En Dispositivos usa «Cargar Excel»: te da la plantilla y la previsualización antes de escribir nada." },
+      { label: "Ver dispositivos", to: "/inventory/devices", permission: "devices.view" },
+    ],
+  },
+  {
+    screenId: "inventory.deviceDetail",
+    title: "Detalle del dispositivo",
+    route: "/inventory/devices/:id",
+    explain: "Las piezas del dispositivo, quién las tiene y su historial de movimientos.",
+    match: (p) => /^\/inventory\/devices\/[^/]+$/.test(p),
+    actions: [
+      { label: "¿Cómo agrego piezas?", answer: "Con «Agregar unidades» en este detalle: crea piezas nuevas con su folio y sube el disponible." },
+      { label: "Ver dispositivos", to: "/inventory/devices", permission: "devices.view" },
+      { label: "Ver movimientos", to: "/inventory/movements", permission: "devices.view" },
+    ],
+  },
+  {
+    screenId: "notifications",
+    title: "Notificaciones",
+    route: "/notifications",
+    explain: "Tus avisos: tickets, tareas, expedientes y movimientos del sistema.",
+    match: (p) => p.startsWith("/notifications"),
+    actions: [
+      { label: "¿Por qué no me llega el correo?", answer: "Revisa la configuración de correo del sistema; si el aviso aparece aquí, la notificación interna sí se creó." },
+      { label: "Ir al inicio", to: "/" },
+    ],
+  },
+  {
+    screenId: "inventory.mismatches",
+    title: "Diferencias de inventario",
+    route: "/inventory/audit/mismatches",
+    explain: "Lo que el auditor encontró: piezas, préstamos y kardex que no cuadran.",
+    match: (p) => p.startsWith("/inventory/audit/mismatches"),
+    actions: [
+      { label: "¿Cada cuándo corre el auditor?", answer: "Al arrancar el sistema y cada 24 horas; también puedes pedir una revisión desde el tablero de inventario." },
+      { label: "Ver inventario", to: "/inventory", permission: "devices.view" },
+    ],
+  },
+  {
     screenId: "default",
     title: "Puerto Nuevo",
     route: "/",
@@ -472,9 +568,60 @@ export const HELP_SCREENS: HelpScreen[] = [
 ];
 
 /** Pantalla de ayuda que corresponde a una ruta (siempre hay una: `default`). */
-export const helpScreenFor = (pathname: string): HelpScreen =>
-  HELP_SCREENS.find((screen) => screen.screenId !== "default" && screen.match(pathname)) ??
-  (HELP_SCREENS.find((screen) => screen.screenId === "default") as HelpScreen);
+/** Arma una pantalla genérica a partir del catálogo de menú (`APP_SCREENS`). */
+const screenFromRoute = (pathname: string): HelpScreen | null => {
+  const flat: Array<{ path?: string; match?: "exact" | "prefix"; label: string }> = [];
+  const walk = (screens: readonly AppScreen[], parentLabel?: string) => {
+    for (const screen of screens) {
+      const label = navLabel(screen.labelKey) || parentLabel || screen.labelKey;
+      flat.push({ path: screen.path, match: screen.match, label });
+      if (screen.children) walk(screen.children, label);
+    }
+  };
+  walk(APP_SCREENS);
+
+  const hit = flat
+    .filter((item): item is { path: string; match?: "exact" | "prefix"; label: string } => Boolean(item.path))
+    .sort((a, b) => b.path.length - a.path.length)
+    .find((item) =>
+      item.match === "exact" ? pathname === item.path : pathname === item.path || pathname.startsWith(`${item.path}/`),
+    );
+  if (!hit) return null;
+
+  return {
+    screenId: `route:${hit.path}`,
+    title: hit.label,
+    route: hit.path,
+    explain: `Estás en ${hit.label}. Pregúntame por esta pantalla o elige a dónde ir.`,
+    match: (p) => p.startsWith(hit.path),
+    actions: [{ label: "Ir al inicio", to: "/" }],
+  };
+};
+
+export const helpScreenFor = (pathname: string): HelpScreen => {
+  const registered = HELP_SCREENS.find((screen) => screen.screenId !== "default" && screen.match(pathname));
+  if (registered) return registered;
+  // Jamás decir "Puerto Nuevo" si estamos en una pantalla del menú: se deduce
+  // del catálogo por la ruta.
+  const fromRoute = pathname === "/" ? null : screenFromRoute(pathname);
+  if (fromRoute) return fromRoute;
+  if (pathname === "/") return HELP_SCREENS.find((screen) => screen.screenId === "default") as HelpScreen;
+  // Fuera del inicio, nunca se dice "Puerto Nuevo": se arma con la ruta.
+  const title = pathname
+    .split("/")
+    .filter(Boolean)
+    .pop()
+    ?.replace(/-/g, " ")
+    .replace(/^./, (c) => c.toUpperCase()) ?? "esta pantalla";
+  return {
+    screenId: `route:${pathname}`,
+    title,
+    route: pathname,
+    explain: `Estás en ${title}. Pregúntame por esta pantalla o elige a dónde ir.`,
+    match: (p) => p === pathname,
+    actions: [{ label: "Ir al inicio", to: "/" }],
+  };
+};
 
 /** ¿La ruta tiene su propio chat y por eso no debe salir el botón flotante? */
 export const isHelpHidden = (pathname: string): boolean => HELP_HIDDEN_ROUTES.some((route) => pathname.startsWith(route));

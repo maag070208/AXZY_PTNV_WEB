@@ -40,6 +40,8 @@ interface Options {
    * fuera del ticket (tablero de tareas): ahí hay tareas de varios tickets.
    */
   askTicket?: boolean;
+  /** Ticket ya elegido (el bot abre desde el detalle): se salta ese paso. */
+  initialTicket?: { id: string; title: string };
 }
 
 // Estado antes de responder un paso; sirve para regresar.
@@ -70,12 +72,13 @@ const emptyDraft = (): TaskDraft => ({
  * Agente de tareas: el mismo chat de Langostín, pero para armar una tarea del
  * ticket (quién la hace, qué hay que hacer, detalles y fecha).
  */
-export const useTaskAgent = ({ onCreate, askTicket = false }: Options) => {
+export const useTaskAgent = ({ onCreate, askTicket = false, initialTicket }: Options) => {
   const { t } = useTranslation("tickets");
-  const steps = askTicket ? TASK_AGENT_STEPS_WITH_TICKET : TASK_AGENT_STEPS;
-  const [step, setStep] = useState<TaskAgentStep>(askTicket ? "ticket" : "who");
-  const [ticketId, setTicketId] = useState("");
-  const [ticketName, setTicketName] = useState("");
+  const askForTicket = askTicket && !initialTicket;
+  const steps = askForTicket ? TASK_AGENT_STEPS_WITH_TICKET : TASK_AGENT_STEPS;
+  const [step, setStep] = useState<TaskAgentStep>(askForTicket ? "ticket" : "who");
+  const [ticketId, setTicketId] = useState(initialTicket?.id ?? "");
+  const [ticketName, setTicketName] = useState(initialTicket?.title ?? "");
   const [messages, setMessages] = useState<TaskAgentMessage[]>([]);
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState<TaskDraft>(emptyDraft);

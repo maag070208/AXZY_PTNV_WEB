@@ -1,4 +1,3 @@
-import { dyn } from "@shared/i18n";
 import type { KeyboardEvent } from "react";
 import { ITAlert, ITButton, ITPage, ITStack } from "@axzydev/axzy_ui_system";
 import { LuBuilding2, LuFileUp, LuIdCard, LuShieldCheck, LuUserPlus } from "react-icons/lu";
@@ -10,7 +9,7 @@ import {
 } from "@features/user/user-form";
 import { useGoBack } from "@shared/lib/useGoBack";
 import { FormSection } from "@shared/ui/form-section";
-import { LangostinGuide, LangostinState, type LangostinGuideStatus } from "@shared/ui/langostin";
+import { LangostinState } from "@shared/ui/langostin";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { StickyActions } from "@shared/ui/sticky-actions";
 
@@ -23,18 +22,6 @@ interface AppStep {
 }
 
 /** Clave de la guía de Langostin para cada campo (por el `name` del input). */
-const HINT_KEYS: Record<string, string> = {
-  u_name: "name",
-  u_second: "secondName",
-  u_apa: "paternalSurname",
-  u_ama: "maternalSurname",
-  u_email: "email",
-  u_num: "employeeNumber",
-  u_jobTitle: "jobTitle",
-  u_username: "username",
-  u_role: "role",
-  u_password: "password",
-};
 
 export default function UserFormPage() {
   const navigate = useNavigate();
@@ -111,29 +98,6 @@ export default function UserFormPage() {
     uniqueness: userForm.uniqueness,
   };
 
-  // Lo que Langostin le dice al usuario según el estado del formulario.
-  const hasErrors = Object.keys(userForm.errors).length > 0 || Boolean(userForm.docsError);
-  const checking = Object.values(userForm.uniqueness).includes("checking");
-  const complete =
-    !!userForm.form.name.trim() &&
-    !!userForm.form.paternalSurname.trim() &&
-    !!userForm.form.username.trim() &&
-    !!userForm.form.password &&
-    !!userForm.form.employeeNumber.trim() &&
-    !!userForm.form.email.trim() &&
-    !hasErrors &&
-    !checking &&
-    (!userForm.requiresDocs || userForm.requiredDocs.every((d) => userForm.docsFiles[d.key]));
-
-  // Pistas por campo (ya traducidas) para LangostinGuide; la de usuario avisa si está libre.
-  const guideHints: Record<string, string> = Object.fromEntries(
-    Object.entries(HINT_KEYS).map(([input, key]) => [input, dyn(tt)(`form.hints.${key}`)])
-  );
-  if (userForm.uniqueness.username === "available") guideHints.u_username = tt("form.hints.usernameFree");
-  const guideStatus: LangostinGuideStatus = userForm.saving || checking ? "saving" : hasErrors ? "error" : "idle";
-  const guideStatusText = userForm.saving ? tt("form.saving") : checking ? tt("form.checking") : tt("form.guideFix");
-  const defaultText = !isEdit && complete ? tt("form.ready") : tt("form.guideStart");
-
   // Enter pasa al siguiente campo del formulario, como en un formulario normal.
   const handleEnter = (event: KeyboardEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -148,6 +112,8 @@ export default function UserFormPage() {
   };
 
   const f = userForm.form;
+  // Error del formulario: apaga la palomita de cada paso.
+  const hasErrors = Object.keys(userForm.errors).length > 0 || Boolean(userForm.docsError);
   const steps: AppStep[] = [
     {
       label: tt("form.sectionPersonal"),
@@ -243,14 +209,6 @@ export default function UserFormPage() {
         </ITButton>
       </StickyActions>
 
-      {/* Langostin flota abajo a la derecha: explica el campo enfocado y avisa mientras verifica o guarda. */}
-      <LangostinGuide
-        hints={guideHints}
-        status={guideStatus}
-        statusText={guideStatusText}
-        defaultText={defaultText}
-        storageKey={`user-form:${isEdit ? "edit" : "new"}`}
-      />
     </ITPage>
     );
 }

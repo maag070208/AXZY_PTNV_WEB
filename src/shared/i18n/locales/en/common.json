@@ -79,7 +79,8 @@
     "settings": "Settings",
     "kitchenSuppliers": "Suppliers",
     "kitchenCostCenters": "Spending by cost center",
-    "langostin": "Langostin"
+    "langostin": "Langostin",
+    "accountMenu": "{{name}}'s account"
   },
   "files": {
     "access": "access",

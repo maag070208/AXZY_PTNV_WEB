@@ -143,6 +143,17 @@ export default function LangostinAssistant() {
   );
   const activeAgent = availableAgents.find((agent) => agent.id === agentId) ?? null;
 
+  // El detalle del ticket pide "Nueva tarea": el panel la arma con ese ticket.
+  useEffect(
+    () =>
+      onAppEvent("task:new", ({ ticketId }) => {
+        setTargetId(ticketId);
+        setAgentId("task");
+        setOpen(true);
+      }),
+    [],
+  );
+
   // La tabla de Horarios pide editar una fila: el panel abre el formulario con
   // ese id (no se navega a otra pantalla ni se abre un modal).
   useEffect(

@@ -72,8 +72,13 @@
 }
 /* Campos más altos que la densidad global (0.85): el login respira. */
 .login-form-panel input {
-  min-height: 2.875rem;
-  font-size: 0.9375rem;
+  min-height: 3.375rem;
+  font-size: 1rem;
+  padding-inline: 1.1rem;
+}
+/* Etiquetas de campo un punto más grandes en el login. */
+.login-form-panel label {
+  font-size: 0.875rem;
 }
 .dark .login-form-panel {
   background: #0f172a;
@@ -104,7 +109,8 @@
 /* Misma silueta de píldora que los campos del kit. */
 .login-submit {
   border-radius: 9999px;
-  min-height: 2.875rem;
+  min-height: 3.375rem;
+  font-size: 0.95rem;
 }
 
 /* Punto de "operación en tiempo real": pulso solo si el usuario no pide menos movimiento. */

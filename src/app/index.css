@@ -392,3 +392,52 @@ html {
   outline: 2px solid var(--color-primary) !important;
   outline-offset: 2px;
 }
+
+/* Riel del sidebar en bento: el icono (y su estado activo) se centra en la
+   tarjeta. El kit lo corrige en 1.8.14; mientras, se aplica aquí para el riel
+   de 72 px (la clase cambia a 248 px al expandir, así que el texto no se mueve). */
+aside.w-\[72px\] > div[class*="rounded-[26px]"] [role="button"] {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* El anillo de foco del navegador se veía como un círculo azul sobre el activo. */
+aside > div[class*="rounded-[26px]"] [role="button"]:focus {
+  outline: none;
+}
+
+aside > div[class*="rounded-[26px]"] [role="button"]:focus-visible {
+  outline: 2px solid var(--color-primary, #0d5777);
+  outline-offset: -2px;
+}
+
+/* Riel del sidebar (72 px): logo que quepa centrado y renglones circulares,
+   para que el estado activo quede exactamente detrás del icono. */
+aside.w-\[72px\] > div[class*="rounded-[26px]"] img {
+  max-width: 40px;
+  max-height: 40px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin-inline: auto;
+}
+
+aside.w-\[72px\] > div[class*="rounded-[26px]"] [role="button"] {
+  width: 40px;
+  height: 40px;
+  margin-inline: auto;
+  border-radius: 9999px;
+}
+
+/* En el riel la navegación no deja relleno lateral: así el renglón circular
+   queda exactamente al centro de la tarjeta. */
+aside.w-\[72px\] > div[class*="rounded-[26px]"] nav {
+  padding-inline: 8px;
+}
+
+/* Riel: el icono también se centra dentro del renglón (el contenedor interno
+   es `w-full` y lo dejaba pegado a la izquierda). */
+aside.w-\[72px\] > div[class*="rounded-[26px]"] [role="button"] > div {
+  justify-content: center;
+}

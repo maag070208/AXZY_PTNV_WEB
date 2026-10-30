@@ -80,7 +80,6 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [tasksOpen, setTasksOpen] = useState(true);
-  const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [expandedAssignments, setExpandedAssignments] = useState<
     Record<string, boolean>
   >({});
@@ -383,8 +382,6 @@ export const useTicketDetail = ({ id, download, onDeleted }: Props) => {
     setDeleteOpen,
     tasksOpen,
     setTasksOpen,
-    newTaskOpen,
-    setNewTaskOpen,
     expandedAssignments,
     setExpandedAssignments,
     savingAssignment,

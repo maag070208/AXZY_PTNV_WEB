@@ -98,8 +98,9 @@ export const ASSISTANT_AGENTS: AssistantAgent[] = [
     id: "task",
     labelKey: "help.agentTask",
     permission: "tasks.assign",
-    // La tarea vive en el tablero, donde se ven las de todos los tickets.
-    screens: ["tickets.kanban", "tickets.tasks"],
+    // La tarea vive en el tablero (donde se ven las de todos los tickets) y en
+    // el detalle del ticket, que la pide con el ticket ya elegido.
+    screens: ["tickets.kanban", "tickets.tasks", "tickets.detail"],
     tone: "success",
     Component: TaskChatAgent,
   },

@@ -13,6 +13,10 @@ import { useTaskAgent } from "@features/ticket/ticket-detail/model/useTaskAgent"
 interface Props {
   /** Se llama cuando la tarea ya se creó. */
   onDone: () => void;
+  /** Ticket ya elegido: lo manda el detalle del ticket al abrir el panel. */
+  targetId?: string;
+  /** Título del ticket para el resumen (opcional). */
+  ticketTitle?: string;
 }
 
 const primaryChip =
@@ -34,7 +38,7 @@ const secondaryStyle = {
  * para cuándo. Mismo formato que el alta de ticket (una columna, auto-scroll,
  * loader al enviar y aviso para que el tablero recargue).
  */
-export default function TaskChatAgent({ onDone }: Props) {
+export default function TaskChatAgent({ onDone, targetId, ticketTitle }: Props) {
   const { t } = useTranslation("tickets");
   const [people, setPeople] = useState<User[]>([]);
   const [ticketOptions, setTicketOptions] = useState<{ value: string; label: string }[]>([]);
@@ -75,7 +79,8 @@ export default function TaskChatAgent({ onDone }: Props) {
   }, []);
 
   const agent = useTaskAgent({
-    askTicket: true,
+    askTicket: !targetId,
+    initialTicket: targetId ? { id: targetId, title: ticketTitle ?? "" } : undefined,
     onCreate: async (draft, ticketId) => {
       if (!ticketId) return false;
       try {

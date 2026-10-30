@@ -14,14 +14,6 @@ import type { APIRequestContext } from "@playwright/test";
 
 const RUN = newRunId();
 
-/** Abre el panel del bot y devuelve su raíz (`role="dialog"`). */
-const openPanel = async (page: import("@playwright/test").Page) => {
-  await page.locator("button[aria-expanded]").click();
-  const panel = page.locator('[role="dialog"]');
-  await expect(panel).toBeVisible();
-  return panel;
-};
-
 /** Toca el globo de oferta del bot (p. ej. «Nuevo ticket»). */
 const useOffer = async (page: import("@playwright/test").Page, label: string) => {
   await page.getByRole("button", { name: label, exact: true }).first().click();

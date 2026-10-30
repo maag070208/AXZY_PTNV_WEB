@@ -18,8 +18,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-canvas flex min-h-screen items-center justify-center p-0 sm:p-6 lg:p-10">
-      <div className="login-card flex w-full max-w-6xl flex-col overflow-hidden sm:rounded-[28px] lg:flex-row">
+    <div className="login-canvas flex min-h-screen items-center justify-center p-0 sm:p-8 lg:p-12">
+      <div className="login-card flex w-full max-w-7xl flex-col overflow-hidden sm:rounded-[32px] lg:flex-row">
         <LoginBrandPanel />
         <LoginForm
           username={login.username}

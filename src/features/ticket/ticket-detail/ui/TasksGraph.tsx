@@ -21,13 +21,13 @@ import {
   LuTrash2,
 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
+import { emitAppEvent } from "@shared/lib/appEvents";
 import { formatDate, formatDateTime } from "@shared/utils/dates";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { dyn } from "@shared/i18n/dyn";
 import { LangostinState } from "@shared/ui/langostin";
 import { ASSIGNMENT_TONE, TicketChip } from "@entities/ticket";
 import type { UseTicketDetail } from "../model/useTicketDetail";
-import TaskAgentForm from "./TaskAgentForm";
 
 interface Props {
   fx: UseTicketDetail;
@@ -53,11 +53,6 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
   const isClosed = fx.isClosed;
   const tareas = ticket.assignments;
   const canAddTask = canManage && !isClosed;
-
-  /** Cierra el formulario y lo deja limpio para la siguiente tarea. */
-  const cancelarNueva = () => {
-    fx.setNewTaskOpen(false);
-  };
 
   if (!fx.tasksOpen) {
     return (
@@ -90,8 +85,13 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
           <TicketChip tone="primary" label={tt("detail.tasksCount", { count: tareas.length })} />
         </ITFlex>
         <ITFlex align="center" gap={2}>
-          {canAddTask && !fx.newTaskOpen && (
-            <ITButton variant="filled" color="primary" size="sm" onClick={() => fx.setNewTaskOpen(true)}>
+          {canAddTask && (
+            <ITButton
+              variant="filled"
+              color="primary"
+              size="sm"
+              onClick={() => emitAppEvent("task:new", { ticketId: ticket.id, ticketTitle: ticket.title })}
+            >
               <ITFlex align="center" gap={1}>
                 <LuPlus size={12} />
                 <ITText className="!text-[11px] font-bold">{tt("detail.newTask")}</ITText>
@@ -114,20 +114,6 @@ export default function TasksGraph({ fx, canManage, renderAssignmentAttachments 
             })}
           </ITText>
         </ITStack>
-      )}
-
-      {/* Tarea nueva: la arma Langostín en el chat de arriba de la lista. */}
-      {fx.newTaskOpen && canAddTask && (
-        <div className="rounded-2xl bg-[color-mix(in_srgb,var(--color-primary)_6%,transparent)] p-3">
-          <ITFlex direction="column" gap={1} className="mb-2.5 px-1">
-            <ITText className="!text-[12px] font-semibold text-primary-500">
-              {tt("detail.newTask")}
-            </ITText>
-            <ITText className="!text-[11px] text-slate-500">{tt("detail.newTaskHint")}</ITText>
-          </ITFlex>
-
-          <TaskAgentForm fx={fx} onCancel={cancelarNueva} />
-        </div>
       )}
 
       {/* Lista de tareas. */}

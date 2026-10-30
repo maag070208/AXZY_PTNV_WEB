@@ -21,7 +21,7 @@ import { useGoBack } from "@shared/lib/useGoBack";
 import { FormSection } from "@shared/ui/form-section";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { StickyActions } from "@shared/ui/sticky-actions";
-import { LangostinGuide, LangostinState, type LangostinGuideStatus } from "@shared/ui/langostin";
+import { LangostinState } from "@shared/ui/langostin";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 
 /** Una pieza pendiente de devolver: se decide pieza por pieza. */
@@ -189,19 +189,6 @@ export default function NewLoanReturnPage() {
   const assignedName = loan ? (loan.custodian?.name ?? loan.department?.name ?? "—") : undefined;
   const sectionsDone = (loan ? 1 : 0) + (totalToReturn > 0 ? 1 : 0);
 
-  // Pistas de Langostín por campo (clave = atributo `name` del input).
-  const hints: Record<string, string> = { loan: t("loanReturn.hints.loan") };
-  for (const { unit } of selectedUnits) {
-    if (needsNotes(unit.condition)) hints[`notes-${unit.unitId}`] = t("loanReturn.hints.notes");
-  }
-  const guideStatus: LangostinGuideStatus = saving
-    ? "saving"
-    : toast?.type === "success"
-      ? "saved"
-      : toast?.type === "error" || Object.keys(errors).length > 0
-        ? "error"
-        : "idle";
-
   return (
     <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
@@ -281,24 +268,18 @@ export default function NewLoanReturnPage() {
                             {u.selected && (
                               <ITFlex gap={1.5} wrap="wrap" className="ml-auto">
                                 {CONDITIONS.map((c) => {
-                                  const p = CONDITION_PRESETS[c];
-                                  const isActive = u.condition === c;
+                                  const preset = CONDITION_PRESETS[c];
                                   return (
-                                    <button
+                                    <ITChip
                                       key={c}
-                                      type="button"
-                                      aria-pressed={isActive}
+                                      size="md"
+                                      color={preset.tone}
+                                      icon={preset.icon}
+                                      selected={u.condition === c}
                                       onClick={() => updateUnit(r.key, u.unitId, { condition: c })}
-                                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full !border-0 px-3 py-1.5 text-[12px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]"
-                                      style={
-                                        isActive
-                                          ? { background: `var(--color-${p.tone}-soft)`, color: `var(--color-${p.tone})` }
-                                          : { background: "color-mix(in srgb, currentColor 6%, transparent)", color: "inherit", opacity: 0.8 }
-                                      }
                                     >
-                                      {p.icon}
-                                      <ITText as="span">{t(`loanReturn.conditionLabels.${c}`)}</ITText>
-                                    </button>
+                                      {t(`loanReturn.conditionLabels.${c}`)}
+                                    </ITChip>
                                   );
                                 })}
                               </ITFlex>
@@ -377,8 +358,6 @@ export default function NewLoanReturnPage() {
           disabled={saving || !isValid}
         />
       </StickyActions>
-
-      <LangostinGuide storageKey="inventory-return-new" hints={hints} status={guideStatus} defaultText={t("loanReturn.hints.default")} />
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />
