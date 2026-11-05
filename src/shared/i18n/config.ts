@@ -17,6 +17,7 @@ import subareasEn from "./locales/en/subareas.json";
 import deviceTypesEn from "./locales/en/device-types.json";
 import deviceEn from "./locales/en/device.json";
 import employeesEn from "./locales/en/employees.json";
+import hrHomeEn from "./locales/en/hr-home.json";
 import homeEn from "./locales/en/home.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import inventoryEn from "./locales/en/inventory.json";
@@ -46,6 +47,7 @@ import subareasEs from "./locales/es/subareas.json";
 import deviceTypesEs from "./locales/es/device-types.json";
 import deviceEs from "./locales/es/device.json";
 import employeesEs from "./locales/es/employees.json";
+import hrHomeEs from "./locales/es/hr-home.json";
 import homeEs from "./locales/es/home.json";
 import dashboardEs from "./locales/es/dashboard.json";
 import inventoryEs from "./locales/es/inventory.json";
@@ -75,6 +77,7 @@ export const NS_LIST = [
   "tickets",
   "users",
   "employees",
+  "hr-home",
   "departments",
   "subareas",
   "inventory",
@@ -108,6 +111,7 @@ export const resources = {
     tickets: ticketsEn,
     users: usersEn,
     employees: employeesEn,
+    "hr-home": hrHomeEn,
     departments: departmentsEn,
     subareas: subareasEn,
     inventory: inventoryEn,
@@ -138,6 +142,7 @@ export const resources = {
     tickets: ticketsEs,
     users: usersEs,
     employees: employeesEs,
+    "hr-home": hrHomeEs,
     departments: departmentsEs,
     subareas: subareasEs,
     inventory: inventoryEs,

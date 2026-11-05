@@ -65,6 +65,11 @@ export type NavLabelKey =
   | "nav.schedulesAssign"
   | "nav.overtime"
   | "nav.hr"
+  | "nav.hrHome"
+  | "nav.sectionPersonal"
+  | "nav.sectionAttendance"
+  | "nav.sectionPayroll"
+  | "nav.accessGroup"
   | "nav.employees"
   | "nav.hrReports"
   | "nav.employeeRecords"
@@ -154,41 +159,53 @@ const ALL_SCREENS: readonly AppScreen[] = [
     ],
   },
   {
+    // RH agrupado por tarea, en el orden en que trabaja RH: primero la persona
+    // y su expediente, luego su asistencia de la semana y al final el cierre de
+    // nómina. Las secciones solo agrupan en el menú (no navegan) y desaparecen
+    // si no hay permiso en ninguna de sus pantallas.
     id: "hr",
     labelKey: "nav.hr",
     children: [
-      { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] }, actions: ["users.create"] },
-      { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] }, actions: [] },
-      { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] }, actions: ["hr.disciplinary_reports"] },
-      // Asistencias es del RELOJ (las checadas del personal); la bitácora y el
-      // reporte de entradas/salidas son del GUARDIA (las puertas). Van en
-      // secciones aparte a propósito: con un solo título "Asistencia" no se
-      // sabía cuál era cuál.
+      // Primero el inicio de RH (lo pendiente del día y el cierre de la semana).
+      { id: "hrHome", labelKey: "nav.hrHome", path: "/hr", match: "exact", requirement: { anyOf: ["hr.records"] } },
       {
-        id: "clockAttendance",
-        labelKey: "nav.clockAttendance",
+        id: "hrPersonal",
+        labelKey: "nav.sectionPersonal",
         children: [
-          { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] }, actions: [] },
+          { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] }, actions: ["users.create"] },
+          { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] }, actions: [] },
+          { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] }, actions: ["hr.disciplinary_reports"] },
         ],
       },
       {
-        id: "access",
-        labelKey: "nav.access",
-        children: [
-          { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] }, actions: ["access.void"] },
-          { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] }, actions: [] },
-        ],
-      },
-      {
-        id: "schedules",
-        labelKey: "nav.schedules",
+        id: "hrAttendance",
+        labelKey: "nav.sectionAttendance",
         children: [
           { id: "schedulesAdmin", labelKey: "nav.schedulesAdmin", path: "/schedules", match: "exact", requirement: { anyOf: ["schedules.view"] } },
           { id: "schedulesAssign", labelKey: "nav.schedulesAssign", path: "/schedules/assign", requirement: { anyOf: ["schedules.view"] } },
+          { id: "accessTimeClockReport", labelKey: "nav.accessTimeClockReport", path: "/hr/time-clock/entries-exits", requirement: { anyOf: ["time_clock.view"] }, actions: [] },
           { id: "overtime", labelKey: "nav.overtime", path: "/schedules/overtime/approval", requirement: { anyOf: ["overtime.view"] } },
+        ],
+      },
+      {
+        id: "hrPayroll",
+        labelKey: "nav.sectionPayroll",
+        children: [
           { id: "payroll", labelKey: "nav.payroll", path: "/schedules/payroll", requirement: { anyOf: ["payroll.view"] } },
         ],
       },
+    ],
+  },
+  {
+    // Portería: la bitácora y el reporte de entradas/salidas son del GUARDIA
+    // (las puertas), no de RH. Van como grupo propio para que el guardia no
+    // tenga que entrar a "Recursos Humanos" y el resto de RH no mezcle puertas
+    // con checadas del reloj.
+    id: "accessGroup",
+    labelKey: "nav.accessGroup",
+    children: [
+      { id: "accessLog", labelKey: "nav.accessLog", path: "/access", excludes: ["/access/report"], requirement: { anyOf: ["access.log"] }, actions: ["access.void"] },
+      { id: "accessReport", labelKey: "nav.accessReport", path: "/access/report", requirement: { anyOf: ["access.log"] }, actions: [] },
     ],
   },
   {

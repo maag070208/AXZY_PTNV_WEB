@@ -70,6 +70,7 @@ test("ninguna pantalla principal truena sin contexto seguro", async ({ page }) =
     "/inventory/loans/new",
     "/inventory/returns",
     "/users",
+    "/hr",
     "/employees",
     "/employees/records",
     "/tickets",
@@ -83,6 +84,8 @@ test("ninguna pantalla principal truena sin contexto seguro", async ({ page }) =
     "/access/report",
     "/schedules",
     "/schedules/assign",
+    "/schedules/payroll",
+    "/schedules/payroll/history",
     "/reports",
   ];
 

@@ -84,7 +84,7 @@
   "state": {
     "withoutExit": "No exit",
     "withoutEntry": "No entry",
-    "late": "Late {{minutes}} min",
+    "late": "Late {{time}} h",
     "onSite": "On site",
     "closed": "Shift closed",
     "absence": "Absence",

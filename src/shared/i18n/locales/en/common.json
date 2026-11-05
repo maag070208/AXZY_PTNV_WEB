@@ -47,7 +47,12 @@
     "kitchenInvoices": "Invoices",
     "kitchenCatalog": "Catalogs",
     "hr": "Human Resources",
-    "employees": "Personnel",
+    "hrHome": "HR Home",
+    "sectionPersonal": "People",
+    "sectionAttendance": "Attendance",
+    "sectionPayroll": "Payroll",
+    "accessGroup": "Access",
+    "employees": "Employees",
     "documentCatalog": "Document Catalog",
     "departments": "Departments",
     "subareas": "Areas",
@@ -70,7 +75,7 @@
     "accessTimeClockRoster": "Clock roster",
     "clockDashboard": "Clock dashboard",
     "schedules": "Schedules",
-    "schedulesAdmin": "Calendar",
+    "schedulesAdmin": "Schedules",
     "schedulesAssign": "Assign schedules",
     "overtime": "Overtime",
     "weeklyAttendance": "Weekly attendance",
@@ -149,7 +154,8 @@
     "pageOf": "Page {{current}} of {{total}}",
     "page": "Page",
     "of": "of",
-    "generated": "Generated:"
+    "generated": "Generated:",
+    "noData": "No data"
   },
   "itDevices": {
     "PC": "Desktop PC",

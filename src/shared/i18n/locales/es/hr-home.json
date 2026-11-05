@@ -1,0 +1,128 @@
+{
+  "title": "Inicio de RH",
+  "description": "Lo pendiente de hoy, las tareas de la semana y los reportes a un clic.",
+  "week": {
+    "previous": "Semana anterior",
+    "next": "Semana siguiente"
+  },
+  "errors": {
+    "week": "No se pudo cargar el reporte de la semana",
+    "review": "No se pudo cargar la revisión de la semana",
+    "action": "No se pudo guardar el cambio"
+  },
+  "pending": {
+    "title": "Pendiente hoy",
+    "absences": "Faltas hoy",
+    "absencesAction": "Ver y justificar",
+    "lates": "Retardos hoy",
+    "latesAction": "Ver retardos",
+    "overtime": "Tiempo extra por aprobar",
+    "overtimeAction": "{{people}} personas · Revisar",
+    "records": "Expedientes incompletos",
+    "recordsAction": "Avisar a pendientes"
+  },
+  "quick": {
+    "title": "Acciones rápidas",
+    "description": "Las tareas que más se hacen desde RH.",
+    "newEmployee": "+ Alta de empleado",
+    "newEmployeeCaption": "Datos y expediente en un paso",
+    "assignSchedule": "Asignar horario",
+    "assignScheduleCaption": "A una o varias personas",
+    "approveOvertime": "Aprobar tiempo extra",
+    "approveOvertimeCaption": "{{count}} solicitudes por aprobar",
+    "closePayroll": "Cerrar pre-nómina",
+    "closePayrollCaption": "Semana {{week}}"
+  },
+  "closing": {
+    "title": "Cierre de la semana",
+    "description": "Los pasos para dejar la pre-nómina lista.",
+    "steps": {
+      "attendance": "Revisar asistencia",
+      "overtime": "Aprobar tiempo extra",
+      "review": "Revisar pre-nómina por departamento",
+      "close": "Cerrar y exportar"
+    },
+    "captions": {
+      "attendanceDone": "Faltas y retardos justificados",
+      "attendancePending": "{{count}} faltas por justificar",
+      "overtimeDone": "Nada pendiente por aprobar",
+      "overtimePending": "{{count}} personas con horas por aprobar",
+      "reviewState": "{{done}} de {{total}} departamentos revisados",
+      "closeDone": "Semana cerrada",
+      "closePending": "Se habilita al terminar el paso 3"
+    },
+    "open": "Abrir",
+    "continue": "Continuar",
+    "closeAction": "Cerrar y exportar",
+    "reopen": "Reabrir semana"
+  },
+  "review": {
+    "title": "Revisar pre-nómina por departamento",
+    "subtitle": "Semana {{week}}",
+    "empty": "Todavía no hay departamentos con asistencia esta semana.",
+    "people": "{{count}} personas",
+    "hours": "{{hours}} h normales",
+    "extra": "{{hours}} h extra",
+    "absences": "{{count}} faltas",
+    "reviewed": "Revisado",
+    "markAll": "Marcar todo como revisado",
+    "close": "Cerrar",
+    "closeWeek": "Cerrar semana"
+  },
+  "reports": {
+    "title": "Reportes principales",
+    "description": "Se generan de la semana seleccionada arriba.",
+    "generated": "Generado desde el inicio de RH",
+    "error": "No se pudo generar el reporte",
+    "approved": "Aprobado",
+    "rejected": "Rechazado",
+    "pending": "Pendiente",
+    "absence": "Falta",
+    "late": "Retardo",
+    "incomplete": "Incompleto",
+    "incident": "Incidencia",
+    "columns": {
+      "department": "Departamento",
+      "people": "Personas",
+      "normalHours": "Horas normales",
+      "extraHours": "Horas extra",
+      "approvedHours": "Extra aprobada",
+      "absences": "Faltas",
+      "name": "Persona",
+      "workedHours": "Horas trabajadas",
+      "incomplete": "Días incompletos",
+      "day": "Día",
+      "status": "Estado",
+      "late": "Retardo",
+      "entry": "Entrada",
+      "jobTitle": "Puesto",
+      "employeeNumber": "Número"
+    },
+    "prenomina": {
+      "title": "Pre-nómina semanal",
+      "caption": "Horas trabajadas y tiempo extra por departamento"
+    },
+    "attendance": {
+      "title": "Asistencia semanal",
+      "caption": "Horas trabajadas, tiempo extra y faltas por empleado"
+    },
+    "incidents": {
+      "title": "Faltas y retrasos",
+      "caption": "Incidencias del periodo, con su justificación"
+    },
+    "overtime": {
+      "title": "Tiempo extra",
+      "caption": "Aprobado, rechazado y pendiente"
+    },
+    "staff": {
+      "title": "Plantilla activa",
+      "caption": "Empleados activos por departamento y puesto"
+    }
+  },
+  "confirm": {
+    "title": "Cerrar la semana",
+    "message": "Se va a cerrar la pre-nómina de la semana {{week}}. Después podrás reabrirla si hace falta corregir algo.",
+    "confirm": "Cerrar semana",
+    "cancel": "Cancelar"
+  }
+}

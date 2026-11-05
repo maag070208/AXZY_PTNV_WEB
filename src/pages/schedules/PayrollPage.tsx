@@ -2,14 +2,15 @@ import { ITPage } from "@axzydev/axzy_ui_system";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useWeeklyAttendance, WeeklyAttendancePanel } from "@features/schedule";
+import { useWeeklyAttendance, WeeklyAttendanceFilters, WeeklyAttendancePanel } from "@features/schedule";
 import { downloadWeeklyAttendancePdf } from "@widgets/reports";
 import { useGoBack } from "@shared/lib/useGoBack";
 
 /**
  * Nómina: el reporte semanal de asistencia (entradas, salidas, horas y tiempo
  * extra) por departamento, para el control de RH. La pantalla vive en Recursos
- * Humanos y se protege con `payroll.view`.
+ * Humanos y se protege con `payroll.view`. Los filtros rápidos (semana,
+ * departamento y búsqueda) van en el encabezado; las cifras y la tabla, debajo.
  */
 export default function PayrollPage() {
   const { t } = useTranslation(["weekly-attendance", "common"]);
@@ -25,6 +26,7 @@ export default function PayrollPage() {
       noPadding
       horizontalPadding={"px-0"}
       maxWidth="7xl"
+      actions={<WeeklyAttendanceFilters fx={fx} />}
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("common:nav.hr"), onClick: () => navigate("/employees") },

@@ -1,0 +1,128 @@
+{
+  "title": "HR Home",
+  "description": "What's pending today, this week's tasks and reports one click away.",
+  "week": {
+    "previous": "Previous week",
+    "next": "Next week"
+  },
+  "errors": {
+    "week": "Could not load the week's report",
+    "review": "Could not load the week's review",
+    "action": "Could not save the change"
+  },
+  "pending": {
+    "title": "Pending today",
+    "absences": "Absences today",
+    "absencesAction": "Review and justify",
+    "lates": "Late today",
+    "latesAction": "Review late",
+    "overtime": "Overtime awaiting approval",
+    "overtimeAction": "{{people}} people · Review",
+    "records": "Incomplete records",
+    "recordsAction": "Notify pending"
+  },
+  "quick": {
+    "title": "Quick actions",
+    "description": "The tasks HR does most often.",
+    "newEmployee": "+ New employee",
+    "newEmployeeCaption": "Details and record in one step",
+    "assignSchedule": "Assign schedule",
+    "assignScheduleCaption": "One or more people",
+    "approveOvertime": "Approve overtime",
+    "approveOvertimeCaption": "{{count}} requests awaiting approval",
+    "closePayroll": "Close payroll",
+    "closePayrollCaption": "Week {{week}}"
+  },
+  "closing": {
+    "title": "Weekly close",
+    "description": "The steps to get payroll ready.",
+    "steps": {
+      "attendance": "Review attendance",
+      "overtime": "Approve overtime",
+      "review": "Review payroll by department",
+      "close": "Close and export"
+    },
+    "captions": {
+      "attendanceDone": "Absences and lateness justified",
+      "attendancePending": "{{count}} absences to justify",
+      "overtimeDone": "Nothing pending approval",
+      "overtimePending": "{{count}} people with hours to approve",
+      "reviewState": "{{done}} of {{total}} departments reviewed",
+      "closeDone": "Week closed",
+      "closePending": "Enabled after step 3 is done"
+    },
+    "open": "Open",
+    "continue": "Continue",
+    "closeAction": "Close and export",
+    "reopen": "Reopen week"
+  },
+  "review": {
+    "title": "Review payroll by department",
+    "subtitle": "Week {{week}}",
+    "empty": "No departments with attendance this week yet.",
+    "people": "{{count}} people",
+    "hours": "{{hours}} h normal",
+    "extra": "{{hours}} h overtime",
+    "absences": "{{count}} absences",
+    "reviewed": "Reviewed",
+    "markAll": "Mark all as reviewed",
+    "close": "Close",
+    "closeWeek": "Close week"
+  },
+  "reports": {
+    "title": "Main reports",
+    "description": "Generated for the week selected above.",
+    "generated": "Generated from HR Home",
+    "error": "Could not generate the report",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "pending": "Pending",
+    "absence": "Absence",
+    "late": "Late",
+    "incomplete": "Incomplete",
+    "incident": "Incident",
+    "columns": {
+      "department": "Department",
+      "people": "People",
+      "normalHours": "Normal hours",
+      "extraHours": "Overtime hours",
+      "approvedHours": "Approved overtime",
+      "absences": "Absences",
+      "name": "Person",
+      "workedHours": "Worked hours",
+      "incomplete": "Incomplete days",
+      "day": "Day",
+      "status": "Status",
+      "late": "Lateness",
+      "entry": "Entry",
+      "jobTitle": "Job title",
+      "employeeNumber": "Number"
+    },
+    "prenomina": {
+      "title": "Weekly payroll",
+      "caption": "Worked hours and overtime by department"
+    },
+    "attendance": {
+      "title": "Weekly attendance",
+      "caption": "Worked hours, overtime and absences per employee"
+    },
+    "incidents": {
+      "title": "Absences and lateness",
+      "caption": "Period incidents with justification"
+    },
+    "overtime": {
+      "title": "Overtime",
+      "caption": "Approved, rejected and pending"
+    },
+    "staff": {
+      "title": "Active staff",
+      "caption": "Active employees by department and job title"
+    }
+  },
+  "confirm": {
+    "title": "Close the week",
+    "message": "Payroll for week {{week}} will be closed. You can reopen it later if something needs fixing.",
+    "confirm": "Close week",
+    "cancel": "Cancel"
+  }
+}

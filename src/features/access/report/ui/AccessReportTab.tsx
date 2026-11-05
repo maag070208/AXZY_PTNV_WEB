@@ -36,23 +36,23 @@ const BROWSER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 /** Ancho de la columna de días según el periodo. */
 const DAYS_COLUMN_WIDTH: Record<"WEEK" | "FORTNIGHT" | "MONTH", number> = {
-  WEEK: 210,
+  WEEK: 260,
   FORTNIGHT: 250,
   MONTH: 380,
 };
 
-/** Marcador de cada día: tonos semánticos del tema (no hex sueltos). */
+/** Marcador de cada día: colores de estado con buen contraste en claro y oscuro. */
 const DAY_STYLE: Record<AttendanceDayStatus, string> = {
-  ATTENDED: "!bg-primary-500 text-white",
-  LATE: "!bg-[var(--color-warning)] !text-slate-900",
-  ABSENCE: "border-[1.5px] border-dashed border-slate-400 !bg-[var(--it-card-bg)] text-slate-500",
-  REST: "!bg-slate-100 text-slate-400",
-  PENDING: "!bg-slate-100 text-slate-400",
-  NO_INFO: "!bg-slate-100 text-slate-400",
+  ATTENDED: "bg-emerald-500 text-white",
+  LATE: "bg-amber-400 text-amber-950",
+  ABSENCE: "bg-rose-500 text-white",
+  REST: "bg-slate-200 text-slate-600",
+  PENDING: "border border-slate-300 bg-white text-slate-500",
+  NO_INFO: "bg-slate-100 text-slate-400",
 };
 
 /** Anillo del día de hoy. */
-const TODAY_RING = "ring-2 ring-primary-500/30 ring-offset-1";
+const TODAY_RING = "ring-2 ring-slate-800 ring-offset-1";
 
 /** Fecha de una clave de día (`YYYY-MM-DD`) con las opciones dadas, sin corrimiento de zona. */
 const formatDay = (dayKey: string, options: Intl.DateTimeFormatOptions): string =>
@@ -110,17 +110,15 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const renderDays = (r: PeopleAttendanceRow) => (
     <div className={`flex items-center ${period === "WEEK" ? "gap-1" : "gap-0.5"}`}>
       {r.days.map((day) => (
-        <ITText as="span"
+        <span
           key={day.date}
           title={dayTooltip(day)}
           className={`inline-flex shrink-0 items-center justify-center ${
-            period === "WEEK" ? "h-6 w-6 rounded-md text-[10px] font-bold" : "h-5 w-2 rounded-sm"
+            period === "WEEK" ? "h-7 w-7 rounded-md text-[11px] font-bold" : "h-5 w-2 rounded-sm"
           } ${DAY_STYLE[day.status]} ${day.date === today ? TODAY_RING : ""}`}
         >
-          {period === "WEEK"
-            ? formatDay(day.date, { weekday: "narrow" }).toUpperCase()
-            : null}
-        </ITText>
+          {period === "WEEK" ? formatDay(day.date, { weekday: "narrow" }).toUpperCase() : null}
+        </span>
       ))}
     </div>
   );
@@ -138,7 +136,7 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const focusState = (r: PeopleAttendanceRow, d: PeopleAttendanceDay): { color: BadgeColor; text: string } => {
     if (d.incident === "ENTRY_WITHOUT_EXIT") return { color: "warning", text: t("state.withoutExit") };
     if (d.incident === "EXIT_WITHOUT_ENTRY") return { color: "danger", text: t("state.withoutEntry") };
-    if (d.status === "LATE") return { color: "warning", text: t("state.late", { minutes: d.lateMinutes }) };
+    if (d.status === "LATE") return { color: "warning", text: t("state.late", { time: workedTime(d.lateMinutes) }) };
     if (r.onSite) return { color: "success", text: t("state.onSite") };
     switch (d.status) {
       case "ATTENDED":

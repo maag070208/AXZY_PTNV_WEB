@@ -97,6 +97,48 @@ export const dayLabel = (dayKey: string): string => {
 export const toDayKey = (date: Date): string =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
+/** Renglón del resumen por departamento de la pre-nómina. */
+export interface WeeklyDepartmentRow {
+  departmentId: string | null;
+  name: string;
+  people: number;
+  /** Horas trabajadas sin contar el tiempo extra. */
+  normalMin: number;
+  extraMin: number;
+  approvedExtraMin: number;
+  absences: number;
+}
+
+/**
+ * Resumen por departamento del reporte semanal (la tabla principal de la
+ * pre-nómina): personas, horas normales, horas extra y faltas, ordenado por
+ * nombre. Los departamentos sin nombre caen en "—".
+ */
+export const buildDepartmentRows = (report: WeeklyAttendanceReport): WeeklyDepartmentRow[] => {
+  const byDept = new Map<string, WeeklyDepartmentRow>();
+  for (const row of report.rows) {
+    const key = row.departmentId ?? "";
+    const agg =
+      byDept.get(key) ??
+      ({
+        departmentId: row.departmentId,
+        name: row.departmentName ?? "—",
+        people: 0,
+        normalMin: 0,
+        extraMin: 0,
+        approvedExtraMin: 0,
+        absences: 0,
+      } satisfies WeeklyDepartmentRow);
+    agg.people += 1;
+    agg.normalMin += Math.max(0, row.totals.workedMin - row.totals.extraMin);
+    agg.extraMin += row.totals.extraMin;
+    agg.approvedExtraMin += row.totals.approvedExtraMin;
+    agg.absences += row.totals.absences;
+    byDept.set(key, agg);
+  }
+  return [...byDept.values()].sort((a, b) => a.name.localeCompare(b.name, "es"));
+};
+
 /**
  * Filas de la vista Detallada: una por persona y día, en el orden del reporte.
  * La comparten la tabla y el PDF para que el export salga igual que la pantalla.

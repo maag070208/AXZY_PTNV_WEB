@@ -23,7 +23,7 @@ interface Props {
 /**
  * Primer día de la semana laboral (`sys_config.WEEK_START_DAY`): define el borde
  * de los rangos semanales de los filtros Diaria/Semanal/Mensual. El cliente
- * opera miércoles→miércoles, así que ese es el valor por defecto.
+ * opera jueves→miércoles, así que ese es el valor por defecto.
  */
 export default function WeekStartCard({ onResult }: Props) {
   const { t, i18n } = useTranslation(["catalog", "common"]);

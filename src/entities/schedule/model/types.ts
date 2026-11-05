@@ -211,3 +211,46 @@ export interface WeeklyAttendanceQuery {
   departmentId?: string;
   q?: string;
 }
+
+// ── Pre-nómina: revisión por departamento y cierre de la semana ─────────────
+
+/** Revisión vigente de un departamento (`departmentId` null = sin departamento). */
+export interface PayrollReviewEntry {
+  departmentId: string | null;
+  /** Nombre del departamento revisado (null = grupo sin departamento). */
+  departmentName: string | null;
+  /** true = marcada con «Marcar todo como revisado»; false = una por una. */
+  bulk: boolean;
+  reviewedAt: string;
+  reviewedBy: { id: string; name: string } | null;
+}
+
+/** Estado de la semana: el cierre (si existe) y las revisiones por departamento. */
+export interface PayrollReviewState {
+  weekStart: string;
+  closed: boolean;
+  closure: {
+    closedAt: string;
+    closedBy: { id: string; name: string } | null;
+    reopenedAt: string | null;
+    reopenedBy: { id: string; name: string } | null;
+    snapshot: unknown;
+  } | null;
+  reviews: PayrollReviewEntry[];
+}
+
+/** Una revisión dentro de la fotografía del cierre (inmutable). */
+export type PayrollClosureReview = PayrollReviewEntry;
+
+/** Renglón del historial de cierres: quién/cuándo/dónde revisó y cerró. */
+export interface PayrollClosureRow {
+  weekStart: string;
+  closed: boolean;
+  closedAt: string;
+  closedBy: { id: string; name: string } | null;
+  reopenedAt: string | null;
+  reopenedBy: { id: string; name: string } | null;
+  snapshot: unknown;
+  /** Revisiones vigentes de esa semana, con su sello. */
+  reviews: PayrollClosureReview[];
+}

@@ -6,22 +6,13 @@ import {
   ITBentoWeekBars,
   ITButton,
   ITCard,
-  ITDatePicker,
+  ITConfirmDialog,
   ITDialog,
   ITFlex,
   ITGrid,
-  ITInput,
-  ITSearchSelect,
   ITText,
 } from "@axzydev/axzy_ui_system";
-import {
-  LuBell,
-  LuChartColumn,
-  LuChevronLeft,
-  LuChevronRight,
-  LuFileText,
-  LuInfo,
-} from "react-icons/lu";
+import { LuBell, LuChartColumn, LuInfo } from "react-icons/lu";
 import { dyn } from "@shared/i18n/dyn";
 import { dateLocale } from "@shared/i18n";
 import { DialogHeader } from "@shared/ui/dialog-header";
@@ -30,17 +21,29 @@ import { Num } from "@shared/ui/bento-bits";
 import { LangostinState } from "@shared/ui/langostin";
 import { PanelCard } from "@shared/ui/panel-card";
 import { seriesColor } from "@shared/ui/charts";
-import { WEEKLY_LEGEND, WEEKLY_STATUS_BADGE, hoursDecimal, toDayKey } from "@entities/schedule";
+import { buildDepartmentRows, WEEKLY_LEGEND, WEEKLY_STATUS_BADGE, hoursDecimal, toDayKey } from "@entities/schedule";
 import type { UseWeeklyAttendance, WeeklyAttendanceMode } from "../model/useWeeklyAttendance";
+import { useDepartmentReviews } from "../model/useDepartmentReviews";
 import WeeklyAttendanceTable from "./WeeklyAttendanceTable";
+import WeeklyAttendanceActions from "./WeeklyAttendanceActions";
+import PayrollReviewDialog from "./PayrollReviewDialog";
+
+const shortMonth = (date: Date): string =>
+  date.toLocaleDateString(dateLocale(), { month: "short" }).replace(/\./g, "");
+
+/** "2 – 8 nov" (mismo mes) o "29 oct – 4 nov" (mes distinto). */
+const weekRangeLabel = ([start, end]: [Date, Date]): string =>
+  start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()
+    ? `${start.getDate()} – ${end.getDate()} ${shortMonth(end)}`
+    : `${start.getDate()} ${shortMonth(start)} – ${end.getDate()} ${shortMonth(end)}`;
 
 /**
  * Reporte semanal de pre nómina.
  *
- * Plantilla P6: filtros + acciones (una fila), mosaicos con los totales de la
- * semana, la gráfica de horas extra por día y por departamento, y el reporte
- * con su selector de vista. La simbología se muestra
- * solo si se pide: antes competía con los filtros y confundía.
+ * Barra de acciones rápidas (exportar, verificar y cerrar la semana), cifras
+ * del mosaico (de la semana o del departamento filtrado), la gráfica de horas
+ * extra y el reporte con su selector de vista. Los filtros rápidos viven en el
+ * encabezado de la página.
  */
 export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance }) {
   const t = dyn(fx.t);
@@ -48,6 +51,23 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
   const summary = report?.summary;
   const [noticesOpen, setNoticesOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [confirmVerifyAll, setConfirmVerifyAll] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
+
+  // Revisión y cierre de la semana (guardados en el API por semana). Se usan
+  // las filas SIN filtros: la revisión/cierre es de toda la semana, no solo del
+  // departamento elegido en la tabla.
+  const reviewReport = fx.reviewReport;
+  const weekKey = reviewReport?.range.days[0] ?? report?.range.days[0] ?? null;
+  const reviews = useDepartmentReviews(weekKey);
+  const departmentIds = useMemo(
+    () => [...new Set((reviewReport?.rows ?? []).map((row) => row.departmentId))],
+    [reviewReport]
+  );
+  const allReviewed = departmentIds.length > 0 && reviews.reviewedCount >= departmentIds.length;
+  const weekLabel = weekRangeLabel(fx.rangeValue);
+
 
   // Avisos de la semana: solo se muestran si hay algo que atender.
   const notices: string[] = [];
@@ -55,14 +75,10 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
   if (summary?.withoutSchedule) notices.push(t("withoutScheduleHint", { count: summary.withoutSchedule }));
   const noticesCount = (summary?.unlinked ?? 0) + (summary?.withoutSchedule ?? 0);
 
-  const handleRange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: Date | [Date | null, Date | null] } },
-  ) => {
-    const value = e.target.value;
-    if (Array.isArray(value) && value[0]) fx.setWeekDate(value[0]);
-  };
+  // Cifras de la semana (o del departamento filtrado: el API ya las recorta).
+  const scopeName = fx.departmentId
+    ? fx.departments.data.find((department) => department.id === fx.departmentId)?.name ?? null
+    : null;
 
   // Horas extra calculadas por día y por departamento (sumas de las filas del reporte).
   const { extraByDay, extraByDepartment } = useMemo(() => {
@@ -105,9 +121,26 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
 
   return (
     <ITFlex direction="column" gap={4}>
-      {/* Cifras de la semana: la tira del mosaico, como en Asistencias */}
+      {/* Acciones rápidas: exportar, verificar y cerrar la semana, siempre a la
+          vista (la barra se queda pegada arriba al recorrer la tabla). */}
+      <WeeklyAttendanceActions
+        reviews={reviews}
+        allReviewed={allReviewed}
+        hasWeekData={departmentIds.length > 0}
+        onVerifyAll={() => setConfirmVerifyAll(true)}
+        onVerify={() => setVerifyOpen(true)}
+        onCloseWeek={() => setConfirmClose(true)}
+      />
+
+      {/* Cifras de la semana: la tira del mosaico, como en Asistencias. Con un
+          departamento elegido, el API ya devuelve sus totales: la tira son las
+          cifras de ese departamento. */}
       {summary && (
-        <ITBentoStatStrip
+        <ITFlex direction="column" gap={1.5}>
+          <ITText muted className="!text-[11.5px] font-semibold">
+            {scopeName ? t("kpis.scopeDepartment", { name: scopeName }) : t("kpis.scopeAll")}
+          </ITText>
+          <ITBentoStatStrip
           stack
           items={[
             {
@@ -158,7 +191,8 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
             { id: "overtime", label: t("kpis.overtime"), value: summary.extraMin, color: "var(--color-warning)" },
             { id: "absences", label: t("kpis.absences"), value: summary.absences, color: "var(--color-danger)" },
           ]}
-        />
+          />
+        </ITFlex>
       )}
 
       {fx.error && (
@@ -167,8 +201,8 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
         </ITAlert>
       )}
 
-      {/* Igual que Asistencias: una sola tarjeta con el título, la vista, los
-          filtros debajo en una fila y el reporte. */}
+      {/* Igual que Asistencias: una sola tarjeta con el título, la vista y el
+          reporte. Los filtros rápidos viven en el encabezado de la página. */}
       <ITCard contentClassName="!p-0">
         <ITFlex align="center" justify="between" wrap="wrap" gap={2} className="px-5 py-3">
           <ITFlex align="center" gap={2} className="min-w-0">
@@ -194,6 +228,14 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
                 <ITText className="text-[11px] font-bold">{t("legend")}</ITText>
               </ITFlex>
             </ITButton>
+            {noticesCount > 0 && (
+              <ITButton variant="outlined" color="warning" size="sm" onClick={() => setNoticesOpen(true)} title={t("notices.title")}>
+                <ITFlex align="center" gap={1}>
+                  <LuBell size={13} />
+                  <ITText className="text-[11px] font-bold">{noticesCount}</ITText>
+                </ITFlex>
+              </ITButton>
+            )}
           </ITFlex>
         </ITFlex>
 
@@ -211,70 +253,6 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
             )}
           </ITFlex>
         )}
-
-        {/* Filtros: semana con anterior/siguiente, departamento, buscar y PDF */}
-        <ITFlex wrap="wrap" align="end" gap={3} className="  px-5 py-3">
-          <ITFlex align="end" gap={1.5} className="min-w-[250px] flex-[1.3]">
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={fx.previousWeek} title={t("filters.previousWeek")}>
-              <LuChevronLeft size={13} />
-            </ITButton>
-            <ITFlex className="min-w-0 flex-1">
-              <ITDatePicker
-                name="weeklyAttendanceWeek"
-                label={t("filters.week")}
-                range
-                value={fx.rangeValue}
-                onChange={handleRange}
-                className="w-full min-w-0"
-              />
-            </ITFlex>
-            <ITButton variant="outlined" color="secondary" size="sm" onClick={fx.nextWeek} title={t("filters.nextWeek")}>
-              <LuChevronRight size={13} />
-            </ITButton>
-          </ITFlex>
-
-          <ITFlex className="min-w-[180px] flex-1">
-            <ITSearchSelect
-              name="weeklyAttendanceDepartment"
-              label={t("filters.department")}
-              options={[
-                { value: "", label: t("filters.allDepartments") },
-                ...fx.departments.data.map((d) => ({ value: d.id, label: d.name })),
-              ]}
-              value={fx.departmentId}
-              onChange={(value) => fx.setDepartmentId(String(value))}
-              className="w-full min-w-0"
-            />
-          </ITFlex>
-
-          <ITFlex className="min-w-[170px] flex-1">
-            <ITInput
-              name="weeklyAttendanceSearch"
-              label={t("filters.search")}
-              placeholder={t("filters.searchPlaceholder")}
-              value={fx.search}
-              onChange={(e) => fx.setSearch(e.target.value)}
-              className="w-full min-w-0"
-            />
-          </ITFlex>
-
-          <ITFlex align="center" gap={1.5} className="shrink-0">
-            {noticesCount > 0 && (
-              <ITButton variant="outlined" color="warning" size="sm" onClick={() => setNoticesOpen(true)} title={t("notices.title")}>
-                <ITFlex align="center" gap={1}>
-                  <LuBell size={13} />
-                  <ITText className="text-[11px] font-bold">{noticesCount}</ITText>
-                </ITFlex>
-              </ITButton>
-            )}
-            <ITButton variant="filled" color="primary" size="sm" onClick={fx.exportPdf} disabled={fx.exporting || !report || report.rows.length === 0}>
-              <ITFlex align="center" gap={1}>
-                <LuFileText size={13} />
-                <ITText className="text-[11px] font-bold">{fx.exporting ? t("exporting") : t("exportPdf")}</ITText>
-              </ITFlex>
-            </ITButton>
-          </ITFlex>
-        </ITFlex>
 
         <div className=" ">
           {fx.loading && !report ? (
@@ -362,6 +340,64 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
           ))}
         </ITFlex>
       </ITDialog>
+
+      {/* Verificar la semana por departamento y cerrarla. */}
+      <PayrollReviewDialog
+        open={verifyOpen}
+        onClose={() => setVerifyOpen(false)}
+        report={reviewReport}
+        reviews={reviews}
+        weekLabel={weekLabel}
+        onRequestClose={() => {
+          setVerifyOpen(false);
+          setConfirmClose(true);
+        }}
+      />
+      <ITConfirmDialog
+        isOpen={confirmClose}
+        onClose={() => setConfirmClose(false)}
+        onConfirm={() => {
+          setConfirmClose(false);
+          if (!reviewReport) return;
+          const departmentRows = buildDepartmentRows(reviewReport);
+          reviews.close(
+            departmentRows.map((department) => department.departmentId),
+            {
+              summary: reviewReport.summary,
+              departments: departmentRows,
+              people: reviewReport.rows.map((row) => ({
+                departmentId: row.departmentId,
+                name: row.name,
+                clock: row.clockNumbers.join(", ") || row.employeeNumber || "",
+                workedMin: row.totals.workedMin,
+                extraMin: row.totals.extraMin,
+                approvedExtraMin: row.totals.approvedExtraMin,
+                absences: row.totals.absences,
+              })),
+            }
+          );
+        }}
+        title={t("closeDialog.title")}
+        message={t("closeDialog.message", { week: weekLabel })}
+        confirmLabel={t("closeDialog.confirm")}
+        cancelLabel={t("closeDialog.cancel")}
+        variant="warning"
+        loading={reviews.busy}
+      />
+      <ITConfirmDialog
+        isOpen={confirmVerifyAll}
+        onClose={() => setConfirmVerifyAll(false)}
+        onConfirm={() => {
+          setConfirmVerifyAll(false);
+          reviews.reviewAll(departmentIds);
+        }}
+        title={t("verifyAllDialog.title")}
+        message={t("verifyAllDialog.message", { count: departmentIds.length, week: weekLabel })}
+        confirmLabel={t("verifyAllDialog.confirm")}
+        cancelLabel={t("verifyAllDialog.cancel")}
+        variant="primary"
+        loading={reviews.busy}
+      />
     </ITFlex>
   );
 }

@@ -31,7 +31,8 @@
     "incomplete": "Incomplete punches",
     "missing": "Missing",
     "shift": "Shift",
-    "total": "Total"
+    "total": "Total",
+    "department": "Department"
   },
   "view": {
     "label": "View",
@@ -66,7 +67,9 @@
     "approved": "Approved OT",
     "notApproved": "Not approved OT",
     "absences": "Absences",
-    "incomplete": "Incomplete punches"
+    "incomplete": "Incomplete punches",
+    "scopeAll": "Whole staff",
+    "scopeDepartment": "Figures for {{name}}"
   },
   "legend": "Legend",
   "withoutSchedule": "No schedule: no overtime",
@@ -132,5 +135,77 @@
     "calculated": "{{pct}}% of calculated",
     "people": "of {{total}} people"
   },
-  "reportTitle": "Weekly report"
+  "reportTitle": "Weekly report",
+  "actionsBar": {
+    "notePending": "\"Close payroll\" is enabled when every department has been reviewed.",
+    "noteReady": "Every department is reviewed: you can close the week.",
+    "noteClosed": "Payroll closed by {{name}} on {{date}}.",
+    "exportPdf": "Export PDF",
+    "exportExcel": "Export Excel",
+    "verify": "Review payroll",
+    "close": "Close payroll",
+    "reopen": "Reopen week",
+    "verifyAll": "Verify the whole payroll",
+    "verifyByDepartment": "Verify by department",
+    "history": "History"
+  },
+  "reviewDialog": {
+    "title": "Review payroll",
+    "subtitle": "Review the departments of week {{week}} before closing it.",
+    "pending": "{{count}} of {{total}} departments pending review",
+    "markAll": "Mark all as reviewed",
+    "empty": "No departments with punches this week.",
+    "cancel": "Close",
+    "closeWeek": "Close payroll"
+  },
+  "closeDialog": {
+    "title": "Close the week",
+    "message": "Payroll for week {{week}} will be closed. You can reopen it later if something needs fixing.",
+    "confirm": "Close week",
+    "cancel": "Cancel"
+  },
+  "reviewStatus": {
+    "reviewed": "Reviewed",
+    "pending": "Pending review"
+  },
+  "verifyAllDialog": {
+    "title": "Verify the whole payroll",
+    "message": "The {{count}} departments of week {{week}} will be marked as reviewed. You can uncheck any of them later from \"Verify by department\".",
+    "confirm": "Yes, verify all",
+    "cancel": "Cancel"
+  },
+  "history": {
+    "title": "Payroll history",
+    "description": "Closed weeks: who reviewed each department, when, and who closed the week.",
+    "loadError": "Could not load the history",
+    "reopenError": "Could not reopen the week",
+    "empty": "No closed payrolls yet.",
+    "week": "Week {{range}}",
+    "closed": "Closed",
+    "reopened": "Reopened",
+    "closedBy": "Closed by {{name}} · {{date}}",
+    "reopenedBy": "Reopened by {{name}} · {{date}}",
+    "open": "View detail",
+    "hide": "Hide detail",
+    "reviewHeader": "Review by department",
+    "columns": {
+      "department": "Department",
+      "people": "People",
+      "reviewer": "Reviewed by",
+      "when": "When",
+      "mode": "How"
+    },
+    "noDepartment": "No department",
+    "noReviews": "No reviews recorded.",
+    "bulk": "Mark all",
+    "individual": "Individual",
+    "reopen": "Reopen",
+    "stats": {
+      "people": "{{count}} people",
+      "worked": "{{hours}} h worked",
+      "extra": "{{hours}} h overtime",
+      "approved": "{{hours}} h approved",
+      "absences": "{{count}} absences"
+    }
+  }
 }
