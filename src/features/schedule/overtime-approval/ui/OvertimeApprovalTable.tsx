@@ -135,14 +135,14 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
           </ITButton>
           <ITButton
             variant="filled"
-            color="primary"
+            color="success"
             size="sm"
             disabled={fx.saving}
             onClick={() => void fx.approveItems(item)}
           >
             <ITFlex align="center" gap={1}>
-              <FaCheck size={11} />
-              <ITText className="text-[11px] font-bold">{t("actions.approve")}</ITText>
+              <FaCheck size={11} className="text-white" />
+              <ITText as="span" className="text-[11px] font-bold text-white">{t("actions.approve")}</ITText>
             </ITFlex>
           </ITButton>
         </ITFlex>
@@ -382,8 +382,8 @@ export default function OvertimeApprovalTable({ fx }: { fx: UseOvertimeApproval 
               </ITButton>
               <ITButton variant="filled" color="success" size="sm" disabled={fx.saving} onClick={() => void fx.approveSelected()}>
                 <ITFlex align="center" gap={1}>
-                  <FaCheck size={11} />
-                  <ITText className="text-[11px] font-bold">{t("actions.approve")}</ITText>
+                  <FaCheck size={11} className="text-white" />
+                  <ITText as="span" className="text-[11px] font-bold text-white">{t("actions.approve")}</ITText>
                 </ITFlex>
               </ITButton>
             </ITFlex>

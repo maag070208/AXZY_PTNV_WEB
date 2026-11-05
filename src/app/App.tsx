@@ -18,6 +18,7 @@ import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
 import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
 import OvertimeApprovalPage from "@pages/overtime/OvertimeApprovalPage";
 import PayrollPage from "@pages/schedules/PayrollPage";
+import PayrollHistoryPage from "@pages/schedules/PayrollHistoryPage";
 import HomePage from "@pages/home/HomePage";
 import DashboardPage from "@pages/inventory/DashboardPage";
 import InventoryMismatchesPage from "@pages/inventory/InventoryMismatchesPage";
@@ -40,6 +41,7 @@ import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
 import SubareasPage from "@pages/subareas/SubareasPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
 import EmployeeRecordsPage from "@pages/employees/EmployeeRecordsPage";
+import HrHomePage from "@pages/hr/HrHomePage";
 import EmployeeDetailPage from "@pages/employees/EmployeeDetailPage";
 import EmployeeProfileEditPage from "@pages/employees/EmployeeProfileEditPage";
 import HrReportsPage from "@pages/employees/HrReportsPage";
@@ -355,6 +357,15 @@ export default function App() {
             </RequiresPermission>
           }
         />
+        {/* Inicio de RH: pendiente del día, cierre de la semana y reportes. */}
+        <Route
+          path="/hr"
+          element={
+            <RequiresPermission permission="hr.records">
+              <HrHomePage />
+            </RequiresPermission>
+          }
+        />
         {/* Reloj checador Hikvision (solo lectura; ver TIME_CLOCK.md). */}
         <Route
           path="/hr/time-clock"
@@ -479,6 +490,14 @@ export default function App() {
           element={
             <RequiresPermission permission="payroll.view">
               <PayrollPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/schedules/payroll/history"
+          element={
+            <RequiresPermission permission="payroll.view">
+              <PayrollHistoryPage />
             </RequiresPermission>
           }
         />

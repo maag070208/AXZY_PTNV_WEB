@@ -217,6 +217,8 @@ export interface WeeklyAttendanceQuery {
 /** Revisión vigente de un departamento (`departmentId` null = sin departamento). */
 export interface PayrollReviewEntry {
   departmentId: string | null;
+  /** Nombre del departamento revisado (null = grupo sin departamento). */
+  departmentName: string | null;
   /** true = marcada con «Marcar todo como revisado»; false = una por una. */
   bulk: boolean;
   reviewedAt: string;
@@ -237,36 +239,10 @@ export interface PayrollReviewState {
   reviews: PayrollReviewEntry[];
 }
 
-/** Una persona dentro de la fotografía del cierre (detalle por departamento). */
-export interface PayrollSnapshotPerson {
-  departmentId: string | null;
-  name: string;
-  /** Número(s) de reloj, o el número de empleado. */
-  clock: string;
-  workedMin: number;
-  extraMin: number;
-  approvedExtraMin: number;
-  absences: number;
-}
+/** Una revisión dentro de la fotografía del cierre (inmutable). */
+export type PayrollClosureReview = PayrollReviewEntry;
 
-/** Fotografía de las cifras que se guardó al cerrar la semana. */
-export interface PayrollClosureSnapshot {
-  summary?: { people?: number; workedMin?: number; extraMin?: number; approvedExtraMin?: number; absences?: number };
-  /** El resumen por departamento tal como se veía al cerrar (WeeklyDepartmentRow). */
-  departments?: {
-    departmentId: string | null;
-    name: string;
-    people: number;
-    normalMin: number;
-    extraMin: number;
-    approvedExtraMin: number;
-    absences: number;
-  }[];
-  /** El detalle por persona (los cierres anteriores a esta versión no lo tienen). */
-  people?: PayrollSnapshotPerson[];
-}
-
-/** Un renglón del historial de cierres. */
+/** Renglón del historial de cierres: quién/cuándo/dónde revisó y cerró. */
 export interface PayrollClosureRow {
   weekStart: string;
   closed: boolean;
@@ -274,5 +250,7 @@ export interface PayrollClosureRow {
   closedBy: { id: string; name: string } | null;
   reopenedAt: string | null;
   reopenedBy: { id: string; name: string } | null;
-  snapshot: PayrollClosureSnapshot | null;
+  snapshot: unknown;
+  /** Revisiones vigentes de esa semana, con su sello. */
+  reviews: PayrollClosureReview[];
 }

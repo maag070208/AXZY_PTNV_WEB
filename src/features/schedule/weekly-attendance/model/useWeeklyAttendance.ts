@@ -56,7 +56,7 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
   const departments = useDepartmentOptions();
   const weekStart = useWeekStartDay();
 
-  /** Rango [inicio, fin] de la semana según `WEEK_START_DAY` (por defecto miércoles→martes). */
+  /** Rango [inicio, fin] de la semana según `WEEK_START_DAY` (por defecto jueves→miércoles). */
   const rangeValue = useMemo<[Date, Date]>(() => {
     const offset = (weekDate.getDay() - weekStart + 7) % 7;
     const start = new Date(weekDate);
@@ -88,6 +88,23 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     };
   }, [date, departmentId, q, t]);
 
+  /**
+   * Reporte de la semana SIN los filtros de la tabla. La revisión y el cierre
+   * son de TODA la semana: con la tabla filtrada por departamento, `report` solo
+   * trae ese departamento y no alcanza para validar el cierre.
+   */
+  const [reviewReport, setReviewReport] = useState<WeeklyAttendanceReport | null>(null);
+  useEffect(() => {
+    let active = true;
+    scheduleApi
+      .weeklyAttendance({ date })
+      .then((res) => active && setReviewReport(res))
+      .catch(() => active && setReviewReport(null));
+    return () => {
+      active = false;
+    };
+  }, [date]);
+
   const departmentName = useMemo(
     () => departments.data.find((d) => d.id === departmentId)?.name ?? null,
     [departments.data, departmentId]
@@ -117,10 +134,7 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     }
   }, [report, mode, detailRows, tableParams, downloadPdf, departmentName, t]);
 
-  /**
-   * El "Excel" del pie de la pre-nómina: un CSV (lo abre Excel directo) con un
-   * renglón por persona y los totales de la semana, como la vista Resumida.
-   */
+  /** CSV de la tabla resumida (lo que en las pantallas se llama "Excel"). */
   const exportExcel = useCallback(() => {
     if (!report || report.rows.length === 0) return;
     const header = [
@@ -132,23 +146,23 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
       t("columns.absences"),
       t("columns.incomplete"),
     ];
-    const lines = report.rows.map((r) => [
-      r.employeeNumber ? `${r.name} (#${r.employeeNumber})` : r.name,
-      r.departmentName ?? "",
-      hoursDecimal(r.totals.workedMin),
-      hoursDecimal(r.totals.extraMin),
-      hoursDecimal(r.totals.approvedExtraMin),
-      r.totals.absences,
-      r.totals.incompleteDays,
+    const lines = report.rows.map((row) => [
+      row.employeeNumber ? `${row.name} (#${row.employeeNumber})` : row.name,
+      row.departmentName ?? "",
+      hoursDecimal(row.totals.workedMin),
+      hoursDecimal(row.totals.extraMin),
+      hoursDecimal(row.totals.approvedExtraMin),
+      row.totals.absences,
+      row.totals.incompleteDays,
     ]);
-    const escape = (c: unknown) => `"${String(c ?? "").replace(/"/g, '""')}"`;
+    const escape = (cell: unknown) => `"${String(cell ?? "").replace(/"/g, '""')}"`;
     const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${fileName("payroll")}_${report.range.days[0]}.csv`;
-    a.click();
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${fileName("payroll")}_${report.range.days[0]}.csv`;
+    anchor.click();
     URL.revokeObjectURL(url);
   }, [report, t]);
 
@@ -168,6 +182,7 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     mode,
     setMode,
     report,
+    reviewReport,
     detailRows,
     tableParams,
     setTableParams,

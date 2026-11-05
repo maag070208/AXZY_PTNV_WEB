@@ -298,7 +298,7 @@ test.describe("Reporte de entradas/salidas", () => {
     // La barra lateral arranca colapsada; al pasar el mouse se expande y el
     // padre (auto-expandido por el subitem activo) muestra sus hijos.
     await page.locator("aside").hover();
-    await expect(page.getByText("Guardia", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Accesos", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Entrada/salida", { exact: true }).first()).toBeVisible();
   });
 });

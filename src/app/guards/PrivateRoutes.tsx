@@ -2,6 +2,7 @@ import { ITLayout, ITSidebarProps, ITToast, type ITNavigationItem } from "@axzyd
 import { useEffect, useState, useCallback, type ReactNode } from "react";
 import {
   FaBoxes,
+  FaDoorOpen,
   FaHouseUser,
   FaTicketAlt,
   FaUserTie,
@@ -31,6 +32,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   inventory: <FaBoxes size={14} />,
   kitchen: <FaUtensils size={14} />,
   hr: <FaUserTie size={14} />,
+  accessGroup: <FaDoorOpen size={14} />,
   settings: <FaCog size={14} />,
   langostin: <FaLaptopCode size={14} />,
 };

@@ -4,7 +4,7 @@ import { sysConfigApi } from "../api/sysConfigApi";
 /**
  * Primer día de la semana laboral (`sys_config.WEEK_START_DAY`).
  *
- * El cliente opera miércoles→miércoles: los filtros de periodo (`Diaria /
+ * El cliente opera jueves→miércoles: los filtros de periodo (`Diaria /
  * Semanal / Mensual`) muestran la semana según este día y el API calcula el
  * mismo borde. Aquí solo se usa para etiquetas y rangos de UI; la fuente de
  * verdad de los datos es el API.
@@ -23,8 +23,8 @@ export const WEEKDAYS = [
 
 export type Weekday = (typeof WEEKDAYS)[number];
 
-/** Fallback de la app cuando la clave no existe o es inválida: miércoles. */
-export const DEFAULT_WEEK_START_DAY: Weekday = "WEDNESDAY";
+/** Fallback de la app cuando la clave no existe o es inválida: jueves. */
+export const DEFAULT_WEEK_START_DAY: Weekday = "THURSDAY";
 
 /** `true` si `value` es un nombre de día válido (sin distinguir mayúsculas). */
 export const isWeekday = (value: unknown): value is Weekday =>

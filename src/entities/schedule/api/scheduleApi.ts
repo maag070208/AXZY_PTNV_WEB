@@ -49,6 +49,7 @@ export const scheduleApi = {
 
   // ── Pre-nómina: revisión por departamento y cierre de la semana ──────────
 
+  /** Estado de la semana: cierre (si existe) y revisiones por departamento. */
   payrollReviewState: (weekStart: string) =>
     api.get<PayrollReviewState>(`/schedules/payroll/review-state?weekStart=${weekStart}`),
 
@@ -60,12 +61,14 @@ export const scheduleApi = {
   payrollReviewAll: (data: { weekStart: string; departmentIds: (string | null)[] }) =>
     api.post<PayrollReviewState>(`/schedules/payroll/reviews/mark-all`, data),
 
+  /** Cierra la semana (exige todos los departamentos revisados). */
   payrollClose: (data: { weekStart: string; departmentIds: (string | null)[]; snapshot?: Record<string, unknown> }) =>
     api.post<PayrollReviewState>(`/schedules/payroll/close`, data),
 
+  /** Reabre una semana cerrada. */
   payrollReopen: (weekStart: string) =>
     api.post<PayrollReviewState>(`/schedules/payroll/reopen`, { weekStart }),
 
-  /** Historial de cierres (más reciente primero). */
+  /** Historial de cierres: quién/cuándo/dónde revisó y quién cerró (más reciente primero). */
   payrollClosures: () => api.get<PayrollClosureRow[]>(`/schedules/payroll/closures`),
 };
