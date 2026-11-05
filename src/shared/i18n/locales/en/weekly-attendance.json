@@ -1,7 +1,30 @@
 {
   "title": "Payroll",
-  "description": "Entries, exits, hours worked and overtime for the week by department for payroll",
+  "description": "hours worked and overtime by department.",
   "breadcrumb": "Payroll",
+  "weekPill": "Week of {{range}}",
+  "tabs": {
+    "week": "Week",
+    "history": "Closing history"
+  },
+  "history": {
+    "title": "Closing history",
+    "empty": "No closed weeks yet.",
+    "week": "Week",
+    "people": "People",
+    "worked": "Hours",
+    "approved": "OT appr.",
+    "absences": "Absences",
+    "closedBy": "Closed by",
+    "closedAt": "Closed at",
+    "status": "Status",
+    "closed": "Closed",
+    "reopened": "Reopened",
+    "reopenedTooltip": "Reopened by {{name}} · {{date}}",
+    "detailSubtitle": "Closed by {{name}} · {{date}}",
+    "noSnapshot": "This closing has no department snapshot.",
+    "pdfTitle": "Payroll closing"
+  },
   "filters": {
     "week": "Week",
     "previousWeek": "Previous week",
@@ -17,6 +40,7 @@
   "columns": {
     "code": "Code",
     "employee": "Employee",
+    "department": "Department",
     "schedule": "Schedule",
     "day": "Day",
     "status": "Status",
@@ -132,5 +156,69 @@
     "calculated": "{{pct}}% of calculated",
     "people": "of {{total}} people"
   },
-  "reportTitle": "Weekly report"
+  "reportTitle": "Weekly report",
+  "detailTitle": "Detail by person",
+  "exportPdfFull": "Export PDF",
+  "exportExcelFull": "Export Excel",
+  "steps": {
+    "attendance": "Attendance",
+    "attendanceOk": "Absences and late arrivals justified",
+    "attendancePending": "{{count}} absences to justify",
+    "overtime": "Overtime",
+    "overtimeNone": "0 to approve",
+    "overtimePending": "{{hours}} h to approve",
+    "review": "Review departments",
+    "reviewCaption": "{{done}} of {{total}} reviewed",
+    "close": "Close and export",
+    "closeCaption": "Pending",
+    "closeDone": "Closed"
+  },
+  "cards": {
+    "people": "People with punches",
+    "peopleCaption": "of {{total}} on clock",
+    "worked": "Hours worked",
+    "workedCaption": "this week",
+    "approved": "Approved overtime",
+    "approvedCaption": "{{hours}} h to approve",
+    "absences": "Unjustified absences",
+    "goToAttendance": "Go to Attendance"
+  },
+  "deptTable": {
+    "department": "Department",
+    "people": "People",
+    "normalHours": "Regular hours",
+    "extraHours": "Overtime",
+    "absences": "Absences",
+    "review": "Review",
+    "reviewed": "Reviewed",
+    "pending": "To review",
+    "reviewedTooltip": "Reviewed by {{name}} · {{date}} ({{how}})",
+    "reviewedBulk": "mark all",
+    "reviewedSingle": "one by one",
+    "detail": "View detail",
+    "reviewAll": "Mark all as reviewed",
+    "note": "The review is saved per week with who did it; the closing keeps a snapshot of the figures."
+  },
+  "deptDetail": {
+    "subtitle": "{{count}} people this week"
+  },
+  "reviewAllDialog": {
+    "title": "Mark all as reviewed?",
+    "message": "All {{count}} departments will be marked as reviewed. You can unmark any of them from its detail.",
+    "confirm": "Yes, mark all",
+    "cancel": "Cancel"
+  },
+  "review": {
+    "mark": "Mark as reviewed",
+    "unmark": "Unmark"
+  },
+  "close": {
+    "note": "\"Close payroll\" is enabled once every department is reviewed.",
+    "allReviewed": "All departments are reviewed: you can close the week.",
+    "button": "Close payroll",
+    "reopen": "Reopen",
+    "closed": "Payroll closed. You can reopen it if needed.",
+    "closedBy": "Payroll closed by {{name}} · {{date}}. You can reopen it if needed.",
+    "disabled": "Departments still pending review"
+  }
 }

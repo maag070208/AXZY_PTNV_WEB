@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
-  ITBentoStatStrip,
   ITBadget,
   ITCard,
   ITButton,
@@ -16,6 +15,7 @@ import { FaBell, FaChevronRight, FaSearch } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { RowAction } from "@shared/ui/row-action";
+import { Num } from "@shared/ui/bento-bits";
 import type { RecordGapsRow } from "@entities/dashboard";
 import { recordStatus, type RecordFilter, type RecordStatus, type UseEmployeeRecords } from "../model/useEmployeeRecords";
 
@@ -62,14 +62,36 @@ interface Props {
  * Expedientes de empleados (RH): indicadores, lista filtrable con los
  * obligatorios de cada quien, avance del expediente y de los datos personales,
  * y el detalle de la persona elegida para ver o subir documentos y avisarle.
+ *
+ * Las tarjetas de arriba y la tabla usan el estilo de Pre-nómina: tarjetas
+ * blancas sin borde (la primera en tinta), número rojo solo en lo que falta,
+ * y la tabla sin fondo de encabezado, con líneas finas inline (las clases
+ * border-slate/border-[color:] no se generan en el CSS de la app y el tema
+ * mete reglas globales a thead/tbody con !important).
  */
-/** Tono del mosaico por indicador: plantilla, completo, lo que falta y lo incompleto. */
-const STAT_TONE: Record<string, "sea" | "mint" | "rose" | "sun"> = {
-  active: "sea",
-  complete: "mint",
-  missingRequired: "rose",
-  incomplete: "sun",
-};
+const hairline = "1px solid #edf1f5";
+const grid = "grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.1fr)_auto] items-center";
+const th = "text-[10.5px] font-bold uppercase tracking-[0.05em] text-slate-400";
+
+/** Tarjeta de indicador blanca, como las de Pre-nómina. */
+function RecordKpi({ label, value, alert = false }: { label: string; value: number; alert?: boolean }) {
+  return (
+    <div
+      className="rounded-[14px] px-4 py-3.5"
+      style={{ background: "var(--it-card-bg, #ffffff)", boxShadow: "0 1px 2px rgb(15 23 42 / 0.06)" }}
+    >
+      <ITText muted className="block !text-[12px] font-semibold">
+        {label}
+      </ITText>
+      <ITText
+        className="mt-1 block !text-[26px] font-extrabold leading-none tabular-nums"
+        style={alert ? { color: value > 0 ? "var(--color-danger)" : "var(--color-text-muted)" } : undefined}
+      >
+        <Num value={value} />
+      </ITText>
+    </div>
+  );
+}
 
 export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
   const { t } = fx;
@@ -85,13 +107,7 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
     fileInput.current?.click();
   };
 
-  // Indicadores con el mismo componente del resto de la app. En cero, neutro.
-  const kpis: Array<{ key: string; value: number }> = [
-    { key: "active", value: fx.counts.total },
-    { key: "complete", value: fx.counts.COMPLETE },
-    { key: "missingRequired", value: fx.counts.REQUIRED },
-    { key: "incomplete", value: fx.counts.INCOMPLETE },
-  ];
+  // Indicadores estilo Pre-nómina: plantilla en tinta, lo que falta en rojo.
 
   const done = (items: Array<{ delivered: boolean }>) => items.filter((i) => i.delivered).length;
   const totalOf = (r: RecordGapsRow) => ({
@@ -109,16 +125,19 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Indicadores en la tira del mosaico (una fila, tono por significado) */}
+      {/* Indicadores estilo Pre-nómina (una fila de cuatro tarjetas). */}
       {!hideKpis && (
-        <ITBentoStatStrip
-          items={kpis.map((k) => ({
-            id: k.key,
-            label: t(`records.kpis.${k.key}`),
-            value: k.value,
-            tone: STAT_TONE[k.key],
-          }))}
-        />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-[14px] px-4 py-3.5" style={{ background: "var(--color-primary-900)" }}>
+            <ITText className="block !text-[12px] font-semibold !text-white/75">{t("records.kpis.active")}</ITText>
+            <ITText className="mt-1 block !text-[26px] font-extrabold leading-none tabular-nums !text-white">
+              <Num value={fx.counts.total} />
+            </ITText>
+          </div>
+          <RecordKpi label={t("records.kpis.complete")} value={fx.counts.COMPLETE} />
+          <RecordKpi label={t("records.kpis.missingRequired")} value={fx.counts.REQUIRED} alert />
+          <RecordKpi label={t("records.kpis.incomplete")} value={fx.counts.INCOMPLETE} />
+        </div>
       )}
 
       {fx.error && (
@@ -129,7 +148,10 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
         {/* Lista */}
         <ITCard contentClassName="!p-0">
           {/* Filtros: buscar, pastillas de estado y área */}
-          <div className="grid gap-2 border-b border-slate-100 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_auto_minmax(0,1fr)] md:items-center">
+          <div
+            className="grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_auto_minmax(0,1fr)] md:items-center"
+            style={{ borderBottom: hairline }}
+          >
             <ITInput
               name="employee_records_search"
               size="sm"
@@ -165,108 +187,110 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
           </div>
 
           <div className="max-h-[640px] overflow-auto">
-            <table className="w-full border-collapse text-left">
-              <thead className="sticky top-0 z-10 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                <tr>
-                  <th className="px-4 py-2.5">{t("records.columns.employee")}</th>
-                  <th className="px-3 py-3">{t("records.columns.required")}</th>
-                  <th className="px-3 py-3">{t("records.columns.record")}</th>
-                  <th className="px-3 py-3">{t("records.columns.personal")}</th>
-                  <th className="px-3 py-3">{t("records.columns.status")}</th>
-                  <th className="px-3 py-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {fx.visible.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-[12px] text-slate-400">
-                      {t("records.empty")}
-                    </td>
-                  </tr>
-                )}
-                {fx.visible.map((r) => {
-                  const status = recordStatus(r);
-                  const active = sel?.userId === r.userId;
-                  const fieldsTotal = r.filledFields.length + r.missingFields.length;
-                  return (
-                    <tr
-                      key={r.userId}
-                      onClick={() => fx.select(r.userId)}
-                      className={`cursor-pointer border-t border-slate-100 align-middle ${
-                        active ? "bg-slate-50 shadow-[inset_3px_0_0_var(--color-primary)]" : "hover:bg-slate-50/60"
-                      }`}
-                    >
-                      <td className="px-4 py-2">
-                        <div className="flex items-center gap-3">
-                          <ProfileAvatar name={r.name} size="sm" />
-                          <div className="min-w-0 max-w-[200px]">
-                            <div className="line-clamp-2 text-[12px] font-bold leading-tight text-slate-900">{r.name}</div>
-                            <div className="text-[10px] text-slate-500">
-                              {[r.employeeNumber ? `#${r.employeeNumber}` : "#—", r.departmentName].filter(Boolean).join(" · ")}
-                            </div>
+            {/* Divs con roles ARIA (no <table>): el tema inyecta reglas globales
+                a thead/tbody con !important y ensucian cualquier tabla plana. */}
+            <div role="table" aria-label={t("records.columns.employee")} className="min-w-[760px]">
+              <div
+                role="row"
+                className={`${grid} sticky top-0 z-10 px-4 py-2.5`}
+                style={{ borderBottom: hairline, background: "var(--it-card-bg, #ffffff)" }}
+              >
+                <span role="columnheader" className={th}>{t("records.columns.employee")}</span>
+                <span role="columnheader" className={th}>{t("records.columns.required")}</span>
+                <span role="columnheader" className={th}>{t("records.columns.record")}</span>
+                <span role="columnheader" className={th}>{t("records.columns.personal")}</span>
+                <span role="columnheader" className={th}>{t("records.columns.status")}</span>
+                <span role="columnheader" className={th} />
+              </div>
+              {fx.visible.length === 0 && (
+                <div role="row" className="px-4 py-10 text-center text-[12px] text-slate-400">
+                  {t("records.empty")}
+                </div>
+              )}
+              {fx.visible.map((r, i) => {
+                const status = recordStatus(r);
+                const active = sel?.userId === r.userId;
+                const fieldsTotal = r.filledFields.length + r.missingFields.length;
+                return (
+                  <div
+                    role="row"
+                    key={r.userId}
+                    onClick={() => fx.select(r.userId)}
+                    className={`${grid} cursor-pointer px-4 py-2 ${
+                      active ? "bg-slate-50 shadow-[inset_3px_0_0_var(--color-primary)]" : "hover:bg-slate-50/60"
+                    }`}
+                    style={i < fx.visible.length - 1 ? { borderBottom: hairline } : undefined}
+                  >
+                    <span role="cell" className="pr-3">
+                      <div className="flex items-center gap-3">
+                        <ProfileAvatar name={r.name} size="sm" />
+                        <div className="min-w-0 max-w-[200px]">
+                          <div className="line-clamp-2 text-[12px] font-bold leading-tight text-slate-900">{r.name}</div>
+                          <div className="text-[10px] text-slate-500">
+                            {[r.employeeNumber ? `#${r.employeeNumber}` : "#—", r.departmentName].filter(Boolean).join(" · ")}
                           </div>
                         </div>
-                      </td>
-                      <td className="px-3 py-3">
-                        {/* Los obligatorios, en puntos: se lee de un vistazo y no
-                            repite tres etiquetas rojas en cada fila. El detalle
-                            con el nombre de cada documento está a la derecha. */}
-                        <div
-                          className="flex items-center gap-1.5"
-                          title={r.requiredDocuments.map((d) => `${d.delivered ? "✓" : "✗"} ${d.name}`).join("\n")}
-                        >
-                          {r.requiredDocuments.map((d) => (
-                            <span
-                              key={d.id}
-                              className={`h-2 w-2 rounded-full ${d.delivered ? "bg-emerald-500" : "bg-rose-300"}`}
-                            />
-                          ))}
-                          <ITText as="span" className="ml-1 text-[11px] font-semibold tabular-nums text-slate-600">
-                            {done(r.requiredDocuments)}/{r.requiredDocuments.length}
-                          </ITText>
-                        </div>
-                      </td>
-                      <td className="px-3 py-3">
-                        <Progress
-                          done={done(r.otherDocuments)}
-                          total={r.otherDocuments.length}
-                          label={t("records.progress", { done: done(r.otherDocuments), total: r.otherDocuments.length })}
-                        />
-                      </td>
-                      <td className="px-3 py-3">
-                        <Progress
-                          done={r.filledFields.length}
-                          total={fieldsTotal}
-                          label={t("records.progress", { done: r.filledFields.length, total: fieldsTotal })}
-                        />
-                      </td>
-                      <td className="px-3 py-3">
-                        <ITBadget size="sm" className="whitespace-nowrap" color={STATUS_COLOR[status]} label={t(`records.status.${status}`)} />
-                      </td>
-                      <td className="px-3 py-3">
-                        <ITFlex justify="end" gap={1} onClick={(e) => e.stopPropagation()}>
-                          {status !== "COMPLETE" && (
-                            <RowAction
-                              icon={<FaBell size={12} />}
-                              label={t("records.notify")}
-                              tone="warning"
-                              disabled={fx.notifying === r.userId}
-                              onClick={() => void fx.notify(r)}
-                            />
-                          )}
-                          <RowAction
-                            icon={<FaChevronRight size={12} />}
-                            label={t("records.detail.open")}
-                            tone="primary"
-                            onClick={() => navigate(`/employees/${r.userId}`)}
+                      </div>
+                    </span>
+                    <span role="cell">
+                      {/* Los obligatorios, en puntos: se lee de un vistazo y no
+                          repite tres etiquetas rojas en cada fila. El detalle
+                          con el nombre de cada documento está a la derecha. */}
+                      <div
+                        className="flex items-center gap-1.5"
+                        title={r.requiredDocuments.map((d) => `${d.delivered ? "✓" : "✗"} ${d.name}`).join("\n")}
+                      >
+                        {r.requiredDocuments.map((d) => (
+                          <span
+                            key={d.id}
+                            className={`h-2 w-2 rounded-full ${d.delivered ? "bg-emerald-500" : "bg-rose-300"}`}
                           />
-                        </ITFlex>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        ))}
+                        <ITText as="span" className="ml-1 text-[11px] font-semibold tabular-nums text-slate-600">
+                          {done(r.requiredDocuments)}/{r.requiredDocuments.length}
+                        </ITText>
+                      </div>
+                    </span>
+                    <span role="cell">
+                      <Progress
+                        done={done(r.otherDocuments)}
+                        total={r.otherDocuments.length}
+                        label={t("records.progress", { done: done(r.otherDocuments), total: r.otherDocuments.length })}
+                      />
+                    </span>
+                    <span role="cell">
+                      <Progress
+                        done={r.filledFields.length}
+                        total={fieldsTotal}
+                        label={t("records.progress", { done: r.filledFields.length, total: fieldsTotal })}
+                      />
+                    </span>
+                    <span role="cell">
+                      <ITBadget size="sm" className="whitespace-nowrap" color={STATUS_COLOR[status]} label={t(`records.status.${status}`)} />
+                    </span>
+                    <span role="cell">
+                      <ITFlex justify="end" gap={1} onClick={(e) => e.stopPropagation()}>
+                        {status !== "COMPLETE" && (
+                          <RowAction
+                            icon={<FaBell size={12} />}
+                            label={t("records.notify")}
+                            tone="warning"
+                            disabled={fx.notifying === r.userId}
+                            onClick={() => void fx.notify(r)}
+                          />
+                        )}
+                        <RowAction
+                          icon={<FaChevronRight size={12} />}
+                          label={t("records.detail.open")}
+                          tone="primary"
+                          onClick={() => navigate(`/employees/${r.userId}`)}
+                        />
+                      </ITFlex>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </ITCard>
 
@@ -413,7 +437,7 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
                 </div>
               </div>
 
-              <div className="grid !grid-cols-2 gap-2 border-t border-slate-100 p-3">
+              <div className="grid !grid-cols-2 gap-2 p-3" style={{ borderTop: hairline }}>
                 <ITButton
                   variant="outlined"
                   color="secondary"

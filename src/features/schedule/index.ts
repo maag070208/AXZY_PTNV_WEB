@@ -7,5 +7,5 @@ export { default as OvertimeApprovalTable } from "./overtime-approval/ui/Overtim
 export { default as OvertimeExportActions } from "./overtime-approval/ui/OvertimeExportActions";
 export { useOvertimeApproval } from "./overtime-approval/model/useOvertimeApproval";
 export type { DownloadOvertimePdf } from "./overtime-approval/model/types";
-export { WeeklyAttendancePanel, useWeeklyAttendance } from "./weekly-attendance";
+export { WeeklyAttendancePanel, PayrollHistoryPanel, useWeeklyAttendance } from "./weekly-attendance";
 export type { DownloadWeeklyAttendancePdf } from "./weekly-attendance";

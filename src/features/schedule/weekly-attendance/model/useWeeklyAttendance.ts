@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import {
   buildDetailRows,
+  hoursDecimal,
   scheduleApi,
   toDayKey,
   type WeeklyAttendanceDetailRow,
@@ -12,6 +13,7 @@ import {
   type WeeklyAttendanceRow,
 } from "@entities/schedule";
 import { applyClientTableParams } from "@shared/api/clientTable";
+import { fileName } from "@shared/i18n";
 import { useDepartmentOptions } from "@entities/department";
 import { useWeekStartDay } from "@entities/sys-config";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
@@ -115,6 +117,41 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     }
   }, [report, mode, detailRows, tableParams, downloadPdf, departmentName, t]);
 
+  /**
+   * El "Excel" del pie de la pre-nómina: un CSV (lo abre Excel directo) con un
+   * renglón por persona y los totales de la semana, como la vista Resumida.
+   */
+  const exportExcel = useCallback(() => {
+    if (!report || report.rows.length === 0) return;
+    const header = [
+      t("columns.employee"),
+      t("columns.department"),
+      t("columns.hours"),
+      t("columns.overtime"),
+      t("columns.approved"),
+      t("columns.absences"),
+      t("columns.incomplete"),
+    ];
+    const lines = report.rows.map((r) => [
+      r.employeeNumber ? `${r.name} (#${r.employeeNumber})` : r.name,
+      r.departmentName ?? "",
+      hoursDecimal(r.totals.workedMin),
+      hoursDecimal(r.totals.extraMin),
+      hoursDecimal(r.totals.approvedExtraMin),
+      r.totals.absences,
+      r.totals.incompleteDays,
+    ]);
+    const escape = (c: unknown) => `"${String(c ?? "").replace(/"/g, '""')}"`;
+    const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${fileName("payroll")}_${report.range.days[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [report, t]);
+
   return {
     t,
     weekDate,
@@ -141,6 +178,7 @@ export const useWeeklyAttendance = ({ downloadPdf }: { downloadPdf: DownloadWeek
     setError,
     exporting,
     exportPdf,
+    exportExcel,
   };
 };
 

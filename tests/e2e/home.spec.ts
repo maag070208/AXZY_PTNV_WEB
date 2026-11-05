@@ -11,16 +11,17 @@ test.describe("Inicio", () => {
   test("el ADMIN ve el tablero por pestañas y puede cambiar entre ellas", async ({ page }) => {
     await goToRoute(page, "/");
 
-    await expect(page.getByRole("heading", { level: 1, name: "Inicio" })).toBeVisible();
+    // El encabezado es el saludo con el nombre ("Hola, E2E"), no "Inicio".
+    await expect(page.getByRole("heading", { level: 1, name: /^Hola,/ })).toBeVisible();
 
     // Las pestañas del ADMIN: tiene permiso para todos los tableros.
-    // `exact` porque el menú lateral también tiene "Almacén de cocina".
-    for (const grupo of ["Operación", "Personal", "Reloj y accesos", "Sistema", "Cocina"]) {
+    // (Cocina no sale: el módulo está apagado con `FEATURES.kitchen = false`.)
+    for (const grupo of ["Operación", "Personal", "Reloj y accesos", "Sistema"]) {
       await expect(page.getByRole("button", { name: grupo, exact: true })).toBeVisible();
     }
 
     // La primera trae el panel de operación en vivo.
-    await expect(page.getByText("Panel en tiempo real")).toBeVisible();
+    await expect(page.getByText("En vivo", { exact: true })).toBeVisible();
 
     // El panel ya NO repite lo que muestran los tableros de Tickets y Tareas
     // (salía dos y tres veces: los contadores, el donut por estado y la lista de
@@ -42,10 +43,10 @@ test.describe("Inicio", () => {
     // Al cambiar de pestaña cambia el tablero (y el anterior se desmonta).
     await page.getByRole("button", { name: "Personal", exact: true }).click();
     await expect(page.getByText("Asistencia de hoy")).toBeVisible();
-    await expect(page.getByText("Panel en tiempo real")).toBeHidden();
+    await expect(contenido.getByText("Dispositivos", { exact: true })).toBeHidden();
 
     // Y se puede volver.
     await page.getByRole("button", { name: "Operación", exact: true }).click();
-    await expect(page.getByText("Panel en tiempo real")).toBeVisible();
+    await expect(contenido.getByText("Dispositivos", { exact: true })).toBeVisible();
   });
 });

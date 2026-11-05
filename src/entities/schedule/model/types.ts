@@ -211,3 +211,68 @@ export interface WeeklyAttendanceQuery {
   departmentId?: string;
   q?: string;
 }
+
+// ── Pre-nómina: revisión por departamento y cierre de la semana ─────────────
+
+/** Revisión vigente de un departamento (`departmentId` null = sin departamento). */
+export interface PayrollReviewEntry {
+  departmentId: string | null;
+  /** true = marcada con «Marcar todo como revisado»; false = una por una. */
+  bulk: boolean;
+  reviewedAt: string;
+  reviewedBy: { id: string; name: string } | null;
+}
+
+/** Estado de la semana: el cierre (si existe) y las revisiones por departamento. */
+export interface PayrollReviewState {
+  weekStart: string;
+  closed: boolean;
+  closure: {
+    closedAt: string;
+    closedBy: { id: string; name: string } | null;
+    reopenedAt: string | null;
+    reopenedBy: { id: string; name: string } | null;
+    snapshot: unknown;
+  } | null;
+  reviews: PayrollReviewEntry[];
+}
+
+/** Una persona dentro de la fotografía del cierre (detalle por departamento). */
+export interface PayrollSnapshotPerson {
+  departmentId: string | null;
+  name: string;
+  /** Número(s) de reloj, o el número de empleado. */
+  clock: string;
+  workedMin: number;
+  extraMin: number;
+  approvedExtraMin: number;
+  absences: number;
+}
+
+/** Fotografía de las cifras que se guardó al cerrar la semana. */
+export interface PayrollClosureSnapshot {
+  summary?: { people?: number; workedMin?: number; extraMin?: number; approvedExtraMin?: number; absences?: number };
+  /** El resumen por departamento tal como se veía al cerrar (WeeklyDepartmentRow). */
+  departments?: {
+    departmentId: string | null;
+    name: string;
+    people: number;
+    normalMin: number;
+    extraMin: number;
+    approvedExtraMin: number;
+    absences: number;
+  }[];
+  /** El detalle por persona (los cierres anteriores a esta versión no lo tienen). */
+  people?: PayrollSnapshotPerson[];
+}
+
+/** Un renglón del historial de cierres. */
+export interface PayrollClosureRow {
+  weekStart: string;
+  closed: boolean;
+  closedAt: string;
+  closedBy: { id: string; name: string } | null;
+  reopenedAt: string | null;
+  reopenedBy: { id: string; name: string } | null;
+  snapshot: PayrollClosureSnapshot | null;
+}
