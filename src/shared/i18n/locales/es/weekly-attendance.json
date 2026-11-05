@@ -1,30 +1,7 @@
 {
   "title": "Pre Nómina",
-  "description": "horas trabajadas y tiempo extra por departamento.",
+  "description": "Entradas, salidas, horas trabajadas y tiempo extra de la semana por departamento para pre nómina",
   "breadcrumb": "Pre Nómina",
-  "weekPill": "Semana {{range}}",
-  "tabs": {
-    "week": "Semana",
-    "history": "Historial de cierres"
-  },
-  "history": {
-    "title": "Historial de cierres",
-    "empty": "Todavía no hay semanas cerradas.",
-    "week": "Semana",
-    "people": "Personas",
-    "worked": "Horas",
-    "approved": "HE aprob.",
-    "absences": "Faltas",
-    "closedBy": "Cerrada por",
-    "closedAt": "Fecha de cierre",
-    "status": "Estado",
-    "closed": "Cerrada",
-    "reopened": "Reabierta",
-    "reopenedTooltip": "Reabierta por {{name}} · {{date}}",
-    "detailSubtitle": "Cerrada por {{name}} · {{date}}",
-    "noSnapshot": "Este cierre no guardó fotografía por departamento.",
-    "pdfTitle": "Cierre de pre-nómina"
-  },
   "filters": {
     "week": "Semana",
     "previousWeek": "Semana anterior",
@@ -40,7 +17,6 @@
   "columns": {
     "code": "Cód.",
     "employee": "Empleado",
-    "department": "Departamento",
     "schedule": "Horario",
     "day": "Día",
     "status": "Estado",
@@ -156,69 +132,5 @@
     "calculated": "{{pct}}% de lo calculado",
     "people": "de {{total}} personas"
   },
-  "reportTitle": "Reporte semanal",
-  "detailTitle": "Detalle por persona",
-  "exportPdfFull": "Exportar PDF",
-  "exportExcelFull": "Exportar Excel",
-  "steps": {
-    "attendance": "Asistencia",
-    "attendanceOk": "Faltas y retardos justificados",
-    "attendancePending": "{{count}} faltas por justificar",
-    "overtime": "Tiempo extra",
-    "overtimeNone": "0 por aprobar",
-    "overtimePending": "{{hours}} h por aprobar",
-    "review": "Revisar departamentos",
-    "reviewCaption": "{{done}} de {{total}} revisados",
-    "close": "Cerrar y exportar",
-    "closeCaption": "Pendiente",
-    "closeDone": "Cerrada"
-  },
-  "cards": {
-    "people": "Personas con checadas",
-    "peopleCaption": "de {{total}} con reloj",
-    "worked": "Horas trabajadas",
-    "workedCaption": "en la semana",
-    "approved": "Horas extra aprobadas",
-    "approvedCaption": "{{hours}} h por aprobar",
-    "absences": "Faltas sin justificar",
-    "goToAttendance": "Ir a Asistencia"
-  },
-  "deptTable": {
-    "department": "Departamento",
-    "people": "Personas",
-    "normalHours": "Horas normales",
-    "extraHours": "Horas extra",
-    "absences": "Faltas",
-    "review": "Revisión",
-    "reviewed": "Revisado",
-    "pending": "Por revisar",
-    "reviewedTooltip": "Revisado por {{name}} · {{date}} ({{how}})",
-    "reviewedBulk": "marcar todo",
-    "reviewedSingle": "una por una",
-    "detail": "Ver detalle",
-    "reviewAll": "Marcar todo como revisado",
-    "note": "La revisión queda guardada por semana con quién la hizo; el cierre conserva la fotografía de las cifras."
-  },
-  "deptDetail": {
-    "subtitle": "{{count}} personas en la semana"
-  },
-  "reviewAllDialog": {
-    "title": "¿Marcar todos como revisados?",
-    "message": "Se marcarán los {{count}} departamentos como revisados. Puedes quitar la revisión de cualquiera desde su detalle.",
-    "confirm": "Sí, marcar todo",
-    "cancel": "Cancelar"
-  },
-  "review": {
-    "mark": "Marcar como revisado",
-    "unmark": "Quitar revisión"
-  },
-  "close": {
-    "note": "\"Cerrar pre-nómina\" se habilita cuando todos los departamentos están revisados.",
-    "allReviewed": "Todos los departamentos están revisados: ya puedes cerrar la semana.",
-    "button": "Cerrar pre-nómina",
-    "reopen": "Reabrir",
-    "closed": "Pre-nómina cerrada. Puedes reabrirla si hace falta.",
-    "closedBy": "Pre-nómina cerrada por {{name}} · {{date}}. Puedes reabrirla si hace falta.",
-    "disabled": "Faltan departamentos por revisar"
-  }
+  "reportTitle": "Reporte semanal"
 }

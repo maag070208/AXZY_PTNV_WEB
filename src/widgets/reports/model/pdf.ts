@@ -15,7 +15,7 @@ import type {
   AccessReportSummary,
 } from "@entities/access";
 import type { OvertimePdfPayload } from "@entities/overtime";
-import type { PayrollClosureRow, WeeklyAttendancePdfPayload } from "@entities/schedule";
+import type { WeeklyAttendancePdfPayload } from "@entities/schedule";
 import ReportPDF from "../ui/ReportPDF";
 import AssignedDevicesPdf from "../ui/AssignedDevicesPdf";
 import DevicePDF from "../ui/DevicePDF";
@@ -23,7 +23,6 @@ import MaterialOutputsPdf from "../ui/MaterialOutputsPdf";
 import AccessReportPDF from "../ui/AccessReportPDF";
 import OvertimePDF from "../ui/OvertimePDF";
 import WeeklyAttendancePdf from "../ui/WeeklyAttendancePdf";
-import PayrollClosurePdf from "../ui/PayrollClosurePdf";
 
 export const downloadReportPDF = async (
   rows: ReportRow[],
@@ -130,16 +129,4 @@ export const downloadWeeklyAttendancePdf = async (
     createElement(WeeklyAttendancePdf, { report, mode, rows, meta }) as any
   ).toBlob();
   saveAs(blob, `${fileName("payroll")}_${report.range.days[0]}.pdf`);
-};
-
-/** Cierre de pre-nómina desde la fotografía guardada (historial de cierres). */
-export const downloadPayrollClosurePdf = async (
-  closure: PayrollClosureRow,
-  weekLabel: string
-): Promise<void> => {
-  const generatedAt = new Date().toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-  const blob = await pdf(
-    createElement(PayrollClosurePdf, { closure, weekLabel, generatedAt }) as any
-  ).toBlob();
-  saveAs(blob, `${fileName("payroll")}_cierre_${closure.weekStart}.pdf`);
 };
