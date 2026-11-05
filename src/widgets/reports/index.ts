@@ -16,4 +16,5 @@ export {
   downloadTimeClockReportPdf,
   downloadOvertimePDF,
   downloadWeeklyAttendancePdf,
+  downloadPayrollClosurePdf,
 } from "./model/pdf";

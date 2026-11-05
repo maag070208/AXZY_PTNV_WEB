@@ -4,6 +4,8 @@ import type {
   AssignmentRow,
   AssignedPerson,
   OvertimeResponse,
+  PayrollClosureRow,
+  PayrollReviewState,
   Schedule,
   ScheduleInput,
   WeeklyAttendanceQuery,
@@ -44,4 +46,26 @@ export const scheduleApi = {
   /** Universo completo sin paginar, SOLO aprobado (para CSV/KPIs/PDF). */
   overtimeExport: (params: ITDataTableFetchParamsPost) =>
     tableQuery<OvertimeResponse>(`/schedules/overtime/export`, params),
+
+  // ── Pre-nómina: revisión por departamento y cierre de la semana ──────────
+
+  payrollReviewState: (weekStart: string) =>
+    api.get<PayrollReviewState>(`/schedules/payroll/review-state?weekStart=${weekStart}`),
+
+  /** Marca o desmarca un departamento (revisión individual). */
+  payrollSetReview: (data: { weekStart: string; departmentId: string | null; reviewed: boolean }) =>
+    api.put<PayrollReviewState>(`/schedules/payroll/reviews`, data),
+
+  /** «Marcar todo como revisado»: crea las revisiones que falten. */
+  payrollReviewAll: (data: { weekStart: string; departmentIds: (string | null)[] }) =>
+    api.post<PayrollReviewState>(`/schedules/payroll/reviews/mark-all`, data),
+
+  payrollClose: (data: { weekStart: string; departmentIds: (string | null)[]; snapshot?: Record<string, unknown> }) =>
+    api.post<PayrollReviewState>(`/schedules/payroll/close`, data),
+
+  payrollReopen: (weekStart: string) =>
+    api.post<PayrollReviewState>(`/schedules/payroll/reopen`, { weekStart }),
+
+  /** Historial de cierres (más reciente primero). */
+  payrollClosures: () => api.get<PayrollClosureRow[]>(`/schedules/payroll/closures`),
 };
