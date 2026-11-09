@@ -8,6 +8,7 @@ import {
   FaUserTie,
   FaCog,
   FaUtensils,
+  FaTshirt,
   FaLaptopCode,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,6 +32,7 @@ const NAV_ICONS: Record<string, ReactNode> = {
   tasks: <FaTicketAlt size={14} />,
   inventory: <FaBoxes size={14} />,
   kitchen: <FaUtensils size={14} />,
+  linen: <FaTshirt size={14} />,
   hr: <FaUserTie size={14} />,
   accessGroup: <FaDoorOpen size={14} />,
   settings: <FaCog size={14} />,

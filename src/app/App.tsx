@@ -85,6 +85,31 @@ import {
   KitchenSupplierFormPage,
   KitchenSuppliersPage,
 } from "@pages/kitchen";
+import {
+  LinenAreasPage,
+  LinenDirtyDetailPage,
+  LinenDirtyNewPage,
+  LinenDirtyPage,
+  LinenLaundryPage,
+  LinenReconciliationPage,
+  LinenRequestDetailPage,
+  LinenRequestNewPage,
+  LinenRequestsPage,
+  LinenCatalogPage,
+  LinenStockPage,
+  LinenTransferDetailPage,
+  LinenTransferNewPage,
+  LinenTransfersPage,
+  LinenCountDetailPage,
+  LinenCountsPage,
+  LinenWriteoffDetailPage,
+  LinenWriteoffNewPage,
+  LinenWriteoffsPage,
+} from "@pages/hotel-linen";
+import { LinenAmenitiesPage, LinenAmenityControlPage } from "@pages/hotel-linen/AmenityPages";
+import { LinenEquipmentPage, LinenExtrasPage, LinenLoansPage } from "@pages/hotel-linen/ReceptionPages";
+import { LinenHomePage, LinenReportsPage } from "@pages/hotel-linen/ReportPages";
+import { LinenPurchasesPage } from "@pages/hotel-linen/PurchasePages";
 
 export default function App() {
   return (
@@ -498,6 +523,232 @@ export default function App() {
           element={
             <RequiresPermission permission="payroll.view">
               <PayrollHistoryPage />
+            </RequiresPermission>
+          }
+        />
+
+        <Route
+          path="/linen"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenHomePage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/reports"
+          element={
+            <RequiresPermission permission="hotel_linen.reports">
+              <LinenReportsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/catalog"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenCatalogPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/areas"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenAreasPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/stock"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenStockPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/transfers"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenTransfersPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/transfers/new"
+          element={
+            <RequiresPermission permission="hotel_linen.transfer_send">
+              <LinenTransferNewPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/amenities"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenAmenitiesPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/amenities/new"
+          element={
+            <RequiresPermission permission="hotel_linen.amenities_control">
+              <LinenAmenityControlPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/amenities/:id"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenAmenityControlPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/transfers/:id"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenTransferDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/purchases"
+          element={
+            <RequiresPermission permission="hotel_purchase.view">
+              <LinenPurchasesPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/requests"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenRequestsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/requests/new"
+          element={
+            <RequiresPermission permission="hotel_linen.request">
+              <LinenRequestNewPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/requests/:id"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenRequestDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/dirty"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenDirtyPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/dirty/new"
+          element={
+            <RequiresPermission permission="hotel_linen.dirty_receive">
+              <LinenDirtyNewPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/dirty/:id"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenDirtyDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/laundry"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenLaundryPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/reconciliation"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenReconciliationPage />
+            </RequiresPermission>
+          }
+        />
+
+        <Route
+          path="/linen/writeoffs"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenWriteoffsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/writeoffs/new"
+          element={
+            <RequiresPermission permission="hotel_linen.writeoff_request">
+              <LinenWriteoffNewPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/writeoffs/:id"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenWriteoffDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/counts"
+          element={
+            <RequiresPermission permission="hotel_linen.count">
+              <LinenCountsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/counts/:id"
+          element={
+            <RequiresPermission permission="hotel_linen.count">
+              <LinenCountDetailPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/loans"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenLoansPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/extras"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenExtrasPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/equipment"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenEquipmentPage />
             </RequiresPermission>
           }
         />

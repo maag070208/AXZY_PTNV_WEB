@@ -1,0 +1,150 @@
+{
+  "title": "Purchase orders",
+  "description": "Linen and consumables purchasing: order, receipt against invoice, held items and replenishment.",
+  "common": {
+    "cancel": "Cancel",
+    "loading": "Loading…"
+  },
+  "tabs": {
+    "orders": "Orders",
+    "receive": "Receiving",
+    "holds": "Held items",
+    "requests": "Replenishment requests"
+  },
+  "orders": {
+    "new": "New PO",
+    "noSupplier": "No supplier",
+    "columns": {
+      "folio": "Number",
+      "supplier": "Supplier",
+      "status": "Status",
+      "createdAt": "Created",
+      "expected": "Promised date",
+      "pending": "To receive",
+      "total": "Total"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "APPROVED": "Approved",
+      "PARTIALLY_RECEIVED": "Partially received",
+      "RECEIVED": "Received",
+      "CLOSED": "Closed with shortfall",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "form": {
+    "title": "New purchase order",
+    "editTitle": "Edit {{folio}}",
+    "supplier": "Supplier",
+    "noSupplier": "No supplier (assign before approving)",
+    "warehouse": "Receiving warehouse",
+    "defaultWarehouse": "Central warehouse (default)",
+    "expected": "Promised date",
+    "product": "Product",
+    "quantity": "Quantity",
+    "unitCost": "Unit cost",
+    "tax": "VAT",
+    "addLine": "Add line",
+    "subtotal": "Subtotal",
+    "taxTotal": "VAT",
+    "total": "Total",
+    "notes": "Notes",
+    "save": "Save"
+  },
+  "detail": {
+    "title": "Order {{folio}}",
+    "loading": "Purchase order",
+    "status": "Status",
+    "createdBy": "Prepared by",
+    "approvedBy": "Approved by",
+    "received": "Received",
+    "receipts": "Receipts",
+    "closedReason": "Closed with shortfall",
+    "closeHint": "The order closes with what was received so far; the pending amount is released. Enter the reason.",
+    "closeReason": "Shortfall reason",
+    "confirmClose": "Close with shortfall",
+    "pdf": "PDF",
+    "edit": "Edit",
+    "approve": "Approve",
+    "cancel": "Cancel PO",
+    "receive": "Receive",
+    "close": "Close with shortfall"
+  },
+  "receive": {
+    "title": "Receipt of {{folio}}",
+    "hint": "Count against the invoice and the order. Accepted items enter inventory with a new lot; held items stay in HOLD until Purchasing resolves them (5 business days).",
+    "invoice": "Invoice",
+    "pending": "pending",
+    "received": "Received",
+    "accepted": "Accepted",
+    "held": "Held",
+    "reason": "Hold reason",
+    "notes": "Notes",
+    "lineInvalid": "Accepted + held cannot exceed received, and held items need a reason.",
+    "overHint": "You are receiving more than ordered. Above the tolerance, notes and the purchase approval permission are required.",
+    "confirm": "Register receipt",
+    "lots": "Lots"
+  },
+  "holds": {
+    "hint": "Merchandise with an invoice difference: it does not enter inventory until accepted. Returning it removes it from the system.",
+    "overdue": "overdue",
+    "accept": "Accept",
+    "return": "Return",
+    "columns": {
+      "product": "Product",
+      "quantity": "Qty",
+      "reason": "Reason",
+      "order": "PO / invoice",
+      "dueAt": "Due",
+      "status": "Status"
+    },
+    "status": {
+      "OPEN": "Open",
+      "RETURNED": "Returned",
+      "ACCEPTED": "Accepted"
+    }
+  },
+  "requests": {
+    "weekFrom": "Week starting",
+    "generateWeekly": "Generate from weekly write-offs",
+    "generateLowStock": "Generate below minimum",
+    "generated": "Request {{folio}} generated.",
+    "alreadyExists": "Request {{folio}} already exists.",
+    "nothing": "Nothing to replenish.",
+    "detailTitle": "Request {{folio}}",
+    "supplier": "PO supplier",
+    "pickSupplier": "Pick a supplier",
+    "convert": "Convert to PO",
+    "dismiss": "Dismiss",
+    "openOrder": "Open {{folio}}",
+    "columns": {
+      "folio": "Number",
+      "source": "Source",
+      "status": "Status",
+      "lines": "Lines",
+      "createdAt": "Created",
+      "order": "PO"
+    },
+    "source": {
+      "WEEKLY_WRITEOFFS": "Weekly write-offs",
+      "LOW_STOCK": "Below minimum",
+      "MANUAL": "Manual"
+    },
+    "status": {
+      "OPEN": "Open",
+      "CONVERTED": "Converted",
+      "DISMISSED": "Dismissed"
+    }
+  },
+  "pdf": {
+    "title": "Purchase order",
+    "order": "Order",
+    "date": "Date",
+    "createdBy": "Prepared by",
+    "contact": "Contact",
+    "taxLine": "VAT {{rate}}",
+    "prepared": "Prepared by",
+    "authorized": "Authorized by",
+    "footer": "Hotel linen purchase order"
+  }
+}

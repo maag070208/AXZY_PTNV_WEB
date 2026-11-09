@@ -1,0 +1,129 @@
+{
+  "loading": "Loading…",
+  "page": {
+    "title": "Amenities",
+    "description": "Weekly consumption control per area, amenities warehouse and Spa towels.",
+    "new": "New control"
+  },
+  "tabs": {
+    "controls": "Weekly controls",
+    "lowStock": "Warehouse below minimum",
+    "spa": "Spa today"
+  },
+  "status": {
+    "DRAFT": "Draft",
+    "SUBMITTED": "Submitted",
+    "REVIEWED": "Reviewed",
+    "ACKNOWLEDGED": "Acknowledged"
+  },
+  "role": {
+    "CONFIRMS": "Prepared by",
+    "REVIEWS": "Reviewed by",
+    "AUTHORIZES": "Acknowledged by"
+  },
+  "columns": {
+    "folio": "Number",
+    "area": "Area",
+    "week": "Week",
+    "occupied": "Occupied nights",
+    "flagged": "Lines > 10%",
+    "status": "Status"
+  },
+  "board": {
+    "title": "Weekly controls",
+    "description": "One control per area and week. The area supervisor prepares it, the general supervisor reviews it and the Operations Manager acknowledges it."
+  },
+  "form": {
+    "pageTitle": "New weekly amenities control",
+    "title": "Area and week",
+    "description": "The system calculates opening stock, supplied and extras; enter the final stock counted in carts and linen rooms.",
+    "area": "Area",
+    "weekOf": "Week containing",
+    "previous": "Previous week",
+    "next": "Next week",
+    "pick": "Pick an area to calculate the week.",
+    "exists": "A control for that week already exists ({{folio}}).",
+    "open": "Open"
+  },
+  "sheet": {
+    "pageTitle": "Weekly amenities control",
+    "newTitle": "New control",
+    "calculated": "Occupied (calculated)",
+    "rooms": "{{count}} rooms",
+    "override": "Occupied (manual entry)",
+    "effective": "Occupied in use",
+    "flagged": "Lines > 10%",
+    "linesTitle": "Items",
+    "formula": "Real = initial + supplied − final. Expected = occupied × standard + extras. Difference % = (real − expected) ÷ expected.",
+    "noLines": "There are no items with a standard or movement that week.",
+    "item": "Item",
+    "col": {
+      "standard": "Standard",
+      "initial": "Initial",
+      "supplied": "Supplied",
+      "extras": "Extras",
+      "final": "Final",
+      "real": "Real",
+      "expected": "Expected",
+      "diff": "Diff. %"
+    },
+    "notes": "Notes",
+    "signatures": "Signatures",
+    "noSignatures": "No signatures yet."
+  },
+  "actions": {
+    "save": "Save draft",
+    "submit": "Submit",
+    "review": "Review",
+    "acknowledge": "Acknowledge",
+    "pdf": "PDF"
+  },
+  "lowStock": {
+    "title": "Amenities warehouse below minimum",
+    "description": "Consumable products in the AME warehouse at or below their minimum.",
+    "kpiBelow": "Below minimum",
+    "kpiEmpty": "Out of stock",
+    "none": "No product is at its minimum.",
+    "item": "Item",
+    "stock": "Stock",
+    "min": "Minimum",
+    "max": "Maximum",
+    "suggested": "Suggested"
+  },
+  "spa": {
+    "title": "Spa today",
+    "description": "Spa towels: delivered by laundry, dirty returned, in use and shortage.",
+    "date": "Date",
+    "delivered": "Delivered",
+    "returned": "Dirty returned",
+    "inUse": "In use",
+    "shortage": "Shortage",
+    "item": "Item",
+    "none": "No Spa movements that day.",
+    "noSpa": "No Spa warehouse is configured."
+  },
+  "pdf": {
+    "title": "Weekly amenities control per area",
+    "area": "Area",
+    "week": "Week",
+    "occupied": "Occupied rooms",
+    "supervisor": "Area supervisor",
+    "no": "No.",
+    "item": "Item",
+    "col": {
+      "standard": "Standard per occupied room",
+      "initial": "Initial stock",
+      "supplied": "Supplied by warehouse",
+      "extras": "Registered extras",
+      "final": "Final stock",
+      "real": "Real consumption",
+      "expected": "Expected consumption",
+      "diff": "Difference %"
+    },
+    "formula": "Real consumption = initial stock + supplied − final stock (carts and area linen room). Expected consumption = occupied rooms × standard + registered extras. Difference % = (real − expected) ÷ expected. Above 10% it is reviewed with the area supervisor and reported to the Operations Manager.",
+    "prepared": "Prepared by (area supervisor)",
+    "reviewed": "Reviewed by (General supervisor)",
+    "acknowledged": "Acknowledged (Operations Manager)",
+    "footer": "Weekly amenities control"
+  }
+}

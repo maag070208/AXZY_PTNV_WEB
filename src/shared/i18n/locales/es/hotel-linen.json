@@ -1,0 +1,222 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saved": "Guardado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "edit": "Editar",
+    "deactivate": "Desactivar",
+    "reactivate": "Reactivar",
+    "none": "Sin asignar",
+    "all": "Todos",
+    "loading": "Cargando…"
+  },
+  "kind": {
+    "LINEN": "Blanco",
+    "CONSUMABLE": "Consumible",
+    "EQUIPMENT": "Equipo",
+    "CHEMICAL": "Químico"
+  },
+  "warehouseKind": {
+    "CENTRAL": "Almacén",
+    "NEW_LINEN": "Bodega de nuevos",
+    "LAUNDRY": "Lavandería",
+    "ZONE": "Ropería",
+    "POINT": "Punto de préstamo",
+    "SPA": "Spa",
+    "EQUIPMENT": "Bodega de equipos",
+    "CART": "Carro",
+    "ADMIN": "Administración"
+  },
+  "catalog": {
+    "title": "Catálogo de blancos",
+    "description": "Artículos de blancos con su par, mínimo y costo.",
+    "new": "Nuevo artículo",
+    "edit": "Editar artículo",
+    "quickFilter": "Tipo",
+    "columns": {
+      "code": "Código",
+      "name": "Nombre",
+      "kind": "Tipo",
+      "category": "Categoría",
+      "size": "Tamaño",
+      "par": "Par",
+      "minStock": "Mínimo",
+      "cost": "Costo",
+      "status": "Estado",
+      "washLife": "Vida (lavadas)",
+      "standard": "Std/hab."
+    },
+    "form": {
+      "code": "Código",
+      "name": "Nombre",
+      "kind": "Tipo",
+      "category": "Categoría",
+      "unit": "Unidad",
+      "size": "Tamaño",
+      "tagPrefix": "Prefijo de etiqueta",
+      "tagPrefixHint": "Para equipos por pieza, p. ej. SEC",
+      "par": "Par (existencia total requerida)",
+      "minStock": "Mínimo",
+      "overstock": "Sobreexistencia",
+      "cost": "Último costo",
+      "washLife": "Vida útil (lavadas)",
+      "standard": "Estándar por habitación ocupada"
+    }
+  },
+  "areas": {
+    "title": "Áreas y puntos",
+    "description": "Almacenes, roperías y puntos de blancos con su custodio y ubicaciones.",
+    "new": "Nueva área",
+    "edit": "Editar área",
+    "addLocation": "Agregar ubicación",
+    "locationTitle": "Nueva ubicación en {{name}}",
+    "noLocations": "Sin ubicaciones",
+    "columns": {
+      "code": "Código",
+      "name": "Nombre",
+      "kind": "Tipo",
+      "custodian": "Custodio",
+      "zone": "Zona",
+      "locations": "Ubicaciones",
+      "status": "Estado"
+    },
+    "form": {
+      "code": "Código",
+      "name": "Nombre",
+      "kind": "Tipo",
+      "custodian": "Custodio",
+      "zone": "Zona"
+    },
+    "location": {
+      "code": "Código",
+      "name": "Nombre (opcional)"
+    },
+    "limits": {
+      "action": "Mínimos y máximos",
+      "title": "Mínimos y máximos de {{name}}",
+      "hint": "Deja vacío un artículo para quitarle el límite. Máximo 0 = sin máximo.",
+      "min": "Mínimo",
+      "max": "Máximo",
+      "invalid": "El máximo no puede ser menor que el mínimo."
+    }
+  },
+  "cosign": {
+    "hint": "La otra persona confirma con su usuario y contraseña.",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "confirm": "Firmar",
+    "titleDelivers": "Firma de quien entrega",
+    "titleReceives": "Firma de quien recibe"
+  },
+  "stock": {
+    "title": "Existencias",
+    "description": "Existencia por artículo y tipo de almacén, con tránsito y semáforo contra el par. Toca un artículo para ver sus lotes.",
+    "kpi": {
+      "belowPar": "Artículos bajo par",
+      "inTransit": "En tránsito",
+      "totalPieces": "Total de piezas",
+      "allGood": "Todo en orden"
+    },
+    "columns": {
+      "item": "Artículo",
+      "warehouse": "Almacén",
+      "newLinen": "Nuevos",
+      "laundry": "Lavandería",
+      "zones": "Roperías",
+      "points": "Puntos",
+      "spa": "Spa",
+      "inTransit": "En tránsito",
+      "total": "Total",
+      "par": "Par",
+      "pct": "%",
+      "light": "Semáforo"
+    },
+    "light": {
+      "green": "Completo",
+      "yellow": "Cerca del par",
+      "red": "Bajo par",
+      "none": "Sin par"
+    },
+    "lots": {
+      "title": "Lotes de {{name}}",
+      "empty": "Sin lotes registrados.",
+      "balance": "Saldo {{n}}",
+      "received": "Entrada {{date}} · inicial {{n}}"
+    }
+  },
+  "transfers": {
+    "title": "Traspasos",
+    "description": "Envíos entre almacenes con doble firma: quien entrega y quien recibe cuenta.",
+    "tabs": {
+      "inbox": "Por recibir",
+      "all": "Todos"
+    },
+    "status": {
+      "IN_TRANSIT": "En tránsito",
+      "ACTIVE": "Recibido",
+      "RECEIVED_WITH_DIFFERENCE": "Recibido con diferencia",
+      "CANCELLED": "Cancelado"
+    },
+    "role": {
+      "DELIVERS": "Entrega",
+      "RECEIVES": "Recibe"
+    },
+    "method": {
+      "PASSWORD": "Contraseña",
+      "SESSION": "Sesión"
+    },
+    "columns": {
+      "folio": "Folio",
+      "date": "Fecha",
+      "status": "Estado",
+      "from": "Origen",
+      "to": "Destino",
+      "sentBy": "Envía",
+      "receivedBy": "Recibe",
+      "sent": "Enviado",
+      "received": "Recibido",
+      "difference": "Diferencia"
+    },
+    "new": {
+      "action": "Nuevo traspaso",
+      "title": "Nuevo traspaso",
+      "description": "Elige origen, destino y los artículos a enviar.",
+      "from": "Origen",
+      "to": "Destino",
+      "lines": "Artículos",
+      "item": "Artículo",
+      "quantity": "Cantidad",
+      "lot": "Lote",
+      "lotAuto": "Automático (el más antiguo)",
+      "addLine": "Agregar artículo",
+      "removeLine": "Quitar",
+      "notes": "Notas (opcional)",
+      "cosign": "Firma quien entrega (otra persona confirma con su contraseña)",
+      "send": "Enviar traspaso"
+    },
+    "detail": {
+      "title": "Detalle del traspaso",
+      "sentBy": "Envía",
+      "receivedBy": "Recibe",
+      "difference": "Diferencia",
+      "notes": "Notas del envío",
+      "receiveNotes": "Notas de la recepción",
+      "lines": "Artículos",
+      "blindHint": "Cuenta lo que llegó físicamente y captura la cantidad de cada artículo.",
+      "blindNotice": "Conteo ciego: la cantidad enviada se muestra al confirmar la recepción.",
+      "sent": "Enviado",
+      "received": "Recibido",
+      "countedQty": "Cantidad contada",
+      "cosign": "Firma quien recibe (otra persona confirma con su contraseña)",
+      "receive": "Recibir",
+      "confirmReceive": "Confirmar recepción",
+      "cancel": "Cancelar traspaso",
+      "cancelTitle": "Cancelar traspaso",
+      "cancelMessage": "Lo enviado regresará al almacén de origen. ¿Continuar?",
+      "signatures": "Firmas",
+      "noSignatures": "Sin firmas."
+    }
+  }
+}

@@ -51,6 +51,31 @@ export type NavLabelKey =
   | "nav.kitchenSuppliers"
   | "nav.kitchenCostCenters"
   | "nav.kitchenCatalog"
+  | "nav.linen"
+  | "nav.linenHome"
+  | "nav.linenSectionWarehouse"
+  | "nav.linenSectionLaundry"
+  | "nav.linenSectionRooms"
+  | "nav.linenSectionControl"
+  | "nav.linenSectionPurchases"
+  | "nav.linenSectionCatalogs"
+  | "nav.linenSectionReports"
+  | "nav.linenReports"
+  | "nav.linenCatalog"
+  | "nav.linenAreas"
+  | "nav.linenStock"
+  | "nav.linenTransfers"
+  | "nav.linenAmenities"
+  | "nav.linenRequests"
+  | "nav.linenDirty"
+  | "nav.linenLaundry"
+  | "nav.linenReconciliation"
+  | "nav.linenWriteoffs"
+  | "nav.linenCounts"
+  | "nav.linenLoans"
+  | "nav.linenExtras"
+  | "nav.linenEquipment"
+  | "nav.linenPurchases"
   | "nav.access"
   | "nav.accessLog"
   | "nav.accessReport"
@@ -156,6 +181,76 @@ const ALL_SCREENS: readonly AppScreen[] = [
         ],
       },
       { id: "kitchenCatalog", labelKey: "nav.kitchenCatalog", path: "/kitchen/catalog", requirement: { anyOf: ["kitchen.manage"] }, actions: [] },
+    ],
+  },
+  {
+    // Blancos del hotel (submódulo de hotel-store). El grupo queda listo para
+    // sumar pantallas (traspasos, lavandería, bajas, conteo, reportes).
+    id: "linen",
+    labelKey: "nav.linen",
+    requirement: { anyOf: ["hotel_linen.view"] },
+    // Secciones por etapa del proceso (solo agrupan en el menú; el título no navega).
+    // Orden: inicio -> almacén/traspasos -> lavandería -> habitaciones -> control -> compras -> catálogos -> reportes.
+    children: [
+      { id: "linenHome", labelKey: "nav.linenHome", path: "/linen", match: "exact", actions: [] },
+      {
+        id: "linenSectionWarehouse",
+        labelKey: "nav.linenSectionWarehouse",
+        children: [
+          { id: "linenStock", labelKey: "nav.linenStock", path: "/linen/stock", actions: [] },
+          { id: "linenTransfers", labelKey: "nav.linenTransfers", path: "/linen/transfers", actions: [] },
+          { id: "linenRequests", labelKey: "nav.linenRequests", path: "/linen/requests", actions: [] },
+        ],
+      },
+      {
+        id: "linenSectionLaundry",
+        labelKey: "nav.linenSectionLaundry",
+        children: [
+          { id: "linenDirty", labelKey: "nav.linenDirty", path: "/linen/dirty", actions: [] },
+          { id: "linenLaundry", labelKey: "nav.linenLaundry", path: "/linen/laundry", actions: [] },
+          { id: "linenReconciliation", labelKey: "nav.linenReconciliation", path: "/linen/reconciliation", actions: [] },
+        ],
+      },
+      {
+        id: "linenSectionRooms",
+        labelKey: "nav.linenSectionRooms",
+        children: [
+          { id: "linenLoans", labelKey: "nav.linenLoans", path: "/linen/loans", actions: [] },
+          { id: "linenExtras", labelKey: "nav.linenExtras", path: "/linen/extras", actions: [] },
+          { id: "linenEquipment", labelKey: "nav.linenEquipment", path: "/linen/equipment", actions: [] },
+        ],
+      },
+      {
+        id: "linenSectionControl",
+        labelKey: "nav.linenSectionControl",
+        children: [
+          { id: "linenAmenities", labelKey: "nav.linenAmenities", path: "/linen/amenities", actions: [] },
+          { id: "linenCounts", labelKey: "nav.linenCounts", path: "/linen/counts", requirement: { anyOf: ["hotel_linen.count"] }, actions: [] },
+          { id: "linenWriteoffs", labelKey: "nav.linenWriteoffs", path: "/linen/writeoffs", actions: [] },
+        ],
+      },
+      {
+        id: "linenSectionPurchases",
+        labelKey: "nav.linenSectionPurchases",
+        children: [
+          { id: "linenPurchases", labelKey: "nav.linenPurchases", path: "/linen/purchases", requirement: { anyOf: ["hotel_purchase.view"] }, actions: [] },
+        ],
+      },
+      {
+        id: "linenSectionCatalogs",
+        labelKey: "nav.linenSectionCatalogs",
+        children: [
+          { id: "linenCatalog", labelKey: "nav.linenCatalog", path: "/linen/catalog", actions: [] },
+          { id: "linenAreas", labelKey: "nav.linenAreas", path: "/linen/areas", actions: [] },
+        ],
+      },
+      {
+        id: "linenSectionReports",
+        labelKey: "nav.linenSectionReports",
+        children: [
+          { id: "linenReports", labelKey: "nav.linenReports", path: "/linen/reports", requirement: { anyOf: ["hotel_linen.reports"] }, actions: [] },
+        ],
+      },
     ],
   },
   {

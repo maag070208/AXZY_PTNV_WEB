@@ -1,0 +1,183 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "loading": "Cargando…",
+    "back": "Volver",
+    "none": "—",
+    "all": "Todos"
+  },
+  "writeoffs": {
+    "title": "Bajas de blancos",
+    "description": "Solicitud con fotos, revisión del Gerente Ops y autorización de la Supervisora general.",
+    "tabs": {
+      "requests": "Solicitudes",
+      "review": "Por revisar",
+      "authorize": "Por autorizar",
+      "weekly": "Reporte semanal"
+    },
+    "status": {
+      "PENDING_APPROVAL": "Pendiente",
+      "ACTIVE": "Autorizada",
+      "CANCELLED": "Rechazada"
+    },
+    "reviewedYes": "Revisada",
+    "reviewedNo": "Sin revisar",
+    "reason": {
+      "R": "Rota",
+      "M": "Mancha",
+      "D": "Desgaste",
+      "Q": "Quemada",
+      "F": "Faltante / extravío"
+    },
+    "disposition": {
+      "SECOND_LIFE": "Segunda vida",
+      "DISPOSAL": "Disposición final"
+    },
+    "columns": {
+      "folio": "Folio",
+      "date": "Fecha",
+      "status": "Estado",
+      "warehouse": "Almacén",
+      "reason": "Motivo",
+      "requestedBy": "Solicitó",
+      "reviewed": "Revisión",
+      "quantity": "Piezas",
+      "cost": "Costo",
+      "photos": "Fotos",
+      "disposition": "Destino"
+    },
+    "new": {
+      "action": "Nueva baja",
+      "title": "Nueva baja de blancos",
+      "description": "Una baja por motivo. Las piezas esperan autorización y no salen del inventario hasta entonces.",
+      "warehouse": "Almacén",
+      "location": "Ubicación",
+      "locationAuto": "Cuarentena (por defecto)",
+      "lines": "Renglones",
+      "item": "Artículo",
+      "lot": "Lote",
+      "lotAuto": "Más antiguo (FIFO)",
+      "quantity": "Cantidad",
+      "reason": "Motivo",
+      "addLine": "Agregar renglón",
+      "removeLine": "Quitar renglón",
+      "notes": "Notas",
+      "photos": "Fotos de evidencia",
+      "photosHint": "Toma o elige al menos una foto (no hace falta si todo es faltante).",
+      "photosAdd": "Tomar o elegir fotos",
+      "photosRemove": "Quitar foto",
+      "submit": "Solicitar baja",
+      "createdMany": "Se crearon {{count}} bajas"
+    },
+    "detail": {
+      "title": "Baja de blancos",
+      "requestedBy": "Solicitó",
+      "authorizedBy": "Autorizó",
+      "warehouse": "Almacén",
+      "reason": "Motivo",
+      "notes": "Notas",
+      "cost": "Costo",
+      "disposition": "Destino",
+      "lines": "Renglones",
+      "item": "Artículo",
+      "lot": "Lote",
+      "location": "Ubicación",
+      "quantity": "Cantidad",
+      "photos": "Fotos",
+      "noPhotos": "Sin fotos (faltante)",
+      "signatures": "Firmas",
+      "noSignatures": "Sin firmas",
+      "skipped": "Autorizada sin revisión del Gerente Ops",
+      "review": "Marcar como revisada",
+      "reviewNotes": "Notas de la revisión (opcional)",
+      "approve": "Autorizar",
+      "reject": "Rechazar",
+      "rejectNotes": "Motivo del rechazo",
+      "approveTitle": "Autorizar baja",
+      "approveHint": "Al autorizar, las piezas salen del inventario. Indica su destino.",
+      "confirmApprove": "Autorizar baja",
+      "confirmReject": "Rechazar baja",
+      "cosign": "Firma otra persona (usuario y contraseña)",
+      "cosignTitle": "Firma de la baja",
+      "quarantined": "La pieza está retenida en la cuarentena de Lavandería hasta que la baja se autorice o se rechace."
+    },
+    "role": {
+      "DELIVERS": "Solicita",
+      "REVIEWS": "Revisa",
+      "AUTHORIZES": "Autoriza",
+      "RECEIVES": "Recibe",
+      "CONFIRMS": "Confirma"
+    },
+    "method": {
+      "SESSION": "Sesión",
+      "PASSWORD": "Contraseña"
+    },
+    "weekly": {
+      "from": "Del",
+      "to": "Al",
+      "generate": "Consultar",
+      "pdf": "Descargar PDF",
+      "empty": "Sin bajas autorizadas en el periodo.",
+      "item": "Artículo",
+      "total": "Total",
+      "cost": "Costo",
+      "totals": "Totales",
+      "writeoffs": "Bajas autorizadas",
+      "title": "Reporte semanal de bajas de blancos",
+      "period": "Periodo"
+    },
+    "quarantined": "Cuarentena"
+  },
+  "counts": {
+    "title": "Conteo físico",
+    "description": "Captura ciega por artículo y ubicación, con el estado físico A–E.",
+    "new": {
+      "action": "Nueva toma",
+      "warehouse": "Almacén",
+      "notes": "Notas",
+      "create": "Crear toma",
+      "blind": "Conteo ciego"
+    },
+    "status": {
+      "DRAFT": "Borrador",
+      "COUNTING": "Contando",
+      "PENDING_APPROVAL": "Por aprobar",
+      "APPLIED": "Aplicada",
+      "CANCELLED": "Cancelada"
+    },
+    "columns": {
+      "folio": "Folio",
+      "warehouse": "Almacén",
+      "status": "Estado",
+      "createdAt": "Creada",
+      "approvedAt": "Aplicada"
+    },
+    "detail": {
+      "title": "Toma de inventario",
+      "start": "Iniciar conteo",
+      "save": "Guardar captura",
+      "close": "Cerrar conteo",
+      "approve": "Aprobar diferencias",
+      "cancel": "Cancelar toma",
+      "item": "Artículo",
+      "location": "Ubicación",
+      "total": "Total contado",
+      "system": "Sistema",
+      "difference": "Diferencia",
+      "empty": "La toma no tiene renglones.",
+      "gradesHint": "A nuevo · B bueno · C regular · D desgastado · E baja. Lo capturado en E genera una solicitud de baja al aprobar.",
+      "saved": "Captura guardada",
+      "review": "Revisión de diferencias",
+      "pendingEmpty": "Inicia el conteo para tomar la foto del inventario.",
+      "confirmApprove": "Se aplicarán los ajustes y lo contado en E generará bajas pendientes.",
+      "pieces": "Piezas"
+    },
+    "grade": {
+      "A": "A · Nuevo",
+      "B": "B · Bueno",
+      "C": "C · Regular",
+      "D": "D · Desgastado",
+      "E": "E · Baja"
+    }
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "loading": "Loading…"
+  },
+  "cosign": {
+    "titleDelivers": "Signature of the person delivering"
+  },
+  "shift": {
+    "MORNING": "Morning",
+    "AFTERNOON": "Afternoon",
+    "NIGHT": "Night"
+  },
+  "role": {
+    "DELIVERS": "Delivers",
+    "RECEIVES": "Receives",
+    "CONFIRMS": "Confirms",
+    "REQUESTS": "Requests"
+  },
+  "transferStatus": {
+    "IN_TRANSIT": "In transit",
+    "ACTIVE": "Received",
+    "RECEIVED_WITH_DIFFERENCE": "Received with difference",
+    "CANCELLED": "Cancelled"
+  },
+  "form": {
+    "title": "New area request",
+    "description": "Pick the area, enter checkouts and occupied rooms, and request pieces per item.",
+    "area": "Area",
+    "date": "Date",
+    "shift": "Shift",
+    "noShift": "No shift",
+    "checkouts": "Checkouts",
+    "occupied": "Occupied",
+    "suggest": "Suggest",
+    "suggestEmpty": "The area has no rooms with a kit to suggest from; enter quantities by hand.",
+    "suggestDone": "Suggestion computed over {{rooms}} rooms. You can adjust the quantities.",
+    "notes": "Notes",
+    "noCategory": "No category",
+    "noProducts": "There are no linen items in the catalog.",
+    "saveDraft": "Save draft",
+    "saveSubmit": "Save and submit"
+  },
+  "requests": {
+    "title": "Area requests",
+    "description": "Linen requests from areas to the laundry: requested, delivered, received and pending.",
+    "new": "New request",
+    "tabs": {
+      "toSupply": "To supply",
+      "all": "All"
+    },
+    "columns": {
+      "folio": "Folio",
+      "area": "Area",
+      "date": "Date",
+      "shift": "Shift",
+      "status": "Status",
+      "requested": "Requested",
+      "pending": "Pending"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "SUBMITTED": "Submitted",
+      "PARTIALLY_FULFILLED": "Partially supplied",
+      "FULFILLED": "Supplied",
+      "RECEIVED": "Received in area",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "detail": {
+    "title": "Request detail",
+    "requestedBy": "Requested by",
+    "dateShift": "Date and shift",
+    "lines": "Items",
+    "item": "Item",
+    "requested": "Requested",
+    "delivered": "Delivered",
+    "received": "Received",
+    "pending": "Pending",
+    "total": "Total",
+    "transfers": "Linked transfers",
+    "transfersHint": "The floor attendant receives each transfer on the Transfers screen.",
+    "noTransfers": "Nothing supplied yet.",
+    "signatures": "Signatures",
+    "noSignatures": "No signatures.",
+    "submit": "Submit",
+    "cancel": "Cancel request",
+    "cancelTitle": "Cancel request",
+    "cancelMessage": "The request will be cancelled. Continue?",
+    "fulfill": "Supply",
+    "confirm": "Confirm receipt in area",
+    "confirmBlocked": "There are transfers in transit not yet received.",
+    "confirmTitle": "Confirm receipt",
+    "confirmMessage": "You confirm with your signature that the area received what was delivered. Continue?"
+  },
+  "fulfill": {
+    "title": "Supply {{folio}}",
+    "titleLoading": "Supply request",
+    "hint": "Enter what you deliver now to {{area}}. An in-transit transfer is created that the floor attendant must receive.",
+    "deliverNow": "Deliver now",
+    "overPending": "Some lines have more pieces than pending.",
+    "cosign": "Floor attendant co-signs (confirms with their password)",
+    "confirm": "Supply"
+  },
+  "dirty": {
+    "title": "Dirty linen intake",
+    "description": "Dirty linen delivered by areas per cart; the laundry counts and signs it.",
+    "new": "New intake",
+    "withShortage": "With shortage",
+    "noShortage": "No shortage",
+    "laundry": "Laundry",
+    "columns": {
+      "folio": "Folio",
+      "date": "Date",
+      "origin": "Origin area",
+      "cart": "Cart",
+      "shift": "Shift",
+      "deliveredBy": "Delivers",
+      "receivedBy": "Receives",
+      "received": "Dirty received",
+      "shortage": "Shortage"
+    },
+    "detail": {
+      "title": "Intake detail",
+      "lines": "Items",
+      "delivered": "Delivered to floor",
+      "receivedDirty": "Dirty received",
+      "stillInUse": "Still in use",
+      "shortage": "Shortage",
+      "good": "Good",
+      "stained": "Stained",
+      "damaged": "Damaged"
+    },
+    "form": {
+      "title": "New dirty linen intake",
+      "description": "Count the cart per item. On save, the person delivering signs with their user and password.",
+      "origin": "Origin area",
+      "date": "Date",
+      "cart": "Cart",
+      "delivered": "Delivered to floor",
+      "shortage": "Shortage",
+      "receivedDirty": "Dirty received",
+      "stillInUse": "Still in use",
+      "good": "Good",
+      "stained": "Stained",
+      "damaged": "Damaged",
+      "noPrefill": "The area had no deliveries that day; add items by hand.",
+      "addItem": "Add item",
+      "removeLine": "Remove line",
+      "splitMismatch": "Good + stained + damaged must add up to dirty received ({{n}}).",
+      "shortageTotal": "Total shortage: {{n}} pieces. Responsible people will be notified.",
+      "save": "Save and sign"
+    }
+  },
+  "laundry": {
+    "title": "Laundry",
+    "description": "Laundry linen by stage, with average wash cycles per piece.",
+    "stage": {
+      "DIRTY": "Dirty",
+      "IN_PROCESS": "In process",
+      "CLEAN": "Clean",
+      "QUARANTINE": "Quarantine"
+    },
+    "columns": {
+      "item": "Item",
+      "total": "Total",
+      "cycles": "Avg. cycles"
+    },
+    "treatment": {
+      "ORDINARY": "Ordinary",
+      "STAIN": "Stain"
+    },
+    "move": {
+      "action": "Move to…",
+      "title": "Move {{name}}",
+      "nothing": "This item has no pieces that can be moved to another stage.",
+      "from": "From",
+      "to": "To",
+      "lot": "Lot",
+      "lotAuto": "Automatic (oldest)",
+      "quantity": "Quantity ({{max}} available)",
+      "over": "Only {{max}} available in that stage.",
+      "confirm": "Move"
+    },
+    "firstWash": {
+      "action": "First wash (from new)",
+      "title": "First wash",
+      "hint": "Moves new linen to the laundry for its first wash; it enters as dirty.",
+      "from": "New linen warehouse",
+      "fromDefault": "Default"
+    },
+    "supplierReturn": {
+      "action": "Return to warehouse as factory defect",
+      "title": "Factory defect return",
+      "hint": "Sends pieces with factory defects back to the warehouse to return them to the supplier.",
+      "notes": "Defect reason (required)"
+    },
+    "lines": {
+      "item": "Item",
+      "stage": "Stage",
+      "quantity": "Quantity",
+      "add": "Add line",
+      "remove": "Remove line",
+      "cosign": "Person delivering signs (another person confirms with their password)",
+      "confirm": "Confirm"
+    }
+  },
+  "reconciliation": {
+    "title": "Daily reconciliation",
+    "description": "Per area: what was delivered to the floor versus dirty received and what is still in use.",
+    "date": "Date",
+    "empty": "There are no dirty intakes that day.",
+    "receipts": "{{count}} intakes",
+    "totals": {
+      "receivedDirty": "Dirty received",
+      "shortage": "Shortage"
+    },
+    "columns": {
+      "delivered": "Delivered",
+      "receivedDirty": "Dirty received",
+      "stillInUse": "In use",
+      "shortage": "Shortage"
+    }
+  }
+}
