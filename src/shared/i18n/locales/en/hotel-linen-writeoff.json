@@ -98,7 +98,8 @@
       "confirmApprove": "Authorize write-off",
       "confirmReject": "Reject write-off",
       "cosign": "Someone else signs (username and password)",
-      "cosignTitle": "Write-off signature"
+      "cosignTitle": "Write-off signature",
+      "quarantined": "The piece is held in the laundry quarantine until the write-off is approved or rejected."
     },
     "role": {
       "DELIVERS": "Requests",
@@ -124,7 +125,8 @@
       "writeoffs": "Authorized write-offs",
       "title": "Weekly linen write-off report",
       "period": "Period"
-    }
+    },
+    "quarantined": "Quarantine"
   },
   "counts": {
     "title": "Physical count",
@@ -167,7 +169,8 @@
       "saved": "Capture saved",
       "review": "Difference review",
       "pendingEmpty": "Start the count to take the stock snapshot.",
-      "confirmApprove": "Adjustments will be applied and what was counted in E will raise pending write-offs."
+      "confirmApprove": "Adjustments will be applied and what was counted in E will raise pending write-offs.",
+      "pieces": "Pieces"
     },
     "grade": {
       "A": "A · New",

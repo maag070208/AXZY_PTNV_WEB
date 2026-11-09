@@ -9,7 +9,9 @@
     "condition": "Estado físico",
     "shrinkage": "Merma",
     "laundry": "Lavandería",
-    "kardex": "Kardex"
+    "kardex": "Kardex",
+    "life": "Lotes y vida útil",
+    "areaReconciliation": "Conciliación por área"
   },
   "export": {
     "pdf": "PDF",
@@ -102,7 +104,9 @@
       "IN_PROCESS": "En proceso",
       "CLEAN": "Limpio",
       "QUARANTINE": "Cuarentena"
-    }
+    },
+    "rate": "Lavadas/pieza/mes",
+    "life": "Vida útil (lavadas)"
   },
   "kardex": {
     "title": "Kardex de blancos",
@@ -135,7 +139,10 @@
       "LOAN_OUT": "Préstamo",
       "LOAN_RETURN": "Devolución de préstamo",
       "EXTRA_RETURN": "Devolución de adicional"
-    }
+    },
+    "docHold": "A cuarentena (baja en trámite)",
+    "docRelease": "Regreso de cuarentena",
+    "docAmenity": "Consumo de amenidades"
   },
   "blank": {
     "button": "Formatos de respaldo",
@@ -219,6 +226,38 @@
     "holdsDue": "Apartados por vencer",
     "depositsTitle": "Depósito en caja por punto",
     "depositsDescription": "Depósitos de los préstamos de toallas abiertos.",
-    "pointLine": "{{pending}} toallas · {{loans}} préstamos"
+    "pointLine": "{{pending}} toallas · {{loans}} préstamos",
+    "quarantine": "Piezas en cuarentena",
+    "quarantineHint": "esperando autorización de baja"
+  },
+  "life": {
+    "title": "Lotes y vida útil",
+    "item": "Artículo",
+    "washes": "Lavadas en el periodo",
+    "pieces": "Existencia",
+    "rate": "Lavadas por pieza al mes",
+    "life": "Vida útil (lavadas)",
+    "months": "Vida estimada (meses)",
+    "rateTitle": "Ritmo de lavado por artículo",
+    "rateHint": "Lavadas por pieza al mes = piezas lavadas en el periodo ÷ existencia total ÷ meses. La vida útil en lavadas se edita en el catálogo del artículo.",
+    "none": "Sin sucios recibidos en Lavandería en el periodo.",
+    "lotsTitle": "Lotes de compra",
+    "lotsHint": "Lavadas estimadas = antigüedad del lote en meses × ritmo del artículo. Arriba de 80% de la vida útil conviene planear la reposición.",
+    "noLots": "Sin entradas de compra con lote de artículos con vida útil.",
+    "lot": "Lote",
+    "received": "Entrada",
+    "age": "Antigüedad (meses)",
+    "estWashes": "Lavadas estimadas",
+    "used": "Vida útil usada"
+  },
+  "areaReconciliation": {
+    "title": "Conciliación por área",
+    "area": "Área",
+    "received": "Limpios recibidos",
+    "dirty": "Sucios enviados",
+    "difference": "Diferencia",
+    "loss": "Faltó en traspasos",
+    "stock": "Existencia hoy",
+    "none": "Sin áreas con movimientos en el periodo."
   }
 }

@@ -98,7 +98,8 @@
       "confirmApprove": "Autorizar baja",
       "confirmReject": "Rechazar baja",
       "cosign": "Firma otra persona (usuario y contraseña)",
-      "cosignTitle": "Firma de la baja"
+      "cosignTitle": "Firma de la baja",
+      "quarantined": "La pieza está retenida en la cuarentena de Lavandería hasta que la baja se autorice o se rechace."
     },
     "role": {
       "DELIVERS": "Solicita",
@@ -124,7 +125,8 @@
       "writeoffs": "Bajas autorizadas",
       "title": "Reporte semanal de bajas de blancos",
       "period": "Periodo"
-    }
+    },
+    "quarantined": "Cuarentena"
   },
   "counts": {
     "title": "Conteo físico",
@@ -167,7 +169,8 @@
       "saved": "Captura guardada",
       "review": "Revisión de diferencias",
       "pendingEmpty": "Inicia el conteo para tomar la foto del inventario.",
-      "confirmApprove": "Se aplicarán los ajustes y lo contado en E generará bajas pendientes."
+      "confirmApprove": "Se aplicarán los ajustes y lo contado en E generará bajas pendientes.",
+      "pieces": "Piezas"
     },
     "grade": {
       "A": "A · Nuevo",

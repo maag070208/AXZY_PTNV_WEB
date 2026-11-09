@@ -133,13 +133,16 @@ export default function OrderDetailDialog({ orderId, reloadKey, onClose, onChang
             {order.receipts.length > 0 && (
               <ITFlex direction="column" gap={1}>
                 <ITText className="text-[12px] font-bold uppercase">{t("detail.receipts")}</ITText>
-                {order.receipts.map((r) => (
-                  <ITText key={r.id} className="text-[12px]">
-                    {`${dateTime(r.date)} · ${t("receive.invoice")} ${r.invoiceNumber} · ${r.receivedBy?.name ?? "—"} · ${t("receive.accepted")} ${qty(
-                      r.lines.reduce((s, l) => s + l.acceptedQty, 0)
-                    )} · ${t("receive.held")} ${qty(r.lines.reduce((s, l) => s + l.heldQty, 0))}`}
-                  </ITText>
-                ))}
+                {order.receipts.map((r) => {
+                  const lots = r.lines.map((l) => l.lot).filter((l): l is string => !!l);
+                  return (
+                    <ITText key={r.id} className="text-[12px]">
+                      {`${dateTime(r.date)} · ${t("receive.invoice")} ${r.invoiceNumber} · ${r.receivedBy?.name ?? "—"} · ${t("receive.accepted")} ${qty(
+                        r.lines.reduce((s, l) => s + l.acceptedQty, 0)
+                      )} · ${t("receive.held")} ${qty(r.lines.reduce((s, l) => s + l.heldQty, 0))}${lots.length ? ` · ${t("receive.lots")} ${lots.join(", ")}` : ""}`}
+                    </ITText>
+                  );
+                })}
               </ITFlex>
             )}
 

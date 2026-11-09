@@ -63,6 +63,10 @@ export interface HotelProduct {
   lastCost: Decimal | null;
   size: string | null;
   tagPrefix: string | null;
+  /** Vida útil estimada en lavadas (blancos; null = no se lava en el ciclo normal). */
+  washLife: number | null;
+  /** Estándar por habitación ocupada (amenidades de consumo). */
+  standardPerRoom: Decimal;
   active: boolean;
   unit?: { id: string; name: string; whole: boolean };
   category?: { id: string; name: string } | null;
@@ -81,6 +85,8 @@ export interface HotelProductInput {
   lastCost?: number | null;
   size?: string | null;
   tagPrefix?: string | null;
+  washLife?: number | null;
+  standardPerRoom?: number;
   active?: boolean;
 }
 

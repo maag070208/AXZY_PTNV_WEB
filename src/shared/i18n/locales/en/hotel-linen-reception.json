@@ -36,7 +36,8 @@
     "DELIVERED": "Delivered",
     "COLLECTED": "Collected",
     "MISSING": "Missing",
-    "CANCELLED": "Cancelled"
+    "CANCELLED": "Cancelled",
+    "CONSUMED": "Consumed"
   },
   "roomStatus": {
     "CLEANING": "Cleaning",
@@ -201,7 +202,8 @@
       "charge": "Suggested charge",
       "ticketHint": "A maintenance ticket is opened and Reception is notified for the charge.",
       "notes": "Notes",
-      "confirm": "Collect"
+      "confirm": "Collect",
+      "notesRequired": "Describe what happened to the equipment."
     },
     "add": {
       "title": "Add units",

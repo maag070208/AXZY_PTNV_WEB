@@ -36,7 +36,8 @@
     "DELIVERED": "Entregado",
     "COLLECTED": "Recolectado",
     "MISSING": "Faltante",
-    "CANCELLED": "Cancelado"
+    "CANCELLED": "Cancelado",
+    "CONSUMED": "Consumida"
   },
   "roomStatus": {
     "CLEANING": "En limpieza",
@@ -201,7 +202,8 @@
       "charge": "Cargo sugerido",
       "ticketHint": "Se abre un ticket de mantenimiento y se avisa a Recepción para el cargo.",
       "notes": "Notas",
-      "confirm": "Retirar"
+      "confirm": "Retirar",
+      "notesRequired": "Escribe qué pasó con el equipo."
     },
     "add": {
       "title": "Alta de piezas",

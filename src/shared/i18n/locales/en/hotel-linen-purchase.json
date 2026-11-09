@@ -1,13 +1,36 @@
 {
   "title": "Purchase orders",
   "description": "Linen and consumables purchasing: order, receipt against invoice, held items and replenishment.",
-  "common": { "cancel": "Cancel", "loading": "Loading…" },
-  "tabs": { "orders": "Orders", "receive": "Receiving", "holds": "Held items", "requests": "Replenishment requests" },
+  "common": {
+    "cancel": "Cancel",
+    "loading": "Loading…"
+  },
+  "tabs": {
+    "orders": "Orders",
+    "receive": "Receiving",
+    "holds": "Held items",
+    "requests": "Replenishment requests"
+  },
   "orders": {
     "new": "New PO",
     "noSupplier": "No supplier",
-    "columns": { "folio": "Number", "supplier": "Supplier", "status": "Status", "createdAt": "Created", "expected": "Promised date", "pending": "To receive", "total": "Total" },
-    "status": { "DRAFT": "Draft", "APPROVED": "Approved", "PARTIALLY_RECEIVED": "Partially received", "RECEIVED": "Received", "CLOSED": "Closed with shortfall", "CANCELLED": "Cancelled" }
+    "columns": {
+      "folio": "Number",
+      "supplier": "Supplier",
+      "status": "Status",
+      "createdAt": "Created",
+      "expected": "Promised date",
+      "pending": "To receive",
+      "total": "Total"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "APPROVED": "Approved",
+      "PARTIALLY_RECEIVED": "Partially received",
+      "RECEIVED": "Received",
+      "CLOSED": "Closed with shortfall",
+      "CANCELLED": "Cancelled"
+    }
   },
   "form": {
     "title": "New purchase order",
@@ -59,15 +82,27 @@
     "notes": "Notes",
     "lineInvalid": "Accepted + held cannot exceed received, and held items need a reason.",
     "overHint": "You are receiving more than ordered. Above the tolerance, notes and the purchase approval permission are required.",
-    "confirm": "Register receipt"
+    "confirm": "Register receipt",
+    "lots": "Lots"
   },
   "holds": {
     "hint": "Merchandise with an invoice difference: it does not enter inventory until accepted. Returning it removes it from the system.",
     "overdue": "overdue",
     "accept": "Accept",
     "return": "Return",
-    "columns": { "product": "Product", "quantity": "Qty", "reason": "Reason", "order": "PO / invoice", "dueAt": "Due", "status": "Status" },
-    "status": { "OPEN": "Open", "RETURNED": "Returned", "ACCEPTED": "Accepted" }
+    "columns": {
+      "product": "Product",
+      "quantity": "Qty",
+      "reason": "Reason",
+      "order": "PO / invoice",
+      "dueAt": "Due",
+      "status": "Status"
+    },
+    "status": {
+      "OPEN": "Open",
+      "RETURNED": "Returned",
+      "ACCEPTED": "Accepted"
+    }
   },
   "requests": {
     "weekFrom": "Week starting",
@@ -82,9 +117,24 @@
     "convert": "Convert to PO",
     "dismiss": "Dismiss",
     "openOrder": "Open {{folio}}",
-    "columns": { "folio": "Number", "source": "Source", "status": "Status", "lines": "Lines", "createdAt": "Created", "order": "PO" },
-    "source": { "WEEKLY_WRITEOFFS": "Weekly write-offs", "LOW_STOCK": "Below minimum", "MANUAL": "Manual" },
-    "status": { "OPEN": "Open", "CONVERTED": "Converted", "DISMISSED": "Dismissed" }
+    "columns": {
+      "folio": "Number",
+      "source": "Source",
+      "status": "Status",
+      "lines": "Lines",
+      "createdAt": "Created",
+      "order": "PO"
+    },
+    "source": {
+      "WEEKLY_WRITEOFFS": "Weekly write-offs",
+      "LOW_STOCK": "Below minimum",
+      "MANUAL": "Manual"
+    },
+    "status": {
+      "OPEN": "Open",
+      "CONVERTED": "Converted",
+      "DISMISSED": "Dismissed"
+    }
   },
   "pdf": {
     "title": "Purchase order",

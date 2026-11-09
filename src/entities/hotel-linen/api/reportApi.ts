@@ -1,5 +1,6 @@
 import { api } from "@shared/api/client";
 import type {
+  AreaReconciliationReport,
   ConditionReport,
   KardexReport,
   LaundryReport,
@@ -22,6 +23,7 @@ export const reportApi = {
   condition: () => api.get<ConditionReport>(`${BASE}/reports/condition`),
   shrinkage: (from?: string, to?: string) => api.get<ShrinkageReport>(`${BASE}/reports/shrinkage?${range(from, to)}`),
   laundry: (from?: string, to?: string) => api.get<LaundryReport>(`${BASE}/reports/laundry?${range(from, to)}`),
+  areaReconciliation: (from?: string, to?: string) => api.get<AreaReconciliationReport>(`${BASE}/reports/area-reconciliation?${range(from, to)}`),
   kardex: (productId: string, from?: string, to?: string, warehouseId?: string) => {
     const q = range(from, to);
     q.set("productId", productId);

@@ -144,6 +144,7 @@ export default function WriteoffDetailView({ id, requestCosign }: Props) {
         </ITAlert>
       )}
       {detail.reviewSkipped && <ITAlert variant="warning">{t("writeoffs.detail.skipped")}</ITAlert>}
+      {detail.quarantined && <ITAlert variant="warning">{t("writeoffs.detail.quarantined")}</ITAlert>}
 
       <PanelCard
         title={detail.folio}

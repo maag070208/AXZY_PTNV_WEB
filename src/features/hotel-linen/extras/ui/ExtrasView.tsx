@@ -130,7 +130,13 @@ export default function ExtrasView({ requestCosign }: Props) {
         filter: "catalog",
         sortable: false,
         catalogOptions: { data: EXTRA_STATUSES.map((s) => ({ id: s, name: tt(`extraStatus.${s}`) })) },
-        render: (r) => <ITChip size="sm" color={STATUS_COLOR[r.status]} label={tt(`extraStatus.${r.status}`)} />,
+        render: (r) => (
+          <ITChip
+            size="sm"
+            color={STATUS_COLOR[r.status]}
+            label={r.kind === "CONSUMABLE" && r.status === "DELIVERED" ? tt("extraStatus.CONSUMED") : tt(`extraStatus.${r.status}`)}
+          />
+        ),
       },
       { key: "missingQty", label: t("extras.columns.missing"), type: "number", width: 100, sortable: false, render: (r) => <ITText className="text-[12px] tabular-nums">{r.missingQty > 0 ? fmt(r.missingQty) : "—"}</ITText> },
     ],
@@ -180,7 +186,7 @@ export default function ExtrasView({ requestCosign }: Props) {
                     {r.extras.map((e) => (
                       <ITFlex key={e.id} align="center" justify="between" gap={2}>
                         <ITText className="text-[13px]">
-                          {e.quantity} × {e.product.name} <span className="text-slate-400">· {tt(`extraStatus.${e.status}`)}{e.notes ? ` · ${e.notes}` : ""}</span>
+                          {e.quantity} × {e.product.name} <span className="text-slate-400">· {e.kind === "CONSUMABLE" && e.status === "DELIVERED" ? tt("extraStatus.CONSUMED") : tt(`extraStatus.${e.status}`)}{e.notes ? ` · ${e.notes}` : ""}</span>
                         </ITText>
                         <ITFlex gap={2}>
                           {e.status === "REQUESTED" && (

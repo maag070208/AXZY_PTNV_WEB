@@ -45,6 +45,8 @@ interface FormState {
   minStock: number | null;
   overstock: number | null;
   lastCost: number | null;
+  washLife: number | null;
+  standardPerRoom: number | null;
 }
 
 const emptyForm = (kind: HotelProductKind = "LINEN"): FormState => ({
@@ -59,6 +61,8 @@ const emptyForm = (kind: HotelProductKind = "LINEN"): FormState => ({
   minStock: 0,
   overstock: 0,
   lastCost: null,
+  washLife: null,
+  standardPerRoom: null,
 });
 
 const fromProduct = (p: HotelProduct): FormState => ({
@@ -73,6 +77,8 @@ const fromProduct = (p: HotelProduct): FormState => ({
   minStock: Number(p.minStock),
   overstock: Number(p.overstock),
   lastCost: p.lastCost == null ? null : Number(p.lastCost),
+  washLife: p.washLife ?? null,
+  standardPerRoom: p.standardPerRoom == null ? null : Number(p.standardPerRoom),
 });
 
 const money = (v: string | number | null) =>
@@ -141,6 +147,8 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
       minStock: f.minStock ?? 0,
       overstock: f.overstock ?? 0,
       lastCost: f.lastCost,
+      washLife: f.washLife,
+      standardPerRoom: f.standardPerRoom ?? 0,
     };
     const ok = await run(() =>
       dialog.item ? hotelLinenApi.updateProduct(dialog.item.id, input) : hotelLinenApi.createProduct(input)
@@ -228,6 +236,23 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
       type: "number",
       width: 100,
       render: (p) => <ITText className="text-[12px] tabular-nums">{Number(p.minStock)}</ITText>,
+    },
+    {
+      key: "washLife",
+      label: t("catalog.columns.washLife"),
+      type: "number",
+      width: 100,
+      render: (p) => <ITText className="text-[12px] tabular-nums">{p.washLife ?? "—"}</ITText>,
+    },
+    {
+      key: "standardPerRoom",
+      label: t("catalog.columns.standard"),
+      type: "number",
+      width: 100,
+      render: (p) => {
+        const value = Number(p.standardPerRoom ?? 0);
+        return <ITText className="text-[12px] tabular-nums">{p.kind === "CONSUMABLE" && value ? value : "—"}</ITText>;
+      },
     },
     {
       key: "lastCost",
@@ -395,6 +420,30 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
             <ITGrid item xs={6} md={3}>
               <ITInputNumber name="linenCost" label={t("catalog.form.cost")} decimals={2} min={0} prefix="$" value={f.lastCost} onChange={(v) => setField("lastCost", v ?? null)} />
             </ITGrid>
+            {f.kind === "LINEN" && (
+              <ITGrid item xs={6} md={3}>
+                <ITInputNumber
+                  name="linenWashLife"
+                  label={t("catalog.form.washLife")}
+                  decimals={0}
+                  min={0}
+                  value={f.washLife}
+                  onChange={(v) => setField("washLife", v ?? null)}
+                />
+              </ITGrid>
+            )}
+            {f.kind === "CONSUMABLE" && (
+              <ITGrid item xs={6} md={3}>
+                <ITInputNumber
+                  name="linenStandard"
+                  label={t("catalog.form.standard")}
+                  decimals={2}
+                  min={0}
+                  value={f.standardPerRoom}
+                  onChange={(v) => setField("standardPerRoom", v ?? null)}
+                />
+              </ITGrid>
+            )}
           </ITGrid>
           <ITFlex justify="end" gap={2}>
             <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setDialog({ open: false, item: null, form: emptyForm() })} />

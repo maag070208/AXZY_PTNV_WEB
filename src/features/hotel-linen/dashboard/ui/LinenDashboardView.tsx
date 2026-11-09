@@ -68,6 +68,7 @@ export default function LinenDashboardView({ onNavigate }: Props) {
       tiles.push({ key: "toAuthorize", label: t("dash.writeoffsAuthorize"), count: data.writeoffs.toAuthorize ?? 0, icon: <FaClipboardList size={14} />, tone: "violet", path: "/linen/writeoffs" });
     }
     if (data.shortages) tiles.push({ key: "shortages", label: t("dash.shortages"), count: data.shortages.pieces, value: fmt(data.shortages.pieces), icon: <FaExclamationTriangle size={14} />, tone: "rose", hint: t("dash.areas", { count: data.shortages.areas }), path: "/linen/reconciliation" });
+    tiles.push({ key: "quarantine", label: t("dash.quarantine"), count: data.quarantine ?? 0, value: fmt(data.quarantine ?? 0), icon: <FaExclamationTriangle size={14} />, tone: "amber", hint: t("dash.quarantineHint"), path: "/linen/writeoffs" });
     if (data.towels) tiles.push({ key: "towels", label: t("dash.towels"), count: data.towels.pending, value: fmt(data.towels.pending), icon: <FaHandHolding size={14} />, tone: "sky", hint: t("dash.openLoans", { count: data.towels.openLoans }), path: "/linen/loans" });
     if (data.extras !== null) tiles.push({ key: "extras", label: t("dash.extras"), count: data.extras, icon: <FaPlusCircle size={14} />, tone: "amber", path: "/linen/extras" });
     if (data.equipment) {

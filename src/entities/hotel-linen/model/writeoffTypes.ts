@@ -20,6 +20,10 @@ export interface WriteoffRow {
   date: string;
   status: WriteoffStatus;
   warehouse: HotelWarehouseRef | null;
+  /** Almacén del área que solicitó (aunque la pieza esté retenida en cuarentena). */
+  originWarehouse: HotelWarehouseRef | null;
+  /** Baja física esperando autorización con la pieza retenida en cuarentena. */
+  quarantined: boolean;
   reason: { code: string | null; name: string } | null;
   requestedBy: HotelUserRef;
   reviewed: boolean;
@@ -58,6 +62,9 @@ export interface WriteoffDetail {
   status: WriteoffStatus;
   warehouse: HotelWarehouseRef | null;
   warehouseId: string | null;
+  originWarehouse: HotelWarehouseRef | null;
+  /** La pieza está retenida en la cuarentena de Lavandería. */
+  quarantined: boolean;
   reason: { code: string | null; name: string } | null;
   notes: string | null;
   requestedBy: HotelUserRef;
@@ -134,7 +141,7 @@ export interface StocktakeLine {
   gradeC: number | string | null;
   gradeD: number | string | null;
   gradeE: number | string | null;
-  product: { id: string; code: string; name: string };
+  product: { id: string; code: string; name: string; kind?: string };
   location: { id: string; code: string };
 }
 
@@ -148,9 +155,11 @@ export type Grade = (typeof GRADES)[number];
 export interface StocktakeCaptureLine {
   productId: string;
   locationId: string;
-  gradeA: number;
-  gradeB: number;
-  gradeC: number;
-  gradeD: number;
-  gradeE: number;
+  /** Cantidades para amenidades (sin grados A–E). */
+  countedQty?: number;
+  gradeA?: number;
+  gradeB?: number;
+  gradeC?: number;
+  gradeD?: number;
+  gradeE?: number;
 }

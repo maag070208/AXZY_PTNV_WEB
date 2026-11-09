@@ -35,12 +35,16 @@ export default function LaundryTab({ exportPdf }: { exportPdf: ExportPdf }) {
       item: productLabel(l.product),
       washed: fmt(l.washed),
       avgCycles: fmt(l.avgCycles),
+      rate: l.rate ? l.rate.toFixed(1) : "—",
+      life: l.washLife ?? "—",
       ...Object.fromEntries(report.stages.map((s) => [s, fmt(l.stages[s] ?? 0)])),
     }));
     rows.push({
       item: t("laundry.totals"),
       washed: fmt(report.totals.washed),
       avgCycles: fmt(report.totals.avgCycles),
+      rate: "—",
+      life: "—",
       ...Object.fromEntries(report.stages.map((s) => [s, fmt(report.totals.stages[s] ?? 0)])),
     });
     return {
@@ -50,6 +54,8 @@ export default function LaundryTab({ exportPdf }: { exportPdf: ExportPdf }) {
         { key: "item", label: t("laundry.item") },
         { key: "washed", label: t("laundry.washed"), align: "right" },
         { key: "avgCycles", label: t("laundry.avgCycles"), align: "right" },
+        { key: "rate", label: t("laundry.rate"), align: "right" },
+        { key: "life", label: t("laundry.life"), align: "right" },
         ...stageCols,
       ],
       rows,
@@ -79,6 +85,8 @@ export default function LaundryTab({ exportPdf }: { exportPdf: ExportPdf }) {
                 <th className={thLeft}>{t("laundry.item")}</th>
                 <th className={th}>{t("laundry.washed")}</th>
                 <th className={th}>{t("laundry.avgCycles")}</th>
+                <th className={th}>{t("laundry.rate")}</th>
+                <th className={th}>{t("laundry.life")}</th>
                 {report.stages.map((s) => <th key={s} className={th}>{tt(`laundry.stage.${s}`)}</th>)}
               </>
             }
@@ -88,6 +96,8 @@ export default function LaundryTab({ exportPdf }: { exportPdf: ExportPdf }) {
                 <td className={tdLeft}>{productLabel(l.product)}</td>
                 <td className={td}>{fmt(l.washed)}</td>
                 <td className={td}>{fmt(l.avgCycles)}</td>
+                <td className={td}>{l.rate ? l.rate.toFixed(1) : "—"}</td>
+                <td className={td}>{l.washLife ?? "—"}</td>
                 {report.stages.map((s) => <td key={s} className={td}>{fmt(l.stages[s] ?? 0)}</td>)}
               </tr>
             ))}

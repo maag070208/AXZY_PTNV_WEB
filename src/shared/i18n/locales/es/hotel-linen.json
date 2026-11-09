@@ -44,7 +44,9 @@
       "par": "Par",
       "minStock": "Mínimo",
       "cost": "Costo",
-      "status": "Estado"
+      "status": "Estado",
+      "washLife": "Vida (lavadas)",
+      "standard": "Std/hab."
     },
     "form": {
       "code": "Código",
@@ -58,7 +60,9 @@
       "par": "Par (existencia total requerida)",
       "minStock": "Mínimo",
       "overstock": "Sobreexistencia",
-      "cost": "Último costo"
+      "cost": "Último costo",
+      "washLife": "Vida útil (lavadas)",
+      "standard": "Estándar por habitación ocupada"
     }
   },
   "areas": {

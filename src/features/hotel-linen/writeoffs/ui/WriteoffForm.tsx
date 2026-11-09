@@ -41,6 +41,27 @@ interface Photo {
 
 const emptyLine = (): LineDraft => ({ id: newId(), productId: "", lotId: "", quantity: null, reason: "" });
 
+/** Reduce la foto a 1280 px JPEG 0.8 antes de subirla (el API valida que sea imagen real). */
+const compressPhoto = async (file: File): Promise<File> => {
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 1280 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.8));
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } catch {
+    return file;
+  }
+};
+
 interface Props {
   onDone: (ids: string[]) => void;
   onCancel: () => void;
@@ -132,7 +153,7 @@ export default function WriteoffForm({ onDone, onCancel }: Props) {
         warehouseId,
         locationId: locationId || null,
         notes: notes.trim() || null,
-        photos: photos.map((p) => p.file),
+        photos: await Promise.all(photos.map((p) => compressPhoto(p.file))),
         lines: lines.map((l) => ({
           productId: l.productId,
           lotId: l.lotId || null,

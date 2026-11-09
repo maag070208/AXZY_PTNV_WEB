@@ -29,6 +29,7 @@ export default function CountDetailView({ id }: Props) {
   const canApprove = linenApprove || storeApprove;
   const [detail, setDetail] = useState<StocktakeDetail | null>(null);
   const [drafts, setDrafts] = useState<Record<string, GradeDraft>>({});
+  const [singleDrafts, setSingleDrafts] = useState<Record<string, number | null>>({});
   const [dirty, setDirty] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -44,6 +45,9 @@ export default function CountDetailView({ id }: Props) {
           { A: num(l.gradeA), B: num(l.gradeB), C: num(l.gradeC), D: num(l.gradeD), E: num(l.gradeE) } as GradeDraft,
         ])
       )
+    );
+    setSingleDrafts(
+      Object.fromEntries(d.lines.map((l) => [l.id, l.gradeA === null && l.countedQty !== null ? num(l.countedQty) : null]))
     );
     setDirty(new Set());
   };
@@ -92,11 +96,23 @@ export default function CountDetailView({ id }: Props) {
     setDirty((s) => new Set(s).add(lineId));
   };
 
+  const setSingle = (lineId: string, value: number | null) => {
+    setSingleDrafts((m) => ({ ...m, [lineId]: value }));
+    setDirty((s) => new Set(s).add(lineId));
+  };
+
   const save = () =>
     act(async () => {
       const payload = lines
-        .filter((l) => dirty.has(l.id) && drafts[l.id] && touched(drafts[l.id]))
+        .filter((l) => {
+          if (!dirty.has(l.id)) return false;
+          if ((l.product.kind ?? "LINEN") === "LINEN") return touched(drafts[l.id] ?? emptyDraft());
+          return singleDrafts[l.id] !== null && singleDrafts[l.id] !== undefined;
+        })
         .map((l) => {
+          if ((l.product.kind ?? "LINEN") !== "LINEN") {
+            return { productId: l.productId, locationId: l.locationId, countedQty: singleDrafts[l.id] ?? 0 };
+          }
           const d = drafts[l.id];
           return {
             productId: l.productId,
@@ -161,8 +177,9 @@ export default function CountDetailView({ id }: Props) {
             {counting && <ITText muted className="text-[11px]">{t("counts.detail.gradesHint")}</ITText>}
             {lines.map((line) => {
               const draft = drafts[line.id] ?? emptyDraft();
+              const isLinen = (line.product.kind ?? "LINEN") === "LINEN";
               const system = num(line.systemQty);
-              const counted = num(line.countedQty);
+              const counted = isLinen ? num(line.countedQty) : (singleDrafts[line.id] ?? num(line.countedQty));
               const difference = counted !== null && system !== null ? counted - system : null;
               return (
                 <ITGrid key={line.id} container columns={12} spacing={3} className="items-end">
@@ -170,7 +187,18 @@ export default function CountDetailView({ id }: Props) {
                     <ITText className="text-[12px] font-bold">{line.product.name}</ITText>
                     <ITText muted className="font-mono text-[11px]">{[line.product.code, line.location.code].join(" · ")}</ITText>
                   </ITGrid>
-                  {counting && canCount ? (
+                  {counting && canCount && !isLinen ? (
+                    <ITGrid item xs={6} md={2}>
+                      <ITInputNumber
+                        name={`counted-${line.id}`}
+                        label={t("counts.detail.pieces")}
+                        decimals={0}
+                        min={0}
+                        value={singleDrafts[line.id] ?? null}
+                        onChange={(v) => setSingle(line.id, v ?? null)}
+                      />
+                    </ITGrid>
+                  ) : counting && canCount ? (
                     <>
                       {GRADES.map((g) => (
                         <ITGrid key={g} item xs={4} md={1}>
@@ -191,12 +219,19 @@ export default function CountDetailView({ id }: Props) {
                     </>
                   ) : (
                     <>
-                      {GRADES.map((g) => (
-                        <ITGrid key={g} item xs={2} md={1}>
-                          <ITText muted className="text-[11px]">{g}</ITText>
-                          <ITText className="text-[12px] tabular-nums">{draft[g] === null ? "—" : fmt(draft[g] as number)}</ITText>
+                      {!isLinen ? (
+                        <ITGrid item xs={6} md={2}>
+                          <ITText muted className="text-[11px]">{t("counts.detail.pieces")}</ITText>
+                          <ITText className="text-[12px] font-bold tabular-nums">{counted === null ? "—" : fmt(counted)}</ITText>
                         </ITGrid>
-                      ))}
+                      ) : (
+                        GRADES.map((g) => (
+                          <ITGrid key={g} item xs={2} md={1}>
+                            <ITText muted className="text-[11px]">{g}</ITText>
+                            <ITText className="text-[12px] tabular-nums">{draft[g] === null ? "—" : fmt(draft[g] as number)}</ITText>
+                          </ITGrid>
+                        ))
+                      )}
                       <ITGrid item xs={4} md={1}>
                         <ITText muted className="text-[11px]">{t("counts.detail.total")}</ITText>
                         <ITText className="text-[12px] font-bold tabular-nums">{counted === null ? "—" : fmt(counted)}</ITText>

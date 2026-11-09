@@ -9,7 +9,9 @@
     "condition": "Condition",
     "shrinkage": "Shrinkage",
     "laundry": "Laundry",
-    "kardex": "Kardex"
+    "kardex": "Kardex",
+    "life": "Lots and useful life",
+    "areaReconciliation": "Area reconciliation"
   },
   "export": {
     "pdf": "PDF",
@@ -102,7 +104,9 @@
       "IN_PROCESS": "In process",
       "CLEAN": "Clean",
       "QUARANTINE": "Quarantine"
-    }
+    },
+    "rate": "Washes/piece/month",
+    "life": "Useful life (washes)"
   },
   "kardex": {
     "title": "Linen kardex",
@@ -135,7 +139,10 @@
       "LOAN_OUT": "Loan",
       "LOAN_RETURN": "Loan return",
       "EXTRA_RETURN": "Extra return"
-    }
+    },
+    "docHold": "To quarantine (write-off in progress)",
+    "docRelease": "Back from quarantine",
+    "docAmenity": "Amenity consumption"
   },
   "blank": {
     "button": "Backup forms",
@@ -219,6 +226,38 @@
     "holdsDue": "Holds about to expire",
     "depositsTitle": "Cash deposit by point",
     "depositsDescription": "Deposits of the open towel loans.",
-    "pointLine": "{{pending}} towels · {{loans}} loans"
+    "pointLine": "{{pending}} towels · {{loans}} loans",
+    "quarantine": "Pieces in quarantine",
+    "quarantineHint": "waiting for write-off approval"
+  },
+  "life": {
+    "title": "Lots and useful life",
+    "item": "Item",
+    "washes": "Washes in the period",
+    "pieces": "Stock",
+    "rate": "Washes per piece per month",
+    "life": "Useful life (washes)",
+    "months": "Estimated life (months)",
+    "rateTitle": "Wash rate by item",
+    "rateHint": "Washes per piece per month = pieces washed in the period ÷ total stock ÷ months. The wash life is edited in the item catalog.",
+    "none": "No dirty linens received by the laundry in the period.",
+    "lotsTitle": "Purchase lots",
+    "lotsHint": "Estimated washes = lot age in months × item wash rate. Above 80% of the useful life, plan the replacement.",
+    "noLots": "No purchase receipts with lots for items with useful life.",
+    "lot": "Lot",
+    "received": "Received",
+    "age": "Age (months)",
+    "estWashes": "Estimated washes",
+    "used": "Useful life used"
+  },
+  "areaReconciliation": {
+    "title": "Area reconciliation",
+    "area": "Area",
+    "received": "Clean received",
+    "dirty": "Dirty sent",
+    "difference": "Difference",
+    "loss": "Lost in transfers",
+    "stock": "Stock today",
+    "none": "No areas with movements in the period."
   }
 }

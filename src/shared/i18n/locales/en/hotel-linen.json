@@ -44,7 +44,9 @@
       "par": "Par",
       "minStock": "Minimum",
       "cost": "Cost",
-      "status": "Status"
+      "status": "Status",
+      "washLife": "Wash life",
+      "standard": "Std/room"
     },
     "form": {
       "code": "Code",
@@ -58,7 +60,9 @@
       "par": "Par (total stock required)",
       "minStock": "Minimum",
       "overstock": "Overstock",
-      "cost": "Last cost"
+      "cost": "Last cost",
+      "washLife": "Wash life (washes)",
+      "standard": "Standard per occupied room"
     }
   },
   "areas": {

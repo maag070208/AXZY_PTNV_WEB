@@ -17,6 +17,8 @@ export interface LinenDashboard {
   requests: number | null;
   belowMin: number | null;
   purchase: { ordersToApprove: number | null; holdsDue: number | null } | null;
+  /** Piezas retenidas en cuarentena esperando autorización de baja. */
+  quarantine: number;
 }
 
 // ── Par e inversión ────────────────────────────────────────────────────────
@@ -93,6 +95,7 @@ export interface ShrinkageReport {
 export interface LaundryReport {
   from: string;
   to: string;
+  months: number;
   stages: string[];
   lines: Array<{
     product: { id: string; code: string; name: string; size: string | null };
@@ -101,8 +104,38 @@ export interface LaundryReport {
     avgCycles: number;
     stages: Record<string, number>;
     quarantine: number;
+    totalPieces: number;
+    /** Lavadas por pieza al mes en el periodo. */
+    rate: number;
+    /** Vida útil en lavadas (null = no se lava en el ciclo normal). */
+    washLife: number | null;
+  }>;
+  lots: Array<{
+    id: string;
+    code: string;
+    product: { id: string; code: string; name: string; size: string | null } | null;
+    receivedAt: string;
+    initialQuantity: number;
+    ageMonths: number;
+    estWashes: number | null;
+    washLife: number | null;
+    pctLife: number | null;
   }>;
   totals: { washed: number; avgCycles: number; stages: Record<string, number>; quarantine: number };
+}
+
+export interface AreaReconciliationReport {
+  from: string;
+  to: string;
+  rows: Array<{
+    warehouse: { id: string; code: string; name: string; kind: string };
+    received: number;
+    dirty: number;
+    difference: number;
+    transferLoss: number;
+    stock: number;
+  }>;
+  totals: { received: number; dirty: number; difference: number; transferLoss: number; stock: number };
 }
 
 // ── Kardex ─────────────────────────────────────────────────────────────────
@@ -119,6 +152,8 @@ export interface KardexReport {
     folio: string;
     type: string;
     status: string;
+    /** Documento que originó el movimiento (para etiquetas de cuarentena/consumo). */
+    sourceDocType: string | null;
     from: { code: string; name: string } | null;
     to: { code: string; name: string } | null;
     lot: { id: string; code: string };

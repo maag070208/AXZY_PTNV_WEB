@@ -13,6 +13,12 @@ const place = (w: { code: string; name: string } | null) => (w ? w.name : "—")
 export default function KardexTab({ exportPdf }: { exportPdf: ExportPdf }) {
   const { t } = useTranslation("hotel-linen-report");
   const tt = dyn(t);
+  const labelOf = (sourceDocType: string | null, type: string) => {
+    if (sourceDocType === "HOTEL_WRITEOFF_HOLD") return t("kardex.docHold");
+    if (sourceDocType === "HOTEL_WRITEOFF_RELEASE") return t("kardex.docRelease");
+    if (sourceDocType === "HOTEL_AMENITY_CONTROL") return t("kardex.docAmenity");
+    return tt(`kardex.movementType.${type}`, { defaultValue: type });
+  };
   const [products, setProducts] = useState<HotelProduct[]>([]);
   const [warehouses, setWarehouses] = useState<HotelWarehouse[]>([]);
   const [productId, setProductId] = useState("");
@@ -60,13 +66,14 @@ export default function KardexTab({ exportPdf }: { exportPdf: ExportPdf }) {
       rows: shown.entries.map((e) => ({
         date: fmtDateTime(e.date),
         folio: e.folio,
-        type: tt(`kardex.movementType.${e.type}`, { defaultValue: e.type }),
+        type: labelOf(e.sourceDocType, e.type),
         route: `${place(e.from)} → ${place(e.to)}`,
         lot: e.lot.code,
         delta: `${e.delta > 0 ? "+" : ""}${fmt(e.delta)}`,
         balance: fmt(e.balance),
       })),
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shown, t, tt]);
 
   return (
@@ -108,7 +115,7 @@ export default function KardexTab({ exportPdf }: { exportPdf: ExportPdf }) {
             <tr key={`${e.folio}-${i}`} className="border-b border-[var(--color-border)]">
               <td className={tdLeft}>{fmtDateTime(e.date)}</td>
               <td className={`${tdLeft} font-mono`}>{e.folio}</td>
-              <td className={tdLeft}>{tt(`kardex.movementType.${e.type}`, { defaultValue: e.type })}</td>
+              <td className={tdLeft}>{labelOf(e.sourceDocType, e.type)}</td>
               <td className={tdLeft}>{place(e.from)} → {place(e.to)}</td>
               <td className={`${tdLeft} font-mono`}>{e.lot.code}</td>
               <td className={td}>{e.delta > 0 ? "+" : ""}{fmt(e.delta)}</td>

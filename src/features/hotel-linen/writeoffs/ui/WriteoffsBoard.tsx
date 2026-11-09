@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITDataTable, ITFlex, ITTabs, ITText } from "@axzydev/axzy_ui_system";
+import { ITBadget, ITDataTable, ITFlex, ITTabs, ITText } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import {
@@ -62,7 +62,12 @@ function WriteoffsTable({ stage, warehouses, onOpen }: TableProps) {
       width: 140,
       filter: filtered ? "catalog" : false,
       catalogOptions: { data: WRITEOFF_STATUSES.map((s) => ({ id: s, name: tt(`writeoffs.status.${s}`) })) },
-      render: (r) => <WriteoffStatusChip status={r.status} />,
+      render: (r) => (
+        <ITFlex align="center" gap={1} wrap="wrap">
+          <WriteoffStatusChip status={r.status} />
+          {r.quarantined && <ITBadget color="warning" size="lg">{t("writeoffs.quarantined")}</ITBadget>}
+        </ITFlex>
+      ),
     },
     {
       key: "warehouseId",

@@ -59,7 +59,7 @@ export interface PurchaseReceiptSummary {
   date: string;
   receivedBy: PurchaseUserRef | null;
   notes: string | null;
-  lines: Array<{ orderLineId: string; receivedQty: number; acceptedQty: number; heldQty: number }>;
+  lines: Array<{ orderLineId: string; receivedQty: number; acceptedQty: number; heldQty: number; lot: string | null }>;
 }
 
 export interface PurchaseOrderDetail extends PurchaseTotals {
