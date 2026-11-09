@@ -103,7 +103,14 @@
     "kitchenSuppliers": "Proveedores",
     "kitchenCostCenters": "Gasto por centro de costo",
     "langostin": "Langostin",
-    "accountMenu": "Cuenta de {{name}}"
+    "accountMenu": "Cuenta de {{name}}",
+    "linenSectionWarehouse": "Almacén",
+    "linenSectionLaundry": "Lavandería",
+    "linenSectionRooms": "Habitaciones y puntos",
+    "linenSectionControl": "Control",
+    "linenSectionPurchases": "Compras",
+    "linenSectionCatalogs": "Catálogos",
+    "linenSectionReports": "Reportes"
   },
   "files": {
     "access": "accesos",
