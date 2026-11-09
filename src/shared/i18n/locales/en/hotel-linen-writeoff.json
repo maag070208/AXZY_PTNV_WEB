@@ -1,0 +1,180 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "back": "Back",
+    "none": "—",
+    "all": "All"
+  },
+  "writeoffs": {
+    "title": "Linen write-offs",
+    "description": "Request with photos, Ops Manager review and General Supervisor authorization.",
+    "tabs": {
+      "requests": "Requests",
+      "review": "To review",
+      "authorize": "To authorize",
+      "weekly": "Weekly report"
+    },
+    "status": {
+      "PENDING_APPROVAL": "Pending",
+      "ACTIVE": "Authorized",
+      "CANCELLED": "Rejected"
+    },
+    "reviewedYes": "Reviewed",
+    "reviewedNo": "Not reviewed",
+    "reason": {
+      "R": "Torn",
+      "M": "Stained",
+      "D": "Worn",
+      "Q": "Burned",
+      "F": "Missing / lost"
+    },
+    "disposition": {
+      "SECOND_LIFE": "Second life",
+      "DISPOSAL": "Final disposal"
+    },
+    "columns": {
+      "folio": "Folio",
+      "date": "Date",
+      "status": "Status",
+      "warehouse": "Warehouse",
+      "reason": "Reason",
+      "requestedBy": "Requested by",
+      "reviewed": "Review",
+      "quantity": "Pieces",
+      "cost": "Cost",
+      "photos": "Photos",
+      "disposition": "Destination"
+    },
+    "new": {
+      "action": "New write-off",
+      "title": "New linen write-off",
+      "description": "One write-off per reason. Pieces wait for authorization and stay in stock until then.",
+      "warehouse": "Warehouse",
+      "location": "Location",
+      "locationAuto": "Quarantine (default)",
+      "lines": "Lines",
+      "item": "Item",
+      "lot": "Lot",
+      "lotAuto": "Oldest (FIFO)",
+      "quantity": "Quantity",
+      "reason": "Reason",
+      "addLine": "Add line",
+      "removeLine": "Remove line",
+      "notes": "Notes",
+      "photos": "Evidence photos",
+      "photosHint": "Take or pick at least one photo (not needed when everything is missing items).",
+      "photosAdd": "Take or pick photos",
+      "photosRemove": "Remove photo",
+      "submit": "Request write-off",
+      "createdMany": "{{count}} write-offs created"
+    },
+    "detail": {
+      "title": "Linen write-off",
+      "requestedBy": "Requested by",
+      "authorizedBy": "Authorized by",
+      "warehouse": "Warehouse",
+      "reason": "Reason",
+      "notes": "Notes",
+      "cost": "Cost",
+      "disposition": "Destination",
+      "lines": "Lines",
+      "item": "Item",
+      "lot": "Lot",
+      "location": "Location",
+      "quantity": "Quantity",
+      "photos": "Photos",
+      "noPhotos": "No photos (missing items)",
+      "signatures": "Signatures",
+      "noSignatures": "No signatures",
+      "skipped": "Authorized without Ops Manager review",
+      "review": "Mark as reviewed",
+      "reviewNotes": "Review notes (optional)",
+      "approve": "Authorize",
+      "reject": "Reject",
+      "rejectNotes": "Rejection reason",
+      "approveTitle": "Authorize write-off",
+      "approveHint": "On authorization the pieces leave stock. Choose their destination.",
+      "confirmApprove": "Authorize write-off",
+      "confirmReject": "Reject write-off",
+      "cosign": "Someone else signs (username and password)",
+      "cosignTitle": "Write-off signature"
+    },
+    "role": {
+      "DELIVERS": "Requests",
+      "REVIEWS": "Reviews",
+      "AUTHORIZES": "Authorizes",
+      "RECEIVES": "Receives",
+      "CONFIRMS": "Confirms"
+    },
+    "method": {
+      "SESSION": "Session",
+      "PASSWORD": "Password"
+    },
+    "weekly": {
+      "from": "From",
+      "to": "To",
+      "generate": "Run",
+      "pdf": "Download PDF",
+      "empty": "No authorized write-offs in the period.",
+      "item": "Item",
+      "total": "Total",
+      "cost": "Cost",
+      "totals": "Totals",
+      "writeoffs": "Authorized write-offs",
+      "title": "Weekly linen write-off report",
+      "period": "Period"
+    }
+  },
+  "counts": {
+    "title": "Physical count",
+    "description": "Blind capture by item and location, with physical condition A–E.",
+    "new": {
+      "action": "New count",
+      "warehouse": "Warehouse",
+      "notes": "Notes",
+      "create": "Create count",
+      "blind": "Blind count"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "COUNTING": "Counting",
+      "PENDING_APPROVAL": "To approve",
+      "APPLIED": "Applied",
+      "CANCELLED": "Cancelled"
+    },
+    "columns": {
+      "folio": "Folio",
+      "warehouse": "Warehouse",
+      "status": "Status",
+      "createdAt": "Created",
+      "approvedAt": "Applied"
+    },
+    "detail": {
+      "title": "Stocktake",
+      "start": "Start count",
+      "save": "Save capture",
+      "close": "Close count",
+      "approve": "Approve differences",
+      "cancel": "Cancel count",
+      "item": "Item",
+      "location": "Location",
+      "total": "Counted total",
+      "system": "System",
+      "difference": "Difference",
+      "empty": "The count has no lines.",
+      "gradesHint": "A new · B good · C fair · D worn · E write-off. What is captured in E raises a write-off request on approval.",
+      "saved": "Capture saved",
+      "review": "Difference review",
+      "pendingEmpty": "Start the count to take the stock snapshot.",
+      "confirmApprove": "Adjustments will be applied and what was counted in E will raise pending write-offs."
+    },
+    "grade": {
+      "A": "A · New",
+      "B": "B · Good",
+      "C": "C · Fair",
+      "D": "D · Worn",
+      "E": "E · Write-off"
+    }
+  }
+}

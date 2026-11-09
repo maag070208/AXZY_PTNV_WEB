@@ -1,0 +1,224 @@
+{
+  "allGood": "All clear",
+  "page": {
+    "title": "Linen reports",
+    "description": "Par and investment, physical condition, shrinkage, laundry and kardex, exportable to PDF and CSV."
+  },
+  "tabs": {
+    "par": "Par and investment",
+    "condition": "Condition",
+    "shrinkage": "Shrinkage",
+    "laundry": "Laundry",
+    "kardex": "Kardex"
+  },
+  "export": {
+    "pdf": "PDF",
+    "csv": "CSV"
+  },
+  "period": {
+    "from": "From",
+    "to": "To"
+  },
+  "light": {
+    "green": "Complete",
+    "yellow": "Close",
+    "red": "Low",
+    "none": "No par"
+  },
+  "par": {
+    "title": "Linen par and investment",
+    "subtitle": "Investment to reach par (last cost). Products without cost: {{count}}",
+    "description": "Total stock (including in transit and loans) against par; investment is shortfall x last cost.",
+    "item": "Item",
+    "total": "Stock",
+    "par": "Par",
+    "pct": "% of par",
+    "light": "Status",
+    "shortfall": "Shortfall",
+    "cost": "Last cost",
+    "subtotal": "Before tax",
+    "total16": "With 16% VAT",
+    "total8": "With 8% VAT",
+    "totals": "Totals",
+    "none": "No items with a par defined.",
+    "transit": "{{count}} in transit",
+    "withoutCost": "No cost recorded (excluded from the investment): {{items}}",
+    "kpi": {
+      "subtotal": "Investment to par",
+      "total16": "Total 16% VAT",
+      "total8": "Total 8% VAT",
+      "noCost": "No cost",
+      "beforeTax": "before tax",
+      "iva": "{{rate}}% VAT"
+    }
+  },
+  "condition": {
+    "title": "Linen physical condition (A-E)",
+    "description": "From the last applied physical count of each warehouse.",
+    "item": "Item",
+    "total": "Total",
+    "totals": "Totals",
+    "none": "No applied counts with physical condition yet.",
+    "grade": {
+      "A": "A new",
+      "B": "B good",
+      "C": "C fair",
+      "D": "D worn",
+      "E": "E write-off"
+    }
+  },
+  "shrinkage": {
+    "title": "Linen shrinkage",
+    "item": "Item",
+    "pieces": "Pieces",
+    "amount": "Amount",
+    "totals": "Totals",
+    "reason": "Write-off reason",
+    "none": "No shrinkage in the period.",
+    "source": {
+      "TRANSFER": "Transfers",
+      "COUNT": "Counts",
+      "TOWEL": "Unreturned towels",
+      "WRITEOFF": "Write-offs"
+    },
+    "reasonName": {
+      "R": "Torn",
+      "M": "Stained",
+      "D": "Worn",
+      "Q": "Burnt",
+      "F": "Missing"
+    }
+  },
+  "laundry": {
+    "title": "Linen laundry",
+    "item": "Item",
+    "washed": "Pieces washed",
+    "avgCycles": "Average cycles",
+    "perLot": "per lot",
+    "totals": "Totals",
+    "none": "No washes or laundry stock.",
+    "stage": {
+      "DIRTY": "Dirty",
+      "IN_PROCESS": "In process",
+      "CLEAN": "Clean",
+      "QUARANTINE": "Quarantine"
+    }
+  },
+  "kardex": {
+    "title": "Linen kardex",
+    "product": "Item",
+    "warehouse": "Warehouse",
+    "pickProduct": "Pick an item",
+    "allWarehouses": "Whole hotel",
+    "pickHint": "Pick an item to see its movements.",
+    "none": "No movements in the period.",
+    "date": "Date",
+    "folio": "Folio",
+    "type": "Type",
+    "route": "From -> to",
+    "lot": "Lot",
+    "delta": "Movement",
+    "balance": "Balance",
+    "opening": "Opening balance",
+    "movementType": {
+      "INITIAL_LOAD": "Initial load",
+      "INBOUND": "Inbound",
+      "TRANSFER": "Transfer",
+      "ROOM_CONSUMPTION": "Consumption",
+      "LINEN_EXCHANGE": "Linen exchange",
+      "ADJUST_IN": "Adjustment (+)",
+      "ADJUST_OUT": "Adjustment (-)",
+      "WRITE_OFF": "Write-off",
+      "FIRST_WASH": "First wash",
+      "SUPPLIER_RETURN": "Supplier return",
+      "ROOM_EXTRA": "Room extra",
+      "LOAN_OUT": "Loan",
+      "LOAN_RETURN": "Loan return",
+      "EXTRA_RETURN": "Extra return"
+    }
+  },
+  "blank": {
+    "button": "Backup forms",
+    "title": "Blank backup forms",
+    "description": "Download the blank printed form, with the current item catalog, to use if the system is down.",
+    "form": {
+      "delivery": "Linen delivery control",
+      "dirty": "Dirty linen receipt",
+      "writeoff": "Linen write-off report",
+      "towelLoan": "Towel loan",
+      "extras": "Room extras",
+      "equipmentLoan": "Equipment loan",
+      "amenityWeekly": "Weekly amenities control"
+    },
+    "meta": {
+      "area": "Area",
+      "date": "Date",
+      "shift": "Shift",
+      "cart": "Cart",
+      "point": "Point"
+    },
+    "col": {
+      "item": "Item",
+      "delivered": "Delivered",
+      "received": "Received",
+      "notes": "Notes",
+      "deliveredFloor": "Delivered to floor",
+      "receivedDirty": "Dirty received",
+      "inUse": "In use",
+      "shortage": "Shortage",
+      "good": "Good",
+      "stained": "Stained",
+      "damaged": "Damaged",
+      "voucher": "Voucher",
+      "guest": "Guest",
+      "room": "Room",
+      "quantity": "Quantity",
+      "deposit": "Deposit",
+      "method": "Method",
+      "returned": "Returned",
+      "signature": "Signature",
+      "requestedBy": "Requested by",
+      "deliveredBy": "Delivered by",
+      "collectedBy": "Collected by",
+      "missing": "Missing",
+      "tag": "Tag",
+      "equipment": "Equipment",
+      "deliveredAt": "Delivered (time)",
+      "test": "Test",
+      "returnedAt": "Returned (time)",
+      "condition": "Condition"
+    },
+    "sign": {
+      "delivers": "Delivers",
+      "receives": "Receives",
+      "lends": "Lends",
+      "closes": "Closes shift"
+    }
+  },
+  "dash": {
+    "title": "Linen",
+    "description": "Module pending items; tap a counter to open its screen.",
+    "allGood": "All clear",
+    "noTiles": "No counters available for your role.",
+    "inTransit": "Transfers in transit",
+    "receivable": "{{count}} for you to receive",
+    "withDifference": "Transfers with difference",
+    "last7": "last 7 days",
+    "writeoffsReview": "Write-offs to review",
+    "writeoffsAuthorize": "Write-offs to authorize",
+    "shortages": "Today's shortages",
+    "areas": "{{count}} areas",
+    "towels": "Towels on loan",
+    "openLoans": "{{count}} open loans",
+    "extras": "Open extras",
+    "equipmentLoaned": "Equipment on loan",
+    "equipmentRepair": "Equipment in repair",
+    "requests": "Requests to fulfill",
+    "belowMin": "Products below minimum",
+    "ordersToApprove": "POs to approve",
+    "holdsDue": "Holds about to expire",
+    "depositsTitle": "Cash deposit by point",
+    "depositsDescription": "Deposits of the open towel loans.",
+    "pointLine": "{{pending}} towels · {{loans}} loans"
+  }
+}

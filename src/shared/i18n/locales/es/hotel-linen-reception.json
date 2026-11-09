@@ -1,0 +1,226 @@
+{
+  "common": {
+    "cancel": "Cancelar"
+  },
+  "pages": {
+    "loans": {
+      "title": "Préstamo de toallas",
+      "description": "Vales de préstamo con depósito, devoluciones y corte de turno por punto"
+    },
+    "extras": {
+      "title": "Adicionales a habitación",
+      "description": "Blancos y amenidades extra: registro de Recepción y tablero de la supervisora"
+    },
+    "equipment": {
+      "title": "Equipos",
+      "description": "Inventario por etiqueta y préstamo de equipos a habitación"
+    }
+  },
+  "method": {
+    "CASH": "Efectivo",
+    "CARD": "Tarjeta",
+    "ROOM_CHARGE": "Cargo a habitación"
+  },
+  "loanStatus": {
+    "OPEN": "Abierto",
+    "PARTIAL": "Parcial",
+    "RETURNED": "Devuelto",
+    "UNRETURNED": "No devuelto"
+  },
+  "kind": {
+    "LINEN": "Blanco",
+    "CONSUMABLE": "Consumible"
+  },
+  "extraStatus": {
+    "REQUESTED": "Solicitado",
+    "DELIVERED": "Entregado",
+    "COLLECTED": "Recolectado",
+    "MISSING": "Faltante",
+    "CANCELLED": "Cancelado"
+  },
+  "roomStatus": {
+    "CLEANING": "En limpieza",
+    "INSPECTION": "En inspección",
+    "AVAILABLE": "Disponible",
+    "OCCUPIED": "Ocupada",
+    "MAINTENANCE": "Mantenimiento",
+    "OUT_OF_SERVICE": "Fuera de servicio"
+  },
+  "equipmentStatus": {
+    "AVAILABLE": "Disponible",
+    "LOANED": "Prestado",
+    "IN_REPAIR": "En reparación",
+    "MISSING": "Extraviado",
+    "RETIRED": "Retirado"
+  },
+  "loans": {
+    "title": "Punto de préstamo",
+    "description": "Toallas prestadas y depósito en caja del punto",
+    "point": "Punto",
+    "close": "Corte de turno",
+    "return": "Devolver",
+    "kpi": {
+      "lent": "Toallas prestadas",
+      "openLoans": "{{count}} vales abiertos",
+      "deposit": "Depósito en caja · {{method}}"
+    },
+    "new": {
+      "title": "Nuevo préstamo",
+      "guest": "Huésped / visitante",
+      "room": "Habitación",
+      "product": "Artículo",
+      "quantity": "Cantidad",
+      "method": "Método del depósito",
+      "deposit": "Depósito: {{amount}} ({{unit}} por toalla)",
+      "submit": "Prestar"
+    },
+    "table": {
+      "title": "Vales de {{point}}"
+    },
+    "columns": {
+      "folio": "Vale",
+      "lentAt": "Fecha",
+      "guest": "Huésped",
+      "product": "Artículo",
+      "quantity": "Devuelto / prestado",
+      "method": "Método",
+      "deposit": "Depósito",
+      "status": "Estado"
+    },
+    "returnDialog": {
+      "title": "Devolver toallas {{folio}}",
+      "pending": "{{guest}} tiene {{count}} toalla(s) por devolver.",
+      "quantity": "Cantidad que devuelve",
+      "refund": "Se devuelve de depósito: {{amount}}",
+      "confirm": "Devolver"
+    }
+  },
+  "close": {
+    "title": "Corte de turno · {{point}}",
+    "cosignTitle": "Firma de quien recibe el turno",
+    "markTitle": "Marcar toallas no devueltas (se retiene su depósito)",
+    "endOfDay": "Cierre del día (sin turno que reciba)",
+    "carriedOver": "{{count}} vale(s) abiertos pasan al turno siguiente.",
+    "confirm": "Cerrar turno",
+    "totals": {
+      "lent": "Prestadas: {{count}}",
+      "returned": "Devueltas: {{count}}",
+      "unreturned": "No devueltas: {{count}}",
+      "collected": "Depósitos cobrados: {{amount}}",
+      "returnedDeposit": "Depósitos devueltos: {{amount}}",
+      "retained": "Depósitos retenidos: {{amount}}"
+    }
+  },
+  "closes": {
+    "title": "Cortes de turno",
+    "description": "Historial de cortes y revisión de Contabilidad",
+    "endOfDay": "Cierre del día",
+    "review": "Revisar",
+    "reviewed": "Revisado",
+    "pending": "Pendiente",
+    "columns": {
+      "folio": "Corte",
+      "date": "Fecha",
+      "point": "Punto",
+      "closedBy": "Entrega",
+      "receivedBy": "Recibe",
+      "lent": "Prestadas",
+      "unreturned": "No devueltas",
+      "collected": "Cobrado",
+      "retained": "Retenido",
+      "review": "Contabilidad"
+    }
+  },
+  "extras": {
+    "new": {
+      "title": "Registrar adicional",
+      "description": "Sale de la dotación de Recepción y avisa a la supervisora de la zona",
+      "room": "Habitación",
+      "pickRoom": "Selecciona habitación",
+      "product": "Artículo",
+      "quantity": "Cantidad",
+      "notes": "Notas",
+      "submit": "Registrar"
+    },
+    "board": {
+      "title": "Adicionales por entregar y recolectar",
+      "description": "Habitaciones con adicionales abiertos, por zona",
+      "empty": "No hay adicionales abiertos.",
+      "room": "Habitación {{number}}",
+      "collectNow": "Recolectar ahora",
+      "deliver": "Entregar",
+      "deliverCosign": "Entregar con firma",
+      "collect": "Recolectar",
+      "cosignTitle": "Firma de quien entrega"
+    },
+    "collect": {
+      "title": "Recolectar · habitación {{room}}",
+      "delivered": "Se entregaron {{count}} × {{product}}.",
+      "quantity": "Cantidad recolectada",
+      "missing": "Faltan {{count}}: quedan como faltante y se avisa a Recepción.",
+      "confirm": "Confirmar"
+    },
+    "table": {
+      "title": "Historial de adicionales"
+    },
+    "columns": {
+      "date": "Fecha",
+      "room": "Hab.",
+      "product": "Artículo",
+      "kind": "Tipo",
+      "requestedBy": "Solicitó",
+      "status": "Estado",
+      "missing": "Faltante"
+    }
+  },
+  "equipment": {
+    "lend": {
+      "title": "Prestar equipo",
+      "description": "El equipo se presta a una habitación y se avisa a la supervisora",
+      "unit": "Pieza disponible",
+      "room": "Habitación",
+      "pickRoom": "Selecciona habitación",
+      "submit": "Prestar"
+    },
+    "loans": {
+      "title": "Equipos prestados",
+      "description": "Habitaciones con equipo en préstamo",
+      "empty": "No hay equipos prestados.",
+      "room": "Hab. {{room}} · {{zone}}",
+      "delivered": "entregó {{name}}",
+      "deliver": "Entregar (prueba)",
+      "deliverCosign": "Entregar con firma",
+      "return": "Retirar",
+      "cosignTitle": "Firma de quien entrega el equipo"
+    },
+    "return": {
+      "title": "Retirar {{tag}}",
+      "GOOD": "B · Bueno",
+      "DAMAGED": "D · Dañado",
+      "MISSING": "F · Faltante",
+      "charge": "Cargo sugerido",
+      "ticketHint": "Se abre un ticket de mantenimiento y se avisa a Recepción para el cargo.",
+      "notes": "Notas",
+      "confirm": "Retirar"
+    },
+    "add": {
+      "title": "Alta de piezas",
+      "description": "Cada pieza recibe su etiqueta consecutiva",
+      "product": "Equipo",
+      "quantity": "Cantidad",
+      "submit": "Dar de alta"
+    },
+    "inventory": {
+      "title": "Inventario por etiqueta"
+    },
+    "columns": {
+      "tag": "Etiqueta",
+      "product": "Equipo",
+      "status": "Estado",
+      "notes": "Notas"
+    },
+    "repaired": "Reparado",
+    "retire": "Retirar de uso",
+    "reactivate": "Reactivar"
+  }
+}

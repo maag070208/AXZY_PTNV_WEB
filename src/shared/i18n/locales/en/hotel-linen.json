@@ -1,0 +1,218 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "saved": "Saved",
+    "active": "Active",
+    "inactive": "Inactive",
+    "edit": "Edit",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "none": "Unassigned",
+    "all": "All",
+    "loading": "Loading…"
+  },
+  "kind": {
+    "LINEN": "Linen",
+    "CONSUMABLE": "Consumable",
+    "EQUIPMENT": "Equipment",
+    "CHEMICAL": "Chemical"
+  },
+  "warehouseKind": {
+    "CENTRAL": "Warehouse",
+    "NEW_LINEN": "New linen store",
+    "LAUNDRY": "Laundry",
+    "ZONE": "Linen room",
+    "POINT": "Loan point",
+    "SPA": "Spa",
+    "EQUIPMENT": "Equipment store",
+    "CART": "Cart",
+    "ADMIN": "Administration"
+  },
+  "catalog": {
+    "title": "Linen catalog",
+    "description": "Linen items with their par, minimum and cost.",
+    "new": "New item",
+    "edit": "Edit item",
+    "quickFilter": "Type",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "kind": "Type",
+      "category": "Category",
+      "size": "Size",
+      "par": "Par",
+      "minStock": "Minimum",
+      "cost": "Cost",
+      "status": "Status"
+    },
+    "form": {
+      "code": "Code",
+      "name": "Name",
+      "kind": "Type",
+      "category": "Category",
+      "unit": "Unit",
+      "size": "Size",
+      "tagPrefix": "Tag prefix",
+      "tagPrefixHint": "For per-piece equipment, e.g. SEC",
+      "par": "Par (total stock required)",
+      "minStock": "Minimum",
+      "overstock": "Overstock",
+      "cost": "Last cost"
+    }
+  },
+  "areas": {
+    "title": "Areas and points",
+    "description": "Warehouses, linen rooms and linen points with their custodian and locations.",
+    "new": "New area",
+    "edit": "Edit area",
+    "addLocation": "Add location",
+    "locationTitle": "New location in {{name}}",
+    "noLocations": "No locations",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "kind": "Type",
+      "custodian": "Custodian",
+      "zone": "Zone",
+      "locations": "Locations",
+      "status": "Status"
+    },
+    "form": {
+      "code": "Code",
+      "name": "Name",
+      "kind": "Type",
+      "custodian": "Custodian",
+      "zone": "Zone"
+    },
+    "location": {
+      "code": "Code",
+      "name": "Name (optional)"
+    },
+    "limits": {
+      "action": "Min and max",
+      "title": "Min and max for {{name}}",
+      "hint": "Leave an item empty to remove its limit. Max 0 = no maximum.",
+      "min": "Minimum",
+      "max": "Maximum",
+      "invalid": "Maximum cannot be lower than minimum."
+    }
+  },
+  "cosign": {
+    "hint": "The other person confirms with their username and password.",
+    "username": "Username",
+    "password": "Password",
+    "confirm": "Sign",
+    "titleDelivers": "Delivering person's signature",
+    "titleReceives": "Receiving person's signature"
+  },
+  "stock": {
+    "title": "Stock",
+    "description": "Stock by item and warehouse type, with in-transit and a par traffic light. Click an item to see its lots.",
+    "kpi": {
+      "belowPar": "Items below par",
+      "inTransit": "In transit",
+      "totalPieces": "Total pieces",
+      "allGood": "All good"
+    },
+    "columns": {
+      "item": "Item",
+      "warehouse": "Warehouse",
+      "newLinen": "New",
+      "laundry": "Laundry",
+      "zones": "Linen rooms",
+      "points": "Points",
+      "spa": "Spa",
+      "inTransit": "In transit",
+      "total": "Total",
+      "par": "Par",
+      "pct": "%",
+      "light": "Status"
+    },
+    "light": {
+      "green": "Complete",
+      "yellow": "Near par",
+      "red": "Below par",
+      "none": "No par"
+    },
+    "lots": {
+      "title": "Lots of {{name}}",
+      "empty": "No lots recorded.",
+      "balance": "Balance {{n}}",
+      "received": "Received {{date}} · initial {{n}}"
+    }
+  },
+  "transfers": {
+    "title": "Transfers",
+    "description": "Shipments between warehouses with double signature: whoever delivers and whoever counts on receipt.",
+    "tabs": {
+      "inbox": "To receive",
+      "all": "All"
+    },
+    "status": {
+      "IN_TRANSIT": "In transit",
+      "ACTIVE": "Received",
+      "RECEIVED_WITH_DIFFERENCE": "Received with difference",
+      "CANCELLED": "Cancelled"
+    },
+    "role": {
+      "DELIVERS": "Delivers",
+      "RECEIVES": "Receives"
+    },
+    "method": {
+      "PASSWORD": "Password",
+      "SESSION": "Session"
+    },
+    "columns": {
+      "folio": "Folio",
+      "date": "Date",
+      "status": "Status",
+      "from": "From",
+      "to": "To",
+      "sentBy": "Sent by",
+      "receivedBy": "Received by",
+      "sent": "Sent",
+      "received": "Received",
+      "difference": "Difference"
+    },
+    "new": {
+      "action": "New transfer",
+      "title": "New transfer",
+      "description": "Choose origin, destination and the items to send.",
+      "from": "From",
+      "to": "To",
+      "lines": "Items",
+      "item": "Item",
+      "quantity": "Quantity",
+      "lot": "Lot",
+      "lotAuto": "Automatic (oldest)",
+      "addLine": "Add item",
+      "removeLine": "Remove",
+      "notes": "Notes (optional)",
+      "cosign": "Delivering person signs (another person confirms with their password)",
+      "send": "Send transfer"
+    },
+    "detail": {
+      "title": "Transfer detail",
+      "sentBy": "Sent by",
+      "receivedBy": "Received by",
+      "difference": "Difference",
+      "notes": "Shipping notes",
+      "receiveNotes": "Receiving notes",
+      "lines": "Items",
+      "blindHint": "Count what physically arrived and enter the quantity of each item.",
+      "blindNotice": "Blind count: the sent quantity is shown once the receipt is confirmed.",
+      "sent": "Sent",
+      "received": "Received",
+      "countedQty": "Counted quantity",
+      "cosign": "Receiving person signs (another person confirms with their password)",
+      "receive": "Receive",
+      "confirmReceive": "Confirm receipt",
+      "cancel": "Cancel transfer",
+      "cancelTitle": "Cancel transfer",
+      "cancelMessage": "What was sent goes back to the origin warehouse. Continue?",
+      "signatures": "Signatures",
+      "noSignatures": "No signatures."
+    }
+  }
+}

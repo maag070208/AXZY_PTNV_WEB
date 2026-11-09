@@ -1,0 +1,226 @@
+{
+  "common": {
+    "cancel": "Cancel"
+  },
+  "pages": {
+    "loans": {
+      "title": "Towel loans",
+      "description": "Loan slips with deposit, returns and shift close per point"
+    },
+    "extras": {
+      "title": "Room extras",
+      "description": "Extra linen and amenities: Reception entry and supervisor board"
+    },
+    "equipment": {
+      "title": "Equipment",
+      "description": "Inventory by tag and equipment loans to rooms"
+    }
+  },
+  "method": {
+    "CASH": "Cash",
+    "CARD": "Card",
+    "ROOM_CHARGE": "Room charge"
+  },
+  "loanStatus": {
+    "OPEN": "Open",
+    "PARTIAL": "Partial",
+    "RETURNED": "Returned",
+    "UNRETURNED": "Not returned"
+  },
+  "kind": {
+    "LINEN": "Linen",
+    "CONSUMABLE": "Consumable"
+  },
+  "extraStatus": {
+    "REQUESTED": "Requested",
+    "DELIVERED": "Delivered",
+    "COLLECTED": "Collected",
+    "MISSING": "Missing",
+    "CANCELLED": "Cancelled"
+  },
+  "roomStatus": {
+    "CLEANING": "Cleaning",
+    "INSPECTION": "Inspection",
+    "AVAILABLE": "Available",
+    "OCCUPIED": "Occupied",
+    "MAINTENANCE": "Maintenance",
+    "OUT_OF_SERVICE": "Out of service"
+  },
+  "equipmentStatus": {
+    "AVAILABLE": "Available",
+    "LOANED": "Loaned",
+    "IN_REPAIR": "In repair",
+    "MISSING": "Missing",
+    "RETIRED": "Retired"
+  },
+  "loans": {
+    "title": "Loan point",
+    "description": "Lent towels and deposit held at the point",
+    "point": "Point",
+    "close": "Shift close",
+    "return": "Return",
+    "kpi": {
+      "lent": "Towels lent",
+      "openLoans": "{{count}} open slips",
+      "deposit": "Deposit held · {{method}}"
+    },
+    "new": {
+      "title": "New loan",
+      "guest": "Guest / visitor",
+      "room": "Room",
+      "product": "Item",
+      "quantity": "Quantity",
+      "method": "Deposit method",
+      "deposit": "Deposit: {{amount}} ({{unit}} per towel)",
+      "submit": "Lend"
+    },
+    "table": {
+      "title": "Slips of {{point}}"
+    },
+    "columns": {
+      "folio": "Slip",
+      "lentAt": "Date",
+      "guest": "Guest",
+      "product": "Item",
+      "quantity": "Returned / lent",
+      "method": "Method",
+      "deposit": "Deposit",
+      "status": "Status"
+    },
+    "returnDialog": {
+      "title": "Return towels {{folio}}",
+      "pending": "{{guest}} has {{count}} towel(s) to return.",
+      "quantity": "Quantity returned",
+      "refund": "Deposit refunded: {{amount}}",
+      "confirm": "Return"
+    }
+  },
+  "close": {
+    "title": "Shift close · {{point}}",
+    "cosignTitle": "Signature of whoever takes the shift",
+    "markTitle": "Mark unreturned towels (their deposit is retained)",
+    "endOfDay": "End of day (nobody takes over)",
+    "carriedOver": "{{count}} open slip(s) carry over to the next shift.",
+    "confirm": "Close shift",
+    "totals": {
+      "lent": "Lent: {{count}}",
+      "returned": "Returned: {{count}}",
+      "unreturned": "Not returned: {{count}}",
+      "collected": "Deposits collected: {{amount}}",
+      "returnedDeposit": "Deposits refunded: {{amount}}",
+      "retained": "Deposits retained: {{amount}}"
+    }
+  },
+  "closes": {
+    "title": "Shift closes",
+    "description": "Close history and Accounting review",
+    "endOfDay": "End of day",
+    "review": "Review",
+    "reviewed": "Reviewed",
+    "pending": "Pending",
+    "columns": {
+      "folio": "Close",
+      "date": "Date",
+      "point": "Point",
+      "closedBy": "Hands over",
+      "receivedBy": "Receives",
+      "lent": "Lent",
+      "unreturned": "Not returned",
+      "collected": "Collected",
+      "retained": "Retained",
+      "review": "Accounting"
+    }
+  },
+  "extras": {
+    "new": {
+      "title": "Register extra",
+      "description": "Comes out of the Reception allotment and notifies the zone supervisor",
+      "room": "Room",
+      "pickRoom": "Pick a room",
+      "product": "Item",
+      "quantity": "Quantity",
+      "notes": "Notes",
+      "submit": "Register"
+    },
+    "board": {
+      "title": "Extras to deliver and collect",
+      "description": "Rooms with open extras, by zone",
+      "empty": "No open extras.",
+      "room": "Room {{number}}",
+      "collectNow": "Collect now",
+      "deliver": "Deliver",
+      "deliverCosign": "Deliver with signature",
+      "collect": "Collect",
+      "cosignTitle": "Signature of whoever delivers"
+    },
+    "collect": {
+      "title": "Collect · room {{room}}",
+      "delivered": "{{count}} × {{product}} were delivered.",
+      "quantity": "Quantity collected",
+      "missing": "{{count}} missing: they stay as missing and Reception is notified.",
+      "confirm": "Confirm"
+    },
+    "table": {
+      "title": "Extras history"
+    },
+    "columns": {
+      "date": "Date",
+      "room": "Room",
+      "product": "Item",
+      "kind": "Type",
+      "requestedBy": "Requested by",
+      "status": "Status",
+      "missing": "Missing"
+    }
+  },
+  "equipment": {
+    "lend": {
+      "title": "Lend equipment",
+      "description": "Equipment is lent to a room and the supervisor is notified",
+      "unit": "Available unit",
+      "room": "Room",
+      "pickRoom": "Pick a room",
+      "submit": "Lend"
+    },
+    "loans": {
+      "title": "Equipment on loan",
+      "description": "Rooms with equipment on loan",
+      "empty": "No equipment on loan.",
+      "room": "Room {{room}} · {{zone}}",
+      "delivered": "delivered by {{name}}",
+      "deliver": "Deliver (test)",
+      "deliverCosign": "Deliver with signature",
+      "return": "Collect",
+      "cosignTitle": "Signature of whoever delivers the equipment"
+    },
+    "return": {
+      "title": "Collect {{tag}}",
+      "GOOD": "G · Good",
+      "DAMAGED": "D · Damaged",
+      "MISSING": "M · Missing",
+      "charge": "Suggested charge",
+      "ticketHint": "A maintenance ticket is opened and Reception is notified for the charge.",
+      "notes": "Notes",
+      "confirm": "Collect"
+    },
+    "add": {
+      "title": "Add units",
+      "description": "Each unit gets its consecutive tag",
+      "product": "Equipment",
+      "quantity": "Quantity",
+      "submit": "Add"
+    },
+    "inventory": {
+      "title": "Inventory by tag"
+    },
+    "columns": {
+      "tag": "Tag",
+      "product": "Equipment",
+      "status": "Status",
+      "notes": "Notes"
+    },
+    "repaired": "Repaired",
+    "retire": "Take out of use",
+    "reactivate": "Reactivate"
+  }
+}

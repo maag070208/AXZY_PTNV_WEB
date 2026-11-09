@@ -1,0 +1,129 @@
+{
+  "loading": "Cargando…",
+  "page": {
+    "title": "Amenidades",
+    "description": "Control semanal de consumo por área, bodega de amenidades y toallas del Spa.",
+    "new": "Nuevo control"
+  },
+  "tabs": {
+    "controls": "Controles semanales",
+    "lowStock": "Bodega bajo mínimo",
+    "spa": "Spa hoy"
+  },
+  "status": {
+    "DRAFT": "Borrador",
+    "SUBMITTED": "Enviado",
+    "REVIEWED": "Revisado",
+    "ACKNOWLEDGED": "Enterado"
+  },
+  "role": {
+    "CONFIRMS": "Elabora",
+    "REVIEWS": "Revisa",
+    "AUTHORIZES": "Enterado"
+  },
+  "columns": {
+    "folio": "Folio",
+    "area": "Área",
+    "week": "Semana",
+    "occupied": "Noches ocupadas",
+    "flagged": "Renglones > 10%",
+    "status": "Estado"
+  },
+  "board": {
+    "title": "Controles semanales",
+    "description": "Un control por área y semana. Elabora la supervisora del área, revisa la Supervisora general y se da por enterado el Gerente de Operaciones."
+  },
+  "form": {
+    "pageTitle": "Nuevo control semanal de amenidades",
+    "title": "Área y semana",
+    "description": "El sistema calcula existencia inicial, surtido y extras; captura la existencia final contada en carros y roperías.",
+    "area": "Área",
+    "weekOf": "Semana que contiene",
+    "previous": "Semana anterior",
+    "next": "Semana siguiente",
+    "pick": "Elige un área para calcular la semana.",
+    "exists": "Ya hay un control de esa semana ({{folio}}).",
+    "open": "Abrir"
+  },
+  "sheet": {
+    "pageTitle": "Control semanal de amenidades",
+    "newTitle": "Nuevo control",
+    "calculated": "Ocupadas (calculado)",
+    "rooms": "{{count}} habitaciones",
+    "override": "Ocupadas (captura manual)",
+    "effective": "Ocupadas en uso",
+    "flagged": "Renglones > 10%",
+    "linesTitle": "Artículos",
+    "formula": "Real = inicial + surtido − final. Esperado = ocupadas × estándar + extras. Diferencia % = (real − esperado) ÷ esperado.",
+    "noLines": "No hay artículos con estándar ni movimiento en esa semana.",
+    "item": "Artículo",
+    "col": {
+      "standard": "Estándar",
+      "initial": "Inicial",
+      "supplied": "Surtido",
+      "extras": "Extras",
+      "final": "Final",
+      "real": "Real",
+      "expected": "Esperado",
+      "diff": "Dif. %"
+    },
+    "notes": "Notas",
+    "signatures": "Firmas",
+    "noSignatures": "Aún sin firmas."
+  },
+  "actions": {
+    "save": "Guardar borrador",
+    "submit": "Enviar",
+    "review": "Revisar",
+    "acknowledge": "Enterado",
+    "pdf": "PDF"
+  },
+  "lowStock": {
+    "title": "Bodega de amenidades bajo mínimo",
+    "description": "Productos de consumo de la bodega AME con existencia igual o menor al mínimo.",
+    "kpiBelow": "Bajo mínimo",
+    "kpiEmpty": "Sin existencia",
+    "none": "Ningún producto está en el mínimo.",
+    "item": "Artículo",
+    "stock": "Existencia",
+    "min": "Mínimo",
+    "max": "Máximo",
+    "suggested": "Sugerido"
+  },
+  "spa": {
+    "title": "Spa hoy",
+    "description": "Toallas del Spa: entregadas por lavandería, sucias devueltas, en uso y faltante.",
+    "date": "Fecha",
+    "delivered": "Entregadas",
+    "returned": "Sucias devueltas",
+    "inUse": "En uso",
+    "shortage": "Faltante",
+    "item": "Artículo",
+    "none": "Sin movimientos del Spa ese día.",
+    "noSpa": "No hay un almacén de Spa configurado."
+  },
+  "pdf": {
+    "title": "Control semanal de amenidades por área",
+    "area": "Área",
+    "week": "Semana",
+    "occupied": "Habitaciones ocupadas",
+    "supervisor": "Supervisora del área",
+    "no": "No.",
+    "item": "Artículo",
+    "col": {
+      "standard": "Estándar por hab. ocupada",
+      "initial": "Existencia inicial",
+      "supplied": "Surtido de almacén",
+      "extras": "Extras registrados",
+      "final": "Existencia final",
+      "real": "Consumo real",
+      "expected": "Consumo esperado",
+      "diff": "Diferencia %"
+    },
+    "formula": "Consumo real = existencia inicial + surtido de almacén − existencia final (carros y ropería del área). Consumo esperado = habitaciones ocupadas × estándar + extras registrados. Diferencia % = (real − esperado) ÷ esperado. Si es mayor a 10% se revisa con la supervisora del área y se reporta al Gerente de Operaciones.",
+    "prepared": "Elabora (supervisora del área)",
+    "reviewed": "Revisa (Supervisora general)",
+    "acknowledged": "Enterado (Gerente de Operaciones)",
+    "footer": "Control semanal de amenidades"
+  }
+}

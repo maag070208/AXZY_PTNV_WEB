@@ -1,0 +1,225 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "loading": "Cargando…"
+  },
+  "cosign": {
+    "titleDelivers": "Firma de quien entrega"
+  },
+  "shift": {
+    "MORNING": "Matutino",
+    "AFTERNOON": "Vespertino",
+    "NIGHT": "Nocturno"
+  },
+  "role": {
+    "DELIVERS": "Entrega",
+    "RECEIVES": "Recibe",
+    "CONFIRMS": "Confirma",
+    "REQUESTS": "Solicita"
+  },
+  "transferStatus": {
+    "IN_TRANSIT": "En tránsito",
+    "ACTIVE": "Recibido",
+    "RECEIVED_WITH_DIFFERENCE": "Recibido con diferencia",
+    "CANCELLED": "Cancelado"
+  },
+  "form": {
+    "title": "Nuevo pedido de área",
+    "description": "Elige el área, captura salidas y ocupadas, y pide las piezas por artículo.",
+    "area": "Área",
+    "date": "Fecha",
+    "shift": "Turno",
+    "noShift": "Sin turno",
+    "checkouts": "Salidas",
+    "occupied": "Ocupadas",
+    "suggest": "Sugerir",
+    "suggestEmpty": "El área no tiene habitaciones con kit para sugerir; captura las cantidades a mano.",
+    "suggestDone": "Sugerido calculado sobre {{rooms}} habitaciones. Puedes ajustar las cantidades.",
+    "notes": "Notas",
+    "noCategory": "Sin categoría",
+    "noProducts": "No hay artículos de blancos en el catálogo.",
+    "saveDraft": "Guardar borrador",
+    "saveSubmit": "Guardar y enviar"
+  },
+  "requests": {
+    "title": "Pedidos de área",
+    "description": "Pedidos de blancos de las áreas a lavandería: solicitado, entregado, recibido y pendiente.",
+    "new": "Nuevo pedido",
+    "tabs": {
+      "toSupply": "Por surtir",
+      "all": "Todos"
+    },
+    "columns": {
+      "folio": "Folio",
+      "area": "Área",
+      "date": "Fecha",
+      "shift": "Turno",
+      "status": "Estado",
+      "requested": "Solicitado",
+      "pending": "Pendiente"
+    },
+    "status": {
+      "DRAFT": "Borrador",
+      "SUBMITTED": "Enviado",
+      "PARTIALLY_FULFILLED": "Surtido parcial",
+      "FULFILLED": "Surtido",
+      "RECEIVED": "Recibido en área",
+      "CANCELLED": "Cancelado"
+    }
+  },
+  "detail": {
+    "title": "Detalle del pedido",
+    "requestedBy": "Solicita",
+    "dateShift": "Fecha y turno",
+    "lines": "Artículos",
+    "item": "Artículo",
+    "requested": "Solicitado",
+    "delivered": "Entregado",
+    "received": "Recibido",
+    "pending": "Pendiente",
+    "total": "Total",
+    "transfers": "Traspasos ligados",
+    "transfersHint": "El auxiliar de piso recibe cada traspaso en su pantalla de Traspasos.",
+    "noTransfers": "Aún no se surte nada.",
+    "signatures": "Firmas",
+    "noSignatures": "Sin firmas.",
+    "submit": "Enviar",
+    "cancel": "Cancelar pedido",
+    "cancelTitle": "Cancelar pedido",
+    "cancelMessage": "El pedido quedará cancelado. ¿Continuar?",
+    "fulfill": "Surtir",
+    "confirm": "Confirmar recepción en área",
+    "confirmBlocked": "Hay traspasos en tránsito sin recibir.",
+    "confirmTitle": "Confirmar recepción",
+    "confirmMessage": "Confirmas con tu firma que el área recibió lo entregado. ¿Continuar?"
+  },
+  "fulfill": {
+    "title": "Surtir {{folio}}",
+    "titleLoading": "Surtir pedido",
+    "hint": "Captura lo que entregas ahora a {{area}}. Se crea un traspaso en tránsito que el auxiliar de piso debe recibir.",
+    "deliverNow": "Entregar ahora",
+    "overPending": "Hay renglones con más piezas de las pendientes.",
+    "cosign": "Co-firma el auxiliar de piso (confirma con su contraseña)",
+    "confirm": "Surtir"
+  },
+  "dirty": {
+    "title": "Recepción de sucios",
+    "description": "Blancos sucios que entregan las áreas por carro; lavandería los cuenta y firma.",
+    "new": "Nueva recepción",
+    "withShortage": "Con faltante",
+    "noShortage": "Sin faltante",
+    "laundry": "Lavandería",
+    "columns": {
+      "folio": "Folio",
+      "date": "Fecha",
+      "origin": "Área de origen",
+      "cart": "Carro",
+      "shift": "Turno",
+      "deliveredBy": "Entrega",
+      "receivedBy": "Recibe",
+      "received": "Sucio recibido",
+      "shortage": "Faltante"
+    },
+    "detail": {
+      "title": "Detalle de la recepción",
+      "lines": "Artículos",
+      "delivered": "Entregado a piso",
+      "receivedDirty": "Sucio recibido",
+      "stillInUse": "Sigue en uso",
+      "shortage": "Faltante",
+      "good": "Bueno",
+      "stained": "Mancha",
+      "damaged": "Roto"
+    },
+    "form": {
+      "title": "Nueva recepción de sucios",
+      "description": "Cuenta el carro por artículo. Al guardar, quien entrega firma con su usuario y contraseña.",
+      "origin": "Área de origen",
+      "date": "Fecha",
+      "cart": "Carro",
+      "delivered": "Entregado a piso",
+      "shortage": "Faltante",
+      "receivedDirty": "Sucio recibido",
+      "stillInUse": "Sigue en uso",
+      "good": "Bueno",
+      "stained": "Mancha",
+      "damaged": "Roto",
+      "noPrefill": "El área no tuvo entregas ese día; agrega los artículos a mano.",
+      "addItem": "Agregar artículo",
+      "removeLine": "Quitar renglón",
+      "splitMismatch": "Bueno + mancha + roto debe sumar lo recibido sucio ({{n}}).",
+      "shortageTotal": "Faltante total: {{n}} piezas. Se avisará a los responsables.",
+      "save": "Guardar y firmar"
+    }
+  },
+  "laundry": {
+    "title": "Lavandería",
+    "description": "Blancos de lavandería por etapa, con ciclos promedio de lavado por pieza.",
+    "stage": {
+      "DIRTY": "Sucio",
+      "IN_PROCESS": "En proceso",
+      "CLEAN": "Limpio",
+      "QUARANTINE": "Cuarentena"
+    },
+    "columns": {
+      "item": "Artículo",
+      "total": "Total",
+      "cycles": "Ciclos prom."
+    },
+    "treatment": {
+      "ORDINARY": "Ordinario",
+      "STAIN": "Mancha"
+    },
+    "move": {
+      "action": "Pasar a…",
+      "title": "Pasar {{name}}",
+      "nothing": "Este artículo no tiene piezas que se puedan pasar de etapa.",
+      "from": "Desde",
+      "to": "Hacia",
+      "lot": "Lote",
+      "lotAuto": "Automático (el más antiguo)",
+      "quantity": "Cantidad (disponible {{max}})",
+      "over": "Solo hay {{max}} disponibles en esa etapa.",
+      "confirm": "Pasar"
+    },
+    "firstWash": {
+      "action": "Primera lavada (desde nuevos)",
+      "title": "Primera lavada",
+      "hint": "Pasa blancos nuevos a lavandería para su primera lavada; entran como sucios.",
+      "from": "Almacén de nuevos",
+      "fromDefault": "Predeterminado"
+    },
+    "supplierReturn": {
+      "action": "Devolver a almacén por defecto de fábrica",
+      "title": "Devolución por defecto de fábrica",
+      "hint": "Regresa piezas con defecto de fábrica al almacén para devolverlas al proveedor.",
+      "notes": "Motivo del defecto (obligatorio)"
+    },
+    "lines": {
+      "item": "Artículo",
+      "stage": "Etapa",
+      "quantity": "Cantidad",
+      "add": "Agregar renglón",
+      "remove": "Quitar renglón",
+      "cosign": "Firma quien entrega (otra persona confirma con su contraseña)",
+      "confirm": "Confirmar"
+    }
+  },
+  "reconciliation": {
+    "title": "Conciliación diaria",
+    "description": "Por área: lo entregado a piso contra el sucio recibido y lo que sigue en uso.",
+    "date": "Fecha",
+    "empty": "No hay recepciones de sucios ese día.",
+    "receipts": "{{count}} recepciones",
+    "totals": {
+      "receivedDirty": "Sucio recibido",
+      "shortage": "Faltante"
+    },
+    "columns": {
+      "delivered": "Entregado",
+      "receivedDirty": "Sucio recibido",
+      "stillInUse": "En uso",
+      "shortage": "Faltante"
+    }
+  }
+}

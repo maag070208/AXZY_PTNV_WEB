@@ -29,6 +29,13 @@ import usersEn from "./locales/en/users.json";
 import catalogEn from "./locales/en/catalog.json";
 import rolesEn from "./locales/en/roles.json";
 import kitchenEn from "./locales/en/kitchen.json";
+import hotelLinenReportEn from "./locales/en/hotel-linen-report.json";
+import hotelLinenEn from "./locales/en/hotel-linen.json";
+import hotelLinenReceptionEn from "./locales/en/hotel-linen-reception.json";
+import hotelLinenPurchaseEn from "./locales/en/hotel-linen-purchase.json";
+import hotelLinenAmenityEn from "./locales/en/hotel-linen-amenity.json";
+import hotelLinenLaundryEn from "./locales/en/hotel-linen-laundry.json";
+import hotelLinenWriteoffEn from "./locales/en/hotel-linen-writeoff.json";
 import langostinEn from "./locales/en/langostin.json";
 
 import accessEs from "./locales/es/access.json";
@@ -59,6 +66,13 @@ import usersEs from "./locales/es/users.json";
 import catalogEs from "./locales/es/catalog.json";
 import rolesEs from "./locales/es/roles.json";
 import kitchenEs from "./locales/es/kitchen.json";
+import hotelLinenReportEs from "./locales/es/hotel-linen-report.json";
+import hotelLinenEs from "./locales/es/hotel-linen.json";
+import hotelLinenReceptionEs from "./locales/es/hotel-linen-reception.json";
+import hotelLinenPurchaseEs from "./locales/es/hotel-linen-purchase.json";
+import hotelLinenAmenityEs from "./locales/es/hotel-linen-amenity.json";
+import hotelLinenLaundryEs from "./locales/es/hotel-linen-laundry.json";
+import hotelLinenWriteoffEs from "./locales/es/hotel-linen-writeoff.json";
 import langostinEs from "./locales/es/langostin.json";
 
 export const defaultNS = "common" as const;
@@ -95,6 +109,13 @@ export const NS_LIST = [
   "overtime",
   "weekly-attendance",
   "kitchen",
+  "hotel-linen",
+  "hotel-linen-report",
+  "hotel-linen-reception",
+  "hotel-linen-purchase",
+  "hotel-linen-amenity",
+  "hotel-linen-laundry",
+  "hotel-linen-writeoff",
   "langostin",
 ] as const;
 
@@ -128,6 +149,13 @@ export const resources = {
     overtime: overtimeEn,
     "weekly-attendance": weeklyAttendanceEn,
     kitchen: kitchenEn,
+    "hotel-linen": hotelLinenEn,
+    "hotel-linen-report": hotelLinenReportEn,
+    "hotel-linen-reception": hotelLinenReceptionEn,
+    "hotel-linen-purchase": hotelLinenPurchaseEn,
+    "hotel-linen-amenity": hotelLinenAmenityEn,
+    "hotel-linen-laundry": hotelLinenLaundryEn,
+    "hotel-linen-writeoff": hotelLinenWriteoffEn,
     langostin: langostinEn,
   },
   es: {
@@ -159,6 +187,13 @@ export const resources = {
     overtime: overtimeEs,
     "weekly-attendance": weeklyAttendanceEs,
     kitchen: kitchenEs,
+    "hotel-linen": hotelLinenEs,
+    "hotel-linen-report": hotelLinenReportEs,
+    "hotel-linen-reception": hotelLinenReceptionEs,
+    "hotel-linen-purchase": hotelLinenPurchaseEs,
+    "hotel-linen-amenity": hotelLinenAmenityEs,
+    "hotel-linen-laundry": hotelLinenLaundryEs,
+    "hotel-linen-writeoff": hotelLinenWriteoffEs,
     langostin: langostinEs,
   },
 } as const;

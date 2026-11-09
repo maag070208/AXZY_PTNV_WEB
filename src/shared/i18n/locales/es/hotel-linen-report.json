@@ -1,0 +1,224 @@
+{
+  "allGood": "Todo en orden",
+  "page": {
+    "title": "Reportes de blancos",
+    "description": "Par e inversión, estado físico, merma, lavandería y kardex, con exportación a PDF y CSV."
+  },
+  "tabs": {
+    "par": "Par e inversión",
+    "condition": "Estado físico",
+    "shrinkage": "Merma",
+    "laundry": "Lavandería",
+    "kardex": "Kardex"
+  },
+  "export": {
+    "pdf": "PDF",
+    "csv": "CSV"
+  },
+  "period": {
+    "from": "Desde",
+    "to": "Hasta"
+  },
+  "light": {
+    "green": "Completo",
+    "yellow": "Cerca",
+    "red": "Bajo",
+    "none": "Sin par"
+  },
+  "par": {
+    "title": "Par e inversión de blancos",
+    "subtitle": "Inversión para llegar al par (último costo). Productos sin costo: {{count}}",
+    "description": "Existencia total (con tránsito y préstamos) contra el par; la inversión es faltante × último costo.",
+    "item": "Artículo",
+    "total": "Existencia",
+    "par": "Par",
+    "pct": "% del par",
+    "light": "Semáforo",
+    "shortfall": "Faltante",
+    "cost": "Último costo",
+    "subtotal": "Antes de IVA",
+    "total16": "Con IVA 16 %",
+    "total8": "Con IVA 8 %",
+    "totals": "Totales",
+    "none": "No hay artículos con par definido.",
+    "transit": "{{count}} en tránsito",
+    "withoutCost": "Sin costo registrado (no entran a la inversión): {{items}}",
+    "kpi": {
+      "subtotal": "Inversión al par",
+      "total16": "Total IVA 16 %",
+      "total8": "Total IVA 8 %",
+      "noCost": "Sin costo",
+      "beforeTax": "antes de IVA",
+      "iva": "IVA {{rate}} %"
+    }
+  },
+  "condition": {
+    "title": "Estado físico de blancos (A–E)",
+    "description": "Del último conteo físico aplicado de cada almacén.",
+    "item": "Artículo",
+    "total": "Total",
+    "totals": "Totales",
+    "none": "Aún no hay conteos aplicados con estado físico.",
+    "grade": {
+      "A": "A nuevo",
+      "B": "B bueno",
+      "C": "C regular",
+      "D": "D desgastado",
+      "E": "E baja"
+    }
+  },
+  "shrinkage": {
+    "title": "Merma de blancos",
+    "item": "Artículo",
+    "pieces": "Piezas",
+    "amount": "Pesos",
+    "totals": "Totales",
+    "reason": "Motivo de baja",
+    "none": "Sin merma en el periodo.",
+    "source": {
+      "TRANSFER": "Traspasos",
+      "COUNT": "Conteos",
+      "TOWEL": "Toallas no devueltas",
+      "WRITEOFF": "Bajas"
+    },
+    "reasonName": {
+      "R": "Rota",
+      "M": "Mancha",
+      "D": "Desgaste",
+      "Q": "Quemada",
+      "F": "Faltante"
+    }
+  },
+  "laundry": {
+    "title": "Lavandería de blancos",
+    "item": "Artículo",
+    "washed": "Piezas lavadas",
+    "avgCycles": "Ciclos promedio",
+    "perLot": "por lote",
+    "totals": "Totales",
+    "none": "Sin lavados ni existencia en lavandería.",
+    "stage": {
+      "DIRTY": "Sucio",
+      "IN_PROCESS": "En proceso",
+      "CLEAN": "Limpio",
+      "QUARANTINE": "Cuarentena"
+    }
+  },
+  "kardex": {
+    "title": "Kardex de blancos",
+    "product": "Artículo",
+    "warehouse": "Almacén",
+    "pickProduct": "Elige un artículo",
+    "allWarehouses": "Todo el hotel",
+    "pickHint": "Elige un artículo para ver sus movimientos.",
+    "none": "Sin movimientos en el periodo.",
+    "date": "Fecha",
+    "folio": "Folio",
+    "type": "Tipo",
+    "route": "Origen → destino",
+    "lot": "Lote",
+    "delta": "Movimiento",
+    "balance": "Saldo",
+    "opening": "Saldo inicial",
+    "movementType": {
+      "INITIAL_LOAD": "Carga inicial",
+      "INBOUND": "Entrada",
+      "TRANSFER": "Traspaso",
+      "ROOM_CONSUMPTION": "Consumo",
+      "LINEN_EXCHANGE": "Cambio de blancos",
+      "ADJUST_IN": "Ajuste (+)",
+      "ADJUST_OUT": "Ajuste (−)",
+      "WRITE_OFF": "Baja",
+      "FIRST_WASH": "Primera lavada",
+      "SUPPLIER_RETURN": "Devolución a proveedor",
+      "ROOM_EXTRA": "Adicional",
+      "LOAN_OUT": "Préstamo",
+      "LOAN_RETURN": "Devolución de préstamo",
+      "EXTRA_RETURN": "Devolución de adicional"
+    }
+  },
+  "blank": {
+    "button": "Formatos de respaldo",
+    "title": "Formatos de respaldo en blanco",
+    "description": "Descarga el formato impreso en blanco, con el catálogo vigente de artículos, para usarlo si falla el sistema.",
+    "form": {
+      "delivery": "Control de entrega de blancos",
+      "dirty": "Recepción de blancos sucios",
+      "writeoff": "Reporte de baja de blancos",
+      "towelLoan": "Préstamo de toallas",
+      "extras": "Adicionales a habitación",
+      "equipmentLoan": "Préstamo de equipos",
+      "amenityWeekly": "Control semanal de amenidades"
+    },
+    "meta": {
+      "area": "Área",
+      "date": "Fecha",
+      "shift": "Turno",
+      "cart": "Carro",
+      "point": "Punto"
+    },
+    "col": {
+      "item": "Artículo",
+      "delivered": "Entregado",
+      "received": "Recibido",
+      "notes": "Observaciones",
+      "deliveredFloor": "Entregado a piso",
+      "receivedDirty": "Sucio recibido",
+      "inUse": "En uso",
+      "shortage": "Faltante",
+      "good": "Buenas",
+      "stained": "Manchadas",
+      "damaged": "Dañadas",
+      "voucher": "Vale",
+      "guest": "Huésped",
+      "room": "Habitación",
+      "quantity": "Cantidad",
+      "deposit": "Depósito",
+      "method": "Método",
+      "returned": "Devueltas",
+      "signature": "Firma",
+      "requestedBy": "Solicitó",
+      "deliveredBy": "Entregó",
+      "collectedBy": "Recogió",
+      "missing": "Faltante",
+      "tag": "Etiqueta",
+      "equipment": "Equipo",
+      "deliveredAt": "Entrega (hora)",
+      "test": "Prueba",
+      "returnedAt": "Devolución (hora)",
+      "condition": "Condición"
+    },
+    "sign": {
+      "delivers": "Entrega",
+      "receives": "Recibe",
+      "lends": "Presta",
+      "closes": "Cierra turno"
+    }
+  },
+  "dash": {
+    "title": "Blancos",
+    "description": "Pendientes del módulo; toca un contador para ir a su pantalla.",
+    "allGood": "Todo en orden",
+    "noTiles": "No hay contadores disponibles para tu rol.",
+    "inTransit": "Traspasos en tránsito",
+    "receivable": "{{count}} por recibir tú",
+    "withDifference": "Traspasos con diferencia",
+    "last7": "últimos 7 días",
+    "writeoffsReview": "Bajas por revisar",
+    "writeoffsAuthorize": "Bajas por autorizar",
+    "shortages": "Faltantes del día",
+    "areas": "{{count}} áreas",
+    "towels": "Toallas prestadas",
+    "openLoans": "{{count}} préstamos abiertos",
+    "extras": "Adicionales abiertos",
+    "equipmentLoaned": "Equipos prestados",
+    "equipmentRepair": "Equipos en reparación",
+    "requests": "Pedidos por surtir",
+    "belowMin": "Productos bajo mínimo",
+    "ordersToApprove": "OC por aprobar",
+    "holdsDue": "Apartados por vencer",
+    "depositsTitle": "Depósito en caja por punto",
+    "depositsDescription": "Depósitos de los préstamos de toallas abiertos.",
+    "pointLine": "{{pending}} toallas · {{loans}} préstamos"
+  }
+}
