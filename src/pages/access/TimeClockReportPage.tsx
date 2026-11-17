@@ -1,4 +1,5 @@
-import { ITFlex, ITPage } from "@axzydev/axzy_ui_system";
+import { ITFlex } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaUserClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ const TIME_CLOCK_SOURCE: AccessReportSource = {
   people: timeClockApi.people,
   reportExport: timeClockApi.reportExport,
   csvFile: "timeClock",
+  timeline: true,
 };
 
 export default function TimeClockReportPage() {
@@ -27,7 +29,7 @@ export default function TimeClockReportPage() {
   const fx = useAccessReport({ download: downloadTimeClockReportPdf, source: TIME_CLOCK_SOURCE });
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("report.title")}
       description={t("report.description")}
@@ -44,6 +46,6 @@ export default function TimeClockReportPage() {
         <LinksSummary onGoToLink={() => navigate("/hr/time-clock/employees")} />
         <AccessReportTab fx={fx} />
       </ITFlex>
-    </ITPage>
+    </AppPage>
   );
 }

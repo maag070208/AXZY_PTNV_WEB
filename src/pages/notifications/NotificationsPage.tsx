@@ -1,4 +1,5 @@
-import { ITButton, ITPage, ITText, ITStack } from "@axzydev/axzy_ui_system";
+import { ITButton, ITText, ITStack } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuBell, LuCheckCheck } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { NotificationItem, useNotificationsList, type NotificationFilter } from "@features/notification/list";
@@ -37,7 +38,7 @@ export default function NotificationsPage() {
   const empty = !initialLoad && fx.groups.length === 0;
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("title")}
       description={tt("description")}
@@ -94,6 +95,6 @@ export default function NotificationsPage() {
           )}
         </PanelCard>
       </ITStack>
-    </ITPage>
+    </AppPage>
   );
 }

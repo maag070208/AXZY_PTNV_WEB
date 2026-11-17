@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { ITAlert, ITBentoStatStrip, ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
-import { LuCircleCheck, LuClock, LuInbox, LuKanban, LuTicket, LuUserX } from "react-icons/lu";
+import { ITAlert, ITBentoStatStrip, ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
+import { LuCircleCheck, LuClock, LuInbox, LuKanban, LuPlus, LuTicket, LuUserX } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
@@ -11,7 +12,7 @@ import {
 import { useGoBack } from "@shared/lib/useGoBack";
 import type { ListSummaryItem } from "@shared/ui/list-summary-strip";
 import { LangostinConfirm } from "@shared/ui/langostin-confirm";
-import { onAppEvent } from "@shared/lib/appEvents";
+import { emitAppEvent, onAppEvent } from "@shared/lib/appEvents";
 
 /** Color de cada cifra del resumen (punto de la tira y segmento de la barra). */
 /** Tono bento de cada cifra (el mismo lenguaje que el mosaico del inicio). */
@@ -34,6 +35,7 @@ export default function TicketsListPage() {
   const goBack = useGoBack();
   const { t: tt } = useTranslation(["tickets", "common"]);
   const canDelete = useCan("tickets.delete");
+  const canCreate = useCan("tickets.create");
 
   const list = useTicketsList();
   // Un ticket creado desde el bot (mismo layout, otra montura) avisa aquí:
@@ -68,7 +70,7 @@ export default function TicketsListPage() {
     : [];
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("list.title")}
       description={tt("list.description")}
@@ -90,6 +92,14 @@ export default function TicketsListPage() {
               <ITText className="font-bold text-[11px]">{tt("list.board")}</ITText>
             </ITFlex>
           </ITButton>
+          {canCreate && (
+            <ITButton variant="filled" color="primary" onClick={() => emitAppEvent("ticket:new", {})}>
+              <ITFlex align="center" gap={1}>
+                <LuPlus size={14} />
+                <ITText className="font-bold text-[11px]">{tt("list.new")}</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
         </ITFlex>
       }
     >
@@ -157,6 +167,6 @@ export default function TicketsListPage() {
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />
-    </ITPage>
+    </AppPage>
   );
 }

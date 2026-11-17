@@ -1,4 +1,5 @@
-import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaExchangeAlt, FaLink, FaMagic, FaUsersCog } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,7 +13,7 @@ export default function TimeClockEmployeesPage() {
   const fx = useTimeClockEmployees();
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("employees.title")}
       description={t("employees.description")}
@@ -68,6 +69,6 @@ export default function TimeClockEmployeesPage() {
         fx={fx}
         onSeeReport={() => navigate("/hr/time-clock/entries-exits")}
       />
-    </ITPage>
+    </AppPage>
   );
 }

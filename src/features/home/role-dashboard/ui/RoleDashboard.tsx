@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LuActivity, LuChefHat, LuClock, LuServer, LuUser, LuUsers } from "react-icons/lu";
 import { usePermissions, useCurrentRole } from "@entities/user";
@@ -122,11 +123,37 @@ interface Props {
 }
 
 /** Tablero de inicio según el rol y los permisos de la sesión. */
+const TAB_STORAGE_KEY = "home-tab";
+const readStoredTab = (): string | null => {
+  try {
+    return sessionStorage.getItem(TAB_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
 export default function RoleDashboard({ slots = {}, panels = {}, live }: Props) {
   const permissions = usePermissions();
   const role = useCurrentRole();
   const { t } = useTranslation("home");
-  const [grupo, setGrupo] = useState<WidgetGroup | null>(null);
+  // La pestaña vive en la URL (`?tab=`) y se recuerda en sessionStorage.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const grupo = (searchParams.get("tab") ?? readStoredTab()) as WidgetGroup | null;
+  const setGrupo = (next: WidgetGroup) => {
+    try {
+      sessionStorage.setItem(TAB_STORAGE_KEY, next);
+    } catch {
+      /* sin sessionStorage: solo se usa la URL */
+    }
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        params.set("tab", next);
+        return params;
+      },
+      { replace: true }
+    );
+  };
 
   const allowed = (id: WidgetId) => {
     // Un módulo apagado no pinta su pestaña ni su tarjeta en el inicio.

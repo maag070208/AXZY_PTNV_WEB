@@ -6,3 +6,4 @@ export {
 } from "./model/useAccessReport";
 export { default as AccessReportTab } from "./ui/AccessReportTab";
 export { default as AccessReportExportActions } from "./ui/AccessReportExportActions";
+export { default as PunchTimeline, timelineText, type TimelineInput } from "./ui/PunchTimeline";

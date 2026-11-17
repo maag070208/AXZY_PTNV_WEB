@@ -15,12 +15,12 @@ import {
   ITInput,
   ITBentoPill,
   ITBentoStatStrip,
-  ITPage,
   ITSearchSelect,
   ITText,
   ITTextarea,
-  ITToast,
+  ITToast
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import type {
   Column,
   ITDataTableFetchParams,
@@ -436,7 +436,7 @@ export default function AccessPage() {
   ];
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("title")}
       description={tt("description")}
@@ -780,7 +780,7 @@ export default function AccessPage() {
           onClose={() => setToast(null)}
         />
       )}
-    </ITPage>
+    </AppPage>
   );
 }
 

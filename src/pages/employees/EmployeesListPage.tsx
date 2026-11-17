@@ -3,8 +3,9 @@ import {
   ITBentoStatStrip,
   ITButton,
   ITFlex,
-  ITPage,
-  ITText, ITStack } from "@axzydev/axzy_ui_system";
+  ITText, ITStack
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuPlus, LuUsersRound } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -40,7 +41,7 @@ export default function EmployeesListPage() {
     : [];
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={tt("title")}
       description={tt("description", { count: list.total })}
       backAction={() => goBack("/")}
@@ -108,6 +109,6 @@ export default function EmployeesListPage() {
           />
         )}
       </ITStack>
-    </ITPage>
+    </AppPage>
   );
 }

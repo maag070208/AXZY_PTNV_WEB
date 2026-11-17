@@ -109,7 +109,11 @@
     "exit": "Última salida",
     "hours": "Horas",
     "date": "Fecha",
-    "incident": "Incidencia"
+    "incident": "Incidencia",
+    "outings": "Salidas",
+    "away": "Tiempo fuera",
+    "incompleteSequence": "Secuencia incompleta",
+    "sequence": "Secuencia"
   },
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entrada sin salida",
@@ -132,5 +136,16 @@
     "totalPeople": "Personas",
     "totalHours": "Horas",
     "totalIncidents": "Incidencias"
+  },
+  "timeline": {
+    "title": "Secuencia de checadas",
+    "entry": "Entrada",
+    "exit": "Salida",
+    "back": "Regreso",
+    "finalExit": "Salida final",
+    "incomplete": "Secuencia incompleta",
+    "details": "Ver secuencia",
+    "away": "Tiempo fuera",
+    "empty": "Sin checadas en el periodo"
   }
 }

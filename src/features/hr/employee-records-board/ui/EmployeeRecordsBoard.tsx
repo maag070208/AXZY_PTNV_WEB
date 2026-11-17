@@ -1,56 +1,16 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  ITAlert,
-  ITBadget,
-  ITCard,
-  ITButton,
-  ITChip,
-  ITFlex,
-  ITConfirmDialog,
-  ITInput,
-  ITSearchSelect,
-  ITToast, ITText } from "@axzydev/axzy_ui_system";
-import { FaBell, FaChevronRight, FaSearch } from "react-icons/fa";
+import { ITAlert, ITConfirmDialog, ITInput, ITToast, ITText } from "@axzydev/axzy_ui_system";
+import { FaChevronDown, FaRegBell, FaSearch } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
-import { ProfileAvatar } from "@shared/ui/profile-avatar";
-import { RowAction } from "@shared/ui/row-action";
 import { Num } from "@shared/ui/bento-bits";
-import type { RecordGapsRow } from "@entities/dashboard";
-import { recordStatus, type RecordFilter, type RecordStatus, type UseEmployeeRecords } from "../model/useEmployeeRecords";
+import type { RecordFilter, UseEmployeeRecords } from "../model/useEmployeeRecords";
+import RecordDetail from "./RecordDetail";
+import RecordRow from "./RecordRow";
+import { NAVY, hairline, recordsGrid } from "./recordStyles";
 
 const FILTERS: RecordFilter[] = ["ALL", "REQUIRED", "INCOMPLETE", "COMPLETE"];
-const OTHER_DOCS_PREVIEW = 4;
-const FIELDS_PREVIEW = 4;
-
-const STATUS_COLOR = { REQUIRED: "warning", INCOMPLETE: "gray", COMPLETE: "success" } as const satisfies Record<RecordStatus, string>;
-
-const percent = (done: number, total: number) => (total ? Math.round((done / total) * 100) : 0);
-
-function Progress({ done, total, label }: { done: number; total: number; label: string }) {
-  const pct = percent(done, total);
-  const complete = total > 0 && done === total;
-  return (
-    <div className="w-[110px]" title={label}>
-      <div className="flex items-baseline justify-between gap-2">
-        <ITText as="span" className="text-[10px] font-medium text-slate-500">{pct}%</ITText>
-        <ITText as="span" className={`text-[11px] font-bold tabular-nums ${complete ? "text-[color:var(--color-success)]" : "text-slate-700"}`}>
-          {done}/{total}
-        </ITText>
-      </div>
-      <div className="mt-1 h-1 overflow-hidden rounded-full bg-slate-100">
-        <div
-          className="h-full rounded-full"
-          style={{
-            width: `${Math.max(pct, done > 0 ? 6 : 0)}%`,
-            backgroundColor: complete ? "var(--color-success)" : "var(--color-primary)",
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
+const th = "text-[10.5px] font-bold uppercase tracking-[0.05em] text-slate-500";
+const cardStyle = { background: "var(--it-card-bg, #ffffff)", border: "1px solid #e6eaf0", borderRadius: 16 } as const;
 
 interface Props {
   fx: UseEmployeeRecords;
@@ -59,20 +19,14 @@ interface Props {
 }
 
 /**
- * Expedientes de empleados (RH): indicadores, lista filtrable con los
- * obligatorios de cada quien, avance del expediente y de los datos personales,
- * y el detalle de la persona elegida para ver o subir documentos y avisarle.
+ * Expedientes de empleados (RH): lista filtrable con casillas de selección, los
+ * obligatorios, el avance del expediente y de los datos personales, y el
+ * detalle de la persona elegida para ver o subir documentos y avisarle.
  *
- * Las tarjetas de arriba y la tabla usan el estilo de Pre-nómina: tarjetas
- * blancas sin borde (la primera en tinta), número rojo solo en lo que falta,
- * y la tabla sin fondo de encabezado, con líneas finas inline (las clases
+ * La tabla usa divs con roles ARIA y líneas finas inline (las clases
  * border-slate/border-[color:] no se generan en el CSS de la app y el tema
  * mete reglas globales a thead/tbody con !important).
  */
-const hairline = "1px solid #edf1f5";
-const grid = "grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.1fr)_auto] items-center";
-const th = "text-[10.5px] font-bold uppercase tracking-[0.05em] text-slate-400";
-
 /** Tarjeta de indicador blanca, como las de Pre-nómina. */
 function RecordKpi({ label, value, alert = false }: { label: string; value: number; alert?: boolean }) {
   return (
@@ -95,25 +49,14 @@ function RecordKpi({ label, value, alert = false }: { label: string; value: numb
 
 export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
   const { t } = fx;
-  const navigate = useNavigate();
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploadType, setUploadType] = useState<string | null>(null);
-  const [showAllDocs, setShowAllDocs] = useState(false);
-  const [showAllFields, setShowAllFields] = useState(false);
   const sel = fx.selected;
 
   const pickFile = (typeId: string) => {
     setUploadType(typeId);
     fileInput.current?.click();
   };
-
-  // Indicadores estilo Pre-nómina: plantilla en tinta, lo que falta en rojo.
-
-  const done = (items: Array<{ delivered: boolean }>) => items.filter((i) => i.delivered).length;
-  const totalOf = (r: RecordGapsRow) => ({
-    done: done(r.requiredDocuments) + done(r.otherDocuments) + r.filledFields.length,
-    total: r.requiredDocuments.length + r.otherDocuments.length + r.filledFields.length + r.missingFields.length,
-  });
 
   if (fx.loading && fx.visible.length === 0 && !fx.error) {
     return (
@@ -123,9 +66,12 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
     );
   }
 
+  const percentComplete = fx.counts.total ? Math.round((fx.counts.COMPLETE / fx.counts.total) * 100) : 0;
+  const countOf = (f: RecordFilter) => (f === "ALL" ? fx.counts.total : fx.counts[f]);
+
   return (
     <div className="flex flex-col gap-4">
-      {/* Indicadores estilo Pre-nómina (una fila de cuatro tarjetas). */}
+      {/* Indicadores estilo Pre-nómina (solo en la pantalla de Expedientes). */}
       {!hideKpis && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-[14px] px-4 py-3.5" style={{ background: "var(--color-primary-900)" }}>
@@ -140,325 +86,128 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
         </div>
       )}
 
-      {fx.error && (
-        <ITAlert variant="error">{fx.error}</ITAlert>
-      )}
+      {fx.error && <ITAlert variant="error">{fx.error}</ITAlert>}
 
-      <div className="grid gap-4 xl:!grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-4 xl:!grid-cols-[minmax(0,1fr)_28%]">
         {/* Lista */}
-        <ITCard contentClassName="!p-0">
-          {/* Filtros: buscar, pastillas de estado y área */}
-          <div
-            className="grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_auto_minmax(0,1fr)] md:items-center"
-            style={{ borderBottom: hairline }}
-          >
-            <ITInput
-              name="employee_records_search"
-              size="sm"
-              value={fx.search}
-              onChange={(e) => fx.setSearch(e.target.value)}
-              placeholder={t("records.filters.search")}
-              iconLeft={<FaSearch size={12} />}
-            />
-            <div className="flex flex-wrap items-center gap-1.5">
-              {FILTERS.map((f) => (
-                <ITChip
-                  key={f}
-                  size="sm"
-                  label={f === "ALL" ? t("records.filters.all") : t(`records.filters.${f}`)}
-                  selected={fx.filter === f}
-                  onClick={() => fx.setFilter(f)}
-                  color="primary"
-                  variant="outlined"
-                />
-              ))}
+        <section className="min-w-0 overflow-hidden" style={cardStyle}>
+          <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5">
+            <div>
+              <h3 className="m-0 text-[17px] font-semibold text-slate-900">{t("records.listTitle")}</h3>
+              <div className="mt-0.5 text-[12.5px] text-slate-500">
+                {t("records.subtitle", { total: fx.counts.total, percent: percentComplete })}
+              </div>
             </div>
-            <ITSearchSelect
-              name="employee_records_department"
-              size="sm"
-              placeholder={t("records.filters.department")}
-              options={[
-                { value: "", label: t("records.filters.allDepartments") },
-                ...fx.departments.map((d) => ({ value: d.id, label: d.name })),
-              ]}
-              value={fx.departmentId}
-              onChange={(value) => fx.setDepartmentId(String(value))}
-            />
+            <button
+              type="button"
+              disabled={fx.notifyTargets.length === 0}
+              onClick={() => fx.setBulkOpen(true)}
+              className="flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ background: NAVY }}
+            >
+              <FaRegBell size={13} />
+              {t("records.remind", { count: fx.notifyTargets.length })}
+            </button>
           </div>
 
-          <div className="max-h-[640px] overflow-auto">
+          <div className="mt-4 grid gap-2 px-5 md:grid-cols-[minmax(0,1fr)_minmax(0,240px)] md:items-center">
+            <ITInput
+              name="employee_records_search"
+              value={fx.search}
+              onChange={(e) => fx.setSearch(e.target.value)}
+              placeholder={t("records.filters.searchShort")}
+              iconLeft={<FaSearch size={12} />}
+            />
+            <label
+              className="relative flex h-full min-h-[40px] cursor-pointer items-center gap-2 rounded-[10px] bg-white px-3 text-[13px]"
+              style={{ border: "1px solid #dfe3ea" }}
+            >
+              <span className="text-slate-500">{t("records.filters.areaLabel")}</span>
+              <select
+                name="employee_records_department"
+                value={fx.departmentId}
+                onChange={(e) => fx.setDepartmentId(e.target.value)}
+                className="min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pr-6 font-semibold text-slate-900 outline-none"
+              >
+                <option value="">{t("records.filters.allAreas")}</option>
+                {fx.departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown size={11} className="pointer-events-none absolute right-3 text-slate-500" />
+            </label>
+          </div>
+
+          {/* Filtro segmentado */}
+          <div className="mt-3 flex flex-wrap px-5 pb-4">
+            <div className="inline-flex flex-wrap gap-1 rounded-xl p-1" style={{ background: "#f1f3f6" }}>
+              {FILTERS.map((f) => {
+                const active = fx.filter === f;
+                return (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => fx.setFilter(f)}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-semibold"
+                    style={{ background: active ? NAVY : "transparent", color: active ? "#ffffff" : "#334155" }}
+                  >
+                    {f === "ALL" ? t("records.filters.all") : t(`records.filters.${f}`)}
+                    <span
+                      className="rounded-full px-1.5 text-[11px] font-bold tabular-nums"
+                      style={{ background: active ? "rgb(255 255 255 / 0.18)" : "#e3e7ee" }}
+                    >
+                      {countOf(f)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="max-h-[640px] overflow-auto" style={{ borderTop: hairline }}>
             {/* Divs con roles ARIA (no <table>): el tema inyecta reglas globales
                 a thead/tbody con !important y ensucian cualquier tabla plana. */}
-            <div role="table" aria-label={t("records.columns.employee")} className="min-w-[760px]">
-              <div
-                role="row"
-                className={`${grid} sticky top-0 z-10 px-4 py-2.5`}
-                style={{ borderBottom: hairline, background: "var(--it-card-bg, #ffffff)" }}
-              >
+            <div role="table" aria-label={t("records.columns.employee")} className="min-w-[860px]">
+              <div role="row" className={`${recordsGrid} sticky top-0 z-10 px-4 py-2.5`} style={{ background: "#f4f6f9", borderBottom: hairline }}>
+                <span role="columnheader">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 cursor-pointer"
+                    checked={fx.allChecked}
+                    onChange={fx.toggleAllChecked}
+                    aria-label={t("records.selectAll")}
+                  />
+                </span>
                 <span role="columnheader" className={th}>{t("records.columns.employee")}</span>
+                <span role="columnheader" className={th}>{t("records.columns.area")}</span>
                 <span role="columnheader" className={th}>{t("records.columns.required")}</span>
                 <span role="columnheader" className={th}>{t("records.columns.record")}</span>
                 <span role="columnheader" className={th}>{t("records.columns.personal")}</span>
                 <span role="columnheader" className={th}>{t("records.columns.status")}</span>
-                <span role="columnheader" className={th} />
+                <span role="columnheader" />
               </div>
               {fx.visible.length === 0 && (
                 <div role="row" className="px-4 py-10 text-center text-[12px] text-slate-400">
                   {t("records.empty")}
                 </div>
               )}
-              {fx.visible.map((r, i) => {
-                const status = recordStatus(r);
-                const active = sel?.userId === r.userId;
-                const fieldsTotal = r.filledFields.length + r.missingFields.length;
-                return (
-                  <div
-                    role="row"
-                    key={r.userId}
-                    onClick={() => fx.select(r.userId)}
-                    className={`${grid} cursor-pointer px-4 py-2 ${
-                      active ? "bg-slate-50 shadow-[inset_3px_0_0_var(--color-primary)]" : "hover:bg-slate-50/60"
-                    }`}
-                    style={i < fx.visible.length - 1 ? { borderBottom: hairline } : undefined}
-                  >
-                    <span role="cell" className="pr-3">
-                      <div className="flex items-center gap-3">
-                        <ProfileAvatar name={r.name} size="sm" />
-                        <div className="min-w-0 max-w-[200px]">
-                          <div className="line-clamp-2 text-[12px] font-bold leading-tight text-slate-900">{r.name}</div>
-                          <div className="text-[10px] text-slate-500">
-                            {[r.employeeNumber ? `#${r.employeeNumber}` : "#—", r.departmentName].filter(Boolean).join(" · ")}
-                          </div>
-                        </div>
-                      </div>
-                    </span>
-                    <span role="cell">
-                      {/* Los obligatorios, en puntos: se lee de un vistazo y no
-                          repite tres etiquetas rojas en cada fila. El detalle
-                          con el nombre de cada documento está a la derecha. */}
-                      <div
-                        className="flex items-center gap-1.5"
-                        title={r.requiredDocuments.map((d) => `${d.delivered ? "✓" : "✗"} ${d.name}`).join("\n")}
-                      >
-                        {r.requiredDocuments.map((d) => (
-                          <span
-                            key={d.id}
-                            className={`h-2 w-2 rounded-full ${d.delivered ? "bg-emerald-500" : "bg-rose-300"}`}
-                          />
-                        ))}
-                        <ITText as="span" className="ml-1 text-[11px] font-semibold tabular-nums text-slate-600">
-                          {done(r.requiredDocuments)}/{r.requiredDocuments.length}
-                        </ITText>
-                      </div>
-                    </span>
-                    <span role="cell">
-                      <Progress
-                        done={done(r.otherDocuments)}
-                        total={r.otherDocuments.length}
-                        label={t("records.progress", { done: done(r.otherDocuments), total: r.otherDocuments.length })}
-                      />
-                    </span>
-                    <span role="cell">
-                      <Progress
-                        done={r.filledFields.length}
-                        total={fieldsTotal}
-                        label={t("records.progress", { done: r.filledFields.length, total: fieldsTotal })}
-                      />
-                    </span>
-                    <span role="cell">
-                      <ITBadget size="sm" className="whitespace-nowrap" color={STATUS_COLOR[status]} label={t(`records.status.${status}`)} />
-                    </span>
-                    <span role="cell">
-                      <ITFlex justify="end" gap={1} onClick={(e) => e.stopPropagation()}>
-                        {status !== "COMPLETE" && (
-                          <RowAction
-                            icon={<FaBell size={12} />}
-                            label={t("records.notify")}
-                            tone="warning"
-                            disabled={fx.notifying === r.userId}
-                            onClick={() => void fx.notify(r)}
-                          />
-                        )}
-                        <RowAction
-                          icon={<FaChevronRight size={12} />}
-                          label={t("records.detail.open")}
-                          tone="primary"
-                          onClick={() => navigate(`/employees/${r.userId}`)}
-                        />
-                      </ITFlex>
-                    </span>
-                  </div>
-                );
-              })}
+              {fx.visible.map((r, i) => (
+                <RecordRow key={r.userId} row={r} fx={fx} active={sel?.userId === r.userId} last={i === fx.visible.length - 1} />
+              ))}
             </div>
           </div>
-        </ITCard>
+        </section>
 
         {/* Detalle */}
-        <ITCard className="xl:sticky xl:top-4" contentClassName="flex max-h-[760px] flex-col !p-4">
+        <section className="flex max-h-[820px] min-w-0 flex-col self-start p-5 xl:sticky xl:top-4" style={cardStyle}>
           {!sel ? (
             <div className="p-8 text-center text-[12px] text-slate-400">{t("records.detail.select")}</div>
           ) : (
-            <>
-              <div className="p-1">
-                <div className="flex items-center gap-2.5">
-                  <ProfileAvatar name={sel.name} size="md" />
-                  <div className="min-w-0">
-                    <div className="line-clamp-2 text-[14px] font-bold leading-tight text-slate-900">{sel.name}</div>
-                    <div className="mt-0.5 text-[11.5px] text-slate-500">
-                      {[sel.employeeNumber ? `#${sel.employeeNumber}` : "#—", sel.departmentName].filter(Boolean).join(" · ")}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Total del expediente: número grande a la derecha, como el diseño */}
-                <div className="mt-4 flex items-baseline justify-between gap-2">
-                  <ITText as="span" className="text-[13.5px] font-bold text-slate-900">{t("records.detail.total")}</ITText>
-                  <ITText as="span" className="flex items-baseline gap-1">
-                    <ITText as="b" className="text-[22px] font-extrabold leading-none tabular-nums text-slate-900">{totalOf(sel).done}</ITText>
-                    <ITText as="span" className="text-[12px] text-slate-500">{t("records.detail.ofTotal", { total: totalOf(sel).total })}</ITText>
-                  </ITText>
-                </div>
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-[var(--color-primary-500)] transition-[width] duration-700"
-                    style={{ width: `${percent(totalOf(sel).done, totalOf(sel).total)}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="min-h-0 flex-1 overflow-auto px-1 pt-4">
-                <div className="text-[13px] font-bold" style={{ color: "color-mix(in srgb, var(--color-warning) 42%, var(--color-text-default))" }}>
-                  {t("records.detail.required", { done: done(sel.requiredDocuments), total: sel.requiredDocuments.length })}
-                </div>
-                <div className="mt-1 divide-y divide-slate-100">
-                  {sel.requiredDocuments.map((d) => {
-                    const file = fx.documentOf(d.id);
-                    return (
-                      <div key={d.id} className="flex items-center gap-2.5 py-2">
-                        <span
-                          className="h-2 w-2 shrink-0 rounded-full"
-                          style={{ background: d.delivered ? "var(--color-success)" : "var(--color-warning)" }}
-                        />
-                        <ITText as="span" className="flex-1 text-[12.5px] font-medium text-slate-800">{d.name}</ITText>
-                        {d.delivered && file ? (
-                          <ITButton variant="text" color="primary" size="sm" label={t("records.detail.view")} onClick={() => window.open(file.url, "_blank", "noopener")} />
-                        ) : (
-                          <ITButton
-                            variant="outlined"
-                            color="primary"
-                            size="sm"
-                            disabled={fx.uploading === d.id}
-                            onClick={() => pickFile(d.id)}
-                            label={fx.uploading === d.id ? t("records.detail.uploading") : t("records.detail.upload")}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-4 text-[12px] font-bold text-slate-500">
-                  {t("records.detail.other", { done: done(sel.otherDocuments), total: sel.otherDocuments.length })}
-                </div>
-                <div className="mt-2">
-                  {(showAllDocs ? sel.otherDocuments : sel.otherDocuments.slice(0, OTHER_DOCS_PREVIEW)).map((d) => {
-                    const file = fx.documentOf(d.id);
-                    return (
-                      <div key={d.id} className="flex items-center gap-2.5 py-1">
-                        <span className={`h-2 w-2 shrink-0 rounded-full ${d.delivered ? "bg-emerald-600" : "bg-slate-300"}`} />
-                        <ITText as="span" className="flex-1 text-[12px] text-slate-800">{d.name}</ITText>
-                        {d.delivered && file ? (
-                          <a href={file.url} target="_blank" rel="noreferrer" className="text-[11px] text-slate-500 hover:underline">
-                            {t("records.detail.delivered")}
-                          </a>
-                        ) : showAllDocs ? (
-                          <ITButton
-                            variant="text"
-                            color="primary"
-                            size="sm"
-                            disabled={fx.uploading === d.id}
-                            onClick={() => pickFile(d.id)}
-                            label={fx.uploading === d.id ? t("records.detail.uploading") : t("records.detail.upload")}
-                          />
-                        ) : (
-                          <ITText as="span" className="text-[11px] text-slate-500">{d.delivered ? t("records.detail.delivered") : t("records.detail.pending")}</ITText>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                {sel.otherDocuments.length > OTHER_DOCS_PREVIEW && (
-                  <ITButton
-                    variant="text"
-                    color="primary"
-                    size="sm"
-                    onClick={() => setShowAllDocs((v) => !v)}
-                    label={showAllDocs ? t("records.detail.showLess") : t("records.detail.showAll", { count: sel.otherDocuments.length })}
-                  />
-                )}
-
-                <div className="mt-4 text-[12px] font-bold text-slate-500">
-                  {t("records.detail.personal", {
-                    done: sel.filledFields.length,
-                    total: sel.filledFields.length + sel.missingFields.length,
-                  })}
-                </div>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {(() => {
-                    const all = [
-                      ...sel.filledFields.map((f) => ({ key: f, filled: true })),
-                      ...sel.missingFields.map((f) => ({ key: f, filled: false })),
-                    ];
-                    const shown = showAllFields ? all : all.slice(0, FIELDS_PREVIEW);
-                    return (
-                      <>
-                        {shown.map((f) => (
-                          <ITChip
-                            key={f.key}
-                            size="sm"
-                            variant={f.filled ? "soft" : "outlined"}
-                            color={f.filled ? "success" : "gray"}
-                            label={t(`records.profileFields.${f.key}`)}
-                          />
-                        ))}
-                        {all.length > FIELDS_PREVIEW && (
-                          <ITButton
-                            variant="text"
-                            color="primary"
-                            size="sm"
-                            onClick={() => setShowAllFields((v) => !v)}
-                            label={showAllFields ? t("records.detail.showLess") : t("records.detail.moreFields", { count: all.length - FIELDS_PREVIEW })}
-                          />
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-
-              <div className="grid !grid-cols-2 gap-2 p-3" style={{ borderTop: hairline }}>
-                <ITButton
-                  variant="outlined"
-                  color="secondary"
-                  size="sm"
-                  className="w-full"
-                  disabled={recordStatus(sel) === "COMPLETE" || fx.notifying === sel.userId}
-                  onClick={() => void fx.notify(sel)}
-                  label={recordStatus(sel) === "COMPLETE" ? t("records.complete") : t("records.detail.notify")}
-                />
-                <ITButton
-                  variant="filled"
-                  color="primary"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => navigate(`/employees/${sel.userId}`)}
-                  label={t("records.detail.open")}
-                />
-              </div>
-            </>
+            <RecordDetail sel={sel} fx={fx} onPickFile={pickFile} />
           )}
-        </ITCard>
+        </section>
       </div>
 
       <input
@@ -478,7 +227,7 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
         onClose={() => fx.setBulkOpen(false)}
         onConfirm={() => void fx.notifyPending()}
         title={t("records.notifyPendingConfirmTitle")}
-        message={t("records.notifyPendingConfirm", { count: fx.pendingVisible.length })}
+        message={t("records.notifyPendingConfirm", { count: fx.notifyTargets.length })}
         confirmLabel={t("records.notifyPending")}
         cancelLabel={t("common:actions.cancel")}
         loading={fx.bulkSending}

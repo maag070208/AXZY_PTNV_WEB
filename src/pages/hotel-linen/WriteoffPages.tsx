@@ -1,4 +1,5 @@
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaClipboardList, FaPlus, FaTrashAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -17,7 +18,7 @@ export function LinenWriteoffsPage() {
   const goBack = useGoBack();
   const canRequest = useCan("hotel_linen.writeoff_request");
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("writeoffs.title")}
@@ -36,7 +37,7 @@ export function LinenWriteoffsPage() {
       }
     >
       <WriteoffsBoard onOpen={(id) => navigate(`/linen/writeoffs/${id}`)} onDownloadPdf={(r) => void downloadWriteoffWeeklyPdf(r)} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -45,7 +46,7 @@ export function LinenWriteoffNewPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("writeoffs.new.title")}
@@ -63,7 +64,7 @@ export function LinenWriteoffNewPage() {
         onDone={(ids) => navigate(ids.length === 1 ? `/linen/writeoffs/${ids[0]}` : "/linen/writeoffs", { replace: true })}
         onCancel={() => goBack("/linen/writeoffs")}
       />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -74,7 +75,7 @@ export function LinenWriteoffDetailPage() {
   const { id = "" } = useParams();
   const cosign = useCosign();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("writeoffs.detail.title")}
@@ -89,7 +90,7 @@ export function LinenWriteoffDetailPage() {
     >
       <WriteoffDetailView id={id} requestCosign={cosign.request} />
       {cosign.dialog}
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -98,7 +99,7 @@ export function LinenCountsPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("counts.title")}
@@ -112,7 +113,7 @@ export function LinenCountsPage() {
       backAction={() => goBack("/")}
     >
       <CountsBoard onOpen={(id) => navigate(`/linen/counts/${id}`)} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -122,7 +123,7 @@ export function LinenCountDetailPage() {
   const goBack = useGoBack();
   const { id = "" } = useParams();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("counts.detail.title")}
@@ -136,6 +137,6 @@ export function LinenCountDetailPage() {
       backAction={() => goBack("/linen/counts")}
     >
       <CountDetailView id={id} />
-    </ITPage>
+    </AppPage>
   );
 }

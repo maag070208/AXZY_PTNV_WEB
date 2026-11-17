@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,7 @@ export default function PayrollPage() {
   const fx = useWeeklyAttendance({ downloadPdf: downloadWeeklyAttendancePdf });
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("title")}
       description={t("description")}
       icon={<FaMoneyCheckAlt size={20} />}
@@ -35,6 +35,6 @@ export default function PayrollPage() {
       backAction={() => goBack("/employees")}
     >
       <WeeklyAttendancePanel fx={fx} />
-    </ITPage>
+    </AppPage>
   );
 }

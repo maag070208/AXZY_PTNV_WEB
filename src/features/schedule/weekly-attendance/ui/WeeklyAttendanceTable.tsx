@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { ITBadget, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import type { Column, ITDataTableFetchParams } from "@axzydev/axzy_ui_system";
 import type { TFunction } from "i18next";
+import { Link } from "react-router-dom";
 import {
   buildDetailRows,
   WEEKLY_APPROVAL_BADGE,
@@ -50,11 +51,21 @@ const STATUSES: WeeklyAttendanceDayStatus[] = [
   "FUTURE",
 ];
 
-const employeeCell = (name: string, sub: string) => (
+const employeeCell = (name: string, sub: string, userId?: string) => (
   <ITFlex align="center" gap={2}>
     <ProfileAvatar name={name} size="sm" />
     <ITFlex direction="column" gap={0} className="min-w-0">
-      <ITText className="truncate text-[12px] font-black text-slate-800">{name}</ITText>
+      {/* Personas vinculadas: el nombre lleva a su pestaña de asistencias. */}
+      {userId && !userId.startsWith("reloj:") ? (
+        <Link
+          to={`/employees/${userId}?tab=attendance`}
+          className="truncate text-[12px] font-black text-slate-800 hover:text-primary-600 hover:underline"
+        >
+          {name}
+        </Link>
+      ) : (
+        <ITText className="truncate text-[12px] font-black text-slate-800">{name}</ITText>
+      )}
       <ITText className="truncate text-[12px] font-bold text-slate-400">{sub}</ITText>
     </ITFlex>
   </ITFlex>
@@ -131,7 +142,8 @@ export default function WeeklyAttendanceTable({
           r.name,
           `${subOf(r.clockNumbers.join(", ") || r.employeeNumber || "—", r.departmentName)}${
             !r.linked ? ` · ${t("unlinked")}` : ""
-          }`
+          }`,
+          r.userId
         ),
     },
     // Una columna por día de la semana: el rango horario (entrada–salida).
@@ -200,7 +212,7 @@ export default function WeeklyAttendanceTable({
       type: "string",
       width: 240,
       sortable: false,
-      render: (r) => employeeCell(r.name, subOf(r.clock, r.departmentName)),
+      render: (r) => employeeCell(r.name, subOf(r.clock, r.departmentName), r.userId),
     },
     {
       key: "day",

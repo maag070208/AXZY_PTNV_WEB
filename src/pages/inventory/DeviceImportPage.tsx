@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaFileExcel } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -25,7 +25,7 @@ export default function DeviceImportPage() {
   const fx = useDeviceImport();
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("inventory:import.title")}
       description={t("inventory:import.description")}
@@ -46,6 +46,6 @@ export default function DeviceImportPage() {
           onGoToMovements={() => navigate("/inventory/movements", { replace: true })}
         />
       )}
-    </ITPage>
+    </AppPage>
   );
 }

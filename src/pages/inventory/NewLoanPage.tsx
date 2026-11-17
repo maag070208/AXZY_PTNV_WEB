@@ -5,9 +5,10 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITPage,
   ITSearchSelect,
-  ITToast, ITText, ITStack } from "@axzydev/axzy_ui_system";
+  ITToast, ITText, ITStack
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaFileSignature } from "react-icons/fa";
 import { LuFileText, LuMessageCircle, LuPackageOpen, LuUser } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
@@ -196,15 +197,15 @@ export default function NewLoanPage() {
 
   if (loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loans.new")} backAction={() => goBack("/inventory/loans")}>
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("loans.new")}
       description={t("loans.formSub")}
@@ -394,6 +395,6 @@ export default function NewLoanPage() {
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />
       )}
-    </ITPage>
+    </AppPage>
   );
 }

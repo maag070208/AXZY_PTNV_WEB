@@ -7,6 +7,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { HashRouter } from "react-router-dom";
+import { NavigationTrailProvider } from "@shared/lib/navigation-trail";
 import App from "./App";
 import "@app/index.css";
 
@@ -44,7 +45,9 @@ createRoot(document.getElementById("root")!).render(
       <ITThemeProvider theme={customTheme} showFab={false} density={0.80} appearance="bento">
         <ToastProvider>
           <HashRouter>
-            <App />
+            <NavigationTrailProvider>
+              <App />
+            </NavigationTrailProvider>
           </HashRouter>
         </ToastProvider>
       </ITThemeProvider>

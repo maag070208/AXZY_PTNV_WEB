@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITButton, ITChip, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITChip, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBoxOpen, FaFileExcel, FaPlus } from "react-icons/fa";
 import { LuBox, LuCircleCheck, LuHandHelping, LuWrench } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
@@ -197,7 +198,7 @@ export default function DevicesPage() {
   );
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("devices.title")}
       description={t("devices.description")}
@@ -255,6 +256,6 @@ export default function DevicesPage() {
           />
         </>
       )}
-    </ITPage>
+    </AppPage>
   );
 }

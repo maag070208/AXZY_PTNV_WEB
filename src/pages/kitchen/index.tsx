@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ITButton, ITPage, ITFlex } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { useCan } from "@entities/user";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -67,7 +68,7 @@ export function KitchenOverviewPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("overview.title")}
       description={t("overview.description")}
@@ -76,7 +77,7 @@ export function KitchenOverviewPage() {
       backAction={() => goBack("/")}
     >
       <KitchenOverviewPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -90,7 +91,7 @@ export function KitchenItemsPage() {
   const canCount = useCan("kitchen.adjust");
   const [newSignal, setNewSignal] = useState(0);
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("items.title")}
       description={t("items.description")}
@@ -122,7 +123,7 @@ export function KitchenItemsPage() {
       }
     >
       <KitchenItemsPanel newSignal={newSignal} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -131,7 +132,7 @@ export function KitchenItemDetailPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("items.detail")}
       icon={<FaBoxes size={20} />}
@@ -139,7 +140,7 @@ export function KitchenItemDetailPage() {
       backAction={() => goBack("/kitchen/items")}
     >
       <KitchenItemDetailPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -148,7 +149,7 @@ export function KitchenItemImportPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("import.title")}
       description={t("import.description")}
@@ -163,7 +164,7 @@ export function KitchenItemImportPage() {
       backAction={() => goBack("/kitchen/items")}
     >
       <KitchenImportPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -172,7 +173,7 @@ export function KitchenLotsPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("lots.title")}
       description={t("lots.description")}
@@ -181,7 +182,7 @@ export function KitchenLotsPage() {
       backAction={() => goBack("/kitchen")}
     >
       <KitchenLotsPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -190,7 +191,7 @@ export function KitchenStockInPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("stockIn.title")}
       description={t("stockIn.description")}
@@ -199,7 +200,7 @@ export function KitchenStockInPage() {
       backAction={() => goBack("/kitchen/items")}
     >
       <KitchenStockInPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -208,7 +209,7 @@ export function KitchenStockOutPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("stockOut.title")}
       description={t("stockOut.description")}
@@ -217,7 +218,7 @@ export function KitchenStockOutPage() {
       backAction={() => goBack("/kitchen/items")}
     >
       <KitchenStockOutPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -226,7 +227,7 @@ export function KitchenLedgerPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("ledger.title")}
       description={t("ledger.description")}
@@ -235,7 +236,7 @@ export function KitchenLedgerPage() {
       backAction={() => goBack("/kitchen")}
     >
       <KitchenLedgerPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -244,7 +245,7 @@ export function KitchenCountPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("count.title")}
       description={t("count.description")}
@@ -253,7 +254,7 @@ export function KitchenCountPage() {
       backAction={() => goBack("/kitchen/items")}
     >
       <KitchenCountPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -262,7 +263,7 @@ export function KitchenRestockPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("restock.title")}
       description={t("restock.description")}
@@ -271,7 +272,7 @@ export function KitchenRestockPage() {
       backAction={() => goBack("/kitchen")}
     >
       <KitchenRestockPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -280,7 +281,7 @@ export function KitchenCatalogPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("catalog.title")}
       description={t("catalog.description")}
@@ -289,7 +290,7 @@ export function KitchenCatalogPage() {
       backAction={() => goBack("/kitchen")}
     >
       <KitchenCatalogPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -299,7 +300,7 @@ export function KitchenPurchaseOrdersPage() {
   const goBack = useGoBack();
   const canCreate = useCan("purchase_orders.create");
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("purchaseOrders.title")}
       description={t("purchaseOrders.description")}
@@ -309,7 +310,7 @@ export function KitchenPurchaseOrdersPage() {
       actions={canCreate ? newButton(t("purchaseOrders.new"), () => navigate("/kitchen/purchase-orders/new")) : undefined}
     >
       <PurchaseOrdersPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -319,7 +320,7 @@ export function KitchenPurchaseOrderFormPage() {
   const goBack = useGoBack();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={id ? t("purchaseOrders.edit") : t("purchaseOrders.new")}
       description={t("purchaseOrders.description")}
@@ -328,7 +329,7 @@ export function KitchenPurchaseOrderFormPage() {
       backAction={() => goBack("/kitchen/purchase-orders")}
     >
       <PurchaseOrderFormPanel id={id} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -338,7 +339,7 @@ export function KitchenPurchaseOrderDetailPage() {
   const goBack = useGoBack();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("purchaseOrders.detail")}
       icon={<FaShoppingCart size={20} />}
@@ -346,7 +347,7 @@ export function KitchenPurchaseOrderDetailPage() {
       backAction={() => goBack("/kitchen/purchase-orders")}
     >
       <PurchaseOrderDetailPanel id={id} onDownloadPdf={downloadPurchaseOrderPdf} buildPdf={buildPurchaseOrderPdf} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -355,7 +356,7 @@ export function KitchenCostCenterSpendingPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("costCenterSpending.title")}
       description={t("costCenterSpending.description")}
@@ -364,7 +365,7 @@ export function KitchenCostCenterSpendingPage() {
       backAction={() => goBack("/kitchen/purchase-orders")}
     >
       <CostCenterSpendingPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -374,7 +375,7 @@ export function KitchenInvoicesPage() {
   const goBack = useGoBack();
   const canRegister = useCan("invoices.register");
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("invoices.title")}
       description={t("invoices.description")}
       icon={<FaFileInvoice size={20} />}
@@ -384,7 +385,7 @@ export function KitchenInvoicesPage() {
       actions={canRegister ? newButton(t("invoices.new"), () => navigate("/kitchen/invoices/new")) : undefined}
     >
       <InvoicesPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -393,7 +394,7 @@ export function KitchenInvoiceFormPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("invoices.new")}
       description={t("invoices.description")}
@@ -402,7 +403,7 @@ export function KitchenInvoiceFormPage() {
       backAction={() => goBack("/kitchen/invoices")}
     >
       <InvoiceFormPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -412,7 +413,7 @@ export function KitchenInvoiceDetailPage() {
   const goBack = useGoBack();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("invoices.detail")}
       icon={<FaFileInvoice size={20} />}
@@ -420,7 +421,7 @@ export function KitchenInvoiceDetailPage() {
       backAction={() => goBack("/kitchen/invoices")}
     >
       <InvoiceDetailPanel id={id} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -430,7 +431,7 @@ export function KitchenSuppliersPage() {
   const goBack = useGoBack();
   const canManage = useCan("kitchen.manage");
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("suppliers.title")}
       description={t("suppliers.description")}
@@ -440,7 +441,7 @@ export function KitchenSuppliersPage() {
       actions={canManage ? newButton(t("suppliers.new"), () => navigate("/kitchen/suppliers/new")) : undefined}
     >
       <SuppliersPanel />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -450,7 +451,7 @@ export function KitchenSupplierFormPage() {
   const goBack = useGoBack();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={id ? t("suppliers.edit") : t("suppliers.new")}
       description={t("suppliers.description")}
@@ -459,7 +460,7 @@ export function KitchenSupplierFormPage() {
       backAction={() => goBack(id ? `/kitchen/suppliers/${id}` : "/kitchen/suppliers")}
     >
       <SupplierFormPanel id={id} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -469,7 +470,7 @@ export function KitchenSupplierDetailPage() {
   const goBack = useGoBack();
   const { id } = useParams();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("suppliers.detail")}
       icon={<FaTruck size={20} />}
@@ -477,6 +478,6 @@ export function KitchenSupplierDetailPage() {
       backAction={() => goBack("/kitchen/suppliers")}
     >
       <SupplierDetailPanel id={id} />
-    </ITPage>
+    </AppPage>
   );
 }

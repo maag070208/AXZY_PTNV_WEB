@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaUserClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,7 @@ export default function AssignSchedulesPage() {
   const goBack = useGoBack();
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("assign.title")}
       description={t("assign.description")}
@@ -24,6 +24,6 @@ export default function AssignSchedulesPage() {
       backAction={() => goBack("/schedules")}
     >
       <AssignSchedules />
-    </ITPage>
+    </AppPage>
   );
 }

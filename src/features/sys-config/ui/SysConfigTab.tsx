@@ -18,6 +18,7 @@ import {
 } from "@features/sys-config";
 import SystemLanguageCard from "./SystemLanguageCard";
 import WeekStartCard from "./WeekStartCard";
+import DuplicateWindowCard from "./DuplicateWindowCard";
 
 const KEY = "EMAIL_NOTIFICATION_RECIPIENTS";
 const SEND_EMAIL_KEY = "ENABLE_SEND_EMAIL";
@@ -332,6 +333,8 @@ export default function SysConfigTab() {
       <SystemLanguageCard onResult={(message, type) => setToast({ message, type })} />
 
       <WeekStartCard onResult={(message, type) => setToast({ message, type })} />
+
+      <DuplicateWindowCard onResult={(message, type) => setToast({ message, type })} />
 
       {toast && (
         <ITToast

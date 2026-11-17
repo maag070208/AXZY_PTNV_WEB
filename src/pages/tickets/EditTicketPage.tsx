@@ -1,10 +1,10 @@
 import {
   ITButton,
   ITFlex,
-  ITPage,
   ITText,
-  ITToast,
+  ITToast
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { useEffect } from "react";
 import { LuSave, LuTicket } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +45,7 @@ export default function EditTicketPage() {
 
   if (editTicket.loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("edit.title")}
         backAction={() => goBack("/tickets")}
@@ -53,13 +53,13 @@ export default function EditTicketPage() {
         breadcrumbs={breadcrumbs}
       >
         <LangostinState kind="loading" title={tt("edit.loading")} description="" />
-      </ITPage>
+      </AppPage>
     );
   }
 
   if (!editTicket.ticket) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("edit.title")}
         backAction={() => goBack("/tickets")}
@@ -70,12 +70,12 @@ export default function EditTicketPage() {
         ]}
       >
         <LangostinState kind="error" title={tt("edit.notFound")} description={tt("edit.ticketNotFound")} />
-      </ITPage>
+      </AppPage>
     );
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("edit.title")}
       description={tt("edit.description")}
@@ -113,6 +113,6 @@ export default function EditTicketPage() {
           onClose={editTicket.dismissToast}
         />
       )}
-    </ITPage>
+    </AppPage>
   );
 }

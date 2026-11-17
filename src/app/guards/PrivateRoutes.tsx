@@ -24,6 +24,7 @@ import { desktop } from "@shared/lib/desktop";
 import { useAblyNotifications, type LiveNotification } from "./useAblyNotifications";
 import ForcePasswordChange from "./ForcePasswordChange";
 import { LangostinAssistant } from "@widgets/assistant";
+import { NavigationTrailTracker, useNavigationTrail } from "@shared/lib/navigation-trail";
 import logoUrl from "@shared/assets/puerto-nuevo-logo.svg";
 
 /** Icono del menú por pantalla (el catálogo vive en `@entities/permission`). */
@@ -39,6 +40,9 @@ const NAV_ICONS: Record<string, ReactNode> = {
   langostin: <FaLaptopCode size={14} />,
 };
 
+/** Un clic de menú abre un rastro nuevo. */
+const NAV_ROOT = { state: { navRoot: true } } as const;
+
 export default function PrivateRoutes() {
   const { t: tt, i18n } = useTranslation(["common"]);
   const navigate = useNavigate();
@@ -47,6 +51,10 @@ export default function PrivateRoutes() {
   const { token, user } = useSelector((s: RootState) => s.auth);
   const unreadCount = useSelector((s: RootState) => s.notifications.unreadCount);
   const [toast, setToast] = useState<string | null>(null);
+  const { dispatch: dispatchTrail } = useNavigationTrail();
+
+  // Al salir de la zona privada (logout) el rastro de navegación se borra.
+  useEffect(() => () => dispatchTrail({ type: "CLEAR" }), [dispatchTrail]);
 
   // En la app de escritorio llega como notificación nativa del sistema; en el
   // navegador, como aviso dentro de la página.
@@ -170,7 +178,7 @@ export default function PrivateRoutes() {
     id: screen.id,
     label: tt(screen.labelKey),
     action: () => {
-      if (screen.path) navigate(screen.path);
+      if (screen.path) navigate(screen.path, NAV_ROOT);
     },
     isActive: isScreenActive(screen),
   });
@@ -182,7 +190,7 @@ export default function PrivateRoutes() {
       id: screen.id,
       label: tt(screen.labelKey),
       icon: NAV_ICONS[screen.id],
-      ...(screen.path ? { action: () => navigate(screen.path!) } : {}),
+      ...(screen.path ? { action: () => navigate(screen.path!, NAV_ROOT) } : {}),
       isActive: isScreenActive(screen),
       ...(children.length > 0
         ? {
@@ -235,11 +243,13 @@ export default function PrivateRoutes() {
   const topBar = {
     variant: "bento" as const,
     logo: (
-      <img
-        src={logoUrl}
-        alt="Puerto Nuevo Hotel y Villas"
-        className="h-12 w-auto object-contain"
-      />
+      <button type="button" className="cursor-pointer" onClick={() => navigate("/", NAV_ROOT)}>
+        <img
+          src={logoUrl}
+          alt="Puerto Nuevo Hotel y Villas"
+          className="h-12 w-auto object-contain"
+        />
+      </button>
     ),
     logoText: "Puerto Nuevo",
     userMenu: user
@@ -268,6 +278,7 @@ export default function PrivateRoutes() {
   return (
     <>
       <ITLayout topBar={topBar} sidebar={sidebar} sidebarFullHeight contentClassName="max-w-screen! m-0! !px-2">
+        <NavigationTrailTracker />
         <Outlet />
       </ITLayout>
       {/* Langostín de ayuda en todas las pantallas (se oculta donde ya hay chat). */}

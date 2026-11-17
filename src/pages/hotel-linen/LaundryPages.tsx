@@ -1,4 +1,5 @@
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBalanceScale, FaClipboardList, FaPlus, FaSoap, FaTshirt } from "react-icons/fa";
 import type { ReactNode } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -35,7 +36,7 @@ function Shell({ title, description, icon, parent, back, actions, children }: Sh
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={title}
@@ -51,7 +52,7 @@ function Shell({ title, description, icon, parent, back, actions, children }: Sh
       actions={actions}
     >
       {children}
-    </ITPage>
+    </AppPage>
   );
 }
 

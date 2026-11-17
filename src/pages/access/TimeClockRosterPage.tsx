@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaUsersCog } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,7 @@ export default function TimeClockRosterPage() {
   const goBack = useGoBack();
 
   return (
-    <ITPage
+    <AppPage
       noPadding
       title={t("roster.title")}
       description={t("roster.description")}
@@ -22,6 +22,6 @@ export default function TimeClockRosterPage() {
       backAction={() => goBack("/hr/time-clock")}
     >
       <TimeClockRosterView />
-    </ITPage>
+    </AppPage>
   );
 }

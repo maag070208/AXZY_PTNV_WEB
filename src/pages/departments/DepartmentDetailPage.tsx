@@ -7,9 +7,9 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITPage,
-  ITText,
+  ITText
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBuilding, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -32,7 +32,7 @@ export default function DepartmentDetailPage() {
 
   if (!detail.dept) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.loadingTitle")}
         backAction={() => goBack("/departments")}
@@ -51,14 +51,14 @@ export default function DepartmentDetailPage() {
             <LottieLoader size="lg" />
           </ITFlex>
         )}
-      </ITPage>
+      </AppPage>
     );
   }
 
   const dept = detail.dept;
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("detail.title")}
       description={dept.name}
@@ -167,6 +167,6 @@ export default function DepartmentDetailPage() {
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />
-    </ITPage>
+    </AppPage>
   );
 }

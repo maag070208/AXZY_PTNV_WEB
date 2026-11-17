@@ -1,4 +1,5 @@
-import { ITBentoLive, ITPage } from "@axzydev/axzy_ui_system";
+import { ITBentoLive } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "@app/store";
@@ -34,7 +35,7 @@ export default function HomePage() {
   const slots: Partial<Record<WidgetId, React.ReactNode>> = {};
 
   return (
-    <ITPage
+    <AppPage
       noPadding
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={firstName ? t("greeting", { name: firstName }) : t("title")}
@@ -45,7 +46,7 @@ export default function HomePage() {
         panels={panels}
         live={showOperations ? <ITBentoLive label={t("adminDashboard.live")} /> : undefined}
       />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -71,7 +72,7 @@ function PersonalPanel() {
   const attendance = useWidgetData(dashboardApi.attendanceToday);
   const overtime = useWidgetData(dashboardApi.overtimeWeek);
   return (
-    <PersonalDashboard recordsCounts={fx.counts} attendance={attendance.data} overtime={overtime.data}>
+    <PersonalDashboard attendance={attendance.data} overtime={overtime.data}>
       <EmployeeRecordsBoard fx={fx} hideKpis />
     </PersonalDashboard>
   );

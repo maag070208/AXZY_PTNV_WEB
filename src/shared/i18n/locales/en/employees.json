@@ -37,7 +37,8 @@
       "activity": "Activity",
       "documents": "Documents",
       "clock": "Time clock",
-      "info": "Employee data"
+      "info": "Employee data",
+      "attendance": "Attendance"
     },
     "activity": {
       "loading": "Loading activity…",
@@ -286,14 +287,18 @@
       "INCOMPLETE": "Incomplete",
       "COMPLETE": "Complete",
       "department": "Area",
-      "allDepartments": "Area: all"
+      "allDepartments": "Area: all",
+      "areaLabel": "Area",
+      "allAreas": "All",
+      "searchShort": "Name, number or area"
     },
     "columns": {
       "employee": "Employee",
       "required": "Required",
       "record": "Record",
       "personal": "Personal data",
-      "status": "Status"
+      "status": "Status",
+      "area": "Area"
     },
     "status": {
       "REQUIRED": "Missing required",
@@ -319,7 +324,13 @@
       "notify": "Notify missing",
       "open": "Open record",
       "select": "Select an employee to see their record",
-      "ofTotal": "of {{total}}"
+      "ofTotal": "of {{total}}",
+      "send": "Send reminder",
+      "requiredMissing": "Required · {{count}} missing",
+      "requiredDone": "Required · complete",
+      "summaryRequired": "Required",
+      "summaryOther": "Other",
+      "summaryData": "Data"
     },
     "notify": "Notify",
     "notified": "{{name}} was notified",
@@ -341,7 +352,12 @@
       "city": "City",
       "emergencyContactName": "Emergency contact",
       "emergencyContactPhone": "Emergency phone"
-    }
+    },
+    "remind": "Remind {{count}}",
+    "subtitle": "{{total}} active · {{percent}} % with a complete record",
+    "selectAll": "Select all",
+    "selectRow": "Select {{name}}",
+    "listTitle": "Staff records"
   },
   "summary": {
     "all": "All staff",

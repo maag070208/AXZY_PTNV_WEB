@@ -109,7 +109,11 @@
     "exit": "Last exit",
     "hours": "Hours",
     "date": "Date",
-    "incident": "Incident"
+    "incident": "Incident",
+    "outings": "Outings",
+    "away": "Time away",
+    "incompleteSequence": "Incomplete sequence",
+    "sequence": "Sequence"
   },
   "incidents": {
     "ENTRY_WITHOUT_EXIT": "Entry without exit",
@@ -132,5 +136,16 @@
     "totalPeople": "People",
     "totalHours": "Hours",
     "totalIncidents": "Incidents"
+  },
+  "timeline": {
+    "title": "Punch sequence",
+    "entry": "In",
+    "exit": "Out",
+    "back": "Back",
+    "finalExit": "Final out",
+    "incomplete": "Incomplete sequence",
+    "details": "View sequence",
+    "away": "Time away",
+    "empty": "No punches in the period"
   }
 }

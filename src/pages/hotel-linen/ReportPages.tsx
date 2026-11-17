@@ -1,5 +1,5 @@
 import { FaChartBar, FaWarehouse } from "react-icons/fa";
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { hotelLinenApi, WRITEOFF_REASONS, type AmenityLine, type WeeklyWriteoffReport } from "@entities/hotel-linen";
@@ -61,7 +61,7 @@ export function LinenReportsPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("page.title")}
@@ -76,7 +76,7 @@ export function LinenReportsPage() {
       actions={<BlankFormsMenu onDownload={downloadBlank} />}
     >
       <ReportsPanel exportPdf={(doc, name) => downloadHrReportPdf(doc, name)} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -85,7 +85,7 @@ export function LinenHomePage() {
   const { t } = useTranslation(["hotel-linen-report", "common"]);
   const navigate = useNavigate();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("dash.title")}
@@ -94,6 +94,6 @@ export function LinenHomePage() {
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("common:nav.linen") }]}
     >
       <LinenDashboardView onNavigate={navigate} />
-    </ITPage>
+    </AppPage>
   );
 }

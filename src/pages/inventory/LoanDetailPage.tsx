@@ -7,9 +7,10 @@ import {
   ITButton,
   ITChip,
   ITFlex,
-  ITPage,
   ITText,
-  useITBentoCountUp, ITStack } from "@axzydev/axzy_ui_system";
+  useITBentoCountUp, ITStack
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { PanelCard } from "@shared/ui/panel-card";
 import { InsightNote } from "@shared/ui/bento-bits";
@@ -154,19 +155,19 @@ export default function LoanDetailPage() {
 
   if (failed && !loan) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loans.detail")} backAction={() => goBack("/inventory/loans")}>
         <LangostinState kind="error" description={t("common:errors.load")} />
-      </ITPage>
+      </AppPage>
     );
   }
 
   if (loading || !loan) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loans.detail")} backAction={() => goBack("/inventory/loans")}>
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -177,7 +178,7 @@ export default function LoanDetailPage() {
   const assignedName = loan.custodian?.name ?? (loan.department ? `${loan.department.name}${loan.subarea ? ` — ${loan.subarea.name}` : ""}` : "—");
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={loan.number}
       description={`${loan.custodian?.name ?? "—"} · ${formatDate(loan.date)}`}
@@ -329,6 +330,6 @@ export default function LoanDetailPage() {
           </PanelCard>
         </div>
       </div>
-    </ITPage>
+    </AppPage>
   );
 }

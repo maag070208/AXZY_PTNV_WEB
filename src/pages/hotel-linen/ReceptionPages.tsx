@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaHandHolding, FaPlusSquare, FaTools } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ function Shell({ title, description, icon, children }: ShellProps) {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={title}
@@ -33,7 +33,7 @@ function Shell({ title, description, icon, children }: ShellProps) {
       backAction={() => goBack("/")}
     >
       {children}
-    </ITPage>
+    </AppPage>
   );
 }
 

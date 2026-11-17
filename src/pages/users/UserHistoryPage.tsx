@@ -1,5 +1,6 @@
 import { useMemo, type CSSProperties } from "react";
-import { ITBentoDonut, ITBentoGrid, ITBentoTile, ITBentoWaves, ITPage, ITText, ITFlex } from "@axzydev/axzy_ui_system";
+import { ITBentoDonut, ITBentoGrid, ITBentoTile, ITBentoWaves, ITText, ITFlex } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuCalendarDays, LuChartPie, LuHistory, LuPackage, LuShieldCheck, LuTicket, LuUserCog, LuUserRound } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -59,7 +60,7 @@ export default function UserHistoryPage() {
 
   if (loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("history.historyTitle")}
         backAction={() => goBack("/users")}
@@ -70,13 +71,13 @@ export default function UserHistoryPage() {
         ]}
       >
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
   if (!user) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("history.historyTitle")}
         backAction={() => goBack("/users")}
@@ -87,12 +88,12 @@ export default function UserHistoryPage() {
         ]}
       >
         <LangostinState kind="error" title={tt("history.notFound")} description={tt("history.notFoundHint")} />
-      </ITPage>
+      </AppPage>
     );
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("history.historyTitle")}
       description={user.name}
@@ -235,6 +236,6 @@ export default function UserHistoryPage() {
           </PanelCard>
         </div>
       )}
-    </ITPage>
+    </AppPage>
   );
 }

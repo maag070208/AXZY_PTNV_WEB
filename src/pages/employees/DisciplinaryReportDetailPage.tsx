@@ -8,9 +8,9 @@ import {
   ITChip,
   ITFlex,
   ITGrid,
-  ITPage,
-  ITText,
+  ITText
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { FaFilePdf, FaScroll } from "react-icons/fa6";
 import { LuCalendarDays } from "react-icons/lu";
@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils/dates";
 import { personalApi, type DisciplinaryReport } from "@entities/hr";
 import { DisciplinaryReportPreview, downloadDisciplinaryReportPdf } from "@widgets/disciplinary-report";
+import { downloadApercibimientoPdf } from "@widgets/hr-formats";
 import { i18n } from "@shared/i18n";
 import { useGoBack } from "@shared/lib/useGoBack";
 
@@ -45,18 +46,18 @@ export default function DisciplinaryReportDetailPage() {
 
   if (loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={tt("preview.title")} backAction={() => goBack("/employees/disciplinary-reports")}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
-      </ITPage>
+      </AppPage>
     );
   }
 
   if (error || !disciplinaryReport) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("preview.title")}
         backAction={() => goBack("/employees/disciplinary-reports")}
@@ -69,7 +70,7 @@ export default function DisciplinaryReportDetailPage() {
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
           {error ?? i18n.t("employees:disciplinary.notFound")}
         </ITAlert>
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -78,7 +79,7 @@ export default function DisciplinaryReportDetailPage() {
     : "—";
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("preview.title")}
       description={`${disciplinaryReport.user.name} · ${tt(`reasons.${disciplinaryReport.reason}`)}`}
@@ -91,6 +92,29 @@ export default function DisciplinaryReportDetailPage() {
       backAction={() => goBack("/employees/disciplinary-reports")}
       actions={
         <ITFlex gap={2}>
+          {disciplinaryReport.sanction === "Apercibimiento" && (
+            <ITButton
+              variant="outlined"
+              color="secondary"
+              onClick={() =>
+                void downloadApercibimientoPdf({
+                  date: disciplinaryReport.incidentDate.slice(0, 10),
+                  name: disciplinaryReport.user.name,
+                  jobTitle: disciplinaryReport.user.jobTitle ?? "",
+                  irregularities: disciplinaryReport.description,
+                  // El jefe de área no se guarda con el acta: queda en blanco para firma a mano.
+                  headName: "",
+                  signerName: "Lic. Rosalba Meda Anaya",
+                  signerTitle: "Jefatura de Recursos Humanos",
+                })
+              }
+            >
+              <ITFlex align="center" gap={1}>
+                <FaFilePdf className="text-red-600" size={13} />
+                <ITText className="font-bold text-[11px]">{tt("preview.downloadApercibimiento")}</ITText>
+              </ITFlex>
+            </ITButton>
+          )}
           <ITButton variant="outlined" color="secondary" onClick={() => void downloadDisciplinaryReportPdf(disciplinaryReport)}>
             <ITFlex align="center" gap={1}>
               <FaFilePdf className="text-red-600" size={13} />
@@ -178,6 +202,6 @@ export default function DisciplinaryReportDetailPage() {
           </ITGrid>
         </ITGrid>
       </ITFlex>
-    </ITPage>
+    </AppPage>
   );
 }

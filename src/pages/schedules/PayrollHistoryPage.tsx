@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuHistory } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -17,7 +17,7 @@ export default function PayrollHistoryPage() {
   const fx = usePayrollHistory();
 
   return (
-    <ITPage
+    <AppPage
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("history.title")}
       description={t("history.description")}
@@ -34,6 +34,6 @@ export default function PayrollHistoryPage() {
       backAction={() => goBack("/schedules/payroll")}
     >
       <PayrollHistoryPanel fx={fx} />
-    </ITPage>
+    </AppPage>
   );
 }

@@ -7,10 +7,11 @@ import {
   ITFlex,
   ITInput,
   ITLoader,
-  ITPage,
   ITSelect,
   ITText,
-  ITTextarea, ITStack } from "@axzydev/axzy_ui_system";
+  ITTextarea, ITStack
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuCamera, LuIdCard, LuMapPin, LuPhone, LuUserRound } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -240,7 +241,7 @@ export default function EmployeeProfileEditPage() {
 
   if (detail.loading || !detail.profile) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.editInfo")}
         backAction={() => goBack(`/employees/${id}`)}
@@ -261,7 +262,7 @@ export default function EmployeeProfileEditPage() {
             <ITLoader variant="spinner" size="lg" color="primary" />
           </ITFlex>
         )}
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -531,7 +532,7 @@ export default function EmployeeProfileEditPage() {
     next.focus();
   };
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("detail.editInfo")}
       description={profile.name}
@@ -593,6 +594,6 @@ export default function EmployeeProfileEditPage() {
         </ITButton>
       </StickyActions>
 
-    </ITPage>
+    </AppPage>
   );
 }

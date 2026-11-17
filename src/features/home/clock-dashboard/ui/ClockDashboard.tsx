@@ -1,36 +1,35 @@
-import { ITBentoFeed, ITBentoGauge, ITBentoGrid, ITBentoPill, ITBentoTile, useITBentoCountUp, ITText } from "@axzydev/axzy_ui_system";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { LuClock, LuDoorOpen, LuWrench } from "react-icons/lu";
 import type { AccessTodayWidget, SetupGapsWidget } from "@entities/dashboard";
 import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { formatTimeInTZ } from "@shared/utils/dates";
-import { MiniStat, Num } from "@shared/ui/bento-bits";
-import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { toTitleCase } from "@shared/utils/text";
+import { AttentionBlock, CardShell, StackedBar, StatChip, StatusPill } from "@shared/ui/dashboard-card";
+import { InitialsAvatar } from "@shared/ui/initials-avatar";
 
 interface Props {
   access: AccessTodayWidget | null;
   setup: SetupGapsWidget | null;
 }
 
-/** Hueco vacío de una tarjeta: ícono tenue y una línea que explica qué falta. */
-function Blank({ text }: { text: string }) {
-  return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-1.5 py-6 text-center">
-      <LuClock size={26} className="opacity-25" />
-      <ITText className="m-0 text-[12px] font-medium" style={{ color: "var(--it-bento-muted)" }}>
-        {text}
-      </ITText>
-    </div>
-  );
-}
+type ChipKey = "ENTRY" | "EXIT" | "ON_SITE";
+
+const AMBER = "var(--color-warning)";
+const GREEN = "var(--color-success)";
+const VIOLET = "var(--color-violet-500)";
+
+/** Estado vacío compacto, centrado dentro de la tarjeta. */
+const Empty = ({ text }: { text: string }) => (
+  <div className="py-4 text-center text-[12.5px] text-slate-500">{text}</div>
+);
+
+const linkCls = "cursor-pointer text-[13px] font-semibold text-slate-900 underline";
 
 /**
- * Pestaña **Reloj y accesos** con el mosaico bento del inicio: los pendientes de
- * configuración (números sin vincular, personas sin reloj o sin horario), el
- * resumen de accesos del día con su medidor, quién sigue en sitio y los últimos
- * registros. Cada número abre la pantalla donde se atiende.
+ * Pestaña **Reloj y accesos**: accesos de hoy (con filtro por chip), pendientes
+ * de configuración, quién sigue en sitio y los últimos registros.
  */
 export default function ClockDashboard({ access, setup }: Props) {
   const { t: tt } = useTranslation("dashboard");
@@ -38,122 +37,212 @@ export default function ClockDashboard({ access, setup }: Props) {
   const navigate = useNavigate();
   const canAssign = useCan("schedules.view");
   const canLog = useCan("access.log");
+  const [selectedKey, setSelectedKey] = useState<ChipKey | null>(null);
 
   const entries = access?.entries ?? 0;
   const exits = access?.exits ?? 0;
-  const onSite = access?.onSite.length ?? 0;
-  const insideShare = entries > 0 ? onSite / entries : 0;
+  const mine = access?.registeredByMe ?? 0;
+  const onSiteRows = access?.onSite ?? [];
+  const latest = access?.latest ?? [];
   const time = (iso: string) => (access ? formatTimeInTZ(iso, access.timezone) : "");
-  const shown = useITBentoCountUp(onSite, 1200);
-
+  const nameOf = (n: string | null) => (n ? toTitleCase(n) : "—");
+  const openLog = canLog ? () => navigate("/access") : undefined;
   const linked = () => navigate("/hr/time-clock/employees");
 
+  const chips: Array<{ key: ChipKey | "MINE"; label: string; value: number; color: string }> = [
+    { key: "ENTRY", label: t("access.entries"), value: entries, color: GREEN },
+    { key: "EXIT", label: t("access.exits"), value: exits, color: AMBER },
+    { key: "MINE", label: t("access.mine"), value: mine, color: "#9aa3b2" },
+    { key: "ON_SITE", label: t("access.onSite"), value: onSiteRows.length, color: VIOLET },
+  ];
+  const selected = chips.find((c) => c.key === selectedKey) ?? null;
+  // Filas del filtro: registros recientes del tipo elegido, o quienes siguen en sitio.
+  const listRows =
+    selectedKey === "ON_SITE"
+      ? onSiteRows.map((p) => ({ id: p.employeeId, name: p.name, detail: [p.site, t("access.since", { time: time(p.since) })].filter(Boolean).join(" · ") }))
+      : selectedKey
+        ? latest.filter((e) => e.type === selectedKey).map((e) => ({ id: e.id, name: e.name, detail: [e.site, time(e.at)].filter(Boolean).join(" · ") }))
+        : [];
+
+  const setupBlocks = [
+    {
+      key: "numbers",
+      value: setup?.unlinkedClockNumbers ?? 0,
+      title: t("setup.unlinkedClockNumbers"),
+      subtitle: t("setup.unlinkedNumbersHint"),
+      action: t("setup.link"),
+      onAction: linked,
+    },
+    {
+      key: "withoutClock",
+      value: setup?.personalWithoutClock ?? 0,
+      title: t("setup.personalWithoutClock"),
+      subtitle: t("setup.withoutClockHint"),
+      action: t("setup.link"),
+      onAction: linked,
+    },
+    {
+      key: "withoutSchedule",
+      value: setup?.personalWithoutSchedule ?? 0,
+      title: t("setup.personalWithoutSchedule"),
+      subtitle: t("setup.withoutScheduleHint"),
+      action: t("setup.assign"),
+      onAction: canAssign ? () => navigate("/schedules/assign") : undefined,
+    },
+  ].filter((b) => b.value > 0);
+
   return (
-    <ITBentoGrid>
-      {/* Pendientes de configuración: lo que impide calcular bien la asistencia */}
-      <ITBentoTile cols={12} rows={2} wide icon={<LuWrench size={15} />} label={t("setup.title")}>
-        <div className="mt-2 grid flex-1 !grid-cols-3 gap-2">
-          <MiniStat
-            label={t("setup.unlinkedClockNumbers")}
-            value={<Num value={setup?.unlinkedClockNumbers ?? 0} />}
-            color="var(--color-warning)"
-            onClick={linked}
-            hint={t("attendance.linkClocks")}
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 xl:!flex-row">
+        {/* Accesos de hoy */}
+        <CardShell
+          title={t("access.title")}
+          className="xl:basis-[44%]"
+          right={<span className="text-[13px] text-slate-600">{t("access.entriesExits", { entries, exits })}</span>}
+        >
+          <StackedBar
+            label={t("access.title")}
+            segments={[
+              { key: "ENTRY", value: entries, color: GREEN },
+              { key: "EXIT", value: exits, color: AMBER },
+            ]}
           />
-          <MiniStat
-            label={t("setup.personalWithoutClock")}
-            value={<Num value={setup?.personalWithoutClock ?? 0} />}
-            color="var(--color-warning)"
-            onClick={linked}
-            hint={t("attendance.linkClocks")}
-          />
-          <MiniStat
-            label={t("setup.personalWithoutSchedule")}
-            value={<Num value={setup?.personalWithoutSchedule ?? 0} />}
-            color="var(--color-warning)"
-            onClick={canAssign ? () => navigate("/schedules/assign") : undefined}
-            hint={t("setup.assignSchedule")}
-          />
-        </div>
-      </ITBentoTile>
-
-      {/* Accesos de hoy: tarjeta oscura con medidor de quién sigue dentro */}
-      <ITBentoTile
-        tone="sea"
-        cols={4}
-        rows={3}
-        wide
-        icon={<LuDoorOpen size={15} />}
-        label={t("access.title")}
-        value={<>{Math.round(shown).toLocaleString("es-MX")}</>}
-        caption={t("access.ofEntries", { total: entries })}
-        onClick={canLog ? () => navigate("/access") : undefined}
-      >
-        <div className="relative z-[1] my-1 flex min-h-0 flex-1 flex-col justify-center">
-          {entries > 0 ? (
-            <ITBentoGauge value={insideShare} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
-          ) : (
-            <ITText className="m-0 text-center text-[12px] font-medium" style={{ color: "rgba(234,246,248,.6)" }}>
-              {t("access.noEntries")}
-            </ITText>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {chips.map((chip) =>
+              chip.key === "MINE" ? (
+                <StatChip key={chip.key} label={chip.label} value={chip.value} color={chip.color} onClick={openLog} />
+              ) : (
+                <StatChip
+                  key={chip.key}
+                  label={chip.label}
+                  value={chip.value}
+                  color={chip.color}
+                  selected={selectedKey === chip.key}
+                  onClick={() => setSelectedKey(selectedKey === chip.key ? null : (chip.key as ChipKey))}
+                />
+              ),
+            )}
+          </div>
+          {entries + exits === 0 && !selected && <Empty text={t("access.noEntries")} />}
+          {selected && (
+            <div className="mt-3 flex min-h-0 flex-col">
+              <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
+                <b className="font-semibold text-slate-900">{selected.label} · {listRows.length}</b>
+                <span className="flex items-center gap-3">
+                  {openLog && (
+                    <button type="button" className="cursor-pointer text-[12px] font-semibold text-slate-900 underline" onClick={openLog}>
+                      {t("access.viewLog")}
+                    </button>
+                  )}
+                  <button type="button" className="cursor-pointer text-[12px] text-slate-500 underline" onClick={() => setSelectedKey(null)}>
+                    {t("attendance.clearFilter")}
+                  </button>
+                </span>
+              </div>
+              <div className="max-h-[216px] overflow-auto" style={{ borderTop: "1px solid #eef1f5" }}>
+                {listRows.length === 0 ? (
+                  <Empty text={t("attendance.nobody")} />
+                ) : (
+                  listRows.map((r) => (
+                    <div key={r.id} className="flex items-center justify-between gap-3 py-1.5" style={{ borderBottom: "1px solid #f3f5f8" }}>
+                      <span className="flex min-w-0 items-center gap-2.5 text-[13px] text-slate-800">
+                        <InitialsAvatar name={r.name ?? "—"} size={28} />
+                        <span className="truncate">{nameOf(r.name)}</span>
+                      </span>
+                      <span className="shrink-0 text-[12.5px] tabular-nums text-slate-600">{r.detail}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           )}
-          <div className="mt-1 flex flex-wrap gap-1.5">
-            <ITBentoPill dot="var(--color-success)">{t("access.entries")} {entries}</ITBentoPill>
-            <ITBentoPill dot="var(--color-warning)">{t("access.exits")} {exits}</ITBentoPill>
-            <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("access.mine")} {access?.registeredByMe ?? 0}</ITBentoPill>
-          </div>
-        </div>
-      </ITBentoTile>
+        </CardShell>
 
-      {/* Quién sigue en sitio */}
-      <ITBentoTile cols={4} rows={3} wide icon={<LuClock size={15} />} label={t("access.onSite")}>
-        {onSite === 0 ? (
-          <Blank text={t("access.nobodyInside")} />
-        ) : (
-          <ul className="m-0 mt-2 flex min-h-0 list-none flex-col gap-1.5 overflow-y-auto p-0">
-            {access?.onSite.map((p) => (
-              <li key={p.employeeId} className="flex items-center gap-2">
-                <ProfileAvatar size="sm" name={p.name ?? "—"} />
-                <ITText as="span" className="min-w-0 flex-1">
-                  <ITText as="span" className="block truncate text-[12.5px] font-semibold">{p.name ?? "—"}</ITText>
-                  <ITText as="span" className="block truncate text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
-                    {p.site ?? "—"}
-                  </ITText>
-                </ITText>
-                <ITText as="span" className="shrink-0 text-[11px]" style={{ color: "var(--it-bento-muted)" }}>
-                  {t("access.since", { time: time(p.since) })}
-                </ITText>
-              </li>
+        {/* Pendientes de configuración */}
+        <CardShell
+          title={t("setup.title")}
+          className="xl:basis-[29%]"
+          right={
+            setupBlocks.length > 0 ? (
+              <StatusPill tone="danger">{t("setup.pending", { count: setupBlocks.length })}</StatusPill>
+            ) : undefined
+          }
+        >
+          <div className="flex flex-1 flex-col gap-2.5">
+            {setupBlocks.map((b) => (
+              <AttentionBlock
+                key={b.key}
+                value={b.value}
+                title={b.title}
+                subtitle={b.subtitle}
+                action={b.action}
+                onAction={b.onAction}
+                bg="#fef1e3"
+                color="#f97316"
+              />
             ))}
-          </ul>
-        )}
-      </ITBentoTile>
+            {setupBlocks.length === 0 && (
+              <div className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-3 py-6 text-center" style={{ background: "#e6f4ea" }}>
+                <b className="text-[14px] font-semibold" style={{ color: GREEN }}>{t("setup.allDone")}</b>
+                <span className="text-[12px] text-slate-600">{t("setup.allDoneHint")}</span>
+              </div>
+            )}
+          </div>
+        </CardShell>
 
-      {/* Últimos registros del día */}
-      <ITBentoTile cols={4} rows={3} wide icon={<LuDoorOpen size={15} />} label={t("access.latest")}>
-        {(access?.latest.length ?? 0) === 0 ? (
-          <Blank text={t("access.noRecords")} />
+        {/* En sitio */}
+        <CardShell
+          title={t("access.onSite")}
+          className="xl:basis-[27%]"
+          right={<span className="text-[13px] text-slate-600">{t("access.onSiteCount", { count: onSiteRows.length })}</span>}
+        >
+          {onSiteRows.length === 0 ? (
+            <Empty text={t("access.nobodyInside")} />
+          ) : (
+            <div className="max-h-[260px] overflow-auto" style={{ borderTop: "1px solid #eef1f5" }}>
+              {onSiteRows.map((p) => (
+                <div key={p.employeeId} className="flex items-center justify-between gap-3 py-1.5" style={{ borderBottom: "1px solid #f3f5f8" }}>
+                  <span className="flex min-w-0 items-center gap-2.5 text-[13px] text-slate-800">
+                    <InitialsAvatar name={p.name ?? "—"} size={28} />
+                    <span className="truncate">{nameOf(p.name)}</span>
+                  </span>
+                  <span className="shrink-0 text-[12.5px] tabular-nums text-slate-600">{time(p.since)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardShell>
+      </div>
+
+      {/* Últimos registros */}
+      <CardShell
+        title={t("access.latest")}
+        right={
+          openLog ? (
+            <button type="button" onClick={openLog} className={linkCls}>
+              {t("access.viewLog")}
+            </button>
+          ) : undefined
+        }
+      >
+        {latest.length === 0 ? (
+          <Empty text={t("access.noRecords")} />
         ) : (
-          <div className="mt-1 min-h-0 flex-1">
-            <ITBentoFeed
-              maxHeight={232}
-              groups={[
-                {
-                  key: "today",
-                  label: t("attendance.today"),
-                  items: (access?.latest ?? []).map((e) => ({
-                    id: e.id,
-                    icon: <LuDoorOpen size={13} />,
-                    title: e.name ?? "—",
-                    meta: [time(e.at), e.site].filter(Boolean).join(" · "),
-                    tone: e.type === "ENTRY" ? "success" : "violet",
-                  })),
-                },
-              ]}
-            />
+          <div className="max-h-[352px] overflow-auto" style={{ borderTop: "1px solid #eef1f5" }}>
+            {latest.slice(0, 8).map((e) => (
+              <div key={e.id} className="flex items-center justify-between gap-3 py-2" style={{ borderBottom: "1px solid #f3f5f8" }}>
+                <span className="flex min-w-0 items-center gap-2.5 text-[13px] text-slate-800">
+                  <InitialsAvatar name={e.name ?? "—"} size={28} />
+                  <span className="truncate">{nameOf(e.name)}</span>
+                  <StatusPill tone={e.type === "ENTRY" ? "success" : "warning"}>{t(`access.${e.type}`)}</StatusPill>
+                  {e.site && <span className="hidden truncate text-[12.5px] text-slate-500 sm:inline">{e.site}</span>}
+                </span>
+                <span className="shrink-0 text-[12.5px] tabular-nums text-slate-600">{time(e.at)}</span>
+              </div>
+            ))}
           </div>
         )}
-      </ITBentoTile>
-    </ITBentoGrid>
+      </CardShell>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { FaPlus, FaSprayCan } from "react-icons/fa";
-import { ITButton, ITPage, ITTabs } from "@axzydev/axzy_ui_system";
+import { ITButton, ITTabs } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
@@ -20,7 +21,7 @@ export function LinenAmenitiesPage() {
   const goBack = useGoBack();
   const canControl = useCan("hotel_linen.amenities_control");
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("page.title")}
@@ -46,7 +47,7 @@ export function LinenAmenitiesPage() {
           { id: "spa", label: t("tabs.spa"), content: <SpaTodayPanel /> },
         ]}
       />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -58,7 +59,7 @@ export function LinenAmenityControlPage() {
   const { id } = useParams();
   const isNew = !id || id === "new";
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={isNew ? t("form.pageTitle") : t("sheet.pageTitle")}
@@ -72,6 +73,6 @@ export function LinenAmenityControlPage() {
       backAction={() => goBack("/linen/amenities")}
     >
       <AmenityControlView key={isNew ? "new" : id} id={isNew ? undefined : id} />
-    </ITPage>
+    </AppPage>
   );
 }

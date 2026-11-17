@@ -1,4 +1,5 @@
-import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBell, FaIdCard } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,7 +13,7 @@ export default function EmployeeRecordsPage() {
   const goBack = useGoBack();
   const fx = useEmployeeRecords();
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("records.title")}
       description={t("records.description")}
@@ -35,6 +36,6 @@ export default function EmployeeRecordsPage() {
       }
     >
       <EmployeeRecordsBoard fx={fx} />
-    </ITPage>
+    </AppPage>
   );
 }

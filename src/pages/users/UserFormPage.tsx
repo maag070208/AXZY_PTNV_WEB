@@ -1,5 +1,6 @@
 import type { KeyboardEvent } from "react";
-import { ITAlert, ITButton, ITPage, ITStack } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITStack } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuBuilding2, LuFileUp, LuIdCard, LuShieldCheck, LuUserPlus } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -60,7 +61,7 @@ export default function UserFormPage() {
 
   if (userForm.loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={title}
         description={description}
@@ -73,7 +74,7 @@ export default function UserFormPage() {
         ]}
       >
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -153,7 +154,7 @@ export default function UserFormPage() {
   const fullName = [f.name, f.paternalSurname, f.maternalSurname].map((part) => part.trim()).filter(Boolean).join(" ");
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={title}
       description={description}
@@ -209,6 +210,6 @@ export default function UserFormPage() {
         </ITButton>
       </StickyActions>
 
-    </ITPage>
+    </AppPage>
     );
 }

@@ -51,3 +51,23 @@ export const formatLongDate = (date: Date, locale: string): string => {
   const rest = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(date);
   return locale.startsWith("es") ? `${weekday} ${rest}` : `${weekday}, ${rest}`;
 };
+
+/** "YYYY-MM-DD" (o ISO) → Date local, sin pasar por UTC para no correr el día. */
+export const parseLocalDay = (value?: string | null): Date | undefined => {
+  if (!value) return undefined;
+  const [y, m, d] = value.slice(0, 10).split("-").map(Number);
+  if (!y || !m || !d) return undefined;
+  return new Date(y, m - 1, d);
+};
+
+/** Date local → "YYYY-MM-DD". */
+export const toDayString = (value: Date): string => {
+  const y = value.getFullYear();
+  const m = String(value.getMonth() + 1).padStart(2, "0");
+  const d = String(value.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+/** Fecha larga en español para las cartas: "17 de noviembre de 2026". */
+export const formatLongDateEs = (value: Date | undefined): string =>
+  value ? value.toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }) : "";

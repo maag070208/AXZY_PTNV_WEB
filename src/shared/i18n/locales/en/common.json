@@ -80,6 +80,7 @@
     "logout": "Sign out",
     "catalogs": "Catalogs",
     "roles": "Roles and permissions",
+    "hrFormats": "Formats",
     "hrReports": "HR Reports",
     "employeeRecords": "Employee records",
     "access": "Guard",

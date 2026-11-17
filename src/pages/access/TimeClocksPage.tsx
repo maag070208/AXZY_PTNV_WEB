@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,7 @@ export default function TimeClocksPage() {
   const fx = useTimeClocks();
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("clocks.title")}
       description={t("clocks.description")}
@@ -24,6 +24,6 @@ export default function TimeClocksPage() {
       backAction={() => goBack("/")}
     >
       <TimeClocksTab fx={fx} />
-    </ITPage>
+    </AppPage>
   );
 }

@@ -1,10 +1,12 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   ITAlert,
   ITBadget,
   ITBentoStatStrip,
+  ITButton,
   ITCheckbox,
   ITDataTable,
+  ITDialog,
   ITFlex,
   ITInput,
   ITSearchSelect,
@@ -25,6 +27,8 @@ import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { dyn } from "@shared/i18n/dyn";
 import { dateLocale } from "@shared/i18n";
+import { formatMinutesAsHhMm } from "@shared/utils/dates";
+import PunchTimeline from "./PunchTimeline";
 import type { UseAccessReport } from "../model/useAccessReport";
 
 type BadgeColor = "success" | "warning" | "danger" | "gray" | "info";
@@ -61,6 +65,8 @@ const formatDay = (dayKey: string, options: Intl.DateTimeFormatOptions): string 
 export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
   const { t, period, summary, view, setView } = fx;
   const tt = dyn(t);
+  // Detalle de la secuencia de checadas de una persona (solo el reloj checador).
+  const [detail, setDetail] = useState<PeopleAttendanceRow | null>(null);
 
   const days = summary?.range.days ?? [];
   const today = summary?.range.today;
@@ -242,6 +248,51 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           },
         ]
       : []),
+    ...(fx.timeline
+      ? [
+          {
+            key: "outings",
+            label: t("columns.outings"),
+            type: "number" as const,
+            width: 80,
+            sortable: false,
+            render: (r: PeopleAttendanceRow) => (
+              <ITText className="text-[12px] font-bold tabular-nums text-slate-700">{r.outingsCount ?? 0}</ITText>
+            ),
+          },
+          {
+            key: "away",
+            label: t("columns.away"),
+            type: "string" as const,
+            width: 100,
+            sortable: false,
+            render: (r: PeopleAttendanceRow) => (
+              <ITText className="text-[12px] tabular-nums text-slate-700">
+                {r.awayMinutes ? formatMinutesAsHhMm(r.awayMinutes) : "—"}
+              </ITText>
+            ),
+          },
+          {
+            key: "sequence",
+            label: t("columns.sequence"),
+            type: "string" as const,
+            width: 150,
+            sortable: false,
+            render: (r: PeopleAttendanceRow) => (
+              <ITFlex align="center" gap={1}>
+                {(r.incompleteDays ?? 0) > 0 && (
+                  <ITBadget color="warning" size="sm">
+                    {t("timeline.incomplete")}
+                  </ITBadget>
+                )}
+                <ITButton variant="outlined" color="secondary" size="sm" onClick={() => setDetail(r)}>
+                  <ITText className="text-[11px] font-bold">{t("timeline.details")}</ITText>
+                </ITButton>
+              </ITFlex>
+            ),
+          },
+        ]
+      : []),
     {
       key: "workedMinutes",
       label: t("columns.hours"),
@@ -419,6 +470,35 @@ export default function AccessReportTab({ fx }: { fx: UseAccessReport }) {
           </ITFlex>
         )}
       </PanelCard>
+
+      <ITDialog isOpen={detail !== null} onClose={() => setDetail(null)} className="max-w-2xl">
+        <ITText className="mb-3 block text-[14px] font-bold text-slate-800">
+          {detail?.employeeName} · {t("timeline.title")}
+        </ITText>
+        <ITFlex direction="column" gap={2}>
+          {detail?.days
+            .filter((d) => d.entryAt)
+            .map((d) => (
+              <ITFlex key={d.date} direction="column" gap={0.5} className="rounded-lg border border-slate-200 px-3 py-2">
+                <ITFlex align="center" justify="between" gap={2}>
+                  <ITText className="text-[12px] font-bold text-slate-700">
+                    {formatDay(d.date, { weekday: "short", day: "2-digit", month: "short" })}
+                  </ITText>
+                  <ITText className="text-[11px] text-slate-500">
+                    {t("timeline.away")}: {formatMinutesAsHhMm(d.awayMinutes ?? 0)}
+                  </ITText>
+                </ITFlex>
+                <PunchTimeline
+                  entryAt={d.entryAt}
+                  exitAt={d.onSite ? null : d.exitAt}
+                  outings={d.outings}
+                  incompleteSequence={d.incompleteSequence}
+                  timezone={tz}
+                />
+              </ITFlex>
+            ))}
+        </ITFlex>
+      </ITDialog>
     </ITFlex>
   );
 }
