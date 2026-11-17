@@ -9,10 +9,10 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITPage,
   ITText,
-  ITToast,
+  ITToast
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBoxOpen, FaCheckCircle, FaChevronDown, FaChevronRight, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type DeviceUnitStatus, type DeviceUnit } from "@entities/inventory";
@@ -139,17 +139,17 @@ export default function EditDevicePage() {
 
   if (loading || !device) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("devices.edit")} backAction={() => goBack(`/inventory/devices/${id}`)}>
         <ITFlex justify="center" align="center" className="py-20">
           <LottieLoader size="lg" />
         </ITFlex>
-      </ITPage>
+      </AppPage>
     );
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("devices.edit")}
       description={device.name}
@@ -325,6 +325,6 @@ export default function EditDevicePage() {
       </ITGrid>
 
       {toast && <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />}
-    </ITPage>
+    </AppPage>
   );
 }

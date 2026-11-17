@@ -6,9 +6,10 @@ import {
   ITChip,
   ITFlex,
   ITInput,
-  ITPage,
   ITSearchSelect,
-  ITToast, ITText } from "@axzydev/axzy_ui_system";
+  ITToast, ITText
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaCheckCircle, FaInfoCircle, FaTimesCircle, FaUndoAlt } from "react-icons/fa";
 import { LuClipboardList, LuPackageCheck } from "react-icons/lu";
 import type { ReactNode } from "react";
@@ -177,10 +178,10 @@ export default function NewLoanReturnPage() {
 
   if (loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("loanReturn.new")} backAction={() => goBack("/inventory/returns")}>
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -190,7 +191,7 @@ export default function NewLoanReturnPage() {
   const sectionsDone = (loan ? 1 : 0) + (totalToReturn > 0 ? 1 : 0);
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("loanReturn.new")}
       description={t("loanReturn.description")}
@@ -362,6 +363,6 @@ export default function NewLoanReturnPage() {
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />
       )}
-    </ITPage>
+    </AppPage>
   );
 }

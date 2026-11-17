@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaExchangeAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,7 @@ export default function TimeClockDifferencesPage() {
   const fx = useTimeClockDifferences();
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("differences.title")}
       description={t("differences.description")}
@@ -29,6 +29,6 @@ export default function TimeClockDifferencesPage() {
       backAction={() => goBack("/hr/time-clock/employees")}
     >
       <TimeClockDifferencesTab fx={fx} />
-    </ITPage>
+    </AppPage>
   );
 }

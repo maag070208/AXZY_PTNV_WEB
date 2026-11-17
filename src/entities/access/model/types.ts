@@ -137,6 +137,14 @@ export interface AccessReportSessionRow {
    * número del reloj aún no está vinculado a un usuario.
    */
   linked?: boolean;
+  /** Solo reloj checador: línea de tiempo de la jornada (ISO). */
+  punches?: string[];
+  outings?: Array<{ exitAt: string; returnAt: string | null }>;
+  /** Tiempo fuera (suma de salida→regreso). Informativo. */
+  awayMinutes?: number;
+  /** Salida sin regreso: RH debe revisarla. */
+  incompleteSequence?: boolean;
+  onSite?: boolean;
 }
 
 /** Rango de fechas resuelto por el servidor en la zona horaria efectiva. */
@@ -193,6 +201,11 @@ export interface PeopleAttendanceDay {
   lateMinutes: number;
   onSite: boolean;
   incident: "ENTRY_WITHOUT_EXIT" | "EXIT_WITHOUT_ENTRY" | null;
+  /** Solo reloj checador: línea de tiempo del día. */
+  punches?: string[];
+  outings?: Array<{ exitAt: string; returnAt: string | null }>;
+  awayMinutes?: number;
+  incompleteSequence?: boolean;
 }
 
 /** Una fila por persona; `days` trae cada día del periodo (`summary.range.days`). */
@@ -213,6 +226,10 @@ export interface PeopleAttendanceRow {
   absences: number;
   withoutExit: number;
   withoutEntry: number;
+  /** Solo reloj checador: totales del periodo. */
+  outingsCount?: number;
+  awayMinutes?: number;
+  incompleteDays?: number;
 }
 
 /** Vistas rápidas de la tabla. */

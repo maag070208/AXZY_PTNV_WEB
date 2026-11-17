@@ -1,4 +1,5 @@
-import { ITAlert, ITPage } from "@axzydev/axzy_ui_system";
+import { ITAlert } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaUserShield } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -17,7 +18,7 @@ export default function UserImportPage() {
   const fx = useUserImport();
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("import.title")}
       description={tt("import.description")}
@@ -36,6 +37,6 @@ export default function UserImportPage() {
 
       <ImportPanel fx={fx} />
       <ImportResultCard fx={fx} onGoToList={() => goBack("/users")} />
-    </ITPage>
+    </AppPage>
   );
 }

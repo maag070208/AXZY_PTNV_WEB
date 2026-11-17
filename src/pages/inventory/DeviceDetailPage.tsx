@@ -8,10 +8,10 @@ import {
   ITButton,
   ITChip,
   ITFlex,
-  ITPage,
   ITText,
-  useITBentoCountUp,
+  useITBentoCountUp
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBoxOpen, FaEdit, FaPlusCircle } from "react-icons/fa";
 import {
   LuArrowLeftRight,
@@ -131,19 +131,19 @@ export default function DeviceDetailPage() {
   // Sin dispositivo (no existe o falló la carga): el error, no un cargador infinito.
   if (!loading && !device) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("devices.detail")} backAction={() => goBack("/inventory/devices")}>
         <LangostinState kind="error" description={error ?? t("common:errors.load")} />
-      </ITPage>
+      </AppPage>
     );
   }
 
   if (loading || !device) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("devices.detail")} backAction={() => goBack("/inventory/devices")}>
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -163,7 +163,7 @@ export default function DeviceDetailPage() {
   const shownUnits = unitFilter === "all" ? units : units.filter((u) => u.status === unitFilter);
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={device.name}
       description={`${device.brand} ${device.model}`}
@@ -311,6 +311,6 @@ export default function DeviceDetailPage() {
           )}
         </ITBentoTile>
       </ITBentoGrid>
-    </ITPage>
+    </AppPage>
   );
 }

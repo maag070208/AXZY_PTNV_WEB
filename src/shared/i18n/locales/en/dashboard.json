@@ -37,7 +37,12 @@
     "chartTitle": "How the day is going",
     "followUp": "Today's follow-up",
     "viewAccess": "Open access log",
-    "linkClocks": "Link people to clocks"
+    "linkClocks": "Link people to clocks",
+    "arrivedOfScheduled": "of {{total}} scheduled have arrived",
+    "unlinkedShort": "Unlinked",
+    "viewReportShort": "View report",
+    "clearFilter": "Clear filter",
+    "nobody": "Nobody in this status"
   },
   "records": {
     "title": "Active staff",
@@ -114,7 +119,10 @@
     "rejected": "Rejected",
     "topPending": "Most unapproved hours",
     "review": "Review and approve",
-    "chartTitle": "Overtime decisions"
+    "chartTitle": "Overtime decisions",
+    "titleWeek": "Overtime · week",
+    "report": "Report",
+    "toApprove": "To approve"
   },
   "setup": {
     "title": "Setup pending",
@@ -123,7 +131,13 @@
     "personalWithoutSchedule": "Staff without schedule",
     "link": "Link",
     "assign": "Assign schedule",
-    "assignSchedule": "Assign schedules"
+    "assignSchedule": "Assign schedules",
+    "pending": "{{count}} pending",
+    "allDone": "All set up",
+    "allDoneHint": "Nothing left to link or assign",
+    "unlinkedNumbersHint": "Clock numbers that belong to nobody",
+    "withoutClockHint": "They cannot clock in until linked",
+    "withoutScheduleHint": "Their attendance cannot be measured"
   },
   "tickets": {
     "title": "Tickets",
@@ -172,7 +186,10 @@
     "assignSchedule": "Assign schedules",
     "noEntries": "No access logged today",
     "nobodyInside": "Nobody inside the hotel right now",
-    "noRecords": "No records yet today"
+    "noRecords": "No records yet today",
+    "entriesExits": "{{entries}} entries · {{exits}} exits",
+    "viewLog": "Open log",
+    "onSiteCount": "{{count}} inside"
   },
   "system": {
     "title": "System health",
@@ -196,9 +213,29 @@
     "shortcutCatalog": "Catalogs",
     "shortcutAudit": "Inventory audit",
     "staleOne": "stale",
-    "okOne": "up to date"
+    "okOne": "up to date",
+    "syncedOf": "{{fresh}} of {{total}} clocks synced",
+    "chipSynced": "Synced",
+    "chipStale": "Stale",
+    "allGood": "All good",
+    "needsAttention": "Needs attention",
+    "auditOk": "Balanced",
+    "auditMismatch": "Mismatch",
+    "viewAudit": "View audit",
+    "viewClocks": "View clocks"
   },
   "operations": {
     "title": "Operations"
+  },
+  "attention": {
+    "title": "Needs attention",
+    "pending": "{{count}} pending",
+    "andMore": "and {{count}} more",
+    "view": "View",
+    "unlinkedHint": "They cannot clock in until linked",
+    "link": "Link",
+    "late": "Arrived late",
+    "unapproved": "Unapproved hours",
+    "allClear": "Nothing needs attention"
   }
 }

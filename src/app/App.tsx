@@ -42,6 +42,9 @@ import SubareasPage from "@pages/subareas/SubareasPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
 import EmployeeRecordsPage from "@pages/employees/EmployeeRecordsPage";
 import HrHomePage from "@pages/hr/HrHomePage";
+import HrFormatsPage from "@pages/hr/HrFormatsPage";
+import HrEmploymentLetterPage from "@pages/hr/HrEmploymentLetterPage";
+import HrWarningLetterPage from "@pages/hr/HrWarningLetterPage";
 import EmployeeDetailPage from "@pages/employees/EmployeeDetailPage";
 import EmployeeProfileEditPage from "@pages/employees/EmployeeProfileEditPage";
 import HrReportsPage from "@pages/employees/HrReportsPage";
@@ -392,6 +395,30 @@ export default function App() {
           }
         />
         {/* Reloj checador Hikvision (solo lectura; ver TIME_CLOCK.md). */}
+        <Route
+          path="/hr/formats"
+          element={
+            <RequiresPermission permission="hr.records">
+              <HrFormatsPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/hr/formats/employment-letter"
+          element={
+            <RequiresPermission permission="hr.records">
+              <HrEmploymentLetterPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/hr/formats/warning-letter"
+          element={
+            <RequiresPermission permission="hr.records">
+              <HrWarningLetterPage />
+            </RequiresPermission>
+          }
+        />
         <Route
           path="/hr/time-clock"
           element={

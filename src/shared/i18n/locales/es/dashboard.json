@@ -37,7 +37,12 @@
     "chartTitle": "Cómo va el día",
     "followUp": "Seguimiento del día",
     "viewAccess": "Ver bitácora de accesos",
-    "linkClocks": "Vincular personas al reloj"
+    "linkClocks": "Vincular personas al reloj",
+    "arrivedOfScheduled": "de {{total}} programados han llegado",
+    "unlinkedShort": "Sin vincular",
+    "viewReportShort": "Ver reporte",
+    "clearFilter": "Quitar filtro",
+    "nobody": "Nadie en este estado"
   },
   "records": {
     "title": "Plantilla activa",
@@ -114,7 +119,10 @@
     "rejected": "Rechazadas",
     "topPending": "Más horas sin aprobar",
     "review": "Revisar y aprobar",
-    "chartTitle": "Decisión sobre las horas extra"
+    "chartTitle": "Decisión sobre las horas extra",
+    "titleWeek": "Horas extra · semana",
+    "report": "Reporte",
+    "toApprove": "Por aprobar"
   },
   "setup": {
     "title": "Pendientes de configuración",
@@ -123,7 +131,13 @@
     "personalWithoutSchedule": "Personal sin horario",
     "link": "Vincular",
     "assign": "Asignar horario",
-    "assignSchedule": "Asignar horarios"
+    "assignSchedule": "Asignar horarios",
+    "pending": "{{count}} pendientes",
+    "allDone": "Todo configurado",
+    "allDoneHint": "No hay nada por vincular ni asignar",
+    "unlinkedNumbersHint": "Números del reloj que no pertenecen a nadie",
+    "withoutClockHint": "No pueden checar hasta vincularse",
+    "withoutScheduleHint": "No se les puede medir la asistencia"
   },
   "tickets": {
     "title": "Tickets",
@@ -172,7 +186,10 @@
     "assignSchedule": "Asignar horarios",
     "noEntries": "Sin accesos registrados hoy",
     "nobodyInside": "Nadie dentro del hotel ahora",
-    "noRecords": "Todavía no hay registros hoy"
+    "noRecords": "Todavía no hay registros hoy",
+    "entriesExits": "{{entries}} entradas · {{exits}} salidas",
+    "viewLog": "Ver bitácora",
+    "onSiteCount": "{{count}} dentro"
   },
   "system": {
     "title": "Salud del sistema",
@@ -196,9 +213,29 @@
     "shortcutCatalog": "Catálogos",
     "shortcutAudit": "Auditoría de inventario",
     "staleOne": "atrasado",
-    "okOne": "al día"
+    "okOne": "al día",
+    "syncedOf": "{{fresh}} de {{total}} relojes sincronizados",
+    "chipSynced": "Sincronizados",
+    "chipStale": "Atrasados",
+    "allGood": "Todo bien",
+    "needsAttention": "Requiere atención",
+    "auditOk": "Cuadrado",
+    "auditMismatch": "Descuadre",
+    "viewAudit": "Ver auditoría",
+    "viewClocks": "Ver relojes"
   },
   "operations": {
     "title": "Operación"
+  },
+  "attention": {
+    "title": "Requieren atención",
+    "pending": "{{count}} pendientes",
+    "andMore": "y {{count}} más",
+    "view": "Ver",
+    "unlinkedHint": "No pueden checar hasta vincularse",
+    "link": "Vincular",
+    "late": "Llegaron tarde",
+    "unapproved": "Horas sin aprobar",
+    "allClear": "Nada requiere atención"
   }
 }

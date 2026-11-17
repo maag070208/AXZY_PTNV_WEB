@@ -18,6 +18,7 @@ import deviceTypesEn from "./locales/en/device-types.json";
 import deviceEn from "./locales/en/device.json";
 import employeesEn from "./locales/en/employees.json";
 import hrHomeEn from "./locales/en/hr-home.json";
+import hrFormatsEn from "./locales/en/hr-formats.json";
 import homeEn from "./locales/en/home.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import inventoryEn from "./locales/en/inventory.json";
@@ -55,6 +56,7 @@ import deviceTypesEs from "./locales/es/device-types.json";
 import deviceEs from "./locales/es/device.json";
 import employeesEs from "./locales/es/employees.json";
 import hrHomeEs from "./locales/es/hr-home.json";
+import hrFormatsEs from "./locales/es/hr-formats.json";
 import homeEs from "./locales/es/home.json";
 import dashboardEs from "./locales/es/dashboard.json";
 import inventoryEs from "./locales/es/inventory.json";
@@ -92,6 +94,7 @@ export const NS_LIST = [
   "users",
   "employees",
   "hr-home",
+  "hr-formats",
   "departments",
   "subareas",
   "inventory",
@@ -133,6 +136,7 @@ export const resources = {
     users: usersEn,
     employees: employeesEn,
     "hr-home": hrHomeEn,
+    "hr-formats": hrFormatsEn,
     departments: departmentsEn,
     subareas: subareasEn,
     inventory: inventoryEn,
@@ -171,6 +175,7 @@ export const resources = {
     users: usersEs,
     employees: employeesEs,
     "hr-home": hrHomeEs,
+    "hr-formats": hrFormatsEs,
     departments: departmentsEs,
     subareas: subareasEs,
     inventory: inventoryEs,

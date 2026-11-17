@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ITAlert, ITButton, ITConfirmDialog, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITConfirmDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuCalendarDays, LuChevronLeft, LuChevronRight, LuUserRound } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -100,7 +101,7 @@ export default function HrHomePage() {
   );
 
   return (
-    <ITPage
+    <AppPage
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("title")}
@@ -169,6 +170,6 @@ export default function HrHomePage() {
         variant="primary"
         loading={fx.busy}
       />
-    </ITPage>
+    </AppPage>
   );
 }

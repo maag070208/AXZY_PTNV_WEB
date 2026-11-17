@@ -19,6 +19,7 @@ import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { formatMinutesAsHhMm, formatTimeInTZ } from "@shared/utils/dates";
 import { useDebouncedValue } from "@shared/lib/useDebouncedValue";
 import { periodRangeOf, shiftPeriod, toDateInput } from "@shared/lib/reportPeriod";
+import { timelineText } from "../ui/PunchTimeline";
 import { fileName, type FileNameKey, dateLocale } from "@shared/i18n";
 
 /** Firma del generador de PDF, inyectado por la página (widgets → features por DI). */
@@ -39,6 +40,8 @@ export interface AccessReportSource {
   reportExport: (params: ITDataTableFetchParamsPost) => Promise<AccessReportTableResponse>;
   /** Prefijo del nombre del CSV. */
   csvFile: FileNameKey;
+  /** Muestra salidas intermedias y tiempo fuera (solo el reloj checador las trae). */
+  timeline?: boolean;
 }
 
 /** Orden de los exports: sesión más reciente primero. */
@@ -179,6 +182,9 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
         t("columns.exit"),
         t("columns.hours"),
         t("columns.incident"),
+        ...(source.timeline
+          ? [t("columns.outings"), t("columns.away"), t("columns.incompleteSequence"), t("columns.sequence")]
+          : []),
       ];
       const lines = res.data.map((r) => [
         r.date,
@@ -189,6 +195,22 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
         stamp(r.exitAt),
         r.entryAt && r.exitAt ? formatMinutesAsHhMm(r.workedMinutes) : "",
         r.incident ? t(`incidents.${r.incident}`) : "",
+        ...(source.timeline
+          ? [
+              r.outings?.length ?? 0,
+              formatMinutesAsHhMm(r.awayMinutes ?? 0),
+              r.incompleteSequence ? t("timeline.incomplete") : "",
+              timelineText(
+                { entryAt: r.entryAt, exitAt: r.exitAt, outings: r.outings, timezone: tz },
+                {
+                  entry: t("timeline.entry"),
+                  exit: t("timeline.exit"),
+                  back: t("timeline.back"),
+                  finalExit: t("timeline.finalExit"),
+                }
+              ),
+            ]
+          : []),
       ]);
       const escape = (cell: unknown) => `"${String(cell ?? "").replace(/"/g, '""')}"`;
       const csv = [header, ...lines].map((row) => row.map(escape).join(",")).join("\r\n");
@@ -208,6 +230,7 @@ export const useAccessReport = ({ download, source = ACCESS_SOURCE }: Options) =
 
   return {
     t,
+    timeline: Boolean(source.timeline),
     period,
     changePeriod,
     date,

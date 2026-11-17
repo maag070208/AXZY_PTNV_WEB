@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaUsersCog } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { TimeClockPeopleView } from "@features/access/time-clock-people";
@@ -9,7 +9,7 @@ export default function TimeClockPeoplePage() {
   const goBack = useGoBack();
 
   return (
-    <ITPage
+    <AppPage
       noPadding
       title={t("people.title")}
       description={t("people.description")}
@@ -18,6 +18,6 @@ export default function TimeClockPeoplePage() {
       backAction={() => goBack("/time-clocks")}
     >
       <TimeClockPeopleView />
-    </ITPage>
+    </AppPage>
   );
 }

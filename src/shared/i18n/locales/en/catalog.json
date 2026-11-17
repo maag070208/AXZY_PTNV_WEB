@@ -75,7 +75,11 @@
       "THURSDAY": "Thursday",
       "FRIDAY": "Friday",
       "SATURDAY": "Saturday"
-    }
+    },
+    "duplicateWindowLabel": "Duplicate punch window (min)",
+    "duplicateWindowHelp": "Two punches from the same employee closer than this many minutes count as one (0 to 30, default 2). Affects workdays, overtime and the exits/returns timeline.",
+    "duplicateWindowSaved": "Duplicate punch window updated",
+    "duplicateWindowSaveError": "Could not save the duplicate punch window"
   },
   "stats": {
     "total": "Total",

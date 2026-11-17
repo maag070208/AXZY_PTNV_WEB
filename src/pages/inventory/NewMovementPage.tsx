@@ -7,9 +7,10 @@ import {
   ITButton,
   ITChip,
   ITInput,
-  ITPage,
   ITSearchSelect,
-  ITToast, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
+  ITToast, ITText, ITFlex, ITStack
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuArrowLeftRight, LuBoxes, LuCheck, LuInfo, LuPackageOpen, LuTrash2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import {
@@ -392,16 +393,16 @@ export default function NewMovementPage() {
 
   if (loading) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("new.title")} backAction={() => goBack("/inventory/movements")}>
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
   if (loadError) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding title={t("new.title")} backAction={() => goBack("/inventory/movements")}>
         <LangostinState
           kind="error"
@@ -411,14 +412,14 @@ export default function NewMovementPage() {
             </ITButton>
           }
         />
-      </ITPage>
+      </AppPage>
     );
   }
 
   // Sin catálogo no hay nada que mover: se dice y se lleva al alta de dispositivos.
   if (devices.length === 0) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={t("new.title")}
         description={t("new.description")}
@@ -434,12 +435,12 @@ export default function NewMovementPage() {
             </ITButton>
           }
         />
-      </ITPage>
+      </AppPage>
     );
   }
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("new.title")}
       description={t("new.formSub")}
@@ -856,6 +857,6 @@ export default function NewMovementPage() {
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />
       )}
-    </ITPage>
+    </AppPage>
   );
 }

@@ -1,4 +1,5 @@
-import { ITPage, ITToast } from "@axzydev/axzy_ui_system";
+import { ITToast } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuKanban } from "react-icons/lu";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -32,7 +33,7 @@ export default function KanbanPage() {
   useEffect(() => onAppEvent("kanban:guide", () => setGuideOpen(true)), []);
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={ticketId ? tt("kanban.byTicket") : tt("kanban.board")}
       description={ticketId ? tt("kanban.descByTicket") : tt("kanban.descBoard")}
@@ -72,6 +73,6 @@ export default function KanbanPage() {
           onClose={() => fx.setToast(null)}
         />
       )}
-    </ITPage>
+    </AppPage>
   );
 }

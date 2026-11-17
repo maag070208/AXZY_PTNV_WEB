@@ -11,9 +11,10 @@ import {
   ITFlex,
   ITGrid,
   ITInput,
-  ITPage,
   ITText,
-  type Column, ITStack } from "@axzydev/axzy_ui_system";
+  type Column, ITStack
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaEdit, FaPlus, FaTag } from "react-icons/fa";
 import { LuListChecks, LuSearch, LuTag } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
@@ -358,7 +359,7 @@ export default function DeviceTypesPage() {
         : "help";
 
   return (
-    <ITPage
+    <AppPage
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("types.title")}
@@ -638,6 +639,6 @@ export default function DeviceTypesPage() {
           </ITFlex>
         </div>
       </ITDialog>
-    </ITPage>
+    </AppPage>
   );
 }

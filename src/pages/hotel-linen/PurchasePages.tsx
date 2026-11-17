@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaPlus, FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -15,7 +16,7 @@ export function LinenPurchasesPage() {
   const canCreate = useCan("hotel_purchase.create");
   const [newSignal, setNewSignal] = useState(0);
   return (
-    <ITPage
+    <AppPage
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("title")}
@@ -28,6 +29,6 @@ export function LinenPurchasesPage() {
       }
     >
       <PurchasesBoard newSignal={newSignal} />
-    </ITPage>
+    </AppPage>
   );
 }

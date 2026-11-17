@@ -12,8 +12,6 @@ interface Props {
   value: ReactNode;
   /** Color de estado: tiñe el fondo y la etiqueta. */
   color: string;
-  /** Contorno en vez de relleno (la celda que pide atención). */
-  outline?: boolean;
   /** Abre la pantalla donde se revisa ese número. */
   onClick?: () => void;
   hint?: string;
@@ -24,7 +22,7 @@ interface Props {
  * fondo suave del mismo color. Si recibe `onClick` se comporta como botón
  * (foco, teclado y realce al pasar el cursor).
  */
-export default function MiniStat({ label, value, color, outline = false, onClick, hint }: Props) {
+export default function MiniStat({ label, value, color, onClick, hint }: Props) {
   return (
     <div
       role={onClick ? "button" : undefined}
@@ -44,22 +42,8 @@ export default function MiniStat({ label, value, color, outline = false, onClick
       className={`relative flex min-w-0 flex-col justify-between rounded-[14px] px-3 py-2.5 ${
         onClick ? "cursor-pointer transition-transform hover:-translate-y-0.5" : ""
       }`}
-      style={
-        outline
-          ? { background: "var(--it-card-bg)", boxShadow: `inset 0 0 0 1.5px ${color}` }
-          : { background: `color-mix(in srgb, ${color} 14%, transparent)` }
-      }
+      style={{ background: `color-mix(in srgb, ${color} 14%, transparent)` }}
     >
-      {outline && (
-        <span
-          className="absolute right-2.5 top-2.5 h-[7px] w-[7px] rounded-full"
-          style={{
-            background: color,
-            boxShadow: `0 0 0 0 color-mix(in srgb, ${color} 70%, transparent)`,
-            animation: "it-bento-pulse 2s ease-out infinite",
-          }}
-        />
-      )}
       <ITText className="m-0 text-[11.5px] font-semibold leading-tight" style={{ color: `color-mix(in srgb, ${color} 62%, #0f172a)` }}>
         {label}
       </ITText>

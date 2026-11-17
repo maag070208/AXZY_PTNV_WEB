@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaHouseUser } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { TimeClockDashboardView } from "@widgets/time-clock-dashboard";
@@ -9,7 +9,7 @@ export default function TimeClockDashboardPage() {
   const goBack = useGoBack();
 
   return (
-    <ITPage
+    <AppPage
       noPadding
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("dashboard.title")}
@@ -19,6 +19,6 @@ export default function TimeClockDashboardPage() {
       backAction={() => goBack("/time-clocks")}
     >
       <TimeClockDashboardView />
-    </ITPage>
+    </AppPage>
   );
 }

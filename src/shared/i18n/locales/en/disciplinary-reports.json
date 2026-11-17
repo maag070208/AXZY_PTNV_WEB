@@ -87,7 +87,8 @@
   },
   "preview": {
     "title": "Record preview",
-    "download": "Download PDF"
+    "download": "Download PDF",
+    "downloadApercibimiento": "Download warning letter"
   },
   "actions": {
     "view": "View record",

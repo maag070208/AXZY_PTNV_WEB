@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuBox, LuChartColumn, LuHandshake, LuTrash2 } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +29,7 @@ export default function ReportsPage() {
   const materialOutputsFx = useMaterialOutputsReport({ download: downloadMaterialOutputsPdf });
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       title={t("title")}
       description={t("description")}
       backAction={() => goBack("/")}
@@ -54,6 +54,6 @@ export default function ReportsPage() {
       {tab === "assigned" && <AssignedDevicesTab fx={assignedFx} />}
       {tab === "devices" && <DevicesTab fx={devicesFx} />}
       {tab === "exits" && <MaterialOutputsTab fx={materialOutputsFx} />}
-    </ITPage>
+    </AppPage>
   );
 }

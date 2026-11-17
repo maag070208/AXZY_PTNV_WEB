@@ -12,6 +12,8 @@
 export interface AppEventMap {
   "ticket:created": { id?: string };
   "task:created": { ticketId?: string };
+  /** Pide al panel de Langostín abrir el alta de ticket (botón "Nuevo ticket"). */
+  "ticket:new": Record<string, never>;
   /** Pide al panel que arme una tarea para ese ticket (lo lanza el detalle). */
   "task:new": { ticketId: string; ticketTitle?: string };
   /** Pide al tablero que muestre la animación de cómo mover una tarjeta. */

@@ -75,7 +75,11 @@
       "THURSDAY": "Jueves",
       "FRIDAY": "Viernes",
       "SATURDAY": "Sábado"
-    }
+    },
+    "duplicateWindowLabel": "Ventana de checadas duplicadas (min)",
+    "duplicateWindowHelp": "Dos checadas del mismo empleado con menos de estos minutos entre sí cuentan como una (0 a 30, por defecto 2). Afecta las jornadas, el tiempo extra y la línea de tiempo de salidas y regresos.",
+    "duplicateWindowSaved": "Ventana de checadas duplicadas actualizada",
+    "duplicateWindowSaveError": "No se pudo guardar la ventana de checadas duplicadas"
   },
   "stats": {
     "total": "Total",

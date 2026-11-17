@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { ITBentoStatStrip, ITButton, ITFlex, ITInput, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITBentoStatStrip, ITButton, ITFlex, ITInput, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuKanban, LuListChecks, LuRefreshCw, LuSearch } from "react-icons/lu";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -58,7 +59,7 @@ export default function AdminTasksPage() {
   if (!canCompleteTasks) return <Navigate to="/" replace />;
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("admintasks.title")}
       description={tt("admintasks.description", { count: fx.rows.length })}
@@ -139,6 +140,6 @@ export default function AdminTasksPage() {
           </ITFlex>
         }
       />
-    </ITPage>
+    </AppPage>
   );
 }

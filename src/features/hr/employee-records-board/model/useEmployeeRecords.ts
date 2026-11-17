@@ -29,6 +29,7 @@ export const useEmployeeRecords = () => {
   const [filter, setFilter] = useState<RecordFilter>("ALL");
   const [departmentId, setDepartmentId] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
   const [documents, setDocuments] = useState<EmployeeDocument[]>([]);
   const [uploading, setUploading] = useState<string | null>(null);
   const [notifying, setNotifying] = useState<string | null>(null);
@@ -125,10 +126,25 @@ export const useEmployeeRecords = () => {
   /** Pendientes de la lista visible (lo que se avisa con "Avisar a pendientes"). */
   const pendingVisible = visible.filter((r) => recordStatus(r) !== "COMPLETE");
 
+  // Casillas de selección: solo cuentan las filas visibles.
+  const checkedVisible = visible.filter((r) => checkedIds.has(r.userId));
+  const allChecked = visible.length > 0 && checkedVisible.length === visible.length;
+  const toggleChecked = (userId: string) =>
+    setCheckedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  const toggleAllChecked = () => setCheckedIds(allChecked ? new Set() : new Set(visible.map((r) => r.userId)));
+
+  /** A quién se avisa en masa: los pendientes marcados; sin marcas, todos los pendientes visibles. */
+  const notifyTargets = checkedVisible.length > 0 ? checkedVisible.filter((r) => recordStatus(r) !== "COMPLETE") : pendingVisible;
+
   const notifyPending = async () => {
     setBulkSending(true);
     try {
-      const res = await dashboardApi.notifyMissingRecordsBulk(pendingVisible.map((r) => r.userId));
+      const res = await dashboardApi.notifyMissingRecordsBulk(notifyTargets.map((r) => r.userId));
       setToast({ message: t("records.notifyPendingDone", { notified: res.notified, emailed: res.emailed }), type: "success" });
     } catch (e) {
       setToast({ message: e instanceof Error ? e.message : t("records.notifyError"), type: "error" });
@@ -160,6 +176,11 @@ export const useEmployeeRecords = () => {
     notify,
     notifying,
     pendingVisible,
+    checkedIds,
+    allChecked,
+    toggleChecked,
+    toggleAllChecked,
+    notifyTargets,
     bulkOpen,
     setBulkOpen,
     bulkSending,

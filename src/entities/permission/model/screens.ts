@@ -97,6 +97,7 @@ export type NavLabelKey =
   | "nav.accessGroup"
   | "nav.employees"
   | "nav.hrReports"
+  | "nav.hrFormats"
   | "nav.employeeRecords"
   | "nav.settings"
   | "nav.catalogs"
@@ -270,6 +271,7 @@ const ALL_SCREENS: readonly AppScreen[] = [
           { id: "employees", labelKey: "nav.employees", path: "/employees", excludes: ["/employees/disciplinary-reports", "/employees/records"], requirement: { anyOf: ["hr.records"] }, actions: ["users.create"] },
           { id: "employeeRecords", labelKey: "nav.employeeRecords", path: "/employees/records", requirement: { anyOf: ["hr.records"] }, actions: [] },
           { id: "hrReports", labelKey: "nav.hrReports", path: "/employees/disciplinary-reports", requirement: { anyOf: ["hr.records"] }, actions: ["hr.disciplinary_reports"] },
+          { id: "hrFormats", labelKey: "nav.hrFormats", path: "/hr/formats", requirement: { anyOf: ["hr.records"] }, actions: ["hr.disciplinary_reports"] },
         ],
       },
       {

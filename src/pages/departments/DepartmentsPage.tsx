@@ -5,9 +5,9 @@ import {
   ITDialog,
   ITFlex,
   ITInput,
-  ITPage,
-  ITText,
+  ITText
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBuilding, FaPlus } from "react-icons/fa";
 import { LuBuilding2, LuPencil } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
@@ -51,7 +51,7 @@ export default function DepartmentsPage() {
   };
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("list.title")}
       description={tt("list.description")}
@@ -172,6 +172,6 @@ export default function DepartmentsPage() {
         variant="danger"
         loading={deleting}
       />
-    </ITPage>
+    </AppPage>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITButton, ITChip, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITChip, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaArrowDown, FaArrowRight, FaArrowUp, FaExchangeAlt, FaFilePdf, FaHistory, FaPlus, FaTrash, FaUndoAlt, FaWrench } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@shared/utils/dates";
@@ -249,7 +250,7 @@ export default function MovementsPage() {
   ];
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("movements.title")}
       description={t("movements.description")}
@@ -296,6 +297,6 @@ export default function MovementsPage() {
         virtualized
         virtualizedMaxHeight={460}
       />
-    </ITPage>
+    </AppPage>
   );
 }

@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { TimeClockInspectView } from "@features/access/time-clock-inspect";
@@ -9,7 +9,7 @@ export default function TimeClockInspectPage() {
   const goBack = useGoBack();
 
   return (
-    <ITPage
+    <AppPage
       noPadding
       title={t("inspect.title")}
       description={t("inspect.description")}
@@ -18,6 +18,6 @@ export default function TimeClockInspectPage() {
       backAction={() => goBack("/time-clocks")}
     >
       <TimeClockInspectView />
-    </ITPage>
+    </AppPage>
   );
 }

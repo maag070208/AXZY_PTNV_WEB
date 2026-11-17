@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ITButton, ITPage } from "@axzydev/axzy_ui_system";
+import { ITButton } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaBoxes, FaExchangeAlt, FaMapMarkedAlt, FaPlus, FaTshirt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -24,7 +25,7 @@ export function LinenCatalogPage() {
   const canManage = useCan("hotel_store.manage");
   const [newSignal, setNewSignal] = useState(0);
   return (
-    <ITPage
+    <AppPage
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("catalog.title")}
@@ -39,7 +40,7 @@ export function LinenCatalogPage() {
       actions={canManage ? newButton(t("catalog.new"), () => setNewSignal((n) => n + 1)) : undefined}
     >
       <LinenCatalogPanel newSignal={newSignal} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -50,7 +51,7 @@ export function LinenAreasPage() {
   const canManage = useCan("hotel_store.manage");
   const [newSignal, setNewSignal] = useState(0);
   return (
-    <ITPage
+    <AppPage
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("areas.title")}
@@ -65,7 +66,7 @@ export function LinenAreasPage() {
       actions={canManage ? newButton(t("areas.new"), () => setNewSignal((n) => n + 1)) : undefined}
     >
       <LinenAreasPanel newSignal={newSignal} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -76,7 +77,7 @@ export function LinenStockPage() {
   const navigate = useNavigate();
   const goBack = useGoBack();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("stock.title")}
@@ -90,7 +91,7 @@ export function LinenStockPage() {
       backAction={() => goBack("/")}
     >
       <LinenStockBoard />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -100,7 +101,7 @@ export function LinenTransfersPage() {
   const goBack = useGoBack();
   const canSend = useCan("hotel_linen.transfer_send");
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("transfers.title")}
@@ -115,7 +116,7 @@ export function LinenTransfersPage() {
       actions={canSend ? newButton(t("transfers.new.action"), () => navigate("/linen/transfers/new")) : undefined}
     >
       <TransfersBoard onOpen={(id) => navigate(`/linen/transfers/${id}`)} />
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -125,7 +126,7 @@ export function LinenTransferNewPage() {
   const goBack = useGoBack();
   const cosign = useCosign();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("transfers.new.title")}
@@ -145,7 +146,7 @@ export function LinenTransferNewPage() {
         onCancel={() => goBack("/linen/transfers")}
       />
       {cosign.dialog}
-    </ITPage>
+    </AppPage>
   );
 }
 
@@ -156,7 +157,7 @@ export function LinenTransferDetailPage() {
   const { id = "" } = useParams();
   const cosign = useCosign();
   return (
-    <ITPage
+    <AppPage
       className={pageClass}
       noPadding
       title={t("transfers.detail.title")}
@@ -171,7 +172,7 @@ export function LinenTransferDetailPage() {
     >
       <TransferDetailView id={id} requestCosign={cosign.request} />
       {cosign.dialog}
-    </ITPage>
+    </AppPage>
   );
 }
 export {

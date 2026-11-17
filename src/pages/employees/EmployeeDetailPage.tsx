@@ -3,11 +3,11 @@ import {
   ITAlert,
   ITButton,
   ITFlex,
-  ITPage,
-  ITText,
+  ITText
 } from "@axzydev/axzy_ui_system";
-import { LuActivity, LuClock, LuFileText, LuIdCard, LuPencil, LuUserCog, LuUserRound, LuUserX } from "react-icons/lu";
-import { useNavigate, useParams } from "react-router-dom";
+import { AppPage } from "@shared/ui/app-page";
+import { LuActivity, LuCalendarCheck, LuClock, LuFileText, LuIdCard, LuPencil, LuUserCog, LuUserRound, LuUserX } from "react-icons/lu";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   useEmployeeDetail,
@@ -20,11 +20,13 @@ import {
 import { EmployeeCredentialDialog } from "@widgets/employee-credential";
 import { useCan } from "@entities/user";
 import { EmployeeClockSection } from "@widgets/employee-clock";
+import { EmployeeAttendanceSection } from "@widgets/employee-attendance";
 import { useGoBack } from "@shared/lib/useGoBack";
 import { LangostinState } from "@shared/ui/langostin";
 import { TabBar, type TabBarItem } from "@shared/ui/tab-bar";
 
-type Section = "activity" | "documents" | "clock" | "info";
+type Section = "activity" | "documents" | "clock" | "attendance" | "info";
+const SECTIONS: readonly Section[] = ["activity", "documents", "clock", "attendance", "info"];
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +34,13 @@ export default function EmployeeDetailPage() {
   const goBack = useGoBack();
   const { t: tt } = useTranslation(["employees", "common"]);
   const [credentialOpen, setCredentialOpen] = useState(false);
-  const [section, setSection] = useState<Section>("activity");
+  // `?tab=attendance` abre la pestaña (p. ej. desde el reporte semanal).
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab") as Section | null;
+  const [section, setSection] = useState<Section>(
+    tabParam && SECTIONS.includes(tabParam) ? tabParam : "activity"
+  );
+  const canViewAttendance = useCan("time_clock.view");
   /** La cuenta (usuario, contraseña, roles) se edita en Usuarios: solo ADMIN. */
   const canEditUser = useCan("users.edit");
   // El reloj lo ve quien lo administra o quien da de alta/baja personas en él (RH).
@@ -44,7 +52,7 @@ export default function EmployeeDetailPage() {
 
   if (detail.loading || !detail.profile) {
     return (
-      <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+      <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
         noPadding
         title={tt("detail.loadingTitle")}
         backAction={() => goBack("/employees")}
@@ -61,7 +69,7 @@ export default function EmployeeDetailPage() {
         ) : (
           <LangostinState kind="loading" />
         )}
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -72,11 +80,12 @@ export default function EmployeeDetailPage() {
     { id: "activity", label: tt("detail.sections.activity"), icon: <LuActivity size={13} /> },
     { id: "documents", label: tt("detail.sections.documents"), icon: <LuFileText size={13} /> },
     ...(canManageClock ? [{ id: "clock" as Section, label: tt("detail.sections.clock"), icon: <LuClock size={13} /> }] : []),
+    ...(canViewAttendance ? [{ id: "attendance" as Section, label: tt("detail.sections.attendance"), icon: <LuCalendarCheck size={13} /> }] : []),
     { id: "info", label: tt("detail.sections.info"), icon: <LuIdCard size={13} /> },
   ];
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("detail.title")}
       description={tt("detail.subtitle")}
@@ -155,6 +164,7 @@ export default function EmployeeDetailPage() {
           />
         )}
         {section === "clock" && canManageClock && <EmployeeClockSection userName={profile.name} userId={profile.id} />}
+        {section === "attendance" && canViewAttendance && <EmployeeAttendanceSection userId={profile.id} />}
         {section === "info" && <EmployeeInfoCards profile={profile} />}
       </ITFlex>
 
@@ -170,6 +180,6 @@ export default function EmployeeDetailPage() {
         onClose={() => setCredentialOpen(false)}
         profile={profile}
       />
-    </ITPage>
+    </AppPage>
   );
 }

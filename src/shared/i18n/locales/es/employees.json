@@ -37,7 +37,8 @@
       "activity": "Actividad",
       "documents": "Documentos",
       "clock": "Reloj checador",
-      "info": "Datos del empleado"
+      "info": "Datos del empleado",
+      "attendance": "Asistencias"
     },
     "activity": {
       "loading": "Cargando actividad…",
@@ -286,14 +287,18 @@
       "INCOMPLETE": "Incompletos",
       "COMPLETE": "Completos",
       "department": "Área",
-      "allDepartments": "Área: todas"
+      "allDepartments": "Área: todas",
+      "areaLabel": "Área",
+      "allAreas": "Todas",
+      "searchShort": "Nombre, número o área"
     },
     "columns": {
       "employee": "Empleado",
       "required": "Obligatorios",
       "record": "Expediente",
       "personal": "Datos personales",
-      "status": "Estado"
+      "status": "Estado",
+      "area": "Área"
     },
     "status": {
       "REQUIRED": "Falta obligatorio",
@@ -319,7 +324,13 @@
       "notify": "Avisar faltantes",
       "open": "Abrir expediente",
       "select": "Selecciona un empleado para ver su expediente",
-      "ofTotal": "de {{total}}"
+      "ofTotal": "de {{total}}",
+      "send": "Enviar recordatorio",
+      "requiredMissing": "Obligatorios · faltan {{count}}",
+      "requiredDone": "Obligatorios · completos",
+      "summaryRequired": "Obligatorios",
+      "summaryOther": "Otros",
+      "summaryData": "Datos"
     },
     "notify": "Avisar",
     "notified": "Se avisó a {{name}}",
@@ -341,7 +352,12 @@
       "city": "Ciudad",
       "emergencyContactName": "Contacto de emergencia",
       "emergencyContactPhone": "Teléfono de emergencia"
-    }
+    },
+    "remind": "Recordar a {{count}}",
+    "subtitle": "{{total}} activos · {{percent}} % con expediente completo",
+    "selectAll": "Seleccionar todos",
+    "selectRow": "Seleccionar a {{name}}",
+    "listTitle": "Expedientes del personal"
   },
   "summary": {
     "all": "Todo el personal",

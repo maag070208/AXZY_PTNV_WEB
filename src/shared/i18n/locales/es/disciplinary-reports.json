@@ -87,7 +87,8 @@
   },
   "preview": {
     "title": "Vista previa del acta",
-    "download": "Descargar PDF"
+    "download": "Descargar PDF",
+    "downloadApercibimiento": "Descargar carta de apercibimiento"
   },
   "actions": {
     "view": "Ver acta",

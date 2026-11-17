@@ -4,10 +4,10 @@ import {
   ITButton,
   ITFlex,
   ITInput,
-  ITPage,
   ITText,
-  useITBentoCountUp,
+  useITBentoCountUp
 } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LuCalendarDays,
@@ -129,7 +129,7 @@ export default function HrReportsPage() {
   ];
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("title")}
       description={tt("description")}
@@ -242,6 +242,6 @@ export default function HrReportsPage() {
         cancelLabel={tt("common:actions.cancel")}
         variant="danger"
       />
-    </ITPage>
+    </AppPage>
   );
 }

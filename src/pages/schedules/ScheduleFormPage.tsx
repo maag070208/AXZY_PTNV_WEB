@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaRegClock } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -13,7 +13,7 @@ export default function ScheduleFormPage() {
   const isEdit = Boolean(id);
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={isEdit ? t("edit") : t("new")}
       icon={<FaRegClock size={20} />}
@@ -25,6 +25,6 @@ export default function ScheduleFormPage() {
       backAction={() => goBack("/schedules")}
     >
       <ScheduleForm id={id} />
-    </ITPage>
+    </AppPage>
   );
 }

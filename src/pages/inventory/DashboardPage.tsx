@@ -6,7 +6,9 @@ import {
   ITBentoGrid,
   ITBentoTile,
   ITBentoWaves,
-  ITPage, ITText } from "@axzydev/axzy_ui_system";
+  ITText
+} from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuActivity, LuBox, LuHandshake, LuLayers, LuPackageX, LuTriangleAlert, LuWrench } from "react-icons/lu";
 import { FaBoxes } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -151,17 +153,17 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <ITPage {...header}>
+      <AppPage {...header}>
         <LangostinState kind="loading" />
-      </ITPage>
+      </AppPage>
     );
   }
 
   if (failed || !data) {
     return (
-      <ITPage {...header}>
+      <AppPage {...header}>
         <LangostinState kind="error" />
-      </ITPage>
+      </AppPage>
     );
   }
 
@@ -173,7 +175,7 @@ export default function DashboardPage() {
   const barMax = rowsBars[0]?.count ?? 1;
 
   return (
-    <ITPage {...header} description={t("dashboard.description")}>
+    <AppPage {...header} description={t("dashboard.description")}>
       {canAudit && <InventoryAuditCard />}
 
       <ITBentoGrid>
@@ -338,6 +340,6 @@ export default function DashboardPage() {
           )}
         </ITBentoTile>
       </ITBentoGrid>
-    </ITPage>
+    </AppPage>
   );
 }

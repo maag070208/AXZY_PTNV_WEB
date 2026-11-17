@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ITButton, ITChip, ITDataTable, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITChip, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { LangostinState } from "@shared/ui/langostin";
 import { ListSummaryStrip, type ListSummaryItem } from "@shared/ui/list-summary-strip";
@@ -202,7 +203,7 @@ export default function LoansPage() {
   );
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("loans.title")}
       description={t("loans.description")}
@@ -243,6 +244,6 @@ export default function LoansPage() {
           />
         </>
       )}
-    </ITPage>
+    </AppPage>
   );
 }

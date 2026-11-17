@@ -1,4 +1,5 @@
-import { ITButton, ITFlex, ITPage, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { LuKanban, LuListChecks, LuRefreshCw } from "react-icons/lu";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +32,7 @@ export default function MyTasksPage() {
         (dueToday > 0 ? ` · ${tt("mytasks.dueTodayCount", { count: dueToday })}` : "");
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={firstName ? tt("mytasks.greeting", { name: firstName }) : tt("mytasks.title")}
       description={summary}
@@ -65,6 +66,6 @@ export default function MyTasksPage() {
       </ITFlex>
 
       <MyTasksCards fx={fx} onOpenBoard={() => navigate("/tickets/kanban")} />
-    </ITPage>
+    </AppPage>
   );
 }

@@ -154,6 +154,16 @@ export default function LangostinAssistant() {
     [],
   );
 
+  // El botón "Nuevo ticket" de la lista abre el panel directo en el alta.
+  useEffect(
+    () =>
+      onAppEvent("ticket:new", () => {
+        setAgentId("ticket");
+        setOpen(true);
+      }),
+    [],
+  );
+
   // La tabla de Horarios pide editar una fila: el panel abre el formulario con
   // ese id (no se navega a otra pantalla ni se abre un modal).
   useEffect(

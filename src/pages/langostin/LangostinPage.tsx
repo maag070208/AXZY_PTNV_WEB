@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaLaptopCode } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Langostin } from "@shared/ui/langostin";
@@ -12,7 +12,7 @@ export default function LangostinPage() {
   const { t: tt } = useTranslation(["langostin", "common"]);
 
   return (
-    <ITPage
+    <AppPage
       className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={tt("title")}
@@ -22,6 +22,6 @@ export default function LangostinPage() {
       actions={<Langostin anim="wave" size={30} />}
     >
       <LangostinGallery />
-    </ITPage>
+    </AppPage>
   );
 }

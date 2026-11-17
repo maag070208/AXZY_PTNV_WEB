@@ -1,4 +1,4 @@
-import { ITPage } from "@axzydev/axzy_ui_system";
+import { AppPage } from "@shared/ui/app-page";
 import { FaFingerprint } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,7 @@ export default function TimeClockPage() {
   const canManageClocks = useCan("time_clocks.manage");
 
   return (
-    <ITPage className="m-0! p-0! px-8! min-w-full! pb-12!"
+    <AppPage className="m-0! p-0! px-8! min-w-full! pb-12!"
       noPadding
       title={t("title")}
       description={t("description")}
@@ -34,6 +34,6 @@ export default function TimeClockPage() {
       backAction={() => goBack("/employees")}
     >
       <TimeClockTab fx={fx} />
-    </ITPage>
+    </AppPage>
   );
 }
