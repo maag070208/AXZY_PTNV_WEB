@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import {
   ITAlert,
-  ITBentoGauge,
   ITBentoGrid,
   ITBentoPill,
   ITBentoTile,
@@ -123,7 +122,6 @@ export default function LinenDashboardView({ onNavigate }: Props) {
     ops.push({ key: "orders", label: t("dash.ordersToApprove"), value: data.purchase.ordersToApprove ?? 0, color: INFO, path: "/linen/purchases" });
     ops.push({ key: "holds", label: t("dash.holdsDue"), value: data.purchase.holdsDue ?? 0, color: WARNING, path: "/linen/purchases" });
   }
-  const opsPending = ops.filter((o) => o.value > 0).length;
 
   return (
     <ITFlex direction="column" gap={4}>
@@ -136,8 +134,8 @@ export default function LinenDashboardView({ onNavigate }: Props) {
         {/* Piezas del hotel: tarjeta oscura con el cumplimiento de par */}
         <ITBentoTile
           tone="sea"
-          cols={4}
-          rows={3}
+          cols={3}
+          rows={2}
           wide
           icon={<LuShirt size={15} />}
           label={t("dash.piecesTitle")}
@@ -145,17 +143,18 @@ export default function LinenDashboardView({ onNavigate }: Props) {
           caption={t("dash.piecesCaption", { count: rows.length })}
           onClick={() => onNavigate("/linen/stock")}
         >
-          <div className="relative z-[1] my-1 flex min-h-0 flex-1 flex-col justify-center">
-            {withPar.length > 0 && (
-              <ITBentoGauge value={parRatio} color="var(--color-warning)" trackColor="rgb(255 255 255 / 0.14)" />
+          <div className="relative z-[1] mt-auto flex flex-wrap gap-1.5">
+            {withPar.length === 0 ? (
+              <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("dash.noStock")}</ITBentoPill>
+            ) : (
+              <>
+                <ITBentoPill dot="var(--color-warning)">{t("dash.atParPill", { pct: Math.round(parRatio * 100) })}</ITBentoPill>
+                <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("dash.belowParPill", { count: belowPar.length })}</ITBentoPill>
+              </>
             )}
-            <div className="mt-1 flex flex-wrap gap-1.5">
-              <ITBentoPill dot="var(--color-warning)">{t("dash.atParPill", { pct: Math.round(parRatio * 100) })}</ITBentoPill>
-              <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("dash.belowParPill", { count: belowPar.length })}</ITBentoPill>
               {inTransitPieces > 0 && (
                 <ITBentoPill dot="color-mix(in srgb,currentColor 40%,transparent)">{t("dash.inTransitPill", { count: inTransitPieces })}</ITBentoPill>
               )}
-            </div>
           </div>
         </ITBentoTile>
 
@@ -164,7 +163,7 @@ export default function LinenDashboardView({ onNavigate }: Props) {
           <ITBentoTile
             tone="lavender"
             cols={3}
-            rows={3}
+            rows={2}
             icon={<LuArrowLeftRight size={15} />}
             label={t("dash.inTransit")}
             value={<Big value={inTransit} />}
@@ -182,8 +181,8 @@ export default function LinenDashboardView({ onNavigate }: Props) {
         {/* Bajas pendientes */}
         {data.writeoffs && (
           <ITBentoTile
-            cols={2}
-            rows={3}
+            cols={3}
+            rows={2}
             icon={<LuClipboardCheck size={15} />}
             label={t("dash.writeoffsTitle")}
             value={
@@ -207,7 +206,7 @@ export default function LinenDashboardView({ onNavigate }: Props) {
           <ITBentoTile
             tone="sun"
             cols={3}
-            rows={3}
+            rows={2}
             icon={<LuHandCoins size={15} />}
             label={t("dash.towels")}
             value={<Big value={towelsPending} />}
@@ -228,11 +227,11 @@ export default function LinenDashboardView({ onNavigate }: Props) {
         )}
 
         {/* Pendientes de operación */}
-        <ITBentoTile cols={4} rows={4} wide icon={<LuListTodo size={15} />} label={t("dash.opsTitle")}>
+        <ITBentoTile cols={12} rows={3} wide icon={<LuListTodo size={15} />} label={t("dash.opsTitle")}>
           {ops.length === 0 ? (
             <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("dash.noTiles")}</ITText>
           ) : (
-            <div className="mt-2 grid !grid-cols-2 gap-2">
+            <div className="mt-2 grid !grid-cols-2 gap-2 md:!grid-cols-5">
               {ops.map((o) => (
                 <MiniStat
                   key={o.key}
@@ -244,22 +243,22 @@ export default function LinenDashboardView({ onNavigate }: Props) {
               ))}
             </div>
           )}
-          <InsightNote className="mt-auto">
-            {opsPending > 0 ? t("dash.opsNote", { count: opsPending }) : t("dash.opsNoteClear")}
-          </InsightNote>
         </ITBentoTile>
 
         {/* Piezas por ubicación */}
         <ITBentoTile
-          cols={4}
-          rows={4}
+          cols={6}
+          rows={3}
           wide
           icon={<LuMapPin size={15} />}
           label={t("dash.byLocation")}
           onClick={() => onNavigate("/linen/stock")}
         >
           {byLocation.length === 0 ? (
-            <ITText className="m-0 mt-3 text-[12px] font-semibold opacity-60">{t("dash.noStock")}</ITText>
+            <ITFlex direction="column" align="center" justify="center" gap={2} className="flex-1 opacity-60">
+              <LuMapPin size={22} />
+              <ITText className="m-0 text-[12.5px] font-semibold">{t("dash.noStock")}</ITText>
+            </ITFlex>
           ) : (
             <div className="it-bento-bars mt-3 flex-1 content-around">
               {byLocation.map(([name, qty], i) => (
@@ -276,17 +275,17 @@ export default function LinenDashboardView({ onNavigate }: Props) {
 
         {/* Artículos debajo del par */}
         <ITBentoTile
-          cols={4}
-          rows={4}
+          cols={6}
+          rows={3}
           wide
           icon={<LuTrendingDown size={15} />}
           label={t("dash.belowParTitle", { pct: BELOW_PAR_PCT })}
           onClick={() => onNavigate("/linen/reports")}
         >
           {belowPar.length === 0 ? (
-            <ITFlex direction="column" gap={1} className="mt-3">
-              <LuLayers size={18} className="text-[color:var(--color-success)]" />
-              <ITText className="m-0 text-[12px] font-semibold text-[color:var(--color-success)]">
+            <ITFlex direction="column" align="center" justify="center" gap={2} className="flex-1 text-center">
+              <LuLayers size={22} className={withPar.length > 0 ? "text-[color:var(--color-success)]" : "opacity-60"} />
+              <ITText className={`m-0 text-[12.5px] font-semibold ${withPar.length > 0 ? "text-[color:var(--color-success)]" : "opacity-60"}`}>
                 {withPar.length > 0 ? t("dash.belowParEmpty") : t("dash.noPar")}
               </ITText>
             </ITFlex>
