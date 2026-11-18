@@ -1,0 +1,53 @@
+{
+  "title": "Rooms",
+  "description": "Room catalog with zone, type, beds and bathrooms.",
+  "new": "New room",
+  "newTitle": "New room",
+  "editTitle": "Edit room",
+  "save": "Save",
+  "saved": "Saved",
+  "cancel": "Cancel",
+  "edit": "Edit",
+  "active": "Active",
+  "inactive": "Inactive",
+  "deactivate": "Deactivate",
+  "reactivate": "Reactivate",
+  "deactivateConfirm": "Deactivate room {{number}}? It will no longer show on the boards.",
+  "kpi": {
+    "active": "Active rooms",
+    "king": "King beds",
+    "queen": "Queen beds",
+    "sofa": "Sofa beds",
+    "bathrooms": "Bathrooms"
+  },
+  "columns": {
+    "number": "Number",
+    "zone": "Zone",
+    "type": "Type",
+    "king": "King",
+    "queen": "Queen",
+    "sofa": "Sofa",
+    "bathrooms": "Baths",
+    "status": "Status",
+    "active": "Active"
+  },
+  "form": {
+    "number": "Number",
+    "zone": "Zone",
+    "type": "Type",
+    "king": "King beds",
+    "queen": "Queen beds",
+    "sofa": "Sofa beds",
+    "bathrooms": "Bathrooms",
+    "notes": "Notes",
+    "active": "Active"
+  },
+  "status": {
+    "CLEANING": "Cleaning",
+    "INSPECTION": "Inspection",
+    "AVAILABLE": "Available",
+    "OCCUPIED": "Occupied",
+    "MAINTENANCE": "Maintenance",
+    "OUT_OF_SERVICE": "Out of service"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "loading": "Cargando…",
+  "cancel": "Cancelar",
+  "title": "Entregas de amenidades",
+  "description": "Entrega del Almacén a la ropería con destinataria supervisora",
+  "tabs": {
+    "deliveries": "Entregas",
+    "history": "Historial por área"
+  },
+  "status": {
+    "IN_TRANSIT": "En tránsito",
+    "ACTIVE": "Recibida",
+    "RECEIVED_WITH_DIFFERENCE": "Recibida con diferencia",
+    "CANCELLED": "Cancelada"
+  },
+  "columns": {
+    "folio": "Folio",
+    "date": "Fecha",
+    "status": "Estado",
+    "to": "Ropería",
+    "recipient": "Destinataria",
+    "sent": "Enviado",
+    "received": "Recibido",
+    "difference": "Diferencia"
+  },
+  "history": {
+    "pickArea": "Elige una ropería para ver su historial",
+    "empty": "Sin entregas para esta ropería"
+  },
+  "new": {
+    "action": "Nueva entrega",
+    "title": "Nueva entrega de amenidades",
+    "description": "Elige la ropería y la supervisora que recibe; el sugerido sale de las habitaciones de la zona",
+    "from": "Almacén de origen",
+    "to": "Ropería destino",
+    "recipient": "Destinataria (supervisora)",
+    "noRecipients": "La zona no tiene supervisoras de piso asignadas",
+    "suggestionTitle": "Sugerido por área",
+    "suggestionHint": "{{rooms}} habitaciones activas en la zona. Sugerido = esperado de la dotación − existencia del área.",
+    "applySuggestion": "Usar sugerido",
+    "noSuggestion": "El área está surtida: no hay sugerido",
+    "item": "Artículo",
+    "expected": "Esperado",
+    "onHand": "En el área",
+    "suggested": "Sugerido",
+    "quantity": "Cantidad a entregar",
+    "addLine": "Agregar renglón",
+    "notes": "Notas",
+    "submit": "Entregar"
+  },
+  "detail": {
+    "title": "Entrega de amenidades",
+    "recipient": "Destinataria",
+    "recipientHint": "La destinataria recibe la entrega desde el detalle del traspaso.",
+    "openTransfer": "Abrir traspaso para recibir",
+    "lines": "Renglones",
+    "sent": "Enviado",
+    "received": "Recibido",
+    "sentBy": "Entregó",
+    "notes": "Notas"
+  }
+}

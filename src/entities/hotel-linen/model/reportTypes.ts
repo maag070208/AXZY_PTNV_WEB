@@ -19,6 +19,8 @@ export interface LinenDashboard {
   purchase: { ordersToApprove: number | null; holdsDue: number | null } | null;
   /** Piezas retenidas en cuarentena esperando autorización de baja. */
   quarantine: number;
+  /** 2ª firma en limpio: por firmar y diferencias recientes (null = sin permiso). */
+  signoffs?: { pending: number; differences: number } | null;
 }
 
 // ── Par e inversión ────────────────────────────────────────────────────────

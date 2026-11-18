@@ -20,3 +20,22 @@ export { receptionApi } from "./api/receptionApi";
 // F7: reportes y tablero
 export * from "./model/reportTypes";
 export { reportApi } from "./api/reportApi";
+// Blancos v3: dotación por componente
+export * from "./model/roomParTypes";
+export { roomParApi } from "./api/roomParApi";
+// Habitaciones (alta/edición del catálogo)
+export * from "./model/roomTypes";
+export { roomApi } from "./api/roomApi";
+// Revisión de habitación
+export * from "./model/roomReviewTypes";
+export { roomReviewApi } from "./api/roomReviewApi";
+// Blancos v3: reposición por dotación y tablero de flujo
+export * from "./model/restockTypes";
+export { restockApi } from "./api/restockApi";
+export * from "./model/flowTypes";
+export { flowApi } from "./api/flowApi";
+// Blancos v3 F3: 2ª firma en limpio y entrega de amenidades
+export * from "./model/signoffTypes";
+export { signoffApi } from "./api/signoffApi";
+export * from "./model/amenityDeliveryTypes";
+export { amenityDeliveryApi } from "./api/amenityDeliveryApi";

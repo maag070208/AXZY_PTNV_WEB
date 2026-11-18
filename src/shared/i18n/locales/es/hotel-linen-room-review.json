@@ -1,0 +1,82 @@
+{
+  "loading": "Cargando…",
+  "cancel": "Cancelar",
+  "unexpected": "No esperado",
+  "noDifference": "Sin diferencia",
+  "title": "Revisión de habitación",
+  "description": "Conteo de blancos en la habitación contra la dotación esperada",
+  "tabs": {
+    "reviews": "Revisiones",
+    "consolidated": "Consolidado"
+  },
+  "shift": {
+    "MORNING": "Matutino",
+    "AFTERNOON": "Vespertino",
+    "NIGHT": "Nocturno"
+  },
+  "filters": {
+    "withDifference": "Con diferencia",
+    "noDifference": "Sin diferencia"
+  },
+  "columns": {
+    "folio": "Folio",
+    "date": "Fecha",
+    "room": "Habitación",
+    "zone": "Zona",
+    "responsible": "Responsable",
+    "shift": "Turno",
+    "difference": "Diferencia",
+    "item": "Artículo",
+    "expected": "Esperado",
+    "counted": "Contado",
+    "diff": "Diferencia",
+    "missing": "Faltante",
+    "surplus": "Sobrante",
+    "reviews": "Revisiones",
+    "missingPieces": "Piezas faltantes",
+    "surplusPieces": "Piezas sobrantes"
+  },
+  "consolidated": {
+    "from": "Desde",
+    "to": "Hasta",
+    "zone": "Zona",
+    "allZones": "Todas las zonas",
+    "count": "{{n}} revisión(es) en el periodo",
+    "byItem": "Por artículo",
+    "byResponsible": "Por responsable"
+  },
+  "new": {
+    "action": "Nueva revisión",
+    "title": "Nueva revisión",
+    "description": "Elige la habitación, cuenta cada artículo y registra al responsable",
+    "room": "Habitación",
+    "responsible": "Responsable (camarista o auxiliar)",
+    "shift": "Turno",
+    "king": "King: {{n}}",
+    "queen": "Queen: {{n}}",
+    "sofa": "Sofá cama: {{n}}",
+    "bathrooms": "Baños: {{n}}",
+    "addUnexpected": "Agregar artículo no esperado",
+    "add": "Agregar",
+    "removeExtra": "Quitar artículo",
+    "uncountedHint": "Lo esperado que no captures se registra como contado 0.",
+    "notes": "Nota",
+    "submit": "Guardar revisión",
+    "noPar": "Esta habitación no tiene dotación de blancos capturada; no se puede revisar.",
+    "goToPar": "Ir a dotación"
+  },
+  "detail": {
+    "title": "Revisión de habitación",
+    "room": "Habitación {{number}}",
+    "responsible": "Responsable",
+    "shift": "Turno",
+    "reviewedAt": "Fecha",
+    "reviewedBy": "Revisó",
+    "totalExpected": "Esperado: {{n}}",
+    "totalCounted": "Contado: {{n}}",
+    "totalMissing": "Faltante: {{n}}",
+    "totalSurplus": "Sobrante: {{n}}",
+    "notes": "Nota",
+    "lines": "Artículos"
+  }
+}

@@ -30,13 +30,19 @@ import usersEn from "./locales/en/users.json";
 import catalogEn from "./locales/en/catalog.json";
 import rolesEn from "./locales/en/roles.json";
 import kitchenEn from "./locales/en/kitchen.json";
+import hotelLinenRestockEn from "./locales/en/hotel-linen-restock.json";
+import hotelLinenFlowEn from "./locales/en/hotel-linen-flow.json";
 import hotelLinenReportEn from "./locales/en/hotel-linen-report.json";
 import hotelLinenEn from "./locales/en/hotel-linen.json";
+import hotelLinenRoomReviewEn from "./locales/en/hotel-linen-room-review.json";
+import hotelLinenSignoffEn from "./locales/en/hotel-linen-signoff.json";
+import hotelLinenAmenityDeliveryEn from "./locales/en/hotel-linen-amenity-delivery.json";
 import hotelLinenReceptionEn from "./locales/en/hotel-linen-reception.json";
 import hotelLinenPurchaseEn from "./locales/en/hotel-linen-purchase.json";
 import hotelLinenAmenityEn from "./locales/en/hotel-linen-amenity.json";
 import hotelLinenLaundryEn from "./locales/en/hotel-linen-laundry.json";
 import hotelLinenWriteoffEn from "./locales/en/hotel-linen-writeoff.json";
+import hotelLinenRoomsEn from "./locales/en/hotel-linen-rooms.json";
 import langostinEn from "./locales/en/langostin.json";
 
 import accessEs from "./locales/es/access.json";
@@ -70,11 +76,17 @@ import rolesEs from "./locales/es/roles.json";
 import kitchenEs from "./locales/es/kitchen.json";
 import hotelLinenReportEs from "./locales/es/hotel-linen-report.json";
 import hotelLinenEs from "./locales/es/hotel-linen.json";
+import hotelLinenRoomReviewEs from "./locales/es/hotel-linen-room-review.json";
+import hotelLinenSignoffEs from "./locales/es/hotel-linen-signoff.json";
+import hotelLinenAmenityDeliveryEs from "./locales/es/hotel-linen-amenity-delivery.json";
 import hotelLinenReceptionEs from "./locales/es/hotel-linen-reception.json";
 import hotelLinenPurchaseEs from "./locales/es/hotel-linen-purchase.json";
 import hotelLinenAmenityEs from "./locales/es/hotel-linen-amenity.json";
 import hotelLinenLaundryEs from "./locales/es/hotel-linen-laundry.json";
 import hotelLinenWriteoffEs from "./locales/es/hotel-linen-writeoff.json";
+import hotelLinenRoomsEs from "./locales/es/hotel-linen-rooms.json";
+import hotelLinenRestockEs from "./locales/es/hotel-linen-restock.json";
+import hotelLinenFlowEs from "./locales/es/hotel-linen-flow.json";
 import langostinEs from "./locales/es/langostin.json";
 
 export const defaultNS = "common" as const;
@@ -115,10 +127,16 @@ export const NS_LIST = [
   "hotel-linen",
   "hotel-linen-report",
   "hotel-linen-reception",
+  "hotel-linen-room-review",
+  "hotel-linen-signoff",
+  "hotel-linen-amenity-delivery",
+  "hotel-linen-restock",
+  "hotel-linen-flow",
   "hotel-linen-purchase",
   "hotel-linen-amenity",
   "hotel-linen-laundry",
   "hotel-linen-writeoff",
+  "hotel-linen-rooms",
   "langostin",
 ] as const;
 
@@ -156,10 +174,16 @@ export const resources = {
     "hotel-linen": hotelLinenEn,
     "hotel-linen-report": hotelLinenReportEn,
     "hotel-linen-reception": hotelLinenReceptionEn,
+    "hotel-linen-room-review": hotelLinenRoomReviewEn,
+    "hotel-linen-signoff": hotelLinenSignoffEn,
+    "hotel-linen-amenity-delivery": hotelLinenAmenityDeliveryEn,
+    "hotel-linen-restock": hotelLinenRestockEn,
+    "hotel-linen-flow": hotelLinenFlowEn,
     "hotel-linen-purchase": hotelLinenPurchaseEn,
     "hotel-linen-amenity": hotelLinenAmenityEn,
     "hotel-linen-laundry": hotelLinenLaundryEn,
     "hotel-linen-writeoff": hotelLinenWriteoffEn,
+    "hotel-linen-rooms": hotelLinenRoomsEn,
     langostin: langostinEn,
   },
   es: {
@@ -195,10 +219,16 @@ export const resources = {
     "hotel-linen": hotelLinenEs,
     "hotel-linen-report": hotelLinenReportEs,
     "hotel-linen-reception": hotelLinenReceptionEs,
+    "hotel-linen-room-review": hotelLinenRoomReviewEs,
+    "hotel-linen-signoff": hotelLinenSignoffEs,
+    "hotel-linen-amenity-delivery": hotelLinenAmenityDeliveryEs,
+    "hotel-linen-restock": hotelLinenRestockEs,
+    "hotel-linen-flow": hotelLinenFlowEs,
     "hotel-linen-purchase": hotelLinenPurchaseEs,
     "hotel-linen-amenity": hotelLinenAmenityEs,
     "hotel-linen-laundry": hotelLinenLaundryEs,
     "hotel-linen-writeoff": hotelLinenWriteoffEs,
+    "hotel-linen-rooms": hotelLinenRoomsEs,
     langostin: langostinEs,
   },
 } as const;

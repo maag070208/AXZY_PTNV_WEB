@@ -1,0 +1,62 @@
+{
+  "loading": "Loading…",
+  "cancel": "Cancel",
+  "title": "Amenity deliveries",
+  "description": "Delivery from the warehouse to the linen room with a supervisor recipient",
+  "tabs": {
+    "deliveries": "Deliveries",
+    "history": "History by area"
+  },
+  "status": {
+    "IN_TRANSIT": "In transit",
+    "ACTIVE": "Received",
+    "RECEIVED_WITH_DIFFERENCE": "Received with difference",
+    "CANCELLED": "Cancelled"
+  },
+  "columns": {
+    "folio": "Folio",
+    "date": "Date",
+    "status": "Status",
+    "to": "Linen room",
+    "recipient": "Recipient",
+    "sent": "Sent",
+    "received": "Received",
+    "difference": "Difference"
+  },
+  "history": {
+    "pickArea": "Pick a linen room to see its history",
+    "empty": "No deliveries for this linen room"
+  },
+  "new": {
+    "action": "New delivery",
+    "title": "New amenity delivery",
+    "description": "Pick the linen room and the supervisor who receives; the suggestion comes from the zone rooms",
+    "from": "Source warehouse",
+    "to": "Destination linen room",
+    "recipient": "Recipient (supervisor)",
+    "noRecipients": "The zone has no housekeeping supervisors assigned",
+    "suggestionTitle": "Suggested by area",
+    "suggestionHint": "{{rooms}} active rooms in the zone. Suggested = par expected − area stock.",
+    "applySuggestion": "Use suggestion",
+    "noSuggestion": "The area is fully stocked: nothing suggested",
+    "item": "Item",
+    "expected": "Expected",
+    "onHand": "In the area",
+    "suggested": "Suggested",
+    "quantity": "Quantity to deliver",
+    "addLine": "Add line",
+    "notes": "Notes",
+    "submit": "Deliver"
+  },
+  "detail": {
+    "title": "Amenity delivery",
+    "recipient": "Recipient",
+    "recipientHint": "The recipient receives the delivery from the transfer detail.",
+    "openTransfer": "Open transfer to receive",
+    "lines": "Lines",
+    "sent": "Sent",
+    "received": "Received",
+    "sentBy": "Delivered by",
+    "notes": "Notes"
+  }
+}

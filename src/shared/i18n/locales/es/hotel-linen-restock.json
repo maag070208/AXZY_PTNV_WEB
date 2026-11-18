@@ -1,0 +1,17 @@
+{
+  "title": "Reposición",
+  "description": "Déficit de blancos de una ropería contra su dotación",
+  "area": "Área (ropería de zona)",
+  "factor": "Factor de reposición",
+  "generate": "Generar pedido",
+  "formula": "Déficit = dotación de las habitaciones activas de la zona × factor − (existencia sin sucio + en camino). En camino: traspasos en tránsito y pendiente de pedidos abiertos.",
+  "pick": "Elige una ropería de zona para calcular la reposición.",
+  "item": "Artículo",
+  "target": "Objetivo",
+  "onHand": "Tiene",
+  "incoming": "En camino",
+  "deficit": "Déficit",
+  "rooms": "{{count}} habitaciones",
+  "noDeficit": "Sin déficit",
+  "noPar": "La zona no tiene habitaciones con dotación de blancos."
+}

@@ -218,5 +218,23 @@
       "signatures": "Signatures",
       "noSignatures": "No signatures."
     }
+  },
+  "roomPar": {
+    "title": "Room par",
+    "description": "What each room must have per bed and per bathroom; a room's expected quantity is computed from its composition.",
+    "tabLinen": "Linen",
+    "tabAmenities": "Amenities",
+    "product": "Product",
+    "empty": "There are no active products of this kind.",
+    "readOnly": "Read only: you do not have permission to edit the par.",
+    "save": "Save par",
+    "saved": "Par saved",
+    "components": {
+      "ROOM": "Room",
+      "KING_BED": "King bed",
+      "QUEEN_BED": "Queen bed",
+      "SOFA_BED": "Sofa bed",
+      "BATHROOM": "Bathroom"
+    }
   }
 }

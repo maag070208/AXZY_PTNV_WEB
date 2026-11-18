@@ -218,5 +218,23 @@
       "signatures": "Firmas",
       "noSignatures": "Sin firmas."
     }
+  },
+  "roomPar": {
+    "title": "Dotación por habitación",
+    "description": "Lo que debe haber en cada cuarto por cama y por baño; el esperado de una habitación se calcula con su composición.",
+    "tabLinen": "Blancos",
+    "tabAmenities": "Amenidades",
+    "product": "Producto",
+    "empty": "No hay productos activos de este tipo.",
+    "readOnly": "Solo lectura: no tienes permiso para editar la dotación.",
+    "save": "Guardar dotación",
+    "saved": "Dotación guardada",
+    "components": {
+      "ROOM": "Habitación",
+      "KING_BED": "Cama king",
+      "QUEEN_BED": "Cama queen",
+      "SOFA_BED": "Sofá-cama",
+      "BATHROOM": "Baño"
+    }
   }
 }
