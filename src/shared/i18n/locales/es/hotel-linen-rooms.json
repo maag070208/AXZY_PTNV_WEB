@@ -1,0 +1,53 @@
+{
+  "title": "Habitaciones",
+  "description": "Catálogo de habitaciones con zona, tipo, camas y baños.",
+  "new": "Nueva habitación",
+  "newTitle": "Nueva habitación",
+  "editTitle": "Editar habitación",
+  "save": "Guardar",
+  "saved": "Guardado",
+  "cancel": "Cancelar",
+  "edit": "Editar",
+  "active": "Activa",
+  "inactive": "Inactiva",
+  "deactivate": "Desactivar",
+  "reactivate": "Reactivar",
+  "deactivateConfirm": "¿Desactivar la habitación {{number}}? Dejará de aparecer en los tableros.",
+  "kpi": {
+    "active": "Habitaciones activas",
+    "king": "Camas King",
+    "queen": "Camas Queen",
+    "sofa": "Sofá cama",
+    "bathrooms": "Baños"
+  },
+  "columns": {
+    "number": "Número",
+    "zone": "Zona",
+    "type": "Tipo",
+    "king": "King",
+    "queen": "Queen",
+    "sofa": "Sofá",
+    "bathrooms": "Baños",
+    "status": "Estado",
+    "active": "Activa"
+  },
+  "form": {
+    "number": "Número",
+    "zone": "Zona",
+    "type": "Tipo",
+    "king": "Camas King",
+    "queen": "Camas Queen",
+    "sofa": "Sofá cama",
+    "bathrooms": "Baños",
+    "notes": "Notas",
+    "active": "Activa"
+  },
+  "status": {
+    "CLEANING": "En limpieza",
+    "INSPECTION": "En inspección",
+    "AVAILABLE": "Disponible",
+    "OCCUPIED": "Ocupada",
+    "MAINTENANCE": "Mantenimiento",
+    "OUT_OF_SERVICE": "Fuera de servicio"
+  }
+}

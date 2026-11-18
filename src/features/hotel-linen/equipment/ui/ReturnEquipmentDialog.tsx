@@ -57,7 +57,7 @@ export default function ReturnEquipmentDialog({ loan, onClose, onDone }: Props) 
           <ITInputNumber name="equipCharge" label={t("equipment.return.charge")} decimals={2} min={0} value={charge} onChange={(v) => setCharge(v ?? null)} />
         )}
         {condition === "DAMAGED" && <ITText muted>{t("equipment.return.ticketHint")}</ITText>}
-        <ITInput name="equipNotes" label={t("equipment.return.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <ITInput name="equipNotes" label={t("equipment.return.notes")} required={condition !== "GOOD"} value={notes} onChange={(e) => setNotes(e.target.value)} />
         {condition !== "GOOD" && !notes.trim() && <ITText muted>{t("equipment.return.notesRequired")}</ITText>}
         <ITFlex justify="end" gap={2}>
           <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />

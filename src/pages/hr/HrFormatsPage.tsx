@@ -1,6 +1,6 @@
 import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
-import { LuFileText, LuTriangleAlert } from "react-icons/lu";
+import { LuBaby, LuFileText, LuTriangleAlert } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { HrFormatKind } from "@widgets/hr-formats";
@@ -10,6 +10,7 @@ import { useGoBack } from "@shared/lib/useGoBack";
 const FORMATS: { kind: HrFormatKind; file: string; path: string; icon: React.ReactNode }[] = [
   { kind: "laboral", file: "carta-laboral.docx", path: "/hr/formats/employment-letter", icon: <LuFileText size={22} /> },
   { kind: "apercibimiento", file: "carta-apercibimiento.docx", path: "/hr/formats/warning-letter", icon: <LuTriangleAlert size={22} /> },
+  { kind: "daycare", file: "carta-guarderia.docx", path: "/hr/formats/daycare-letter", icon: <LuBaby size={22} /> },
 ];
 
 /** Formatos de RH: genera cada carta en PDF o descarga la plantilla original. */

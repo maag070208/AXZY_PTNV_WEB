@@ -1,0 +1,46 @@
+{
+  "loading": "Loading…",
+  "cancel": "Cancel",
+  "title": "To sign off",
+  "description": "Conformity of the clean linen delivered to areas",
+  "tabs": {
+    "pending": "To sign off",
+    "differences": "Incidents",
+    "all": "All"
+  },
+  "status": {
+    "PENDING": "To sign off",
+    "CONFORM": "Conform",
+    "DIFFERENCE": "With difference"
+  },
+  "columns": {
+    "folio": "Folio",
+    "receivedAt": "Received",
+    "from": "From",
+    "to": "Area",
+    "receivedBy": "Counted by",
+    "sent": "Sent",
+    "received": "Counted",
+    "status": "Conformity",
+    "signoffBy": "Signed by"
+  },
+  "detail": {
+    "title": "Transfer conformity",
+    "receivedBy": "Counted and received",
+    "signoffBy": "Signed the conformity",
+    "notes": "Note",
+    "lines": "Counted per line",
+    "sent": "Sent",
+    "counted": "Counted",
+    "difference": "Difference",
+    "action": "Give conformity",
+    "conform": "Conform",
+    "withDifference": "With difference",
+    "notesLabel": "Difference note",
+    "notesRequired": "A note is required when there is a difference",
+    "confirmDifference": "Record difference",
+    "sameUser": "Whoever counted the transfer cannot sign the conformity",
+    "notApplicable": "This transfer does not require a conformity signature",
+    "noStockBlock": "Signing does not block stock: the area already holds the received pieces."
+  }
+}

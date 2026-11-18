@@ -61,8 +61,15 @@ export type NavLabelKey =
   | "nav.linenSectionCatalogs"
   | "nav.linenSectionReports"
   | "nav.linenReports"
+  | "nav.linenRestock"
+  | "nav.linenFlow"
   | "nav.linenCatalog"
   | "nav.linenAreas"
+  | "nav.linenRoomPar"
+  | "nav.linenRoomReviews"
+  | "nav.linenSignoffs"
+  | "nav.linenAmenityDeliveries"
+  | "nav.linenRooms"
   | "nav.linenStock"
   | "nav.linenTransfers"
   | "nav.linenAmenities"
@@ -131,6 +138,30 @@ export interface AppScreen {
   readonly children?: readonly AppScreen[];
 }
 
+/**
+ * Blancos: pantallas que la Auxiliar de piso no ve (existencias, pedidos, lavandería, préstamos, control,
+ * bajas, flujo). Ella solo tiene ver/traspasos/adicionales/equipo, así que basta pedir cualquier otro
+ * permiso de Blancos; coherente con el recorte por puesto del API (HOTEL_SCOPE_FLOOR_ASSISTANT).
+ */
+const LINEN_NOT_FLOOR = [
+  "hotel_linen.request",
+  "hotel_linen.fulfill",
+  "hotel_linen.dirty_receive",
+  "hotel_linen.process",
+  "hotel_linen.writeoff_request",
+  "hotel_linen.writeoff_review",
+  "hotel_linen.writeoff_approve",
+  "hotel_linen.count",
+  "hotel_linen.loans",
+  "hotel_linen.shift_close",
+  "hotel_linen.deposits_review",
+  "hotel_linen.amenities_control",
+  "hotel_linen.transfer_signoff",
+  "hotel_linen.amenity_delivery",
+  "hotel_linen.equipment_manage",
+  "hotel_linen.reports",
+] as const;
+
 /** Catálogo completo, apagados incluidos (el menú usa `APP_SCREENS`). */
 const ALL_SCREENS: readonly AppScreen[] = [
   {
@@ -198,25 +229,25 @@ const ALL_SCREENS: readonly AppScreen[] = [
         id: "linenSectionWarehouse",
         labelKey: "nav.linenSectionWarehouse",
         children: [
-          { id: "linenStock", labelKey: "nav.linenStock", path: "/linen/stock", actions: [] },
+          { id: "linenStock", labelKey: "nav.linenStock", path: "/linen/stock", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
           { id: "linenTransfers", labelKey: "nav.linenTransfers", path: "/linen/transfers", actions: [] },
-          { id: "linenRequests", labelKey: "nav.linenRequests", path: "/linen/requests", actions: [] },
+          { id: "linenRequests", labelKey: "nav.linenRequests", path: "/linen/requests", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
         ],
       },
       {
         id: "linenSectionLaundry",
         labelKey: "nav.linenSectionLaundry",
         children: [
-          { id: "linenDirty", labelKey: "nav.linenDirty", path: "/linen/dirty", actions: [] },
-          { id: "linenLaundry", labelKey: "nav.linenLaundry", path: "/linen/laundry", actions: [] },
-          { id: "linenReconciliation", labelKey: "nav.linenReconciliation", path: "/linen/reconciliation", actions: [] },
+          { id: "linenDirty", labelKey: "nav.linenDirty", path: "/linen/dirty", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
+          { id: "linenLaundry", labelKey: "nav.linenLaundry", path: "/linen/laundry", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
+          { id: "linenReconciliation", labelKey: "nav.linenReconciliation", path: "/linen/reconciliation", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
         ],
       },
       {
         id: "linenSectionRooms",
         labelKey: "nav.linenSectionRooms",
         children: [
-          { id: "linenLoans", labelKey: "nav.linenLoans", path: "/linen/loans", actions: [] },
+          { id: "linenLoans", labelKey: "nav.linenLoans", path: "/linen/loans", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
           { id: "linenExtras", labelKey: "nav.linenExtras", path: "/linen/extras", actions: [] },
           { id: "linenEquipment", labelKey: "nav.linenEquipment", path: "/linen/equipment", actions: [] },
         ],
@@ -225,9 +256,12 @@ const ALL_SCREENS: readonly AppScreen[] = [
         id: "linenSectionControl",
         labelKey: "nav.linenSectionControl",
         children: [
-          { id: "linenAmenities", labelKey: "nav.linenAmenities", path: "/linen/amenities", actions: [] },
+          { id: "linenAmenities", labelKey: "nav.linenAmenities", path: "/linen/amenities", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
           { id: "linenCounts", labelKey: "nav.linenCounts", path: "/linen/counts", requirement: { anyOf: ["hotel_linen.count"] }, actions: [] },
-          { id: "linenWriteoffs", labelKey: "nav.linenWriteoffs", path: "/linen/writeoffs", actions: [] },
+          { id: "linenWriteoffs", labelKey: "nav.linenWriteoffs", path: "/linen/writeoffs", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
+          { id: "linenRoomReviews", labelKey: "nav.linenRoomReviews", path: "/linen/room-reviews", requirement: { anyOf: ["hotel_linen.room_review"] }, actions: [] },
+          { id: "linenSignoffs", labelKey: "nav.linenSignoffs", path: "/linen/signoffs", requirement: { anyOf: ["hotel_linen.transfer_signoff"] }, actions: [] },
+          { id: "linenAmenityDeliveries", labelKey: "nav.linenAmenityDeliveries", path: "/linen/amenity-deliveries", requirement: { anyOf: ["hotel_linen.amenity_delivery"] }, actions: [] },
         ],
       },
       {
@@ -243,12 +277,16 @@ const ALL_SCREENS: readonly AppScreen[] = [
         children: [
           { id: "linenCatalog", labelKey: "nav.linenCatalog", path: "/linen/catalog", actions: [] },
           { id: "linenAreas", labelKey: "nav.linenAreas", path: "/linen/areas", actions: [] },
+          { id: "linenRoomPar", labelKey: "nav.linenRoomPar", path: "/linen/room-par", actions: [] },
+          { id: "linenRooms", labelKey: "nav.linenRooms", path: "/linen/rooms", requirement: { anyOf: ["hotel_rooms.view"] }, actions: [] },
         ],
       },
       {
         id: "linenSectionReports",
         labelKey: "nav.linenSectionReports",
         children: [
+          { id: "linenRestock", labelKey: "nav.linenRestock", path: "/linen/restock", requirement: { anyOf: ["hotel_linen.request"] }, actions: [] },
+          { id: "linenFlow", labelKey: "nav.linenFlow", path: "/linen/flow", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
           { id: "linenReports", labelKey: "nav.linenReports", path: "/linen/reports", requirement: { anyOf: ["hotel_linen.reports"] }, actions: [] },
         ],
       },

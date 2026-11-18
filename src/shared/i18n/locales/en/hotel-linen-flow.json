@@ -1,0 +1,33 @@
+{
+  "title": "Linen flow",
+  "description": "Where each piece is: areas, dirty, laundry, clean, lent, quarantine and store",
+  "stage": {
+    "AREAS": "Areas",
+    "DIRTY": "Dirty",
+    "LAUNDRY": "Laundry",
+    "CLEAN": "Clean",
+    "LENT": "Lent",
+    "QUARANTINE": "Quarantine",
+    "STORE": "Store"
+  },
+  "hint": {
+    "AREAS": "Linen rooms and points",
+    "DIRTY": "Areas and laundry",
+    "LAUNDRY": "In process",
+    "CLEAN": "Ready to supply",
+    "LENT": "Loans and rooms",
+    "QUARANTINE": "Pending decision",
+    "STORE": "Warehouse and new"
+  },
+  "inRooms": "{{count}} in rooms",
+  "item": "Item",
+  "inTransit": "In transit",
+  "other": "Other (held)",
+  "total": "Total",
+  "totals": "Totals",
+  "none": "No linen in stock.",
+  "reconciled": "Matches stock summary",
+  "notReconciled": "Does not match stock summary",
+  "exportCsv": "Export CSV",
+  "transitLine": "In transit: {{transit}} · Other (purchase hold): {{other}} · Total: {{total}}"
+}

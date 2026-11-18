@@ -38,6 +38,20 @@
     "headName": "Jefe de área",
     "generateAndSave": "Generar y guardar"
   },
+  "daycare": {
+    "title": "Carta para guardería",
+    "description": "Constancia para la guardería del IMSS: datos laborales, horario, días de descanso y periodo vacacional.",
+    "schedule": "Horario",
+    "scheduleHint": "Por ejemplo: 9:00 am. a 5:00 pm.",
+    "workDays": "Días laborales",
+    "workDaysHint": "Por ejemplo: lunes a domingo",
+    "restDays": "Días de descanso",
+    "restDaysHint": "Por ejemplo: martes",
+    "vacationDays": "Días de vacaciones",
+    "vacationFrom": "Vacaciones: del",
+    "vacationTo": "Vacaciones: al",
+    "vacationHint": "Opcional: si faltan los días o las fechas, el párrafo de vacaciones no se imprime."
+  },
   "errors": {
     "loadPeople": "No se pudo cargar la lista de empleados",
     "loadProfile": "No se pudo cargar el expediente del empleado",

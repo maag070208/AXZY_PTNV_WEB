@@ -1,0 +1,46 @@
+{
+  "loading": "Cargando…",
+  "cancel": "Cancelar",
+  "title": "Por firmar",
+  "description": "Conformidad de la ropa limpia entregada a las áreas",
+  "tabs": {
+    "pending": "Por firmar",
+    "differences": "Incidencias",
+    "all": "Todas"
+  },
+  "status": {
+    "PENDING": "Por firmar",
+    "CONFORM": "Conforme",
+    "DIFFERENCE": "Con diferencia"
+  },
+  "columns": {
+    "folio": "Folio",
+    "receivedAt": "Recibido",
+    "from": "Origen",
+    "to": "Área",
+    "receivedBy": "Contó",
+    "sent": "Enviado",
+    "received": "Contado",
+    "status": "Conformidad",
+    "signoffBy": "Firmó"
+  },
+  "detail": {
+    "title": "Conformidad del traspaso",
+    "receivedBy": "Contó y recibió",
+    "signoffBy": "Firmó la conformidad",
+    "notes": "Nota",
+    "lines": "Contado por línea",
+    "sent": "Enviado",
+    "counted": "Contado",
+    "difference": "Diferencia",
+    "action": "Dar conformidad",
+    "conform": "Conforme",
+    "withDifference": "Con diferencia",
+    "notesLabel": "Nota de la diferencia",
+    "notesRequired": "La nota es obligatoria cuando hay diferencia",
+    "confirmDifference": "Registrar diferencia",
+    "sameUser": "Quien contó el traspaso no puede firmar la conformidad",
+    "notApplicable": "Este traspaso no requiere firma de conformidad",
+    "noStockBlock": "La firma no bloquea las existencias: el área ya cuenta con las piezas recibidas."
+  }
+}

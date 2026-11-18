@@ -1,0 +1,33 @@
+{
+  "title": "Flujo de blancos",
+  "description": "Dónde está cada pieza: áreas, sucio, lavandería, limpio, prestado, cuarentena y bodega",
+  "stage": {
+    "AREAS": "Áreas",
+    "DIRTY": "Sucio",
+    "LAUNDRY": "Lavandería",
+    "CLEAN": "Limpio",
+    "LENT": "Prestado",
+    "QUARANTINE": "Cuarentena",
+    "STORE": "Bodega"
+  },
+  "hint": {
+    "AREAS": "Roperías y puntos",
+    "DIRTY": "Áreas y lavandería",
+    "LAUNDRY": "En proceso",
+    "CLEAN": "Listo para surtir",
+    "LENT": "Préstamos y habitaciones",
+    "QUARANTINE": "Por decidir",
+    "STORE": "Almacén y nuevos"
+  },
+  "inRooms": "{{count}} en habitaciones",
+  "item": "Artículo",
+  "inTransit": "En tránsito",
+  "other": "Otros (apartado)",
+  "total": "Total",
+  "totals": "Totales",
+  "none": "No hay blancos con existencia.",
+  "reconciled": "Cuadra con existencias",
+  "notReconciled": "No cuadra con existencias",
+  "exportCsv": "Exportar CSV",
+  "transitLine": "En tránsito: {{transit}} · Otros (apartado de compras): {{other}} · Total: {{total}}"
+}

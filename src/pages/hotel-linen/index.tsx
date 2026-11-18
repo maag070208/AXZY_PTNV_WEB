@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITButton } from "@axzydev/axzy_ui_system";
+import { ITButton, ITTabs } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
 import { FaBoxes, FaExchangeAlt, FaMapMarkedAlt, FaPlus, FaTshirt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,6 +12,7 @@ import TransfersBoard from "@features/hotel-linen/transfers/ui/TransfersBoard";
 import TransferForm from "@features/hotel-linen/transfers/ui/TransferForm";
 import TransferDetailView from "@features/hotel-linen/transfers/ui/TransferDetailView";
 import { useCosign } from "@features/hotel-linen/cosign";
+import { RoomParMatrix } from "@features/hotel-linen/room-par";
 import { useGoBack } from "@shared/lib/useGoBack";
 
 const newButton = (label: string, onClick: () => void) => (
@@ -186,3 +187,37 @@ export {
   LinenRequestsPage,
 } from "./LaundryPages";
 export * from "./WriteoffPages";
+export * from "./RoomReviewPages";
+export * from "./SignoffPages";
+export * from "./AmenityDeliveryPages";
+export { LinenRoomsPage } from "./RoomsPages";
+
+/** Dotación por habitación: pestañas Blancos / Amenidades. */
+export function LinenRoomParPage() {
+  const { t } = useTranslation(["hotel-linen", "common"]);
+  const navigate = useNavigate();
+  const goBack = useGoBack();
+  return (
+    <AppPage
+      className="m-0! p-0! px-8! min-w-full! pb-12!"
+      noPadding
+      title={t("roomPar.title")}
+      description={t("roomPar.description")}
+      icon={<FaBoxes size={20} />}
+      breadcrumbs={[
+        { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
+        { label: t("common:nav.linen") },
+        { label: t("roomPar.title") },
+      ]}
+      backAction={() => goBack("/")}
+    >
+      <ITTabs
+        variant="line"
+        items={[
+          { id: "linen", label: t("roomPar.tabLinen"), content: <RoomParMatrix kind="LINEN" /> },
+          { id: "amenities", label: t("roomPar.tabAmenities"), content: <RoomParMatrix kind="CONSUMABLE" /> },
+        ]}
+      />
+    </AppPage>
+  );
+}

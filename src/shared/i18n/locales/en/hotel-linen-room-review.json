@@ -1,0 +1,82 @@
+{
+  "loading": "Loading…",
+  "cancel": "Cancel",
+  "unexpected": "Unexpected",
+  "noDifference": "No difference",
+  "title": "Room review",
+  "description": "Linen count in the room against the expected par",
+  "tabs": {
+    "reviews": "Reviews",
+    "consolidated": "Consolidated"
+  },
+  "shift": {
+    "MORNING": "Morning",
+    "AFTERNOON": "Afternoon",
+    "NIGHT": "Night"
+  },
+  "filters": {
+    "withDifference": "With difference",
+    "noDifference": "No difference"
+  },
+  "columns": {
+    "folio": "Folio",
+    "date": "Date",
+    "room": "Room",
+    "zone": "Zone",
+    "responsible": "Responsible",
+    "shift": "Shift",
+    "difference": "Difference",
+    "item": "Item",
+    "expected": "Expected",
+    "counted": "Counted",
+    "diff": "Difference",
+    "missing": "Missing",
+    "surplus": "Surplus",
+    "reviews": "Reviews",
+    "missingPieces": "Missing pieces",
+    "surplusPieces": "Surplus pieces"
+  },
+  "consolidated": {
+    "from": "From",
+    "to": "To",
+    "zone": "Zone",
+    "allZones": "All zones",
+    "count": "{{n}} review(s) in the period",
+    "byItem": "By item",
+    "byResponsible": "By responsible"
+  },
+  "new": {
+    "action": "New review",
+    "title": "New review",
+    "description": "Pick the room, count each item and record the responsible person",
+    "room": "Room",
+    "responsible": "Responsible (housekeeper or assistant)",
+    "shift": "Shift",
+    "king": "King: {{n}}",
+    "queen": "Queen: {{n}}",
+    "sofa": "Sofa bed: {{n}}",
+    "bathrooms": "Bathrooms: {{n}}",
+    "addUnexpected": "Add unexpected item",
+    "add": "Add",
+    "removeExtra": "Remove item",
+    "uncountedHint": "Expected items you do not capture are recorded as counted 0.",
+    "notes": "Note",
+    "submit": "Save review",
+    "noPar": "This room has no linen par captured, so it cannot be reviewed.",
+    "goToPar": "Go to room par"
+  },
+  "detail": {
+    "title": "Room review",
+    "room": "Room {{number}}",
+    "responsible": "Responsible",
+    "shift": "Shift",
+    "reviewedAt": "Date",
+    "reviewedBy": "Reviewed by",
+    "totalExpected": "Expected: {{n}}",
+    "totalCounted": "Counted: {{n}}",
+    "totalMissing": "Missing: {{n}}",
+    "totalSurplus": "Surplus: {{n}}",
+    "notes": "Note",
+    "lines": "Items"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Restock",
+  "description": "A linen room's deficit against its par",
+  "area": "Area (zone linen room)",
+  "factor": "Restock factor",
+  "generate": "Create request",
+  "formula": "Deficit = par of the active rooms in the zone × factor − (stock excluding dirty + on the way). On the way: in-transit transfers and pending quantity of open requests.",
+  "pick": "Pick a zone linen room to calculate the restock.",
+  "item": "Item",
+  "target": "Target",
+  "onHand": "On hand",
+  "incoming": "On the way",
+  "deficit": "Deficit",
+  "rooms": "{{count}} rooms",
+  "noDeficit": "No deficit",
+  "noPar": "The zone has no rooms with a linen par."
+}
