@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITAlert, ITChip, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITChip, ITFlex } from "@axzydev/axzy_ui_system";
 import { FaCoins, FaExclamationTriangle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { reportApi, type HotelStockLight, type ParReport } from "@entities/hotel-linen";
 import type { ReportDoc } from "@shared/lib/reportDoc";
 import { KpiTile } from "@shared/ui/kpi-tile";
 import { fmt, money, pct, productLabel } from "../lib";
-import { ExportBar, ReportTable, td, tdLeft, th, thLeft, type ExportPdf } from "./common";
+import { PanelCard } from "@shared/ui/panel-card";
+import { ExportBar, ReportTable, type ExportPdf, type ReportCol } from "./common";
 
 const LIGHT_COLOR: Record<HotelStockLight, "success" | "warning" | "danger" | "gray"> = { green: "success", yellow: "warning", red: "danger", none: "gray" };
 
@@ -54,58 +55,57 @@ export default function ParTab({ exportPdf }: { exportPdf: ExportPdf }) {
     };
   }, [report, t]);
 
+  const parColumns: ReportCol<ParReport["lines"][number]>[] = [
+    { key: "name", label: t("par.item"), width: 240, value: (l) => productLabel(l), render: (l) => `${productLabel(l)} · ${l.code}` },
+    {
+      key: "total",
+      label: t("par.total"),
+      numeric: true,
+      width: 110,
+      value: (l) => l.total,
+      render: (l) => `${fmt(l.total)}${l.inTransit > 0 ? ` (${t("par.transit", { count: l.inTransit })})` : ""}`,
+    },
+    { key: "par", label: t("par.par"), numeric: true, width: 90, value: (l) => l.par, render: (l) => fmt(l.par) },
+    { key: "pct", label: t("par.pct"), numeric: true, width: 90, value: (l) => l.pct ?? -1, render: (l) => pct(l.pct) },
+    {
+      key: "light",
+      label: t("par.light"),
+      width: 110,
+      filter: false,
+      value: (l) => l.light,
+      render: (l) => <ITChip size="sm" color={LIGHT_COLOR[l.light]} label={t(`light.${l.light}`)} />,
+    },
+    { key: "shortfall", label: t("par.shortfall"), numeric: true, width: 110, value: (l) => l.shortfall, render: (l) => fmt(l.shortfall) },
+    { key: "cost", label: t("par.cost"), numeric: true, width: 110, value: (l) => l.lastCost ?? -1, render: (l) => (l.lastCost === null ? "—" : money(l.lastCost)) },
+    { key: "subtotal", label: t("par.subtotal"), numeric: true, width: 120, value: (l) => l.subtotal, render: (l) => money(l.subtotal) },
+    { key: "total16", label: t("par.total16"), numeric: true, width: 120, value: (l) => l.total16, render: (l) => money(l.total16) },
+    { key: "total8", label: t("par.total8"), numeric: true, width: 120, value: (l) => l.total8, render: (l) => money(l.total8) },
+  ];
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && <ITAlert variant="error">{error}</ITAlert>}
-      <ITFlex justify="between" align="center">
-        <ITText muted className="text-[12px]">{t("par.description")}</ITText>
-        <ExportBar doc={doc} fileName="blancos-par-inversion" exportPdf={exportPdf} />
-      </ITFlex>
       {report && (
         <>
-          <ITGrid container columns={12} spacing={3}>
-            <ITGrid item xs={6} md={3}><KpiTile label={t("par.kpi.subtotal")} value={money(report.totals.subtotal)} icon={<FaCoins size={14} />} tone="sky" hint={t("par.kpi.beforeTax")} /></ITGrid>
-            <ITGrid item xs={6} md={3}><KpiTile label={t("par.kpi.total16")} value={money(report.totals.total16)} icon={<FaCoins size={14} />} tone="violet" hint={t("par.kpi.iva", { rate: 16 })} /></ITGrid>
-            <ITGrid item xs={6} md={3}><KpiTile label={t("par.kpi.total8")} value={money(report.totals.total8)} icon={<FaCoins size={14} />} tone="emerald" hint={t("par.kpi.iva", { rate: 8 })} /></ITGrid>
-            <ITGrid item xs={6} md={3}><KpiTile label={t("par.kpi.noCost")} value={report.withoutCost.length} icon={<FaExclamationTriangle size={14} />} tone={report.withoutCost.length > 0 ? "amber" : "neutral"} hint={report.withoutCost.length === 0 ? t("allGood") : undefined} /></ITGrid>
-          </ITGrid>
-          <ReportTable
-            empty={report.lines.length === 0 ? t("par.none") : null}
-            head={
-              <>
-                <th className={thLeft}>{t("par.item")}</th>
-                {(["total", "par", "pct"] as const).map((k) => <th key={k} className={th}>{t(`par.${k}`)}</th>)}
-                <th className={th}>{t("par.light")}</th>
-                {(["shortfall", "cost", "subtotal", "total16", "total8"] as const).map((k) => <th key={k} className={th}>{t(`par.${k}`)}</th>)}
-              </>
-            }
-          >
-            {report.lines.map((l) => (
-              <tr key={l.productId} className="border-b border-[var(--color-border)]">
-                <td className={tdLeft}>{productLabel(l)}<span className="ml-2 font-mono text-[11px] opacity-60">{l.code}</span></td>
-                <td className={td}>{fmt(l.total)}{l.inTransit > 0 && <span className="ml-1 text-[10px] opacity-60">({t("par.transit", { count: l.inTransit })})</span>}</td>
-                <td className={td}>{fmt(l.par)}</td>
-                <td className={td}>{pct(l.pct)}</td>
-                <td className={td}><ITChip size="sm" color={LIGHT_COLOR[l.light]} label={t(`light.${l.light}`)} /></td>
-                <td className={td}>{fmt(l.shortfall)}</td>
-                <td className={td}>{l.lastCost === null ? "—" : money(l.lastCost)}</td>
-                <td className={td}>{money(l.subtotal)}</td>
-                <td className={td}>{money(l.total16)}</td>
-                <td className={td}>{money(l.total8)}</td>
-              </tr>
-            ))}
-            {report.lines.length > 0 && (
-              <tr className="font-bold">
-                <td className={tdLeft}>{t("par.totals")}</td>
-                <td className={td} colSpan={4} />
-                <td className={td}>{fmt(report.totals.shortfall)}</td>
-                <td className={td} />
-                <td className={td}>{money(report.totals.subtotal)}</td>
-                <td className={td}>{money(report.totals.total16)}</td>
-                <td className={td}>{money(report.totals.total8)}</td>
-              </tr>
-            )}
-          </ReportTable>
+          <div className="grid !grid-cols-2 gap-4 md:!grid-cols-4">
+            <KpiTile label={t("par.kpi.subtotal")} value={money(report.totals.subtotal)} icon={<FaCoins size={14} />} tone="sky" hint={t("par.kpi.beforeTax")} />
+            <KpiTile label={t("par.kpi.total16")} value={money(report.totals.total16)} icon={<FaCoins size={14} />} tone="violet" hint={t("par.kpi.iva", { rate: 16 })} />
+            <KpiTile label={t("par.kpi.total8")} value={money(report.totals.total8)} icon={<FaCoins size={14} />} tone="emerald" hint={t("par.kpi.iva", { rate: 8 })} />
+            <KpiTile label={t("par.kpi.noCost")} value={report.withoutCost.length} icon={<FaExclamationTriangle size={14} />} tone={report.withoutCost.length > 0 ? "amber" : "neutral"} hint={report.withoutCost.length === 0 ? t("allGood") : undefined} />
+          </div>
+          <PanelCard title={t("par.title")} description={t("par.description")} actions={<ExportBar doc={doc} fileName="blancos-par-inversion" exportPdf={exportPdf} />}>
+            <ReportTable
+              rows={report.lines}
+              empty={t("par.none")}
+              columns={parColumns}
+              totals={[
+                { label: t("par.shortfall"), value: fmt(report.totals.shortfall) },
+                { label: t("par.subtotal"), value: money(report.totals.subtotal) },
+                { label: t("par.total16"), value: money(report.totals.total16) },
+                { label: t("par.total8"), value: money(report.totals.total8) },
+              ]}
+            />
+          </PanelCard>
           {report.withoutCost.length > 0 && (
             <ITAlert variant="warning">
               {t("par.withoutCost", { items: report.withoutCost.map((p) => productLabel(p)).join(", ") })}

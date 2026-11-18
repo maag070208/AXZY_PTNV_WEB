@@ -5,6 +5,7 @@ import { GRADES, writeoffApi, type Grade, type StocktakeDetail } from "@entities
 import { useCan } from "@entities/user";
 import { PanelCard } from "@shared/ui/panel-card";
 import CountStatusChip from "./CountStatusChip";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 type GradeDraft = Record<Grade, number | null>;
 const fmt = (n: number) => new Intl.NumberFormat("es-MX", { maximumFractionDigits: 2 }).format(n);
@@ -21,6 +22,7 @@ interface Props {
 /** Toma de inventario: captura ciega A–E por artículo × ubicación, cierre, revisión de diferencias y aprobación. */
 export default function CountDetailView({ id }: Props) {
   const { t } = useTranslation("hotel-linen-writeoff");
+  const notify = useSuccessToast();
   const linenCount = useCan("hotel_linen.count");
   const storeCount = useCan("hotel_store.stocktake");
   const linenApprove = useCan("hotel_linen.count_approve");
@@ -83,6 +85,7 @@ export default function CountDetailView({ id }: Props) {
     try {
       await fn();
       if (message) setInfo(message);
+      notify(message);
       hydrate(await writeoffApi.stocktake(id));
     } catch (e) {
       setError((e as Error).message);

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
-  ITBadget,
   ITButton,
   ITConfirmDialog,
   ITDataTable,
@@ -28,7 +27,11 @@ import { useCan } from "@entities/user";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { PanelCard } from "@shared/ui/panel-card";
 import { KpiTile } from "@shared/ui/kpi-tile";
+import { ToneChip } from "@shared/ui/tone-chip";
 import { dyn } from "@shared/i18n/dyn";
+import { LuBedDouble } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
 
 interface FormState {
   number: string;
@@ -220,9 +223,7 @@ export default function RoomsPanel({ newSignal = 0 }: Props) {
       filter: "catalog",
       catalogOptions: { data: HOTEL_ROOM_STATUSES.map((s) => ({ id: s, name: tt(`status.${s}`) })) },
       render: (r) => (
-        <ITBadget color="info" size="lg">
-          {tt(`status.${r.status}`)}
-        </ITBadget>
+        <ToneChip tone="info" label={tt(`status.${r.status}`)} />
       ),
     },
     {
@@ -238,9 +239,7 @@ export default function RoomsPanel({ newSignal = 0 }: Props) {
         ],
       },
       render: (r) => (
-        <ITBadget color={r.active ? "success" : "danger"} size="lg">
-          {r.active ? t("active") : t("inactive")}
-        </ITBadget>
+        <ToneChip tone={r.active ? "success" : "danger"} label={r.active ? t("active") : t("inactive")} />
       ),
     },
     ...(canManage
@@ -309,25 +308,15 @@ export default function RoomsPanel({ newSignal = 0 }: Props) {
   );
 
   return (
-    <PanelCard title={t("title")} description={t("description")}>
-      <ITFlex direction="column" gap={3}>
-        <ITGrid container spacing={2}>
-          <ITGrid item xs={6} md={4}>
-            <KpiTile label={t("kpi.active")} value={String(kpis.active)} icon={<FaDoorOpen size={14} />} tone="sky" />
-          </ITGrid>
-          <ITGrid item xs={6} md={4}>
-            <KpiTile label={t("kpi.king")} value={String(kpis.king)} icon={<FaBed size={14} />} tone="emerald" />
-          </ITGrid>
-          <ITGrid item xs={6} md={4}>
-            <KpiTile label={t("kpi.queen")} value={String(kpis.queen)} icon={<FaBed size={14} />} tone="violet" />
-          </ITGrid>
-          <ITGrid item xs={6} md={4}>
-            <KpiTile label={t("kpi.sofa")} value={String(kpis.sofa)} icon={<FaBed size={14} />} tone="amber" />
-          </ITGrid>
-          <ITGrid item xs={6} md={4}>
-            <KpiTile label={t("kpi.bathrooms")} value={String(kpis.baths)} icon={<FaBath size={14} />} tone="orange" />
-          </ITGrid>
-        </ITGrid>
+    <PanelCard>
+      <ITFlex direction="column" gap={4}>
+        <div className="grid !grid-cols-2 gap-4 md:!grid-cols-5">
+          <KpiTile size="sm" label={t("kpi.active")} value={String(kpis.active)} icon={<FaDoorOpen size={14} />} tone="sky" />
+          <KpiTile size="sm" label={t("kpi.king")} value={String(kpis.king)} icon={<FaBed size={14} />} tone="emerald" />
+          <KpiTile size="sm" label={t("kpi.queen")} value={String(kpis.queen)} icon={<FaBed size={14} />} tone="violet" />
+          <KpiTile size="sm" label={t("kpi.sofa")} value={String(kpis.sofa)} icon={<FaBed size={14} />} tone="amber" />
+          <KpiTile size="sm" label={t("kpi.bathrooms")} value={String(kpis.baths)} icon={<FaBath size={14} />} tone="orange" />
+        </div>
         {error && !dialog.open && (
           <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
             {error}
@@ -348,7 +337,8 @@ export default function RoomsPanel({ newSignal = 0 }: Props) {
         />
       </ITFlex>
 
-      <ITDialog isOpen={dialog.open} onClose={closeDialog} title={dialog.item ? t("editTitle") : t("newTitle")}>
+      <ITDialog isOpen={dialog.open} onClose={closeDialog}>
+      <DialogHeader icon={<LuBedDouble />} title={dialog.item ? t("editTitle") : t("newTitle")} subtitle={t("formSubtitle")} />
         <ITFlex direction="column" gap={3} className="min-w-[360px]">
           {error && <ITAlert variant="error">{error}</ITAlert>}
           <ITGrid container columns={12} spacing={3}>
@@ -395,10 +385,7 @@ export default function RoomsPanel({ newSignal = 0 }: Props) {
               </ITGrid>
             )}
           </ITGrid>
-          <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" label={t("cancel")} onClick={closeDialog} />
-            <ITButton variant="filled" color="primary" label={t("save")} disabled={saving || !valid} onClick={() => void save()} />
-          </ITFlex>
+          <DialogFooter onCancel={closeDialog} onConfirm={() => void save()} confirmLabel={t("save")} busy={saving} disabled={!valid} />
         </ITFlex>
       </ITDialog>
 

@@ -49,7 +49,8 @@
     "taxTotal": "VAT",
     "total": "Total",
     "notes": "Notes",
-    "save": "Save"
+    "save": "Save",
+    "subtitle": "Supplier, delivery date and lines of the purchase order."
   },
   "detail": {
     "title": "Order {{folio}}",
@@ -68,7 +69,8 @@
     "approve": "Approve",
     "cancel": "Cancel PO",
     "receive": "Receive",
-    "close": "Close with shortfall"
+    "close": "Close with shortfall",
+    "subtitle": "Status, lines and receipts of the purchase order."
   },
   "receive": {
     "title": "Receipt of {{folio}}",
@@ -83,7 +85,8 @@
     "lineInvalid": "Accepted + held cannot exceed received, and held items need a reason.",
     "overHint": "You are receiving more than ordered. Above the tolerance, notes and the purchase approval permission are required.",
     "confirm": "Register receipt",
-    "lots": "Lots"
+    "lots": "Lots",
+    "subtitle": "Enter what was received against the supplier invoice."
   },
   "holds": {
     "hint": "Merchandise with an invoice difference: it does not enter inventory until accepted. Returning it removes it from the system.",
@@ -134,7 +137,8 @@
       "OPEN": "Open",
       "CONVERTED": "Converted",
       "DISMISSED": "Dismissed"
-    }
+    },
+    "detailSubtitle": "Requested pieces: turn them into a purchase order or dismiss them."
   },
   "pdf": {
     "title": "Purchase order",
@@ -146,5 +150,12 @@
     "prepared": "Prepared by",
     "authorized": "Authorized by",
     "footer": "Hotel linen purchase order"
+  },
+  "toast": {
+    "received": "Receipt recorded",
+    "dismissed": "Request dismissed",
+    "converted": "Purchase order created",
+    "saved": "Order saved",
+    "resolved": "Hold resolved"
   }
 }

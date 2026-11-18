@@ -49,5 +49,6 @@
     "OCCUPIED": "Ocupada",
     "MAINTENANCE": "Mantenimiento",
     "OUT_OF_SERVICE": "Fuera de servicio"
-  }
+  },
+  "formSubtitle": "Número, zona, tipo, camas y baños de la habitación."
 }

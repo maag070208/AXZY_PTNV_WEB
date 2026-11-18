@@ -8,15 +8,16 @@ import {
   ITInputNumber,
   ITSearchSelect,
   ITSelect,
-  ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaBoxes, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { hotelLinenApi, type HotelLot, type HotelProduct, type HotelWarehouse } from "@entities/hotel-linen";
 import { newId } from "@shared/lib/newId";
 import { useRequestKey } from "@shared/lib/useRequestKey";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface LineDraft {
   id: string;
@@ -37,6 +38,7 @@ interface Props {
 /** Nuevo traspaso: origen, destino y renglones (artículo + cantidad + lote opcional). */
 export default function TransferForm({ requestCosign, onDone, onCancel }: Props) {
   const { t } = useTranslation("hotel-linen");
+  const notify = useSuccessToast();
   const requestKey = useRequestKey();
   const [warehouses, setWarehouses] = useState<HotelWarehouse[]>([]);
   const [products, setProducts] = useState<HotelProduct[]>([]);
@@ -112,6 +114,7 @@ export default function TransferForm({ requestCosign, onDone, onCancel }: Props)
         if (!cosignToken) return;
       }
       const created = await hotelLinenApi.sendTransfer({ ...body, cosignToken }, requestKey(body));
+      notify(t("transfers.toast.sent"));
       onDone(created.id);
     } catch (e) {
       setError((e as Error).message);
@@ -120,111 +123,130 @@ export default function TransferForm({ requestCosign, onDone, onCancel }: Props)
     }
   };
 
+  const totalPieces = lines.reduce((sum, l) => sum + (l.quantity ?? 0), 0);
+
   return (
-    <PanelCard title={t("transfers.new.title")} description={t("transfers.new.description")}>
-      <ITFlex direction="column" gap={4}>
-        {error && (
-          <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
-            {error}
-          </ITAlert>
-        )}
-        <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12} md={6}>
-            <ITSelect
-              name="transferFrom"
-              label={t("transfers.new.from")}
-              options={warehouseOptions}
-              value={fromId}
-              onChange={(e) => setFromId(e.target.value)}
-            />
-          </ITGrid>
-          <ITGrid item xs={12} md={6}>
-            <ITSelect
-              name="transferTo"
-              label={t("transfers.new.to")}
-              options={warehouseOptions.filter((w) => w.value !== fromId)}
-              value={toId}
-              onChange={(e) => setToId(e.target.value)}
-            />
-          </ITGrid>
+    <ITFlex direction="column" gap={4}>
+      {error && (
+        <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
+          {error}
+        </ITAlert>
+      )}
+      <ITGrid container columns={12} spacing={3}>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("transfers.new.lines")} value={lines.filter((l) => l.productId).length} icon={<FaBoxes size={14} />} tone={lines.some((l) => l.productId) ? "sky" : "neutral"} />
         </ITGrid>
-
-        <ITText className="text-[12px] font-semibold">{t("transfers.new.lines")}</ITText>
-        {lines.map((line, index) => (
-          <ITGrid key={line.id} container columns={12} spacing={3}>
-            <ITGrid item xs={12} md={5}>
-              <ITSearchSelect
-                name={`transferProduct${index}`}
-                label={t("transfers.new.item")}
-                options={productOptions}
-                value={line.productId}
-                onChange={(v) => pickProduct(line.id, String(v))}
-              />
-            </ITGrid>
-            <ITGrid item xs={6} md={2}>
-              <ITInputNumber
-                name={`transferQty${index}`}
-                label={t("transfers.new.quantity")}
-                decimals={products.find((p) => p.id === line.productId)?.unit?.whole === false ? 2 : 0}
-                min={0}
-                value={line.quantity}
-                onChange={(v) => patchLine(line.id, { quantity: v ?? null })}
-              />
-            </ITGrid>
-            <ITGrid item xs={6} md={4}>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("transfers.new.totalPieces")} value={totalPieces} icon={<FaTruck size={14} />} tone={totalPieces > 0 ? "emerald" : "neutral"} />
+        </ITGrid>
+      </ITGrid>
+      <ITGrid container columns={12} spacing={4} className="items-start">
+        <ITGrid item xs={12} lg={6}>
+        <PanelCard
+          actions={
+            <ITFlex gap={2}>
+              <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
+              <ITButton variant="filled" color="primary" label={t("transfers.new.send")} disabled={busy || !valid} onClick={() => void submit()} />
+            </ITFlex>
+          }
+        >
+          <ITGrid container columns={12} spacing={3}>
+            <ITGrid item xs={12} md={6}>
               <ITSelect
-                name={`transferLot${index}`}
-                label={t("transfers.new.lot")}
-                options={[{ value: "", label: t("transfers.new.lotAuto") }, ...lotOptions(line.productId)]}
-                value={line.lotId}
-                disabled={!line.productId}
-                onChange={(e) => patchLine(line.id, { lotId: e.target.value })}
+                name="transferFrom"
+                label={t("transfers.new.from")}
+                options={warehouseOptions}
+                value={fromId}
+                onChange={(e) => setFromId(e.target.value)}
               />
             </ITGrid>
-            <ITGrid item xs={12} md={1}>
-              <ITButton
-                variant="outlined"
-                color="secondary"
-                size="lg"
-                title={t("transfers.new.removeLine")}
-                disabled={lines.length === 1}
-                onClick={() => setLines((list) => list.filter((l) => l.id !== line.id))}
-              >
-                <FaTrash size={12} />
-              </ITButton>
+            <ITGrid item xs={12} md={6}>
+              <ITSelect
+                name="transferTo"
+                label={t("transfers.new.to")}
+                options={warehouseOptions.filter((w) => w.value !== fromId)}
+                value={toId}
+                onChange={(e) => setToId(e.target.value)}
+              />
             </ITGrid>
           </ITGrid>
-        ))}
-        <ITFlex>
-          <ITButton
-            variant="outlined"
-            color="primary"
-            icon={<FaPlus size={12} />}
-            label={t("transfers.new.addLine")}
-            onClick={() => setLines((list) => [...list, emptyLine()])}
-          />
-        </ITFlex>
+          <ITFlex direction="column" gap={3} className="mt-4">
+            <ITTextarea
+              name="transferNotes"
+              label={t("transfers.new.notes")}
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e)}
+            />
+            <ITCheckbox name="transferCosign" label={t("transfers.new.cosign")} checked={cosign} onChange={setCosign} />
+          </ITFlex>
+        </PanelCard>
 
-        <ITTextarea
-          name="transferNotes"
-          label={t("transfers.new.notes")}
-          rows={2}
-          value={notes}
-          onChange={(e) => setNotes(e)}
-        />
-        <ITCheckbox name="transferCosign" label={t("transfers.new.cosign")} checked={cosign} onChange={setCosign} />
-
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
-          <ITButton
-            variant="filled"
-            color="primary"
-            label={t("transfers.new.send")}
-            disabled={busy || !valid}
-            onClick={() => void submit()}
-          />
-        </ITFlex>
-      </ITFlex>
-    </PanelCard>
+        </ITGrid>
+        <ITGrid item xs={12} lg={6}>
+        <PanelCard
+          title={t("transfers.new.lines")}
+          className="lg:sticky lg:top-4"
+          actions={
+            <ITButton
+              variant="outlined"
+              color="primary"
+              icon={<FaPlus size={12} />}
+              label={t("transfers.new.addLine")}
+              onClick={() => setLines((list) => [...list, emptyLine()])}
+            />
+          }
+        >
+          <ITFlex direction="column" gap={3}>
+            {lines.map((line, index) => (
+              <ITGrid key={line.id} container columns={12} spacing={3} className="items-end">
+                <ITGrid item xs={12} md={12}>
+                  <ITSearchSelect
+                    name={`transferProduct${index}`}
+                    label={t("transfers.new.item")}
+                    options={productOptions}
+                    value={line.productId}
+                    onChange={(v) => pickProduct(line.id, String(v))}
+                  />
+                </ITGrid>
+                <ITGrid item xs={5} md={4}>
+                  <ITInputNumber
+                    name={`transferQty${index}`}
+                    label={t("transfers.new.quantity")}
+                    decimals={products.find((p) => p.id === line.productId)?.unit?.whole === false ? 2 : 0}
+                    min={0}
+                    value={line.quantity}
+                    onChange={(v) => patchLine(line.id, { quantity: v ?? null })}
+                  />
+                </ITGrid>
+                <ITGrid item xs={5} md={6}>
+                  <ITSelect
+                    name={`transferLot${index}`}
+                    label={t("transfers.new.lot")}
+                    options={[{ value: "", label: t("transfers.new.lotAuto") }, ...lotOptions(line.productId)]}
+                    value={line.lotId}
+                    disabled={!line.productId}
+                    onChange={(e) => patchLine(line.id, { lotId: e.target.value })}
+                  />
+                </ITGrid>
+                <ITGrid item xs={2} md={2}>
+                  <ITButton
+                    variant="outlined"
+                    color="secondary"
+                    size="lg"
+                    title={t("transfers.new.removeLine")}
+                    disabled={lines.length === 1}
+                    onClick={() => setLines((list) => list.filter((l) => l.id !== line.id))}
+                  >
+                    <FaTrash size={12} />
+                  </ITButton>
+                </ITGrid>
+              </ITGrid>
+            ))}
+          </ITFlex>
+        </PanelCard>
+        </ITGrid>
+      </ITGrid>
+    </ITFlex>
   );
 }

@@ -1,4 +1,4 @@
-import { ITBadget } from "@axzydev/axzy_ui_system";
+import { ToneChip } from "@shared/ui/tone-chip";
 
 interface Props {
   diff: number;
@@ -8,7 +8,7 @@ interface Props {
 
 /** Diferencia contado − esperado: rojo faltante, ámbar sobrante, verde sin diferencia. */
 export default function DiffChip({ diff, zeroLabel = "0" }: Props) {
-  if (diff < 0) return <ITBadget color="danger" size="lg">{diff}</ITBadget>;
-  if (diff > 0) return <ITBadget color="warning" size="lg">{`+${diff}`}</ITBadget>;
-  return <ITBadget color="success" size="lg">{zeroLabel}</ITBadget>;
+  if (diff < 0) return <ToneChip tone="danger" label={String(diff)} />;
+  if (diff > 0) return <ToneChip tone="warning" label={`+${diff}`} />;
+  return <ToneChip tone="success" label={zeroLabel} />;
 }

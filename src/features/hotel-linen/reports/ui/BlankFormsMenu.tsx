@@ -4,6 +4,9 @@ import { FaFilePdf, FaPrint } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
 import { BLANK_FORMS, type BlankFormKind } from "../forms";
+import { LuPrinter } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
 
 interface Props {
   /** Genera el PDF en blanco con el catálogo vivo (lo provee la página). */
@@ -32,7 +35,8 @@ export default function BlankFormsMenu({ onDownload }: Props) {
   return (
     <>
       <ITButton variant="outlined" color="secondary" icon={<FaPrint size={12} />} label={t("blank.button")} onClick={() => setOpen(true)} />
-      <ITDialog isOpen={open} onClose={() => setOpen(false)} title={t("blank.title")}>
+      <ITDialog isOpen={open} onClose={() => setOpen(false)}>
+      <DialogHeader icon={<LuPrinter />} title={t("blank.title")} subtitle={t("blank.subtitle")} />
         <ITFlex direction="column" gap={3} className="min-w-[480px]">
           <ITText muted className="text-[12px]">{t("blank.description")}</ITText>
           {error && <ITAlert variant="error">{error}</ITAlert>}
@@ -42,6 +46,7 @@ export default function BlankFormsMenu({ onDownload }: Props) {
               <ITButton variant="outlined" color="secondary" size="sm" icon={<FaFilePdf size={12} />} label={t("export.pdf")} disabled={busy !== null} onClick={() => void download(kind)} />
             </ITFlex>
           ))}
+          <DialogFooter hideCancel onCancel={() => undefined} onConfirm={() => setOpen(false)} confirmLabel={t("common.close")} />
         </ITFlex>
       </ITDialog>
     </>

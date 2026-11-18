@@ -1,17 +1,79 @@
-import { useCallback, useEffect, useState } from "react";
-import { ITAlert, ITButton, ITChip, ITFlex, ITGrid, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
-import { FaCheck, FaExclamationTriangle } from "react-icons/fa";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ITAlert, ITButton, ITChip, ITDataTable, ITFlex, ITGrid, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
+import type { Column } from "@axzydev/axzy_ui_system";
+import { FaBalanceScale, FaBoxes, FaCheck, FaExclamationTriangle, FaTruck } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import type { RootState } from "@app/store";
 import { signoffApi, type SignoffResult, type TransferSignoffDetail } from "@entities/hotel-linen";
 import { useCan } from "@entities/user";
+import { makeClientTableFetch } from "@shared/api/clientTable";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import SignoffStatusChip from "./SignoffStatusChip";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 const fmt = (n: number) => new Intl.NumberFormat("es-MX", { maximumFractionDigits: 2 }).format(n);
 const fmtDateTime = (iso: string) => new Date(iso).toLocaleString("es-MX");
+
+type SignoffLine = TransferSignoffDetail["lines"][number];
+
+/** Renglones del traspaso: enviado, contado y diferencia. */
+function LinesTable({ lines }: { lines: SignoffLine[] }) {
+  const { t } = useTranslation("hotel-linen-signoff");
+  const fetchData = useMemo(
+    () =>
+      makeClientTableFetch<SignoffLine>(async () => lines, {
+        name: { value: (l) => `${l.product.code} ${l.product.name} ${l.product.size ?? ""}`, sortValue: (l) => l.product.code },
+      }),
+    [lines]
+  );
+  const columns: Column<SignoffLine>[] = [
+    {
+      key: "name",
+      label: t("detail.lines"),
+      type: "string",
+      width: 280,
+      filter: true,
+      render: (l) => (
+        <ITFlex direction="column">
+          <ITText className="text-[12px] font-bold">{l.product.name}</ITText>
+          <ITText muted className="font-mono text-[11px]">{[l.product.code, l.product.size, l.lot?.code].filter(Boolean).join(" · ")}</ITText>
+        </ITFlex>
+      ),
+    },
+    { key: "quantity", label: t("detail.sent"), type: "number", width: 110, render: (l) => <ITText className="text-[12px] tabular-nums">{fmt(l.quantity)}</ITText> },
+    {
+      key: "receivedQuantity",
+      label: t("detail.counted"),
+      type: "number",
+      width: 110,
+      render: (l) => <ITText className="text-[12px] tabular-nums">{l.receivedQuantity === null ? "—" : fmt(l.receivedQuantity)}</ITText>,
+    },
+    {
+      key: "difference",
+      label: t("detail.difference"),
+      type: "number",
+      width: 110,
+      render: (l) =>
+        l.difference ? <ITChip size="sm" color="warning" label={fmt(l.difference)} /> : <ITText className="text-[12px]">{l.difference === null ? "—" : "0"}</ITText>,
+    },
+  ];
+  return (
+    <ITDataTable
+      showViewToggle={false}
+      columns={columns as unknown as Column<Record<string, unknown>>[]}
+      fetchData={fetchData as never}
+      size="lg"
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={56}
+    />
+  );
+}
 
 interface Props {
   id: string;
@@ -20,6 +82,7 @@ interface Props {
 /** Detalle de la conformidad: contado por línea y botones Conforme / Con diferencia (nota obligatoria). */
 export default function SignoffDetailView({ id }: Props) {
   const { t } = useTranslation("hotel-linen-signoff");
+  const notify = useSuccessToast();
   const canSign = useCan("hotel_linen.transfer_signoff");
   const userId = useSelector((s: RootState) => s.auth.user?.id);
   const [detail, setDetail] = useState<TransferSignoffDetail | null>(null);
@@ -51,6 +114,7 @@ export default function SignoffDetailView({ id }: Props) {
     setError(null);
     try {
       await signoffApi.sign(id, { result, notes: notes.trim() || null });
+      notify(t("toast.signed"));
       setAsDifference(false);
       setNotes("");
       load();
@@ -69,6 +133,22 @@ export default function SignoffDetailView({ id }: Props) {
         </ITAlert>
       )}
 
+      <ITGrid container columns={12} spacing={3}>
+        <ITGrid item xs={6} md={4}>
+          <KpiTile label={t("detail.sent")} value={fmt(detail.lines.reduce((n, l) => n + l.quantity, 0))} icon={<FaTruck size={14} />} tone="sky" />
+        </ITGrid>
+        <ITGrid item xs={6} md={4}>
+          <KpiTile label={t("detail.counted")} value={fmt(detail.lines.reduce((n, l) => n + (l.receivedQuantity ?? 0), 0))} icon={<FaBoxes size={14} />} tone="emerald" />
+        </ITGrid>
+        <ITGrid item xs={12} md={4}>
+          <KpiTile
+            label={t("detail.difference")}
+            value={fmt(detail.lines.reduce((n, l) => n + (l.difference ?? 0), 0))}
+            icon={<FaBalanceScale size={14} />}
+            tone={detail.lines.some((l) => l.difference) ? "amber" : "neutral"}
+          />
+        </ITGrid>
+      </ITGrid>
       <PanelCard
         title={detail.folio}
         description={`${detail.from?.name ?? "—"} → ${detail.to?.name ?? "—"}`}
@@ -103,51 +183,13 @@ export default function SignoffDetailView({ id }: Props) {
       </PanelCard>
 
       <PanelCard title={t("detail.lines")}>
-        <ITFlex direction="column" gap={3}>
-          {detail.lines.map((line) => (
-            <ITGrid key={line.id} container columns={12} spacing={3} className="items-center">
-              <ITGrid item xs={12} md={5}>
-                <ITText className="text-[12px] font-bold">{line.product.name}</ITText>
-                <ITText muted className="font-mono text-[11px]">
-                  {[line.product.code, line.product.size, line.lot?.code].filter(Boolean).join(" · ")}
-                </ITText>
-              </ITGrid>
-              <ITGrid item xs={4} md={2}>
-                <ITText muted className="text-[11px]">{t("detail.sent")}</ITText>
-                <ITText className="text-[12px] tabular-nums">{fmt(line.quantity)}</ITText>
-              </ITGrid>
-              <ITGrid item xs={4} md={2}>
-                <ITText muted className="text-[11px]">{t("detail.counted")}</ITText>
-                <ITText className="text-[12px] tabular-nums">{line.receivedQuantity === null ? "—" : fmt(line.receivedQuantity)}</ITText>
-              </ITGrid>
-              <ITGrid item xs={4} md={2}>
-                <ITText muted className="text-[11px]">{t("detail.difference")}</ITText>
-                {line.difference ? <ITChip size="sm" color="warning" label={fmt(line.difference)} /> : <ITText className="text-[12px]">{line.difference === null ? "—" : "0"}</ITText>}
-              </ITGrid>
-            </ITGrid>
-          ))}
-        </ITFlex>
+        <LinesTable lines={detail.lines} />
       </PanelCard>
-
       {detail.signoffStatus === null && <ITAlert variant="info">{t("detail.notApplicable")}</ITAlert>}
 
       {pending && canSign && (
-        <PanelCard title={t("detail.action")} description={t("detail.noStockBlock")}>
-          {isCounter ? (
-            <ITAlert variant="warning">{t("detail.sameUser")}</ITAlert>
-          ) : (
-            <ITFlex direction="column" gap={3}>
-              {asDifference && (
-                <ITTextarea
-                  name="signoffNotes"
-                  label={t("detail.notesLabel")}
-                  rows={3}
-                  value={notes}
-                  onChange={(e) => setNotes(e)}
-                  error={noteMissing ? t("detail.notesRequired") : undefined}
-                />
-              )}
-              <ITFlex justify="end" gap={2}>
+        <PanelCard title={t("detail.action")} description={t("detail.noStockBlock")} actions={isCounter ? undefined : (
+              <ITFlex gap={2}>
                 {asDifference ? (
                   <>
                     <ITButton variant="outlined" color="secondary" label={t("cancel")} disabled={busy} onClick={() => setAsDifference(false)} />
@@ -181,6 +223,21 @@ export default function SignoffDetailView({ id }: Props) {
                   </>
                 )}
               </ITFlex>
+        )}>
+          {isCounter ? (
+            <ITAlert variant="warning">{t("detail.sameUser")}</ITAlert>
+          ) : (
+            <ITFlex direction="column" gap={3}>
+              {asDifference && (
+                <ITTextarea
+                  name="signoffNotes"
+                  label={t("detail.notesLabel")}
+                  rows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e)}
+                  error={noteMissing ? t("detail.notesRequired") : undefined}
+                />
+              )}
             </ITFlex>
           )}
         </PanelCard>

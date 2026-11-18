@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITDialog, ITFlex, ITInput, ITInputNumber, ITSegmentedControl, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITFlex, ITInput, ITInputNumber, ITSegmentedControl, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { receptionApi, type EquipmentCondition, type EquipmentLoan } from "@entities/hotel-linen";
+import { LuUndo2 } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   loan: EquipmentLoan | null;
@@ -12,6 +16,7 @@ interface Props {
 /** Retiro del equipo con su estado: B (bueno), D (dañado) o F (faltante), y cargo sugerido. */
 export default function ReturnEquipmentDialog({ loan, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-reception");
+  const notify = useSuccessToast();
   const [condition, setCondition] = useState<EquipmentCondition>("GOOD");
   const [charge, setCharge] = useState<number | null>(null);
   const [notes, setNotes] = useState("");
@@ -31,6 +36,7 @@ export default function ReturnEquipmentDialog({ loan, onClose, onDone }: Props) 
     setError(null);
     try {
       await receptionApi.returnEquipment(loan.id, { condition, chargeAmount: condition === "GOOD" ? null : charge, notes: notes.trim() || null });
+      notify(t("equipment.toast.returned"));
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -40,7 +46,8 @@ export default function ReturnEquipmentDialog({ loan, onClose, onDone }: Props) 
   };
 
   return (
-    <ITDialog isOpen={loan !== null} onClose={onClose} title={t("equipment.return.title", { tag: loan?.unit.tag ?? "" })}>
+    <ITDialog isOpen={loan !== null} onClose={onClose}>
+      <DialogHeader icon={<LuUndo2 />} title={t("equipment.return.title", { tag: loan?.unit.tag ?? "" })} subtitle={t("equipment.return.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[400px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         <ITSegmentedControl
@@ -59,16 +66,7 @@ export default function ReturnEquipmentDialog({ loan, onClose, onDone }: Props) 
         {condition === "DAMAGED" && <ITText muted>{t("equipment.return.ticketHint")}</ITText>}
         <ITInput name="equipNotes" label={t("equipment.return.notes")} required={condition !== "GOOD"} value={notes} onChange={(e) => setNotes(e.target.value)} />
         {condition !== "GOOD" && !notes.trim() && <ITText muted>{t("equipment.return.notesRequired")}</ITText>}
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton
-            variant="filled"
-            color="primary"
-            label={t("equipment.return.confirm")}
-            disabled={busy || (condition !== "GOOD" && !notes.trim())}
-            onClick={() => void submit()}
-          />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("equipment.return.confirm")} busy={busy} disabled={(condition !== "GOOD" && !notes.trim())} />
       </ITFlex>
     </ITDialog>
   );

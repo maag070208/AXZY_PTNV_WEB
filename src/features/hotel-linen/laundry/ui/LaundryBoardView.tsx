@@ -136,8 +136,6 @@ export default function LaundryBoardView({ requestCosign }: Props) {
       </ITGrid>
 
       <PanelCard
-        title={t("laundry.title")}
-        description={t("laundry.description")}
         actions={
           canTransfer ? (
             <ITFlex gap={2} wrap="wrap">

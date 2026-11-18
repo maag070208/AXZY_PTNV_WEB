@@ -24,6 +24,10 @@ import {
 } from "@entities/hotel-linen";
 import { newId } from "@shared/lib/newId";
 import { dateStrToLocal, localToDateStr, money } from "../lib";
+import { LuFilePen } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface LineDraft {
   id: string;
@@ -47,6 +51,7 @@ interface Props {
 /** Nueva OC (o edición de un borrador): proveedor, renglones producto/cantidad/costo/IVA y totales. */
 export default function OrderFormDialog({ open, lookups, order, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-purchase");
+  const notify = useSuccessToast();
   const defaultTax = useMemo(() => lookups.taxRates.find((r) => Math.abs(r.rate - 0.16) < 1e-9)?.id ?? lookups.taxRates[0]?.id ?? "", [lookups]);
   const [products, setProducts] = useState<HotelProduct[]>([]);
   const [warehouses, setWarehouses] = useState<HotelWarehouse[]>([]);
@@ -119,6 +124,7 @@ export default function OrderFormDialog({ open, lookups, order, onClose, onDone 
         lines: lines.map((l) => ({ productId: l.productId, quantity: l.quantity as number, unitCost: l.unitCost ?? 0, taxRateId: l.taxRateId || null })),
       };
       const saved = order ? await purchaseApi.updateOrder(order.id, body) : await purchaseApi.createOrder(body);
+      notify(t("toast.saved"));
       onDone(saved.id);
     } catch (e) {
       setError((e as Error).message);
@@ -128,7 +134,8 @@ export default function OrderFormDialog({ open, lookups, order, onClose, onDone 
   };
 
   return (
-    <ITDialog isOpen={open} onClose={onClose} title={order ? t("form.editTitle", { folio: order.folio }) : t("form.title")}>
+    <ITDialog isOpen={open} onClose={onClose}>
+      <DialogHeader icon={<LuFilePen />} title={order ? t("form.editTitle", { folio: order.folio }) : t("form.title")} subtitle={t("form.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[860px]">
         {error && (
           <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -222,10 +229,7 @@ export default function OrderFormDialog({ open, lookups, order, onClose, onDone 
         </ITFlex>
 
         <ITTextarea name="poNotes" label={t("form.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton variant="filled" color="primary" label={t("form.save")} disabled={busy || !valid} onClick={() => void save()} />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void save()} confirmLabel={t("form.save")} busy={busy} disabled={!valid} />
       </ITFlex>
     </ITDialog>
   );

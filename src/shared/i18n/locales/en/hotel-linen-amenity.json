@@ -19,7 +19,9 @@
   "role": {
     "CONFIRMS": "Prepared by",
     "REVIEWS": "Reviewed by",
-    "AUTHORIZES": "Acknowledged by"
+    "AUTHORIZES": "Acknowledged by",
+    "DELIVERS": "Delivers",
+    "RECEIVES": "Receives"
   },
   "columns": {
     "folio": "Number",

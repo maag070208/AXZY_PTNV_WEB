@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITCheckbox, ITDialog, ITFlex, ITGrid, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITCheckbox, ITDialog, ITFlex, ITGrid, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { laundryApi, type SupplyRequestDetail } from "@entities/hotel-linen";
 import { fmt } from "../lib";
+import { LuTruck } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   /** Pedido a surtir; `null` = cerrado. */
@@ -15,6 +19,7 @@ interface Props {
 /** Surtir un pedido: cantidad entregada ahora por renglón y co-firma opcional del auxiliar de piso. */
 export default function FulfillDialog({ requestId, requestCosign, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-laundry");
+  const notify = useSuccessToast();
   const [detail, setDetail] = useState<SupplyRequestDetail | null>(null);
   const [qty, setQty] = useState<Record<string, number | null>>({});
   const [cosign, setCosign] = useState(false);
@@ -58,6 +63,7 @@ export default function FulfillDialog({ requestId, requestCosign, onClose, onDon
         lines: detail.lines.map((l) => ({ lineId: l.id, deliveredQty: qty[l.id] ?? 0 })),
         cosignToken,
       });
+      notify(t("toast.fulfilled"));
       onDone(updated);
     } catch (e) {
       setError((e as Error).message);
@@ -70,8 +76,8 @@ export default function FulfillDialog({ requestId, requestCosign, onClose, onDon
     <ITDialog
       isOpen={requestId !== null}
       onClose={onClose}
-      title={detail ? t("fulfill.title", { folio: detail.folio }) : t("fulfill.titleLoading")}
     >
+      <DialogHeader icon={<LuTruck />} title={detail ? t("fulfill.title", { folio: detail.folio }) : t("fulfill.titleLoading")} subtitle={t("fulfill.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[520px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         {!detail && !error && <ITText muted>{t("common.loading")}</ITText>}
@@ -106,16 +112,7 @@ export default function FulfillDialog({ requestId, requestCosign, onClose, onDon
             ))}
             {overPending && <ITAlert variant="warning">{t("fulfill.overPending")}</ITAlert>}
             <ITCheckbox name="fulfillCosign" label={t("fulfill.cosign")} checked={cosign} onChange={setCosign} />
-            <ITFlex justify="end" gap={2}>
-              <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-              <ITButton
-                variant="filled"
-                color="primary"
-                label={t("fulfill.confirm")}
-                disabled={busy || !anyQty || overPending}
-                onClick={() => void submit()}
-              />
-            </ITFlex>
+            <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("fulfill.confirm")} busy={busy} disabled={!anyQty || overPending} />
           </>
         )}
       </ITFlex>

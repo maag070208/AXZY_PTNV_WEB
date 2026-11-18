@@ -165,7 +165,7 @@ export default function SupplyRequestsBoard({ onOpen, requestCosign }: Props) {
   ];
 
   return (
-    <PanelCard title={t("requests.title")} description={t("requests.description")}>
+    <PanelCard>
       <ITTabs variant="line" items={items} />
       <FulfillDialog
         requestId={fulfillId}

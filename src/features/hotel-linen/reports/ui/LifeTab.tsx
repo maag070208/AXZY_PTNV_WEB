@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITAlert, ITBadget, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITChip, ITFlex } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { reportApi, type LaundryReport } from "@entities/hotel-linen";
 import type { ReportDoc } from "@shared/lib/reportDoc";
 import { defaultFrom, fmt, fmtDay, productLabel, todayStr } from "../lib";
-import { ExportBar, PeriodFields, ReportTable, td, tdLeft, th, thLeft, type ExportPdf } from "./common";
+import { PanelCard } from "@shared/ui/panel-card";
+import { ExportBar, PeriodFields, ReportTable, type ExportPdf, type ReportCol } from "./common";
 
 const pct = (value: number | null) => (value === null ? "—" : `${Math.round(value * 100)}%`);
 
@@ -54,6 +55,42 @@ export default function LifeTab({ exportPdf }: { exportPdf: ExportPdf }) {
     };
   }, [report, t]);
 
+  const rateRows = useMemo(
+    () => (report ? report.lines.filter((l) => l.washed > 0).sort((a, b) => b.rate - a.rate) : []),
+    [report]
+  );
+  const rateColumns: ReportCol<(typeof rateRows)[number]>[] = [
+    { key: "item", label: t("life.item"), width: 240, value: (l) => productLabel(l.product) },
+    { key: "washes", label: t("life.washes"), numeric: true, value: (l) => l.washed, render: (l) => fmt(l.washed) },
+    { key: "pieces", label: t("life.pieces"), numeric: true, value: (l) => l.totalPieces, render: (l) => fmt(l.totalPieces) },
+    { key: "rate", label: t("life.rate"), numeric: true, value: (l) => l.rate, render: (l) => (l.rate ? l.rate.toFixed(1) : "—") },
+    { key: "life", label: t("life.life"), numeric: true, value: (l) => l.washLife ?? -1, render: (l) => l.washLife ?? "—" },
+    {
+      key: "months",
+      label: t("life.months"),
+      numeric: true,
+      value: (l) => (l.rate && l.washLife ? Math.round(l.washLife / l.rate) : -1),
+      render: (l) => (l.rate && l.washLife ? `${Math.round(l.washLife / l.rate)}` : "—"),
+    },
+  ];
+  type Lot = LaundryReport["lots"][number];
+  const lotColumns: ReportCol<Lot>[] = [
+    { key: "code", label: t("life.lot"), width: 130, value: (l) => l.code },
+    { key: "received", label: t("life.received"), width: 130, value: (l) => l.receivedAt, render: (l) => fmtDay(l.receivedAt) },
+    { key: "item", label: t("life.item"), width: 220, value: (l) => (l.product ? productLabel(l.product) : "—") },
+    { key: "pieces", label: t("life.pieces"), numeric: true, value: (l) => l.initialQuantity, render: (l) => fmt(l.initialQuantity) },
+    { key: "age", label: t("life.age"), numeric: true, value: (l) => l.ageMonths, render: (l) => l.ageMonths.toFixed(1) },
+    { key: "estWashes", label: t("life.estWashes"), numeric: true, value: (l) => l.estWashes ?? -1, render: (l) => (l.estWashes === null ? "—" : Math.round(l.estWashes)) },
+    {
+      key: "used",
+      label: t("life.used"),
+      numeric: true,
+      value: (l) => l.pctLife ?? -1,
+      render: (l) =>
+        l.pctLife === null ? "—" : <ITChip size="sm" color={l.pctLife >= 1 ? "danger" : l.pctLife >= 0.8 ? "warning" : "success"} label={pct(l.pctLife)} />,
+    },
+  ];
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && <ITAlert variant="error">{error}</ITAlert>}
@@ -63,76 +100,12 @@ export default function LifeTab({ exportPdf }: { exportPdf: ExportPdf }) {
       </ITFlex>
       {report && (
         <>
-          <ITFlex direction="column" gap={2}>
-            <ITText className="text-[13px] font-bold">{t("life.rateTitle")}</ITText>
-            <ITText muted className="text-[11px]">{t("life.rateHint")}</ITText>
-            <ReportTable
-              empty={report.lines.every((l) => l.washed === 0) ? t("life.none") : null}
-              head={
-                <>
-                  <th className={thLeft}>{t("life.item")}</th>
-                  <th className={th}>{t("life.washes")}</th>
-                  <th className={th}>{t("life.pieces")}</th>
-                  <th className={th}>{t("life.rate")}</th>
-                  <th className={th}>{t("life.life")}</th>
-                  <th className={th}>{t("life.months")}</th>
-                </>
-              }
-            >
-              {report.lines
-                .filter((l) => l.washed > 0)
-                .sort((a, b) => b.rate - a.rate)
-                .map((l) => (
-                  <tr key={l.product.id} className="border-b border-[var(--color-border)]">
-                    <td className={tdLeft}>{productLabel(l.product)}</td>
-                    <td className={td}>{fmt(l.washed)}</td>
-                    <td className={td}>{fmt(l.totalPieces)}</td>
-                    <td className={td}>{l.rate ? l.rate.toFixed(1) : "—"}</td>
-                    <td className={td}>{l.washLife ?? "—"}</td>
-                    <td className={td}>{l.rate && l.washLife ? `${Math.round(l.washLife / l.rate)}` : "—"}</td>
-                  </tr>
-                ))}
-            </ReportTable>
-          </ITFlex>
-
-          <ITFlex direction="column" gap={2}>
-            <ITText className="text-[13px] font-bold">{t("life.lotsTitle")}</ITText>
-            <ITText muted className="text-[11px]">{t("life.lotsHint")}</ITText>
-            <ReportTable
-              empty={report.lots.length === 0 ? t("life.noLots") : null}
-              head={
-                <>
-                  <th className={thLeft}>{t("life.lot")}</th>
-                  <th className={thLeft}>{t("life.received")}</th>
-                  <th className={thLeft}>{t("life.item")}</th>
-                  <th className={th}>{t("life.pieces")}</th>
-                  <th className={th}>{t("life.age")}</th>
-                  <th className={th}>{t("life.estWashes")}</th>
-                  <th className={th}>{t("life.used")}</th>
-                </>
-              }
-            >
-              {report.lots.map((l) => (
-                <tr key={l.id} className="border-b border-[var(--color-border)]">
-                  <td className={`${tdLeft} font-mono`}>{l.code}</td>
-                  <td className={tdLeft}>{fmtDay(l.receivedAt)}</td>
-                  <td className={tdLeft}>{l.product ? productLabel(l.product) : "—"}</td>
-                  <td className={td}>{fmt(l.initialQuantity)}</td>
-                  <td className={td}>{l.ageMonths.toFixed(1)}</td>
-                  <td className={td}>{l.estWashes === null ? "—" : Math.round(l.estWashes)}</td>
-                  <td className={td}>
-                    {l.pctLife === null ? (
-                      "—"
-                    ) : (
-                      <ITBadget color={l.pctLife >= 1 ? "danger" : l.pctLife >= 0.8 ? "warning" : "success"} size="lg">
-                        {pct(l.pctLife)}
-                      </ITBadget>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </ReportTable>
-          </ITFlex>
+          <PanelCard title={t("life.rateTitle")} description={t("life.rateHint")}>
+            <ReportTable rows={rateRows} empty={t("life.none")} columns={rateColumns} />
+          </PanelCard>
+          <PanelCard title={t("life.lotsTitle")} description={t("life.lotsHint")}>
+            <ReportTable rows={report.lots} empty={t("life.noLots")} columns={lotColumns} />
+          </PanelCard>
         </>
       )}
     </ITFlex>

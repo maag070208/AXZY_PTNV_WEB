@@ -12,12 +12,14 @@ import {
   ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
-import { FaTrash } from "react-icons/fa";
+import { FaBoxes, FaExclamationTriangle, FaTrash, FaTshirt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { hotelLinenApi, laundryApi, type HotelProduct, type HotelWarehouse } from "@entities/hotel-linen";
 import { dyn } from "@shared/i18n/dyn";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import { AREA_KINDS, SHIFTS, dateStrToLocal, fmt, localToDateStr, todayStr } from "../lib";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface LineDraft {
   productId: string;
@@ -58,6 +60,7 @@ interface Props {
 /** Nueva recepción de sucios: formato por carro con faltante en vivo y desglose bueno/mancha/roto. */
 export default function DirtyReceiptForm({ requestCosign, onDone, onCancel }: Props) {
   const { t } = useTranslation("hotel-linen-laundry");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const [areas, setAreas] = useState<HotelWarehouse[]>([]);
   const [products, setProducts] = useState<HotelProduct[]>([]);
@@ -147,6 +150,7 @@ export default function DirtyReceiptForm({ requestCosign, onDone, onCancel }: Pr
           damaged: n(l.damaged),
         })),
       });
+      notify(t("toast.created"));
       onDone(created.id);
     } catch (e) {
       setError((e as Error).message);
@@ -156,14 +160,33 @@ export default function DirtyReceiptForm({ requestCosign, onDone, onCancel }: Pr
   };
 
   return (
-    <PanelCard title={t("dirty.form.title")} description={t("dirty.form.description")}>
-      <ITFlex direction="column" gap={4}>
-        {error && (
-          <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
-            {error}
-          </ITAlert>
-        )}
-        <ITGrid container columns={12} spacing={3}>
+    <ITFlex direction="column" gap={4}>
+      {error && (
+        <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
+          {error}
+        </ITAlert>
+      )}
+      <ITGrid container columns={12} spacing={3}>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("dirty.form.receivedDirty")} value={fmt(lines.reduce((x, l) => x + n(l.receivedDirty), 0))} icon={<FaTshirt size={14} />} tone={lines.some((l) => n(l.receivedDirty) > 0) ? "sky" : "neutral"} />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("dirty.form.stillInUse")} value={fmt(lines.reduce((x, l) => x + n(l.stillInUse), 0))} icon={<FaBoxes size={14} />} tone={lines.some((l) => n(l.stillInUse) > 0) ? "amber" : "neutral"} />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("dirty.form.shortage")} value={fmt(totalShortage)} icon={<FaExclamationTriangle size={14} />} tone={totalShortage > 0 ? "rose" : "neutral"} hint={totalShortage === 0 ? t("dirty.form.allGood") : undefined} />
+        </ITGrid>
+      </ITGrid>
+      <PanelCard
+        description={t("dirty.form.description")}
+        actions={
+          <ITFlex gap={2}>
+            <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
+            <ITButton variant="filled" color="primary" label={t("dirty.form.save")} disabled={busy || !valid} onClick={() => void submit()} />
+          </ITFlex>
+        }
+      >
+        <ITGrid container columns={12} spacing={3} className="items-end">
           <ITGrid item xs={12} md={4}>
             <ITSelect
               name="dirtyArea"
@@ -198,6 +221,13 @@ export default function DirtyReceiptForm({ requestCosign, onDone, onCancel }: Pr
           </ITGrid>
         </ITGrid>
 
+        <ITFlex direction="column" className="mt-4">
+          <ITTextarea name="dirtyNotes" label={t("form.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
+        </ITFlex>
+      </PanelCard>
+
+      <PanelCard title={t("dirty.detail.lines")}>
+        <ITFlex direction="column" gap={4}>
         {areaId && lines.length === 0 && <ITText muted>{t("dirty.form.noPrefill")}</ITText>}
         {lines.map((l, index) => {
           const shortage = shortageOf(l);
@@ -252,12 +282,8 @@ export default function DirtyReceiptForm({ requestCosign, onDone, onCancel }: Pr
           />
         )}
         {totalShortage > 0 && <ITAlert variant="warning">{t("dirty.form.shortageTotal", { n: fmt(totalShortage) })}</ITAlert>}
-        <ITTextarea name="dirtyNotes" label={t("form.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
-          <ITButton variant="filled" color="primary" label={t("dirty.form.save")} disabled={busy || !valid} onClick={() => void submit()} />
         </ITFlex>
-      </ITFlex>
-    </PanelCard>
+      </PanelCard>
+    </ITFlex>
   );
 }

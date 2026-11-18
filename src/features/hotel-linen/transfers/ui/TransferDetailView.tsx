@@ -11,16 +11,18 @@ import {
   ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
-import { FaBan, FaClipboardCheck } from "react-icons/fa";
+import { FaBan, FaBalanceScale, FaBoxes, FaClipboardCheck, FaTruck } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import type { RootState } from "@app/store";
 import { hotelLinenApi, type HotelTransferDetail } from "@entities/hotel-linen";
 import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import TransferStatusChip from "./TransferStatusChip";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 const fmt = (n: number) => new Intl.NumberFormat("es-MX", { maximumFractionDigits: 2 }).format(n);
 const fmtDateTime = (iso: string) => new Date(iso).toLocaleString("es-MX");
@@ -34,6 +36,7 @@ interface Props {
 /** Detalle del traspaso: líneas, firmas, diferencia; recibir (conteo ciego) y cancelar. */
 export default function TransferDetailView({ id, requestCosign }: Props) {
   const { t } = useTranslation("hotel-linen");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const canReceive = useCan("hotel_linen.transfer_receive");
   const canSend = useCan("hotel_linen.transfer_send");
@@ -86,6 +89,7 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
         notes: receiveNotes.trim() || null,
         cosignToken,
       });
+      notify(t("transfers.toast.received"));
       setDetail(updated);
       setCounting(false);
     } catch (e) {
@@ -100,6 +104,7 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
     setError(null);
     try {
       setDetail(await hotelLinenApi.cancelTransfer(id));
+      notify(t("transfers.toast.cancelled"));
       setConfirmCancel(false);
     } catch (e) {
       setError((e as Error).message);
@@ -145,6 +150,28 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
         </ITAlert>
       )}
 
+      <ITGrid container columns={12} spacing={3}>
+        <ITGrid item xs={6} md={4}>
+          <KpiTile label={t("transfers.detail.sent")} value={blind ? "•••" : fmt(detail.lines.reduce((n, l) => n + l.quantity, 0))} icon={<FaTruck size={14} />} tone="sky" />
+        </ITGrid>
+        <ITGrid item xs={6} md={4}>
+          <KpiTile
+            label={t("transfers.detail.received")}
+            value={detail.lines.some((l) => l.receivedQuantity !== null) ? fmt(detail.lines.reduce((n, l) => n + (l.receivedQuantity ?? 0), 0)) : "—"}
+            icon={<FaBoxes size={14} />}
+            tone={detail.status === "IN_TRANSIT" ? "neutral" : "emerald"}
+          />
+        </ITGrid>
+        <ITGrid item xs={12} md={4}>
+          <KpiTile
+            label={t("transfers.detail.difference")}
+            value={detail.difference === null ? "—" : fmt(detail.difference)}
+            icon={<FaBalanceScale size={14} />}
+            tone={detail.difference ? "amber" : "neutral"}
+          />
+        </ITGrid>
+      </ITGrid>
+
       <PanelCard
         title={detail.folio}
         description={`${detail.from?.name ?? "—"} → ${detail.to?.name ?? "—"}`}
@@ -156,7 +183,7 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
         }
       >
         <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12} md={4}>
+          <ITGrid item xs={12} md={6}>
             <ITText muted className="text-[11px]">{t("transfers.detail.sentBy")}</ITText>
             <ITFlex align="center" gap={2}>
               {detail.sentBy && <ProfileAvatar name={detail.sentBy.name} size="sm" />}
@@ -164,19 +191,13 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
             </ITFlex>
             <ITText muted className="text-[11px]">{fmtDateTime(detail.date)}</ITText>
           </ITGrid>
-          <ITGrid item xs={12} md={4}>
+          <ITGrid item xs={12} md={6}>
             <ITText muted className="text-[11px]">{t("transfers.detail.receivedBy")}</ITText>
             <ITFlex align="center" gap={2}>
               {detail.receivedBy && <ProfileAvatar name={detail.receivedBy.name} size="sm" />}
               <ITText className="text-[12px] font-semibold">{detail.receivedBy?.name ?? "—"}</ITText>
             </ITFlex>
             {detail.receivedAt && <ITText muted className="text-[11px]">{fmtDateTime(detail.receivedAt)}</ITText>}
-          </ITGrid>
-          <ITGrid item xs={12} md={4}>
-            <ITText muted className="text-[11px]">{t("transfers.detail.difference")}</ITText>
-            <ITText className={`text-[16px] font-bold tabular-nums ${detail.difference ? "text-[var(--color-warning)]" : ""}`}>
-              {detail.difference === null ? "—" : fmt(detail.difference)}
-            </ITText>
           </ITGrid>
           {detail.notes && (
             <ITGrid item xs={12}>
@@ -196,6 +217,20 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
       <PanelCard
         title={t("transfers.detail.lines")}
         description={counting ? t("transfers.detail.blindHint") : blind ? t("transfers.detail.blindNotice") : undefined}
+        actions={
+          counting ? (
+            <ITFlex gap={2}>
+              <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setCounting(false)} />
+              <ITButton
+                variant="filled"
+                color="primary"
+                label={t("transfers.detail.confirmReceive")}
+                disabled={busy || !allCounted}
+                onClick={() => void doReceive()}
+              />
+            </ITFlex>
+          ) : undefined
+        }
       >
         <ITFlex direction="column" gap={3}>
           {detail.lines.map((line) => (
@@ -252,16 +287,6 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
                 onChange={(e) => setReceiveNotes(e)}
               />
               <ITCheckbox name="receiveCosign" label={t("transfers.detail.cosign")} checked={cosign} onChange={setCosign} />
-              <ITFlex justify="end" gap={2}>
-                <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setCounting(false)} />
-                <ITButton
-                  variant="filled"
-                  color="primary"
-                  label={t("transfers.detail.confirmReceive")}
-                  disabled={busy || !allCounted}
-                  onClick={() => void doReceive()}
-                />
-              </ITFlex>
             </ITFlex>
           )}
         </ITFlex>

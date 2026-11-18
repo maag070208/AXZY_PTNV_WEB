@@ -32,6 +32,7 @@ import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { computeLine, dateStrToLocal, fmt, fmtDateTime, fmtDay, fmtPct, localToDateStr, shiftDays, todayStr } from "../lib";
 import { downloadAmenityControlPdf } from "../pdf/download";
 import AmenityStatusChip from "./AmenityStatusChip";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Sheet {
   id: string | null;
@@ -98,6 +99,7 @@ interface Props {
  */
 export default function AmenityControlView({ id }: Props) {
   const { t } = useTranslation("hotel-linen-amenity");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const navigate = useNavigate();
   const canControl = useCan("hotel_linen.amenities_control");
@@ -185,6 +187,7 @@ export default function AmenityControlView({ id }: Props) {
       if (!d) return;
       if (!id) navigate(`/linen/amenities/${d.id}`, { replace: true });
       else adopt(fromDetail(d));
+      notify();
     } catch (e) {
       setError((e as Error).message);
     } finally {

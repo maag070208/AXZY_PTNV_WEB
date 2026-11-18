@@ -1,18 +1,70 @@
-import { useCallback, useEffect, useState } from "react";
-import { ITAlert, ITButton, ITChip, ITConfirmDialog, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
-import { FaBan, FaCheck, FaPaperPlane, FaTruck } from "react-icons/fa";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ITAlert, ITButton, ITChip, ITConfirmDialog, ITDataTable, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
+import type { Column } from "@axzydev/axzy_ui_system";
+import { FaBan, FaBoxes, FaCheck, FaClipboardList, FaExclamationTriangle, FaPaperPlane, FaTruck } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { laundryApi, type SupplyRequestDetail } from "@entities/hotel-linen";
 import { useCan } from "@entities/user";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 import { dyn } from "@shared/i18n/dyn";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { fmt, fmtDate, fmtDateTime } from "../lib";
 import FulfillDialog from "./FulfillDialog";
 import SupplyStatusChip from "./SupplyStatusChip";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 type Confirm = "cancel" | "confirm" | null;
+type RequestLine = SupplyRequestDetail["lines"][number];
+
+/** Renglones del pedido en tabla (artículo, solicitado, entregado, recibido, pendiente). */
+function LinesTable({ lines }: { lines: RequestLine[] }) {
+  const { t } = useTranslation("hotel-linen-laundry");
+  const fetchData = useMemo(
+    () =>
+      makeClientTableFetch<RequestLine>(async () => lines, {
+        name: { value: (l) => `${l.product.code} ${l.product.name} ${l.product.size ?? ""}`, sortValue: (l) => l.product.code },
+      }),
+    [lines]
+  );
+  const num = (v: number, warn = false) => (
+    <ITText className={`text-[12px] tabular-nums ${warn && v > 0 ? "font-bold text-[var(--color-warning)]" : ""}`}>{fmt(v)}</ITText>
+  );
+  const columns: Column<RequestLine>[] = [
+    {
+      key: "name",
+      label: t("detail.item"),
+      type: "string",
+      width: 260,
+      filter: true,
+      render: (l) => (
+        <ITFlex direction="column">
+          <ITText className="text-[12px] font-bold">{l.product.name}</ITText>
+          <ITText muted className="font-mono text-[11px]">{[l.product.code, l.product.size].filter(Boolean).join(" · ")}</ITText>
+        </ITFlex>
+      ),
+    },
+    { key: "requestedQty", label: t("detail.requested"), type: "number", width: 110, render: (l) => num(l.requestedQty) },
+    { key: "deliveredQty", label: t("detail.delivered"), type: "number", width: 110, render: (l) => num(l.deliveredQty) },
+    { key: "receivedQty", label: t("detail.received"), type: "number", width: 110, render: (l) => num(l.receivedQty) },
+    { key: "pendingQty", label: t("detail.pending"), type: "number", width: 110, render: (l) => num(l.pendingQty, true) },
+  ];
+  return (
+    <ITDataTable
+      showViewToggle={false}
+      columns={columns as unknown as Column<Record<string, unknown>>[]}
+      fetchData={fetchData as never}
+      size="lg"
+      defaultItemsPerPage={25}
+      itemsPerPageOptions={[25, 50, 100]}
+      layout="fixed"
+      density="compact"
+      rowHeight={56}
+    />
+  );
+}
 
 interface Props {
   id: string;
@@ -22,6 +74,7 @@ interface Props {
 /** Detalle del pedido (formato del hotel): Solicitado / Entregado / Recibido / Pendiente, traspasos y firmas. */
 export default function SupplyRequestDetailView({ id, requestCosign }: Props) {
   const { t } = useTranslation("hotel-linen-laundry");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const canRequest = useCan("hotel_linen.request");
   const canFulfill = useCan("hotel_linen.fulfill");
@@ -55,6 +108,7 @@ export default function SupplyRequestDetailView({ id, requestCosign }: Props) {
     setError(null);
     try {
       setDetail(await action());
+      notify();
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -86,7 +140,6 @@ export default function SupplyRequestDetailView({ id, requestCosign }: Props) {
     (s, l) => ({ r: s.r + l.requestedQty, d: s.d + l.deliveredQty, rc: s.rc + l.receivedQty, p: s.p + l.pendingQty }),
     { r: 0, d: 0, rc: 0, p: 0 }
   );
-  const cell = "text-[12px] tabular-nums text-right";
 
   return (
     <ITFlex direction="column" gap={4}>
@@ -96,6 +149,26 @@ export default function SupplyRequestDetailView({ id, requestCosign }: Props) {
         </ITAlert>
       )}
 
+      <ITGrid container columns={12} spacing={3}>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("detail.requested")} value={fmt(totals.r)} icon={<FaClipboardList size={14} />} tone="sky" />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("detail.delivered")} value={fmt(totals.d)} icon={<FaTruck size={14} />} tone={totals.d > 0 ? "violet" : "neutral"} />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("detail.received")} value={fmt(totals.rc)} icon={<FaBoxes size={14} />} tone={totals.rc > 0 ? "emerald" : "neutral"} />
+        </ITGrid>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile
+            label={t("detail.pending")}
+            value={fmt(totals.p)}
+            icon={<FaExclamationTriangle size={14} />}
+            tone={totals.p > 0 ? "amber" : "neutral"}
+            hint={totals.p === 0 ? t("dirty.form.allGood") : undefined}
+          />
+        </ITGrid>
+      </ITGrid>
       <PanelCard
         title={detail.folio}
         description={`${detail.source.name} → ${detail.area.name}`}
@@ -139,37 +212,8 @@ export default function SupplyRequestDetailView({ id, requestCosign }: Props) {
       </PanelCard>
 
       <PanelCard title={t("detail.lines")}>
-        <ITFlex direction="column" gap={2}>
-          <ITGrid container columns={12} spacing={3}>
-            <ITGrid item xs={4}><ITText muted className="text-[11px]">{t("detail.item")}</ITText></ITGrid>
-            {(["requested", "delivered", "received", "pending"] as const).map((k) => (
-              <ITGrid key={k} item xs={2}><ITText muted className="text-right text-[11px]">{t(`detail.${k}`)}</ITText></ITGrid>
-            ))}
-          </ITGrid>
-          {detail.lines.map((l) => (
-            <ITGrid key={l.id} container columns={12} spacing={3} className="items-center">
-              <ITGrid item xs={4}>
-                <ITText className="text-[12px] font-bold">{l.product.name}</ITText>
-                <ITText muted className="font-mono text-[11px]">{[l.product.code, l.product.size].filter(Boolean).join(" · ")}</ITText>
-              </ITGrid>
-              <ITGrid item xs={2}><ITText className={cell}>{fmt(l.requestedQty)}</ITText></ITGrid>
-              <ITGrid item xs={2}><ITText className={cell}>{fmt(l.deliveredQty)}</ITText></ITGrid>
-              <ITGrid item xs={2}><ITText className={cell}>{fmt(l.receivedQty)}</ITText></ITGrid>
-              <ITGrid item xs={2}>
-                <ITText className={`${cell} ${l.pendingQty > 0 ? "font-bold text-[var(--color-warning)]" : ""}`}>{fmt(l.pendingQty)}</ITText>
-              </ITGrid>
-            </ITGrid>
-          ))}
-          <ITGrid container columns={12} spacing={3} className="items-center border-t pt-2">
-            <ITGrid item xs={4}><ITText className="text-[12px] font-bold">{t("detail.total")}</ITText></ITGrid>
-            <ITGrid item xs={2}><ITText className={`${cell} font-bold`}>{fmt(totals.r)}</ITText></ITGrid>
-            <ITGrid item xs={2}><ITText className={`${cell} font-bold`}>{fmt(totals.d)}</ITText></ITGrid>
-            <ITGrid item xs={2}><ITText className={`${cell} font-bold`}>{fmt(totals.rc)}</ITText></ITGrid>
-            <ITGrid item xs={2}><ITText className={`${cell} font-bold`}>{fmt(totals.p)}</ITText></ITGrid>
-          </ITGrid>
-        </ITFlex>
+        <LinesTable lines={detail.lines} />
       </PanelCard>
-
       <PanelCard title={t("detail.transfers")} description={t("detail.transfersHint")}>
         {detail.transfers.length === 0 ? (
           <ITText muted>{t("detail.noTransfers")}</ITText>

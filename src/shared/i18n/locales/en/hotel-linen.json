@@ -10,7 +10,9 @@
     "reactivate": "Reactivate",
     "none": "Unassigned",
     "all": "All",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "allGood": "All good",
+    "close": "Close"
   },
   "kind": {
     "LINEN": "Linen",
@@ -63,7 +65,14 @@
       "cost": "Last cost",
       "washLife": "Wash life (washes)",
       "standard": "Standard per occupied room"
-    }
+    },
+    "kpi": {
+      "active": "Active items",
+      "linen": "Linen",
+      "consumable": "Consumables",
+      "inactive": "Inactive"
+    },
+    "formSubtitle": "Item details: type, size, par, minimum and cost."
   },
   "areas": {
     "title": "Areas and points",
@@ -99,8 +108,17 @@
       "hint": "Leave an item empty to remove its limit. Max 0 = no maximum.",
       "min": "Minimum",
       "max": "Maximum",
-      "invalid": "Maximum cannot be lower than minimum."
-    }
+      "invalid": "Maximum cannot be lower than minimum.",
+      "subtitle": "Minimum and maximum pieces per item in this warehouse."
+    },
+    "kpi": {
+      "active": "Active areas",
+      "withCustodian": "With custodian",
+      "withoutCustodian": "Without custodian",
+      "locations": "Locations"
+    },
+    "formSubtitle": "Code, name, type and custodian of the warehouse, linen room or point.",
+    "locationSubtitle": "Add a location (shelf, cart, room) inside the area."
   },
   "cosign": {
     "hint": "The other person confirms with their username and password.",
@@ -108,7 +126,8 @@
     "password": "Password",
     "confirm": "Sign",
     "titleDelivers": "Delivering person's signature",
-    "titleReceives": "Receiving person's signature"
+    "titleReceives": "Receiving person's signature",
+    "subtitle": "Another person confirms with their username and password."
   },
   "stock": {
     "title": "Stock",
@@ -143,7 +162,8 @@
       "title": "Lots of {{name}}",
       "empty": "No lots recorded.",
       "balance": "Balance {{n}}",
-      "received": "Received {{date}} · initial {{n}}"
+      "received": "Received {{date}} · initial {{n}}",
+      "subtitle": "Item lots and where each piece is."
     }
   },
   "transfers": {
@@ -194,7 +214,8 @@
       "removeLine": "Remove",
       "notes": "Notes (optional)",
       "cosign": "Delivering person signs (another person confirms with their password)",
-      "send": "Send transfer"
+      "send": "Send transfer",
+      "totalPieces": "Pieces to send"
     },
     "detail": {
       "title": "Transfer detail",
@@ -217,6 +238,11 @@
       "cancelMessage": "What was sent goes back to the origin warehouse. Continue?",
       "signatures": "Signatures",
       "noSignatures": "No signatures."
+    },
+    "toast": {
+      "sent": "Transfer sent",
+      "received": "Transfer received",
+      "cancelled": "Transfer cancelled"
     }
   },
   "roomPar": {

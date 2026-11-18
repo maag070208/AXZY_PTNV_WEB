@@ -138,7 +138,8 @@
       "ROOM_EXTRA": "Adicional",
       "LOAN_OUT": "Préstamo",
       "LOAN_RETURN": "Devolución de préstamo",
-      "EXTRA_RETURN": "Devolución de adicional"
+      "EXTRA_RETURN": "Devolución de adicional",
+      "AMENITY_DELIVERY": "Entrega de amenidades"
     },
     "docHold": "A cuarentena (baja en trámite)",
     "docRelease": "Regreso de cuarentena",
@@ -200,7 +201,8 @@
       "receives": "Recibe",
       "lends": "Presta",
       "closes": "Cierra turno"
-    }
+    },
+    "subtitle": "Formatos en blanco para llenar a mano."
   },
   "dash": {
     "title": "Blancos",
@@ -281,5 +283,8 @@
     "loss": "Faltó en traspasos",
     "stock": "Existencia hoy",
     "none": "Sin áreas con movimientos en el periodo."
+  },
+  "common": {
+    "close": "Cerrar"
   }
 }

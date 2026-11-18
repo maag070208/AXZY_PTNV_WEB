@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITDialog, ITFlex, ITGrid, ITInput, ITInputNumber, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITFlex, ITGrid, ITInput, ITInputNumber, ITText, ITTextarea } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { purchaseApi, type PurchaseOrderDetail } from "@entities/hotel-linen";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { qty } from "../lib";
+import { LuPackageCheck } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Draft {
   received: number | null;
@@ -22,6 +26,7 @@ interface Props {
 /** Recepción contra factura y OC: por renglón recibido / aceptado / apartado (con motivo). */
 export default function ReceiveDialog({ order, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-purchase");
+  const notify = useSuccessToast();
   const requestKey = useRequestKey();
   const [invoice, setInvoice] = useState("");
   const [notes, setNotes] = useState("");
@@ -77,6 +82,7 @@ export default function ReceiveDialog({ order, onClose, onDone }: Props) {
         }),
       };
       await purchaseApi.receive(order.id, body, requestKey(body));
+      notify(t("toast.received"));
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -86,7 +92,8 @@ export default function ReceiveDialog({ order, onClose, onDone }: Props) {
   };
 
   return (
-    <ITDialog isOpen={order !== null} onClose={onClose} title={order ? t("receive.title", { folio: order.folio }) : ""}>
+    <ITDialog isOpen={order !== null} onClose={onClose}>
+      <DialogHeader icon={<LuPackageCheck />} title={order ? t("receive.title", { folio: order.folio }) : ""} subtitle={t("receive.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[860px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         <ITText muted className="text-[12px]">{t("receive.hint")}</ITText>
@@ -119,10 +126,7 @@ export default function ReceiveDialog({ order, onClose, onDone }: Props) {
         {lineErrors.some(Boolean) && <ITAlert variant="warning">{t("receive.lineInvalid")}</ITAlert>}
         {exceeds && <ITAlert variant="warning">{t("receive.overHint")}</ITAlert>}
         <ITTextarea name="receiveNotes" label={t("receive.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton variant="filled" color="primary" label={t("receive.confirm")} disabled={busy || !valid} onClick={() => void submit()} />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("receive.confirm")} busy={busy} disabled={!valid} />
       </ITFlex>
     </ITDialog>
   );

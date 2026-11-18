@@ -138,7 +138,8 @@
       "ROOM_EXTRA": "Room extra",
       "LOAN_OUT": "Loan",
       "LOAN_RETURN": "Loan return",
-      "EXTRA_RETURN": "Extra return"
+      "EXTRA_RETURN": "Extra return",
+      "AMENITY_DELIVERY": "Amenity delivery"
     },
     "docHold": "To quarantine (write-off in progress)",
     "docRelease": "Back from quarantine",
@@ -200,7 +201,8 @@
       "receives": "Receives",
       "lends": "Lends",
       "closes": "Closes shift"
-    }
+    },
+    "subtitle": "Blank forms to fill in by hand."
   },
   "dash": {
     "title": "Linen",
@@ -281,5 +283,8 @@
     "loss": "Lost in transfers",
     "stock": "Stock today",
     "none": "No areas with movements in the period."
+  },
+  "common": {
+    "close": "Close"
   }
 }

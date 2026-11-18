@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { ITAlert, ITButton, ITInputNumber, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ITAlert, ITButton, ITDataTable, ITFlex, ITInputNumber, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import type { Column } from "@axzydev/axzy_ui_system";
+import { FaInbox } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { ROOM_COMPONENTS, roomParApi, type RoomComponent, type RoomParKind, type RoomParMatrix } from "@entities/hotel-linen";
 import { useCan } from "@entities/user";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 import { PanelCard } from "@shared/ui/panel-card";
 
 const cellKey = (productId: string, component: RoomComponent) => `${productId}:${component}`;
@@ -54,55 +57,66 @@ export default function RoomParMatrixPanel({ kind }: Props) {
     }
   };
 
+  const fetchData = useMemo(
+    () => makeClientTableFetch<RoomParMatrix["products"][number]>(async () => data?.products ?? [], {}),
+    [data]
+  );
+  const columns: Column<RoomParMatrix["products"][number]>[] = [
+    {
+      key: "name",
+      label: t("roomPar.product"),
+      type: "string",
+      width: 260,
+      filter: true,
+      render: (p) => <ITText className="text-[12px] font-semibold">{`${p.code} · ${p.name}`}</ITText>,
+    },
+    ...ROOM_COMPONENTS.map((c) => ({
+      key: c,
+      label: t(`roomPar.components.${c}`),
+      type: "string" as const,
+      width: 130,
+      sortable: false,
+      render: (p: RoomParMatrix["products"][number]) => (
+        <ITInputNumber
+          name={`par-${p.id}-${c}`}
+          label=""
+          decimals={0}
+          min={0}
+          max={999}
+          disabled={!canEdit}
+          value={values[cellKey(p.id, c)] ?? 0}
+          onChange={(v) => setValues((prev) => ({ ...prev, [cellKey(p.id, c)]: v ?? 0 }))}
+        />
+      ),
+    })),
+  ];
+
   return (
     <PanelCard
-      title={t("roomPar.title")}
-      description={t("roomPar.description")}
       actions={
         canEdit ? <ITButton variant="filled" color="primary" label={t("roomPar.save")} disabled={saving} onClick={save} /> : undefined
       }
     >
       {error && <ITAlert variant="error">{error}</ITAlert>}
-      {!canEdit && <ITText>{t("roomPar.readOnly")}</ITText>}
-      {data && data.products.length === 0 && <ITText>{t("roomPar.empty")}</ITText>}
+      {!canEdit && <ITAlert variant="info">{t("roomPar.readOnly")}</ITAlert>}
+      {data && data.products.length === 0 && (
+        <ITFlex direction="column" align="center" gap={2} className="py-8">
+          <FaInbox size={22} className="opacity-40" />
+          <ITText muted className="text-[12px]">{t("roomPar.empty")}</ITText>
+        </ITFlex>
+      )}
       {data && data.products.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left">
-                <th className="p-2">{t("roomPar.product")}</th>
-                {ROOM_COMPONENTS.map((c) => (
-                  <th key={c} className="p-2">
-                    {t(`roomPar.components.${c}`)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.products.map((p) => (
-                <tr key={p.id}>
-                  <td className="p-2 whitespace-nowrap">
-                    {p.code} · {p.name}
-                  </td>
-                  {ROOM_COMPONENTS.map((c) => (
-                    <td key={c} className="p-2">
-                      <ITInputNumber
-                        name={`par-${p.id}-${c}`}
-                        label=""
-                        decimals={0}
-                        min={0}
-                        max={999}
-                        disabled={!canEdit}
-                        value={values[cellKey(p.id, c)] ?? 0}
-                        onChange={(v) => setValues((prev) => ({ ...prev, [cellKey(p.id, c)]: v ?? 0 }))}
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ITDataTable
+          showViewToggle={false}
+          columns={columns as unknown as Column<Record<string, unknown>>[]}
+          fetchData={fetchData as never}
+          size="lg"
+          defaultItemsPerPage={25}
+          itemsPerPageOptions={[25, 50, 100]}
+          layout="fixed"
+          density="compact"
+          rowHeight={64}
+        />
       )}
       {toast && <ITToast message={toast} type="success" position="bottom-center" duration={2000} onClose={() => setToast(null)} />}
     </PanelCard>

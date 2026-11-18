@@ -77,6 +77,16 @@
     "totalMissing": "Faltante: {{n}}",
     "totalSurplus": "Sobrante: {{n}}",
     "notes": "Nota",
-    "lines": "Artículos"
+    "lines": "Artículos",
+    "kpi": {
+      "expected": "Esperado",
+      "counted": "Contado",
+      "missing": "Faltante",
+      "surplus": "Sobrante"
+    },
+    "allGood": "Todo en orden"
+  },
+  "toast": {
+    "created": "Revisión registrada"
   }
 }

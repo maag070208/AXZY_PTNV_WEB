@@ -49,7 +49,8 @@
     "taxTotal": "IVA",
     "total": "Total",
     "notes": "Notas",
-    "save": "Guardar"
+    "save": "Guardar",
+    "subtitle": "Proveedor, fecha de entrega y renglones de la orden de compra."
   },
   "detail": {
     "title": "Orden {{folio}}",
@@ -68,7 +69,8 @@
     "approve": "Aprobar",
     "cancel": "Cancelar OC",
     "receive": "Recibir",
-    "close": "Cerrar con faltante"
+    "close": "Cerrar con faltante",
+    "subtitle": "Estado, renglones y recepciones de la orden de compra."
   },
   "receive": {
     "title": "Recepción de {{folio}}",
@@ -83,7 +85,8 @@
     "lineInvalid": "Aceptado + apartado no puede superar lo recibido, y lo apartado necesita motivo.",
     "overHint": "Estás recibiendo más de lo pedido. Si pasa de la tolerancia se exigen notas y permiso de aprobación de compras.",
     "confirm": "Registrar recepción",
-    "lots": "Lotes"
+    "lots": "Lotes",
+    "subtitle": "Captura lo recibido contra la factura del proveedor."
   },
   "holds": {
     "hint": "Mercancía con diferencia contra la factura: no entra a inventario hasta aceptarla. Devolver la saca del sistema.",
@@ -134,7 +137,8 @@
       "OPEN": "Abierta",
       "CONVERTED": "Convertida",
       "DISMISSED": "Descartada"
-    }
+    },
+    "detailSubtitle": "Piezas solicitadas: conviértelas en orden de compra o descártalas."
   },
   "pdf": {
     "title": "Orden de compra",
@@ -146,5 +150,12 @@
     "prepared": "Elaboró",
     "authorized": "Autorizó",
     "footer": "Orden de compra de blancos del hotel"
+  },
+  "toast": {
+    "received": "Recepción registrada",
+    "dismissed": "Solicitud descartada",
+    "converted": "Orden de compra creada",
+    "saved": "Orden guardada",
+    "resolved": "Apartado resuelto"
   }
 }

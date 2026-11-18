@@ -24,6 +24,8 @@
     "CANCELLED": "Cancelled"
   },
   "form": {
+    "itemsKpi": "Items",
+    "piecesKpi": "Pieces",
     "title": "New area request",
     "description": "Pick the area, enter checkouts and occupied rooms, and request pieces per item.",
     "area": "Area",
@@ -100,7 +102,8 @@
     "deliverNow": "Deliver now",
     "overPending": "Some lines have more pieces than pending.",
     "cosign": "Floor attendant co-signs (confirms with their password)",
-    "confirm": "Supply"
+    "confirm": "Supply",
+    "subtitle": "Deliver what is available and leave the rest pending for the next delivery."
   },
   "dirty": {
     "title": "Dirty linen intake",
@@ -132,6 +135,7 @@
       "damaged": "Damaged"
     },
     "form": {
+      "allGood": "All good",
       "title": "New dirty linen intake",
       "description": "Count the cart per item. On save, the person delivering signs with their user and password.",
       "origin": "Origin area",
@@ -180,20 +184,23 @@
       "lotAuto": "Automatic (oldest)",
       "quantity": "Quantity ({{max}} available)",
       "over": "Only {{max}} available in that stage.",
-      "confirm": "Move"
+      "confirm": "Move",
+      "subtitle": "Move pieces from one laundry stage to the next."
     },
     "firstWash": {
       "action": "First wash (from new)",
       "title": "First wash",
       "hint": "Moves new linen to the laundry for its first wash; it enters as dirty.",
       "from": "New linen warehouse",
-      "fromDefault": "Default"
+      "fromDefault": "Default",
+      "subtitle": "First wash of new pieces before they go into use."
     },
     "supplierReturn": {
       "action": "Return to warehouse as factory defect",
       "title": "Factory defect return",
       "hint": "Sends pieces with factory defects back to the warehouse to return them to the supplier.",
-      "notes": "Defect reason (required)"
+      "notes": "Defect reason (required)",
+      "subtitle": "Return of pieces to the supplier, with the reason."
     },
     "lines": {
       "item": "Item",
@@ -221,5 +228,13 @@
       "stillInUse": "In use",
       "shortage": "Shortage"
     }
+  },
+  "toast": {
+    "created": "Request saved as draft",
+    "moved": "Move recorded",
+    "fulfilled": "Request supplied",
+    "sent": "Request sent to laundry",
+    "firstWash": "First wash recorded",
+    "supplierReturn": "Supplier return recorded"
   }
 }

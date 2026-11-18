@@ -44,7 +44,8 @@
       "quantity": "Pieces",
       "cost": "Cost",
       "photos": "Photos",
-      "disposition": "Destination"
+      "disposition": "Destination",
+      "product": "Item"
     },
     "new": {
       "action": "New write-off",
@@ -99,7 +100,9 @@
       "confirmReject": "Reject write-off",
       "cosign": "Someone else signs (username and password)",
       "cosignTitle": "Write-off signature",
-      "quarantined": "The piece is held in the laundry quarantine until the write-off is approved or rejected."
+      "quarantined": "The piece is held in the laundry quarantine until the write-off is approved or rejected.",
+      "approveSubtitle": "Decide what happens to the written-off pieces and confirm with your signature.",
+      "rejectSubtitle": "Explain why the write-off is rejected; the pieces return to inventory."
     },
     "role": {
       "DELIVERS": "Requests",
@@ -136,7 +139,8 @@
       "warehouse": "Warehouse",
       "notes": "Notes",
       "create": "Create count",
-      "blind": "Blind count"
+      "blind": "Blind count",
+      "subtitle": "Choose the warehouse. The count is blind: system stock is not shown."
     },
     "status": {
       "DRAFT": "Draft",
@@ -178,6 +182,12 @@
       "C": "C · Fair",
       "D": "D · Worn",
       "E": "E · Write-off"
+    },
+    "toast": {
+      "created": "Count started"
     }
+  },
+  "toast": {
+    "created": "Write-off requested"
   }
 }

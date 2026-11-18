@@ -18,9 +18,11 @@ import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { fmt, fmtDateTime, money } from "../lib";
 import ReturnLoanDialog from "./ReturnLoanDialog";
 import ShiftCloseDialog from "./ShiftCloseDialog";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   /** La página provee la co-firma (las features no se importan entre sí). */
@@ -39,6 +41,7 @@ const STATUS_COLOR: Record<string, "primary" | "success" | "warning" | "danger">
 /** Préstamo de toallas por punto: resumen de caja, alta de vale, abiertos con devolución y corte de turno. */
 export default function LoansView({ requestCosign, onClosed }: Props) {
   const { t } = useTranslation("hotel-linen-reception");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const canLend = useCan("hotel_linen.loans");
   const canClose = useCan("hotel_linen.shift_close");
@@ -99,6 +102,7 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
     setError(null);
     try {
       await receptionApi.createLoan({ warehouseId: pointId, productId, quantity: qty, guestName: guest.trim(), room: room.trim() || null, depositMethod: method });
+      notify(t("toast.loanCreated"));
       setQty(null);
       setGuest("");
       setRoom("");
@@ -121,6 +125,7 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
       { key: "folio", label: t("loans.columns.folio"), type: "string", width: 100, filter: true, render: (r) => <ITText className="font-mono text-[12px] font-bold">{r.folio}</ITText> },
       { key: "lentAt", label: t("loans.columns.lentAt"), type: "date", width: 150, filter: "date-range", render: (r) => <ITText className="text-[12px]">{fmtDateTime(r.lentAt)}</ITText> },
       { key: "guest", label: t("loans.columns.guest"), type: "string", width: 180, filter: true, render: (r) => <ITText className="text-[12px]">{r.guestName}{r.room ? ` · ${r.room}` : ""}</ITText> },
+      { key: "lentBy", label: t("loans.columns.lentBy"), type: "string", width: 170, sortable: false, render: (r) => <ITFlex align="center" gap={2}><ProfileAvatar name={r.lentBy.name} size="xs" /><ITText className="text-[12px]">{r.lentBy.name}</ITText></ITFlex> },
       { key: "product", label: t("loans.columns.product"), type: "string", width: 160, sortable: false, render: (r) => <ITText className="text-[12px]">{r.product.name}</ITText> },
       { key: "quantity", label: t("loans.columns.quantity"), type: "number", width: 110, sortable: false, render: (r) => <ITText className="text-[12px] tabular-nums">{fmt(r.returnedQty)} / {fmt(r.quantity)}</ITText> },
       { key: "depositMethod", label: t("loans.columns.method"), type: "string", width: 110, sortable: false, render: (r) => <ITText className="text-[12px]">{tt(`method.${r.depositMethod}`)}</ITText> },
@@ -172,21 +177,21 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
             value={pointId}
             onChange={(e) => setPointId(e.target.value)}
           />
-          <ITGrid container spacing={2}>
-            <ITGrid item xs={6} md={3}>
-              <KpiTile label={t("loans.kpi.lent")} value={fmt(summary?.lentPending ?? 0)} icon={<FaHandHolding size={14} />} tone="sky" hint={t("loans.kpi.openLoans", { count: summary?.openLoans ?? 0 })} />
-            </ITGrid>
+          <ITText as="div" className="grid !grid-cols-2 gap-3 md:!grid-cols-4">
+            <KpiTile size="sm" label={t("loans.kpi.lent")} value={fmt(summary?.lentPending ?? 0)} icon={<FaHandHolding size={12} />} tone={(summary?.lentPending ?? 0) === 0 ? "neutral" : "sky"} hint={t("loans.kpi.openLoans", { count: summary?.openLoans ?? 0 })} />
             {DEPOSIT_METHODS.map((m) => (
-              <ITGrid item xs={6} md={3} key={m}>
-                <KpiTile label={t("loans.kpi.deposit", { method: tt(`method.${m}`) })} value={money(summary?.deposits[m] ?? 0)} icon={<FaMoneyBillWave size={14} />} tone={m === "CASH" ? "emerald" : m === "CARD" ? "violet" : "amber"} />
-              </ITGrid>
+              <KpiTile key={m} size="sm" label={t("loans.kpi.deposit", { method: tt(`method.${m}`) })} value={money(summary?.deposits[m] ?? 0)} icon={<FaMoneyBillWave size={12} />} tone={(summary?.deposits[m] ?? 0) === 0 ? "neutral" : m === "CASH" ? "emerald" : m === "CARD" ? "violet" : "amber"} />
             ))}
-          </ITGrid>
+          </ITText>
         </ITFlex>
       </PanelCard>
 
       {canLend && (
-        <PanelCard title={t("loans.new.title")}>
+        <PanelCard
+          title={t("loans.new.title")}
+          description={t("loans.new.deposit", { amount: money(deposit), unit: money(summary?.depositUnit ?? 0) })}
+          actions={<ITButton variant="filled" color="primary" label={t("loans.new.submit")} disabled={busy || !pointId || !productId || !qty || !guest.trim()} onClick={() => void submit()} />}
+        >
           <ITGrid container spacing={2}>
             <ITGrid item xs={12} md={3}>
               <ITInput name="loanGuest" label={t("loans.new.guest")} value={guest} onChange={(e) => setGuest(e.target.value)} />
@@ -204,10 +209,6 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
               <ITSelect name="loanMethod" label={t("loans.new.method")} options={DEPOSIT_METHODS.map((m) => ({ value: m, label: tt(`method.${m}`) }))} value={method} onChange={(e) => setMethod(e.target.value as DepositMethod)} />
             </ITGrid>
           </ITGrid>
-          <ITFlex align="center" justify="between" className="mt-3">
-            <ITText muted>{t("loans.new.deposit", { amount: money(deposit), unit: money(summary?.depositUnit ?? 0) })}</ITText>
-            <ITButton variant="filled" color="primary" label={t("loans.new.submit")} disabled={busy || !pointId || !productId || !qty || !guest.trim()} onClick={() => void submit()} />
-          </ITFlex>
         </PanelCard>
       )}
 

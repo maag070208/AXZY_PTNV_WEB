@@ -24,6 +24,8 @@
     "CANCELLED": "Cancelado"
   },
   "form": {
+    "itemsKpi": "Artículos",
+    "piecesKpi": "Piezas",
     "title": "Nuevo pedido de área",
     "description": "Elige el área, captura salidas y ocupadas, y pide las piezas por artículo.",
     "area": "Área",
@@ -100,7 +102,8 @@
     "deliverNow": "Entregar ahora",
     "overPending": "Hay renglones con más piezas de las pendientes.",
     "cosign": "Co-firma el auxiliar de piso (confirma con su contraseña)",
-    "confirm": "Surtir"
+    "confirm": "Surtir",
+    "subtitle": "Surte lo que hay y deja el resto pendiente para la siguiente entrega."
   },
   "dirty": {
     "title": "Recepción de sucios",
@@ -132,6 +135,7 @@
       "damaged": "Roto"
     },
     "form": {
+      "allGood": "Todo en orden",
       "title": "Nueva recepción de sucios",
       "description": "Cuenta el carro por artículo. Al guardar, quien entrega firma con su usuario y contraseña.",
       "origin": "Área de origen",
@@ -180,20 +184,23 @@
       "lotAuto": "Automático (el más antiguo)",
       "quantity": "Cantidad (disponible {{max}})",
       "over": "Solo hay {{max}} disponibles en esa etapa.",
-      "confirm": "Pasar"
+      "confirm": "Pasar",
+      "subtitle": "Pasa piezas de una etapa de la lavandería a la siguiente."
     },
     "firstWash": {
       "action": "Primera lavada (desde nuevos)",
       "title": "Primera lavada",
       "hint": "Pasa blancos nuevos a lavandería para su primera lavada; entran como sucios.",
       "from": "Almacén de nuevos",
-      "fromDefault": "Predeterminado"
+      "fromDefault": "Predeterminado",
+      "subtitle": "Primer lavado de piezas nuevas antes de ponerlas en uso."
     },
     "supplierReturn": {
       "action": "Devolver a almacén por defecto de fábrica",
       "title": "Devolución por defecto de fábrica",
       "hint": "Regresa piezas con defecto de fábrica al almacén para devolverlas al proveedor.",
-      "notes": "Motivo del defecto (obligatorio)"
+      "notes": "Motivo del defecto (obligatorio)",
+      "subtitle": "Devolución de piezas al proveedor, con su motivo."
     },
     "lines": {
       "item": "Artículo",
@@ -221,5 +228,13 @@
       "stillInUse": "En uso",
       "shortage": "Faltante"
     }
+  },
+  "toast": {
+    "created": "Pedido guardado como borrador",
+    "moved": "Movimiento registrado",
+    "fulfilled": "Pedido surtido",
+    "sent": "Pedido enviado a lavandería",
+    "firstWash": "Primer lavado registrado",
+    "supplierReturn": "Devolución al proveedor registrada"
   }
 }

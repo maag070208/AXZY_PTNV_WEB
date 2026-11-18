@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITDialog, ITFlex, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITFlex, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { receptionApi, type TowelLoan } from "@entities/hotel-linen";
 import { fmt, money } from "../lib";
+import { LuUndo2 } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   loan: TowelLoan | null;
@@ -13,6 +17,7 @@ interface Props {
 /** Devolución (parcial permitida): reembolsa cantidad × depósito por toalla. */
 export default function ReturnLoanDialog({ loan, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-reception");
+  const notify = useSuccessToast();
   const [qty, setQty] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +35,7 @@ export default function ReturnLoanDialog({ loan, onClose, onDone }: Props) {
     setError(null);
     try {
       await receptionApi.returnLoan(loan.folio, qty as number);
+      notify(t("toast.returned"));
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -39,16 +45,14 @@ export default function ReturnLoanDialog({ loan, onClose, onDone }: Props) {
   };
 
   return (
-    <ITDialog isOpen={loan !== null} onClose={onClose} title={t("loans.returnDialog.title", { folio: loan?.folio ?? "" })}>
+    <ITDialog isOpen={loan !== null} onClose={onClose}>
+      <DialogHeader icon={<LuUndo2 />} title={t("loans.returnDialog.title", { folio: loan?.folio ?? "" })} subtitle={t("loans.returnDialog.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[380px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         <ITText>{t("loans.returnDialog.pending", { guest: loan?.guestName ?? "", count: fmt(loan?.pendingQty ?? 0) })}</ITText>
         <ITInputNumber name="returnQty" label={t("loans.returnDialog.quantity")} decimals={0} min={0} value={qty} onChange={(v) => setQty(v ?? null)} />
         <ITText muted>{t("loans.returnDialog.refund", { amount: money((qty ?? 0) * (loan?.depositUnit ?? 0)) })}</ITText>
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton variant="filled" color="primary" label={t("loans.returnDialog.confirm")} disabled={busy || !valid} onClick={() => void submit()} />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("loans.returnDialog.confirm")} busy={busy} disabled={!valid} />
       </ITFlex>
     </ITDialog>
   );

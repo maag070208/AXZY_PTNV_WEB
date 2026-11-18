@@ -24,6 +24,7 @@ import {
 import { dyn } from "@shared/i18n/dyn";
 import { newId } from "@shared/lib/newId";
 import { PanelCard } from "@shared/ui/panel-card";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface LineDraft {
   id: string;
@@ -70,6 +71,7 @@ interface Props {
 /** Nueva baja: almacén, renglones artículo/lote/cantidad/motivo y fotos (cámara o archivo). */
 export default function WriteoffForm({ onDone, onCancel }: Props) {
   const { t } = useTranslation("hotel-linen-writeoff");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const fileInput = useRef<HTMLInputElement>(null);
   const [warehouses, setWarehouses] = useState<HotelWarehouse[]>([]);
@@ -161,6 +163,7 @@ export default function WriteoffForm({ onDone, onCancel }: Props) {
           reasonCode: l.reason as WriteoffReasonCode,
         })),
       });
+      notify(t("toast.created"));
       onDone(created.map((w) => w.id));
     } catch (e) {
       setError((e as Error).message);
@@ -170,7 +173,14 @@ export default function WriteoffForm({ onDone, onCancel }: Props) {
   };
 
   return (
-    <PanelCard title={t("writeoffs.new.title")} description={t("writeoffs.new.description")}>
+    <PanelCard
+      actions={
+        <ITFlex gap={2}>
+          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
+          <ITButton variant="filled" color="primary" label={t("writeoffs.new.submit")} disabled={busy || !valid} onClick={() => void submit()} />
+        </ITFlex>
+      }
+    >
       <ITFlex direction="column" gap={4}>
         {error && (
           <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -207,7 +217,7 @@ export default function WriteoffForm({ onDone, onCancel }: Props) {
 
         <ITText className="text-[12px] font-semibold">{t("writeoffs.new.lines")}</ITText>
         {lines.map((line, index) => (
-          <ITGrid key={line.id} container columns={12} spacing={3}>
+          <ITGrid key={line.id} container columns={12} spacing={3} className="items-end">
             <ITGrid item xs={12} md={4}>
               <ITSearchSelect
                 name={`writeoffProduct${index}`}
@@ -310,16 +320,6 @@ export default function WriteoffForm({ onDone, onCancel }: Props) {
 
         <ITTextarea name="writeoffNotes" label={t("writeoffs.new.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
 
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
-          <ITButton
-            variant="filled"
-            color="primary"
-            label={t("writeoffs.new.submit")}
-            disabled={busy || !valid}
-            onClick={() => void submit()}
-          />
-        </ITFlex>
       </ITFlex>
     </PanelCard>
   );

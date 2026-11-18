@@ -58,5 +58,8 @@
     "received": "Received",
     "sentBy": "Delivered by",
     "notes": "Notes"
+  },
+  "toast": {
+    "created": "Amenity delivery recorded"
   }
 }

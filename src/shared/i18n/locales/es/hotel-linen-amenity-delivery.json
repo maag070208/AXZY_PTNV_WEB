@@ -58,5 +58,8 @@
     "received": "Recibido",
     "sentBy": "Entregó",
     "notes": "Notas"
+  },
+  "toast": {
+    "created": "Entrega de amenidades registrada"
   }
 }

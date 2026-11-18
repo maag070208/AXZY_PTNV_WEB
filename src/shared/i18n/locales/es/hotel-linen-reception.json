@@ -86,14 +86,16 @@
       "quantity": "Devuelto / prestado",
       "method": "Método",
       "deposit": "Depósito",
-      "status": "Estado"
+      "status": "Estado",
+      "lentBy": "Prestó"
     },
     "returnDialog": {
       "title": "Devolver toallas {{folio}}",
       "pending": "{{guest}} tiene {{count}} toalla(s) por devolver.",
       "quantity": "Cantidad que devuelve",
       "refund": "Se devuelve de depósito: {{amount}}",
-      "confirm": "Devolver"
+      "confirm": "Devolver",
+      "subtitle": "Registra las toallas que devuelve el huésped; se reembolsa su depósito."
     }
   },
   "close": {
@@ -110,7 +112,8 @@
       "collected": "Depósitos cobrados: {{amount}}",
       "returnedDeposit": "Depósitos devueltos: {{amount}}",
       "retained": "Depósitos retenidos: {{amount}}"
-    }
+    },
+    "subtitle": "Resumen de toallas y depósitos del turno antes de cerrar el punto."
   },
   "closes": {
     "title": "Cortes de turno",
@@ -159,7 +162,8 @@
       "delivered": "Se entregaron {{count}} × {{product}}.",
       "quantity": "Cantidad recolectada",
       "missing": "Faltan {{count}}: quedan como faltante y se avisa a Recepción.",
-      "confirm": "Confirmar"
+      "confirm": "Confirmar",
+      "subtitle": "Registra las piezas que se recogieron del cuarto."
     },
     "table": {
       "title": "Historial de adicionales"
@@ -172,6 +176,11 @@
       "requestedBy": "Solicitó",
       "status": "Estado",
       "missing": "Faltante"
+    },
+    "toast": {
+      "collected": "Recolección registrada",
+      "created": "Adicional registrado",
+      "delivered": "Adicional entregado"
     }
   },
   "equipment": {
@@ -192,7 +201,10 @@
       "deliver": "Entregar (prueba)",
       "deliverCosign": "Entregar con firma",
       "return": "Retirar",
-      "cosignTitle": "Firma de quien entrega el equipo"
+      "cosignTitle": "Firma de quien entrega el equipo",
+      "requested": "Solicitado",
+      "deliveredByCol": "Entregó",
+      "pending": "Por entregar"
     },
     "return": {
       "title": "Retirar {{tag}}",
@@ -203,7 +215,8 @@
       "ticketHint": "Se abre un ticket de mantenimiento y se avisa a Recepción para el cargo.",
       "notes": "Notas",
       "confirm": "Retirar",
-      "notesRequired": "Escribe qué pasó con el equipo."
+      "notesRequired": "Escribe qué pasó con el equipo.",
+      "subtitle": "Registra en qué condición regresa el equipo."
     },
     "add": {
       "title": "Alta de piezas",
@@ -223,6 +236,16 @@
     },
     "repaired": "Reparado",
     "retire": "Retirar de uso",
-    "reactivate": "Reactivar"
+    "reactivate": "Reactivar",
+    "toast": {
+      "delivered": "Equipo entregado",
+      "returned": "Devolución de equipo registrada"
+    }
+  },
+  "toast": {
+    "loanCreated": "Préstamo registrado",
+    "closed": "Corte de turno registrado",
+    "returned": "Devolución registrada",
+    "reviewed": "Corte revisado"
   }
 }

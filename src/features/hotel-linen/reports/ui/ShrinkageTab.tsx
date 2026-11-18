@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITAlert, ITFlex, ITGrid } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITFlex } from "@axzydev/axzy_ui_system";
 import { FaBalanceScale } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { SHRINKAGE_SOURCES, reportApi, type ShrinkageReport } from "@entities/hotel-linen";
@@ -7,7 +7,8 @@ import { dyn } from "@shared/i18n/dyn";
 import type { ReportDoc } from "@shared/lib/reportDoc";
 import { KpiTile } from "@shared/ui/kpi-tile";
 import { defaultFrom, fmt, fmtDay, money, productLabel, todayStr } from "../lib";
-import { ExportBar, PeriodFields, ReportTable, td, tdLeft, th, thLeft, type ExportPdf } from "./common";
+import { PanelCard } from "@shared/ui/panel-card";
+import { ExportBar, PeriodFields, ReportTable, type ExportPdf, type ReportCol } from "./common";
 
 const SOURCE_TONE = { TRANSFER: "sky", COUNT: "violet", TOWEL: "amber", WRITEOFF: "rose" } as const;
 
@@ -57,6 +58,30 @@ export default function ShrinkageTab({ exportPdf }: { exportPdf: ExportPdf }) {
     };
   }, [report, t]);
 
+  type Row = ShrinkageReport["products"][number];
+  const columns: ReportCol<Row>[] = [
+    { key: "item", label: t("shrinkage.item"), width: 240, value: (p) => (p.product ? productLabel(p.product) : p.productId) },
+    ...SHRINKAGE_SOURCES.map((s) => ({
+      key: s,
+      label: t(`shrinkage.source.${s}`),
+      numeric: true,
+      width: 110,
+      value: (p: Row) => p.sources[s],
+      render: (p: Row) => (p.sources[s] ? fmt(p.sources[s]) : "—"),
+    })),
+    { key: "pieces", label: t("shrinkage.pieces"), numeric: true, width: 100, value: (p) => p.pieces, render: (p) => fmt(p.pieces) },
+    { key: "amount", label: t("shrinkage.amount"), numeric: true, width: 120, value: (p) => p.amount, render: (p) => money(p.amount) },
+  ];
+  const reasonRows = useMemo(
+    () => Object.entries(report?.byReason ?? {}).map(([code, v]) => ({ code, pieces: v.pieces, amount: v.amount })),
+    [report]
+  );
+  const reasonColumns: ReportCol<(typeof reasonRows)[number]>[] = [
+    { key: "code", label: t("shrinkage.reason"), width: 260, value: (r) => `${r.code} · ${tt(`shrinkage.reasonName.${r.code}`, { defaultValue: r.code })}` },
+    { key: "pieces", label: t("shrinkage.pieces"), numeric: true, value: (r) => r.pieces, render: (r) => fmt(r.pieces) },
+    { key: "amount", label: t("shrinkage.amount"), numeric: true, value: (r) => r.amount, render: (r) => money(r.amount) },
+  ];
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && <ITAlert variant="error">{error}</ITAlert>}
@@ -66,9 +91,9 @@ export default function ShrinkageTab({ exportPdf }: { exportPdf: ExportPdf }) {
       </ITFlex>
       {report && (
         <>
-          <ITGrid container columns={12} spacing={3}>
+          <div className="grid !grid-cols-2 gap-4 md:!grid-cols-4">
             {SHRINKAGE_SOURCES.map((s) => (
-              <ITGrid item xs={6} md={3} key={s}>
+              
                 <KpiTile
                   label={t(`shrinkage.source.${s}`)}
                   value={fmt(report.bySource[s].pieces)}
@@ -76,55 +101,24 @@ export default function ShrinkageTab({ exportPdf }: { exportPdf: ExportPdf }) {
                   tone={report.bySource[s].pieces > 0 ? SOURCE_TONE[s] : "neutral"}
                   hint={report.bySource[s].pieces > 0 ? money(report.bySource[s].amount) : t("allGood")}
                 />
-              </ITGrid>
+              
             ))}
-          </ITGrid>
-          <ReportTable
-            empty={report.products.length === 0 ? t("shrinkage.none") : null}
-            head={
-              <>
-                <th className={thLeft}>{t("shrinkage.item")}</th>
-                {SHRINKAGE_SOURCES.map((s) => <th key={s} className={th}>{t(`shrinkage.source.${s}`)}</th>)}
-                <th className={th}>{t("shrinkage.pieces")}</th>
-                <th className={th}>{t("shrinkage.amount")}</th>
-              </>
-            }
-          >
-            {report.products.map((p) => (
-              <tr key={p.productId} className="border-b border-[var(--color-border)]">
-                <td className={tdLeft}>{p.product ? productLabel(p.product) : p.productId}</td>
-                {SHRINKAGE_SOURCES.map((s) => <td key={s} className={td}>{p.sources[s] ? fmt(p.sources[s]) : "—"}</td>)}
-                <td className={`${td} font-bold`}>{fmt(p.pieces)}</td>
-                <td className={td}>{money(p.amount)}</td>
-              </tr>
-            ))}
-            {report.products.length > 0 && (
-              <tr className="font-bold">
-                <td className={tdLeft}>{t("shrinkage.totals")}</td>
-                {SHRINKAGE_SOURCES.map((s) => <td key={s} className={td}>{fmt(report.bySource[s].pieces)}</td>)}
-                <td className={td}>{fmt(report.total.pieces)}</td>
-                <td className={td}>{money(report.total.amount)}</td>
-              </tr>
-            )}
-          </ReportTable>
-          {Object.keys(report.byReason).length > 0 && (
+          </div>
+          <PanelCard title={t("shrinkage.title")}>
             <ReportTable
-              head={
-                <>
-                  <th className={thLeft}>{t("shrinkage.reason")}</th>
-                  <th className={th}>{t("shrinkage.pieces")}</th>
-                  <th className={th}>{t("shrinkage.amount")}</th>
-                </>
-              }
-            >
-              {Object.entries(report.byReason).map(([code, v]) => (
-                <tr key={code} className="border-b border-[var(--color-border)]">
-                  <td className={tdLeft}>{code} · {tt(`shrinkage.reasonName.${code}`, { defaultValue: code })}</td>
-                  <td className={td}>{fmt(v.pieces)}</td>
-                  <td className={td}>{money(v.amount)}</td>
-                </tr>
-              ))}
-            </ReportTable>
+              rows={report.products}
+              empty={t("shrinkage.none")}
+              columns={columns}
+              totals={[
+                { label: t("shrinkage.pieces"), value: fmt(report.total.pieces) },
+                { label: t("shrinkage.amount"), value: money(report.total.amount) },
+              ]}
+            />
+          </PanelCard>
+          {reasonRows.length > 0 && (
+            <PanelCard title={t("shrinkage.reason")}>
+              <ReportTable rows={reasonRows} columns={reasonColumns} />
+            </PanelCard>
           )}
         </>
       )}

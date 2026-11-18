@@ -19,7 +19,9 @@
   "role": {
     "CONFIRMS": "Elabora",
     "REVIEWS": "Revisa",
-    "AUTHORIZES": "Enterado"
+    "AUTHORIZES": "Enterado",
+    "DELIVERS": "Entrega",
+    "RECEIVES": "Recibe"
   },
   "columns": {
     "folio": "Folio",

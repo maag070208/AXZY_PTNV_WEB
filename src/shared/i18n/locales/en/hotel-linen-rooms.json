@@ -49,5 +49,6 @@
     "OCCUPIED": "Occupied",
     "MAINTENANCE": "Maintenance",
     "OUT_OF_SERVICE": "Out of service"
-  }
+  },
+  "formSubtitle": "Room number, zone, type, beds and bathrooms."
 }

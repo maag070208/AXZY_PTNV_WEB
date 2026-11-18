@@ -9,6 +9,10 @@ import { makeClientTableFetch } from "@shared/api/clientTable";
 import { dyn } from "@shared/i18n/dyn";
 import { PanelCard } from "@shared/ui/panel-card";
 import CountStatusChip from "./CountStatusChip";
+import { LuClipboardList } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 const STATUSES = ["DRAFT", "COUNTING", "PENDING_APPROVAL", "APPLIED", "CANCELLED"] as const;
 const fmtDate = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("es-MX") : "—");
@@ -20,6 +24,7 @@ interface Props {
 /** Tomas de inventario: lista (con filtros) y alta por almacén. */
 export default function CountsBoard({ onOpen }: Props) {
   const { t } = useTranslation("hotel-linen-writeoff");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const linenCount = useCan("hotel_linen.count");
   const storeCount = useCan("hotel_store.stocktake");
@@ -58,6 +63,7 @@ export default function CountsBoard({ onOpen }: Props) {
     setError(null);
     try {
       const created = await writeoffApi.createStocktake({ warehouseId, notes: notes.trim() || null, blind: true });
+      notify(t("counts.toast.created"));
       setCreating(false);
       setWarehouseId("");
       setNotes("");
@@ -115,8 +121,6 @@ export default function CountsBoard({ onOpen }: Props) {
 
   return (
     <PanelCard
-      title={t("counts.title")}
-      description={t("counts.description")}
       actions={
         canCreate ? (
           <ITButton variant="filled" color="primary" icon={<FaPlus size={12} />} label={t("counts.new.action")} onClick={() => setCreating(true)} />
@@ -136,7 +140,8 @@ export default function CountsBoard({ onOpen }: Props) {
         rowHeight={56}
       />
 
-      <ITDialog isOpen={creating} onClose={() => setCreating(false)} title={t("counts.new.action")}>
+      <ITDialog isOpen={creating} onClose={() => setCreating(false)}>
+      <DialogHeader icon={<LuClipboardList />} title={t("counts.new.action")} subtitle={t("counts.new.subtitle")} />
         <ITFlex direction="column" gap={3} className="min-w-[420px]">
           {error && <ITAlert variant="error">{error}</ITAlert>}
           <ITSelect
@@ -148,10 +153,7 @@ export default function CountsBoard({ onOpen }: Props) {
           />
           <ITTextarea name="countNotes" label={t("counts.new.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
           <ITText muted className="text-[11px]">{t("counts.new.blind")}</ITText>
-          <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setCreating(false)} />
-            <ITButton variant="filled" color="primary" label={t("counts.new.create")} disabled={busy || !warehouseId} onClick={() => void create()} />
-          </ITFlex>
+          <DialogFooter onCancel={() => setCreating(false)} onConfirm={() => void create()} confirmLabel={t("counts.new.create")} busy={busy} disabled={!warehouseId} />
         </ITFlex>
       </ITDialog>
     </PanelCard>

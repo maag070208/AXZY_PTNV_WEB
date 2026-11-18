@@ -44,7 +44,8 @@
       "quantity": "Piezas",
       "cost": "Costo",
       "photos": "Fotos",
-      "disposition": "Destino"
+      "disposition": "Destino",
+      "product": "Artículo"
     },
     "new": {
       "action": "Nueva baja",
@@ -99,7 +100,9 @@
       "confirmReject": "Rechazar baja",
       "cosign": "Firma otra persona (usuario y contraseña)",
       "cosignTitle": "Firma de la baja",
-      "quarantined": "La pieza está retenida en la cuarentena de Lavandería hasta que la baja se autorice o se rechace."
+      "quarantined": "La pieza está retenida en la cuarentena de Lavandería hasta que la baja se autorice o se rechace.",
+      "approveSubtitle": "Decide qué pasa con las piezas dadas de baja y confirma con tu firma.",
+      "rejectSubtitle": "Explica por qué se rechaza la baja; las piezas regresan al inventario."
     },
     "role": {
       "DELIVERS": "Solicita",
@@ -136,7 +139,8 @@
       "warehouse": "Almacén",
       "notes": "Notas",
       "create": "Crear toma",
-      "blind": "Conteo ciego"
+      "blind": "Conteo ciego",
+      "subtitle": "Elige el almacén. La captura es ciega: no se muestra la existencia del sistema."
     },
     "status": {
       "DRAFT": "Borrador",
@@ -178,6 +182,12 @@
       "C": "C · Regular",
       "D": "D · Desgastado",
       "E": "E · Baja"
+    },
+    "toast": {
+      "created": "Conteo iniciado"
     }
+  },
+  "toast": {
+    "created": "Baja solicitada"
   }
 }

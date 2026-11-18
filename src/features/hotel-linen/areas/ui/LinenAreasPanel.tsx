@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
-  ITBadget,
   ITButton,
   ITChip,
   ITDataTable,
@@ -14,7 +13,7 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaPlus, FaSlidersH, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaEdit, FaMapMarkerAlt, FaPlus, FaSlidersH, FaTrash, FaTrashRestore, FaUserCheck, FaUserSlash, FaWarehouse } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import {
   HOTEL_WAREHOUSE_KINDS,
@@ -27,10 +26,15 @@ import {
 } from "@entities/hotel-linen";
 import { personLabel, useCan, usersApi } from "@entities/user";
 import { makeClientTableFetch } from "@shared/api/clientTable";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { ToneChip } from "@shared/ui/tone-chip";
 import { dyn } from "@shared/i18n/dyn";
 import WarehouseLimitsDialog from "./WarehouseLimitsDialog";
+import { LuWarehouse, LuMapPin } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
 
 interface FormState {
   code: string;
@@ -54,6 +58,7 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
   const canManage = useCan("hotel_store.manage");
   const zones = useHotelZoneOptions();
   const [people, setPeople] = useState<HotelPerson[]>([]);
+  const [all, setAll] = useState<HotelWarehouse[]>([]);
   const [reloadKey, setReloadKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -143,13 +148,20 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
 
   const fetchData = useMemo(
     () =>
-      makeClientTableFetch<HotelWarehouse>(() => hotelLinenApi.warehouses(true), {
+      makeClientTableFetch<HotelWarehouse>(
+        () =>
+          hotelLinenApi.warehouses(true).then((rows) => {
+            setAll(rows);
+            return rows;
+          }),
+        {
         kind: { match: "equals" },
         zone: { value: (w) => w.zone?.name ?? zones.data.find((z) => z.id === w.zoneId)?.name },
         custodian: { value: (w) => (w.custodian ?? (w.custodianId ? personById.get(w.custodianId) : null))?.name },
         locations: { value: (w) => w.locations.map((l) => l.code) },
         active: { match: "equals" },
-      }),
+        }
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [reloadKey, zones.data, personById]
   );
@@ -179,9 +191,7 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
       filter: "catalog",
       catalogOptions: { data: HOTEL_WAREHOUSE_KINDS.map((k) => ({ id: k, name: tt(`warehouseKind.${k}`) })) },
       render: (w) => (
-        <ITBadget color="info" size="lg">
-          {tt(`warehouseKind.${w.kind}`)}
-        </ITBadget>
+        <ToneChip tone="info" label={tt(`warehouseKind.${w.kind}`)} />
       ),
     },
     {
@@ -243,9 +253,7 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
         ],
       },
       render: (w) => (
-        <ITBadget color={w.active ? "success" : "danger"} size="lg">
-          {w.active ? t("common.active") : t("common.inactive")}
-        </ITBadget>
+        <ToneChip tone={w.active ? "success" : "danger"} label={w.active ? t("common.active") : t("common.inactive")} />
       ),
     },
     ...(canManage
@@ -307,10 +315,34 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
   ];
 
   const f = dialog.form;
+  const kpis = useMemo(() => {
+    const act = all.filter((w) => w.active);
+    const withCustodian = act.filter((w) => custodianOf(w)).length;
+    return {
+      active: act.length,
+      withCustodian,
+      without: act.length - withCustodian,
+      locations: act.reduce((n, w) => n + w.locations.length, 0),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [all, personById]);
 
   return (
-    <PanelCard title={t("areas.title")} description={t("areas.description")}>
-      <ITFlex direction="column" gap={3}>
+    <PanelCard>
+      <ITFlex direction="column" gap={4}>
+        <div className="grid !grid-cols-2 gap-4 md:!grid-cols-4">
+          <KpiTile size="sm" label={t("areas.kpi.active")} value={kpis.active} icon={<FaWarehouse size={14} />} tone="sky" />
+          <KpiTile size="sm" label={t("areas.kpi.withCustodian")} value={kpis.withCustodian} icon={<FaUserCheck size={14} />} tone="emerald" />
+          <KpiTile
+            size="sm"
+            label={t("areas.kpi.withoutCustodian")}
+            value={kpis.without}
+            icon={<FaUserSlash size={14} />}
+            tone={kpis.without > 0 ? "amber" : "neutral"}
+            hint={kpis.without === 0 ? t("common.allGood") : undefined}
+          />
+          <KpiTile size="sm" label={t("areas.kpi.locations")} value={kpis.locations} icon={<FaMapMarkerAlt size={14} />} tone="violet" />
+        </div>
         {error && (
           <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
             {error}
@@ -334,8 +366,8 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
       <ITDialog
         isOpen={dialog.open}
         onClose={() => setDialog({ open: false, item: null, form: emptyForm() })}
-        title={dialog.item ? t("areas.edit") : t("areas.new")}
       >
+      <DialogHeader icon={<LuWarehouse />} title={dialog.item ? t("areas.edit") : t("areas.new")} subtitle={t("areas.formSubtitle")} />
         <ITFlex direction="column" gap={3} className="min-w-[360px]">
           {error && <ITAlert variant="error">{error}</ITAlert>}
           <ITGrid container columns={12} spacing={3}>
@@ -380,24 +412,15 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
               />
             </ITGrid>
           </ITGrid>
-          <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setDialog({ open: false, item: null, form: emptyForm() })} />
-            <ITButton
-              variant="filled"
-              color="primary"
-              label={t("common.save")}
-              disabled={saving || !f.name.trim() || (!dialog.item && !f.code.trim())}
-              onClick={() => void save()}
-            />
-          </ITFlex>
+          <DialogFooter onCancel={() => setDialog({ open: false, item: null, form: emptyForm() })} onConfirm={() => void save()} confirmLabel={t("common.save")} busy={saving} disabled={!f.name.trim() || (!dialog.item && !f.code.trim())} />
         </ITFlex>
       </ITDialog>
 
       <ITDialog
         isOpen={locDialog.open}
         onClose={() => setLocDialog({ open: false, area: null, code: "", name: "" })}
-        title={t("areas.locationTitle", { name: locDialog.area?.name ?? "" })}
       >
+      <DialogHeader icon={<LuMapPin />} title={t("areas.locationTitle", { name: locDialog.area?.name ?? "" })} subtitle={t("areas.locationSubtitle")} />
         <ITFlex direction="column" gap={3} className="min-w-[320px]">
           <ITInput
             name="locationCode"
@@ -411,10 +434,7 @@ export default function LinenAreasPanel({ newSignal = 0 }: Props) {
             value={locDialog.name}
             onChange={(e) => setLocDialog((d) => ({ ...d, name: e.target.value }))}
           />
-          <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setLocDialog({ open: false, area: null, code: "", name: "" })} />
-            <ITButton variant="filled" color="primary" label={t("common.save")} disabled={saving || !locDialog.code.trim()} onClick={() => void saveLocation()} />
-          </ITFlex>
+          <DialogFooter onCancel={() => setLocDialog({ open: false, area: null, code: "", name: "" })} onConfirm={() => void saveLocation()} confirmLabel={t("common.save")} busy={saving} disabled={!locDialog.code.trim()} />
         </ITFlex>
       </ITDialog>
 

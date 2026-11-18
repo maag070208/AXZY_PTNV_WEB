@@ -107,7 +107,15 @@ function SignoffTable({ fixed, onOpen }: TableProps) {
       type: "string",
       width: 170,
       sortable: false,
-      render: (r) => <ITText className="text-[11px]">{r.signoffBy?.name ?? "—"}</ITText>,
+      render: (r) =>
+        r.signoffBy ? (
+          <ITFlex align="center" gap={2}>
+            <ProfileAvatar name={r.signoffBy.name} size="sm" />
+            <ITText className="text-[11px] font-semibold">{r.signoffBy.name}</ITText>
+          </ITFlex>
+        ) : (
+          <ITText className="text-[11px]">—</ITText>
+        ),
     },
   ];
 
@@ -136,7 +144,7 @@ interface Props {
 export default function SignoffBoard({ onOpen }: Props) {
   const { t } = useTranslation("hotel-linen-signoff");
   return (
-    <PanelCard title={t("title")} description={t("description")}>
+    <PanelCard>
       <ITTabs
         variant="line"
         items={[

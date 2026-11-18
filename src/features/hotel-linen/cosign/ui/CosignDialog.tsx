@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { ITAlert, ITButton, ITDialog, ITFlex, ITInput, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITFlex, ITInput } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
+import { LuPenLine } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
 import { hotelLinenApi, type HotelCosignResult } from "@entities/hotel-linen";
 
 interface Props {
@@ -42,11 +45,10 @@ export default function CosignDialog({ isOpen, title, onClose, onSigned }: Props
   };
 
   return (
-    <ITDialog isOpen={isOpen} onClose={close} title={title}>
+    <ITDialog isOpen={isOpen} onClose={close}>
+      <DialogHeader icon={<LuPenLine />} title={title} subtitle={t("cosign.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[340px]">
-        <ITText muted className="text-[12px]">
-          {t("cosign.hint")}
-        </ITText>
+        <ITAlert variant="info">{t("cosign.hint")}</ITAlert>
         {error && <ITAlert variant="error">{error}</ITAlert>}
         <ITInput name="cosignUser" label={t("cosign.username")} value={username} onChange={(e) => setUsername(e.target.value)} />
         <ITInput
@@ -56,16 +58,7 @@ export default function CosignDialog({ isOpen, title, onClose, onSigned }: Props
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={close} />
-          <ITButton
-            variant="filled"
-            color="primary"
-            label={t("cosign.confirm")}
-            disabled={busy || !username.trim() || !password}
-            onClick={() => void confirm()}
-          />
-        </ITFlex>
+        <DialogFooter onCancel={close} onConfirm={() => void confirm()} confirmLabel={t("cosign.confirm")} busy={busy} disabled={!username.trim() || !password} />
       </ITFlex>
     </ITDialog>
   );

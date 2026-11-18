@@ -10,7 +10,7 @@ import {
   ITText,
   ITTextarea,
 } from "@axzydev/axzy_ui_system";
-import { FaMagic } from "react-icons/fa";
+import { FaBoxes, FaMagic, FaTshirt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import {
   hotelLinenApi,
@@ -19,8 +19,10 @@ import {
   type HotelWarehouse,
 } from "@entities/hotel-linen";
 import { dyn } from "@shared/i18n/dyn";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import { AREA_KINDS, SHIFTS, dateStrToLocal, localToDateStr, todayStr } from "../lib";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   onDone: (id: string) => void;
@@ -30,6 +32,7 @@ interface Props {
 /** Nuevo pedido de área: área, salidas/ocupadas con sugerido y cantidades por artículo agrupadas por categoría. */
 export default function SupplyRequestForm({ onDone, onCancel }: Props) {
   const { t } = useTranslation("hotel-linen-laundry");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const [areas, setAreas] = useState<HotelWarehouse[]>([]);
   const [products, setProducts] = useState<HotelProduct[]>([]);
@@ -111,6 +114,7 @@ export default function SupplyRequestForm({ onDone, onCancel }: Props) {
         lines: chosen.map(([productId, n]) => ({ productId, requestedQty: n as number })),
       });
       if (andSubmit) await laundryApi.submitRequest(created.id);
+      notify(andSubmit ? t("toast.sent") : t("toast.created"));
       onDone(created.id);
     } catch (e) {
       setError((e as Error).message);
@@ -119,96 +123,127 @@ export default function SupplyRequestForm({ onDone, onCancel }: Props) {
     }
   };
 
+  const totalPieces = chosen.reduce((sum, [, n]) => sum + (n ?? 0), 0);
+
   return (
-    <PanelCard title={t("form.title")} description={t("form.description")}>
-      <ITFlex direction="column" gap={4}>
-        {error && (
-          <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
-            {error}
-          </ITAlert>
-        )}
-        {info && (
-          <ITAlert variant="info" dismissible onDismiss={() => setInfo(null)}>
-            {info}
-          </ITAlert>
-        )}
-        <ITGrid container columns={12} spacing={3}>
-          <ITGrid item xs={12} md={4}>
-            <ITSelect
-              name="requestArea"
-              label={t("form.area")}
-              options={areas.map((a) => ({ value: a.id, label: a.name }))}
-              value={areaId}
-              onChange={(e) => setAreaId(e.target.value)}
-            />
-          </ITGrid>
-          <ITGrid item xs={6} md={2}>
-            <ITDatePicker
-              name="requestDate"
-              label={t("form.date")}
-              value={dateStrToLocal(date)}
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v instanceof Date) setDate(localToDateStr(v));
-              }}
-            />
-          </ITGrid>
-          <ITGrid item xs={6} md={2}>
-            <ITSelect
-              name="requestShift"
-              label={t("form.shift")}
-              options={[{ value: "", label: t("form.noShift") }, ...SHIFTS.map((s) => ({ value: s, label: tt(`shift.${s}`) }))]}
-              value={shift}
-              onChange={(e) => setShift(e.target.value)}
-            />
-          </ITGrid>
-          <ITGrid item xs={4} md={1}>
-            <ITInputNumber name="requestCheckouts" label={t("form.checkouts")} decimals={0} min={0} value={checkouts} onChange={(v) => setCheckouts(v ?? null)} />
-          </ITGrid>
-          <ITGrid item xs={4} md={1}>
-            <ITInputNumber name="requestOccupied" label={t("form.occupied")} decimals={0} min={0} value={occupied} onChange={(v) => setOccupied(v ?? null)} />
-          </ITGrid>
-          <ITGrid item xs={4} md={2}>
-            <ITButton
-              variant="outlined"
-              color="primary"
-              size="lg"
-              icon={<FaMagic size={12} />}
-              label={t("form.suggest")}
-              disabled={!areaId || suggesting}
-              onClick={() => void suggest()}
-            />
-          </ITGrid>
+    <ITFlex direction="column" gap={4}>
+      {error && (
+        <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
+          {error}
+        </ITAlert>
+      )}
+      {info && (
+        <ITAlert variant="info" dismissible onDismiss={() => setInfo(null)}>
+          {info}
+        </ITAlert>
+      )}
+      <ITGrid container columns={12} spacing={3}>
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("form.itemsKpi")} value={chosen.length} icon={<FaTshirt size={14} />} tone={chosen.length > 0 ? "sky" : "neutral"} />
         </ITGrid>
-
-        {groups.length === 0 && <ITText muted>{t("form.noProducts")}</ITText>}
-        {groups.map((g) => (
-          <ITFlex key={g.key} direction="column" gap={2}>
-            <ITText className="text-[12px] font-bold uppercase tracking-wide">{g.name}</ITText>
-            <ITGrid container columns={12} spacing={3}>
-              {g.items.map((p) => (
-                <ITGrid key={p.id} item xs={12} md={4}>
-                  <ITInputNumber
-                    name={`requestQty-${p.id}`}
-                    label={`${p.name}${p.size ? ` · ${p.size}` : ""}`}
-                    decimals={0}
-                    min={0}
-                    value={qty[p.id] ?? null}
-                    onChange={(v) => setQty((q) => ({ ...q, [p.id]: v ?? null }))}
-                  />
-                </ITGrid>
-              ))}
+        <ITGrid item xs={6} md={3}>
+          <KpiTile label={t("form.piecesKpi")} value={totalPieces} icon={<FaBoxes size={14} />} tone={totalPieces > 0 ? "emerald" : "neutral"} />
+        </ITGrid>
+      </ITGrid>
+      <ITGrid container columns={12} spacing={4} className="items-start">
+        <ITGrid item xs={12} lg={6}>
+        <PanelCard
+          description={t("form.description")}
+          className="lg:sticky lg:top-4"
+          actions={
+            <ITFlex gap={2} wrap="wrap">
+              <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
+              <ITButton variant="outlined" color="primary" label={t("form.saveDraft")} disabled={busy || !valid} onClick={() => void save(false)} />
+              <ITButton variant="filled" color="primary" label={t("form.saveSubmit")} disabled={busy || !valid} onClick={() => void save(true)} />
+            </ITFlex>
+          }
+        >
+          <ITFlex direction="column" gap={4}>
+            <ITGrid container columns={12} spacing={3} className="items-end">
+              <ITGrid item xs={12} md={6}>
+                <ITSelect
+                  name="requestArea"
+                  label={t("form.area")}
+                  options={areas.map((a) => ({ value: a.id, label: a.name }))}
+                  value={areaId}
+                  onChange={(e) => setAreaId(e.target.value)}
+                />
+              </ITGrid>
+              <ITGrid item xs={6} md={3}>
+                <ITDatePicker
+                  name="requestDate"
+                  label={t("form.date")}
+                  value={dateStrToLocal(date)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v instanceof Date) setDate(localToDateStr(v));
+                  }}
+                />
+              </ITGrid>
+              <ITGrid item xs={6} md={3}>
+                <ITSelect
+                  name="requestShift"
+                  label={t("form.shift")}
+                  options={[{ value: "", label: t("form.noShift") }, ...SHIFTS.map((s) => ({ value: s, label: tt(`shift.${s}`) }))]}
+                  value={shift}
+                  onChange={(e) => setShift(e.target.value)}
+                />
+              </ITGrid>
+              <ITGrid item xs={6} md={3}>
+                <ITInputNumber name="requestCheckouts" label={t("form.checkouts")} decimals={0} min={0} value={checkouts} onChange={(v) => setCheckouts(v ?? null)} />
+              </ITGrid>
+              <ITGrid item xs={6} md={3}>
+                <ITInputNumber name="requestOccupied" label={t("form.occupied")} decimals={0} min={0} value={occupied} onChange={(v) => setOccupied(v ?? null)} />
+              </ITGrid>
+              <ITGrid item xs={12} md={6}>
+                <ITButton
+                  variant="outlined"
+                  color="primary"
+                  size="lg"
+                  icon={<FaMagic size={12} />}
+                  label={t("form.suggest")}
+                  disabled={!areaId || suggesting}
+                  onClick={() => void suggest()}
+                />
+              </ITGrid>
             </ITGrid>
+            <ITTextarea name="requestNotes" label={t("form.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
           </ITFlex>
-        ))}
+        </PanelCard>
 
-        <ITTextarea name="requestNotes" label={t("form.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onCancel} />
-          <ITButton variant="outlined" color="primary" label={t("form.saveDraft")} disabled={busy || !valid} onClick={() => void save(false)} />
-          <ITButton variant="filled" color="primary" label={t("form.saveSubmit")} disabled={busy || !valid} onClick={() => void save(true)} />
-        </ITFlex>
-      </ITFlex>
-    </PanelCard>
+        </ITGrid>
+        <ITGrid item xs={12} lg={6}>
+        <PanelCard title={t("detail.lines")}>
+          <ITFlex direction="column" gap={4}>
+            {groups.length === 0 && (
+              <ITFlex direction="column" align="center" gap={2} className="py-6">
+                <FaTshirt size={28} className="opacity-30" />
+                <ITText muted className="text-[12px]">{t("form.noProducts")}</ITText>
+              </ITFlex>
+            )}
+            {groups.map((g) => (
+              <ITFlex key={g.key} direction="column" gap={2}>
+                <ITText className="text-[12px] font-semibold">{g.name}</ITText>
+                <ITGrid container columns={12} spacing={3}>
+                  {g.items.map((p) => (
+                    <ITGrid key={p.id} item xs={12} md={6}>
+                      <ITInputNumber
+                        name={`requestQty-${p.id}`}
+                        label={`${p.name}${p.size ? ` · ${p.size}` : ""}`}
+                        decimals={0}
+                        min={0}
+                        value={qty[p.id] ?? null}
+                        onChange={(v) => setQty((q) => ({ ...q, [p.id]: v ?? null }))}
+                      />
+                    </ITGrid>
+                  ))}
+                </ITGrid>
+              </ITFlex>
+            ))}
+          </ITFlex>
+        </PanelCard>
+        </ITGrid>
+      </ITGrid>
+    </ITFlex>
   );
 }

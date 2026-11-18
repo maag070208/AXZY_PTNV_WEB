@@ -65,7 +65,7 @@ export default function PurchasesBoard({ newSignal }: Props) {
   ];
 
   return (
-    <PanelCard title={t("title")} description={t("description")}>
+    <PanelCard>
       {error && (
         <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
           {error}

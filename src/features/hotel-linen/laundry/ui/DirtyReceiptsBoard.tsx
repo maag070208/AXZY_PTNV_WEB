@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { ITChip, ITDataTable, ITText } from "@axzydev/axzy_ui_system";
+import { ITChip, ITDataTable, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { hotelLinenApi, laundryApi, type DirtyReceiptRow, type HotelWarehouse } from "@entities/hotel-linen";
 import { dyn } from "@shared/i18n/dyn";
 import { PanelCard } from "@shared/ui/panel-card";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { AREA_KINDS, fmt, fmtDate } from "../lib";
 
 interface Props {
@@ -43,7 +44,16 @@ export default function DirtyReceiptsBoard({ onOpen }: Props) {
     },
     { key: "cartNumber", label: t("dirty.columns.cart"), type: "string", width: 90, sortable: false, render: (r) => <ITText className="text-[12px]">{r.cartNumber ?? "—"}</ITText> },
     { key: "shift", label: t("dirty.columns.shift"), type: "string", width: 120, sortable: false, render: (r) => <ITText className="text-[12px]">{r.shift ? tt(`shift.${r.shift}`) : "—"}</ITText> },
-    { key: "deliveredBy", label: t("dirty.columns.deliveredBy"), type: "string", width: 170, sortable: false, render: (r) => <ITText className="text-[12px]">{r.deliveredBy?.name ?? "—"}</ITText> },
+    { key: "deliveredBy", label: t("dirty.columns.deliveredBy"), type: "string", width: 170, sortable: false, render: (r) =>
+        r.deliveredBy ? (
+          <ITFlex align="center" gap={2}>
+            <ProfileAvatar name={r.deliveredBy.name} size="sm" />
+            <ITText className="text-[11px] font-semibold">{r.deliveredBy.name}</ITText>
+          </ITFlex>
+        ) : (
+          <ITText className="text-[12px]">—</ITText>
+        ),
+    },
     { key: "receivedDirty", label: t("dirty.columns.received"), type: "number", width: 110, sortable: false, render: (r) => <ITText className="text-[12px] tabular-nums">{fmt(r.receivedDirty)}</ITText> },
     {
       key: "hasShortage",
@@ -58,7 +68,7 @@ export default function DirtyReceiptsBoard({ onOpen }: Props) {
   ];
 
   return (
-    <PanelCard title={t("dirty.title")} description={t("dirty.description")}>
+    <PanelCard>
       <ITDataTable
         showViewToggle={false}
         columns={columns as unknown as Column<Record<string, unknown>>[]}

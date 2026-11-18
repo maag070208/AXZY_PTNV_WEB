@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITChip, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
+import { useEffect, useMemo, useState } from "react";
+import { ITAlert, ITButton, ITChip, ITDataTable, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
+import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { amenityDeliveryApi, type AmenityDeliveryDetail } from "@entities/hotel-linen";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import AmenityDeliveryStatusChip from "./AmenityDeliveryStatusChip";
@@ -30,6 +32,41 @@ export default function AmenityDeliveryDetailView({ id, onOpenTransfer }: Props)
       active = false;
     };
   }, [id]);
+
+  const lines = detail?.lines;
+  type Line = AmenityDeliveryDetail["lines"][number];
+  const linesFetch = useMemo(() => makeClientTableFetch<Line>(() => Promise.resolve(lines ?? [])), [lines]);
+  const lineColumns: Column<Line>[] = useMemo(
+    () => [
+      {
+        key: "product.name",
+        label: t("new.item"),
+        type: "string",
+        width: 260,
+        filter: true,
+        render: (l) => (
+          <ITFlex direction="column">
+            <ITText className="text-[12px] font-bold">{l.product.name}</ITText>
+            <ITText muted className="font-mono text-[11px]">{l.product.code}</ITText>
+          </ITFlex>
+        ),
+      },
+      { key: "quantity", label: t("detail.sent"), type: "number", width: 110, render: (l) => <ITText className="text-[12px] tabular-nums">{fmt(l.quantity)}</ITText> },
+      {
+        key: "receivedQuantity",
+        label: t("detail.received"),
+        type: "number",
+        width: 150,
+        render: (l) =>
+          l.difference ? (
+            <ITChip size="sm" color="warning" label={`${fmt(l.receivedQuantity ?? 0)} (−${fmt(l.difference)})`} />
+          ) : (
+            <ITText className="text-[12px] tabular-nums">{l.receivedQuantity === null ? "—" : fmt(l.receivedQuantity)}</ITText>
+          ),
+      },
+    ],
+    [t]
+  );
 
   if (!detail) return error ? <ITAlert variant="error">{error}</ITAlert> : <ITText muted>{t("loading")}</ITText>;
 
@@ -72,28 +109,17 @@ export default function AmenityDeliveryDetailView({ id, onOpenTransfer }: Props)
       </PanelCard>
 
       <PanelCard title={t("detail.lines")}>
-        <ITFlex direction="column" gap={3}>
-          {detail.lines.map((line) => (
-            <ITGrid key={line.id} container columns={12} spacing={3} className="items-center">
-              <ITGrid item xs={12} md={6}>
-                <ITText className="text-[12px] font-bold">{line.product.name}</ITText>
-                <ITText muted className="font-mono text-[11px]">{line.product.code}</ITText>
-              </ITGrid>
-              <ITGrid item xs={6} md={3}>
-                <ITText muted className="text-[11px]">{t("detail.sent")}</ITText>
-                <ITText className="text-[12px] tabular-nums">{fmt(line.quantity)}</ITText>
-              </ITGrid>
-              <ITGrid item xs={6} md={3}>
-                <ITText muted className="text-[11px]">{t("detail.received")}</ITText>
-                {line.difference ? (
-                  <ITChip size="sm" color="warning" label={`${fmt(line.receivedQuantity ?? 0)} (−${fmt(line.difference)})`} />
-                ) : (
-                  <ITText className="text-[12px] tabular-nums">{line.receivedQuantity === null ? "—" : fmt(line.receivedQuantity)}</ITText>
-                )}
-              </ITGrid>
-            </ITGrid>
-          ))}
-        </ITFlex>
+        <ITDataTable
+          showViewToggle={false}
+          columns={lineColumns as unknown as Column<Record<string, unknown>>[]}
+          fetchData={linesFetch as never}
+          size="lg"
+          defaultItemsPerPage={25}
+          itemsPerPageOptions={[25, 50]}
+          layout="fixed"
+          density="compact"
+          rowHeight={52}
+        />
       </PanelCard>
     </ITFlex>
   );

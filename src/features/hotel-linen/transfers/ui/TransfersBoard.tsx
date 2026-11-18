@@ -182,7 +182,7 @@ export default function TransfersBoard({ onOpen }: Props) {
   }, []);
 
   return (
-    <PanelCard title={t("transfers.title")} description={t("transfers.description")}>
+    <PanelCard>
       <ITTabs
         variant="line"
         items={[

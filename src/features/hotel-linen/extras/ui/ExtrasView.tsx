@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ITAlert, ITButton, ITChip, ITDataTable, ITFlex, ITGrid, ITInput, ITInputNumber, ITSelect, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITCard, ITChip, ITDataTable, ITFlex, ITGrid, ITInput, ITInputNumber, ITSelect, ITText } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
+import { FaPlusSquare } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import {
   EXTRA_STATUSES,
@@ -14,7 +15,9 @@ import {
 import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { PanelCard } from "@shared/ui/panel-card";
+import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import CollectDialog from "./CollectDialog";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   /** La página provee la co-firma (las features no se importan entre sí). */
@@ -34,6 +37,7 @@ const STATUS_COLOR: Record<string, "primary" | "success" | "warning" | "danger" 
 /** Adicionales a habitación: vista de Recepción (registrar) y de la supervisora (tablero por zona). */
 export default function ExtrasView({ requestCosign }: Props) {
   const { t } = useTranslation("hotel-linen-reception");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const canCreate = useCan("hotel_linen.extras_create");
   const canCollect = useCan("hotel_linen.extras_collect");
@@ -97,6 +101,7 @@ export default function ExtrasView({ requestCosign }: Props) {
     setBusy(true);
     await run(async () => {
       await receptionApi.createExtra({ roomId, productId, quantity: qty, notes: notes.trim() || null });
+      notify(t("extras.toast.created"));
       setQty(1);
       setNotes("");
     });
@@ -111,6 +116,7 @@ export default function ExtrasView({ requestCosign }: Props) {
         if (!token) return;
       }
       await receptionApi.deliverExtra(extra.id, token);
+      notify(t("extras.toast.delivered"));
     });
 
   const fetchData = useCallback((params: Parameters<typeof receptionApi.extrasTable>[0]) => receptionApi.extrasTable(params), []);
@@ -121,7 +127,7 @@ export default function ExtrasView({ requestCosign }: Props) {
       { key: "room", label: t("extras.columns.room"), type: "string", width: 100, sortable: false, render: (r) => <ITText className="text-[12px] font-bold">{r.room.number}</ITText> },
       { key: "product", label: t("extras.columns.product"), type: "string", width: 200, sortable: false, render: (r) => <ITText className="text-[12px]">{r.quantity} × {r.product.name}</ITText> },
       { key: "kind", label: t("extras.columns.kind"), type: "string", width: 120, sortable: false, render: (r) => <ITText className="text-[12px]">{tt(`kind.${r.kind}`)}</ITText> },
-      { key: "requestedBy", label: t("extras.columns.requestedBy"), type: "string", width: 150, sortable: false, render: (r) => <ITText className="text-[12px]">{r.requestedBy.name}</ITText> },
+      { key: "requestedBy", label: t("extras.columns.requestedBy"), type: "string", width: 150, sortable: false, render: (r) => <ITFlex align="center" gap={2}><ProfileAvatar name={r.requestedBy.name} size="xs" /><ITText className="text-[12px]">{r.requestedBy.name}</ITText></ITFlex> },
       {
         key: "status",
         label: t("extras.columns.status"),
@@ -148,7 +154,11 @@ export default function ExtrasView({ requestCosign }: Props) {
       {error && <ITAlert variant="error">{error}</ITAlert>}
 
       {canCreate && (
-        <PanelCard title={t("extras.new.title")} description={t("extras.new.description")}>
+        <PanelCard
+          title={t("extras.new.title")}
+          description={t("extras.new.description")}
+          actions={<ITButton variant="filled" color="primary" label={t("extras.new.submit")} disabled={busy || !roomId || !productId || !qty} onClick={() => void submit()} />}
+        >
           <ITGrid container spacing={2}>
             <ITGrid item xs={12} md={3}>
               <ITSelect name="extraRoom" label={t("extras.new.room")} options={[{ value: "", label: t("extras.new.pickRoom") }, ...rooms.map((r) => ({ value: r.id, label: r.zone ? `${r.number} · ${r.zone.name}` : r.number }))]} value={roomId} onChange={(e) => setRoomId(e.target.value)} />
@@ -163,21 +173,24 @@ export default function ExtrasView({ requestCosign }: Props) {
               <ITInput name="extraNotes" label={t("extras.new.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} />
             </ITGrid>
           </ITGrid>
-          <ITFlex justify="end" className="mt-3">
-            <ITButton variant="filled" color="primary" label={t("extras.new.submit")} disabled={busy || !roomId || !productId || !qty} onClick={() => void submit()} />
-          </ITFlex>
         </PanelCard>
       )}
 
       {canCollect && (
         <PanelCard title={t("extras.board.title")} description={t("extras.board.description")}>
-          {board && board.zones.length === 0 && <ITText muted>{t("extras.board.empty")}</ITText>}
+          {board && board.zones.length === 0 && (
+            <ITFlex direction="column" align="center" gap={2} className="py-6">
+              <FaPlusSquare size={22} className="text-slate-300" />
+              <ITText muted>{t("extras.board.empty")}</ITText>
+            </ITFlex>
+          )}
           <ITFlex direction="column" gap={4}>
             {board?.zones.map((z) => (
               <ITFlex key={z.zone.id} direction="column" gap={2}>
                 <ITText className="font-bold">{z.zone.name}</ITText>
                 {z.rooms.map((r) => (
-                  <ITFlex key={r.room.id} direction="column" gap={1} className={`rounded-lg border p-3 ${r.collectNow ? "border-amber-400 bg-amber-50" : "border-slate-200"}`}>
+                  <ITCard key={r.room.id} tone={r.collectNow ? "warning" : undefined} contentClassName="!p-0">
+                    <ITFlex direction="column" gap={1} className="p-3">
                     <ITFlex align="center" gap={2}>
                       <ITText className="font-semibold">{t("extras.board.room", { number: r.room.number })}</ITText>
                       <ITChip size="sm" color="secondary" label={tt(`roomStatus.${r.room.status}`)} />
@@ -201,7 +214,8 @@ export default function ExtrasView({ requestCosign }: Props) {
                         </ITFlex>
                       </ITFlex>
                     ))}
-                  </ITFlex>
+                    </ITFlex>
+                  </ITCard>
                 ))}
               </ITFlex>
             ))}

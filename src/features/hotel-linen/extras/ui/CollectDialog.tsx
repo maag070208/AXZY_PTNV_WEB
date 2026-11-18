@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITDialog, ITFlex, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITFlex, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { receptionApi, type RoomExtra } from "@entities/hotel-linen";
+import { LuPackageOpen } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   extra: RoomExtra | null;
@@ -12,6 +16,7 @@ interface Props {
 /** Recolección: cuenta lo recogido; lo que falta queda como faltante y avisa a Recepción. */
 export default function CollectDialog({ extra, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-reception");
+  const notify = useSuccessToast();
   const [qty, setQty] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +35,7 @@ export default function CollectDialog({ extra, onClose, onDone }: Props) {
     setError(null);
     try {
       await receptionApi.collectExtra(extra.id, qty as number);
+      notify(t("extras.toast.collected"));
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -39,16 +45,14 @@ export default function CollectDialog({ extra, onClose, onDone }: Props) {
   };
 
   return (
-    <ITDialog isOpen={extra !== null} onClose={onClose} title={t("extras.collect.title", { room: extra?.room.number ?? "" })}>
+    <ITDialog isOpen={extra !== null} onClose={onClose}>
+      <DialogHeader icon={<LuPackageOpen />} title={t("extras.collect.title", { room: extra?.room.number ?? "" })} subtitle={t("extras.collect.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[380px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         <ITText>{t("extras.collect.delivered", { count: extra?.quantity ?? 0, product: extra?.product.name ?? "" })}</ITText>
         <ITInputNumber name="collectQty" label={t("extras.collect.quantity")} decimals={0} min={0} value={qty} onChange={(v) => setQty(v ?? null)} />
         {missing > 0 && <ITAlert variant="warning">{t("extras.collect.missing", { count: missing })}</ITAlert>}
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton variant="filled" color="primary" label={t("extras.collect.confirm")} disabled={busy || !valid} onClick={() => void submit()} />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("extras.collect.confirm")} busy={busy} disabled={!valid} />
       </ITFlex>
     </ITDialog>
   );

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITAlert, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITFlex } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { CONDITION_GRADES, reportApi, type ConditionReport } from "@entities/hotel-linen";
 import type { ReportDoc } from "@shared/lib/reportDoc";
 import { fmt, pct, productLabel } from "../lib";
-import { ExportBar, ReportTable, td, tdLeft, th, thLeft, type ExportPdf } from "./common";
+import { PanelCard } from "@shared/ui/panel-card";
+import { ExportBar, ReportTable, type ExportPdf, type ReportCol } from "./common";
 
 /** Estado físico A–E por producto, del último conteo aplicado de cada almacén. */
 export default function ConditionTab({ exportPdf }: { exportPdf: ExportPdf }) {
@@ -42,43 +43,38 @@ export default function ConditionTab({ exportPdf }: { exportPdf: ExportPdf }) {
     };
   }, [report, t]);
 
+  const columns: ReportCol<ConditionReport["products"][number]>[] = [
+    { key: "item", label: t("condition.item"), width: 240, value: (p) => productLabel(p.product) },
+    ...CONDITION_GRADES.map((g) => ({
+      key: g,
+      label: t(`condition.grade.${g}`),
+      numeric: true,
+      width: 120,
+      value: (p: ConditionReport["products"][number]) => p[g],
+      render: (p: ConditionReport["products"][number]) => `${fmt(p[g])} (${pct(p.pct[g])})`,
+    })),
+    { key: "total", label: t("condition.total"), numeric: true, width: 100, value: (p) => p.total, render: (p) => fmt(p.total) },
+  ];
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && <ITAlert variant="error">{error}</ITAlert>}
-      <ITFlex justify="between" align="center">
-        <ITText muted className="text-[12px]">{t("condition.description")}</ITText>
-        <ExportBar doc={doc} fileName="blancos-estado-fisico" exportPdf={exportPdf} />
-      </ITFlex>
       {report && (
-        <ReportTable
-          empty={report.products.length === 0 ? t("condition.none") : null}
-          head={
-            <>
-              <th className={thLeft}>{t("condition.item")}</th>
-              {CONDITION_GRADES.map((g) => <th key={g} className={th} colSpan={2}>{t(`condition.grade.${g}`)}</th>)}
-              <th className={th}>{t("condition.total")}</th>
-            </>
-          }
+        <PanelCard
+          title={t("condition.title")}
+          description={t("condition.description")}
+          actions={<ExportBar doc={doc} fileName="blancos-estado-fisico" exportPdf={exportPdf} />}
         >
-          {report.products.map((p) => (
-            <tr key={p.product.id} className="border-b border-[var(--color-border)]">
-              <td className={tdLeft}>{productLabel(p.product)}</td>
-              {CONDITION_GRADES.map((g) => (
-                <td key={g} className={td} colSpan={2}>{fmt(p[g])} <span className="opacity-60">({pct(p.pct[g])})</span></td>
-              ))}
-              <td className={`${td} font-bold`}>{fmt(p.total)}</td>
-            </tr>
-          ))}
-          {report.products.length > 0 && (
-            <tr className="font-bold">
-              <td className={tdLeft}>{t("condition.totals")}</td>
-              {CONDITION_GRADES.map((g) => (
-                <td key={g} className={td} colSpan={2}>{fmt(report.totals[g])} <span className="opacity-60">({pct(report.totals.pct[g])})</span></td>
-              ))}
-              <td className={td}>{fmt(report.totals.total)}</td>
-            </tr>
-          )}
-        </ReportTable>
+          <ReportTable
+            rows={report.products}
+            empty={t("condition.none")}
+            columns={columns}
+            totals={[
+              ...CONDITION_GRADES.map((g) => ({ label: t(`condition.grade.${g}`), value: `${fmt(report.totals[g])} (${pct(report.totals.pct[g])})` })),
+              { label: t("condition.totals"), value: fmt(report.totals.total) },
+            ]}
+          />
+        </PanelCard>
       )}
     </ITFlex>
   );

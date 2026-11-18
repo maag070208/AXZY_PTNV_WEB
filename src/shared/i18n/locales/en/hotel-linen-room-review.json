@@ -77,6 +77,16 @@
     "totalMissing": "Missing: {{n}}",
     "totalSurplus": "Surplus: {{n}}",
     "notes": "Note",
-    "lines": "Items"
+    "lines": "Items",
+    "kpi": {
+      "expected": "Expected",
+      "counted": "Counted",
+      "missing": "Missing",
+      "surplus": "Surplus"
+    },
+    "allGood": "All good"
+  },
+  "toast": {
+    "created": "Review recorded"
   }
 }

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITDialog, ITFlex, ITGrid, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITFlex, ITGrid, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { hotelLinenApi, type HotelProduct, type HotelWarehouse } from "@entities/hotel-linen";
+import { LuGauge } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
 
 interface Props {
   warehouse: HotelWarehouse | null;
@@ -62,7 +65,8 @@ export default function WarehouseLimitsDialog({ warehouse, onClose, onSaved }: P
   };
 
   return (
-    <ITDialog isOpen={warehouse !== null} onClose={onClose} title={t("areas.limits.title", { name: warehouse?.name ?? "" })}>
+    <ITDialog isOpen={warehouse !== null} onClose={onClose}>
+      <DialogHeader icon={<LuGauge />} title={t("areas.limits.title", { name: warehouse?.name ?? "" })} subtitle={t("areas.limits.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[520px]">
         <ITText muted className="text-[12px]">
           {t("areas.limits.hint")}
@@ -103,16 +107,7 @@ export default function WarehouseLimitsDialog({ warehouse, onClose, onSaved }: P
             ))}
           </ITFlex>
         )}
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton
-            variant="filled"
-            color="primary"
-            label={t("common.save")}
-            disabled={saving || loading || invalid}
-            onClick={() => void save()}
-          />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void save()} confirmLabel={t("common.save")} busy={saving} disabled={loading || invalid} />
       </ITFlex>
     </ITDialog>
   );

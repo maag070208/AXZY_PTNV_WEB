@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITCheckbox, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITCheckbox, ITDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { receptionApi, type ShiftClosePreview, type TowelLoan } from "@entities/hotel-linen";
 import { fmt, money } from "../lib";
+import { LuClipboardCheck } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   isOpen: boolean;
@@ -16,6 +20,7 @@ interface Props {
 /** Corte de turno: totales, marcar no devueltas (retienen depósito) y co-firma de quien recibe el turno. */
 export default function ShiftCloseDialog({ isOpen, pointId, pointName, requestCosign, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-reception");
+  const notify = useSuccessToast();
   const [open, setOpen] = useState<TowelLoan[]>([]);
   const [marked, setMarked] = useState<string[]>([]);
   const [preview, setPreview] = useState<ShiftClosePreview | null>(null);
@@ -52,6 +57,7 @@ export default function ShiftCloseDialog({ isOpen, pointId, pointName, requestCo
         if (!cosignToken) return;
       }
       await receptionApi.createClose({ warehouseId: pointId, cosignToken, endOfDay, markUnreturned: marked });
+      notify(t("toast.closed"));
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -62,7 +68,8 @@ export default function ShiftCloseDialog({ isOpen, pointId, pointName, requestCo
 
   const totals = preview?.totals;
   return (
-    <ITDialog isOpen={isOpen} onClose={onClose} title={t("close.title", { point: pointName })}>
+    <ITDialog isOpen={isOpen} onClose={onClose}>
+      <DialogHeader icon={<LuClipboardCheck />} title={t("close.title", { point: pointName })} subtitle={t("close.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[480px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         <ITFlex direction="column" gap={1}>
@@ -88,10 +95,7 @@ export default function ShiftCloseDialog({ isOpen, pointId, pointName, requestCo
           </ITFlex>
         )}
         <ITCheckbox checked={endOfDay} onChange={() => setEndOfDay((v) => !v)} label={t("close.endOfDay")} />
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton variant="filled" color="primary" label={t("close.confirm")} disabled={busy || !preview || preview.included === 0} onClick={() => void submit()} />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("close.confirm")} busy={busy} disabled={!preview || preview.included === 0} />
       </ITFlex>
     </ITDialog>
   );

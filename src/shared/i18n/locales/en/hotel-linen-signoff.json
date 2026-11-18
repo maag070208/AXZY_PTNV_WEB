@@ -42,5 +42,8 @@
     "sameUser": "Whoever counted the transfer cannot sign the conformity",
     "notApplicable": "This transfer does not require a conformity signature",
     "noStockBlock": "Signing does not block stock: the area already holds the received pieces."
+  },
+  "toast": {
+    "signed": "Signature recorded"
   }
 }

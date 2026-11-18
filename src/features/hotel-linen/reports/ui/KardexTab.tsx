@@ -5,7 +5,8 @@ import { hotelLinenApi, reportApi, type HotelProduct, type HotelWarehouse, type 
 import { dyn } from "@shared/i18n/dyn";
 import type { ReportDoc } from "@shared/lib/reportDoc";
 import { defaultFrom, fmt, fmtDateTime, fmtDay, productLabel, todayStr } from "../lib";
-import { ExportBar, PeriodFields, ReportTable, td, tdLeft, th, thLeft, type ExportPdf } from "./common";
+import { PanelCard } from "@shared/ui/panel-card";
+import { ExportBar, PeriodFields, ReportTable, type ExportPdf, type ReportCol } from "./common";
 
 const place = (w: { code: string; name: string } | null) => (w ? w.name : "—");
 
@@ -76,6 +77,17 @@ export default function KardexTab({ exportPdf }: { exportPdf: ExportPdf }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shown, t, tt]);
 
+  type Row = KardexReport["entries"][number];
+  const columns: ReportCol<Row>[] = [
+    { key: "date", label: t("kardex.date"), width: 170, value: (e) => e.date, render: (e) => fmtDateTime(e.date) },
+    { key: "folio", label: t("kardex.folio"), width: 130, value: (e) => e.folio },
+    { key: "type", label: t("kardex.type"), width: 170, value: (e) => labelOf(e.sourceDocType, e.type) },
+    { key: "route", label: t("kardex.route"), width: 240, value: (e) => `${place(e.from)} → ${place(e.to)}` },
+    { key: "lot", label: t("kardex.lot"), width: 120, value: (e) => e.lot.code },
+    { key: "delta", label: t("kardex.delta"), numeric: true, width: 100, value: (e) => e.delta, render: (e) => `${e.delta > 0 ? "+" : ""}${fmt(e.delta)}` },
+    { key: "balance", label: t("kardex.balance"), numeric: true, width: 100, value: (e) => e.balance, render: (e) => fmt(e.balance) },
+  ];
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && <ITAlert variant="error">{error}</ITAlert>}
@@ -93,36 +105,12 @@ export default function KardexTab({ exportPdf }: { exportPdf: ExportPdf }) {
       </ITFlex>
       {!productId && <ITText muted>{t("kardex.pickHint")}</ITText>}
       {shown && (
-        <ReportTable
-          empty={shown.entries.length === 0 ? t("kardex.none") : null}
-          head={
-            <>
-              <th className={thLeft}>{t("kardex.date")}</th>
-              <th className={thLeft}>{t("kardex.folio")}</th>
-              <th className={thLeft}>{t("kardex.type")}</th>
-              <th className={thLeft}>{t("kardex.route")}</th>
-              <th className={thLeft}>{t("kardex.lot")}</th>
-              <th className={th}>{t("kardex.delta")}</th>
-              <th className={th}>{t("kardex.balance")}</th>
-            </>
-          }
+        <PanelCard
+          title={`${shown.product.code} · ${productLabel(shown.product)}`}
+          description={`${t("kardex.opening")}: ${fmt(shown.opening)}`}
         >
-          <tr className="border-b border-[var(--color-border)] font-bold">
-            <td className={tdLeft} colSpan={6}>{t("kardex.opening")}</td>
-            <td className={td}>{fmt(shown.opening)}</td>
-          </tr>
-          {shown.entries.map((e, i) => (
-            <tr key={`${e.folio}-${i}`} className="border-b border-[var(--color-border)]">
-              <td className={tdLeft}>{fmtDateTime(e.date)}</td>
-              <td className={`${tdLeft} font-mono`}>{e.folio}</td>
-              <td className={tdLeft}>{labelOf(e.sourceDocType, e.type)}</td>
-              <td className={tdLeft}>{place(e.from)} → {place(e.to)}</td>
-              <td className={`${tdLeft} font-mono`}>{e.lot.code}</td>
-              <td className={td}>{e.delta > 0 ? "+" : ""}{fmt(e.delta)}</td>
-              <td className={`${td} font-bold`}>{fmt(e.balance)}</td>
-            </tr>
-          ))}
-        </ReportTable>
+          <ReportTable rows={shown.entries} empty={t("kardex.none")} columns={columns} />
+        </PanelCard>
       )}
     </ITFlex>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITBadget, ITDataTable, ITFlex, ITTabs, ITText } from "@axzydev/axzy_ui_system";
+import { ITDataTable, ITFlex, ITTabs, ITText } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { receptionApi, roomReviewApi, useHotelZoneOptions, type HotelRoomOption, type RoomReview } from "@entities/hotel-linen";
@@ -8,6 +8,7 @@ import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { dyn } from "@shared/i18n/dyn";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { ToneChip } from "@shared/ui/tone-chip";
 import { fmtDateTime } from "../lib";
 import ConsolidatedView from "./ConsolidatedView";
 import DiffChip from "./DiffChip";
@@ -102,7 +103,7 @@ function ReviewsTable({ onOpen }: { onOpen: (id: string) => void }) {
       catalogOptions: { data: [{ id: "true", name: t("filters.withDifference") }, { id: "false", name: t("filters.noDifference") }] },
       render: (r) =>
         r.totals.missing === 0 && r.totals.surplus === 0 ? (
-          <ITBadget color="success" size="lg">{t("noDifference")}</ITBadget>
+          <ToneChip tone="success" label={t("noDifference")} />
         ) : (
           <ITFlex gap={1} wrap="wrap">
             {r.totals.missing > 0 && <DiffChip diff={-r.totals.missing} />}
@@ -136,7 +137,7 @@ interface Props {
 export default function RoomReviewsBoard({ onOpen }: Props) {
   const { t } = useTranslation("hotel-linen-room-review");
   return (
-    <PanelCard title={t("title")} description={t("description")}>
+    <PanelCard>
       <ITTabs
         variant="line"
         items={[

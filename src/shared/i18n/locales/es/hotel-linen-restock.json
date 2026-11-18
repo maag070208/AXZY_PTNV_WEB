@@ -13,5 +13,8 @@
   "deficit": "Déficit",
   "rooms": "{{count}} habitaciones",
   "noDeficit": "Sin déficit",
-  "noPar": "La zona no tiene habitaciones con dotación de blancos."
+  "noPar": "La zona no tiene habitaciones con dotación de blancos.",
+  "toast": {
+    "created": "Solicitud de reposición creada"
+  }
 }

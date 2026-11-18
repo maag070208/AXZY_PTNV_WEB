@@ -15,6 +15,10 @@ import {
 import { newId } from "@shared/lib/newId";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { dyn } from "@shared/i18n/dyn";
+import { LuWashingMachine } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 export type LinesMode = "firstWash" | "supplierReturn";
 
@@ -41,6 +45,7 @@ interface Props {
  */
 export default function LaundryLinesDialog({ mode, board, requestCosign, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-laundry");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const requestKey = useRequestKey();
   const [products, setProducts] = useState<HotelProduct[]>([]);
@@ -126,6 +131,7 @@ export default function LaundryLinesDialog({ mode, board, requestCosign, onClose
         };
         await laundryApi.supplierReturn(body, requestKey(body));
       }
+      notify(t(`toast.${mode}`));
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -137,7 +143,8 @@ export default function LaundryLinesDialog({ mode, board, requestCosign, onClose
   const productOptions = products.map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` }));
 
   return (
-    <ITDialog isOpen={mode !== null} onClose={onClose} title={mode ? t(`laundry.${mode}.title`) : ""}>
+    <ITDialog isOpen={mode !== null} onClose={onClose}>
+      <DialogHeader icon={<LuWashingMachine />} title={mode ? t(`laundry.${mode}.title`) : ""} subtitle={mode ? t(`laundry.${mode}.subtitle`) : ""} />
       <ITFlex direction="column" gap={3} className="min-w-[640px]">
         {mode && <ITAlert variant="info">{t(`laundry.${mode}.hint`)}</ITAlert>}
         {error && <ITAlert variant="error">{error}</ITAlert>}
@@ -197,10 +204,7 @@ export default function LaundryLinesDialog({ mode, board, requestCosign, onClose
           onChange={(e) => setNotes(e)}
         />
         <ITCheckbox name="linesCosign" label={t("laundry.lines.cosign")} checked={cosign} onChange={setCosign} />
-        <ITFlex justify="end" gap={2}>
-          <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-          <ITButton variant="filled" color="primary" label={t("laundry.lines.confirm")} disabled={busy || !valid} onClick={() => void submit()} />
-        </ITFlex>
+        <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("laundry.lines.confirm")} busy={busy} disabled={!valid} />
       </ITFlex>
     </ITDialog>
   );

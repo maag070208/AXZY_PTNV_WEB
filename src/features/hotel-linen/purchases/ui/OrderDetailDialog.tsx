@@ -7,6 +7,10 @@ import { useCan } from "@entities/user";
 import { dateTime, day, money, pct, qty } from "../lib";
 import { downloadHotelPurchaseOrderPdf } from "../pdf/downloadPdf";
 import { OrderStatusChip } from "./PurchaseChips";
+import { LuFileText } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   /** OC a mostrar; `null` = cerrado. */
@@ -21,6 +25,7 @@ interface Props {
 /** Detalle de la OC con totales, recepciones y acciones (aprobar, cancelar, cerrar con faltante, recibir, PDF). */
 export default function OrderDetailDialog({ orderId, reloadKey, onClose, onChanged, onEdit, onReceive }: Props) {
   const { t } = useTranslation("hotel-linen-purchase");
+  const notify = useSuccessToast();
   const canCreate = useCan("hotel_purchase.create");
   const canApprove = useCan("hotel_purchase.approve");
   const canReceive = useCan("hotel_purchase.receive");
@@ -51,6 +56,7 @@ export default function OrderDetailDialog({ orderId, reloadKey, onClose, onChang
     setError(null);
     try {
       setOrder(await action());
+      notify();
       setClosing(false);
       onChanged();
     } catch (e) {
@@ -63,7 +69,8 @@ export default function OrderDetailDialog({ orderId, reloadKey, onClose, onChang
   const receivable = !!order && (order.status === "APPROVED" || order.status === "PARTIALLY_RECEIVED");
 
   return (
-    <ITDialog isOpen={orderId !== null} onClose={onClose} title={order ? t("detail.title", { folio: order.folio }) : t("detail.loading")}>
+    <ITDialog isOpen={orderId !== null} onClose={onClose}>
+      <DialogHeader icon={<LuFileText />} title={order ? t("detail.title", { folio: order.folio }) : t("detail.loading")} subtitle={t("detail.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[820px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         {!order && !error && <ITText muted>{t("common.loading")}</ITText>}
@@ -150,16 +157,13 @@ export default function OrderDetailDialog({ orderId, reloadKey, onClose, onChang
               <ITFlex direction="column" gap={2}>
                 <ITAlert variant="info">{t("detail.closeHint")}</ITAlert>
                 <ITTextarea name="poCloseNotes" label={t("detail.closeReason")} rows={2} value={closeNotes} onChange={(e) => setCloseNotes(e)} />
-                <ITFlex justify="end" gap={2}>
-                  <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setClosing(false)} />
-                  <ITButton
-                    variant="filled"
-                    color="primary"
-                    label={t("detail.confirmClose")}
-                    disabled={busy || !closeNotes.trim()}
-                    onClick={() => void run(() => purchaseApi.closeOrder(order.id, closeNotes.trim()))}
-                  />
-                </ITFlex>
+                <DialogFooter
+                  onCancel={() => setClosing(false)}
+                  onConfirm={() => void run(() => purchaseApi.closeOrder(order.id, closeNotes.trim()))}
+                  confirmLabel={t("detail.confirmClose")}
+                  busy={busy}
+                  disabled={!closeNotes.trim()}
+                />
               </ITFlex>
             )}
 

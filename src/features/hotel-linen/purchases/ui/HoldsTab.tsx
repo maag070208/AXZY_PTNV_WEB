@@ -7,6 +7,7 @@ import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { day, qty } from "../lib";
 import { HoldStatusChip } from "./PurchaseChips";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   reloadKey: number;
@@ -16,6 +17,7 @@ interface Props {
 /** Mercancía apartada (HOLD) por diferencia con la factura: vence en 5 días hábiles; aceptar o devolver. */
 export default function HoldsTab({ reloadKey, onChanged }: Props) {
   const { t } = useTranslation("hotel-linen-purchase");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const canResolve = useCan("hotel_purchase.receive");
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -26,6 +28,7 @@ export default function HoldsTab({ reloadKey, onChanged }: Props) {
     setError(null);
     try {
       await purchaseApi.resolveHold(id, action);
+      notify(t("toast.resolved"));
       onChanged();
     } catch (e) {
       setError((e as Error).message);

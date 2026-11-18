@@ -17,6 +17,9 @@ import { makeClientTableFetch } from "@shared/api/clientTable";
 import { dyn } from "@shared/i18n/dyn";
 import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
+import { LuBoxes } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
 
 type QuickKind = "ALL" | "LINEN" | "CONSUMABLE" | "EQUIPMENT";
 
@@ -189,8 +192,6 @@ export default function LinenStockBoard() {
       </ITGrid>
 
       <PanelCard
-        title={t("stock.title")}
-        description={t("stock.description")}
         actions={<ITSegmentedControl size="sm" options={quickOptions} value={quick} onChange={(v) => setQuick(v as QuickKind)} />}
       >
         <ITFlex direction="column" gap={3}>
@@ -220,8 +221,8 @@ export default function LinenStockBoard() {
       <ITDialog
         isOpen={lotsDialog.row !== null}
         onClose={() => setLotsDialog({ row: null, lots: [], loading: false, error: null })}
-        title={t("stock.lots.title", { name: lotsDialog.row?.name ?? "" })}
       >
+      <DialogHeader icon={<LuBoxes />} title={t("stock.lots.title", { name: lotsDialog.row?.name ?? "" })} subtitle={t("stock.lots.subtitle")} />
         <ITFlex direction="column" gap={3} className="min-w-[420px]">
           {lotsDialog.error && <ITAlert variant="error">{lotsDialog.error}</ITAlert>}
           {lotsDialog.loading && <ITText muted>{t("common.loading")}</ITText>}
@@ -244,6 +245,7 @@ export default function LinenStockBoard() {
               </ITFlex>
             </ITFlex>
           ))}
+          <DialogFooter hideCancel onCancel={() => undefined} onConfirm={() => setLotsDialog({ row: null, lots: [], loading: false, error: null })} confirmLabel={t("common.close")} />
         </ITFlex>
       </ITDialog>
     </ITFlex>

@@ -10,7 +10,9 @@
     "reactivate": "Reactivar",
     "none": "Sin asignar",
     "all": "Todos",
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "allGood": "Todo en orden",
+    "close": "Cerrar"
   },
   "kind": {
     "LINEN": "Blanco",
@@ -63,7 +65,14 @@
       "cost": "Último costo",
       "washLife": "Vida útil (lavadas)",
       "standard": "Estándar por habitación ocupada"
-    }
+    },
+    "kpi": {
+      "active": "Artículos activos",
+      "linen": "Blancos",
+      "consumable": "Consumibles",
+      "inactive": "Inactivos"
+    },
+    "formSubtitle": "Datos del artículo: tipo, talla, par, mínimo y costo."
   },
   "areas": {
     "title": "Áreas y puntos",
@@ -99,8 +108,17 @@
       "hint": "Deja vacío un artículo para quitarle el límite. Máximo 0 = sin máximo.",
       "min": "Mínimo",
       "max": "Máximo",
-      "invalid": "El máximo no puede ser menor que el mínimo."
-    }
+      "invalid": "El máximo no puede ser menor que el mínimo.",
+      "subtitle": "Mínimo y máximo de piezas por artículo en este almacén."
+    },
+    "kpi": {
+      "active": "Áreas activas",
+      "withCustodian": "Con custodio",
+      "withoutCustodian": "Sin custodio",
+      "locations": "Ubicaciones"
+    },
+    "formSubtitle": "Código, nombre, tipo y custodio del almacén, ropería o punto.",
+    "locationSubtitle": "Agrega una ubicación (estante, carro, cuarto) dentro del área."
   },
   "cosign": {
     "hint": "La otra persona confirma con su usuario y contraseña.",
@@ -108,7 +126,8 @@
     "password": "Contraseña",
     "confirm": "Firmar",
     "titleDelivers": "Firma de quien entrega",
-    "titleReceives": "Firma de quien recibe"
+    "titleReceives": "Firma de quien recibe",
+    "subtitle": "Otra persona confirma con su usuario y contraseña."
   },
   "stock": {
     "title": "Existencias",
@@ -143,7 +162,8 @@
       "title": "Lotes de {{name}}",
       "empty": "Sin lotes registrados.",
       "balance": "Saldo {{n}}",
-      "received": "Entrada {{date}} · inicial {{n}}"
+      "received": "Entrada {{date}} · inicial {{n}}",
+      "subtitle": "Lotes del artículo y dónde está cada pieza."
     }
   },
   "transfers": {
@@ -194,7 +214,8 @@
       "removeLine": "Quitar",
       "notes": "Notas (opcional)",
       "cosign": "Firma quien entrega (otra persona confirma con su contraseña)",
-      "send": "Enviar traspaso"
+      "send": "Enviar traspaso",
+      "totalPieces": "Piezas a enviar"
     },
     "detail": {
       "title": "Detalle del traspaso",
@@ -217,6 +238,11 @@
       "cancelMessage": "Lo enviado regresará al almacén de origen. ¿Continuar?",
       "signatures": "Firmas",
       "noSignatures": "Sin firmas."
+    },
+    "toast": {
+      "sent": "Traspaso enviado",
+      "received": "Traspaso recibido",
+      "cancelled": "Traspaso cancelado"
     }
   },
   "roomPar": {

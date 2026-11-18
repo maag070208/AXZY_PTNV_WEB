@@ -42,5 +42,8 @@
     "sameUser": "Quien contó el traspaso no puede firmar la conformidad",
     "notApplicable": "Este traspaso no requiere firma de conformidad",
     "noStockBlock": "La firma no bloquea las existencias: el área ya cuenta con las piezas recibidas."
+  },
+  "toast": {
+    "signed": "Firma registrada"
   }
 }

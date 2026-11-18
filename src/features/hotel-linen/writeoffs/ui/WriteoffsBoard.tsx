@@ -190,7 +190,7 @@ export default function WriteoffsBoard({ onOpen, onDownloadPdf }: Props) {
   ];
 
   return (
-    <PanelCard title={t("writeoffs.title")} description={t("writeoffs.description")}>
+    <PanelCard>
       <ITTabs variant="line" items={items} />
     </PanelCard>
   );

@@ -13,6 +13,7 @@ import {
 import { newId } from "@shared/lib/newId";
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { PanelCard } from "@shared/ui/panel-card";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface LineDraft {
   id: string;
@@ -30,6 +31,7 @@ interface Props {
 /** Nueva entrega: ropería, destinataria (supervisora de la zona), sugerido por área y renglones. */
 export default function AmenityDeliveryForm({ onDone, onCancel }: Props) {
   const { t } = useTranslation("hotel-linen-amenity-delivery");
+  const notify = useSuccessToast();
   const requestKey = useRequestKey();
   const [warehouses, setWarehouses] = useState<HotelWarehouse[]>([]);
   const [products, setProducts] = useState<HotelProduct[]>([]);
@@ -103,6 +105,7 @@ export default function AmenityDeliveryForm({ onDone, onCancel }: Props) {
         notes: notes.trim() || null,
       };
       const created = await amenityDeliveryApi.create(body, requestKey(body));
+      notify(t("toast.created"));
       onDone(created.id);
     } catch (e) {
       setError((e as Error).message);
@@ -113,7 +116,7 @@ export default function AmenityDeliveryForm({ onDone, onCancel }: Props) {
 
   return (
     <ITFlex direction="column" gap={4}>
-      <PanelCard title={t("new.title")} description={t("new.description")}>
+      <PanelCard>
         <ITFlex direction="column" gap={4}>
           {error && (
             <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
@@ -180,10 +183,18 @@ export default function AmenityDeliveryForm({ onDone, onCancel }: Props) {
         </PanelCard>
       )}
 
-      <PanelCard title={t("new.quantity")}>
+      <PanelCard
+        title={t("new.quantity")}
+        actions={
+          <ITFlex gap={2}>
+            <ITButton variant="outlined" color="secondary" label={t("cancel")} onClick={onCancel} />
+            <ITButton variant="filled" color="primary" label={t("new.submit")} disabled={busy || !valid} onClick={() => void submit()} />
+          </ITFlex>
+        }
+      >
         <ITFlex direction="column" gap={3}>
           {lines.map((line, index) => (
-            <ITGrid key={line.id} container columns={12} spacing={3}>
+            <ITGrid key={line.id} container columns={12} spacing={3} className="items-end">
               <ITGrid item xs={12} md={7}>
                 <ITSearchSelect
                   name={`amenityProduct${index}`}
@@ -214,10 +225,6 @@ export default function AmenityDeliveryForm({ onDone, onCancel }: Props) {
             <ITButton variant="outlined" color="primary" icon={<FaPlus size={12} />} label={t("new.addLine")} onClick={() => setLines((list) => [...list, emptyLine()])} />
           </ITFlex>
           <ITTextarea name="amenityNotes" label={t("new.notes")} rows={2} value={notes} onChange={(e) => setNotes(e)} />
-          <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" label={t("cancel")} onClick={onCancel} />
-            <ITButton variant="filled" color="primary" label={t("new.submit")} disabled={busy || !valid} onClick={() => void submit()} />
-          </ITFlex>
         </ITFlex>
       </PanelCard>
     </ITFlex>

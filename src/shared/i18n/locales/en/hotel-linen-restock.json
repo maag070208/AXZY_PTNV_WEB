@@ -13,5 +13,8 @@
   "deficit": "Deficit",
   "rooms": "{{count}} rooms",
   "noDeficit": "No deficit",
-  "noPar": "The zone has no rooms with a linen par."
+  "noPar": "The zone has no rooms with a linen par.",
+  "toast": {
+    "created": "Restock request created"
+  }
 }

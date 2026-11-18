@@ -15,6 +15,9 @@ import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { dateStrToLocal, day, localToDateStr, qty, todayStr } from "../lib";
 import { RequestStatusChip } from "./PurchaseChips";
+import { LuClipboardList } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 /** Lunes de la semana de una fecha local ("YYYY-MM-DD"). */
 const mondayOf = (value: string): string => {
@@ -33,6 +36,7 @@ interface Props {
 /** Solicitudes de reposición: generar (semanal de bajas / bajo mínimo), revisar y convertir en OC. */
 export default function RequestsTab({ lookups, reloadKey, onChanged, onOpenOrder }: Props) {
   const { t } = useTranslation("hotel-linen-purchase");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const canCreate = useCan("hotel_purchase.create");
   const [week, setWeek] = useState(mondayOf(todayStr()));
@@ -66,6 +70,7 @@ export default function RequestsTab({ lookups, reloadKey, onChanged, onOpenOrder
     setError(null);
     try {
       const { orderId } = await purchaseApi.convertRequest(selected.id, supplierId);
+      notify(t("toast.converted"));
       setSelected(null);
       onChanged();
       onOpenOrder(orderId);
@@ -82,6 +87,7 @@ export default function RequestsTab({ lookups, reloadKey, onChanged, onOpenOrder
     setError(null);
     try {
       await purchaseApi.dismissRequest(selected.id);
+      notify(t("toast.dismissed"));
       setSelected(null);
       onChanged();
     } catch (e) {
@@ -125,7 +131,7 @@ export default function RequestsTab({ lookups, reloadKey, onChanged, onOpenOrder
     <ITFlex direction="column" gap={3}>
       {canCreate && (
         <ITFlex gap={3} className="items-end" wrap="wrap">
-          <div className="w-[190px]">
+          <ITFlex className="w-48">
             <ITDatePicker
               name="requestWeek"
               label={t("requests.weekFrom")}
@@ -135,7 +141,7 @@ export default function RequestsTab({ lookups, reloadKey, onChanged, onOpenOrder
                 if (v instanceof Date) setWeek(mondayOf(localToDateStr(v)));
               }}
             />
-          </div>
+          </ITFlex>
           <ITButton variant="outlined" color="primary" icon={<FaMagic size={12} />} label={t("requests.generateWeekly")} disabled={busy} onClick={() => void generate(() => purchaseApi.generateWeekly(week))} />
           <ITButton variant="outlined" color="primary" icon={<FaMagic size={12} />} label={t("requests.generateLowStock")} disabled={busy} onClick={() => void generate(() => purchaseApi.generateLowStock())} />
         </ITFlex>
@@ -168,17 +174,18 @@ export default function RequestsTab({ lookups, reloadKey, onChanged, onOpenOrder
         rowHeight={56}
       />
 
-      <ITDialog isOpen={selected !== null} onClose={() => setSelected(null)} title={selected ? t("requests.detailTitle", { folio: selected.folio }) : ""}>
+      <ITDialog isOpen={selected !== null} onClose={() => setSelected(null)}>
+      <DialogHeader icon={<LuClipboardList />} title={selected ? t("requests.detailTitle", { folio: selected.folio }) : ""} subtitle={t("requests.detailSubtitle")} />
         {selected && (
           <ITFlex direction="column" gap={3} className="min-w-[560px]">
             {error && <ITAlert variant="error">{error}</ITAlert>}
             <RequestStatusChip status={selected.status} />
             {selected.lines.map((l) => (
               <ITFlex key={l.id} justify="between" gap={3}>
-                <div>
+                <ITFlex direction="column">
                   <ITText className="text-[12px] font-bold">{l.product.name}</ITText>
                   <ITText muted className="text-[11px]">{l.reason ?? [l.product.code, l.product.size].filter(Boolean).join(" · ")}</ITText>
-                </div>
+                </ITFlex>
                 <ITText className="text-[12px] font-bold tabular-nums">{qty(l.quantity)}</ITText>
               </ITFlex>
             ))}

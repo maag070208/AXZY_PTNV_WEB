@@ -86,14 +86,16 @@
       "quantity": "Returned / lent",
       "method": "Method",
       "deposit": "Deposit",
-      "status": "Status"
+      "status": "Status",
+      "lentBy": "Lent by"
     },
     "returnDialog": {
       "title": "Return towels {{folio}}",
       "pending": "{{guest}} has {{count}} towel(s) to return.",
       "quantity": "Quantity returned",
       "refund": "Deposit refunded: {{amount}}",
-      "confirm": "Return"
+      "confirm": "Return",
+      "subtitle": "Record the towels the guest returns; the deposit is refunded."
     }
   },
   "close": {
@@ -110,7 +112,8 @@
       "collected": "Deposits collected: {{amount}}",
       "returnedDeposit": "Deposits refunded: {{amount}}",
       "retained": "Deposits retained: {{amount}}"
-    }
+    },
+    "subtitle": "Towel and deposit summary for the shift before closing the point."
   },
   "closes": {
     "title": "Shift closes",
@@ -159,7 +162,8 @@
       "delivered": "{{count}} × {{product}} were delivered.",
       "quantity": "Quantity collected",
       "missing": "{{count}} missing: they stay as missing and Reception is notified.",
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "subtitle": "Record the pieces collected from the room."
     },
     "table": {
       "title": "Extras history"
@@ -172,6 +176,11 @@
       "requestedBy": "Requested by",
       "status": "Status",
       "missing": "Missing"
+    },
+    "toast": {
+      "collected": "Collection recorded",
+      "created": "Extra recorded",
+      "delivered": "Extra delivered"
     }
   },
   "equipment": {
@@ -192,7 +201,10 @@
       "deliver": "Deliver (test)",
       "deliverCosign": "Deliver with signature",
       "return": "Collect",
-      "cosignTitle": "Signature of whoever delivers the equipment"
+      "cosignTitle": "Signature of whoever delivers the equipment",
+      "requested": "Requested",
+      "deliveredByCol": "Delivered by",
+      "pending": "Pending"
     },
     "return": {
       "title": "Collect {{tag}}",
@@ -203,7 +215,8 @@
       "ticketHint": "A maintenance ticket is opened and Reception is notified for the charge.",
       "notes": "Notes",
       "confirm": "Collect",
-      "notesRequired": "Describe what happened to the equipment."
+      "notesRequired": "Describe what happened to the equipment.",
+      "subtitle": "Record the condition the equipment comes back in."
     },
     "add": {
       "title": "Add units",
@@ -223,6 +236,16 @@
     },
     "repaired": "Repaired",
     "retire": "Take out of use",
-    "reactivate": "Reactivate"
+    "reactivate": "Reactivate",
+    "toast": {
+      "delivered": "Equipment delivered",
+      "returned": "Equipment return recorded"
+    }
+  },
+  "toast": {
+    "loanCreated": "Loan recorded",
+    "closed": "Shift close recorded",
+    "returned": "Return recorded",
+    "reviewed": "Close reviewed"
   }
 }

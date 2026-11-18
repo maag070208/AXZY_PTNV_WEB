@@ -8,7 +8,10 @@
     "view": "Ver detalle",
     "save": "Guardar",
     "search": "Buscar...",
-    "back": "Volver"
+    "back": "Volver",
+    "saving": "Guardando…",
+    "saved": "Guardado",
+    "close": "Cerrar"
   },
   "breadcrumbs": {
     "home": "Inicio"

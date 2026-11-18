@@ -11,6 +11,7 @@ import {
 } from "@entities/hotel-linen";
 import type { ITDataTableFetchParamsPost } from "@shared/api/table";
 import { dyn } from "@shared/i18n/dyn";
+import { makeClientTableFetch } from "@shared/api/clientTable";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import AmenityDeliveryStatusChip from "./AmenityDeliveryStatusChip";
@@ -137,6 +138,18 @@ function AreaHistory({ warehouses, onOpen }: { warehouses: HotelWarehouse[]; onO
     };
   }, [areaId]);
 
+  const historyFetch = useMemo(() => makeClientTableFetch<AmenityDeliveryRow>(() => Promise.resolve(rows)), [rows]);
+  const historyColumns: Column<AmenityDeliveryRow>[] = useMemo(
+    () => [
+      { key: "folio", label: t("columns.folio"), type: "string", width: 120, filter: true, render: (r) => <ITText className="font-mono text-[12px] font-bold">{r.folio}</ITText> },
+      { key: "date", label: t("columns.date"), type: "date", width: 130, filter: "date-range", render: (r) => <ITText className="text-[12px]">{new Date(r.date).toLocaleDateString("es-MX")}</ITText> },
+      { key: "status", label: t("columns.status"), type: "string", width: 190, sortable: false, render: (r) => <AmenityDeliveryStatusChip status={r.status} /> },
+      { key: "recipient.name", label: t("columns.recipient"), type: "string", width: 200, filter: true, render: (r) => personCell(r.recipient) },
+      { key: "sentQuantity", label: t("columns.sent"), type: "number", width: 100, render: (r) => <ITText className="text-[12px] tabular-nums">{fmt(r.sentQuantity)}</ITText> },
+    ],
+    [t]
+  );
+
   return (
     <ITFlex direction="column" gap={3}>
       <ITSelect
@@ -151,15 +164,18 @@ function AreaHistory({ warehouses, onOpen }: { warehouses: HotelWarehouse[]; onO
       ) : rows.length === 0 ? (
         <ITText muted>{t("history.empty")}</ITText>
       ) : (
-        rows.map((r) => (
-          <ITFlex key={r.id} align="center" gap={3} className="cursor-pointer" onClick={() => onOpen(r.id)}>
-            <ITText className="font-mono text-[12px] font-bold">{r.folio}</ITText>
-            <ITText className="text-[12px]">{new Date(r.date).toLocaleDateString("es-MX")}</ITText>
-            <AmenityDeliveryStatusChip status={r.status} />
-            <ITText className="text-[12px]">{r.recipient?.name ?? "—"}</ITText>
-            <ITText className="text-[12px] tabular-nums">{fmt(r.sentQuantity)}</ITText>
-          </ITFlex>
-        ))
+        <ITDataTable
+          showViewToggle={false}
+          columns={historyColumns as unknown as Column<Record<string, unknown>>[]}
+          fetchData={historyFetch as never}
+          onRowClick={((row: AmenityDeliveryRow) => onOpen(row.id)) as never}
+          size="lg"
+          defaultItemsPerPage={10}
+          itemsPerPageOptions={[10, 25, 50]}
+          layout="fixed"
+          density="compact"
+          rowHeight={52}
+        />
       )}
     </ITFlex>
   );
@@ -186,7 +202,7 @@ export default function AmenityDeliveriesBoard({ onOpen }: Props) {
   }, []);
 
   return (
-    <PanelCard title={t("title")} description={t("description")}>
+    <PanelCard>
       <ITTabs
         variant="line"
         items={[

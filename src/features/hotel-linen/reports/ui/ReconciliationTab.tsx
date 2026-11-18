@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITAlert, ITBadget, ITFlex } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITChip, ITFlex } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { reportApi, type AreaReconciliationReport } from "@entities/hotel-linen";
 import type { ReportDoc } from "@shared/lib/reportDoc";
 import { defaultFrom, fmt, fmtDay, todayStr } from "../lib";
-import { ExportBar, PeriodFields, ReportTable, td, tdLeft, th, thLeft, type ExportPdf } from "./common";
+import { PanelCard } from "@shared/ui/panel-card";
+import { ExportBar, PeriodFields, ReportTable, type ExportPdf, type ReportCol } from "./common";
 
 /** Conciliación por área: limpios recibidos vs sucios enviados a Lavandería (ajuste demo v2). */
 export default function ReconciliationTab({ exportPdf }: { exportPdf: ExportPdf }) {
@@ -48,6 +49,24 @@ export default function ReconciliationTab({ exportPdf }: { exportPdf: ExportPdf 
     };
   }, [report, t]);
 
+  type Row = AreaReconciliationReport["rows"][number];
+  const columns: ReportCol<Row>[] = [
+    { key: "area", label: t("areaReconciliation.area"), width: 220, value: (r) => r.warehouse.name },
+    { key: "received", label: t("areaReconciliation.received"), numeric: true, value: (r) => r.received, render: (r) => fmt(r.received) },
+    { key: "dirty", label: t("areaReconciliation.dirty"), numeric: true, value: (r) => r.dirty, render: (r) => fmt(r.dirty) },
+    {
+      key: "difference",
+      label: t("areaReconciliation.difference"),
+      numeric: true,
+      value: (r) => r.difference,
+      render: (r) => (
+        <ITChip size="sm" color={Math.abs(r.difference) > Math.max(20, r.received * 0.1) ? "warning" : "info"} label={`${r.difference > 0 ? "+" : ""}${fmt(r.difference)}`} />
+      ),
+    },
+    { key: "loss", label: t("areaReconciliation.loss"), numeric: true, value: (r) => r.transferLoss, render: (r) => (r.transferLoss ? fmt(r.transferLoss) : "—") },
+    { key: "stock", label: t("areaReconciliation.stock"), numeric: true, value: (r) => r.stock, render: (r) => fmt(r.stock) },
+  ];
+
   return (
     <ITFlex direction="column" gap={4}>
       {error && <ITAlert variant="error">{error}</ITAlert>}
@@ -56,35 +75,9 @@ export default function ReconciliationTab({ exportPdf }: { exportPdf: ExportPdf 
         <ExportBar doc={doc} fileName={`blancos-conciliacion-${from}-${to}`} exportPdf={exportPdf} />
       </ITFlex>
       {report && (
-        <ReportTable
-          empty={report.rows.length === 0 ? t("areaReconciliation.none") : null}
-          head={
-            <>
-              <th className={thLeft}>{t("areaReconciliation.area")}</th>
-              <th className={th}>{t("areaReconciliation.received")}</th>
-              <th className={th}>{t("areaReconciliation.dirty")}</th>
-              <th className={th}>{t("areaReconciliation.difference")}</th>
-              <th className={th}>{t("areaReconciliation.loss")}</th>
-              <th className={th}>{t("areaReconciliation.stock")}</th>
-            </>
-          }
-        >
-          {report.rows.map((r) => (
-            <tr key={r.warehouse.id} className="border-b border-[var(--color-border)]">
-              <td className={tdLeft}>{r.warehouse.name}</td>
-              <td className={td}>{fmt(r.received)}</td>
-              <td className={td}>{fmt(r.dirty)}</td>
-              <td className={td}>
-                <ITBadget color={Math.abs(r.difference) > Math.max(20, r.received * 0.1) ? "warning" : "info"} size="lg">
-                  {r.difference > 0 ? "+" : ""}
-                  {fmt(r.difference)}
-                </ITBadget>
-              </td>
-              <td className={td}>{r.transferLoss ? fmt(r.transferLoss) : "—"}</td>
-              <td className={td}>{fmt(r.stock)}</td>
-            </tr>
-          ))}
-        </ReportTable>
+        <PanelCard title={t("areaReconciliation.title")}>
+          <ReportTable rows={report.rows} empty={t("areaReconciliation.none")} columns={columns} />
+        </PanelCard>
       )}
     </ITFlex>
   );

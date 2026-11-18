@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
-  ITBadget,
   ITButton,
   ITDataTable,
   ITDialog,
@@ -15,7 +14,7 @@ import {
   ITToast,
 } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
-import { FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
+import { FaBoxes, FaEdit, FaPowerOff, FaSprayCan, FaTrash, FaTrashRestore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import {
   HOTEL_PRODUCT_KINDS,
@@ -28,8 +27,13 @@ import {
 } from "@entities/hotel-linen";
 import { useCan } from "@entities/user";
 import { makeClientTableFetch } from "@shared/api/clientTable";
+import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
+import { ToneChip } from "@shared/ui/tone-chip";
 import { dyn } from "@shared/i18n/dyn";
+import { LuShirt } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
 
 type QuickKind = "ALL" | HotelProductKind;
 
@@ -97,6 +101,7 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
   const units = useHotelUnitOptions();
   const categories = useHotelCategoryOptions();
   const [quick, setQuick] = useState<QuickKind>("ALL");
+  const [all, setAll] = useState<HotelProduct[]>([]);
   const [reloadKey, setReloadKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -162,6 +167,7 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
     const base = makeClientTableFetch<HotelProduct>(
       async () => {
         const rows = await hotelLinenApi.products(true);
+        setAll(rows);
         return quick === "ALL" ? rows : rows.filter((p) => p.kind === quick);
       },
       {
@@ -202,9 +208,7 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
       filter: "catalog",
       catalogOptions: { data: kindOptions },
       render: (p) => (
-        <ITBadget color="info" size="lg">
-          {tt(`kind.${p.kind}`)}
-        </ITBadget>
+        <ToneChip tone="info" label={tt(`kind.${p.kind}`)} />
       ),
     },
     {
@@ -274,9 +278,7 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
         ],
       },
       render: (p) => (
-        <ITBadget color={p.active ? "success" : "danger"} size="lg">
-          {p.active ? t("common.active") : t("common.inactive")}
-        </ITBadget>
+        <ToneChip tone={p.active ? "success" : "danger"} label={p.active ? t("common.active") : t("common.inactive")} />
       ),
     },
     ...(canManage
@@ -319,11 +321,18 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
   ];
 
   const f = dialog.form;
+  const kpis = useMemo(() => {
+    const act = all.filter((p) => p.active);
+    return {
+      active: act.length,
+      linen: act.filter((p) => p.kind === "LINEN").length,
+      consumable: act.filter((p) => p.kind === "CONSUMABLE").length,
+      inactive: all.length - act.length,
+    };
+  }, [all]);
 
   return (
     <PanelCard
-      title={t("catalog.title")}
-      description={t("catalog.description")}
       actions={
         <ITSegmentedControl
           size="sm"
@@ -333,7 +342,20 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
         />
       }
     >
-      <ITFlex direction="column" gap={3}>
+      <ITFlex direction="column" gap={4}>
+        <div className="grid !grid-cols-2 gap-4 md:!grid-cols-4">
+          <KpiTile size="sm" label={t("catalog.kpi.active")} value={kpis.active} icon={<FaBoxes size={14} />} tone="sky" />
+          <KpiTile size="sm" label={t("catalog.kpi.linen")} value={kpis.linen} icon={<FaBoxes size={14} />} tone="violet" />
+          <KpiTile size="sm" label={t("catalog.kpi.consumable")} value={kpis.consumable} icon={<FaSprayCan size={14} />} tone="emerald" />
+          <KpiTile
+            size="sm"
+            label={t("catalog.kpi.inactive")}
+            value={kpis.inactive}
+            icon={<FaPowerOff size={14} />}
+            tone={kpis.inactive > 0 ? "amber" : "neutral"}
+            hint={kpis.inactive === 0 ? t("common.allGood") : undefined}
+          />
+        </div>
         {error && (
           <ITAlert variant="error" dismissible onDismiss={() => setError(null)}>
             {error}
@@ -358,8 +380,8 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
       <ITDialog
         isOpen={dialog.open}
         onClose={() => setDialog({ open: false, item: null, form: emptyForm() })}
-        title={dialog.item ? t("catalog.edit") : t("catalog.new")}
       >
+      <DialogHeader icon={<LuShirt />} title={dialog.item ? t("catalog.edit") : t("catalog.new")} subtitle={t("catalog.formSubtitle")} />
         <ITFlex direction="column" gap={3} className="min-w-[360px]">
           {error && <ITAlert variant="error">{error}</ITAlert>}
           <ITGrid container columns={12} spacing={3}>
@@ -445,16 +467,7 @@ export default function LinenCatalogPanel({ newSignal = 0 }: Props) {
               </ITGrid>
             )}
           </ITGrid>
-          <ITFlex justify="end" gap={2}>
-            <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={() => setDialog({ open: false, item: null, form: emptyForm() })} />
-            <ITButton
-              variant="filled"
-              color="primary"
-              label={t("common.save")}
-              disabled={saving || !f.code.trim() || !f.name.trim() || !f.unitId}
-              onClick={() => void save()}
-            />
-          </ITFlex>
+          <DialogFooter onCancel={() => setDialog({ open: false, item: null, form: emptyForm() })} onConfirm={() => void save()} confirmLabel={t("common.save")} busy={saving} disabled={!f.code.trim() || !f.name.trim() || !f.unitId} />
         </ITFlex>
       </ITDialog>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ITAlert, ITButton, ITDialog, ITFlex, ITInputNumber, ITSegmentedControl, ITSelect, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITDialog, ITFlex, ITInputNumber, ITSegmentedControl, ITSelect, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import {
   LAUNDRY_TRANSITIONS,
@@ -11,6 +11,10 @@ import {
 } from "@entities/hotel-linen";
 import { dyn } from "@shared/i18n/dyn";
 import { fmt } from "../lib";
+import { LuArrowRightLeft } from "react-icons/lu";
+import { DialogHeader } from "@shared/ui/dialog-header";
+import { DialogFooter } from "@shared/ui/dialog-footer";
+import { useSuccessToast } from "@app/toast/useSuccessToast";
 
 interface Props {
   /** Producto a mover; `null` = cerrado. */
@@ -22,6 +26,7 @@ interface Props {
 /** "Pasar a…": mueve piezas de una etapa a otra respetando las transiciones válidas. */
 export default function LaundryMoveDialog({ row, onClose, onDone }: Props) {
   const { t } = useTranslation("hotel-linen-laundry");
+  const notify = useSuccessToast();
   const tt = dyn(t);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -71,6 +76,7 @@ export default function LaundryMoveDialog({ row, onClose, onDone }: Props) {
         treatment: showTreatment ? treatment : null,
       };
       await laundryApi.process([move]);
+      notify(t("toast.moved"));
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -80,7 +86,8 @@ export default function LaundryMoveDialog({ row, onClose, onDone }: Props) {
   };
 
   return (
-    <ITDialog isOpen={row !== null} onClose={onClose} title={t("laundry.move.title", { name: row?.product.name ?? "" })}>
+    <ITDialog isOpen={row !== null} onClose={onClose}>
+      <DialogHeader icon={<LuArrowRightLeft />} title={t("laundry.move.title", { name: row?.product.name ?? "" })} subtitle={t("laundry.move.subtitle")} />
       <ITFlex direction="column" gap={3} className="min-w-[420px]">
         {error && <ITAlert variant="error">{error}</ITAlert>}
         {fromStages.length === 0 ? (
@@ -134,10 +141,7 @@ export default function LaundryMoveDialog({ row, onClose, onDone }: Props) {
               onChange={(v) => setQty(v ?? null)}
             />
             {qty !== null && qty > available && <ITAlert variant="warning">{t("laundry.move.over", { max: fmt(available) })}</ITAlert>}
-            <ITFlex justify="end" gap={2}>
-              <ITButton variant="outlined" color="secondary" label={t("common.cancel")} onClick={onClose} />
-              <ITButton variant="filled" color="primary" label={t("laundry.move.confirm")} disabled={busy || !valid} onClick={() => void submit()} />
-            </ITFlex>
+            <DialogFooter onCancel={onClose} onConfirm={() => void submit()} confirmLabel={t("laundry.move.confirm")} busy={busy} disabled={!valid} />
           </>
         )}
       </ITFlex>
