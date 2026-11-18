@@ -27,13 +27,16 @@ import { StickyActions } from "@shared/ui/sticky-actions";
 import { formatLongDateEs, parseLocalDay, toDayString } from "@shared/utils/dates";
 import {
   emptyApercibimiento,
+  emptyDaycare,
   emptyLaboral,
   type ApercibimientoLetterData,
+  type DaycareLetterData,
   type HrFormatKind,
   type LaboralLetterData,
 } from "../model/types";
-import { downloadApercibimientoPdf, downloadLaboralPdf } from "../model/pdf";
+import { downloadApercibimientoPdf, downloadDaycarePdf, downloadLaboralPdf } from "../model/pdf";
 import ApercibimientoLetterPdf from "./ApercibimientoLetterPdf";
+import DaycareLetterPdf from "./DaycareLetterPdf";
 import LaboralLetterPdf from "./LaboralLetterPdf";
 
 const BACK = "/hr/formats";
@@ -71,6 +74,7 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
   const [error, setError] = useState<string | null>(null);
   const [laboral, setLaboral] = useState<LaboralLetterData>(() => emptyLaboral(today));
   const [aperc, setAperc] = useState<ApercibimientoLetterData>(() => emptyApercibimiento(today));
+  const [daycare, setDaycare] = useState<DaycareLetterData>(() => emptyDaycare(today));
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
@@ -101,16 +105,17 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
         }
       }
       const genderName = (p.gender?.name ?? "").toLowerCase();
-      setLaboral((l) => ({
-        ...l,
-        treatment: /^(m$|masc|hombre|varon|varón|male)/.test(genderName) ? "el" : "la",
+      const identity = {
+        treatment: /^(m$|masc|hombre|varon|varón|male)/.test(genderName) ? ("el" as const) : ("la" as const),
         name: fullName,
         nss: p.nss ?? "",
         curp: p.curp ?? "",
         rfc: p.rfc ?? "",
         jobTitle: p.jobTitle ?? "",
         hireDate: p.hireDate ? p.hireDate.slice(0, 10) : "",
-      }));
+      };
+      setLaboral((l) => ({ ...l, ...identity }));
+      setDaycare((d) => ({ ...d, ...identity }));
       setAperc((a) => ({ ...a, name: fullName, jobTitle: p.jobTitle ?? "", headName }));
     } catch {
       setError(t("errors.loadProfile"));
@@ -120,12 +125,16 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
   };
 
   const isLaboral = kind === "laboral";
-  const data = isLaboral ? laboral : aperc;
+  const isDaycare = kind === "daycare";
+  const isWarning = kind === "apercibimiento";
+  const data = isLaboral ? laboral : isDaycare ? daycare : aperc;
   const previewData = useDebouncedValue(data, 500);
 
   const valid = isLaboral
     ? !!laboral.name.trim() && (laboral.salary ?? 0) > 0
-    : !!aperc.name.trim() && !!aperc.irregularities.trim();
+    : isDaycare
+      ? !!daycare.name.trim()
+      : !!aperc.name.trim() && !!aperc.irregularities.trim();
 
   const run = async (save: boolean) => {
     setTouched(true);
@@ -135,6 +144,8 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
     try {
       if (isLaboral) {
         await downloadLaboralPdf(laboral);
+      } else if (isDaycare) {
+        await downloadDaycarePdf(daycare);
       } else {
         if (save) {
           if (!userId) {
@@ -166,6 +177,7 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
     if (!(v instanceof Date)) return;
     const s = toDayString(v);
     if (isLaboral) setLaboral((l) => ({ ...l, date: s }));
+    else if (isDaycare) setDaycare((d) => ({ ...d, date: s }));
     else setAperc((a) => ({ ...a, date: s }));
   };
 
@@ -178,6 +190,21 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
     name: `fmt-ap-${key}`,
     value: aperc[key] as string,
     onChange: (e: { target: { value: string } }) => setAperc((a) => ({ ...a, [key]: e.target.value })),
+  });
+
+  const dcText = <K extends keyof DaycareLetterData>(key: K) => ({
+    name: `fmt-dc-${key}`,
+    value: daycare[key] as string,
+    onChange: (e: { target: { value: string } }) => setDaycare((d) => ({ ...d, [key]: e.target.value })),
+  });
+  /** Fecha opcional de la constancia (vacía = sin fecha). */
+  const dcDate = (key: "hireDate" | "vacationFrom" | "vacationTo") => ({
+    name: `fmt-dc-${key}`,
+    value: parseLocalDay(daycare[key]),
+    onChange: (e: { target: { value: unknown } }) => {
+      const v = e.target.value;
+      setDaycare((d) => ({ ...d, [key]: v instanceof Date ? toDayString(v) : "" }));
+    },
   });
 
   const whoDone = !!userId && !!data.name.trim();
@@ -199,8 +226,9 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
         { label: t(`${kind}.title`) },
       ]}
     >
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
-        <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
+      {/* Mitad formulario, mitad formato: la vista previa queda fija mientras se captura. */}
+      <div className="grid grid-cols-1 items-start gap-4 lg:!grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-4">
           <FormSection
             number={1}
             icon={<LuUser size={16} />}
@@ -280,6 +308,42 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
                   <ITInput {...text("signerName")} label={t("signerName")} />
                   <ITInput {...text("signerTitle")} label={t("signerTitle")} />
                 </>
+              ) : isDaycare ? (
+                <>
+                  <ITSelect
+                    name="fmt-dc-treatment"
+                    label={t("laboral.treatment")}
+                    value={daycare.treatment}
+                    options={[
+                      { value: "la", label: t("laboral.treatmentFemale") },
+                      { value: "el", label: t("laboral.treatmentMale") },
+                    ]}
+                    onChange={(e: { target: { value: string } }) =>
+                      setDaycare((d) => ({ ...d, treatment: e.target.value === "el" ? "el" : "la" }))
+                    }
+                  />
+                  <ITInput {...dcText("name")} label={t("fullName")} required error={required(!daycare.name.trim())} />
+                  <ITInput {...dcText("rfc")} label={t("rfc")} />
+                  <ITInput {...dcText("nss")} label={t("nss")} />
+                  <ITInput {...dcText("curp")} label={t("curp")} />
+                  <ITInput {...dcText("jobTitle")} label={t("jobTitle")} />
+                  <ITDatePicker {...dcDate("hireDate")} label={t("hireDate")} />
+                  <ITInput {...dcText("schedule")} label={t("daycare.schedule")} placeholder={t("daycare.scheduleHint")} />
+                  <ITInput {...dcText("workDays")} label={t("daycare.workDays")} placeholder={t("daycare.workDaysHint")} />
+                  <ITInput {...dcText("restDays")} label={t("daycare.restDays")} placeholder={t("daycare.restDaysHint")} />
+                  <ITInputNumber
+                    name="fmt-dc-vacationDays"
+                    label={t("daycare.vacationDays")}
+                    min={0}
+                    value={daycare.vacationDays}
+                    onChange={(v) => setDaycare((d) => ({ ...d, vacationDays: v ?? null }))}
+                  />
+                  <ITDatePicker {...dcDate("vacationFrom")} label={t("daycare.vacationFrom")} />
+                  <ITDatePicker {...dcDate("vacationTo")} label={t("daycare.vacationTo")} />
+                  <ITText muted className="!text-[11px]">{t("daycare.vacationHint")}</ITText>
+                  <ITInput {...dcText("signerName")} label={t("signerName")} />
+                  <ITInput {...dcText("signerTitle")} label={t("signerTitle")} />
+                </>
               ) : (
                 <>
                   <ITInput {...apText("name")} label={t("fullName")} required error={required(!aperc.name.trim())} />
@@ -301,24 +365,31 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
               {error && <ITText className="!text-[12px] text-red-600">{error}</ITText>}
             </ITStack>
           </FormSection>
+
+          <LiveSummary title={t("summaryTitle")} total={2} done={(whoDone ? 1 : 0) + (dataDone ? 1 : 0)}>
+            <LiveSummaryRow label={t("employee")} value={data.name || undefined} />
+            <LiveSummaryRow label={t("date")} value={formatLongDateEs(parseLocalDay(data.date))} />
+            <LiveSummaryRow label={t("jobTitle")} value={data.jobTitle || undefined} />
+          </LiveSummary>
         </div>
 
-        <LiveSummary title={t("summaryTitle")} total={2} done={(whoDone ? 1 : 0) + (dataDone ? 1 : 0)}>
-          <LiveSummaryRow label={t("employee")} value={data.name || undefined} />
-          <LiveSummaryRow label={t("date")} value={formatLongDateEs(parseLocalDay(data.date))} />
-          <LiveSummaryRow label={t("jobTitle")} value={data.jobTitle || undefined} />
-        </LiveSummary>
+        <div className="min-w-0 lg:sticky lg:top-4">
+          <PanelCard title={t("preview")} icon={<LuFileText size={16} />}>
+            <PDFViewer
+              style={{ width: "100%", height: "calc(100vh - 220px)", minHeight: 560, border: "none", borderRadius: 16 }}
+              showToolbar={false}
+            >
+              {isLaboral ? (
+                <LaboralLetterPdf data={previewData as LaboralLetterData} />
+              ) : isDaycare ? (
+                <DaycareLetterPdf data={previewData as DaycareLetterData} />
+              ) : (
+                <ApercibimientoLetterPdf data={previewData as ApercibimientoLetterData} />
+              )}
+            </PDFViewer>
+          </PanelCard>
+        </div>
       </div>
-
-      <PanelCard title={t("preview")} icon={<LuFileText size={16} />}>
-        <PDFViewer style={{ width: "100%", height: 760, border: "none", borderRadius: 16 }} showToolbar={false}>
-          {isLaboral ? (
-            <LaboralLetterPdf data={previewData as LaboralLetterData} />
-          ) : (
-            <ApercibimientoLetterPdf data={previewData as ApercibimientoLetterData} />
-          )}
-        </PDFViewer>
-      </PanelCard>
 
       <StickyActions>
         <ITButton
@@ -332,14 +403,14 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
         />
         <ITButton
           label={t("downloadPdf")}
-          variant={!isLaboral && canSave ? "outlined" : "rounded"}
+          variant={isWarning && canSave ? "outlined" : "rounded"}
           color="primary"
           size="sm"
-          className={!isLaboral && canSave ? "!rounded-full" : undefined}
+          className={isWarning && canSave ? "!rounded-full" : undefined}
           onClick={() => void run(false)}
           disabled={busy}
         />
-        {!isLaboral && canSave && (
+        {isWarning && canSave && (
           <ITButton
             label={t("apercibimiento.generateAndSave")}
             variant="rounded"

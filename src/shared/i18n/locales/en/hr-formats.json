@@ -38,6 +38,20 @@
     "headName": "Department head",
     "generateAndSave": "Generate and save"
   },
+  "daycare": {
+    "title": "Daycare letter",
+    "description": "Letter for the IMSS daycare: employment data, work schedule, rest days and vacation period.",
+    "schedule": "Work schedule",
+    "scheduleHint": "For example: 9:00 am. a 5:00 pm.",
+    "workDays": "Work days",
+    "workDaysHint": "For example: lunes a domingo",
+    "restDays": "Rest days",
+    "restDaysHint": "For example: martes",
+    "vacationDays": "Vacation days",
+    "vacationFrom": "Vacation: from",
+    "vacationTo": "Vacation: to",
+    "vacationHint": "Optional: without days or dates the vacation sentence is not printed."
+  },
   "errors": {
     "loadPeople": "Could not load the employee list",
     "loadProfile": "Could not load the employee file",

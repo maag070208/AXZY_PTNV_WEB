@@ -1,9 +1,13 @@
 /** Datos de las cartas de RH. Las fechas viajan como "YYYY-MM-DD". */
 
-export type HrFormatKind = "laboral" | "apercibimiento";
+export type HrFormatKind = "laboral" | "apercibimiento" | "daycare";
 
 export const RH_SIGNER_NAME = "Lic. Rosalba Meda Anaya";
 export const RH_SIGNER_TITLE = "Jefatura de Recursos Humanos";
+
+/** Datos patronales fijos que pide la constancia para guardería. */
+export const EMPLOYER_REGISTRATION = "Y94-15081-109";
+export const EMPLOYER_RFC = "HVP-1902142-A4";
 
 export interface LaboralLetterData {
   date: string;
@@ -33,6 +37,30 @@ export interface ApercibimientoLetterData {
   signerTitle: string;
 }
 
+/** Constancia para guardería (IMSS): horario, descanso y vacaciones de la persona. */
+export interface DaycareLetterData {
+  date: string;
+  treatment: "la" | "el";
+  name: string;
+  rfc: string;
+  nss: string;
+  curp: string;
+  jobTitle: string;
+  hireDate: string;
+  /** Texto libre, p. ej. "9:00 am. a 5:00 pm.". */
+  schedule: string;
+  /** Texto libre, p. ej. "lunes a domingo". */
+  workDays: string;
+  /** Texto libre, p. ej. "martes". */
+  restDays: string;
+  /** Periodo vacacional opcional: sin días o sin fechas no se imprime. */
+  vacationDays: number | null;
+  vacationFrom: string;
+  vacationTo: string;
+  signerName: string;
+  signerTitle: string;
+}
+
 export const emptyLaboral = (date: string): LaboralLetterData => ({
   date,
   addressee: "",
@@ -54,6 +82,25 @@ export const emptyApercibimiento = (date: string): ApercibimientoLetterData => (
   jobTitle: "",
   irregularities: "",
   headName: "",
+  signerName: RH_SIGNER_NAME,
+  signerTitle: RH_SIGNER_TITLE,
+});
+
+export const emptyDaycare = (date: string): DaycareLetterData => ({
+  date,
+  treatment: "la",
+  name: "",
+  rfc: "",
+  nss: "",
+  curp: "",
+  jobTitle: "",
+  hireDate: "",
+  schedule: "",
+  workDays: "",
+  restDays: "",
+  vacationDays: null,
+  vacationFrom: "",
+  vacationTo: "",
   signerName: RH_SIGNER_NAME,
   signerTitle: RH_SIGNER_TITLE,
 });
