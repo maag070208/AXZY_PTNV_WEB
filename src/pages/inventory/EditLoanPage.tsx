@@ -1,3 +1,5 @@
+import { LuFileText } from "react-icons/lu";
+import { PanelCard } from "@shared/ui/panel-card";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,7 +15,7 @@ import {
   ITToast
 } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
-import { FaFileSignature, FaSave } from "react-icons/fa";
+import { FaFileSignature } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { inventoryApi, type Device, type Loan, type DeviceType } from "@entities/inventory";
 import { departmentsApi, type Department } from "@entities/department";
@@ -213,12 +215,17 @@ export default function EditLoanPage() {
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.edit") }]}
       backAction={() => goBack(`/inventory/loans/${loan.id}`)}
       actions={
-        <ITButton variant="filled" color="primary" onClick={handleSubmit} disabled={saving || !isValid}>
-          <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{saving ? t("new.saving") : t("loans.save")}</ITText>
-          </ITFlex>
-        </ITButton>
+        <ITFlex gap={2} align="center">
+          <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack(`/inventory/loans/${loan.id}`)} disabled={saving} />
+          <ITButton
+            label={saving ? t("new.saving") : t("loans.save")}
+            variant="rounded"
+            color="primary"
+            size="sm"
+            onClick={handleSubmit}
+            disabled={saving || !isValid}
+          />
+        </ITFlex>
       }
     >
       {lockedResource && (
@@ -320,10 +327,12 @@ export default function EditLoanPage() {
         </ITGrid>
 
         <ITGrid item xs={12} lg={6}>
-          <ITCard contentClassName="flex flex-col gap-2">
-            <ITText className="text-sm font-bold text-slate-800">{t("loans.preview")}</ITText>
-            <CustodyLetterPreview loan={draftPreview as never} />
-          </ITCard>
+          {/* La carta queda fija mientras se edita del lado izquierdo. */}
+          <div className="min-w-0 lg:sticky lg:top-4">
+            <PanelCard title={t("loans.preview")} icon={<LuFileText size={16} />}>
+              <CustodyLetterPreview loan={draftPreview as never} />
+            </PanelCard>
+          </div>
         </ITGrid>
       </ITGrid>
 
