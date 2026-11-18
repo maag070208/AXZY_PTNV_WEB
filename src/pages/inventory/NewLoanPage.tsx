@@ -25,7 +25,6 @@ import { useGoBack } from "@shared/lib/useGoBack";
 import { FormSection } from "@shared/ui/form-section";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { PanelCard } from "@shared/ui/panel-card";
-import { StickyActions } from "@shared/ui/sticky-actions";
 import { LangostinState } from "@shared/ui/langostin";
 
 const MODE_KEY = "ptnv.newLoan.mode";
@@ -212,7 +211,25 @@ export default function NewLoanPage() {
       icon={<FaFileSignature size={20} />}
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loans.title"), onClick: () => navigate("/inventory/loans") }, { label: t("loans.new") }]}
       backAction={() => goBack("/inventory/loans")}
+      actions={
+        mode === "form" ? (
+          <ITFlex gap={2} align="center">
+            <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/loans")} disabled={saving} />
+            <ITButton
+              label={saving ? t("new.saving") : t("loans.save")}
+              variant="rounded"
+              color="primary"
+              size="sm"
+              onClick={handleSubmit}
+              disabled={saving || !isValid}
+            />
+          </ITFlex>
+        ) : undefined
+      }
     >
+      {/* Mitad captura (Langostín o formulario), mitad carta: la vista previa queda fija mientras se llena. */}
+      <div className="grid grid-cols-1 items-start gap-4 lg:!grid-cols-2">
+      <div className="flex min-w-0 flex-col gap-4">
       {mode === "chat" ? (
         <LoanAgent
           assignment={assignment}
@@ -254,8 +271,8 @@ export default function NewLoanPage() {
           </ITFlex>
         </ITButton>
       </ITFlex>
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
-        <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-4">
           <FormSection
             number={1}
             icon={<LuUser size={16} />}
@@ -373,24 +390,14 @@ export default function NewLoanPage() {
 
       </>
       )}
+      </div>
 
-      <PanelCard title={t("loans.preview")} icon={<LuFileText size={16} />}>
-        <CustodyLetterPreview loan={draftPreview as never} />
-      </PanelCard>
-
-      {mode === "form" && (
-      <StickyActions>
-        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/loans")} disabled={saving} />
-        <ITButton
-          label={saving ? t("new.saving") : t("loans.save")}
-          variant="rounded"
-          color="primary"
-          size="sm"
-          onClick={handleSubmit}
-          disabled={saving || !isValid}
-        />
-      </StickyActions>
-      )}
+      <div className="min-w-0 lg:sticky lg:top-4">
+        <PanelCard title={t("loans.preview")} icon={<LuFileText size={16} />}>
+          <CustodyLetterPreview loan={draftPreview as never} />
+        </PanelCard>
+      </div>
+      </div>
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

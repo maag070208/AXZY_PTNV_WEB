@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ITButton,
   ITDatePicker,
+  ITFlex,
   ITInput,
   ITInputNumber,
   ITSearchSelect,
@@ -23,7 +24,6 @@ import { AppPage } from "@shared/ui/app-page";
 import { FormSection } from "@shared/ui/form-section";
 import { LiveSummary, LiveSummaryRow } from "@shared/ui/live-summary";
 import { PanelCard } from "@shared/ui/panel-card";
-import { StickyActions } from "@shared/ui/sticky-actions";
 import { formatLongDateEs, parseLocalDay, toDayString } from "@shared/utils/dates";
 import {
   emptyApercibimiento,
@@ -219,6 +219,38 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
       description={t(`${kind}.description`)}
       icon={<LuFileText size={20} />}
       backAction={() => goBack(BACK)}
+      actions={
+        <ITFlex gap={2} align="center">
+          <ITButton
+            label={t("cancel")}
+            variant="outlined"
+            color="gray"
+            size="sm"
+            className="!rounded-full"
+            onClick={() => goBack(BACK)}
+            disabled={busy}
+          />
+          <ITButton
+            label={t("downloadPdf")}
+            variant={isWarning && canSave ? "outlined" : "rounded"}
+            color="primary"
+            size="sm"
+            className={isWarning && canSave ? "!rounded-full" : undefined}
+            onClick={() => void run(false)}
+            disabled={busy}
+          />
+          {isWarning && canSave && (
+            <ITButton
+              label={t("apercibimiento.generateAndSave")}
+              variant="rounded"
+              color="primary"
+              size="sm"
+              onClick={() => void run(true)}
+              disabled={busy}
+            />
+          )}
+        </ITFlex>
+      }
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("hr"), onClick: () => navigate("/hr") },
@@ -391,36 +423,6 @@ export default function HrFormatEditor({ kind }: { kind: HrFormatKind }) {
         </div>
       </div>
 
-      <StickyActions>
-        <ITButton
-          label={t("cancel")}
-          variant="outlined"
-          color="gray"
-          size="sm"
-          className="!rounded-full"
-          onClick={() => goBack(BACK)}
-          disabled={busy}
-        />
-        <ITButton
-          label={t("downloadPdf")}
-          variant={isWarning && canSave ? "outlined" : "rounded"}
-          color="primary"
-          size="sm"
-          className={isWarning && canSave ? "!rounded-full" : undefined}
-          onClick={() => void run(false)}
-          disabled={busy}
-        />
-        {isWarning && canSave && (
-          <ITButton
-            label={t("apercibimiento.generateAndSave")}
-            variant="rounded"
-            color="primary"
-            size="sm"
-            onClick={() => void run(true)}
-            disabled={busy}
-          />
-        )}
-      </StickyActions>
     </AppPage>
   );
 }
