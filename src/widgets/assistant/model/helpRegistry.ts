@@ -64,8 +64,11 @@ export interface HelpScreen {
   glossary?: Record<string, string>;
 }
 
-/** Rutas que nunca muestran el FAB (tienen su propio flujo de chat). */
-export const HELP_HIDDEN_ROUTES = ["/tickets/new", "/login"];
+/**
+ * Rutas que nunca muestran el FAB de Langostín: tienen su propio flujo de chat
+ * o el globo tapa una tabla/asistente que necesita toda la pantalla.
+ */
+export const HELP_HIDDEN_ROUTES = ["/tickets/new", "/login", "/employees/sync"];
 
 export const HELP_SCREENS: HelpScreen[] = [
   {

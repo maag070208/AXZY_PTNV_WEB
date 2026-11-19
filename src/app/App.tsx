@@ -40,6 +40,7 @@ import DepartmentsPage from "@pages/departments/DepartmentsPage";
 import DepartmentDetailPage from "@pages/departments/DepartmentDetailPage";
 import SubareasPage from "@pages/subareas/SubareasPage";
 import EmployeesListPage from "@pages/employees/EmployeesListPage";
+import EmployeeSyncPage from "@pages/employees/EmployeeSyncPage";
 import EmployeeRecordsPage from "@pages/employees/EmployeeRecordsPage";
 import HrHomePage from "@pages/hr/HrHomePage";
 import HrFormatsPage from "@pages/hr/HrFormatsPage";
@@ -290,6 +291,14 @@ export default function App() {
           element={
             <RequiresPermission permission="hr.records">
               <EmployeesListPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/employees/sync"
+          element={
+            <RequiresPermission permission="users.create">
+              <EmployeeSyncPage />
             </RequiresPermission>
           }
         />

@@ -6,7 +6,7 @@ import {
   ITText, ITStack
 } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
-import { LuPlus, LuUsersRound } from "react-icons/lu";
+import { LuFileSpreadsheet, LuPlus, LuUsersRound } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
@@ -27,6 +27,9 @@ export default function EmployeesListPage() {
   const canEditEmployees = useCan("hr.records");
   // El alta crea la cuenta (`POST /users`): la API exige `users.create`.
   const canCreateEmployees = useCan("users.create");
+  // Sincronizar crea y da de baja cuentas: pide `users.create` y `users.edit`.
+  const canEditUsers = useCan("users.edit");
+  const canSyncEmployees = canCreateEmployees && canEditUsers;
 
   const list = useEmployeesList();
 
@@ -52,16 +55,31 @@ export default function EmployeesListPage() {
       ]}
       actions={
         canCreateEmployees ? (
-          <ITButton
-            variant="filled"
-            color="primary"
-            onClick={() => navigate("/users/new")}
-          >
-            <ITFlex align="center" gap={1}>
-              <LuPlus size={14} />
-              <ITText className="font-bold text-[12px]">{tt("newEmployee")}</ITText>
-            </ITFlex>
-          </ITButton>
+          <ITFlex align="center" gap={2}>
+            {canSyncEmployees && (
+              <ITButton
+                variant="filled"
+                color="primary"
+                className="!bg-[#217346] hover:!brightness-110"
+                onClick={() => navigate("/employees/sync")}
+              >
+                <ITFlex align="center" gap={1}>
+                  <LuFileSpreadsheet size={14} />
+                  <ITText className="font-bold text-[12px] !text-white">{tt("sync.listButton")}</ITText>
+                </ITFlex>
+              </ITButton>
+            )}
+            <ITButton
+              variant="filled"
+              color="primary"
+              onClick={() => navigate("/users/new")}
+            >
+              <ITFlex align="center" gap={1}>
+                <LuPlus size={14} />
+                <ITText className="font-bold text-[12px]">{tt("newEmployee")}</ITText>
+              </ITFlex>
+            </ITButton>
+          </ITFlex>
         ) : undefined
       }
       icon={<LuUsersRound size={20} />}
