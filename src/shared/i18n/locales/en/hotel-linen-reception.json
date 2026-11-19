@@ -96,7 +96,10 @@
       "refund": "Deposit refunded: {{amount}}",
       "confirm": "Return",
       "subtitle": "Record the towels the guest returns; the deposit is refunded."
-    }
+    },
+    "guestLoss": "Guest loss",
+    "guestLossDone": "Loss {{folio}}",
+    "guestLossSummary": "{{guest}} did not return {{count}} × {{product}}"
   },
   "close": {
     "title": "Shift close · {{point}}",
@@ -180,8 +183,12 @@
     "toast": {
       "collected": "Collection recorded",
       "created": "Extra recorded",
-      "delivered": "Extra delivered"
-    }
+      "delivered": "Extra delivered",
+      "guestLoss": "Guest loss recorded"
+    },
+    "guestLoss": "Guest loss",
+    "guestLossDone": "Loss {{folio}}",
+    "guestLossSummary": "Room {{room}}: {{count}} × {{product}} missing"
   },
   "equipment": {
     "lend": {
@@ -246,6 +253,7 @@
     "loanCreated": "Loan recorded",
     "closed": "Shift close recorded",
     "returned": "Return recorded",
-    "reviewed": "Close reviewed"
+    "reviewed": "Close reviewed",
+    "guestLoss": "Guest loss recorded"
   }
 }

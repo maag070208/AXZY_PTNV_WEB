@@ -20,6 +20,7 @@ import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import { fmt, fmtDateTime, money } from "../lib";
+import { GuestLossDialog } from "@shared/ui/guest-loss-dialog";
 import ReturnLoanDialog from "./ReturnLoanDialog";
 import ShiftCloseDialog from "./ShiftCloseDialog";
 import { useSuccessToast } from "@app/toast/useSuccessToast";
@@ -45,6 +46,7 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
   const tt = dyn(t);
   const canLend = useCan("hotel_linen.loans");
   const canClose = useCan("hotel_linen.shift_close");
+  const canGuestLoss = useCan("hotel_linen.writeoff_request");
 
   const [points, setPoints] = useState<HotelWarehouse[]>([]);
   const [products, setProducts] = useState<HotelProduct[]>([]);
@@ -55,6 +57,7 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
   const [busy, setBusy] = useState(false);
   const [returning, setReturning] = useState<TowelLoan | null>(null);
   const [closing, setClosing] = useState(false);
+  const [converting, setConverting] = useState<TowelLoan | null>(null);
 
   // Alta de vale
   const [productId, setProductId] = useState("");
@@ -144,15 +147,22 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
         key: "actions",
         label: "",
         type: "string",
-        width: 110,
+        width: 190,
         sortable: false,
-        render: (r) =>
-          canLend && (r.status === "OPEN" || r.status === "PARTIAL") ? (
-            <ITButton size="sm" variant="outlined" color="primary" label={t("loans.return")} onClick={() => setReturning(r)} />
-          ) : null,
+        render: (r) => {
+          if (canLend && (r.status === "OPEN" || r.status === "PARTIAL")) {
+            return <ITButton size="sm" variant="outlined" color="primary" label={t("loans.return")} onClick={() => setReturning(r)} />;
+          }
+          // Préstamo no devuelto: se convierte en pérdida de huésped una sola vez (una rechazada permite reintentar).
+          if (r.status === "UNRETURNED") {
+            if (r.guestLoss && r.guestLoss.status !== "CANCELLED") return <ITChip size="sm" color="secondary" label={t("loans.guestLossDone", { folio: r.guestLoss.folio })} />;
+            if (canGuestLoss) return <ITButton size="sm" variant="outlined" color="danger" label={t("loans.guestLoss")} onClick={() => setConverting(r)} />;
+          }
+          return null;
+        },
       },
     ],
-    [t, tt, canLend]
+    [t, tt, canLend, canGuestLoss]
   );
 
   const pointName = points.find((p) => p.id === pointId)?.name ?? "";
@@ -227,6 +237,19 @@ export default function LoansView({ requestCosign, onClosed }: Props) {
         />
       </PanelCard>
 
+      <GuestLossDialog
+        open={converting !== null}
+        askGuest={false}
+        summary={converting ? t("loans.guestLossSummary", { guest: converting.guestName, count: converting.pendingQty, product: converting.product.name }) : ""}
+        onClose={() => setConverting(null)}
+        onSubmit={async (v) => {
+          if (!converting) return;
+          await receptionApi.loanGuestLoss(converting.folio, { chargeStatus: v.chargeStatus, chargeAmount: v.chargeAmount, notes: v.notes });
+          notify(t("toast.guestLoss"));
+          setConverting(null);
+          refresh();
+        }}
+      />
       <ReturnLoanDialog loan={returning} onClose={() => setReturning(null)} onDone={() => { setReturning(null); refresh(); }} />
       <ShiftCloseDialog
         isOpen={closing}

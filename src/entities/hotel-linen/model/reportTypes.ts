@@ -1,4 +1,5 @@
 import type { HotelStockLight } from "./types";
+import type { GuestChargeStatus } from "./writeoffTypes";
 
 // ── Tablero ────────────────────────────────────────────────────────────────
 
@@ -163,4 +164,96 @@ export interface KardexReport {
     delta: number;
     balance: number;
   }>;
+}
+
+// ── Ajustes al inventario ──────────────────────────────────────────────────
+
+export type AdjustmentType = "ADJUST_IN" | "ADJUST_OUT" | "WRITE_OFF";
+export type AdjustmentStatus = "PENDING_APPROVAL" | "ACTIVE" | "CANCELLED";
+export const ADJUSTMENT_TYPES: readonly AdjustmentType[] = ["ADJUST_IN", "ADJUST_OUT", "WRITE_OFF"];
+export const ADJUSTMENT_STATUSES: readonly AdjustmentStatus[] = ["PENDING_APPROVAL", "ACTIVE", "CANCELLED"];
+
+export interface AdjustmentReportFilters {
+  from?: string;
+  to?: string;
+  warehouseId?: string;
+  productId?: string;
+  reasonId?: string;
+  type?: AdjustmentType;
+  status?: AdjustmentStatus;
+}
+
+export interface AdjustmentGroup {
+  key: string | null;
+  name: string | null;
+  pieces: number;
+  cost: number;
+}
+
+export interface AdjustmentReport {
+  from: string;
+  to: string;
+  reasons: Array<{ id: string; code: string | null; name: string }>;
+  rows: Array<{
+    date: string;
+    folio: string;
+    type: AdjustmentType;
+    direction: "IN" | "OUT";
+    warehouse: { id: string; code: string; name: string } | null;
+    product: { id: string; code: string; name: string; size: string | null };
+    quantity: number;
+    unitCost: number | null;
+    totalCost: number;
+    reason: { id: string; code: string | null; name: string } | null;
+    createdBy: { id: string; name: string };
+    approvedBy: { id: string; name: string } | null;
+    status: AdjustmentStatus;
+  }>;
+  byReason: AdjustmentGroup[];
+  byWarehouse: AdjustmentGroup[];
+  total: { pieces: number; cost: number };
+}
+
+// ── Pérdidas por huésped ───────────────────────────────────────────────────
+
+export interface GuestLossReportFilters {
+  from?: string;
+  to?: string;
+  roomId?: string;
+  guestName?: string;
+}
+
+export interface GuestLossTotals {
+  events: number;
+  pieces: number;
+  cost: number;
+  chargeAmount: number;
+}
+
+export interface GuestLossReport {
+  from: string;
+  to: string;
+  rows: Array<{
+    id: string;
+    date: string;
+    folio: string;
+    status: AdjustmentStatus;
+    guestName: string | null;
+    room: { id: string; number: string } | null;
+    items: Array<{
+      product: { id: string; code: string; name: string; size: string | null };
+      quantity: number;
+      unitCost: number | null;
+      totalCost: number;
+    }>;
+    pieces: number;
+    cost: number;
+    chargeStatus: GuestChargeStatus;
+    chargeAmount: number | null;
+    source: { type: "LOAN" | "EXTRA"; ref: string | null } | null;
+    createdBy: { id: string; name: string };
+    notes: string | null;
+  }>;
+  byChargeStatus: Array<GuestLossTotals & { status: GuestChargeStatus }>;
+  total: GuestLossTotals;
 }

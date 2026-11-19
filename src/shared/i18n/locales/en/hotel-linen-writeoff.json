@@ -27,7 +27,8 @@
       "M": "Stained",
       "D": "Worn",
       "Q": "Burned",
-      "F": "Missing / lost"
+      "F": "Missing / lost",
+      "G": "Taken by guest"
     },
     "disposition": {
       "SECOND_LIFE": "Second life",
@@ -45,7 +46,8 @@
       "cost": "Cost",
       "photos": "Photos",
       "disposition": "Destination",
-      "product": "Item"
+      "product": "Item",
+      "guest": "Guest / room"
     },
     "new": {
       "action": "New write-off",
@@ -189,5 +191,37 @@
   },
   "toast": {
     "created": "Write-off requested"
+  },
+  "guestLoss": {
+    "action": "Record guest loss",
+    "guestName": "Guest name",
+    "room": "Room",
+    "notes": "Notes",
+    "chargeStatus": "Charge status",
+    "chargeAmount": "Amount to charge (optional)",
+    "chargeHint": "Guests are not charged today: the amount and status are only recorded. If left empty and the charge is pending or charged, unit cost × pieces is used.",
+    "charge": {
+      "NOT_CHARGED": "Not charged",
+      "PENDING": "Charge pending",
+      "CHARGED": "Charged",
+      "WAIVED": "Waived"
+    },
+    "new": {
+      "title": "Guest loss",
+      "description": "A guest took linens. This creates a \"Taken by guest\" write-off that follows the usual review and authorization.",
+      "submit": "Record loss"
+    },
+    "convert": {
+      "title": "Convert into guest loss",
+      "subtitle": "The write-off already generated is reused; nothing is entered again.",
+      "confirm": "Convert"
+    },
+    "detail": {
+      "guest": "Guest",
+      "room": "room {{number}}"
+    },
+    "toast": {
+      "created": "Guest loss recorded"
+    }
   }
 }

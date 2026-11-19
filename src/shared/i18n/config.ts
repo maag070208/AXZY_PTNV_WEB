@@ -31,6 +31,7 @@ import catalogEn from "./locales/en/catalog.json";
 import rolesEn from "./locales/en/roles.json";
 import kitchenEn from "./locales/en/kitchen.json";
 import hotelLinenRestockEn from "./locales/en/hotel-linen-restock.json";
+import hotelLinenTabletEn from "./locales/en/hotel-linen-tablet.json";
 import hotelLinenFlowEn from "./locales/en/hotel-linen-flow.json";
 import hotelLinenReportEn from "./locales/en/hotel-linen-report.json";
 import hotelLinenEn from "./locales/en/hotel-linen.json";
@@ -86,6 +87,7 @@ import hotelLinenLaundryEs from "./locales/es/hotel-linen-laundry.json";
 import hotelLinenWriteoffEs from "./locales/es/hotel-linen-writeoff.json";
 import hotelLinenRoomsEs from "./locales/es/hotel-linen-rooms.json";
 import hotelLinenRestockEs from "./locales/es/hotel-linen-restock.json";
+import hotelLinenTabletEs from "./locales/es/hotel-linen-tablet.json";
 import hotelLinenFlowEs from "./locales/es/hotel-linen-flow.json";
 import langostinEs from "./locales/es/langostin.json";
 
@@ -131,6 +133,7 @@ export const NS_LIST = [
   "hotel-linen-signoff",
   "hotel-linen-amenity-delivery",
   "hotel-linen-restock",
+  "hotel-linen-tablet",
   "hotel-linen-flow",
   "hotel-linen-purchase",
   "hotel-linen-amenity",
@@ -178,6 +181,7 @@ export const resources = {
     "hotel-linen-signoff": hotelLinenSignoffEn,
     "hotel-linen-amenity-delivery": hotelLinenAmenityDeliveryEn,
     "hotel-linen-restock": hotelLinenRestockEn,
+    "hotel-linen-tablet": hotelLinenTabletEn,
     "hotel-linen-flow": hotelLinenFlowEn,
     "hotel-linen-purchase": hotelLinenPurchaseEn,
     "hotel-linen-amenity": hotelLinenAmenityEn,
@@ -223,6 +227,7 @@ export const resources = {
     "hotel-linen-signoff": hotelLinenSignoffEs,
     "hotel-linen-amenity-delivery": hotelLinenAmenityDeliveryEs,
     "hotel-linen-restock": hotelLinenRestockEs,
+    "hotel-linen-tablet": hotelLinenTabletEs,
     "hotel-linen-flow": hotelLinenFlowEs,
     "hotel-linen-purchase": hotelLinenPurchaseEs,
     "hotel-linen-amenity": hotelLinenAmenityEs,

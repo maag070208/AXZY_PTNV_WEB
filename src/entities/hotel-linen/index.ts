@@ -39,3 +39,6 @@ export * from "./model/signoffTypes";
 export { signoffApi } from "./api/signoffApi";
 export * from "./model/amenityDeliveryTypes";
 export { amenityDeliveryApi } from "./api/amenityDeliveryApi";
+// Blancos: pedido por habitación (tablet)
+export * from "./model/turnoverTypes";
+export { turnoverApi } from "./api/turnoverApi";

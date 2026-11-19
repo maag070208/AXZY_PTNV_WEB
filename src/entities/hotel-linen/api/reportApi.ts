@@ -1,11 +1,15 @@
 import { api } from "@shared/api/client";
 import type {
+  AdjustmentReport,
+  AdjustmentReportFilters,
   AreaReconciliationReport,
   ConditionReport,
   KardexReport,
   LaundryReport,
   LinenDashboard,
   ParReport,
+  GuestLossReport,
+  GuestLossReportFilters,
   ShrinkageReport,
 } from "../model/reportTypes";
 
@@ -29,5 +33,15 @@ export const reportApi = {
     q.set("productId", productId);
     if (warehouseId) q.set("warehouseId", warehouseId);
     return api.get<KardexReport>(`${BASE}/reports/kardex?${q}`);
+  },
+  adjustments: (filters: AdjustmentReportFilters) => {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(filters)) if (v) q.set(k, v);
+    return api.get<AdjustmentReport>(`${BASE}/reports/adjustments?${q}`);
+  },
+  guestLosses: (filters: GuestLossReportFilters) => {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(filters)) if (v) q.set(k, v);
+    return api.get<GuestLossReport>(`${BASE}/reports/guest-losses?${q}`);
   },
 };

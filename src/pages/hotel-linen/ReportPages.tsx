@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { hotelLinenApi, WRITEOFF_REASONS, type AmenityLine, type WeeklyWriteoffReport } from "@entities/hotel-linen";
 import { LinenDashboardView } from "@features/hotel-linen/dashboard";
-import { BlankFormsMenu, ReportsPanel, type BlankFormKind } from "@features/hotel-linen/reports";
+import { AdjustmentsTab, BlankFormsMenu, GuestLossesTab, ReportsPanel, type BlankFormKind } from "@features/hotel-linen/reports";
 import { downloadAmenityControlPdf } from "@features/hotel-linen/amenities/pdf/download";
 import { downloadHrReportPdf } from "@widgets/reports";
 import { downloadBlankFormPdf } from "@widgets/linen-blank-forms-pdf";
@@ -76,6 +76,54 @@ export function LinenReportsPage() {
       actions={<BlankFormsMenu onDownload={downloadBlank} />}
     >
       <ReportsPanel exportPdf={(doc, name) => downloadHrReportPdf(doc, name)} />
+    </AppPage>
+  );
+}
+
+/** Reporte de ajustes al inventario como pantalla propia (también es una pestaña de los reportes). */
+export function LinenAdjustmentsReportPage() {
+  const { t } = useTranslation(["hotel-linen-report", "common"]);
+  const navigate = useNavigate();
+  const goBack = useGoBack();
+  return (
+    <AppPage
+      className={pageClass}
+      noPadding
+      title={t("adjustments.title")}
+      icon={<FaChartBar size={20} />}
+      breadcrumbs={[
+        { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
+        { label: t("common:nav.linen"), onClick: () => navigate("/linen") },
+        { label: t("page.title"), onClick: () => navigate("/linen/reports") },
+        { label: t("adjustments.title") },
+      ]}
+      backAction={() => goBack("/linen/reports")}
+    >
+      <AdjustmentsTab exportPdf={(doc, name) => downloadHrReportPdf(doc, name)} />
+    </AppPage>
+  );
+}
+
+/** Pérdidas por huésped como pantalla propia (también es una pestaña de los reportes). */
+export function LinenGuestLossesReportPage() {
+  const { t } = useTranslation(["hotel-linen-report", "common"]);
+  const navigate = useNavigate();
+  const goBack = useGoBack();
+  return (
+    <AppPage
+      className={pageClass}
+      noPadding
+      title={t("guestLosses.title")}
+      icon={<FaChartBar size={20} />}
+      breadcrumbs={[
+        { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
+        { label: t("common:nav.linen"), onClick: () => navigate("/linen") },
+        { label: t("page.title"), onClick: () => navigate("/linen/reports") },
+        { label: t("guestLosses.title") },
+      ]}
+      backAction={() => goBack("/linen/reports")}
+    >
+      <GuestLossesTab exportPdf={(doc, name) => downloadHrReportPdf(doc, name)} />
     </AppPage>
   );
 }

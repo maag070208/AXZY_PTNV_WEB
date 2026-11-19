@@ -27,7 +27,8 @@
       "M": "Mancha",
       "D": "Desgaste",
       "Q": "Quemada",
-      "F": "Faltante / extravío"
+      "F": "Faltante / extravío",
+      "G": "Llevado por huésped"
     },
     "disposition": {
       "SECOND_LIFE": "Segunda vida",
@@ -45,7 +46,8 @@
       "cost": "Costo",
       "photos": "Fotos",
       "disposition": "Destino",
-      "product": "Artículo"
+      "product": "Artículo",
+      "guest": "Huésped / hab."
     },
     "new": {
       "action": "Nueva baja",
@@ -189,5 +191,37 @@
   },
   "toast": {
     "created": "Baja solicitada"
+  },
+  "guestLoss": {
+    "action": "Registrar pérdida de huésped",
+    "guestName": "Nombre del huésped",
+    "room": "Habitación",
+    "notes": "Notas",
+    "chargeStatus": "Estado del cobro",
+    "chargeAmount": "Monto a cobrar (opcional)",
+    "chargeHint": "Hoy no se cobra: el monto y el estado solo quedan registrados. Si lo dejas vacío y el cobro está pendiente o cobrado, se usa costo unitario × piezas.",
+    "charge": {
+      "NOT_CHARGED": "Sin cobrar",
+      "PENDING": "Cobro pendiente",
+      "CHARGED": "Cobrado",
+      "WAIVED": "Condonado"
+    },
+    "new": {
+      "title": "Pérdida de huésped",
+      "description": "Un huésped se llevó blancos. Genera una baja motivo «Llevado por huésped» que sigue la revisión y autorización de bajas.",
+      "submit": "Registrar pérdida"
+    },
+    "convert": {
+      "title": "Convertir en pérdida de huésped",
+      "subtitle": "Se usa la baja ya generada; no se vuelve a capturar nada.",
+      "confirm": "Convertir"
+    },
+    "detail": {
+      "guest": "Huésped",
+      "room": "hab. {{number}}"
+    },
+    "toast": {
+      "created": "Pérdida de huésped registrada"
+    }
   }
 }

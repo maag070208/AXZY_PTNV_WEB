@@ -1,0 +1,80 @@
+{
+  "title": "Linen orders",
+  "description": "Linen orders per room: request, fulfill and carry",
+  "loading": "Loading…",
+  "noAccess": "Your role has no linen tablet screen.",
+  "cancel": "Cancel",
+  "sending": "Sending…",
+  "status": {
+    "SUBMITTED": "To fulfill",
+    "PARTIALLY_FULFILLED": "Partially fulfilled",
+    "READY_FOR_PICKUP": "Ready for pickup",
+    "IN_TRANSIT": "On the way",
+    "FULFILLED": "To confirm",
+    "DRAFT": "Draft",
+    "RECEIVED": "Delivered",
+    "CANCELLED": "Cancelled"
+  },
+  "order": {
+    "room": "Room {{number}}",
+    "age": "{{age}} ago"
+  },
+  "supervisor": {
+    "rooms": "Rooms",
+    "roomsHint": "Tap the room that was vacated",
+    "vacated": "Vacated",
+    "noRooms": "There are no rooms in your zone.",
+    "orders": "On the way / Delivered",
+    "noOrders": "No open orders.",
+    "reportDifference": "Report difference",
+    "addExtra": "Add extra",
+    "delivered": "Delivered today",
+    "noDelivered": "No recent deliveries."
+  },
+  "turnover": {
+    "title": "Room {{number}} was vacated",
+    "subtitle": "Linen it takes according to its par",
+    "addItem": "Add something else",
+    "add": "Add",
+    "order": "Order",
+    "alreadyOpen": "This room already has an open order ({{folio}})."
+  },
+  "laundry": {
+    "pending": "Waiting to be fulfilled",
+    "none": "No pending orders.",
+    "requested": "Ordered: {{qty}}",
+    "ready": "Ready"
+  },
+  "carrier": {
+    "toPickUp": "To pick up",
+    "noneToPickUp": "No orders to pick up.",
+    "carrying": "Carrying",
+    "noneCarrying": "You are not carrying any order.",
+    "pickedUp": "Picked up",
+    "delivered": "Delivered to room {{number}}",
+    "pickSelected": "Pick up ({{count}})"
+  },
+  "toast": {
+    "created": "Order sent to laundry",
+    "existing": "The room already had order {{folio}}",
+    "ready": "Order ready for pickup",
+    "pickedUp": "Order picked up",
+    "delivered": "Order delivered",
+    "difference": "Difference reported",
+    "extra": "Extra added",
+    "pickedMany": "{{count}} orders picked up",
+    "conflicts": "{{count}} order(s) were already taken"
+  },
+  "difference": {
+    "title": "Difference in room {{number}}",
+    "subtitle": "Pieces that did not arrive",
+    "notes": "What happened",
+    "send": "Report",
+    "missing": "Missing"
+  },
+  "extra": {
+    "title": "Add to room {{number}}",
+    "product": "Item",
+    "add": "Add"
+  }
+}

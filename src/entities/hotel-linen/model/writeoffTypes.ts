@@ -5,6 +5,13 @@ export type WriteoffReasonCode = "R" | "M" | "D" | "Q" | "F";
 /** Orden de las columnas del formato semanal. */
 export const WRITEOFF_REASONS: readonly WriteoffReasonCode[] = ["R", "M", "D", "Q", "F"];
 
+/** Motivo G (llevado por huésped): no está en las columnas del formato semanal. */
+export const GUEST_LOSS_REASON_CODE = "G";
+
+/** Estado de cobro de una pérdida por huésped (hoy no se cobra; listo para integrarse con recepción). */
+export type GuestChargeStatus = "NOT_CHARGED" | "PENDING" | "CHARGED" | "WAIVED";
+export const GUEST_CHARGE_STATUSES: readonly GuestChargeStatus[] = ["NOT_CHARGED", "PENDING", "CHARGED", "WAIVED"];
+
 export type WriteoffStatus = "PENDING_APPROVAL" | "ACTIVE" | "CANCELLED";
 export const WRITEOFF_STATUSES: readonly WriteoffStatus[] = ["PENDING_APPROVAL", "ACTIVE", "CANCELLED"];
 
@@ -25,6 +32,10 @@ export interface WriteoffRow {
   /** Baja física esperando autorización con la pieza retenida en cuarentena. */
   quarantined: boolean;
   reason: { code: string | null; name: string } | null;
+  guestName: string | null;
+  room: string | null;
+  chargeStatus: GuestChargeStatus;
+  chargeAmount: number | null;
   requestedBy: HotelUserRef;
   reviewed: boolean;
   disposition: WriteoffDisposition | null;
@@ -66,6 +77,10 @@ export interface WriteoffDetail {
   /** La pieza está retenida en la cuarentena de Lavandería. */
   quarantined: boolean;
   reason: { code: string | null; name: string } | null;
+  room: { id: string; number: string } | null;
+  guestName: string | null;
+  chargeStatus: GuestChargeStatus;
+  chargeAmount: number | null;
   notes: string | null;
   requestedBy: HotelUserRef;
   approvedBy: HotelUserRef | null;
@@ -94,6 +109,32 @@ export interface WriteoffCreateInput {
   lines: WriteoffLineInput[];
   notes?: string | null;
   photos: File[];
+}
+
+export interface GuestLossCharge {
+  chargeStatus?: GuestChargeStatus;
+  /** Vacío: el API usa costo unitario × piezas cuando el cobro está pendiente o cobrado. */
+  chargeAmount?: number | null;
+  notes?: string | null;
+}
+
+export interface GuestLossCreateInput extends GuestLossCharge {
+  warehouseId: string;
+  locationId?: string | null;
+  roomId: string;
+  guestName: string;
+  lines: Array<{ productId: string; lotId?: string | null; quantity: number }>;
+}
+
+export interface GuestLossFromExtraInput extends GuestLossCharge {
+  guestName: string;
+}
+
+/** Vínculo de un préstamo / adicional con la pérdida a la que se convirtió. */
+export interface GuestLossRef {
+  id: string;
+  folio: string;
+  status: WriteoffStatus;
 }
 
 export interface WeeklyWriteoffRow {

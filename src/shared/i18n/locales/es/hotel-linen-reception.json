@@ -96,7 +96,10 @@
       "refund": "Se devuelve de depósito: {{amount}}",
       "confirm": "Devolver",
       "subtitle": "Registra las toallas que devuelve el huésped; se reembolsa su depósito."
-    }
+    },
+    "guestLoss": "Pérdida de huésped",
+    "guestLossDone": "Pérdida {{folio}}",
+    "guestLossSummary": "{{guest}} no devolvió {{count}} × {{product}}"
   },
   "close": {
     "title": "Corte de turno · {{point}}",
@@ -180,8 +183,12 @@
     "toast": {
       "collected": "Recolección registrada",
       "created": "Adicional registrado",
-      "delivered": "Adicional entregado"
-    }
+      "delivered": "Adicional entregado",
+      "guestLoss": "Pérdida de huésped registrada"
+    },
+    "guestLoss": "Pérdida de huésped",
+    "guestLossDone": "Pérdida {{folio}}",
+    "guestLossSummary": "Hab. {{room}}: faltan {{count}} × {{product}}"
   },
   "equipment": {
     "lend": {
@@ -246,6 +253,7 @@
     "loanCreated": "Préstamo registrado",
     "closed": "Corte de turno registrado",
     "returned": "Devolución registrada",
-    "reviewed": "Corte revisado"
+    "reviewed": "Corte revisado",
+    "guestLoss": "Pérdida de huésped registrada"
   }
 }

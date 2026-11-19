@@ -213,6 +213,17 @@ export default function WriteoffDetailView({ id, requestCosign }: Props) {
               {detail.disposition ? tt(`writeoffs.disposition.${detail.disposition}`) : "—"}
             </ITText>
           </ITGrid>
+          {detail.guestName && (
+            <ITGrid item xs={12} md={6}>
+              <ITText muted className="text-[11px]">{t("guestLoss.detail.guest")}</ITText>
+              <ITText className="text-[12px] font-semibold">
+                {detail.guestName}{detail.room ? ` · ${t("guestLoss.detail.room", { number: detail.room.number })}` : ""}
+              </ITText>
+              <ITText muted className="text-[11px]">
+                {tt(`guestLoss.charge.${detail.chargeStatus}`)}{detail.chargeAmount !== null ? ` · ${money(detail.chargeAmount)}` : ""}
+              </ITText>
+            </ITGrid>
+          )}
           {detail.notes && (
             <ITGrid item xs={12}>
               <ITText muted className="text-[11px]">{t("writeoffs.detail.notes")}</ITText>

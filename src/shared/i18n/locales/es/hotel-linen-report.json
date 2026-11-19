@@ -11,7 +11,9 @@
     "laundry": "Lavandería",
     "kardex": "Kardex",
     "life": "Lotes y vida útil",
-    "areaReconciliation": "Conciliación por área"
+    "areaReconciliation": "Conciliación por área",
+    "adjustments": "Ajustes",
+    "guestLosses": "Pérdidas por huésped"
   },
   "export": {
     "pdf": "PDF",
@@ -286,5 +288,80 @@
   },
   "common": {
     "close": "Cerrar"
+  },
+  "adjustments": {
+    "title": "Ajustes al inventario",
+    "date": "Fecha",
+    "folio": "Folio",
+    "warehouse": "Almacén",
+    "product": "Artículo",
+    "direction": "Movimiento",
+    "quantity": "Piezas",
+    "unitCost": "Costo unitario",
+    "totalCost": "Costo total",
+    "reason": "Motivo",
+    "createdBy": "Registró",
+    "approvedBy": "Aprobó",
+    "status": "Estado",
+    "typeLabel": "Tipo",
+    "totals": "Totales",
+    "totalPieces": "Piezas ajustadas",
+    "totalsNote": "Los rechazados no suman a los totales.",
+    "byReason": "Totales por motivo",
+    "byWarehouse": "Totales por almacén",
+    "noValue": "Sin dato",
+    "none": "Sin ajustes en el periodo.",
+    "allProducts": "Todos los artículos",
+    "allWarehouses": "Todos los almacenes",
+    "allReasons": "Todos los motivos",
+    "allTypes": "Todos los tipos",
+    "allStatuses": "Todos los estados",
+    "type": {
+      "ADJUST_IN": "Entrada",
+      "ADJUST_OUT": "Salida",
+      "WRITE_OFF": "Baja"
+    },
+    "statusName": {
+      "PENDING_APPROVAL": "Pendiente",
+      "ACTIVE": "Activo",
+      "CANCELLED": "Rechazado"
+    }
+  },
+  "guestLosses": {
+    "title": "Pérdidas por huésped",
+    "date": "Fecha",
+    "folio": "Folio",
+    "guest": "Huésped",
+    "room": "Habitación",
+    "items": "Artículos",
+    "pieces": "Piezas",
+    "cost": "Costo",
+    "chargeStatus": "Cobro",
+    "chargeAmount": "Monto a cobrar",
+    "sourceLabel": "Origen",
+    "sourceDirect": "Directo",
+    "status": "Estado",
+    "totals": "Totales",
+    "totalPieces": "Piezas perdidas",
+    "totalsNote": "Las bajas rechazadas se listan pero no suman a los totales.",
+    "none": "Sin pérdidas de huésped en el periodo",
+    "allRooms": "Todas las habitaciones",
+    "byCharge": "Por estado de cobro",
+    "events": "Pérdidas",
+    "source": {
+      "LOAN": "Préstamo",
+      "EXTRA": "Adicional"
+    },
+    "charge": {
+      "NOT_CHARGED": "Sin cobrar",
+      "PENDING": "Cobro pendiente",
+      "CHARGED": "Cobrado",
+      "WAIVED": "Condonado"
+    },
+    "statusName": {
+      "PENDING_APPROVAL": "Pendiente",
+      "ACTIVE": "Autorizada",
+      "CANCELLED": "Rechazada"
+    }
   }
 }

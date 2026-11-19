@@ -1,10 +1,10 @@
-import { ITButton } from "@axzydev/axzy_ui_system";
+import { ITButton, ITFlex } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
-import { FaClipboardList, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FaClipboardList, FaPlus, FaTrashAlt, FaUserSlash } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCan } from "@entities/user";
-import { WriteoffDetailView, WriteoffForm, WriteoffsBoard } from "@features/hotel-linen/writeoffs";
+import { GuestLossForm, WriteoffDetailView, WriteoffForm, WriteoffsBoard } from "@features/hotel-linen/writeoffs";
 import { CountDetailView, CountsBoard } from "@features/hotel-linen/counts";
 import { useCosign } from "@features/hotel-linen/cosign";
 import { downloadWriteoffWeeklyPdf } from "@widgets/writeoff-weekly-pdf";
@@ -32,7 +32,10 @@ export function LinenWriteoffsPage() {
       backAction={() => goBack("/")}
       actions={
         canRequest ? (
-          <ITButton variant="filled" color="primary" icon={<FaPlus size={12} />} label={t("writeoffs.new.action")} onClick={() => navigate("/linen/writeoffs/new")} />
+          <ITFlex gap={2}>
+            <ITButton variant="outlined" color="primary" icon={<FaUserSlash size={12} />} label={t("guestLoss.action")} onClick={() => navigate("/linen/writeoffs/guest-loss/new")} />
+            <ITButton variant="filled" color="primary" icon={<FaPlus size={12} />} label={t("writeoffs.new.action")} onClick={() => navigate("/linen/writeoffs/new")} />
+          </ITFlex>
         ) : undefined
       }
     >
@@ -64,6 +67,30 @@ export function LinenWriteoffNewPage() {
         onDone={(ids) => navigate(ids.length === 1 ? `/linen/writeoffs/${ids[0]}` : "/linen/writeoffs", { replace: true })}
         onCancel={() => goBack("/linen/writeoffs")}
       />
+    </AppPage>
+  );
+}
+
+export function LinenGuestLossNewPage() {
+  const { t } = useTranslation(["hotel-linen-writeoff", "common"]);
+  const navigate = useNavigate();
+  const goBack = useGoBack();
+  return (
+    <AppPage
+      className={pageClass}
+      noPadding
+      title={t("guestLoss.new.title")}
+      description={t("guestLoss.new.description")}
+      icon={<FaUserSlash size={20} />}
+      breadcrumbs={[
+        { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
+        { label: t("common:nav.linen") },
+        { label: t("writeoffs.title"), onClick: () => navigate("/linen/writeoffs") },
+        { label: t("guestLoss.action") },
+      ]}
+      backAction={() => goBack("/linen/writeoffs")}
+    >
+      <GuestLossForm onDone={(id) => navigate(`/linen/writeoffs/${id}`, { replace: true })} onCancel={() => goBack("/linen/writeoffs")} />
     </AppPage>
   );
 }

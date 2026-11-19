@@ -71,6 +71,8 @@
     "linenEquipment": "Equipment",
     "linenHome": "Linen home",
     "linenReports": "Linen reports",
+    "linenAdjustments": "Inventory adjustments",
+    "linenTablet": "Linen orders (tablet)",
     "linenRestock": "Restock",
     "linenFlow": "Linen flow",
     "kitchenCatalog": "Catalogs",

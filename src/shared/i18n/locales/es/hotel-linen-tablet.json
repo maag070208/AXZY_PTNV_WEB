@@ -1,0 +1,80 @@
+{
+  "title": "Pedido de blancos",
+  "description": "Pedidos de blancos por habitación: pedir, surtir y llevar",
+  "loading": "Cargando…",
+  "noAccess": "No tienes un puesto con pantalla de tablet de blancos.",
+  "cancel": "Cancelar",
+  "sending": "Enviando…",
+  "status": {
+    "SUBMITTED": "Por surtir",
+    "PARTIALLY_FULFILLED": "Surtido parcial",
+    "READY_FOR_PICKUP": "Listo para recoger",
+    "IN_TRANSIT": "En camino",
+    "FULFILLED": "Por confirmar",
+    "DRAFT": "Borrador",
+    "RECEIVED": "Entregado",
+    "CANCELLED": "Cancelado"
+  },
+  "order": {
+    "room": "Hab. {{number}}",
+    "age": "hace {{age}}"
+  },
+  "supervisor": {
+    "rooms": "Habitaciones",
+    "roomsHint": "Toca la habitación que se desocupó",
+    "vacated": "Se desocupó",
+    "noRooms": "No hay habitaciones en tu zona.",
+    "orders": "En camino / Entregados",
+    "noOrders": "No hay pedidos abiertos.",
+    "reportDifference": "Reportar diferencia",
+    "addExtra": "Agregar extra",
+    "delivered": "Entregados hoy",
+    "noDelivered": "Sin entregas recientes."
+  },
+  "turnover": {
+    "title": "Hab. {{number}} se desocupó",
+    "subtitle": "Blancos que lleva según su dotación",
+    "addItem": "Agregar algo más",
+    "add": "Agregar",
+    "order": "Pedir",
+    "alreadyOpen": "Esta habitación ya tiene un pedido abierto ({{folio}})."
+  },
+  "laundry": {
+    "pending": "Pendientes de surtir",
+    "none": "No hay pedidos pendientes.",
+    "requested": "Pedido: {{qty}}",
+    "ready": "Listo"
+  },
+  "carrier": {
+    "toPickUp": "Para recoger",
+    "noneToPickUp": "No hay pedidos para recoger.",
+    "carrying": "Llevando",
+    "noneCarrying": "No llevas ningún pedido.",
+    "pickedUp": "Recogí",
+    "delivered": "Entregado en hab. {{number}}",
+    "pickSelected": "Recoger ({{count}})"
+  },
+  "toast": {
+    "created": "Pedido enviado a lavandería",
+    "existing": "La habitación ya tenía el pedido {{folio}}",
+    "ready": "Pedido listo para recoger",
+    "pickedUp": "Pedido recogido",
+    "delivered": "Pedido entregado",
+    "difference": "Diferencia reportada",
+    "extra": "Extra agregado",
+    "pickedMany": "{{count}} pedidos recogidos",
+    "conflicts": "{{count}} pedido(s) ya los tomaron"
+  },
+  "difference": {
+    "title": "Diferencia en la habitación {{number}}",
+    "subtitle": "Piezas que no llegaron",
+    "notes": "Qué pasó",
+    "send": "Reportar",
+    "missing": "Faltan"
+  },
+  "extra": {
+    "title": "Agregar a la habitación {{number}}",
+    "product": "Artículo",
+    "add": "Agregar"
+  }
+}

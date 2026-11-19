@@ -3,6 +3,7 @@ import { ITBadget, ITDataTable, ITFlex, ITTabs, ITText } from "@axzydev/axzy_ui_
 import type { Column } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import {
+  GUEST_LOSS_REASON_CODE,
   WRITEOFF_REASONS,
   WRITEOFF_STATUSES,
   hotelLinenApi,
@@ -86,8 +87,16 @@ function WriteoffsTable({ stage, warehouses, onOpen }: TableProps) {
       width: 150,
       filter: filtered ? "catalog" : false,
       sortable: false,
-      catalogOptions: { data: WRITEOFF_REASONS.map((c) => ({ id: c, name: tt(`writeoffs.reason.${c}`) })) },
+      catalogOptions: { data: [...WRITEOFF_REASONS, GUEST_LOSS_REASON_CODE].map((c) => ({ id: c, name: tt(`writeoffs.reason.${c}`) })) },
       render: (r) => <ITText className="text-[12px]">{r.reason?.name ?? "—"}</ITText>,
+    },
+    {
+      key: "guest",
+      label: t("writeoffs.columns.guest"),
+      type: "string",
+      width: 170,
+      sortable: false,
+      render: (r) => <ITText className="text-[12px]">{r.guestName ? `${r.guestName}${r.room ? ` · ${r.room}` : ""}` : "—"}</ITText>,
     },
     {
       key: "requestedBy",

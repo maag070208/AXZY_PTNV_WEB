@@ -1,5 +1,6 @@
 // Tipos de Recepción de Blancos (F4): préstamo de toallas, corte de turno, adicionales y equipos.
 import type { HotelSignatureEntry, HotelUserRef, HotelWarehouseRef } from "./types";
+import type { GuestLossRef } from "./writeoffTypes";
 
 export type DepositMethod = "CASH" | "CARD" | "ROOM_CHARGE";
 export const DEPOSIT_METHODS: readonly DepositMethod[] = ["CASH", "CARD", "ROOM_CHARGE"];
@@ -37,6 +38,8 @@ export interface TowelLoan {
   returnedAt: string | null;
   shiftCloseId: string | null;
   notes: string | null;
+  /** Pérdida por huésped a la que se convirtió (null si no). */
+  guestLoss: GuestLossRef | null;
   /** Solo en la respuesta de devolver. */
   depositRefund?: number;
 }
@@ -139,6 +142,8 @@ export interface RoomExtra {
   collectedAt: string | null;
   collectedQty: number | null;
   missingQty: number;
+  /** Pérdida por huésped a la que se convirtió (null si no). */
+  guestLoss: GuestLossRef | null;
 }
 
 export interface RoomExtraInput {

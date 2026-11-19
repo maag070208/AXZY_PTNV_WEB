@@ -13,5 +13,6 @@ export const notificationRoute = (n: Partial<Pick<Notification, "ticketId" | "ty
   if (n.ticketId) return `/tickets/${n.ticketId}`;
   if (n.type === "INVENTORY_AUDIT") return "/inventory";
   if (n.type === "KITCHEN_ALERTS") return "/kitchen";
+  if (n.type?.startsWith("HOTEL_LINEN_ORDER_")) return "/linen/tablet";
   return null;
 };

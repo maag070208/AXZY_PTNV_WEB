@@ -11,7 +11,9 @@
     "laundry": "Laundry",
     "kardex": "Kardex",
     "life": "Lots and useful life",
-    "areaReconciliation": "Area reconciliation"
+    "areaReconciliation": "Area reconciliation",
+    "adjustments": "Adjustments",
+    "guestLosses": "Guest losses"
   },
   "export": {
     "pdf": "PDF",
@@ -286,5 +288,80 @@
   },
   "common": {
     "close": "Close"
+  },
+  "adjustments": {
+    "title": "Inventory adjustments",
+    "date": "Date",
+    "folio": "Folio",
+    "warehouse": "Warehouse",
+    "product": "Item",
+    "direction": "Movement",
+    "quantity": "Pieces",
+    "unitCost": "Unit cost",
+    "totalCost": "Total cost",
+    "reason": "Reason",
+    "createdBy": "Created by",
+    "approvedBy": "Approved by",
+    "status": "Status",
+    "typeLabel": "Type",
+    "totals": "Totals",
+    "totalPieces": "Adjusted pieces",
+    "totalsNote": "Rejected adjustments are not included in the totals.",
+    "byReason": "Totals by reason",
+    "byWarehouse": "Totals by warehouse",
+    "noValue": "Not set",
+    "none": "No adjustments in the period.",
+    "allProducts": "All items",
+    "allWarehouses": "All warehouses",
+    "allReasons": "All reasons",
+    "allTypes": "All types",
+    "allStatuses": "All statuses",
+    "type": {
+      "ADJUST_IN": "In",
+      "ADJUST_OUT": "Out",
+      "WRITE_OFF": "Write-off"
+    },
+    "statusName": {
+      "PENDING_APPROVAL": "Pending",
+      "ACTIVE": "Active",
+      "CANCELLED": "Rejected"
+    }
+  },
+  "guestLosses": {
+    "title": "Guest losses",
+    "date": "Date",
+    "folio": "Folio",
+    "guest": "Guest",
+    "room": "Room",
+    "items": "Items",
+    "pieces": "Pieces",
+    "cost": "Cost",
+    "chargeStatus": "Charge",
+    "chargeAmount": "Amount to charge",
+    "sourceLabel": "Source",
+    "sourceDirect": "Direct",
+    "status": "Status",
+    "totals": "Totals",
+    "totalPieces": "Pieces lost",
+    "totalsNote": "Rejected write-offs are listed but do not count in the totals.",
+    "none": "No guest losses in the period",
+    "allRooms": "All rooms",
+    "byCharge": "By charge status",
+    "events": "Losses",
+    "source": {
+      "LOAN": "Loan",
+      "EXTRA": "Extra"
+    },
+    "charge": {
+      "NOT_CHARGED": "Not charged",
+      "PENDING": "Charge pending",
+      "CHARGED": "Charged",
+      "WAIVED": "Waived"
+    },
+    "statusName": {
+      "PENDING_APPROVAL": "Pending",
+      "ACTIVE": "Authorized",
+      "CANCELLED": "Rejected"
+    }
   }
 }

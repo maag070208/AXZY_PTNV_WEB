@@ -16,6 +16,7 @@ import { useCan } from "@entities/user";
 import { dyn } from "@shared/i18n/dyn";
 import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
+import { GuestLossDialog } from "@shared/ui/guest-loss-dialog";
 import CollectDialog from "./CollectDialog";
 import { useSuccessToast } from "@app/toast/useSuccessToast";
 
@@ -41,6 +42,7 @@ export default function ExtrasView({ requestCosign }: Props) {
   const tt = dyn(t);
   const canCreate = useCan("hotel_linen.extras_create");
   const canCollect = useCan("hotel_linen.extras_collect");
+  const canGuestLoss = useCan("hotel_linen.writeoff_request");
 
   const [rooms, setRooms] = useState<HotelRoomOption[]>([]);
   const [products, setProducts] = useState<HotelProduct[]>([]);
@@ -53,6 +55,7 @@ export default function ExtrasView({ requestCosign }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [collecting, setCollecting] = useState<RoomExtra | null>(null);
+  const [converting, setConverting] = useState<RoomExtra | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -145,8 +148,21 @@ export default function ExtrasView({ requestCosign }: Props) {
         ),
       },
       { key: "missingQty", label: t("extras.columns.missing"), type: "number", width: 100, sortable: false, render: (r) => <ITText className="text-[12px] tabular-nums">{r.missingQty > 0 ? fmt(r.missingQty) : "—"}</ITText> },
+      {
+        key: "actions",
+        label: "",
+        type: "string",
+        width: 190,
+        sortable: false,
+        render: (r) => {
+          if (r.status !== "MISSING") return null;
+          // Faltante: se convierte en pérdida de huésped una sola vez (una rechazada permite reintentar).
+          if (r.guestLoss && r.guestLoss.status !== "CANCELLED") return <ITChip size="sm" color="secondary" label={t("extras.guestLossDone", { folio: r.guestLoss.folio })} />;
+          return canGuestLoss ? <ITButton size="sm" variant="outlined" color="danger" label={t("extras.guestLoss")} onClick={() => setConverting(r)} /> : null;
+        },
+      },
     ],
-    [t, tt]
+    [t, tt, canGuestLoss]
   );
 
   return (
@@ -208,6 +224,9 @@ export default function ExtrasView({ requestCosign }: Props) {
                               <ITButton size="sm" variant="outlined" color="primary" label={t("extras.board.deliverCosign")} onClick={() => void deliver(e, true)} />
                             </>
                           )}
+                          {e.status === "MISSING" && canGuestLoss && !(e.guestLoss && e.guestLoss.status !== "CANCELLED") && (
+                            <ITButton size="sm" variant="outlined" color="danger" label={t("extras.guestLoss")} onClick={() => setConverting(e)} />
+                          )}
                           {e.status === "DELIVERED" && e.kind === "LINEN" && (
                             <ITButton size="sm" variant="filled" color="primary" label={t("extras.board.collect")} onClick={() => setCollecting(e)} />
                           )}
@@ -238,6 +257,19 @@ export default function ExtrasView({ requestCosign }: Props) {
         />
       </PanelCard>
 
+      <GuestLossDialog
+        open={converting !== null}
+        askGuest
+        summary={converting ? t("extras.guestLossSummary", { room: converting.room.number, count: converting.missingQty, product: converting.product.name }) : ""}
+        onClose={() => setConverting(null)}
+        onSubmit={async (v) => {
+          if (!converting) return;
+          await receptionApi.extraGuestLoss(converting.id, { guestName: v.guestName ?? "", chargeStatus: v.chargeStatus, chargeAmount: v.chargeAmount, notes: v.notes });
+          notify(t("extras.toast.guestLoss"));
+          setConverting(null);
+          refresh();
+        }}
+      />
       <CollectDialog extra={collecting} onClose={() => setCollecting(null)} onDone={() => { setCollecting(null); refresh(); }} />
     </ITFlex>
   );

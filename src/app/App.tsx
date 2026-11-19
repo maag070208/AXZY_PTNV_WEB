@@ -116,15 +116,17 @@ import {
   LinenTransfersPage,
   LinenCountDetailPage,
   LinenCountsPage,
+  LinenGuestLossNewPage,
   LinenWriteoffDetailPage,
   LinenWriteoffNewPage,
   LinenWriteoffsPage,
 } from "@pages/hotel-linen";
 import { LinenAmenitiesPage, LinenAmenityControlPage } from "@pages/hotel-linen/AmenityPages";
 import { LinenEquipmentPage, LinenExtrasPage, LinenLoansPage } from "@pages/hotel-linen/ReceptionPages";
-import { LinenHomePage, LinenReportsPage } from "@pages/hotel-linen/ReportPages";
+import { LinenAdjustmentsReportPage, LinenGuestLossesReportPage, LinenHomePage, LinenReportsPage } from "@pages/hotel-linen/ReportPages";
 import { LinenFlowPage, LinenRestockPage } from "@pages/hotel-linen/RestockPages";
 import { LinenPurchasesPage } from "@pages/hotel-linen/PurchasePages";
+import { LinenTabletPage } from "@pages/hotel-linen/TabletPages";
 
 export default function App() {
   return (
@@ -591,6 +593,22 @@ export default function App() {
           }
         />
         <Route
+          path="/linen/reports/guest-losses"
+          element={
+            <RequiresPermission permission="hotel_linen.reports">
+              <LinenGuestLossesReportPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/reports/adjustments"
+          element={
+            <RequiresPermission permission="hotel_linen.reports">
+              <LinenAdjustmentsReportPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
           path="/linen/catalog"
           element={
             <RequiresPermission permission="hotel_linen.view">
@@ -603,6 +621,14 @@ export default function App() {
           element={
             <RequiresPermission permission="hotel_linen.view">
               <LinenAreasPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/tablet"
+          element={
+            <RequiresPermission permission="hotel_linen.view">
+              <LinenTabletPage />
             </RequiresPermission>
           }
         />
@@ -844,6 +870,14 @@ export default function App() {
           element={
             <RequiresPermission permission="hotel_linen.writeoff_request">
               <LinenWriteoffNewPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/linen/writeoffs/guest-loss/new"
+          element={
+            <RequiresPermission permission="hotel_linen.writeoff_request">
+              <LinenGuestLossNewPage />
             </RequiresPermission>
           }
         />

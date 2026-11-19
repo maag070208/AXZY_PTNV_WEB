@@ -1,6 +1,7 @@
 import { api } from "@shared/api/client";
 import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
 import type {
+  GuestLossCreateInput,
   StocktakeCaptureLine,
   StocktakeDetail,
   StocktakeSummary,
@@ -26,6 +27,8 @@ export const writeoffApi = {
     input.photos.forEach((file) => form.append("photos", file));
     return api.post<WriteoffDetail[]>(`${BASE}/writeoffs`, form, { headers: { "Content-Type": "multipart/form-data" } });
   },
+  /** Pérdida por huésped (baja motivo G): sigue la revisión y autorización de bajas. */
+  createGuestLoss: (input: GuestLossCreateInput) => api.post<WriteoffDetail>(`${BASE}/guest-losses`, input),
   review: (id: string, body: { notes?: string | null; cosignToken?: string | null } = {}) =>
     api.post<WriteoffDetail>(`${BASE}/writeoffs/${id}/review`, body),
   approve: (id: string, body: { disposition: WriteoffDisposition; notes?: string | null; cosignToken?: string | null }) =>

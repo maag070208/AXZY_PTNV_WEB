@@ -1,5 +1,6 @@
 import { api } from "@shared/api/client";
 import { tableRequest, type ITDataTableFetchParamsPost } from "@shared/api/table";
+import type { GuestLossCharge, GuestLossFromExtraInput, WriteoffDetail } from "../model/writeoffTypes";
 import type {
   EquipmentBoard,
   EquipmentLoan,
@@ -26,6 +27,8 @@ export const receptionApi = {
   loansTable: (params: ITDataTableFetchParamsPost) => tableRequest<TowelLoan>(`${BASE}/loans/table`, params),
   createLoan: (input: TowelLoanInput) => api.post<TowelLoan>(`${BASE}/loans`, input),
   returnLoan: (folio: string, quantity: number) => api.post<TowelLoan>(`${BASE}/loans/${folio}/return`, { quantity }),
+  /** Convierte un préstamo UNRETURNED en pérdida por huésped (sin recapturar datos). */
+  loanGuestLoss: (folio: string, input: GuestLossCharge) => api.post<WriteoffDetail>(`${BASE}/loans/${folio}/guest-loss`, input),
   pointSummary: (warehouseId: string) =>
     api.get<PointSummary>(`${BASE}/loans/point-summary?warehouseId=${encodeURIComponent(warehouseId)}`),
   closePreview: (warehouseId: string, marked: string[]) =>
@@ -45,6 +48,8 @@ export const receptionApi = {
   deliverExtra: (id: string, cosignToken?: string | null) =>
     api.post<RoomExtra>(`${BASE}/extras/${id}/deliver`, { cosignToken: cosignToken ?? null }),
   collectExtra: (id: string, collectedQty: number) => api.post<RoomExtra>(`${BASE}/extras/${id}/collect`, { collectedQty }),
+  /** Convierte un adicional MISSING en pérdida por huésped. */
+  extraGuestLoss: (id: string, input: GuestLossFromExtraInput) => api.post<WriteoffDetail>(`${BASE}/extras/${id}/guest-loss`, input),
   cancelExtra: (id: string) => api.post<RoomExtra>(`${BASE}/extras/${id}/cancel`, {}),
 
   // equipos por pieza

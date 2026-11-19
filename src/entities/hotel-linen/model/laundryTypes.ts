@@ -10,7 +10,15 @@ export interface LaundryProductRef {
 
 // ── Pedidos de área ────────────────────────────────────────────────────────
 
-export type SupplyRequestStatus = "DRAFT" | "SUBMITTED" | "PARTIALLY_FULFILLED" | "FULFILLED" | "RECEIVED" | "CANCELLED";
+export type SupplyRequestStatus =
+  | "DRAFT"
+  | "SUBMITTED"
+  | "PARTIALLY_FULFILLED"
+  | "FULFILLED"
+  | "RECEIVED"
+  | "CANCELLED"
+  | "READY_FOR_PICKUP"
+  | "IN_TRANSIT";
 export const SUPPLY_REQUEST_STATUSES: readonly SupplyRequestStatus[] = [
   "DRAFT",
   "SUBMITTED",
@@ -18,6 +26,8 @@ export const SUPPLY_REQUEST_STATUSES: readonly SupplyRequestStatus[] = [
   "FULFILLED",
   "RECEIVED",
   "CANCELLED",
+  "READY_FOR_PICKUP",
+  "IN_TRANSIT",
 ];
 
 export interface SupplyRequestRow {
@@ -52,6 +62,13 @@ export interface SupplyRequestDetail {
   date: string;
   shift: string | null;
   status: SupplyRequestStatus;
+  /** Pedido por habitación (tablet): origen, habitación, quién lo lleva y tiempos. */
+  origin?: "MANUAL" | "ROOM_TURNOVER";
+  room?: { id: string; number: string } | null;
+  carrier?: HotelUserRef | null;
+  readyAt?: string | null;
+  pickedUpAt?: string | null;
+  deliveredAt?: string | null;
   checkouts: number;
   occupied: number;
   notes: string | null;

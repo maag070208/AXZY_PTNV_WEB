@@ -66,7 +66,9 @@
       "PARTIALLY_FULFILLED": "Partially supplied",
       "FULFILLED": "Supplied",
       "RECEIVED": "Received in area",
-      "CANCELLED": "Cancelled"
+      "CANCELLED": "Cancelled",
+      "READY_FOR_PICKUP": "Ready for pickup",
+      "IN_TRANSIT": "In transit"
     }
   },
   "detail": {

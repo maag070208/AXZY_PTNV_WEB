@@ -10,6 +10,8 @@ const COLOR: Record<SupplyRequestStatus, "gray" | "info" | "warning" | "success"
   FULFILLED: "primary",
   RECEIVED: "success",
   CANCELLED: "gray",
+  READY_FOR_PICKUP: "warning",
+  IN_TRANSIT: "primary",
 };
 
 export default function SupplyStatusChip({ status }: { status: SupplyRequestStatus }) {

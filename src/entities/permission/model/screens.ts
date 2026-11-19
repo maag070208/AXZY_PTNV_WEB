@@ -61,7 +61,9 @@ export type NavLabelKey =
   | "nav.linenSectionCatalogs"
   | "nav.linenSectionReports"
   | "nav.linenReports"
+  | "nav.linenAdjustments"
   | "nav.linenRestock"
+  | "nav.linenTablet"
   | "nav.linenFlow"
   | "nav.linenCatalog"
   | "nav.linenAreas"
@@ -162,6 +164,9 @@ const LINEN_NOT_FLOOR = [
   "hotel_linen.reports",
 ] as const;
 
+/** Tablet de pedido de blancos: la ve quien pide (supervisora), surte (lavandería) o lleva (auxiliar de piso). */
+const LINEN_TABLET = ["hotel_linen.request", "hotel_linen.fulfill", "hotel_linen.carry"] as const;
+
 /** Catálogo completo, apagados incluidos (el menú usa `APP_SCREENS`). */
 const ALL_SCREENS: readonly AppScreen[] = [
   {
@@ -225,6 +230,7 @@ const ALL_SCREENS: readonly AppScreen[] = [
     // Orden: inicio -> almacén/traspasos -> lavandería -> habitaciones -> control -> compras -> catálogos -> reportes.
     children: [
       { id: "linenHome", labelKey: "nav.linenHome", path: "/linen", match: "exact", actions: [] },
+      { id: "linenTablet", labelKey: "nav.linenTablet", path: "/linen/tablet", requirement: { anyOf: LINEN_TABLET }, actions: [] },
       {
         id: "linenSectionWarehouse",
         labelKey: "nav.linenSectionWarehouse",
@@ -288,6 +294,7 @@ const ALL_SCREENS: readonly AppScreen[] = [
           { id: "linenRestock", labelKey: "nav.linenRestock", path: "/linen/restock", requirement: { anyOf: ["hotel_linen.request"] }, actions: [] },
           { id: "linenFlow", labelKey: "nav.linenFlow", path: "/linen/flow", requirement: { anyOf: LINEN_NOT_FLOOR }, actions: [] },
           { id: "linenReports", labelKey: "nav.linenReports", path: "/linen/reports", requirement: { anyOf: ["hotel_linen.reports"] }, actions: [] },
+          { id: "linenAdjustments", labelKey: "nav.linenAdjustments", path: "/linen/reports/adjustments", requirement: { anyOf: ["hotel_linen.reports"] }, actions: [] },
         ],
       },
     ],
