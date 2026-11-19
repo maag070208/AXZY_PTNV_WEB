@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   ITBadget,
   ITDataTable,
@@ -38,13 +38,16 @@ export default function AltasTab({ fx }: { fx: UseEmployeeSync }) {
    * Errores del 422 para una alta. Se identifican por `rowKey` (el renglón se
    * repite entre hojas); si el error viniera sin `rowKey`, se cae a `row`.
    */
-  const errorsOf = (rowKey: string, row: number, field?: string): EmployeeSyncInvalidRow[] =>
-    fx.rowErrors.filter(
-      (rowError) =>
-        (rowError.rowKey === rowKey ||
-          (rowError.rowKey === undefined && rowError.row === row)) &&
-        (!field || rowError.field === field)
-    );
+  const errorsOf = useCallback(
+    (rowKey: string, row: number, field?: string): EmployeeSyncInvalidRow[] =>
+      fx.rowErrors.filter(
+        (rowError) =>
+          (rowError.rowKey === rowKey ||
+            (rowError.rowKey === undefined && rowError.row === row)) &&
+          (!field || rowError.field === field)
+      ),
+    [fx.rowErrors]
+  );
 
   const departmentLabelOf = useMemo(() => {
     const labels = new Map(fx.departmentOptions.map((option) => [option.value, option.label]));
@@ -72,7 +75,7 @@ export default function AltasTab({ fx }: { fx: UseEmployeeSync }) {
           status: altaStatusOf(draft, errorsOf(alta.rowKey, alta.row).length),
         };
       }),
-    [rows, fx.drafts, fx.rowErrors, departmentLabelOf, scheduleLabelOf]
+    [rows, fx.drafts, errorsOf, departmentLabelOf, scheduleLabelOf]
   );
 
   const fetchData = useMemo(

@@ -544,9 +544,11 @@
       "summaryChanges": "{{created}} will be created, {{deactivated}} terminated and {{updated}} updated.",
       "nothing": "There is nothing selected to apply.",
       "button": "Confirm sync",
-      "confirming": "Applying…",
+      "confirming": "Confirming…",
       "invalidRows": "The sync was not applied: {{count}} row(s) have errors.",
-      "uploadAnother": "Upload another file"
+      "uploadAnother": "Upload another file",
+      "clockNote": "Syncing with the time clocks; it may take up to ~1 minute.",
+      "clockNow": "Update time clocks now"
     },
     "fieldErrors": {
       "USERNAME_TAKEN": "That username already exists",
@@ -599,12 +601,14 @@
       "downloading": "Generating…",
       "uploadAnother": "Sync another file",
       "empty": "No results.",
-      "summary": "{{created}} created · {{deactivated}} terminated · {{updated}} updated"
+      "summary": "{{created}} created · {{deactivated}} terminated · {{updated}} updated",
+      "clockSkipped": "The time clocks were not updated: they stay pending and you can retry per person with \"Retry clock\"."
     },
     "errors": {
       "preview": "The file could not be read.",
       "confirm": "The sync could not be applied.",
-      "export": "The Excel could not be generated."
+      "export": "The Excel could not be generated.",
+      "timeout": "The sync took longer than expected. It may have been applied: upload the file again to check the state before retrying."
     },
     "review": {
       "title": "Review: this is what will be applied on confirm",

@@ -96,6 +96,18 @@ const CLOCK_CODE_KEYS = {
 const messageOf = (error: unknown, fallback: string): string =>
   error instanceof Error && error.message ? error.message : fallback;
 
+/**
+ * ¿El error es un timeout del cliente? Axios lo marca `ECONNABORTED` y su
+ * mensaje dice "timeout of Nms exceeded".
+ */
+const isTimeoutError = (error: unknown): boolean => {
+  const candidate = error as { code?: string; message?: string } | null;
+  return (
+    candidate?.code === "ECONNABORTED" ||
+    (candidate?.message ?? "").toLowerCase().includes("timeout")
+  );
+};
+
 /** Nombre de departamento comparable (sin acentos, mayúsculas ni espacios de más). */
 const normalizeName = (value: string): string =>
   value
@@ -141,6 +153,10 @@ export const useEmployeeSync = () => {
   const [drafts, setDrafts] = useState<AltaDrafts>({});
   const [excludedBajas, setExcludedBajas] = useState<Set<string>>(new Set());
   const [includeChanges, setIncludeChanges] = useState(false);
+  /** Actualizar los relojes al confirmar (si no, quedan pendientes a propósito). */
+  const [clockNow, setClockNow] = useState(true);
+  /** La última confirmación se hizo sin tocar los relojes. */
+  const [clockSkipped, setClockSkipped] = useState(false);
   /** Filas por resolver vinculadas a una persona del sistema (rowKey → userId). */
   const [linkedPending, setLinkedPending] = useState<Record<string, string>>({});
   /** Filas por resolver convertidas en alta (por `rowKey`). */
@@ -350,6 +366,8 @@ export const useEmployeeSync = () => {
     setDrafts({});
     setExcludedBajas(new Set());
     setIncludeChanges(false);
+    setClockNow(true);
+    setClockSkipped(false);
     setLinkedPending({});
     setConvertedRows(new Set());
     setStep2Tab("altas");
@@ -366,6 +384,8 @@ export const useEmployeeSync = () => {
     setDrafts({});
     setExcludedBajas(new Set());
     setIncludeChanges(false);
+    setClockNow(true);
+    setClockSkipped(false);
     setLinkedPending({});
     setConvertedRows(new Set());
     setStep("upload");
@@ -385,6 +405,8 @@ export const useEmployeeSync = () => {
       setStep2Tab("altas");
       setExcludedBajas(new Set());
       setIncludeChanges(false);
+      setClockNow(true);
+      setClockSkipped(false);
       setLinkedPending({});
       setConvertedRows(new Set());
       setDrafts(
@@ -513,8 +535,24 @@ export const useEmployeeSync = () => {
           };
         })
       : undefined;
-    return { altas: altasPayload, bajas, cambios, order };
-  }, [preview, altas, drafts, excludedBajas, includeChanges, departmentIdByName, linkedPending]);
+    return {
+      altas: altasPayload,
+      bajas,
+      cambios,
+      order,
+      // Solo se manda cuando se apaga: el default del contrato es `true`.
+      ...(clockNow ? {} : { clockNow: false }),
+    };
+  }, [
+    preview,
+    altas,
+    drafts,
+    excludedBajas,
+    includeChanges,
+    departmentIdByName,
+    linkedPending,
+    clockNow,
+  ]);
 
   /** Paso 2: aplica la sincronización (todo o nada). Pinta el 422 por fila. */
   const confirm = useCallback(async () => {
@@ -525,6 +563,7 @@ export const useEmployeeSync = () => {
     setRowErrors([]);
     try {
       const data = await employeeSyncApi.confirm(payload);
+      setClockSkipped(!clockNow);
       setResult(data);
       setStep("done");
     } catch (caught) {
@@ -554,13 +593,16 @@ export const useEmployeeSync = () => {
         }
         else if (bajaWithError) setStep2Tab("bajas");
         else if (cambioWithError) setStep2Tab("cambios");
+      } else if (isTimeoutError(caught)) {
+        // La operación pudo aplicarse en el servidor: no se reenvía sola.
+        setError(tt("sync.errors.timeout"));
       } else {
         setError(messageOf(caught, tt("sync.errors.confirm")));
       }
     } finally {
       setConfirming(false);
     }
-  }, [buildPayload, canConfirm, preview, tt]);
+  }, [buildPayload, canConfirm, preview, tt, clockNow]);
 
   /** Filas del reporte final (una por persona), con sistema y reloj. */
   const resultRows = useMemo<EmployeeSyncResultRow[]>(() => {
@@ -792,6 +834,9 @@ export const useEmployeeSync = () => {
     toggleBaja,
     includeChanges,
     setIncludeChanges,
+    clockNow,
+    setClockNow,
+    clockSkipped,
     linkPending,
     undoPending,
     convertPendingToAlta,

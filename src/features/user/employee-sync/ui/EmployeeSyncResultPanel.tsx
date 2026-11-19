@@ -227,6 +227,7 @@ export default function EmployeeSyncResultPanel({ fx }: { fx: UseEmployeeSync })
       {!result.clock.enabled && (
         <ITAlert variant="warning">{t("sync.result.clockDisabled")}</ITAlert>
       )}
+      {fx.clockSkipped && <ITAlert variant="info">{t("sync.result.clockSkipped")}</ITAlert>}
 
       <PanelCard title={t("sync.result.title")} description={t("sync.result.description")}>
         {fx.resultRows.length === 0 ? (

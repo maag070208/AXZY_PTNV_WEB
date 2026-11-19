@@ -544,9 +544,11 @@
       "summaryChanges": "Se crearán {{created}}, se darán de baja {{deactivated}} y se actualizarán {{updated}}.",
       "nothing": "No hay nada seleccionado para aplicar.",
       "button": "Confirmar sincronización",
-      "confirming": "Aplicando…",
+      "confirming": "Confirmando…",
       "invalidRows": "La sincronización no se aplicó: hay {{count}} fila(s) con errores.",
-      "uploadAnother": "Subir otro archivo"
+      "uploadAnother": "Subir otro archivo",
+      "clockNote": "Sincronizando con los relojes; puede tardar hasta ~1 minuto.",
+      "clockNow": "Actualizar relojes ahora"
     },
     "fieldErrors": {
       "USERNAME_TAKEN": "Ese usuario ya existe",
@@ -599,12 +601,14 @@
       "downloading": "Generando…",
       "uploadAnother": "Sincronizar otro archivo",
       "empty": "No hay resultados.",
-      "summary": "{{created}} creados · {{deactivated}} bajas · {{updated}} actualizados"
+      "summary": "{{created}} creados · {{deactivated}} bajas · {{updated}} actualizados",
+      "clockSkipped": "No se actualizaron los relojes: quedan pendientes y puedes reintentar por persona con «Reintentar reloj»."
     },
     "errors": {
       "preview": "No se pudo leer el archivo.",
       "confirm": "No se pudo aplicar la sincronización.",
-      "export": "No se pudo generar el Excel."
+      "export": "No se pudo generar el Excel.",
+      "timeout": "La sincronización tardó más de lo esperado. Puede haberse aplicado: sube el archivo de nuevo para revisar el estado antes de reintentar."
     },
     "review": {
       "title": "Revisión: esto se aplicará al confirmar",

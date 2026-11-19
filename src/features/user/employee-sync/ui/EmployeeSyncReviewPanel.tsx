@@ -5,6 +5,7 @@ import {
   ITCard,
   ITFlex,
   ITGrid,
+  ITSlideToggle,
   ITText,
 } from "@axzydev/axzy_ui_system";
 import { FaCheck, FaFileExcel } from "react-icons/fa";
@@ -85,10 +86,30 @@ export default function EmployeeSyncReviewPanel({ fx }: { fx: UseEmployeeSync })
               >
                 {selection.total === 0 ? t("sync.confirm.nothing") : summary}
               </ITText>
+              {fx.confirming && (
+                <ITText muted className="!text-[11px]">
+                  {t("sync.confirm.clockNote")}
+                </ITText>
+              )}
             </ITFlex>
           </ITFlex>
 
           <ITFlex align="center" gap={2} wrap="wrap" className="shrink-0">
+            {fx.canWriteClock && (
+              <ITFlex align="center" gap={1.5} className="rounded-full bg-slate-100/70 px-2.5 py-1">
+                <ITSlideToggle
+                  isOn={fx.clockNow}
+                  onToggle={fx.setClockNow}
+                  activeColor="primary"
+                  size="sm"
+                  disabled={fx.confirming}
+                  label={t("sync.confirm.clockNow")}
+                />
+                <ITText className="!text-[11px] font-semibold text-slate-600">
+                  {t("sync.confirm.clockNow")}
+                </ITText>
+              </ITFlex>
+            )}
             <ITButton variant="outlined" color="secondary" disabled={fx.confirming} onClick={fx.reset}>
               <ITText className="!text-[11px] font-bold">{t("sync.confirm.uploadAnother")}</ITText>
             </ITButton>

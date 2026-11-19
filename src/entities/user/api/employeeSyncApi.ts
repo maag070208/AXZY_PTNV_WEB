@@ -20,14 +20,20 @@ export const employeeSyncApi = {
     form.append("file", file);
     return api.post<EmployeeSyncPreview>(`/users/sync/preview`, form, {
       headers: { "Content-Type": "multipart/form-data" },
+      // El archivo es grande y el parseo de hojas tarda: más margen que el global.
+      timeout: 120_000,
     });
   },
 
-  /** Aplica la sincronización (todo o nada) sobre el sistema y los relojes. */
+  /**
+   * Aplica la sincronización (todo o nada) sobre el sistema y los relojes.
+   * Puede tardar por la escritura en cada reloj: timeout propio largo para no
+   * cortar en el cliente una operación que el servidor sigue ejecutando.
+   */
   confirm: (input: EmployeeSyncConfirmInput) =>
-    api.post<EmployeeSyncConfirmResult>(`/users/sync/confirm`, input),
+    api.post<EmployeeSyncConfirmResult>(`/users/sync/confirm`, input, { timeout: 300_000 }),
 
   /** Genera el Excel del reporte final con las filas dadas. */
   exportReport: (rows: EmployeeSyncReportRow[]) =>
-    api.post<Blob>(`/users/sync/export`, { rows }, { responseType: "blob" }),
+    api.post<Blob>(`/users/sync/export`, { rows }, { responseType: "blob", timeout: 60_000 }),
 };

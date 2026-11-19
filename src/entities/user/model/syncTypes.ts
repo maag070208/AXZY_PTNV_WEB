@@ -167,6 +167,11 @@ export interface EmployeeSyncConfirmInput {
   cambios?: Array<{ userId: string; name?: string; departmentId?: string }>;
   /** Eco del orden de nómina de `preview.order`. */
   order?: EmployeeSyncOrderEntry[];
+  /**
+   * `false` = aplica solo el sistema y deja el padrón del reloj pendiente (se
+   * reintenta por persona). La API lo toma como `true` si se omite.
+   */
+  clockNow?: boolean;
 }
 
 export interface EmployeeSyncSystemCreated {
