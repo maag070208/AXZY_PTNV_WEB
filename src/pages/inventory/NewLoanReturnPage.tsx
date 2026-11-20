@@ -199,6 +199,17 @@ export default function NewLoanReturnPage() {
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("loanReturn.title"), onClick: () => navigate("/inventory/returns") }, { label: t("loanReturn.new") }]}
       backAction={() => goBack("/inventory/loans")}
     >
+      <StickyActions>
+        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/loans")} disabled={saving} />
+        <ITButton
+          label={saving ? t("new.saving") : t("loanReturn.save")}
+          variant="rounded"
+          color="primary"
+          size="sm"
+          onClick={handleSubmit}
+          disabled={saving || !isValid}
+        />
+      </StickyActions>
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
           <FormSection
@@ -348,17 +359,6 @@ export default function NewLoanReturnPage() {
         </LiveSummary>
       </div>
 
-      <StickyActions>
-        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/loans")} disabled={saving} />
-        <ITButton
-          label={saving ? t("new.saving") : t("loanReturn.save")}
-          variant="rounded"
-          color="primary"
-          size="sm"
-          onClick={handleSubmit}
-          disabled={saving || !isValid}
-        />
-      </StickyActions>
 
       {toast && (
         <ITToast message={toast.message} type={toast.type} position="bottom-center" duration={2500} onClose={() => setToast(null)} />

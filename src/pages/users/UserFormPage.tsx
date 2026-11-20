@@ -165,6 +165,14 @@ export default function UserFormPage() {
         { label: breadcrumb },
       ]}
     >
+      <StickyActions>
+        <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack("/users")} disabled={userForm.saving}>
+          {tt("form.cancel")}
+        </ITButton>
+        <ITButton variant="rounded" color="primary" onClick={handleFinish} disabled={userForm.saving}>
+          {userForm.saving ? tt("form.saving") : isEdit ? tt("form.save") : tt("form.create")}
+        </ITButton>
+      </StickyActions>
       {userForm.error && (
         <ITAlert
           variant="error"
@@ -201,14 +209,6 @@ export default function UserFormPage() {
         </LiveSummary>
       </div>
 
-      <StickyActions>
-        <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack("/users")} disabled={userForm.saving}>
-          {tt("form.cancel")}
-        </ITButton>
-        <ITButton variant="rounded" color="primary" onClick={handleFinish} disabled={userForm.saving}>
-          {userForm.saving ? tt("form.saving") : isEdit ? tt("form.save") : tt("form.create")}
-        </ITButton>
-      </StickyActions>
 
     </AppPage>
     );

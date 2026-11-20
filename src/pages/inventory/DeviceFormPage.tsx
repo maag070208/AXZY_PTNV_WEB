@@ -134,6 +134,17 @@ export default function DeviceFormPage() {
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("devices.title"), onClick: () => navigate("/inventory/devices") }, { label: t("devices.new") }]}
       backAction={() => goBack("/inventory/devices")}
     >
+      <StickyActions>
+        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/devices")} disabled={saving} />
+        <ITButton
+          label={saving ? t("new.saving") : t("devices.save")}
+          variant="rounded"
+          color="primary"
+          size="sm"
+          onClick={handleSubmit}
+          disabled={saving || !isValid}
+        />
+      </StickyActions>
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
           <FormSection
@@ -233,17 +244,6 @@ export default function DeviceFormPage() {
         </LiveSummary>
       </div>
 
-      <StickyActions>
-        <ITButton label={t("common:actions.cancel")} variant="outlined" color="gray" size="sm" className="!rounded-full" onClick={() => goBack("/inventory/devices")} disabled={saving} />
-        <ITButton
-          label={saving ? t("new.saving") : t("devices.save")}
-          variant="rounded"
-          color="primary"
-          size="sm"
-          onClick={handleSubmit}
-          disabled={saving || !isValid}
-        />
-      </StickyActions>
 
 
       {toast && (

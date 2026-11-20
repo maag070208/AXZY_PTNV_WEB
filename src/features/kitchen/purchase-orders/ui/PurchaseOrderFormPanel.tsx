@@ -14,6 +14,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaPhone, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { PanelCard } from "@shared/ui/panel-card";
+import { StickyActions } from "@shared/ui/sticky-actions";
 import { dyn } from "@shared/i18n/dyn";
 import { fmtMoney, fmtQty, fmtRate, numOrNull, numText, type KitchenItemRow } from "@entities/kitchen";
 import { usePurchaseOrderForm } from "../model/usePurchaseOrderForm";
@@ -63,6 +64,17 @@ export default function PurchaseOrderFormPanel({ id }: { id?: string }) {
 
   return (
     <ITFlex direction="column" gap={4}>
+      <StickyActions>
+        <ITButton variant="outlined" color="secondary" label={t("purchaseOrders.form.cancel")} onClick={fx.cancel} />
+        <ITButton
+          variant="filled"
+          color="primary"
+          icon={<FaSave size={12} />}
+          label={t("purchaseOrders.form.save")}
+          disabled={!fx.canSave || fx.saving}
+          onClick={() => void fx.save()}
+        />
+      </StickyActions>
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
           {fx.error}
@@ -254,17 +266,6 @@ export default function PurchaseOrderFormPanel({ id }: { id?: string }) {
         </div>
       </PanelCard>
 
-      <ITFlex align="center" justify="end" gap={2}>
-        <ITButton variant="outlined" color="secondary" label={t("purchaseOrders.form.cancel")} onClick={fx.cancel} />
-        <ITButton
-          variant="filled"
-          color="primary"
-          icon={<FaSave size={12} />}
-          label={t("purchaseOrders.form.save")}
-          disabled={!fx.canSave || fx.saving}
-          onClick={() => void fx.save()}
-        />
-      </ITFlex>
 
       {fx.toast && <ITToast message={fx.toast} type="success" onClose={() => fx.setToast(null)} />}
     </ITFlex>

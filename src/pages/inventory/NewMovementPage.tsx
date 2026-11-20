@@ -448,6 +448,25 @@ export default function NewMovementPage() {
       breadcrumbs={[{ label: t("common:breadcrumbs.home"), onClick: () => navigate("/") }, { label: t("dashboard.title"), onClick: () => navigate("/inventory") }, { label: t("movements.title"), onClick: () => navigate("/inventory/movements") }, { label: t("movements.new") }]}
       backAction={() => goBack("/inventory/movements")}
     >
+      <StickyActions>
+        <ITButton
+          label={t("common:actions.cancel")}
+          variant="outlined"
+          color="gray"
+          size="sm"
+          className="!rounded-full"
+          onClick={() => goBack("/inventory/movements")}
+          disabled={saving}
+        />
+        <ITButton
+          label={saving ? t("new.saving") : t("new.register")}
+          variant="rounded"
+          color="primary"
+          size="sm"
+          onClick={() => void handleSubmit()}
+          disabled={saving || !isValid}
+        />
+      </StickyActions>
       {/* El borrador en mosaicos: piezas, avance de los renglones y la existencia
           real del dispositivo elegido (stock que devuelve la API). */}
       <ITBentoGrid className="mb-4">
@@ -833,25 +852,6 @@ export default function NewMovementPage() {
         </LiveSummary>
       </div>
 
-      <StickyActions>
-        <ITButton
-          label={t("common:actions.cancel")}
-          variant="outlined"
-          color="gray"
-          size="sm"
-          className="!rounded-full"
-          onClick={() => goBack("/inventory/movements")}
-          disabled={saving}
-        />
-        <ITButton
-          label={saving ? t("new.saving") : t("new.register")}
-          variant="rounded"
-          color="primary"
-          size="sm"
-          onClick={() => void handleSubmit()}
-          disabled={saving || !isValid}
-        />
-      </StickyActions>
 
 
       {toast && (

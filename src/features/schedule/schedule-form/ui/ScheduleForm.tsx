@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { scheduleApi, type ScheduleDayInput, type ScheduleInput } from "@entities/schedule";
 import { dyn } from "@shared/i18n/dyn";
 import { PanelCard } from "@shared/ui/panel-card";
+import { StickyActions } from "@shared/ui/sticky-actions";
 import ScheduleChat, { type ScheduleAgentPatch } from "./ScheduleAgent";
 import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import { daysWorked, restDays, weeklyMinutes } from "../model/summary";
@@ -56,7 +57,7 @@ function ActionBar({
   showSave?: boolean;
 }) {
   return (
-    <ITFlex justify="end" gap={2}>
+    <StickyActions>
       <ITButton variant="outlined" color="secondary" onClick={onCancel}>
         {cancelLabel}
       </ITButton>
@@ -68,7 +69,7 @@ function ActionBar({
           </ITFlex>
         </ITButton>
       )}
-    </ITFlex>
+    </StickyActions>
   );
 }
 

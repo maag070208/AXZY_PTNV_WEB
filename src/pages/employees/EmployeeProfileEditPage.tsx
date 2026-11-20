@@ -545,6 +545,27 @@ export default function EmployeeProfileEditPage() {
         { label: tt("detail.editInfo") },
       ]}
     >
+      <StickyActions>
+        {autoSave !== "idle" && (
+          <ITText
+            className={`mr-auto !text-[11.5px] font-semibold ${
+              autoSave === "error" ? "text-[color:var(--color-danger)]" : "text-[color:var(--color-success)]"
+            }`}
+          >
+            {autoSave === "saving"
+              ? tt("detail.autosaving")
+              : autoSave === "ok"
+                ? tt("detail.autosaved")
+                : tt("detail.autosaveError")}
+          </ITText>
+        )}
+        <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack(`/employees/${id}`)} disabled={detail.saving}>
+          {tt("common:actions.cancel")}
+        </ITButton>
+        <ITButton variant="rounded" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>
+          {detail.saving ? tt("detail.saving") : tt("detail.save")}
+        </ITButton>
+      </StickyActions>
       {detail.error && (
         <ITAlert variant="error" dismissible onDismiss={() => detail.setError(null)}>
           {detail.error}
@@ -572,27 +593,6 @@ export default function EmployeeProfileEditPage() {
         </LiveSummary>
       </div>
 
-      <StickyActions>
-        {autoSave !== "idle" && (
-          <ITText
-            className={`mr-auto !text-[11.5px] font-semibold ${
-              autoSave === "error" ? "text-[color:var(--color-danger)]" : "text-[color:var(--color-success)]"
-            }`}
-          >
-            {autoSave === "saving"
-              ? tt("detail.autosaving")
-              : autoSave === "ok"
-                ? tt("detail.autosaved")
-                : tt("detail.autosaveError")}
-          </ITText>
-        )}
-        <ITButton variant="outlined" color="gray" className="!rounded-full" onClick={() => goBack(`/employees/${id}`)} disabled={detail.saving}>
-          {tt("common:actions.cancel")}
-        </ITButton>
-        <ITButton variant="rounded" color="primary" onClick={() => void handleFinish()} disabled={detail.saving}>
-          {detail.saving ? tt("detail.saving") : tt("detail.save")}
-        </ITButton>
-      </StickyActions>
 
     </AppPage>
   );

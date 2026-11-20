@@ -14,6 +14,7 @@ import {
 } from "@axzydev/axzy_ui_system";
 import { FaAddressBook, FaBoxOpen, FaBuilding, FaHandshake, FaMapMarkerAlt, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { PanelCard } from "@shared/ui/panel-card";
+import { StickyActions } from "@shared/ui/sticky-actions";
 import { fmtQty, numOrNull, numText } from "@entities/kitchen";
 import { useSupplierForm } from "../model/useSupplierForm";
 
@@ -54,6 +55,10 @@ export default function SupplierFormPanel({ id }: { id?: string }) {
 
   return (
     <ITFlex direction="column" gap={4}>
+      <StickyActions>
+        <ITButton variant="outlined" color="secondary" label={t("suppliers.actions.cancel")} onClick={fx.cancel} />
+        <ITButton variant="filled" color="primary" icon={<FaSave size={12} />} label={t("suppliers.actions.save")} disabled={fx.saving} onClick={() => void fx.save()} />
+      </StickyActions>
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
           {fx.error}
@@ -213,10 +218,6 @@ export default function SupplierFormPanel({ id }: { id?: string }) {
         </ITFlex>
       </Section>
 
-      <ITFlex align="center" justify="end" gap={2}>
-        <ITButton variant="outlined" color="secondary" label={t("suppliers.actions.cancel")} onClick={fx.cancel} />
-        <ITButton variant="filled" color="primary" icon={<FaSave size={12} />} label={t("suppliers.actions.save")} disabled={fx.saving} onClick={() => void fx.save()} />
-      </ITFlex>
 
       {fx.toast && <ITToast message={fx.toast} type="success" onClose={() => fx.setToast(null)} />}
     </ITFlex>

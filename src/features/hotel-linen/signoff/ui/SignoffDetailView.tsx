@@ -10,6 +10,7 @@ import { useCan } from "@entities/user";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { KpiTile } from "@shared/ui/kpi-tile";
 import { PanelCard } from "@shared/ui/panel-card";
+import { StickyActions } from "@shared/ui/sticky-actions";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import SignoffStatusChip from "./SignoffStatusChip";
 import { useSuccessToast } from "@app/toast/useSuccessToast";
@@ -133,6 +134,68 @@ export default function SignoffDetailView({ id }: Props) {
         </ITAlert>
       )}
 
+      {pending && canSign && (
+        <StickyActions className="!justify-between">
+          <ITFlex align="center" gap={2} className="mr-auto min-w-0">
+            <SignoffStatusChip status={detail.signoffStatus ?? "PENDING"} />
+            <ITFlex direction="column" gap={0.5} className="min-w-0">
+              <ITText className="!text-[13px] font-black">{t("detail.action")}</ITText>
+              <ITText muted className="!text-[11px]">{t("detail.noStockBlock")}</ITText>
+            </ITFlex>
+          </ITFlex>
+          {isCounter ? (
+            <ITAlert variant="warning">{t("detail.sameUser")}</ITAlert>
+          ) : (
+            <ITFlex align="center" gap={2} wrap="wrap" className="shrink-0">
+              {asDifference ? (
+                <>
+                  <ITButton variant="outlined" color="secondary" label={t("cancel")} disabled={busy} onClick={() => setAsDifference(false)} />
+                  <ITButton
+                    variant="filled"
+                    color="danger"
+                    icon={<FaExclamationTriangle size={12} />}
+                    label={t("detail.confirmDifference")}
+                    disabled={busy || noteMissing}
+                    onClick={() => void submit("DIFFERENCE")}
+                  />
+                </>
+              ) : (
+                <>
+                  <ITButton
+                    variant="outlined"
+                    color="danger"
+                    icon={<FaExclamationTriangle size={12} />}
+                    label={t("detail.withDifference")}
+                    disabled={busy}
+                    onClick={() => setAsDifference(true)}
+                  />
+                  <ITButton
+                    variant="filled"
+                    color="primary"
+                    icon={<FaCheck size={12} />}
+                    label={t("detail.conform")}
+                    disabled={busy}
+                    onClick={() => void submit("CONFORM")}
+                  />
+                </>
+              )}
+            </ITFlex>
+          )}
+        </StickyActions>
+      )}
+
+      {pending && canSign && !isCounter && asDifference && (
+        <PanelCard title={t("detail.notesLabel")} description={t("detail.notesRequired")}>
+          <ITTextarea
+            name="signoffNotes"
+            label={t("detail.notesLabel")}
+            rows={3}
+            value={notes}
+            onChange={(e) => setNotes(e)}
+            error={noteMissing ? t("detail.notesRequired") : undefined}
+          />
+        </PanelCard>
+      )}
       <ITGrid container columns={12} spacing={3}>
         <ITGrid item xs={6} md={4}>
           <KpiTile label={t("detail.sent")} value={fmt(detail.lines.reduce((n, l) => n + l.quantity, 0))} icon={<FaTruck size={14} />} tone="sky" />
@@ -187,61 +250,7 @@ export default function SignoffDetailView({ id }: Props) {
       </PanelCard>
       {detail.signoffStatus === null && <ITAlert variant="info">{t("detail.notApplicable")}</ITAlert>}
 
-      {pending && canSign && (
-        <PanelCard title={t("detail.action")} description={t("detail.noStockBlock")} actions={isCounter ? undefined : (
-              <ITFlex gap={2}>
-                {asDifference ? (
-                  <>
-                    <ITButton variant="outlined" color="secondary" label={t("cancel")} disabled={busy} onClick={() => setAsDifference(false)} />
-                    <ITButton
-                      variant="filled"
-                      color="danger"
-                      icon={<FaExclamationTriangle size={12} />}
-                      label={t("detail.confirmDifference")}
-                      disabled={busy || noteMissing}
-                      onClick={() => void submit("DIFFERENCE")}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <ITButton
-                      variant="outlined"
-                      color="danger"
-                      icon={<FaExclamationTriangle size={12} />}
-                      label={t("detail.withDifference")}
-                      disabled={busy}
-                      onClick={() => setAsDifference(true)}
-                    />
-                    <ITButton
-                      variant="filled"
-                      color="primary"
-                      icon={<FaCheck size={12} />}
-                      label={t("detail.conform")}
-                      disabled={busy}
-                      onClick={() => void submit("CONFORM")}
-                    />
-                  </>
-                )}
-              </ITFlex>
-        )}>
-          {isCounter ? (
-            <ITAlert variant="warning">{t("detail.sameUser")}</ITAlert>
-          ) : (
-            <ITFlex direction="column" gap={3}>
-              {asDifference && (
-                <ITTextarea
-                  name="signoffNotes"
-                  label={t("detail.notesLabel")}
-                  rows={3}
-                  value={notes}
-                  onChange={(e) => setNotes(e)}
-                  error={noteMissing ? t("detail.notesRequired") : undefined}
-                />
-              )}
-            </ITFlex>
-          )}
-        </PanelCard>
-      )}
+
     </ITFlex>
   );
 }

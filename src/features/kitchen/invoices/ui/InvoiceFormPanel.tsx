@@ -3,6 +3,7 @@ import { ITAlert, ITBadget, ITButton, ITDatePicker, ITFlex, ITGrid, ITInput,
   ITInputNumber, ITSearchSelect, ITSelect, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaCoins, FaListUl, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { PanelCard } from "@shared/ui/panel-card";
+import { StickyActions } from "@shared/ui/sticky-actions";
 import { useInvoiceForm } from "../model/useInvoiceForm";
 import { fmtMoney, fmtRate, numOrNull, numText } from "@entities/kitchen";
 
@@ -34,6 +35,17 @@ export default function InvoiceFormPanel() {
 
   return (
     <ITFlex direction="column" gap={4}>
+      <StickyActions>
+        <ITButton variant="outlined" color="secondary" onClick={fx.cancel}>
+          {t("invoices.form.cancel")}
+        </ITButton>
+        <ITButton variant="filled" color="primary" disabled={!fx.canSave || fx.saving} onClick={() => void fx.save()}>
+          <ITFlex align="center" gap={1}>
+            <FaSave size={12} />
+            <ITText className="font-bold text-[11px]">{t("invoices.form.save")}</ITText>
+          </ITFlex>
+        </ITButton>
+      </StickyActions>
       {fx.error && (
         <ITAlert variant="error" dismissible onDismiss={() => fx.setError(null)}>
           {fx.error}
@@ -206,17 +218,6 @@ export default function InvoiceFormPanel() {
         </ITGrid>
       </PanelCard>
 
-      <ITFlex align="center" justify="end" gap={2}>
-        <ITButton variant="outlined" color="secondary" onClick={fx.cancel}>
-          {t("invoices.form.cancel")}
-        </ITButton>
-        <ITButton variant="filled" color="primary" disabled={!fx.canSave || fx.saving} onClick={() => void fx.save()}>
-          <ITFlex align="center" gap={1}>
-            <FaSave size={12} />
-            <ITText className="font-bold text-[11px]">{t("invoices.form.save")}</ITText>
-          </ITFlex>
-        </ITButton>
-      </ITFlex>
 
       {fx.toast && <ITToast message={fx.toast} type="success" onClose={() => fx.setToast(null)} />}
     </ITFlex>
