@@ -64,5 +64,50 @@
   "sectionData": "Letter data",
   "sectionDataHint": "Everything can be edited before generating.",
   "summaryTitle": "Summary",
-  "preview": "Preview"
+  "preview": "Preview",
+  "purchaseRequest": {
+    "title": "Purchase request",
+    "description": "Blank or filled-in form to request products or services, with authorization signatures."
+  },
+  "quotationRequest": {
+    "title": "Quotation request",
+    "description": "Form to request a quote from a supplier, with price columns for the supplier to fill in."
+  },
+  "request": {
+    "sectionGeneral": "General information",
+    "optionalHint": "Everything is optional: you can print the form blank.",
+    "requestDate": "Request date",
+    "priority": "Priority level",
+    "priorityHint": "Normal, High, Urgent...",
+    "requestingArea": "Requesting area",
+    "requiredDate": "Required date",
+    "costCenter": "Cost center",
+    "availableBudget": "Available budget",
+    "expenseType": "Expense type",
+    "expenseOperating": "Operating",
+    "expenseCapex": "Capex",
+    "expenseMaintenance": "Maintenance",
+    "requesterName": "Requester (name)",
+    "folio": "Folio",
+    "supplierName": "Supplier: name",
+    "supplierContact": "Supplier: contact",
+    "supplierPhone": "Supplier: phone",
+    "supplierEmail": "Supplier: email",
+    "responseDeadline": "Response deadline",
+    "deliveryTerms": "Delivery place and terms",
+    "sectionItems": "Products and services",
+    "itemsHint": "The PDF always shows empty rows to complete by hand.",
+    "item": "Row {{n}}",
+    "product": "Product / Service",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "addItem": "Add row",
+    "removeItem": "Remove",
+    "sectionNotes": "Reasons and notes",
+    "urgencyReason": "Urgency reason",
+    "justification": "Purchase justification",
+    "suggestedSupplier": "Suggested supplier",
+    "notes": "Notes"
+  }
 }

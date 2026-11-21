@@ -1,10 +1,19 @@
 import { createElement } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { parseLocalDay, toDayString } from "@shared/utils/dates";
-import type { ApercibimientoLetterData, DaycareLetterData, HrFormatKind, LaboralLetterData } from "./types";
+import type {
+  ApercibimientoLetterData,
+  DaycareLetterData,
+  HrFormatKind,
+  LaboralLetterData,
+  PurchaseRequestData,
+  QuotationRequestData,
+} from "./types";
 import ApercibimientoLetterPdf from "../ui/ApercibimientoLetterPdf";
 import DaycareLetterPdf from "../ui/DaycareLetterPdf";
 import LaboralLetterPdf from "../ui/LaboralLetterPdf";
+import PurchaseRequestPdf from "../ui/PurchaseRequestPdf";
+import QuotationRequestPdf from "../ui/QuotationRequestPdf";
 
 /** "María Pérez" → "maria-perez" para el nombre del archivo. */
 const slug = (value: string): string =>
@@ -19,6 +28,8 @@ const FILE_PREFIX: Record<HrFormatKind, string> = {
   laboral: "carta-laboral",
   apercibimiento: "carta-apercibimiento",
   daycare: "carta-guarderia",
+  purchaseRequest: "solicitud-compra",
+  quotationRequest: "solicitud-cotizacion",
 };
 
 export const hrFormatFileName = (kind: HrFormatKind, name: string, date: string): string => {
@@ -48,4 +59,14 @@ export const downloadApercibimientoPdf = async (data: ApercibimientoLetterData):
 export const downloadDaycarePdf = async (data: DaycareLetterData): Promise<void> => {
   const blob = await pdf(createElement(DaycareLetterPdf, { data }) as never).toBlob();
   save(blob, hrFormatFileName("daycare", data.name, data.date));
+};
+
+export const downloadPurchaseRequestPdf = async (data: PurchaseRequestData): Promise<void> => {
+  const blob = await pdf(createElement(PurchaseRequestPdf, { data }) as never).toBlob();
+  save(blob, hrFormatFileName("purchaseRequest", data.requestingArea, data.requestDate));
+};
+
+export const downloadQuotationRequestPdf = async (data: QuotationRequestData): Promise<void> => {
+  const blob = await pdf(createElement(QuotationRequestPdf, { data }) as never).toBlob();
+  save(blob, hrFormatFileName("quotationRequest", data.supplierName, data.requestDate));
 };

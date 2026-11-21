@@ -1,6 +1,6 @@
 /** Datos de las cartas de RH. Las fechas viajan como "YYYY-MM-DD". */
 
-export type HrFormatKind = "laboral" | "apercibimiento" | "daycare";
+export type HrFormatKind = "laboral" | "apercibimiento" | "daycare" | "purchaseRequest" | "quotationRequest";
 
 export const RH_SIGNER_NAME = "Lic. Rosalba Meda Anaya";
 export const RH_SIGNER_TITLE = "Jefatura de Recursos Humanos";
@@ -103,4 +103,78 @@ export const emptyDaycare = (date: string): DaycareLetterData => ({
   vacationTo: "",
   signerName: RH_SIGNER_NAME,
   signerTitle: RH_SIGNER_TITLE,
+});
+
+/** Renglón de las tablas de productos/servicios (cantidad como texto libre). */
+export interface RequestItem {
+  product: string;
+  description: string;
+  quantity: string;
+  unit: string;
+}
+
+export const emptyRequestItem = (): RequestItem => ({ product: "", description: "", quantity: "", unit: "" });
+
+export type PurchaseExpenseType = "" | "operativo" | "capex" | "mantenimiento";
+
+/** Solicitud de compra (formato en papel del hotel). Todo es opcional. */
+export interface PurchaseRequestData {
+  requestDate: string;
+  priority: string;
+  requestingArea: string;
+  requiredDate: string;
+  costCenter: string;
+  availableBudget: string;
+  expenseType: PurchaseExpenseType;
+  items: RequestItem[];
+  urgencyReason: string;
+  justification: string;
+  suggestedSupplier: string;
+  requesterName: string;
+}
+
+/** Solicitud de cotización dirigida a un proveedor. Todo es opcional. */
+export interface QuotationRequestData {
+  requestDate: string;
+  folio: string;
+  requestingArea: string;
+  requesterName: string;
+  supplierName: string;
+  supplierContact: string;
+  supplierPhone: string;
+  supplierEmail: string;
+  responseDeadline: string;
+  deliveryTerms: string;
+  items: RequestItem[];
+  notes: string;
+}
+
+export const emptyPurchaseRequest = (date: string): PurchaseRequestData => ({
+  requestDate: date,
+  priority: "",
+  requestingArea: "",
+  requiredDate: "",
+  costCenter: "",
+  availableBudget: "",
+  expenseType: "",
+  items: [emptyRequestItem()],
+  urgencyReason: "",
+  justification: "",
+  suggestedSupplier: "",
+  requesterName: "",
+});
+
+export const emptyQuotationRequest = (date: string): QuotationRequestData => ({
+  requestDate: date,
+  folio: "",
+  requestingArea: "",
+  requesterName: "",
+  supplierName: "",
+  supplierContact: "",
+  supplierPhone: "",
+  supplierEmail: "",
+  responseDeadline: "",
+  deliveryTerms: "",
+  items: [emptyRequestItem()],
+  notes: "",
 });

@@ -64,5 +64,50 @@
   "sectionData": "Datos de la carta",
   "sectionDataHint": "Todo se puede editar antes de generar.",
   "summaryTitle": "Resumen",
-  "preview": "Vista previa"
+  "preview": "Vista previa",
+  "purchaseRequest": {
+    "title": "Solicitud de compra",
+    "description": "Formato en blanco o capturado para solicitar la compra de productos o servicios, con firmas de autorización."
+  },
+  "quotationRequest": {
+    "title": "Solicitud de cotización",
+    "description": "Formato para pedir cotización a un proveedor, con columnas de precio para que él las llene."
+  },
+  "request": {
+    "sectionGeneral": "Datos generales",
+    "optionalHint": "Todo es opcional: puedes imprimir el formato en blanco.",
+    "requestDate": "Fecha de solicitud",
+    "priority": "Nivel de prioridad",
+    "priorityHint": "Normal, Alta, Urgente...",
+    "requestingArea": "Área solicitante",
+    "requiredDate": "Fecha requerida",
+    "costCenter": "Centro de costos",
+    "availableBudget": "Presupuesto disponible",
+    "expenseType": "Tipo de gasto",
+    "expenseOperating": "Operativo",
+    "expenseCapex": "Capex",
+    "expenseMaintenance": "Mantenimiento",
+    "requesterName": "Solicitante (nombre)",
+    "folio": "Folio",
+    "supplierName": "Proveedor: nombre",
+    "supplierContact": "Proveedor: contacto",
+    "supplierPhone": "Proveedor: teléfono",
+    "supplierEmail": "Proveedor: correo",
+    "responseDeadline": "Fecha límite de respuesta",
+    "deliveryTerms": "Lugar y condiciones de entrega",
+    "sectionItems": "Productos y servicios",
+    "itemsHint": "El PDF siempre muestra renglones vacíos para completar a mano.",
+    "item": "Renglón {{n}}",
+    "product": "Producto / Servicio",
+    "description": "Descripción",
+    "quantity": "Cantidad",
+    "unit": "Unidad",
+    "addItem": "Agregar renglón",
+    "removeItem": "Quitar",
+    "sectionNotes": "Motivos y observaciones",
+    "urgencyReason": "Motivo de urgencia",
+    "justification": "Justificación de la compra",
+    "suggestedSupplier": "Proveedor sugerido",
+    "notes": "Observaciones"
+  }
 }

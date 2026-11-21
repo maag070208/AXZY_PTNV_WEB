@@ -1,16 +1,18 @@
 import { ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
-import { LuBaby, LuFileText, LuTriangleAlert } from "react-icons/lu";
+import { LuBaby, LuFileText, LuReceipt, LuShoppingCart, LuTriangleAlert } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { HrFormatKind } from "@widgets/hr-formats";
 import { useGoBack } from "@shared/lib/useGoBack";
 
-/** Plantillas originales (.docx) que se sirven desde `public/formats`. */
-const FORMATS: { kind: HrFormatKind; file: string; path: string; icon: React.ReactNode }[] = [
+/** Plantillas originales (.docx) de `public/formats`; sin `file` la tarjeta solo genera el PDF. */
+const FORMATS: { kind: HrFormatKind; file?: string; path: string; icon: React.ReactNode }[] = [
   { kind: "laboral", file: "carta-laboral.docx", path: "/hr/formats/employment-letter", icon: <LuFileText size={22} /> },
   { kind: "apercibimiento", file: "carta-apercibimiento.docx", path: "/hr/formats/warning-letter", icon: <LuTriangleAlert size={22} /> },
   { kind: "daycare", file: "carta-guarderia.docx", path: "/hr/formats/daycare-letter", icon: <LuBaby size={22} /> },
+  { kind: "purchaseRequest", path: "/hr/formats/purchase-request", icon: <LuShoppingCart size={22} /> },
+  { kind: "quotationRequest", path: "/hr/formats/quotation-request", icon: <LuReceipt size={22} /> },
 ];
 
 /** Formatos de RH: genera cada carta en PDF o descarga la plantilla original. */
@@ -44,11 +46,13 @@ export default function HrFormatsPage() {
               <ITButton variant="filled" color="primary" onClick={() => navigate(path)}>
                 {t("generate")}
               </ITButton>
-              <a href={`${import.meta.env.BASE_URL}formats/${file}`} download={file}>
-                <ITButton variant="outlined" color="secondary" type="button">
-                  {t("downloadTemplate")}
-                </ITButton>
-              </a>
+              {file && (
+                <a href={`${import.meta.env.BASE_URL}formats/${file}`} download={file}>
+                  <ITButton variant="outlined" color="secondary" type="button">
+                    {t("downloadTemplate")}
+                  </ITButton>
+                </a>
+              )}
             </ITFlex>
           </div>
         ))}

@@ -47,6 +47,8 @@ import HrFormatsPage from "@pages/hr/HrFormatsPage";
 import HrEmploymentLetterPage from "@pages/hr/HrEmploymentLetterPage";
 import HrWarningLetterPage from "@pages/hr/HrWarningLetterPage";
 import HrDaycareLetterPage from "@pages/hr/HrDaycareLetterPage";
+import HrPurchaseRequestPage from "@pages/hr/HrPurchaseRequestPage";
+import HrQuotationRequestPage from "@pages/hr/HrQuotationRequestPage";
 import EmployeeDetailPage from "@pages/employees/EmployeeDetailPage";
 import EmployeeProfileEditPage from "@pages/employees/EmployeeProfileEditPage";
 import HrReportsPage from "@pages/employees/HrReportsPage";
@@ -447,6 +449,22 @@ export default function App() {
           element={
             <RequiresPermission permission="hr.records">
               <HrDaycareLetterPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/hr/formats/purchase-request"
+          element={
+            <RequiresPermission permission="hr.records">
+              <HrPurchaseRequestPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/hr/formats/quotation-request"
+          element={
+            <RequiresPermission permission="hr.records">
+              <HrQuotationRequestPage />
             </RequiresPermission>
           }
         />
