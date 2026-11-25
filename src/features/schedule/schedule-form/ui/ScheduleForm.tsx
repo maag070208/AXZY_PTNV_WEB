@@ -2,12 +2,13 @@ import { LottieLoader } from "@shared/ui/lottie-loader";
 import { useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
-  ITConfirmDialog,
   ITButton,
   ITFlex,
   ITInput,
   ITText,
-  ITToast, ITStack } from "@axzydev/axzy_ui_system";
+  ITToast,
+  ITStack,
+} from "@axzydev/axzy_ui_system";
 import { FaRegClock, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { scheduleApi, type ScheduleDayInput, type ScheduleInput } from "@entities/schedule";
@@ -19,6 +20,7 @@ import { formatMinutesAsHhMm } from "@shared/utils/dates";
 import { daysWorked, restDays, weeklyMinutes } from "../model/summary";
 import { i18n } from "@shared/i18n";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 const emptyDays = (): ScheduleDayInput[] =>
   [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({
@@ -155,7 +157,6 @@ export default function ScheduleForm({ id }: { id?: string }) {
       .finally(() => setLoading(false));
   }, [id]);
 
-
   /** Pide el nombre y abre la confirmación: guardar un horario es un alta. */
   const save = () => {
     if (!form.name.trim()) {
@@ -197,8 +198,6 @@ export default function ScheduleForm({ id }: { id?: string }) {
       </ITFlex>
     );
   }
-
-
 
 
 
@@ -311,7 +310,7 @@ export default function ScheduleForm({ id }: { id?: string }) {
         </PanelCard>
       </div>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={() => void doSave()}

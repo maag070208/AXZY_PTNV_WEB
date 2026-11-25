@@ -66,6 +66,7 @@ interface Props {
   docsFiles?: Record<string, File | null>;
   onPickDoc?: (key: string, file: File) => void;
   docsError?: string | null;
+  /** Alta en los relojes al crear (solo se muestra con permiso y con número de empleado). */
 }
 
 export default function UserFormFields({

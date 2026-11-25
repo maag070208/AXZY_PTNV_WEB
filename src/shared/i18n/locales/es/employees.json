@@ -132,6 +132,7 @@
     "pendingOne": "Pendiente",
     "uploadFor": "Subir {{type}}",
     "documentUploadError": "No se pudo subir el documento",
+    "fileTooLarge": "El archivo pesa {{size}} MB; el máximo es {{max}} MB",
     "documentDeleteError": "No se pudo eliminar el documento",
     "discountNote": "Nota (número de crédito, monto, folio, etc.)",
     "discountTypes": {

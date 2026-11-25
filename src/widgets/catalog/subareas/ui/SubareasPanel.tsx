@@ -1,7 +1,6 @@
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITDialog,
   ITFlex,
   ITInput,
@@ -17,6 +16,7 @@ import {
 } from "@features/subarea/subareas-crud";
 import { subareaApi } from "@entities/subarea";
 import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 export default function SubareasPanel({ openCreateSignal }: { openCreateSignal?: number }) {
   const { t: tt } = useTranslation(["subareas", "common"]);
@@ -129,7 +129,7 @@ export default function SubareasPanel({ openCreateSignal }: { openCreateSignal?:
         </ITFlex>
       </ITDialog>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!crud.subareaToDelete}
         onClose={() => crud.setSubareaToDelete(null)}
         onConfirm={crud.confirmDelete}

@@ -280,7 +280,7 @@
   },
   "import": {
     "title": "Upload users from Excel",
-    "description": "The file must include the columns \"Employee Name\", \"Username\" and \"Password\" in the first sheet. All users are created with the Employee role and no department assigned (you assign it later for each one).",
+    "description": "The file must include the columns \"Employee Name\", \"Username\" and \"Password\" in the first sheet; optionally \"Employee Number\" (if present, they are also enrolled on the time clocks). All users are created with the Employee role and no department assigned (you assign it later for each one).",
     "breadcrumb": "Upload Excel",
     "downloading": "Downloading template…",
     "download": "Download template",
@@ -298,6 +298,7 @@
     "resultTitle": "Import result",
     "skippedCount": "{{count}} skipped",
     "skippedRows": "Skipped rows",
+    "clockEnrollQueued": "{{count}} people are being enrolled on the time clocks. Check the People tab of the clock Dashboard to see the result.",
     "skippedRow": "Row {{row}} ({{username}}): {{reason}}"
   },
   "table": {

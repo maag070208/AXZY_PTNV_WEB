@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { ITButton, ITConfirmDialog, ITInput, ITSearchSelect, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
+import { ITButton, ITInput, ITSearchSelect, ITText, ITFlex, ITStack } from "@axzydev/axzy_ui_system";
 import { FaSearch, FaShieldAlt, FaUserMinus, FaUserPlus } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { AccessMember } from "@entities/permission";
 import { roleLabel } from "@entities/user";
 import { initialsOfName, matchesMember, type AccessMembersState } from "../../model/useAccessMembers";
 import { RoleChip } from "../shared/RoleAvatar";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 interface Props {
   role: string;
@@ -174,7 +175,7 @@ export default function RoleMembersPanel({ role, roleActive, members, onViewAcce
         </div>
       )}
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={removing !== null}
         onClose={() => setRemoving(null)}
         onConfirm={confirmRemove}

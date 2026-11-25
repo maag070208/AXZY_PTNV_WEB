@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ITAlert, ITButton, ITConfirmDialog, ITFlex, ITGrid, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITFlex, ITGrid, ITInputNumber, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import { GRADES, writeoffApi, type Grade, type StocktakeDetail } from "@entities/hotel-linen";
 import { useCan } from "@entities/user";
 import { PanelCard } from "@shared/ui/panel-card";
 import CountStatusChip from "./CountStatusChip";
 import { useSuccessToast } from "@app/toast/useSuccessToast";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 type GradeDraft = Record<Grade, number | null>;
 const fmt = (n: number) => new Intl.NumberFormat("es-MX", { maximumFractionDigits: 2 }).format(n);
@@ -262,7 +263,7 @@ export default function CountDetailView({ id }: Props) {
         )}
       </PanelCard>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirmApprove}
         onClose={() => setConfirmApprove(false)}
         onConfirm={() => {

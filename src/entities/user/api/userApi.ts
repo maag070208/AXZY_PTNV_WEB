@@ -69,7 +69,7 @@ export const usersApi = {
     employeeNumber?: string;
     departmentId?: string;
     subareaId?: string;
-  }) => api.post<User>(`/users`, data),
+  }) => api.post<User & { clockSync?: { results: Array<{ serial: string; name: string; ok: boolean; code?: string }> } }>(`/users`, data),
   update: (
     id: string,
     data: {
@@ -98,6 +98,7 @@ export const usersApi = {
     return api.post<{
       created: number;
       skipped: { row: number; username: string; reason: string }[];
+      clockEnrollQueued?: number;
     }>(`/users/import`, form, {
       headers: { "Content-Type": "multipart/form-data" },
     });

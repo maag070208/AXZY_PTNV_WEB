@@ -254,3 +254,47 @@ export interface PayrollClosureRow {
   /** Revisiones vigentes de esa semana, con su sello. */
   reviews: PayrollClosureReview[];
 }
+
+// ── Rol semanal (turno por fecha que anula el horario base) ───────────────
+
+export type RosterCellSource = "ROSTER" | "BASE" | "NONE";
+
+export interface RosterCell {
+  date: string; // YYYY-MM-DD
+  source: RosterCellSource;
+  scheduleId: string | null;
+  scheduleName: string | null;
+  restDay: boolean;
+  startTime: string | null;
+  endTime: string | null;
+}
+
+export interface RosterPerson {
+  userId: string;
+  employeeNumber: string | null;
+  name: string;
+  departmentId: string | null;
+  departmentName: string | null;
+  baseScheduleName: string | null;
+  cells: RosterCell[];
+}
+
+export interface RosterWeek {
+  days: string[];
+  closed: boolean;
+  people: RosterPerson[];
+}
+
+export interface RosterQuery {
+  weekDate: string;
+  departmentId?: string;
+}
+
+/** Exactamente uno de scheduleId / restDay:true / clear:true por entrada. */
+export interface RosterEntry {
+  userId: string;
+  date: string;
+  scheduleId?: string | null;
+  restDay?: boolean;
+  clear?: boolean;
+}

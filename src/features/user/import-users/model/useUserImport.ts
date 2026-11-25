@@ -4,6 +4,7 @@ import { usersApi } from "@entities/user";
 export interface ImportResult {
   created: number;
   skipped: { row: number; username: string; reason: string }[];
+  clockEnrollQueued?: number;
 }
 
 export const useUserImport = () => {

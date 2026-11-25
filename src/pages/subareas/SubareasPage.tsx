@@ -1,12 +1,11 @@
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITDialog,
   ITFlex,
   ITInput,
   ITSelect,
-  ITText
+  ITText,
 } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
 import { FaMapMarkerAlt, FaPlus } from "react-icons/fa";
@@ -17,6 +16,7 @@ import {
   useSubareasCrud,
 } from "@features/subarea/subareas-crud";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 export default function SubareasPage() {
   const navigate = useNavigate();
@@ -142,7 +142,7 @@ export default function SubareasPage() {
         </ITFlex>
       </ITDialog>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!crud.subareaToDelete}
         onClose={() => crud.setSubareaToDelete(null)}
         onConfirm={crud.confirmDelete}

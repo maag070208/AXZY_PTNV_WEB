@@ -53,6 +53,18 @@ export const timeClockApi = {
   peopleList: (serial: string) => api.get<TimeClockPeopleList>(`${clockPath(serial)}/people`),
   employeeClockStatus: (userId: string) => api.get<EmployeeClockStatus>(`/time-clock/employees/${userId}/clock-status`),
   peopleUnified: () => api.get<UnifiedPeople>("/time-clock/people/unified"),
+  /** Vincula una persona del reloj con un usuario existente (el número del reloj manda). */
+  linkPerson: (employeeNumber: string, userId: string) =>
+    api.post<{ employeeNumber: string; userId: string; userName: string }>(
+      `/time-clock/people/${encodeURIComponent(employeeNumber)}/link`,
+      { userId }
+    ),
+  /** Crea un empleado en el sistema desde una persona del reloj y lo vincula. */
+  createEmployeeFromClock: (employeeNumber: string, input: { name: string; departmentId?: string }) =>
+    api.post<{ employeeNumber: string; userId: string; userName: string; username: string }>(
+      `/time-clock/people/${encodeURIComponent(employeeNumber)}/create-employee`,
+      input
+    ),
   fingerprintStationInfo: () => api.get<FingerprintStationInfo>("/time-clock/fingerprint-station"),
   fingerprintStationTest: (fingerNo: number) =>
     api.post<FingerprintStationTest>("/time-clock/fingerprint-station/test", { fingerNo }),

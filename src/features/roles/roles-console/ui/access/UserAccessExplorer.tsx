@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITAlert, ITButton, ITCheckbox, ITConfirmDialog, ITDropdownMenu, ITInput, ITSelect, ITText, ITFlex } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITCheckbox, ITDropdownMenu, ITInput, ITSelect, ITText, ITFlex } from "@axzydev/axzy_ui_system";
 import type { ITDropdownMenuItem } from "@axzydev/axzy_ui_system";
 import {
   FaBan,
@@ -29,6 +29,7 @@ import SidebarPreview from "../shared/SidebarPreview";
 import { TabBar } from "@shared/ui/tab-bar";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import ExceptionDialog from "./ExceptionDialog";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 interface Props {
   admin: RolesAdminState;
@@ -532,7 +533,7 @@ export default function UserAccessExplorer({
               }}
             />
 
-            <ITConfirmDialog
+            <ConfirmDialog
               isOpen={clearing !== null}
               onClose={() => setClearing(null)}
               onConfirm={confirmClear}
@@ -541,7 +542,7 @@ export default function UserAccessExplorer({
               confirmLabel={t("explorer.fix.clearException")}
             />
 
-            <ITConfirmDialog
+            <ConfirmDialog
               isOpen={removingRole !== null}
               onClose={() => setRemovingRole(null)}
               onConfirm={confirmRemoveRole}

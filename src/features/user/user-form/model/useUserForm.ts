@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
-import { isStaffRole, useCan, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
+import { isStaffRole, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
-import { describeClockSync, timeClockApi } from "@entities/time-clock";
+import { describeClockSync } from "@entities/time-clock";
 import { showToast } from "@app/toast/toast.slice";
 import type { AppDispatch } from "@app/store";
 
@@ -144,7 +144,6 @@ export const useUserForm = (userId?: string) => {
   const isEdit = Boolean(id);
   const { t: tt } = useTranslation(["users", "common"]);
   const dispatch = useDispatch<AppDispatch>();
-  const canWriteClock = useCan("time_clock.write");
   const rolesCatalog = useRolesCatalog();
 
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -451,24 +450,14 @@ export const useUserForm = (userId?: string) => {
           // Correo de alta con los documentos adjuntos (fire-and-forget).
           void personalApi.notifyRegistration(created.id).catch(() => undefined);
         }
-        // Alta en los relojes que aceptan escritura desde la web. Se espera el resultado
-        // para mostrar UN solo toast: la pantalla guarda un único mensaje a la vez.
-        let clockMessage: string | null = null;
-        let clockOk = true;
-        if (canWriteClock) {
-          try {
-            const { results } = await timeClockApi.employeeClockAltaAll(created.id);
-            clockMessage = describeClockSync(results, "alta");
-            clockOk = results.every((r) => r.ok);
-          } catch {
-            clockMessage = i18n.t("time-clock:clockSync.altaRequestFailed");
-            clockOk = false;
-          }
-        }
+        // La API da de alta en los relojes sola; se muestra UN solo toast con el resultado.
+        const results = created.clockSync?.results ?? [];
+        const clockMessage = describeClockSync(results.filter((r) => r.serial), "alta");
+        const clockOk = results.every((r) => r.ok);
         const saved = i18n.t("users:form.created");
         dispatch(
           showToast({
-            message: clockMessage ? `${saved} · ${clockMessage}` : saved,
+            message: clockMessage ? `${saved} · ${clockMessage}` : clockOk ? saved : `${saved} · ${i18n.t("time-clock:clockSync.altaRequestFailed")}`,
             type: clockOk ? "success" : "warning",
           })
         );

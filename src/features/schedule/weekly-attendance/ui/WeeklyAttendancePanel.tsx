@@ -6,7 +6,6 @@ import {
   ITBentoWeekBars,
   ITButton,
   ITCard,
-  ITConfirmDialog,
   ITDialog,
   ITFlex,
   ITGrid,
@@ -27,6 +26,7 @@ import { useDepartmentReviews } from "../model/useDepartmentReviews";
 import WeeklyAttendanceTable from "./WeeklyAttendanceTable";
 import WeeklyAttendanceActions from "./WeeklyAttendanceActions";
 import PayrollReviewDialog from "./PayrollReviewDialog";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 const shortMonth = (date: Date): string =>
   date.toLocaleDateString(dateLocale(), { month: "short" }).replace(/\./g, "");
@@ -67,7 +67,6 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
   );
   const allReviewed = departmentIds.length > 0 && reviews.reviewedCount >= departmentIds.length;
   const weekLabel = weekRangeLabel(fx.rangeValue);
-
 
   // Avisos de la semana: solo se muestran si hay algo que atender.
   const notices: string[] = [];
@@ -353,7 +352,7 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
           setConfirmClose(true);
         }}
       />
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirmClose}
         onClose={() => setConfirmClose(false)}
         onConfirm={() => {
@@ -384,7 +383,7 @@ export default function WeeklyAttendancePanel({ fx }: { fx: UseWeeklyAttendance 
         variant="warning"
         loading={reviews.busy}
       />
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirmVerifyAll}
         onClose={() => setConfirmVerifyAll(false)}
         onConfirm={() => {

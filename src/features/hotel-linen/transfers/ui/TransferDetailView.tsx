@@ -4,7 +4,6 @@ import {
   ITButton,
   ITCheckbox,
   ITChip,
-  ITConfirmDialog,
   ITFlex,
   ITGrid,
   ITInputNumber,
@@ -23,6 +22,7 @@ import { PanelCard } from "@shared/ui/panel-card";
 import { ProfileAvatar } from "@shared/ui/profile-avatar";
 import TransferStatusChip from "./TransferStatusChip";
 import { useSuccessToast } from "@app/toast/useSuccessToast";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 const fmt = (n: number) => new Intl.NumberFormat("es-MX", { maximumFractionDigits: 2 }).format(n);
 const fmtDateTime = (iso: string) => new Date(iso).toLocaleString("es-MX");
@@ -311,7 +311,7 @@ export default function TransferDetailView({ id, requestCosign }: Props) {
         )}
       </PanelCard>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirmCancel}
         onClose={() => setConfirmCancel(false)}
         onConfirm={() => void doCancel()}

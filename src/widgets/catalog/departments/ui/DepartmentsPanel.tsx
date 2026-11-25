@@ -1,7 +1,6 @@
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITDialog,
   ITFlex,
   ITInput,
@@ -17,6 +16,7 @@ import {
 } from "@features/department/departments-list";
 import { departmentsApi } from "@entities/department";
 import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 export default function DepartmentsPanel({ openCreateSignal }: { openCreateSignal?: number }) {
   const navigate = useNavigate();
@@ -117,7 +117,7 @@ export default function DepartmentsPanel({ openCreateSignal }: { openCreateSigna
         </ITFlex>
       </ITDialog>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!crud.deptToDelete}
         onClose={() => crud.setDeptToDelete(null)}
         onConfirm={crud.confirmDeleteDept}

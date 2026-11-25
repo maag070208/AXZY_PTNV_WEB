@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITDataTable,
   ITDialog,
   ITFlex,
@@ -32,6 +31,7 @@ import { dyn } from "@shared/i18n/dyn";
 import { LuBedDouble } from "react-icons/lu";
 import { DialogHeader } from "@shared/ui/dialog-header";
 import { DialogFooter } from "@shared/ui/dialog-footer";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 interface FormState {
   number: string;
@@ -389,7 +389,7 @@ export default function RoomsPanel({ newSignal = 0 }: Props) {
         </ITFlex>
       </ITDialog>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!toDisable}
         onClose={() => setToDisable(null)}
         onConfirm={confirmDisable}

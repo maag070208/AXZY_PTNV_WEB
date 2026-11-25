@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ITAlert, ITButton, ITChip, ITConfirmDialog, ITDataTable, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITChip, ITDataTable, ITFlex, ITGrid, ITText } from "@axzydev/axzy_ui_system";
 import type { Column } from "@axzydev/axzy_ui_system";
 import { FaBan, FaBoxes, FaCheck, FaClipboardList, FaExclamationTriangle, FaPaperPlane, FaTruck } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -15,6 +15,7 @@ import { fmt, fmtDate, fmtDateTime } from "../lib";
 import FulfillDialog from "./FulfillDialog";
 import SupplyStatusChip from "./SupplyStatusChip";
 import { useSuccessToast } from "@app/toast/useSuccessToast";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 type Confirm = "cancel" | "confirm" | null;
 type RequestLine = SupplyRequestDetail["lines"][number];
@@ -258,7 +259,7 @@ export default function SupplyRequestDetailView({ id, requestCosign }: Props) {
           setFulfilling(false);
         }}
       />
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirm !== null}
         onClose={() => setConfirm(null)}
         onConfirm={() => void run(() => (confirm === "cancel" ? laundryApi.cancelRequest(id) : laundryApi.confirmRequest(id)))}

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   ITBentoPill,
   ITBentoStatStrip,
-  ITConfirmDialog,
   ITDataTable,
   ITFlex,
   ITInput,
@@ -20,6 +19,7 @@ import { RowAction } from "@shared/ui/row-action";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { emitAppEvent, onAppEvent } from "@shared/lib/appEvents";
 import { dateLocale } from "@shared/i18n";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 type Filter = "all" | "active" | "inactive";
 
@@ -333,7 +333,7 @@ export default function SchedulesBoard() {
         />
       </div>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!toDeactivate}
         onClose={() => setToDeactivate(null)}
         onConfirm={() => void confirmDeactivate()}

@@ -3,7 +3,6 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITConfirmDialog,
   ITDataTable,
   ITDialog,
   ITFlex,
@@ -24,6 +23,7 @@ import {
 import { useRequestKey } from "@shared/lib/useRequestKey";
 import { fileName } from "@shared/i18n";
 import { dyn } from "@shared/i18n/dyn";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 /**
  * Kardex: todos los movimientos con su lote exacto. Exporta a CSV lo que está
@@ -298,7 +298,7 @@ export default function KitchenLedgerPanel() {
         )}
       </ITDialog>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!toReverse}
         onClose={() => {
           if (!saving) setToReverse(null);

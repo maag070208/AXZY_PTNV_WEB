@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITAlert, ITButton, ITConfirmDialog, ITFlex, ITGrid, ITText, ITToast } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITFlex, ITGrid, ITText, ITToast } from "@axzydev/axzy_ui_system";
 import { FaBalanceScale, FaCoins, FaListUl, FaUndo } from "react-icons/fa";
 import { PanelCard } from "@shared/ui/panel-card";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import { useCan } from "@entities/user";
 import { fmtMoney, fmtQty, fmtRate } from "@entities/kitchen";
 import { useInvoice } from "../model/useInvoice";
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 const HEAD = "text-[12px] font-semibold text-slate-400";
 const money = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
@@ -155,7 +156,7 @@ export default function InvoiceDetailPanel({ id }: { id?: string }) {
         </div>
       </PanelCard>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={cancelOpen}
         onClose={() => setCancelOpen(false)}
         onConfirm={() => {

@@ -291,10 +291,23 @@ export const HELP_SCREENS: HelpScreen[] = [
       { label: "¿Cómo creo un horario?", answer: "Usa «Nuevo horario»: Langostín te pregunta nombre, días, horas y reglas, y te muestra el resumen antes de guardar." },
       { label: "Ver horas extra", to: "/schedules/overtime/approval", permission: "overtime.view" },
       { label: "Asignar horario", to: "/schedules/assign", permission: "schedules.view" },
+      { label: "Rol semanal", to: "/schedules/roster", permission: "schedules.view", keywords: "turnos rol semana calendario" },
     ],
     glossary: {
       "Cruza medianoche": "La salida es al día siguiente (turnos nocturnos).",
     },
+  },
+  {
+    screenId: "schedules.roster",
+    title: "Rol semanal",
+    route: "/schedules/roster",
+    explain: "Eliges el turno de cada persona por día de la semana; lo que pongas aquí anula su horario base en esa fecha.",
+    match: (p) => p.startsWith("/schedules/roster"),
+    actions: [
+      { label: "¿Cómo cambio el turno de un día?", answer: "En la celda de la persona y el día elige el turno, «Descanso» o «Horario base» (quita el cambio). Pulsa «Guardar» para aplicar todo junto." },
+      { label: "¿Puedo copiar el rol de la semana pasada?", answer: "Sí: «Copiar semana anterior» trae los turnos de la semana previa a esta." },
+      { label: "Ver horarios", to: "/schedules", permission: "schedules.view" },
+    ],
   },
   {
     screenId: "schedules.assign",

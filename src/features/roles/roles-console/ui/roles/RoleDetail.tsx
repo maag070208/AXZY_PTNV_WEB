@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ITButton, ITCard, ITConfirmDialog, ITDropdownMenu, ITFlex, ITSegmentedControl, ITText } from "@axzydev/axzy_ui_system";
+import { ITButton, ITCard, ITDropdownMenu, ITFlex, ITSegmentedControl, ITText } from "@axzydev/axzy_ui_system";
 import { FaClone, FaLock, FaPen, FaPowerOff, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { isScreenVisibleInGroup, screenLeaves, type RoleAdmin } from "@entities/permission";
@@ -13,6 +13,7 @@ import SidebarPreview from "../shared/SidebarPreview";
 import RoleMembersPanel from "./RoleMembersPanel";
 import RolePermissionsEditor from "./RolePermissionsEditor";
 import RolePoliciesList from "./RolePoliciesList";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 type DetailTab = "permissions" | "members" | "screens" | "policies";
 
@@ -184,7 +185,7 @@ export default function RoleDetail({
         />
       )}
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirm !== null}
         onClose={() => setConfirm(null)}
         onConfirm={runConfirm}

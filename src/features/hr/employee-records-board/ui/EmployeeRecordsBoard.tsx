@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ITAlert, ITConfirmDialog, ITInput, ITToast, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITInput, ITToast, ITText } from "@axzydev/axzy_ui_system";
 import { FaChevronDown, FaRegBell, FaSearch } from "react-icons/fa";
 import { LottieLoader } from "@shared/ui/lottie-loader";
 import { Num } from "@shared/ui/bento-bits";
@@ -7,6 +7,7 @@ import type { RecordFilter, UseEmployeeRecords } from "../model/useEmployeeRecor
 import RecordDetail from "./RecordDetail";
 import RecordRow from "./RecordRow";
 import { NAVY, hairline, recordsGrid } from "./recordStyles";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 const FILTERS: RecordFilter[] = ["ALL", "REQUIRED", "INCOMPLETE", "COMPLETE"];
 const th = "text-[10.5px] font-bold uppercase tracking-[0.05em] text-slate-500";
@@ -222,7 +223,7 @@ export default function EmployeeRecordsBoard({ fx, hideKpis = false }: Props) {
         }}
       />
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={fx.bulkOpen}
         onClose={() => fx.setBulkOpen(false)}
         onConfirm={() => void fx.notifyPending()}

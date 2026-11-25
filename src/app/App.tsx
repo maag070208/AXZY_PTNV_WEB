@@ -16,6 +16,7 @@ import TimeClocksPage from "@pages/access/TimeClocksPage";
 import SchedulesPage from "@pages/schedules/SchedulesPage";
 import ScheduleFormPage from "@pages/schedules/ScheduleFormPage";
 import AssignSchedulesPage from "@pages/schedules/AssignSchedulesPage";
+import ShiftRosterPage from "@pages/schedules/ShiftRosterPage";
 import OvertimeApprovalPage from "@pages/overtime/OvertimeApprovalPage";
 import PayrollPage from "@pages/schedules/PayrollPage";
 import PayrollHistoryPage from "@pages/schedules/PayrollHistoryPage";
@@ -575,6 +576,14 @@ export default function App() {
           element={
             <RequiresPermission permission="schedules.view">
               <AssignSchedulesPage />
+            </RequiresPermission>
+          }
+        />
+        <Route
+          path="/schedules/roster"
+          element={
+            <RequiresPermission permission="schedules.view">
+              <ShiftRosterPage />
             </RequiresPermission>
           }
         />

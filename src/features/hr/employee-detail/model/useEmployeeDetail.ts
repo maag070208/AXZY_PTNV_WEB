@@ -13,6 +13,13 @@ import type {
 import { usersApi, useCan } from "@entities/user";
 import { describeClockSync, timeClockApi } from "@entities/time-clock";
 
+/** Tope de subida: igual a client_max_body_size de nginx y al límite de multer del API. */
+const MAX_UPLOAD_MB = 15;
+const tooLarge = (file: File) =>
+  file.size > MAX_UPLOAD_MB * 1024 * 1024
+    ? i18n.t("employees:detail.fileTooLarge", { size: (file.size / 1024 / 1024).toFixed(1), max: MAX_UPLOAD_MB })
+    : null;
+
 /** Baja o alta en los relojes. Un fallo del reloj no revierte la baja o el alta de la persona en el sistema. */
 const clockSync = async (run: () => Promise<{ results: Parameters<typeof describeClockSync>[0] }>, action: "baja" | "alta") => {
   try {
@@ -70,7 +77,9 @@ export const useEmployeeDetail = (id: string | undefined) => {
 
   const uploadPhoto = async (file: File) => {
     if (!id) return;
-    setError(null);
+    const sizeError = tooLarge(file);
+    setError(sizeError);
+    if (sizeError) return;
     try {
       const { photoUrl } = await personalApi.uploadPhoto(id, file);
       setProfile((p) => (p ? { ...p, photoUrl } : p));
@@ -81,7 +90,9 @@ export const useEmployeeDetail = (id: string | undefined) => {
 
   const uploadDocument = async (documentTypeId: string, file: File): Promise<boolean> => {
     if (!id) return false;
-    setError(null);
+    const sizeError = tooLarge(file);
+    setError(sizeError);
+    if (sizeError) return false;
     try {
       const doc = await personalApi.uploadDocument(id, documentTypeId, file);
       setDocuments((current) => [doc, ...current]);

@@ -6,7 +6,7 @@ import ToastProvider from "@app/toast/ToastProvider";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { HashRouter } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import { NavigationTrailProvider } from "@shared/lib/navigation-trail";
 import App from "./App";
 import "@app/index.css";
@@ -39,16 +39,25 @@ const customTheme: ITThemePalette = {
   },
 };
 
+// Router de datos con una ruta comodín: las <Routes> de App siguen igual y
+// además funciona useBlocker (avisar al salir con cambios sin guardar).
+const router = createHashRouter([
+  {
+    path: "*",
+    element: (
+      <NavigationTrailProvider>
+        <App />
+      </NavigationTrailProvider>
+    ),
+  },
+]);
+
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
       <ITThemeProvider theme={customTheme} showFab={false} density={0.80} appearance="bento">
         <ToastProvider>
-          <HashRouter>
-            <NavigationTrailProvider>
-              <App />
-            </NavigationTrailProvider>
-          </HashRouter>
+          <RouterProvider router={router} />
         </ToastProvider>
       </ITThemeProvider>
     </Provider>

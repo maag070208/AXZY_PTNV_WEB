@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITFlex,
   ITGrid,
   ITText,
@@ -19,6 +18,7 @@ import { usePurchaseOrder } from "../model/usePurchaseOrder";
 import PurchaseOrderStatusBadge from "./PurchaseOrderStatusBadge";
 import PurchaseOrderReceiveDialog from "./PurchaseOrderReceiveDialog";
 import PurchaseOrderEmailDialog from "./PurchaseOrderEmailDialog";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 const HEAD = "text-[12px] font-semibold text-slate-400";
 const money = fmtMoney;
@@ -281,7 +281,7 @@ export default function PurchaseOrderDetailPanel({ id, onDownloadPdf, buildPdf }
         }}
       />
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={cancelOpen}
         onClose={() => setCancelOpen(false)}
         onConfirm={() => {

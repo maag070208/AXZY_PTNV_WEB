@@ -34,6 +34,12 @@ export default function ImportResultCard({ fx, onGoToList }: Props) {
         )}
       </ITFlex>
 
+      {(result.clockEnrollQueued ?? 0) > 0 && (
+        <ITText className="text-[12px] text-slate-500 mb-3">
+          {tt("import.clockEnrollQueued", { count: result.clockEnrollQueued })}
+        </ITText>
+      )}
+
       {result.skipped.length > 0 && (
         <div className="mt-2">
           <ITFlex align="center" gap={2} className="mb-2">

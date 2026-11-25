@@ -1,4 +1,5 @@
 import { AppPage } from "@shared/ui/app-page";
+import { ITButton } from "@axzydev/axzy_ui_system";
 import { FaRegClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -16,6 +17,11 @@ export default function SchedulesPage() {
       title={t("title")}
       description={t("description")}
       icon={<FaRegClock size={20} />}
+      actions={
+        <ITButton variant="outlined" color="secondary" size="sm" onClick={() => navigate("/schedules/roster")}>
+          {t("roster.open")}
+        </ITButton>
+      }
       breadcrumbs={[
         { label: t("common:breadcrumbs.home"), onClick: () => navigate("/") },
         { label: t("title") },

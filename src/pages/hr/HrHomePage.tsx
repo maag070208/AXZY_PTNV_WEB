@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ITAlert, ITButton, ITConfirmDialog, ITFlex, ITText } from "@axzydev/axzy_ui_system";
+import { ITAlert, ITButton, ITFlex, ITText } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
 import { LuCalendarDays, LuChevronLeft, LuChevronRight, LuUserRound } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ import {
 } from "@features/hr/hr-home";
 import { downloadHrReportPdf } from "@widgets/reports";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 /**
  * Inicio de RH: lo pendiente de hoy, las acciones rápidas, el cierre de la
@@ -155,7 +156,7 @@ export default function HrHomePage() {
         onClose={() => setReviewOpen(false)}
         onRequestClose={() => setConfirmClose(true)}
       />
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={confirmClose}
         onClose={() => setConfirmClose(false)}
         onConfirm={() => {

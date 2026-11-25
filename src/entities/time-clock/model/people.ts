@@ -77,6 +77,8 @@ export interface UnifiedPerson {
   employeeNumber: string;
   name: string;
   presentIn: string[];
+  /** Relación con el sistema: vinculada, coincide con un usuario sin vincular o no existe. */
+  system: { status: "LINKED" | "MATCH" | "NONE"; userId?: string; userName?: string };
 }
 
 export interface UnifiedPeople {

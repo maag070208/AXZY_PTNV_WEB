@@ -132,6 +132,7 @@
     "pendingOne": "Pending",
     "uploadFor": "Upload {{type}}",
     "documentUploadError": "Could not upload the document",
+    "fileTooLarge": "The file is {{size}} MB; the maximum is {{max}} MB",
     "documentDeleteError": "Could not delete the document",
     "discountNote": "Note (credit number, amount, case number, etc.)",
     "discountTypes": {

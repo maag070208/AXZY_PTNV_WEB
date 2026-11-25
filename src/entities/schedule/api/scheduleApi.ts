@@ -6,6 +6,9 @@ import type {
   OvertimeResponse,
   PayrollClosureRow,
   PayrollReviewState,
+  RosterEntry,
+  RosterQuery,
+  RosterWeek,
   Schedule,
   ScheduleInput,
   WeeklyAttendanceQuery,
@@ -38,6 +41,14 @@ export const scheduleApi = {
   /** Quita (cierra la vigencia) la asignación de varias personas. */
   removeAssignments: (data: { scheduleId: string; userIds: string[] }) =>
     api.post<{ removed: number }>(`/schedules/assignments/remove`, data),
+
+  // ── Rol semanal: turno por fecha que anula el horario base ───────────────
+
+  rosterQuery: (query: RosterQuery) => api.post<RosterWeek>(`/schedules/roster/query`, query),
+  rosterSave: (entries: RosterEntry[]) =>
+    api.put<{ saved: number; cleared: number }>(`/schedules/roster`, { entries }),
+  rosterCopyWeek: (data: { fromWeekDate: string; toWeekDate: string; userIds?: string[] }) =>
+    api.post<{ copied: number }>(`/schedules/roster/copy-week`, data),
 
   /** Reporte semanal de asistencia de un departamento (RH). */
   weeklyAttendance: (query: WeeklyAttendanceQuery) =>

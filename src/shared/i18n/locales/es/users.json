@@ -280,7 +280,7 @@
   },
   "import": {
     "title": "Cargar usuarios desde Excel",
-    "description": "El archivo debe traer columnas \"Nombre del empleado\", \"Nombre de usuario\" y \"Contraseña\" en la primera hoja. Todos se crean con rol Empleado y sin departamento asignado (lo asignas después en cada uno).",
+    "description": "El archivo debe traer columnas \"Nombre del empleado\", \"Nombre de usuario\" y \"Contraseña\" en la primera hoja; opcionalmente \"Número de empleado\" (si lo traen, se dan de alta también en los relojes). Todos se crean con rol Empleado y sin departamento asignado (lo asignas después en cada uno).",
     "breadcrumb": "Cargar Excel",
     "downloading": "Descargando plantilla…",
     "download": "Descargar plantilla",
@@ -298,6 +298,7 @@
     "resultTitle": "Resultado de la carga",
     "skippedCount": "{{count}} omitido(s)",
     "skippedRows": "Filas omitidas",
+    "clockEnrollQueued": "Se están dando de alta {{count}} personas en los relojes. Revisa la pestaña Personas del Dashboard del reloj para ver el resultado.",
     "skippedRow": "Fila {{row}} ({{username}}): {{reason}}"
   },
   "table": {

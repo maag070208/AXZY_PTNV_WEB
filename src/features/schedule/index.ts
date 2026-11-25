@@ -9,3 +9,4 @@ export { useOvertimeApproval } from "./overtime-approval/model/useOvertimeApprov
 export type { DownloadOvertimePdf } from "./overtime-approval/model/types";
 export { WeeklyAttendancePanel, WeeklyAttendanceFilters, PayrollHistoryPanel, useWeeklyAttendance, usePayrollHistory } from "./weekly-attendance";
 export type { DownloadWeeklyAttendancePdf } from "./weekly-attendance";
+export { ShiftRoster } from "./shift-roster";

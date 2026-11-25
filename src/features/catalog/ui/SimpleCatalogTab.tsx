@@ -3,7 +3,6 @@ import {
   ITAlert,
   ITBadget,
   ITButton,
-  ITConfirmDialog,
   ITDataTable,
   ITDialog,
   ITFlex,
@@ -15,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { makeClientTableFetch } from "@shared/api/clientTable";
 import { CatalogStatStrip } from "@shared/ui/catalog-stat-strip";
 import { RowAction } from "@shared/ui/row-action";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 interface SimpleCatalogTabProps<T extends { id: string; name: string; active: boolean }> {
   list: (includeInactive?: boolean) => Promise<T[]>;
@@ -206,7 +206,7 @@ export default function SimpleCatalogTab<T extends { id: string; name: string; a
         virtualizedMaxHeight={460}
       />
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!toDelete}
         onClose={() => setToDelete(null)}
         onConfirm={confirmDelete}

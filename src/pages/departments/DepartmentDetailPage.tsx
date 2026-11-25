@@ -2,12 +2,11 @@ import { LottieLoader } from "@shared/ui/lottie-loader";
 import {
   ITAlert,
   ITButton,
-  ITConfirmDialog,
   ITDialog,
   ITFlex,
   ITGrid,
   ITInput,
-  ITText
+  ITText,
 } from "@axzydev/axzy_ui_system";
 import { AppPage } from "@shared/ui/app-page";
 import { FaBuilding, FaTrash, FaTrashRestore } from "react-icons/fa";
@@ -20,6 +19,7 @@ import {
   useDepartmentDetail,
 } from "@features/department/department-detail";
 import { useGoBack } from "@shared/lib/useGoBack";
+import { ConfirmDialog } from "@shared/ui/confirm-dialog";
 
 export default function DepartmentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -138,7 +138,7 @@ export default function DepartmentDetailPage() {
         </ITFlex>
       </ITDialog>
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={!!detail.subareaToDelete}
         onClose={() => detail.setSubareaToDelete(null)}
         onConfirm={detail.confirmRemoveSubarea}
@@ -153,7 +153,7 @@ export default function DepartmentDetailPage() {
         variant="danger"
       />
 
-      <ITConfirmDialog
+      <ConfirmDialog
         isOpen={detail.deptToDelete}
         onClose={() => detail.setDeptToDelete(false)}
         onConfirm={detail.confirmDeleteDept}
