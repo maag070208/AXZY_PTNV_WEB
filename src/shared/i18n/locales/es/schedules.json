@@ -299,7 +299,8 @@
       "required": "Indica nombre, entrada y salida.",
       "nameTaken": "Ya existe un horario con ese nombre.",
       "error": "No se pudo crear el turno.",
-      "created": "Turno «{{name}}» creado."
+      "created": "Turno «{{name}}» creado.",
+      "ready": "Turno «{{name}}» listo: ya está elegido para asignarlo."
     },
     "searchPlaceholder": "Nombre o número",
     "undo": "Deshacer",
@@ -380,6 +381,7 @@
       "howShort": "Pasos",
       "errorsShort": "Errores"
     },
-    "restShort": "Desc."
+    "restShort": "Desc.",
+    "customShift": "+ Otro horario (pon la hora)"
   }
 }

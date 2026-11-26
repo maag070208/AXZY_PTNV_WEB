@@ -18,10 +18,12 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onCreated: (schedule: Schedule) => void;
+  /** Turnos activos: si ya hay uno con ese nombre se reutiliza en vez de fallar. */
+  existing?: Schedule[];
 }
 
 /** Alta rápida de un turno: 7 días iguales, sin descansos (el descanso se marca en el rol). */
-export default function NewShiftDialog({ open, onClose, onCreated }: Props) {
+export default function NewShiftDialog({ open, onClose, onCreated, existing = [] }: Props) {
   const { t } = useTranslation("schedules");
   const [start, setStart] = useState("07:00");
   const [end, setEnd] = useState("15:00");
@@ -37,6 +39,11 @@ export default function NewShiftDialog({ open, onClose, onCreated }: Props) {
   const submit = async () => {
     if (!finalName.trim() || !start || !end) {
       setError(t("roster.newShift.required"));
+      return;
+    }
+    const same = existing.find((x) => x.name.trim().toLowerCase() === finalName.trim().toLowerCase());
+    if (same) {
+      onCreated(same);
       return;
     }
     setSaving(true);

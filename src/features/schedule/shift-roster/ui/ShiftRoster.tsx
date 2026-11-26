@@ -44,6 +44,8 @@ export default function ShiftRoster() {
   const canManage = useCan("schedules.manage");
   const fx = useShiftRoster();
   const [newShiftOpen, setNewShiftOpen] = useState(false);
+  /** Turno recién creado/reutilizado para dejarlo elegido en «Asignar en bloque». */
+  const [pickShiftId, setPickShiftId] = useState<string | null>(null);
   const [tab, setTab] = useState<"bulk" | "grid">("grid");
   const [helpOpen, setHelpOpen] = useState(false);
   const [copyConfirm, setCopyConfirm] = useState(false);
@@ -307,6 +309,8 @@ export default function ShiftRoster() {
           people={fx.visiblePeople}
           tones={tones}
           onApply={fx.stageBulk}
+          onNewShift={canManage ? () => setNewShiftOpen(true) : undefined}
+          pickShiftId={pickShiftId}
         />
       )}
 
@@ -365,6 +369,16 @@ export default function ShiftRoster() {
                 {fx.schedules.map((sc) => chip(sc.id, sc.name, tones.get(sc.id) ?? BASE_TONE))}
                 {chip(REST_VALUE, t("roster.rest"), REST_TONE)}
                 {chip("", t("roster.baseBrush"), BASE_TONE)}
+                {canManage && (
+                  <button
+                    type="button"
+                    onClick={() => setNewShiftOpen(true)}
+                    className="shrink-0 whitespace-nowrap rounded-full border-[1.5px] border-dashed bg-white px-3 py-1.5 text-[14px] font-semibold leading-tight transition hover:brightness-95"
+                    style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+                  >
+                    {t("roster.customShift")}
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -460,11 +474,16 @@ export default function ShiftRoster() {
       <RosterHelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
       <NewShiftDialog
         open={newShiftOpen}
+        existing={fx.schedules}
         onClose={() => setNewShiftOpen(false)}
         onCreated={(s) => {
           setNewShiftOpen(false);
-          fx.setNotice(t("roster.newShift.created", { name: s.name }));
-          void fx.reloadSchedules();
+          fx.setNotice(t("roster.newShift.ready", { name: s.name }));
+          // Queda listo para usarse: pincel en la cuadrícula y turno elegido en el bloque.
+          void fx.reloadSchedules().then(() => {
+            fx.setBrush(s.id);
+            setPickShiftId(s.id);
+          });
         }}
       />
       <ConfirmDialog

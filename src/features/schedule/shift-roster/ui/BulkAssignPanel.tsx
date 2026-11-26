@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ITButton, ITCard, ITInput, ITText } from "@axzydev/axzy_ui_system";
 import { useTranslation } from "react-i18next";
 import type { RosterPerson, Schedule } from "@entities/schedule";
@@ -38,6 +38,10 @@ interface Props {
   tones: Map<string, Tone>;
   /** Escribe las celdas en los cambios pendientes (no guarda). */
   onApply: (userIds: string[], days: string[], value: string) => void;
+  /** Abre el alta de un turno con horario propio. */
+  onNewShift?: () => void;
+  /** Turno recién creado: se deja elegido en el paso 1. */
+  pickShiftId?: string | null;
 }
 
 function StepTitle({ n, title, help }: { n: number; title: string; help: string }) {
@@ -60,7 +64,7 @@ function StepTitle({ n, title, help }: { n: number; title: string; help: string 
  * escribe en los cambios pendientes del rol (un paso de deshacer); se guarda
  * desde la cuadrícula.
  */
-export default function BulkAssignPanel({ days, schedules, people, tones, onApply }: Props) {
+export default function BulkAssignPanel({ days, schedules, people, tones, onApply, onNewShift, pickShiftId }: Props) {
   const { t } = useTranslation("schedules");
   /** null = sin elegir; "" = horario base; REST_VALUE = descanso; id = turno. */
   const [shift, setShift] = useState<string | null>(null);
@@ -68,6 +72,10 @@ export default function BulkAssignPanel({ days, schedules, people, tones, onAppl
   const [pickedPeople, setPickedPeople] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (pickShiftId) setShift(pickShiftId);
+  }, [pickShiftId]);
 
   const shown = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -138,6 +146,16 @@ export default function BulkAssignPanel({ days, schedules, people, tones, onAppl
             {schedules.map((s) => shiftChip(s.id, s.name, tones.get(s.id) ?? BASE_TONE))}
             {shiftChip(REST_VALUE, t("roster.rest"), REST_TONE)}
             {shiftChip("", t("roster.baseBrush"), BASE_TONE)}
+            {onNewShift && (
+              <button
+                type="button"
+                onClick={onNewShift}
+                className="rounded-full border-[1.5px] border-dashed px-3 py-1.5 text-[14px] font-semibold leading-tight transition hover:brightness-95"
+                style={{ borderColor: PRIMARY, color: PRIMARY, background: "#ffffff" }}
+              >
+                {t("roster.customShift")}
+              </button>
+            )}
           </div>
         </div>
 

@@ -299,7 +299,8 @@
       "required": "Enter a name, start and end.",
       "nameTaken": "A schedule with that name already exists.",
       "error": "Could not create the shift.",
-      "created": "Shift \"{{name}}\" created."
+      "created": "Shift \"{{name}}\" created.",
+      "ready": "Shift “{{name}}” ready: it's selected so you can assign it."
     },
     "searchPlaceholder": "Name or number",
     "undo": "Undo",
@@ -380,6 +381,7 @@
       "howShort": "Steps",
       "errorsShort": "Mistakes"
     },
-    "restShort": "Off"
+    "restShort": "Off",
+    "customShift": "+ Other hours (set the time)"
   }
 }
