@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { dyn, i18n } from "@shared/i18n";
 import { useParams } from "react-router-dom";
-import { isStaffRole, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
+import { isStaffRole, useCan, useRolesCatalog, usersApi, type User, type UserRole } from "@entities/user";
 import { departmentsApi, type Department } from "@entities/department";
 import { personalApi, type DocumentType } from "@entities/hr";
 import { validateEmail } from "@shared/validation";
@@ -112,6 +112,9 @@ const suggestUsername = (name: string, paternal: string): string => {
   return first && last ? `${first}.${last}` : "";
 };
 
+/** Contraseña inicial de las altas hechas sin permiso `roles.manage` (el usuario la cambia al entrar). */
+export const INITIAL_PASSWORD = "123456";
+
 /** Datos que no pueden repetirse entre usuarios. */
 export type UniqueField = "username" | "email" | "employeeNumber";
 export type UniqueState = "idle" | "checking" | "available" | "taken";
@@ -139,6 +142,8 @@ export type SubmitResult = { ok: true } | { ok: false; step: number | null; fiel
  * lista, fuera de esa ruta.
  */
 export const useUserForm = (userId?: string) => {
+  // Sin `roles.manage` no se ve ni se captura el acceso (usuario, contraseña, roles).
+  const canManageAccess = useCan("roles.manage");
   const { id: routeId } = useParams<{ id: string }>();
   const id = userId ?? routeId;
   const isEdit = Boolean(id);
@@ -268,7 +273,7 @@ export const useUserForm = (userId?: string) => {
       const next = { ...f, [field]: value };
       if ((field === "name" || field === "paternalSurname") && !usernameTouched.current && !isEdit) {
         next.username = suggestUsername(next.name, next.paternalSurname);
-        if (next.username) checkUnique("username", next.username, 450);
+        if (next.username && canManageAccess) checkUnique("username", next.username, 450);
       }
       return next;
     });
@@ -367,12 +372,13 @@ export const useUserForm = (userId?: string) => {
 
   /** Paso del formulario en el que vive un campo (solo cuentan los pasos que se muestran). */
   const stepOfField = (field: keyof UserFormValues): number =>
-    field === "username" || field === "password" ? (editsPerson ? 1 : 0) : 0;
+    canManageAccess && (field === "username" || field === "password") ? (editsPerson ? 1 : 0) : 0;
 
   /** Valida los campos y devuelve los errores por campo (vacío si todo está bien). */
   const validate = (): Record<string, string> => {
     const e: Record<string, string> = {};
     for (const field of VALIDATED_FIELDS) {
+      if (!canManageAccess && (field === "username" || field === "password")) continue;
       // Los campos que se editan en el expediente no se validan aquí: si algo
       // viniera mal del respaldo, el usuario no tendría dónde verlo ni corregirlo.
       if (!editsPerson && RECORD_FIELDS.includes(field)) continue;
@@ -395,7 +401,7 @@ export const useUserForm = (userId?: string) => {
     );
     const invalidSteps = [
       ...fieldErrors.map(stepOfField),
-      ...(docsMissing ? [editsPerson ? 3 : 2] : []),
+      ...(docsMissing ? [(editsPerson ? 3 : 2) - (canManageAccess ? 0 : 1)] : []),
     ];
     if (invalidSteps.length > 0) return { ok: false, step: Math.min(...invalidSteps), field: fieldErrors[0] };
 
@@ -406,7 +412,7 @@ export const useUserForm = (userId?: string) => {
         // Con expediente, la identidad y los datos laborales los guarda el
         // expediente: aquí no se mandan para no pisarlos desde dos lugares.
         await usersApi.update(id!, {
-          username: form.username,
+          ...(canManageAccess ? { username: form.username } : {}),
           ...(editsPerson
             ? {
                 email: form.email || null,
@@ -416,8 +422,7 @@ export const useUserForm = (userId?: string) => {
                 maternalSurname: form.maternalSurname || null,
               }
             : {}),
-          role: form.role,
-          roles: form.roles.filter((r) => r !== form.role),
+          ...(canManageAccess ? { role: form.role, roles: form.roles.filter((r) => r !== form.role) } : {}),
           employeeNumber: form.employeeNumber || undefined,
           jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
@@ -427,13 +432,13 @@ export const useUserForm = (userId?: string) => {
         const created = await usersApi.create({
           username: form.username,
           email: form.email || undefined,
-          password: form.password,
+          password: canManageAccess ? form.password : INITIAL_PASSWORD,
           name: firstName,
           middleName: form.middleName || undefined,
           paternalSurname: form.paternalSurname || undefined,
           maternalSurname: form.maternalSurname || undefined,
-          role: form.role,
-          roles: form.roles.filter((r) => r !== form.role),
+          // Sin `roles.manage` se omiten: la API fuerza EMPLOYEE sin roles extra.
+          ...(canManageAccess ? { role: form.role, roles: form.roles.filter((r) => r !== form.role) } : {}),
           employeeNumber: form.employeeNumber || undefined,
           jobTitle: form.jobTitle || undefined,
           departmentId: form.departmentId || undefined,
@@ -454,7 +459,8 @@ export const useUserForm = (userId?: string) => {
         const results = created.clockSync?.results ?? [];
         const clockMessage = describeClockSync(results.filter((r) => r.serial), "alta");
         const clockOk = results.every((r) => r.ok);
-        const saved = i18n.t("users:form.created");
+        // La API puede sufijar el usuario (juan.perez2); se muestra el definitivo.
+        const saved = `${i18n.t("users:form.created")} (${i18n.t("users:form.createdUsername", { username: created.username })})`;
         dispatch(
           showToast({
             message: clockMessage ? `${saved} · ${clockMessage}` : clockOk ? saved : `${saved} · ${i18n.t("time-clock:clockSync.altaRequestFailed")}`,
@@ -483,7 +489,7 @@ export const useUserForm = (userId?: string) => {
   };
 
   const canSubmit =
-    !!form.username && !!form.name && (isEdit || !!form.password);
+    !!form.name && (!canManageAccess || (!!form.username && (isEdit || !!form.password)));
 
   /**
    * ¿La cuenta tiene expediente de personal? Lo tiene si alguno de sus roles es
@@ -523,6 +529,7 @@ export const useUserForm = (userId?: string) => {
     setError,
     handleSubmit,
     canSubmit,
+    canManageAccess,
     // Documentación del alta
     requiresDocs,
     requiredDocs,

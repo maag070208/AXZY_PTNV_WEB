@@ -33,6 +33,7 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
   const canSeeRecords = useCan("hr.records");
   const reduced = usePrefersReducedMotion();
   const userForm = useUserForm(userId ?? undefined);
+  const canManageAccess = useCan("roles.manage");
   const { editsPerson, hasRecord, loading } = userForm;
 
   // Al cambiar de usuario se limpia el estado de la corrida anterior.
@@ -117,6 +118,8 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
           />
           </section>
         )}
+        {/* Acceso (usuario, contraseña, roles): solo quien tiene roles.manage. */}
+        {canManageAccess && (
         <section>
         <ITText as="h3" className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionAccess")}</ITText>
         <UserFormFields
@@ -135,6 +138,7 @@ export default function UserEditDialog({ userId, onClose, onSaved }: Props) {
           onToggleExtraRole={userForm.toggleExtraRole}
         />
         </section>
+        )}
         <section>
         <ITText as="h3" className="m-0 mb-3 !text-[14px] font-bold !text-slate-700">{tt("form.sectionOrganization")}</ITText>
         <UserFormFields

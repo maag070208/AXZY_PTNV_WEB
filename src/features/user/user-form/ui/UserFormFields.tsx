@@ -43,6 +43,8 @@ interface Props {
   step: "personal" | "access" | "org" | "docs";
   uniqueness?: Record<UniqueField, UniqueState>;
   isEdit: boolean;
+  /** Nota de solo lectura cuando el alta no captura acceso (sin `roles.manage`). */
+  accessNote?: string;
   /**
    * ¿Se editan aquí los datos de la persona (nombre, apellidos, correo, nº de
    * empleado y puesto)? `false` cuando la cuenta tiene expediente: esos campos
@@ -73,6 +75,7 @@ export default function UserFormFields({
   step,
   uniqueness,
   isEdit,
+  accessNote,
   personFields = true,
   form,
   errors,
@@ -188,6 +191,7 @@ export default function UserFormFields({
               <ITSearchSelect name="u_sub" label={tt("form.subarea")} options={(selectedDept?.subareas ?? []).map((s) => ({ value: s.id, label: s.name }))} value={form.subareaId} onChange={(value) => onFieldChange("subareaId", String(value))} />
             </ITGrid>
           </ITGrid>
+          {accessNote && <ITText className="mt-3 text-[12px] text-slate-500">{accessNote}</ITText>}
         </>
       )}
 

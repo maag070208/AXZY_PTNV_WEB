@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import {
   UserFormFields,
   useUserForm,
+  INITIAL_PASSWORD,
 } from "@features/user/user-form";
 import { useGoBack } from "@shared/lib/useGoBack";
 import { FormSection } from "@shared/ui/form-section";
@@ -80,6 +81,10 @@ export default function UserFormPage() {
 
   const fieldsProps = {
     isEdit,
+    accessNote:
+      !isEdit && !userForm.canManageAccess
+        ? tt("form.accessAutoNote", { username: userForm.form.username.trim() || tt("form.accessAutoPending"), password: INITIAL_PASSWORD })
+        : undefined,
     personFields: true,
     form: userForm.form,
     errors: userForm.errors,
@@ -123,13 +128,17 @@ export default function UserFormPage() {
       complete: !!f.name.trim() && !!f.paternalSurname.trim() && !!f.email.trim() && !!f.employeeNumber.trim() && !hasErrors,
       content: <UserFormFields step="personal" {...fieldsProps} />,
     },
-    {
-      label: tt("form.sectionAccess"),
-      description: tt("form.sectionAccessHint"),
-      icon: <LuShieldCheck size={15} />,
-      complete: !!f.username.trim() && (isEdit || !!f.password) && !!f.role && !hasErrors,
-      content: <UserFormFields step="access" {...fieldsProps} />,
-    },
+    ...(userForm.canManageAccess
+      ? [
+          {
+            label: tt("form.sectionAccess"),
+            description: tt("form.sectionAccessHint"),
+            icon: <LuShieldCheck size={15} />,
+            complete: !!f.username.trim() && (isEdit || !!f.password) && !!f.role && !hasErrors,
+            content: <UserFormFields step="access" {...fieldsProps} />,
+          },
+        ]
+      : []),
     {
       label: tt("form.sectionOrganization"),
       description: tt("form.sectionOrganizationHint"),
@@ -202,8 +211,12 @@ export default function UserFormPage() {
 
         <LiveSummary total={steps.length} done={steps.filter((section) => section.complete).length}>
           <LiveSummaryRow label={tt("form.name")} value={fullName} />
-          <LiveSummaryRow label={tt("form.username")} value={f.username.trim() ? `@${f.username.trim()}` : undefined} />
-          <LiveSummaryRow label={tt("form.role")} value={roleName} />
+          {userForm.canManageAccess && (
+            <>
+              <LiveSummaryRow label={tt("form.username")} value={f.username.trim() ? `@${f.username.trim()}` : undefined} />
+              <LiveSummaryRow label={tt("form.role")} value={roleName} />
+            </>
+          )}
           <LiveSummaryRow label={tt("form.department")} value={departmentName} />
           <LiveSummaryRow label={tt("form.email")} value={f.email.trim()} />
         </LiveSummary>
